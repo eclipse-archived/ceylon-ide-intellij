@@ -1,15 +1,26 @@
 // This is a generated file. Not intended for manual editing.
 package org.intellij.plugins.ceylon.psi.impl;
 
+import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
+import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import org.intellij.plugins.ceylon.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
 
-public class CeylonClassDeclarationImpl extends CeylonCompositeElementImpl implements CeylonClassDeclaration {
+public class CeylonClassDeclarationImpl extends StubBasedPsiElementBase<ClassStub> implements CeylonClassDeclaration {
 
   public CeylonClassDeclarationImpl(ASTNode node) {
     super(node);
+  }
+
+  public CeylonClassDeclarationImpl(ClassStub stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   @Override
@@ -49,9 +60,9 @@ public class CeylonClassDeclarationImpl extends CeylonCompositeElementImpl imple
   }
 
   @Override
-  @NotNull
+  @Nullable
   public CeylonTypeNameDeclaration getTypeNameDeclaration() {
-    return findNotNullChildByClass(CeylonTypeNameDeclaration.class);
+    return findChildByClass(CeylonTypeNameDeclaration.class);
   }
 
   @Override

@@ -2,6 +2,7 @@
 package org.intellij.plugins.ceylon.parser;
 
 import org.jetbrains.annotations.*;
+import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
 import com.intellij.openapi.diagnostic.Logger;
@@ -9,6 +10,7 @@ import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 import static org.intellij.plugins.ceylon.parser.CeylonParserUtil.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
@@ -1933,223 +1935,79 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "class" 
-  //       typeNameDeclaration
-  //       (
-  //         typeParameters 
-  //       )?
-  //       (
-  //         parameters
-  //       )?
-  //       (
-  //         caseTypes
-  //       )?
-  //       /*metatypes?*/ 
-  //       (
-  //         extendedType
-  //       )? 
-  //       (
-  //         satisfiedTypes
-  //       )?
-  //       (
-  //         typeConstraints
-  //       )?
-  //       (
-  //         classBody
-  //       //-> ^("class" typeName classParameters? classBody)
-  //       | 
-  //         (
-  //           typeSpecifier
-  //         )?
-  //         ";"
-  //       //-> ^(CLASS_DECLARATION[$"class"] typeName classParameters? typeSpecifier?)
-  //       )
+  // "class" typeNameDeclaration
+  //         typeParameters? parameters? caseTypes? /*metatypes?*/ extendedType? satisfiedTypes?
+  //         typeConstraints? (classBody | typeSpecifier? ";")
   public static boolean classDeclaration(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration")) return false;
     if (!nextTokenIs(builder_, KW_CLASS)) return false;
     boolean result_ = false;
+    boolean pinned_ = false;
     Marker marker_ = builder_.mark();
+    enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, null);
     result_ = consumeToken(builder_, KW_CLASS);
-    result_ = result_ && typeNameDeclaration(builder_, level_ + 1);
-    result_ = result_ && classDeclaration_2(builder_, level_ + 1);
-    result_ = result_ && classDeclaration_3(builder_, level_ + 1);
-    result_ = result_ && classDeclaration_4(builder_, level_ + 1);
-    result_ = result_ && classDeclaration_5(builder_, level_ + 1);
-    result_ = result_ && classDeclaration_6(builder_, level_ + 1);
-    result_ = result_ && classDeclaration_7(builder_, level_ + 1);
-    result_ = result_ && classDeclaration_8(builder_, level_ + 1);
-    if (result_) {
+    pinned_ = result_; // pin = 1
+    result_ = result_ && report_error_(builder_, typeNameDeclaration(builder_, level_ + 1));
+    result_ = pinned_ && report_error_(builder_, classDeclaration_2(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, classDeclaration_3(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, classDeclaration_4(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, classDeclaration_5(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, classDeclaration_6(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, classDeclaration_7(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && classDeclaration_8(builder_, level_ + 1) && result_;
+    if (result_ || pinned_) {
       marker_.done(CLASS_DECLARATION);
     }
     else {
       marker_.rollbackTo();
     }
-    return result_;
+    result_ = exitErrorRecordingSection(builder_, level_, result_, pinned_, _SECTION_GENERAL_, null);
+    return result_ || pinned_;
   }
 
-  // (
-  //         typeParameters 
-  //       )?
+  // typeParameters?
   private static boolean classDeclaration_2(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_2")) return false;
-    classDeclaration_2_0(builder_, level_ + 1);
+    typeParameters(builder_, level_ + 1);
     return true;
   }
 
-  // (
-  //         typeParameters 
-  //       )
-  private static boolean classDeclaration_2_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "classDeclaration_2_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = typeParameters(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
-  }
-
-  // (
-  //         parameters
-  //       )?
+  // parameters?
   private static boolean classDeclaration_3(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_3")) return false;
-    classDeclaration_3_0(builder_, level_ + 1);
+    parameters(builder_, level_ + 1);
     return true;
   }
 
-  // (
-  //         parameters
-  //       )
-  private static boolean classDeclaration_3_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "classDeclaration_3_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = parameters(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
-  }
-
-  // (
-  //         caseTypes
-  //       )?
+  // caseTypes?
   private static boolean classDeclaration_4(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_4")) return false;
-    classDeclaration_4_0(builder_, level_ + 1);
+    caseTypes(builder_, level_ + 1);
     return true;
   }
 
-  // (
-  //         caseTypes
-  //       )
-  private static boolean classDeclaration_4_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "classDeclaration_4_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = caseTypes(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
-  }
-
-  // (
-  //         extendedType
-  //       )?
+  // extendedType?
   private static boolean classDeclaration_5(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_5")) return false;
-    classDeclaration_5_0(builder_, level_ + 1);
+    extendedType(builder_, level_ + 1);
     return true;
   }
 
-  // (
-  //         extendedType
-  //       )
-  private static boolean classDeclaration_5_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "classDeclaration_5_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = extendedType(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
-  }
-
-  // (
-  //         satisfiedTypes
-  //       )?
+  // satisfiedTypes?
   private static boolean classDeclaration_6(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_6")) return false;
-    classDeclaration_6_0(builder_, level_ + 1);
+    satisfiedTypes(builder_, level_ + 1);
     return true;
   }
 
-  // (
-  //         satisfiedTypes
-  //       )
-  private static boolean classDeclaration_6_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "classDeclaration_6_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = satisfiedTypes(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
-  }
-
-  // (
-  //         typeConstraints
-  //       )?
+  // typeConstraints?
   private static boolean classDeclaration_7(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_7")) return false;
-    classDeclaration_7_0(builder_, level_ + 1);
+    typeConstraints(builder_, level_ + 1);
     return true;
   }
 
-  // (
-  //         typeConstraints
-  //       )
-  private static boolean classDeclaration_7_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "classDeclaration_7_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = typeConstraints(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
-  }
-
-  // classBody
-  //       //-> ^("class" typeName classParameters? classBody)
-  //       | 
-  //         (
-  //           typeSpecifier
-  //         )?
-  //         ";"
+  // classBody | typeSpecifier? ";"
   private static boolean classDeclaration_8(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_8")) return false;
     boolean result_ = false;
@@ -2165,10 +2023,7 @@ public class CeylonParser implements PsiParser {
     return result_;
   }
 
-  // (
-  //           typeSpecifier
-  //         )?
-  //         ";"
+  // typeSpecifier? ";"
   private static boolean classDeclaration_8_1(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_8_1")) return false;
     boolean result_ = false;
@@ -2184,30 +2039,11 @@ public class CeylonParser implements PsiParser {
     return result_;
   }
 
-  // (
-  //           typeSpecifier
-  //         )?
+  // typeSpecifier?
   private static boolean classDeclaration_8_1_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "classDeclaration_8_1_0")) return false;
-    classDeclaration_8_1_0_0(builder_, level_ + 1);
+    typeSpecifier(builder_, level_ + 1);
     return true;
-  }
-
-  // (
-  //           typeSpecifier
-  //         )
-  private static boolean classDeclaration_8_1_0_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "classDeclaration_8_1_0_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = typeSpecifier(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
   }
 
   /* ********************************************************** */

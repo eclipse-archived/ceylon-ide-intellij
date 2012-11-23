@@ -372,52 +372,13 @@ interfaceDeclaration
       //-> ^(INTERFACE_DECLARATION[$"interface"] typeName interfaceParameters? typeSpecifier?)
       )
 
-classDeclaration 
-
-   ::="class" 
-
-      typeNameDeclaration
-
-      (
-        typeParameters 
-
-      )?
-      (
-        parameters
-
-      )?
-      (
-        caseTypes
-
-      )?
-      /*metatypes?*/ 
-      (
-        extendedType
-
-      )? 
-      (
-        satisfiedTypes
-
-      )?
-      (
-        typeConstraints
-
-      )?
-      (
-
-        classBody
-
-      //-> ^("class" typeName classParameters? classBody)
-      | 
-        (
-          typeSpecifier
-
-        )?
-
-        ";"
-
-      //-> ^(CLASS_DECLARATION[$"class"] typeName classParameters? typeSpecifier?)
-      )
+classDeclaration  ::= "class" typeNameDeclaration
+        typeParameters? parameters? caseTypes? /*metatypes?*/ extendedType? satisfiedTypes?
+        typeConstraints? (classBody | typeSpecifier? ";") {
+    pin=1
+    stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
+    elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
+}
 
 aliasDeclaration 
    ::="alias"

@@ -4,6 +4,7 @@ package org.intellij.plugins.ceylon.psi;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
+import org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType;
 import org.intellij.plugins.ceylon.psi.impl.*;
 
 public interface CeylonTypes {
@@ -35,7 +36,7 @@ public interface CeylonTypes {
   IElementType CATCH_BLOCK = new CeylonElementType("CATCH_BLOCK");
   IElementType CATCH_VARIABLE = new CeylonElementType("CATCH_VARIABLE");
   IElementType CLASS_BODY = new CeylonElementType("CLASS_BODY");
-  IElementType CLASS_DECLARATION = new CeylonElementType("CLASS_DECLARATION");
+  IElementType CLASS_DECLARATION = new ClassElementType("CLASS_DECLARATION");
   IElementType COMPARABLE_TYPE = new CeylonElementType("COMPARABLE_TYPE");
   IElementType COMPARISON_EXPRESSION = new CeylonElementType("COMPARISON_EXPRESSION");
   IElementType COMPARISON_OPERATOR = new CeylonElementType("COMPARISON_OPERATOR");

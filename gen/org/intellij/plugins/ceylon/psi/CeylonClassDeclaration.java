@@ -1,9 +1,13 @@
 // This is a generated file. Not intended for manual editing.
 package org.intellij.plugins.ceylon.psi;
 
+import java.util.List;
 import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+import org.intellij.plugins.ceylon.psi.stub.ClassStub;
+import com.intellij.psi.StubBasedPsiElement;
 
-public interface CeylonClassDeclaration extends CeylonCompositeElement {
+public interface CeylonClassDeclaration extends CeylonCompositeElement, StubBasedPsiElement<ClassStub> {
 
   @Nullable
   CeylonCaseTypes getCaseTypes();
@@ -23,7 +27,7 @@ public interface CeylonClassDeclaration extends CeylonCompositeElement {
   @Nullable
   CeylonTypeConstraints getTypeConstraints();
 
-  @NotNull
+  @Nullable
   CeylonTypeNameDeclaration getTypeNameDeclaration();
 
   @Nullable

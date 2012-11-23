@@ -2,6 +2,7 @@
 package org.intellij.plugins.ceylon.psi;
 
 import org.jetbrains.annotations.*;
+import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.PsiElementVisitor;
 
 public class CeylonVisitor extends PsiElementVisitor {
@@ -116,6 +117,7 @@ public class CeylonVisitor extends PsiElementVisitor {
 
   public void visitClassDeclaration(@NotNull CeylonClassDeclaration o) {
     visitCompositeElement(o);
+    // visitStubBasedPsiElement(o);
   }
 
   public void visitComparableType(@NotNull CeylonComparableType o) {
@@ -760,6 +762,10 @@ public class CeylonVisitor extends PsiElementVisitor {
 
   public void visitWhileLoop(@NotNull CeylonWhileLoop o) {
     visitCompositeElement(o);
+  }
+
+  public void visitStubBasedPsiElement(@NotNull StubBasedPsiElement o) {
+    visitElement(o);
   }
 
   public void visitCompositeElement(@NotNull CeylonCompositeElement o) {

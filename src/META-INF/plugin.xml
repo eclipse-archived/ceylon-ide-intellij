@@ -38,5 +38,10 @@
                                        implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
         <highlightVisitor implementation="org.intellij.plugins.ceylon.highlighting.CeylonHighlightVisitor"/>
         <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.editor.CeylonCommenter"/>
+
+        <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>
+        <stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>
+
+        <gotoClassContributor implementation="org.intellij.plugins.ceylon.codeInsight.navigation.CeylonGotoClassContributor"/>
     </extensions>
 </idea-plugin>

@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.psi;
 
 import java.util.List;
 import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
 
 public interface CeylonTypedMethodOrAttributeDeclaration extends CeylonCompositeElement {
 
