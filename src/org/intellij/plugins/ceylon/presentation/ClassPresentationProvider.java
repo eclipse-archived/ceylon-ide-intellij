@@ -3,6 +3,8 @@ package org.intellij.plugins.ceylon.presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.util.PlatformIcons;
+import org.intellij.plugins.ceylon.psi.CeylonClassDeclaration;
+import org.intellij.plugins.ceylon.psi.CeylonInterfaceDeclaration;
 import org.intellij.plugins.ceylon.psi.CeylonTypeNameDeclaration;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +30,13 @@ public class ClassPresentationProvider implements ItemPresentationProvider<Ceylo
             @Nullable
             @Override
             public Icon getIcon(boolean unused) {
-                return PlatformIcons.CLASS_ICON;
+                if (item.getParent() instanceof CeylonClassDeclaration) {
+                    return PlatformIcons.CLASS_ICON;
+                } else if (item.getParent() instanceof CeylonInterfaceDeclaration) {
+                    return PlatformIcons.INTERFACE_ICON;
+                }
+
+                return PlatformIcons.ERROR_INTRODUCTION_ICON;
             }
         };
     }

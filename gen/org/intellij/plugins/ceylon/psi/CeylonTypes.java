@@ -105,7 +105,7 @@ public interface CeylonTypes {
   IElementType INFERRED_GETTER_ARGUMENT = new CeylonElementType("INFERRED_GETTER_ARGUMENT");
   IElementType INITIALIZER = new CeylonElementType("INITIALIZER");
   IElementType INTERFACE_BODY = new CeylonElementType("INTERFACE_BODY");
-  IElementType INTERFACE_DECLARATION = new CeylonElementType("INTERFACE_DECLARATION");
+  IElementType INTERFACE_DECLARATION = new ClassElementType("INTERFACE_DECLARATION");
   IElementType INTERSECTION_TYPE = new CeylonElementType("INTERSECTION_TYPE");
   IElementType INTERSECTION_TYPE_EXPRESSION = new CeylonElementType("INTERSECTION_TYPE_EXPRESSION");
   IElementType IS_CASE_CONDITION = new CeylonElementType("IS_CASE_CONDITION");

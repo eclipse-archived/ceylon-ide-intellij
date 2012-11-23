@@ -4562,22 +4562,26 @@ public class CeylonParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "interfaceDeclaration")) return false;
     if (!nextTokenIs(builder_, KW_INTERFACE)) return false;
     boolean result_ = false;
+    boolean pinned_ = false;
     Marker marker_ = builder_.mark();
+    enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, null);
     result_ = consumeToken(builder_, KW_INTERFACE);
-    result_ = result_ && typeNameDeclaration(builder_, level_ + 1);
-    result_ = result_ && interfaceDeclaration_2(builder_, level_ + 1);
-    result_ = result_ && interfaceDeclaration_3(builder_, level_ + 1);
-    result_ = result_ && interfaceDeclaration_4(builder_, level_ + 1);
-    result_ = result_ && interfaceDeclaration_5(builder_, level_ + 1);
-    result_ = result_ && interfaceDeclaration_6(builder_, level_ + 1);
-    result_ = result_ && interfaceDeclaration_7(builder_, level_ + 1);
-    if (result_) {
+    pinned_ = result_; // pin = 1
+    result_ = result_ && report_error_(builder_, typeNameDeclaration(builder_, level_ + 1));
+    result_ = pinned_ && report_error_(builder_, interfaceDeclaration_2(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, interfaceDeclaration_3(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, interfaceDeclaration_4(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, interfaceDeclaration_5(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && report_error_(builder_, interfaceDeclaration_6(builder_, level_ + 1)) && result_;
+    result_ = pinned_ && interfaceDeclaration_7(builder_, level_ + 1) && result_;
+    if (result_ || pinned_) {
       marker_.done(INTERFACE_DECLARATION);
     }
     else {
       marker_.rollbackTo();
     }
-    return result_;
+    result_ = exitErrorRecordingSection(builder_, level_, result_, pinned_, _SECTION_GENERAL_, null);
+    return result_ || pinned_;
   }
 
   // typeParameters?

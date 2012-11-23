@@ -188,7 +188,12 @@ typedMethodOrAttributeDeclaration ::= type memberNameDeclaration
 
 interfaceDeclaration ::= "interface" typeNameDeclaration
         typeParameters? caseTypes? /*metatypes?*/ adaptedTypes? satisfiedTypes?
-        typeConstraints? (interfaceBody | typeSpecifier? ";")
+        typeConstraints? (interfaceBody | typeSpecifier? ";") {
+     pin=1
+     stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
+     elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
+     implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
+}
 
 classDeclaration  ::= "class" typeNameDeclaration
         typeParameters? parameters? caseTypes? /*metatypes?*/ extendedType? satisfiedTypes?
@@ -196,6 +201,7 @@ classDeclaration  ::= "class" typeNameDeclaration
     pin=1
     stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
     elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
+    implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
 }
 
 aliasDeclaration ::= "alias" typeNameDeclaration typeParameters? typeConstraints? typeSpecifier? ";"

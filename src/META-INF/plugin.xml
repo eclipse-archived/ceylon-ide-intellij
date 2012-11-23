@@ -10,6 +10,7 @@
         Version 0.1:
         * Basic parser
         * Syntax highlighting
+        * Go to class/interface
     </change-notes>
 
     <idea-version since-build="123.4"/>
@@ -31,11 +32,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="org.intellij.plugins.ceylon.CeylonFileTypeFactory"/>
-        <lang.parserDefinition language="Ceylon"
-                               implementationClass="org.intellij.plugins.ceylon.parser.CeylonParserDefinition"/>
+        <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.parser.CeylonParserDefinition"/>
 
-        <lang.syntaxHighlighterFactory key="Ceylon"
-                                       implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory key="Ceylon" implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
         <highlightVisitor implementation="org.intellij.plugins.ceylon.highlighting.CeylonHighlightVisitor"/>
         <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.editor.CeylonCommenter"/>
 
