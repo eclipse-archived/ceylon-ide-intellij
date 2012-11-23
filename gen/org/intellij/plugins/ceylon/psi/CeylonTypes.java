@@ -215,7 +215,7 @@ public interface CeylonTypes {
   IElementType KW_EXTENDS = new CeylonTokenType("extends");
   IElementType KW_FINALLY = new CeylonTokenType("finally");
   IElementType KW_FOR = new CeylonTokenType("for");
-  IElementType KW_FUNCTION = new CeylonTokenType("Function");
+  IElementType KW_FUNCTION = new CeylonTokenType("function");
   IElementType KW_GIVEN = new CeylonTokenType("given");
   IElementType KW_IF = new CeylonTokenType("if");
   IElementType KW_IMPORT = new CeylonTokenType("import");

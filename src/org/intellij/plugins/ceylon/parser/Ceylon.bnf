@@ -82,7 +82,7 @@
         KW_VALUE="value"
         KW_ASSIGN="assign"
         KW_VOID="void"
-        KW_FUNCTION="Function"
+        KW_FUNCTION="function"
         KW_OF="of"
         KW_EXTENDS="extends"
         KW_SATISFIES="satisfies"
@@ -143,7 +143,7 @@ importModuleList ::= "{" (compilerAnnotations annotations importModule)* "}"
 
 packageDescriptor ::= "package" packagePath ";"
 
-importModule ::="import" (QUOTED_LITERAL | packagePath) QUOTED_LITERAL ";"
+importModule ::= "import" (QUOTED_LITERAL | packagePath) QUOTED_LITERAL ";"
 
 importList  ::=  importDeclaration+
 
@@ -151,226 +151,44 @@ importDeclaration ::= "import" (packagePath) importElementList
 
 importElementList ::= "{" (importElement ( "," (importElement | importWildcard))* | importWildcard )? "}"
 
-importElement ::=compilerAnnotations importName ("=" importName)? importElementList?
+importElement ::= compilerAnnotations importName ("=" importName)? importElementList?
 
-importWildcard  ::="..."
+importWildcard ::= "..."
 
-importName ::=memberName | typeName
+importName ::= memberName | typeName
 
-packagePath ::=packageName ("." packageName)*
+packagePath ::= packageName ("." packageName)*
 
-packageName ::=LIDENTIFIER | UIDENTIFIER
+packageName ::= LIDENTIFIER | UIDENTIFIER
 
-typeName ::=UIDENTIFIER
+typeName ::= UIDENTIFIER
 
 annotationName ::= ("shared" | LIDENTIFIER)
 
-memberName ::=LIDENTIFIER
+memberName ::= LIDENTIFIER
 
-memberNameDeclaration ::=memberName | typeName
+memberNameDeclaration ::= memberName | typeName
 
-typeNameDeclaration 
-   ::=typeName 
-    | 
-      memberName 
+typeNameDeclaration ::= typeName | memberName
 
-objectDeclaration 
-   ::="object"
+objectDeclaration ::= "object" memberNameDeclaration extendedType? satisfiedTypes? (classBody | ";")
 
-      memberNameDeclaration
+voidOrInferredMethodDeclaration ::= ("void" | "function") memberNameDeclaration typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
 
-      ( 
-        extendedType
+setterDeclaration ::= "assign" memberNameDeclaration (block | ";")
 
-      )?
-      ( 
-        satisfiedTypes
+inferredAttributeDeclaration ::= "value" memberNameDeclaration ((specifier | initializer)? ";" | block)
 
-      )?
-      (
-        classBody
+typedMethodOrAttributeDeclaration ::= type memberNameDeclaration
+    (
+        typeParameters? parameters+ /*metatypes?*/ typeConstraints? (block | specifier? ";")
+      | (specifier | initializer)? ";"
+      | block
+    )
 
-      | 
-        ";"
-
-      )
-    //-> ^("object" "value" memberName extendedType? satisfiedTypes? classBody?) 
-
-voidOrInferredMethodDeclaration 
-
-   ::=(
-        "void"
-
-      | "function"
-
-      )
-      memberNameDeclaration
-
-      (
-        typeParameters
-
-      )?
-      (
-        parameters
-
-      )*
-      //metatypes? 
-      (
-        typeConstraints
-
-      )?
-      ( 
-
-        block 
-
-      //-> ^(METHOD_DEFINITION "void" memberName methodParameters? block)   
-      | 
-        (
-          specifier
-
-        )?
-
-        ";"
-
-      //-> ^(METHOD_DECLARATION "void" memberName methodParameters? specifier?)   
-      )
-
-setterDeclaration 
-   ::="assign" 
-
-      memberNameDeclaration 
-
-      ( 
-        block
-
-      | 
-        ";"
-
-      )
-    //-> ^(ATTRIBUTE_SETTER_DEFINITION[$"assign"] "void" memberName block)
-
-inferredAttributeDeclaration 
-
-   ::="value" 
-
-      memberNameDeclaration
-
-      ( 
-        (
-          specifier 
-
-        | 
-          initializer
-
-        )?
-
-        ";"
-
-        //-> ^(ATTRIBUTE_DECLARATION "value" memberName specifier? initializer?)
-      | 
-
-        block
-
-        //-> ^(ATTRIBUTE_GETTER_DEFINITION "value" memberName block)
-      )
-
-typedMethodOrAttributeDeclaration 
-
-   ::=type
-
-      memberNameDeclaration
-
-      ( 
-
-        (
-          typeParameters
-
-        )?
-        (
-          parameters
-
-        )+
-        //metatypes? 
-        ( 
-          typeConstraints
-
-        )?
-        ( 
-
-          block
-
-        //-> ^(METHOD_DEFINITION unionType memberName methodParameters memberBody)
-        | 
-          (
-            specifier
-
-          )?
-
-          ";"
-
-        //-> ^(METHOD_DECLARATION unionType memberName methodParameters specifier?)
-        )
-      | 
-        (
-          specifier 
-
-        | 
-          initializer
-
-        )?
-
-        ";"
-
-      //-> ^(ATTRIBUTE_DECLARATION unionType memberName specifier? initializer?)
-      | 
-
-        block
-
-      //-> ^(ATTRIBUTE_GETTER_DEFINITION unionType memberName memberBody)      
-      )
-
-interfaceDeclaration 
-
-   ::="interface"
-
-      typeNameDeclaration 
-
-      (
-        typeParameters 
-
-      )?
-      (
-        caseTypes
-
-      )?
-      /*metatypes?*/ 
-      (
-        adaptedTypes
-
-      )?
-      (
-        satisfiedTypes
-
-      )?
-      (
-        typeConstraints
-
-      )?
-      (
-
-        interfaceBody
-
-      //-> ^("interface" typeName interfaceParameters? interfaceBody)
-      | 
-        (
-          typeSpecifier
-
-        )? 
-
-        ";"
-
-      //-> ^(INTERFACE_DECLARATION[$"interface"] typeName interfaceParameters? typeSpecifier?)
-      )
+interfaceDeclaration ::= "interface" typeNameDeclaration
+        typeParameters? caseTypes? /*metatypes?*/ adaptedTypes? satisfiedTypes?
+        typeConstraints? (interfaceBody | typeSpecifier? ";")
 
 classDeclaration  ::= "class" typeNameDeclaration
         typeParameters? parameters? caseTypes? /*metatypes?*/ extendedType? satisfiedTypes?
@@ -380,159 +198,31 @@ classDeclaration  ::= "class" typeNameDeclaration
     elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
 }
 
-aliasDeclaration 
-   ::="alias"
+aliasDeclaration ::= "alias" typeNameDeclaration typeParameters? typeConstraints? typeSpecifier? ";"
 
-      typeNameDeclaration 
+assertion ::= ASSERT conditions ";"
 
-      (
-        typeParameters 
-
-      )?
-      (
-        typeConstraints
-
-      )?
-      (
-        typeSpecifier
-
-      )?
-
-      ";"
-
-assertion 
-   ::=
-      ASSERT
-
-      conditions
-
-      ";"
-
-      /*{ ValueModifier fm = new ValueModifier($ASSERT);
-        dec = new AttributeDeclaration($ASSERT);
-        dec.setType(fm);
-        $declaration = dec; }
-      memberNameDeclaration
-      { dec.setIdentifier($memberNameDeclaration.identifier); 
-        def.setIdentifier($memberNameDeclaration.identifier); }
-          specifier 
-          { dec.setSpecifierOrInitializerExpression($specifier.specifierExpression); }
-        { expecting=";"; }
-        ";"
-        { $declaration.setEndToken($";"); 
-          expecting=-1; }
-        //-> ^(ATTRIBUTE_DECLARATION "value" memberName specifier? initializer?)*/
-
-block 
-   ::="{" 
-
-      (
-        declarationOrStatement
-
-      )*
-      "}"
-
-    //-> ^(BLOCK[$"{"] annotatedDeclarationOrStatement*)
+block ::="{" declarationOrStatement* "}"
 
 //Note: interface bodies can't really contain 
 //      statements, but error recovery works
 //      much better if we validate that later
 //      on, instead of doing it in the parser.
-interfaceBody 
-   ::="{" 
+interfaceBody ::= "{" declarationOrStatement* "}"
 
-      (
-        declarationOrStatement
+classBody ::= "{" declarationOrStatement* "}"
 
-      )*
-      "}"
+extendedType ::= "extends" (qualifiedType | "super" "." typeReference) positionalArguments // TODO "positionalArguments?"
 
-    //-> ^(INTERFACE_BODY[$"{"] annotatedDeclarationOrStatement2*)
+satisfiedTypes ::= "satisfies" qualifiedType ("&" qualifiedType)*
 
-classBody 
-   ::="{"
+abstractedType ::= "abstracts" qualifiedType
 
-      (
-        declarationOrStatement
+adaptedTypes ::= "adapts" qualifiedType ("&" qualifiedType)*
 
-      )*
-      "}"
+caseTypes ::= "of" caseType ("|" caseType)*
 
-    //-> ^(CLASS_BODY[$"{"] annotatedDeclarationOrStatement2*)
-
-extendedType 
-   ::="extends"
-
-      (
-        qualifiedType
-
-        //-> ^(EXTENDED_TYPE[$"extends"] type ^(INVOCATION_EXPRESSION ^(EXTENDED_TYPE_EXPRESSION) positionalArguments))
-      | "super" "." 
-        typeReference 
-
-        //-> ^(EXTENDED_TYPE[$"extends"] ^(QUALIFIED_TYPE "super"_TYPE[$"super"] typeReference) ^(INVOCATION_EXPRESSION ^(EXTENDED_TYPE_EXPRESSION) positionalArguments))
-      )
-      (
-        positionalArguments
-
-      | 
-      )
-
-satisfiedTypes 
-   ::="satisfies" 
-
-      qualifiedType 
-
-      (
-        "&"
-
-        (
-          qualifiedType
-
-        | 
-        )
-      )*
-    //-> ^(SATISFIED_TYPES[$"satisfies"] type+)
-
-abstractedType 
-   ::="abstracts"
-
-      qualifiedType
-
-adaptedTypes 
-   ::="adapts" 
-
-      qualifiedType 
-
-      (
-        "&" 
-
-        (
-          qualifiedType
-
-        | 
-        )
-      )*
-
-caseTypes 
-   ::="of"
-
-      caseType 
-
-      (
-        "|" 
-
-        (
-          caseType
-
-        | 
-        )
-      )*
-
-caseType 
-   ::=qualifiedType 
-
-    | memberName //-> ^(BASE_MEMBER_EXPRESSION memberName)
+caseType ::= qualifiedType | memberName
 
 //Support for metatypes
 //Note that we don't need this for now
@@ -541,27 +231,7 @@ caseType
     -> ^(METATYPES[$"is"] type*)
     ;*/
 
-parameters 
-   ::="("
-
-      (
-        parameterDeclaration 
-
-        (
-          ","
-
-          (
-//            (~("@" | LIDENTIFIER | UIDENTIFIER)) =>
-//
-//          |
-            parameterDeclaration
-
-          )
-        )*
-      )?
-      ")"
-
-      //-> ^(PARAMETER_LIST[$"("] annotatedParameter*)
+parameters ::= "(" (parameterDeclaration ("," parameterDeclaration)*)? ")"
 
 //special rule for syntactic predicate
 //to distinguish between a formal 
@@ -1600,84 +1270,15 @@ intersectionType
 
       )?
 
-abbreviatedType 
+abbreviatedType ::= qualifiedType ("?" | "[]" | "(" (type ("," type)* )? ")")*
 
-   ::=qualifiedType
+unionTypeExpression ::= intersectionTypeExpression (("|" intersectionTypeExpression)+)?
 
-      (
-        "?"
+intersectionTypeExpression ::=qualifiedType (("&" qualifiedType)+)?
 
-      | "[]" 
+qualifiedType ::= supertypeQualifier? typeNameWithArguments ("." typeNameWithArguments)*
 
-      | "("
-
-          (
-            type
-
-            (
-              ","
-
-              type
-
-            )*
-          )?
-        ")"
-
-      )*
-
-unionTypeExpression 
-
-   ::=intersectionTypeExpression
-
-      ( 
-        (
-          "|"
-
-          (
-            intersectionTypeExpression
-
-//          | { displayRecognitionError(getTokenNames(), 
-//                new MismatchedTokenException(UIDENTIFIER, input)); }
-          )
-        )+
-
-      )?
-
-intersectionTypeExpression 
-
-   ::=qualifiedType
-
-      ( 
-        (
-          "&"
-
-          (
-            qualifiedType
-
-//          | { displayRecognitionError(getTokenNames(), 
-//                new MismatchedTokenException(UIDENTIFIER, input)); }
-          )
-        )+
-
-      )?
-
-qualifiedType 
-   ::=supertypeQualifier?
-      typeNameWithArguments
-
-      (
-        "." 
-        typeNameWithArguments
-
-      )*
-
-typeNameWithArguments 
-   ::=typeName
-
-      (
-        typeArguments
-
-      )?
+typeNameWithArguments ::= typeName typeArguments?
 
 annotations ::= annotation*
 
@@ -1689,385 +1290,84 @@ literalArguments ::= literalArgument*
 
 literalArgument ::= nonstringLiteral | myStringLiteral
 
-//special rule for syntactic predicate
-//to distinguish an interpolated expression
-//in a string template
-//this includes every token that could be 
-//the beginning of an expression, except 
-//for SIMPLESTRINGLITERAL and '['
-//interpolatedExpressionStart
-//   ::="("
-//    | "{"
-//    | LIDENTIFIER
-//    | UIDENTIFIER
-//    | selfReference
-//    | nonstringLiteral
-//    | prefixOperatorStart
-//    ;
-//
-//prefixOperatorStart
-//   ::="-"
-//    | "++"
-//    | "--"
-//    | "~"
-//    ;
-
 compilerAnnotations  ::= compilerAnnotation*
-
 
 compilerAnnotation ::= "@" annotationName ("[" myStringLiteral "]")?
 
-conditions 
-   ::="("
+conditions ::="(" (condition ("," condition)*)? ")"
 
-      (
-      condition
+condition ::= existsCondition | nonemptyCondition | isCondition | satisfiesCondition | booleanCondition
 
-      ( "," 
+booleanCondition ::= expression
 
-        (
-          condition 
+existsCondition ::= "exists" (impliedVariable | specifiedVariable) | booleanCondition
 
-        |  //TODO: sometimes it should be ")"!
-        )
-      )*
-      )?
-      ")"
+nonemptyCondition ::= "nonempty" (impliedVariable | specifiedVariable) | booleanCondition
 
-condition 
-   ::= existsCondition
+isCondition ::= ("!")? "is" type (impliedVariable | memberName specifier) | booleanCondition
 
-    | nonemptyCondition
+satisfiesCondition ::= "satisfies" (qualifiedType qualifiedType)?
 
-    | isCondition
+controlStatement ::= ifElse | switchCaseElse | whileLoop | forElse | tryCatchFinally
 
-    | satisfiesCondition
+controlBlock ::= block
 
-    | booleanCondition
+ifElse ::= ifBlock elseBlock?
 
-booleanCondition 
-   ::=
-      expression
+ifBlock ::= "if" conditions controlBlock
 
-    //-> ^(BOOLEAN_CONDITION expression)
+elseBlock ::= "else" (elseIf | block)
 
-existsCondition 
+elseIf ::= ifElse
 
-   ::= "exists" (impliedVariable | specifiedVariable) | booleanCondition
+switchCaseElse ::= switchHeader cases
 
-nonemptyCondition 
+switchHeader ::= "switch" "(" expression? ")"
 
-   ::= "nonempty" (impliedVariable | specifiedVariable) | booleanCondition
+cases ::= caseBlock+ defaultCaseBlock?
 
-isCondition 
+caseBlock ::= "case" "(" caseItem? ")" block
 
-   ::= ("!" )? "is" type (impliedVariable | memberName specifier) | booleanCondition
+defaultCaseBlock ::= "else" block
 
-satisfiesCondition 
-   ::="satisfies" 
+caseItem ::= isCaseCondition | satisfiesCaseCondition | matchCaseCondition
 
-      (qualifiedType 
+matchCaseCondition ::= expressions
 
-      qualifiedType 
-      )?
-    //-> ^("satisfies"_CONDITION[$"satisfies"] type+)
+isCaseCondition ::= "is" type
 
-controlStatement 
-   ::=ifElse 
+satisfiesCaseCondition ::= "satisfies" qualifiedType
 
-    | switchCaseElse 
+forElse ::= forBlock failBlock?
 
-    | whileLoop 
+forBlock ::= "for" forIterator controlBlock
 
-    | forElse 
+failBlock ::= "else" block
 
-    | tryCatchFinally
+forIterator ::= "(" compilerAnnotations (var (containment | "->" var containment)?)? ")"
 
-controlBlock 
-   ::= block
+containment ::= "in" expression?
 
-ifElse 
-   ::=
-      ifBlock 
+whileLoop ::= whileBlock
 
-      ( 
-        elseBlock
+whileBlock ::= "while" conditions controlBlock
 
-      )?
-    //-> ^(IF_STATEMENT ifBlock elseBlock?)
+tryCatchFinally ::= tryBlock catchBlock* finallyBlock?
 
-ifBlock 
-   ::="if" 
+tryBlock ::= "try" (resource controlBlock | block)
 
-      conditions
+catchBlock ::= "catch" catchVariable block
 
-      controlBlock
+catchVariable ::= "(" variable? ")"
 
-elseBlock 
-   ::="else" 
+finallyBlock ::= "finally" block
 
-      (
-        elseIf 
+resource ::= "(" (specifiedVariable | expression)? ")"
 
-      | 
-        block
+specifiedVariable ::= variable specifier?
 
-      )
+variable ::= compilerAnnotations var
 
-elseIf 
-   ::=ifElse
+var ::= (type | "void" | "function" | "value") memberName parameters* | memberName | memberName parameters+
 
-    //-> ^(BLOCK ifElse)
-
-switchCaseElse 
-   ::=
-      switchHeader 
-
-      cases
-
-    //-> ^(SWITCH_STATEMENT switchHeader cases)
-
-switchHeader 
-   ::="switch" 
-
-      "(" 
-      (
-      expression 
-
-      )?
-      ")"
-
-cases 
-   ::=
-      (
-        caseBlock
-
-      )+
-      (
-        defaultCaseBlock
-
-      )?
-    //-> ^(SWITCH_CASE_LIST caseItem+ defaultCaseItem?)
-
-caseBlock 
-   ::="case" 
-
-      "(" 
-      (
-      caseItem
-
-      )?
-      ")" 
-      block
-
-defaultCaseBlock 
-   ::="else" 
-
-      block
-
-caseItem 
-   ::= isCaseCondition
-
-    | satisfiesCaseCondition
-
-    | matchCaseCondition
-
-matchCaseCondition 
-   ::=expressions
-
-    //-> ^(MATCH_CASE expressions)
-
-isCaseCondition 
-   ::="is" 
-
-      type
-
-    //-> ^(IS_CASE[$"is"] unionType)
-
-satisfiesCaseCondition 
-   ::="satisfies" 
-
-      qualifiedType
-
-    //-> ^("satisfies"_CASE[$"satisfies"] type)
-
-forElse 
-   ::=
-      forBlock 
-
-      (
-        failBlock
-
-      )?
-    //-> ^(FOR_STATEMENT forBlock failBlock?)
-
-forBlock 
-   ::="for" 
-
-      forIterator 
-
-      controlBlock
-
-failBlock 
-   ::="else" 
-
-      block
-
-forIterator 
-
-   ::="("
-
-    compilerAnnotations
-    ( 
-      var
-      (
-
-        containment
-
-      //-> ^(VALUE_ITERATOR $v1 containment)
-      | 
-
-        "->"
-
-        var
-
-        containment
-
-      //-> ^(KEY_VALUE_ITERATOR $v1 $v2 containment)
-      )?
-    )?
-
-    ")"
-
-containment 
-   ::="in" 
-
-      (expression
-      )?
-    //-> ^(SPECIFIER_EXPRESSION expression)
-
-whileLoop 
-   ::=
-      whileBlock
-
-    //-> ^(WHILE_STATEMENT whileBlock)
-
-whileBlock 
-   ::="while"
-
-      conditions
-
-      controlBlock
-
-tryCatchFinally 
-   ::=
-      tryBlock 
-
-      (
-        catchBlock
-
-      )* 
-      ( 
-        finallyBlock
-
-      )?
-    //-> ^(TRY_CATCH_STATEMENT tryBlock catchBlock* finallyBlock?)
-
-tryBlock 
-   ::="try" 
-
-      (
-        resource
-
-        controlBlock
-
-      |
-        block
-
-      )
-
-catchBlock 
-   ::="catch" 
-
-      catchVariable
-
-      block
-
-catchVariable 
-   ::="(" 
-
-      (
-      variable 
-
-      )?
-      ")" 
-
-finallyBlock 
-   ::="finally" 
-
-      block
-
-resource 
-   ::="(" 
-
-    (
-     specifiedVariable
-
-    //-> ^(RESOURCE specifiedVariable2)
-    | expression
-
-    //-> ^(RESOURCE expression)
-    )?
-    ")"
-
-specifiedVariable 
-   ::=variable 
-
-      (
-        specifier
-
-      )?
-
-variable 
-   ::=compilerAnnotations
-      var
-
-var 
-   ::=
-    (
-      ( type 
-
-      | "void"
-
-      | "function"
-
-      | "value"
-
-      )
-      memberName 
-
-      ( 
-        parameters
-
-      )*
-    //-> ^(VARIABLE unionType memberName parameters*)
-    | 
-
-      memberName
-
-    //-> ^(VARIABLE "value" memberName)
-    | 
-
-      memberName 
-
-      (
-        parameters
-
-      )+
-    )
-    //-> ^(VARIABLE "function" memberName parameters+)
-
-impliedVariable 
-   ::=memberName 
-
-    //-> ^(VARIABLE SYNTHETIC_VARIABLE memberName ^(SPECIFIER_EXPRESSION ^(EXPRESSION ^(BASE_MEMBER_EXPRESSION memberName))))
+impliedVariable ::= memberName

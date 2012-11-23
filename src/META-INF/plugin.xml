@@ -43,5 +43,7 @@
         <stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>
 
         <gotoClassContributor implementation="org.intellij.plugins.ceylon.codeInsight.navigation.CeylonGotoClassContributor"/>
+
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.psi.CeylonTypeNameDeclaration" implementationClass="org.intellij.plugins.ceylon.presentation.ClassPresentationProvider"/>
     </extensions>
 </idea-plugin>

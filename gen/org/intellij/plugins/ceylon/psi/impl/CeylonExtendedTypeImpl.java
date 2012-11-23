@@ -17,9 +17,9 @@ public class CeylonExtendedTypeImpl extends CeylonCompositeElementImpl implement
   }
 
   @Override
-  @Nullable
+  @NotNull
   public CeylonPositionalArguments getPositionalArguments() {
-    return findChildByClass(CeylonPositionalArguments.class);
+    return findNotNullChildByClass(CeylonPositionalArguments.class);
   }
 
   @Override

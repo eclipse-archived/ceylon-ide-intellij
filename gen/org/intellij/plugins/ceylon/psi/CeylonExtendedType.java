@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface CeylonExtendedType extends CeylonCompositeElement {
 
-  @Nullable
+  @NotNull
   CeylonPositionalArguments getPositionalArguments();
 
   @Nullable
