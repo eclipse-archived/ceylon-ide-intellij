@@ -1,0 +1,15 @@
+// This is a generated file. Not intended for manual editing.
+package org.intellij.plugins.ceylon.psi;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+
+public interface CeylonFunctionOrExpression extends CeylonCompositeElement {
+
+  @NotNull
+  CeylonExpression getExpression();
+
+  @NotNull
+  List<CeylonParameters> getParametersList();
+
+}

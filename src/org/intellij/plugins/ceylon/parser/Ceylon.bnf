@@ -1,0 +1,2112 @@
+{
+	parserClass="org.intellij.plugins.ceylon.parser.CeylonParser"
+	stubParserClass="org.intellij.plugins.ceylon.parser.CeylonParserUtil"
+
+	implements="org.intellij.plugins.ceylon.psi.CeylonCompositeElement"
+	extends="org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl"
+
+	psiClassPrefix="Ceylon"
+	psiImplClassSuffix="Impl"
+
+	psiPackage="org.intellij.plugins.ceylon.psi"
+	psiImplPackage="org.intellij.plugins.ceylon.psi.impl"
+
+	psiImplUtilClass="org.intellij.plugins.ceylon.psi.CeylonPsiUtils"
+
+	elementTypeHolderClass="org.intellij.plugins.ceylon.psi.CeylonTypes"
+	elementTypeClass="org.intellij.plugins.ceylon.psi.CeylonElementType"
+	tokenTypeClass="org.intellij.plugins.ceylon.psi.CeylonTokenType"
+
+	tokens = [
+	    OP_COMMA=","
+	    OP_SEMI_COLUMN=";"
+	    OP_ELLIPSIS="..."
+        OP_SHARP="#"
+	    OP_LBRACE="{"
+	    OP_RBRACE="}"
+	    OP_LPAREN="("
+	    OP_RPAREN=")"
+	    OP_LBRACKET="["
+	    OP_RBRACKET="]"
+	    OP_BRACKETS="[]"
+	    OP_DOT="."
+	    OP_DOT_QUESTION="?."
+	    OP_BRACKETS_DOT="[]."
+	    OP_EQUALS="="
+	    OP_PLUS="+"
+	    OP_MINUS="-"
+	    OP_DIVIDE="/"
+	    OP_MULTIPLY="*"
+	    OP_MODULO="%"
+	    OP_MULT_MULT="**"
+	    OP_PLUS_PLUS="++"
+	    OP_MIN_MIN="--"
+	    OP_DOT_DOT=".."
+	    OP_ARROW="->"
+	    OP_QUESTION="?"
+	    OP_NOT="!"
+	    OP_LOGICAL_AND="&&"
+	    OP_LOGICAL_OR="||"
+	    OP_TIDLE="~"
+	    OP_INTERSECTION="&"
+	    OP_UNION="|"
+	    OP_XOR="^"
+	    OP_EQ_EQ_EQ="==="
+	    OP_EQ_EQ="=="
+	    OP_EXCL_EQ="!="
+	    OP_LT="<"
+	    OP_GT=">"
+	    OP_LTE="<="
+	    OP_GTE=">="
+	    OP_DIFFERENT="<=>"
+	    OP_ASSIGN=":="
+	    OP_DOT_EQ=".="
+	    OP_PLUS_EQ="+="
+	    OP_MINUS_EQ="-="
+	    OP_DIV_EQ="/="
+	    OP_MULT_EQ="*="
+	    OP_MOD_EQ="%="
+	    OP_OR_EQ="|="
+	    OP_AND_EQ="&="
+	    OP_XOR_EQ="^="
+	    OP_NOT_EQ="~="
+	    OP_LOG_OR_EQ="||="
+	    OP_LOG_AND_EQ="&&="
+	    OP_ANNOTATION="@"
+
+        KW_IMPORT="import"
+        KW_CLASS="class"
+        KW_INTERFACE="interface"
+        KW_OBJECT="object"
+        KW_GIVEN="given"
+        KW_VALUE="value"
+        KW_ASSIGN="assign"
+        KW_VOID="void"
+        KW_FUNCTION="Function"
+        KW_OF="of"
+        KW_EXTENDS="extends"
+        KW_SATISFIES="satisfies"
+        KW_ADAPTS="adapts"
+        KW_ABSTRACTS="abstracts"
+        KW_IN="in"
+        KW_OUT="out"
+        KW_RETURN="return"
+        KW_BREAK="break"
+        KW_CONTINUE="continue"
+        KW_THROW="throw"
+        KW_IF="if"
+        KW_ELSE="else"
+        KW_SWITCH="switch"
+        KW_CASE="case"
+        KW_FOR="for"
+        KW_WHILE="while"
+        KW_TRY="try"
+        KW_CATCH="catch"
+        KW_FINALLY="finally"
+        KW_THEN="then"
+        KW_THIS="this"
+        KW_OUTER="outer"
+        KW_SUPER="super"
+        KW_IS="is"
+        KW_EXISTS="exists"
+        KW_NONEMPTY="nonempty"
+        KW_MODULE="module"
+
+//        KW_SHARED="shared"
+//        KW_ABSTRACT="abstract"
+//        KW_FORMAL="formal"
+//        KW_DEFAULT="default"
+//        KW_ACTUAL="actual"
+//        KW_VARIABLE="variable"
+//        KW_DEPRECATED="deprecated"
+//        KW_LITERAL="literal"
+//        KW_SMALL="small"
+	]
+}
+
+external ceylon ::= parseCeylon compilationUnit
+private Comment ::= LINE_COMMENT | MULTI_LINE_COMMENT
+
+compilationUnit ::= (compilerAnnotations ";")?
+      (
+        Comment
+        | compilerAnnotations annotations (moduleDescriptor | packageDescriptor)
+        | importList? (compilerAnnotations declaration)+ // TODO was * instead of +
+      )
+    {recoverUntil=ceylon_statement_recover}
+
+private ceylon_statement_recover ::= (!compilationUnit)
+
+moduleDescriptor ::= "module" packagePath QUOTED_LITERAL importModuleList
+
+importModuleList ::= "{" (compilerAnnotations annotations importModule)* "}"
+
+packageDescriptor ::= "package" packagePath ";"
+
+importModule ::="import" (QUOTED_LITERAL | packagePath) QUOTED_LITERAL ";"
+
+importList  ::=  importDeclaration+
+
+importDeclaration ::= "import" (packagePath) importElementList
+
+importElementList ::= "{" (importElement ( "," (importElement | importWildcard))* | importWildcard )? "}"
+
+importElement ::=compilerAnnotations importName ("=" importName)? importElementList?
+
+importWildcard  ::="..."
+
+importName ::=memberName | typeName
+
+packagePath ::=packageName ("." packageName)*
+
+packageName ::=LIDENTIFIER | UIDENTIFIER
+
+typeName ::=UIDENTIFIER
+
+annotationName ::= ("shared" | LIDENTIFIER)
+
+memberName ::=LIDENTIFIER
+
+memberNameDeclaration ::=memberName | typeName
+
+typeNameDeclaration 
+   ::=typeName 
+    | 
+      memberName 
+
+objectDeclaration 
+   ::="object"
+
+      memberNameDeclaration
+
+      ( 
+        extendedType
+
+      )?
+      ( 
+        satisfiedTypes
+
+      )?
+      (
+        classBody
+
+      | 
+        ";"
+
+      )
+    //-> ^("object" "value" memberName extendedType? satisfiedTypes? classBody?) 
+
+voidOrInferredMethodDeclaration 
+
+   ::=(
+        "void"
+
+      | "function"
+
+      )
+      memberNameDeclaration
+
+      (
+        typeParameters
+
+      )?
+      (
+        parameters
+
+      )*
+      //metatypes? 
+      (
+        typeConstraints
+
+      )?
+      ( 
+
+        block 
+
+      //-> ^(METHOD_DEFINITION "void" memberName methodParameters? block)   
+      | 
+        (
+          specifier
+
+        )?
+
+        ";"
+
+      //-> ^(METHOD_DECLARATION "void" memberName methodParameters? specifier?)   
+      )
+
+setterDeclaration 
+   ::="assign" 
+
+      memberNameDeclaration 
+
+      ( 
+        block
+
+      | 
+        ";"
+
+      )
+    //-> ^(ATTRIBUTE_SETTER_DEFINITION[$"assign"] "void" memberName block)
+
+inferredAttributeDeclaration 
+
+   ::="value" 
+
+      memberNameDeclaration
+
+      ( 
+        (
+          specifier 
+
+        | 
+          initializer
+
+        )?
+
+        ";"
+
+        //-> ^(ATTRIBUTE_DECLARATION "value" memberName specifier? initializer?)
+      | 
+
+        block
+
+        //-> ^(ATTRIBUTE_GETTER_DEFINITION "value" memberName block)
+      )
+
+typedMethodOrAttributeDeclaration 
+
+   ::=type
+
+      memberNameDeclaration
+
+      ( 
+
+        (
+          typeParameters
+
+        )?
+        (
+          parameters
+
+        )+
+        //metatypes? 
+        ( 
+          typeConstraints
+
+        )?
+        ( 
+
+          block
+
+        //-> ^(METHOD_DEFINITION unionType memberName methodParameters memberBody)
+        | 
+          (
+            specifier
+
+          )?
+
+          ";"
+
+        //-> ^(METHOD_DECLARATION unionType memberName methodParameters specifier?)
+        )
+      | 
+        (
+          specifier 
+
+        | 
+          initializer
+
+        )?
+
+        ";"
+
+      //-> ^(ATTRIBUTE_DECLARATION unionType memberName specifier? initializer?)
+      | 
+
+        block
+
+      //-> ^(ATTRIBUTE_GETTER_DEFINITION unionType memberName memberBody)      
+      )
+
+interfaceDeclaration 
+
+   ::="interface"
+
+      typeNameDeclaration 
+
+      (
+        typeParameters 
+
+      )?
+      (
+        caseTypes
+
+      )?
+      /*metatypes?*/ 
+      (
+        adaptedTypes
+
+      )?
+      (
+        satisfiedTypes
+
+      )?
+      (
+        typeConstraints
+
+      )?
+      (
+
+        interfaceBody
+
+      //-> ^("interface" typeName interfaceParameters? interfaceBody)
+      | 
+        (
+          typeSpecifier
+
+        )? 
+
+        ";"
+
+      //-> ^(INTERFACE_DECLARATION[$"interface"] typeName interfaceParameters? typeSpecifier?)
+      )
+
+classDeclaration 
+
+   ::="class" 
+
+      typeNameDeclaration
+
+      (
+        typeParameters 
+
+      )?
+      (
+        parameters
+
+      )?
+      (
+        caseTypes
+
+      )?
+      /*metatypes?*/ 
+      (
+        extendedType
+
+      )? 
+      (
+        satisfiedTypes
+
+      )?
+      (
+        typeConstraints
+
+      )?
+      (
+
+        classBody
+
+      //-> ^("class" typeName classParameters? classBody)
+      | 
+        (
+          typeSpecifier
+
+        )?
+
+        ";"
+
+      //-> ^(CLASS_DECLARATION[$"class"] typeName classParameters? typeSpecifier?)
+      )
+
+aliasDeclaration 
+   ::="alias"
+
+      typeNameDeclaration 
+
+      (
+        typeParameters 
+
+      )?
+      (
+        typeConstraints
+
+      )?
+      (
+        typeSpecifier
+
+      )?
+
+      ";"
+
+assertion 
+   ::=
+      ASSERT
+
+      conditions
+
+      ";"
+
+      /*{ ValueModifier fm = new ValueModifier($ASSERT);
+        dec = new AttributeDeclaration($ASSERT);
+        dec.setType(fm);
+        $declaration = dec; }
+      memberNameDeclaration
+      { dec.setIdentifier($memberNameDeclaration.identifier); 
+        def.setIdentifier($memberNameDeclaration.identifier); }
+          specifier 
+          { dec.setSpecifierOrInitializerExpression($specifier.specifierExpression); }
+        { expecting=";"; }
+        ";"
+        { $declaration.setEndToken($";"); 
+          expecting=-1; }
+        //-> ^(ATTRIBUTE_DECLARATION "value" memberName specifier? initializer?)*/
+
+block 
+   ::="{" 
+
+      (
+        declarationOrStatement
+
+      )*
+      "}"
+
+    //-> ^(BLOCK[$"{"] annotatedDeclarationOrStatement*)
+
+//Note: interface bodies can't really contain 
+//      statements, but error recovery works
+//      much better if we validate that later
+//      on, instead of doing it in the parser.
+interfaceBody 
+   ::="{" 
+
+      (
+        declarationOrStatement
+
+      )*
+      "}"
+
+    //-> ^(INTERFACE_BODY[$"{"] annotatedDeclarationOrStatement2*)
+
+classBody 
+   ::="{"
+
+      (
+        declarationOrStatement
+
+      )*
+      "}"
+
+    //-> ^(CLASS_BODY[$"{"] annotatedDeclarationOrStatement2*)
+
+extendedType 
+   ::="extends"
+
+      (
+        qualifiedType
+
+        //-> ^(EXTENDED_TYPE[$"extends"] type ^(INVOCATION_EXPRESSION ^(EXTENDED_TYPE_EXPRESSION) positionalArguments))
+      | "super" "." 
+        typeReference 
+
+        //-> ^(EXTENDED_TYPE[$"extends"] ^(QUALIFIED_TYPE "super"_TYPE[$"super"] typeReference) ^(INVOCATION_EXPRESSION ^(EXTENDED_TYPE_EXPRESSION) positionalArguments))
+      )
+      (
+        positionalArguments
+
+      | 
+      )
+
+satisfiedTypes 
+   ::="satisfies" 
+
+      qualifiedType 
+
+      (
+        "&"
+
+        (
+          qualifiedType
+
+        | 
+        )
+      )*
+    //-> ^(SATISFIED_TYPES[$"satisfies"] type+)
+
+abstractedType 
+   ::="abstracts"
+
+      qualifiedType
+
+adaptedTypes 
+   ::="adapts" 
+
+      qualifiedType 
+
+      (
+        "&" 
+
+        (
+          qualifiedType
+
+        | 
+        )
+      )*
+
+caseTypes 
+   ::="of"
+
+      caseType 
+
+      (
+        "|" 
+
+        (
+          caseType
+
+        | 
+        )
+      )*
+
+caseType 
+   ::=qualifiedType 
+
+    | memberName //-> ^(BASE_MEMBER_EXPRESSION memberName)
+
+//Support for metatypes
+//Note that we don't need this for now
+/*metatypes
+   ::="is" type ('&' type)* 
+    -> ^(METATYPES[$"is"] type*)
+    ;*/
+
+parameters 
+   ::="("
+
+      (
+        parameterDeclaration 
+
+        (
+          ","
+
+          (
+//            (~("@" | LIDENTIFIER | UIDENTIFIER)) =>
+//
+//          |
+            parameterDeclaration
+
+          )
+        )*
+      )?
+      ")"
+
+      //-> ^(PARAMETER_LIST[$"("] annotatedParameter*)
+
+//special rule for syntactic predicate
+//to distinguish between a formal 
+//parameter list and a parenthesized body 
+//of an inline callable argument
+//be careful with this one, since it 
+//matches "()", which can also be an 
+//argument list
+//parametersStart
+//   ::="(" ( annotatedDeclarationStart | ")" )
+//    ;
+
+// FIXME: This accepts more than the language spec: named arguments
+// and varargs arguments can appear in any order.  We'll have to
+// enforce the rule that the ... appears at the end of the parapmeter
+// list in a later pass of the compiler.
+parameter 
+
+   ::= parameterType
+
+      memberName
+
+      (
+        (
+          parameters
+
+        )+
+        |
+        (
+          valueParameter
+        )?
+        //-> ^(VALUE_PARAMETER_DECLARATION parameterType memberName specifier?)
+
+          //for callable parameters
+        //-> ^(FUNCTIONAL_PARAMETER_DECLARATION parameterType memberName parameters+ specifier?)
+      )
+      (
+        specifier
+
+      )?
+
+parameterRef 
+
+   ::=memberName
+
+      (
+        specifier
+
+      )?
+
+parameterDeclaration 
+   ::=compilerAnnotations
+      (
+//        (LIDENTIFIER ("="|","|")")) =>
+        parameterRef
+
+      | 
+        annotations 
+        parameter
+
+      )
+
+valueParameter
+   ::="->" type memberName
+
+parameterType 
+   ::=type 
+
+      ( 
+        "..."
+
+      )?
+    | "void"
+
+typeParameters 
+   ::="<"
+
+      typeParameter
+
+      (
+        ","
+
+        (
+          typeParameter
+
+        | 
+        )
+      )*
+      ">"
+
+    //-> ^(TYPE_PARAMETER_LIST[$"<"] typeParameter+)
+
+typeParameter 
+   ::=
+      ( 
+        variance 
+
+      )? 
+      typeNameDeclaration
+
+      (
+        "..."
+
+      )?
+    //-> ^(TYPE_PARAMETER_DECLARATION variance? typeName)
+
+variance 
+   ::="in" //-> ^(TYPE_VARIANCE[$"in"])
+
+    | "out" //-> ^(TYPE_VARIANCE[$"out"])
+
+typeConstraint 
+   ::=compilerAnnotations
+      "given"
+
+      typeNameDeclaration 
+
+      //(typeParameters)?
+      (
+        parameters
+
+      )?
+      (
+        caseTypes
+
+      )?
+      //metatypes? 
+      (
+        satisfiedTypes
+
+      )?
+      ( 
+        abstractedType
+
+      )?
+
+typeConstraints 
+   ::=
+      (
+        typeConstraint
+
+      )+
+    //-> ^("given"_LIST typeConstraint2+)
+
+declarationOrStatement ::=compilerAnnotations
+      ( 
+        annotation* (assertion | declaration)
+      | statement
+      | Comment
+      )
+
+declaration 
+   ::= annotations
+    ( 
+      objectDeclaration
+
+    | setterDeclaration
+
+    | voidOrInferredMethodDeclaration
+
+    | inferredAttributeDeclaration
+
+    | typedMethodOrAttributeDeclaration
+
+    | classDeclaration
+
+    | interfaceDeclaration
+
+    | aliasDeclaration
+
+    )
+
+//special rule for syntactic predicate
+//to distinguish between an annotation
+//and an expression statement
+/*annotatedDeclarationStart
+   ::=declarationStart
+    | LIDENTIFIER
+      ( 
+          declarationStart
+        | LIDENTIFIER
+        | nonstringLiteral | stringLiteral
+        | arguments annotatedDeclarationStart //we need to recurse because it could be an inline callable argument
+      )
+    ;*/
+
+//annotatedDeclarationStart
+//   ::=declarationStart
+//    ;
+
+//special rule for syntactic predicates
+//that distinguish declarations from
+//expressions
+//declarationStart
+//   ::=declarationKeyword
+//    | type ("..." | LIDENTIFIER)
+//    ;
+
+//declarationKeyword
+//   ::="value"
+//    | "function"
+//    | "assign"
+//    | "void"
+//    | "interface"
+//    | "class"
+//    | "object"
+//    | "alias"
+//    ;
+
+statement 
+   ::=directiveStatement
+
+    | controlStatement
+
+    | expressionOrSpecificationStatement
+
+expressionOrSpecificationStatement 
+
+   ::=expression 
+
+      (
+        specifier
+
+      )?
+
+      (
+        ";"
+
+      | 
+        ","
+
+      )
+
+directiveStatement 
+   ::=directive 
+
+      ";"
+
+directive 
+   ::=returnDirective
+
+    | throwDirective
+
+    | breakDirective
+
+    | continueDirective
+
+returnDirective 
+   ::="return" 
+
+      (
+        functionOrExpression
+
+      )?
+
+throwDirective 
+   ::="throw"
+
+      ( 
+        expression
+
+      )?
+
+breakDirective 
+   ::="break"
+
+continueDirective 
+   ::="continue"
+
+typeSpecifier 
+   ::="=" 
+
+      type
+
+    //-> ^(TYPE_SPECIFIER[$"="] type)
+
+specifier 
+   ::="=" 
+
+      functionOrExpression
+
+initializer 
+   ::=":="
+
+      expression
+
+    //-> ^(INITIALIZER_EXPRESSION[$"assign"_OP] expression)
+
+expression 
+   ::=
+      assignmentExpression
+
+base 
+   ::=nonstringLiteral
+
+    | stringExpression
+
+    | enumeration
+
+    | selfReference
+
+    | parExpression
+
+    | baseReference
+
+baseReference 
+   ::=
+    (
+      supertypeQualifier
+
+    )?
+    (
+      memberReference
+
+    | typeReference
+
+    )
+
+supertypeQualifier 
+   ::=typeName "::"
+
+primary 
+   ::=base
+
+    (   
+      //TODO: re-enable:
+        /*inlineFunctionalArgument
+      |*/ qualifiedReference
+
+      | arguments
+
+      | indexOrIndexRange 
+
+    )*
+
+qualifiedReference 
+   ::=memberSelectionOperator 
+
+      ( 
+        memberReference
+
+      | typeReference
+
+      )
+
+memberSelectionOperator 
+   ::="."
+
+    | "?."
+
+    | "[]."
+
+elementSelectionOperator 
+   ::="?["
+
+    | "["
+
+enumeration 
+   ::="{"  
+      (
+        sequencedArgument
+
+      | 
+        comprehension
+
+      )?
+      "}"
+
+expressions 
+   ::=
+      expression 
+
+      ( "," 
+
+        (
+          expression 
+
+        |  //TODO: sometimes it should be ")"!
+        )
+      )*
+
+memberReference 
+   ::=memberName
+
+      (
+         typeArguments
+
+      )?
+
+typeReference 
+   ::=typeName 
+
+      (
+        typeArguments
+
+      )?
+
+//special rule for syntactic predicate to 
+//determine if we have a < operator, or a
+//type argument list
+//typeArgumentsStart
+//   ::="<"
+//    (
+//      UIDENTIFIER ('.' UIDENTIFIER)* /*| 'subtype')*/ ("default"|"[]")*
+//      (("&"|"|"|"->") UIDENTIFIER ('.' UIDENTIFIER)* ("default"|"[]")*)*
+//      (">"|"<"|","|"..."|"("|")")
+//    |
+//      ">" //for IDE only!
+//    )
+//    ;
+
+indexOrIndexRange 
+    //TODO: move indexOperator to ElementOrRange and
+    //      make this rule return ElementOrRange instead
+    //      of IndexExpression, instantiating IndexExpression
+    //      from the calling primary rule
+   ::=elementSelectionOperator
+
+      index
+
+      (
+        "..."
+
+      | ".." 
+
+        index 
+
+      | ":"
+
+        index 
+
+      )?
+      "]"
+
+index 
+   ::=additiveExpression 
+
+arguments ::= positionalArguments | namedArguments
+
+namedArguments 
+   ::="{" 
+
+      ( //TODO: get rid of the predicate and use the approach
+        //      in expressionOrSpecificationStatement
+//        (namedArgumentStart)
+        namedArgument
+
+      )* 
+      ( 
+        sequencedArgument
+
+      | 
+        comprehension
+
+      )?
+      "}"
+
+sequencedArgument 
+   ::=compilerAnnotations
+      expressions
+
+      (
+        "..."
+
+      )?
+
+namedArgument 
+   ::=compilerAnnotations 
+    ( 
+      namedSpecifiedArgument
+
+    | 
+      namedArgumentDeclaration
+
+    )
+
+namedSpecifiedArgument 
+   ::=memberNameDeclaration 
+
+      specifier 
+
+      ";"
+
+objectArgument 
+   ::="object" 
+
+      memberNameDeclaration
+
+      ( 
+        extendedType
+
+      )?
+      ( 
+        satisfiedTypes
+
+      )?
+      (
+        classBody
+
+      | 
+        ";"
+
+      )
+    //-> ^(OBJECT_ARGUMENT[$"object"] "value" memberName extendedType? satisfiedTypes? classBody?)
+
+voidOrInferredMethodArgument 
+   ::=
+      (
+        "void"
+
+      |
+        "function"
+
+      ) 
+      memberNameDeclaration 
+
+      (
+        parameters
+
+      )*
+      block
+
+    //-> ^(METHOD_ARGUMENT "void" memberName parameters* block)
+
+inferredGetterArgument 
+   ::=
+      "value" 
+
+      memberNameDeclaration 
+
+      block
+
+      //-> ^(ATTRIBUTE_ARGUMENT "value" memberName block)      
+
+typedMethodOrGetterArgument 
+
+   ::=type 
+
+      memberNameDeclaration
+
+      ( 
+
+        (
+          parameters
+
+        )+
+      )?
+      block
+
+      //-> ^(METHOD_ARGUMENT unionType memberName parameters+ memberBody)
+      //-> ^(ATTRIBUTE_ARGUMENT unionType memberName memberBody)      
+
+namedArgumentDeclaration 
+   ::=objectArgument
+
+    | typedMethodOrGetterArgument
+
+    | voidOrInferredMethodArgument
+
+    | inferredGetterArgument
+
+//special rule for syntactic predicate
+//to distinguish between a named argument
+//and a sequenced argument
+//namedArgumentStart
+//   ::=compilerAnnotation*
+//      (specificationStart | declarationStart)
+//    ;
+
+//special rule for syntactic predicates
+//specificationStart
+//   ::=LIDENTIFIER '='
+//    ;
+
+parExpression  
+   ::="(" 
+
+      assignmentExpression
+
+      ")"
+
+positionalArguments 
+   ::="(" 
+
+      ( positionalArgument
+
+        (
+          "," 
+
+          (
+            positionalArgument
+
+          | 
+          )
+        )* 
+        (
+          "..."
+
+        )?
+      )? 
+      (
+        comprehension
+
+      )?
+      ")"
+
+positionalArgument 
+
+   ::=functionOrExpression
+
+functionOrExpression 
+
+   ::=
+      (
+        "function" 
+
+      | "void"
+
+      )?
+      parameters
+
+      ( 
+//        (parametersStart)=>
+        parameters
+
+      )*
+      expression
+
+    /*| "value"
+      { fa.setType(new FunctionModifier($"value")); } 
+      e1=expression
+      { fa.addParameterList(new ParameterList(null));
+        fa.setExpression($e1.expression); 
+        $positionalArgument = fa; }*/
+    | expression
+
+/*inlineFunctionalArgument
+   ::=memberName ((parametersStart) => parameters)? 
+      ("(" expression ")" | block)
+    ;*/
+
+comprehension 
+
+   ::=forComprehensionClause
+
+comprehensionClause 
+   ::=forComprehensionClause 
+
+    | ifComprehensionClause 
+
+    | expressionComprehensionClause 
+
+expressionComprehensionClause 
+   ::=expression
+
+    | 
+
+forComprehensionClause 
+   ::="for"
+
+      forIterator
+
+      comprehensionClause
+
+ifComprehensionClause 
+   ::="if"
+
+      conditions
+
+      comprehensionClause
+
+assignmentExpression 
+   ::=thenElseExpression
+
+      (
+        assignmentOperator 
+
+        assignmentExpression
+
+      )?
+
+assignmentOperator 
+   ::=":="
+    //| APPLY_OP 
+    | "+="
+    | "-="
+    | "*="
+    | "/="
+    | "%="
+    | "&="
+    | "|="
+    | "^="
+    | "~="
+    | "&&="
+    | "||="
+    //| DEFAULT_"assign"_OP { $operator = new DefaultAssignOp($DEFAULT_"assign"_OP); }
+
+thenElseExpression 
+   ::=disjunctionExpression
+
+      (
+        thenElseOperator 
+
+        disjunctionExpression
+
+      )*
+
+thenElseOperator 
+   ::="else" 
+
+    | "then"
+
+disjunctionExpression 
+   ::=conjunctionExpression
+
+      (
+        disjunctionOperator 
+
+        conjunctionExpression
+
+      )*
+
+disjunctionOperator 
+   ::="||" 
+
+conjunctionExpression 
+   ::=logicalNegationExpression
+
+      (
+        conjunctionOperator 
+
+        logicalNegationExpression
+
+      )*
+
+conjunctionOperator 
+   ::="&&" 
+
+logicalNegationExpression 
+   ::=notOperator 
+
+      logicalNegationExpression
+
+    | equalityExpression
+
+notOperator 
+   ::="!" 
+
+equalityExpression 
+   ::=comparisonExpression
+
+      (
+        equalityOperator 
+
+        comparisonExpression
+
+      )?
+
+equalityOperator 
+   ::="==" 
+
+    | "!="
+
+    | "==="
+
+comparisonExpression 
+   ::=existenceEmptinessExpression
+
+      (
+        comparisonOperator 
+
+        existenceEmptinessExpression
+
+      | typeOperator
+
+        type
+
+      )?
+    | typeOperator
+
+      comparableType //TODO: support "type" here, using a predicate
+
+      existenceEmptinessExpression
+
+comparableType 
+   ::=unionTypeExpression 
+
+comparisonOperator 
+   ::="<=>" 
+
+    | "<="
+
+    | ">="
+
+    | ">"
+
+    | "<"
+
+    | "in"
+
+typeOperator 
+   ::="is"
+
+    | "extends"
+
+    | "satisfies"
+
+existenceEmptinessExpression 
+   ::=rangeIntervalEntryExpression
+
+      (
+        existsNonemptyOperator
+
+      )?
+    | existsNonemptyOperator
+
+      rangeIntervalEntryExpression
+
+existsNonemptyOperator 
+   ::="exists" 
+
+    | "nonempty"
+
+rangeIntervalEntryExpression 
+   ::=additiveExpression
+
+      (
+        rangeIntervalEntryOperator 
+
+        additiveExpression
+
+      )?
+
+rangeIntervalEntryOperator 
+   ::=".." 
+
+    | ":"
+
+    | "->"
+
+additiveExpression 
+   ::=multiplicativeExpression
+
+      (
+        additiveOperator 
+
+        multiplicativeExpression
+
+      )*
+
+additiveOperator 
+   ::="+" 
+
+    | "-"
+
+    | "|"
+
+    | "^"
+
+    | "~"
+
+multiplicativeExpression 
+   ::=defaultExpression
+
+      (
+        multiplicativeOperator 
+
+        defaultExpression
+
+      )*
+
+multiplicativeOperator 
+   ::="*" 
+
+    | "/"
+
+    | "%"
+
+    | "&"
+
+defaultExpression 
+   ::=negationComplementExpression
+
+      (
+        defaultOperator 
+
+        negationComplementExpression
+
+      )*
+
+defaultOperator 
+   ::="default" 
+
+negationComplementExpression 
+   ::=unaryMinusOrComplementOperator 
+
+      negationComplementExpression
+
+    | exponentiationExpression
+
+unaryMinusOrComplementOperator 
+   ::="-" 
+
+    | "+"
+
+exponentiationExpression 
+   ::=incrementDecrementExpression
+
+      (
+        exponentiationOperator
+
+        exponentiationExpression
+
+      )?
+
+exponentiationOperator ::= "**"
+
+incrementDecrementExpression 
+   ::=prefixOperator
+
+      incrementDecrementExpression
+
+    | postfixIncrementDecrementExpression
+
+prefixOperator ::= "--" | "++"
+
+postfixIncrementDecrementExpression 
+   ::=primary 
+
+      (
+        postfixOperator
+
+      )*
+
+postfixOperator 
+   ::="--" 
+
+    | "++" 
+
+selfReference 
+   ::="this"
+
+    | "super" 
+
+    | "outer"
+
+nonstringLiteral ::= NATURAL_LITERAL | FLOAT_LITERAL | QUOTED_LITERAL | CHAR_LITERAL
+
+stringExpression ::= stringTemplate | myStringLiteral
+
+myStringLiteral ::= STRING_LITERAL
+
+stringTemplate 
+   ::=myStringLiteral
+
+      (
+        expression myStringLiteral
+
+      )+
+
+typeArguments 
+   ::="<"
+
+      typeArgument 
+
+      (
+        ","
+
+        (
+          typeArgument
+
+          | 
+        )
+      )* 
+      ">"
+
+typeArgument 
+   ::=type
+
+      ( 
+        "..."
+
+      )? 
+
+type 
+   ::=unionType 
+
+entryType 
+
+   ::=abbreviatedType
+
+      (
+        "->"
+
+        (
+          abbreviatedType
+
+//        | { displayRecognitionError(getTokenNames(), 
+//                new MismatchedTokenException(UIDENTIFIER, input)); }
+        )
+      )?
+
+unionType 
+
+   ::=intersectionType
+
+      ( 
+        (
+          "|"
+
+          (
+            intersectionType
+
+//          | { displayRecognitionError(getTokenNames(), 
+//                new MismatchedTokenException(UIDENTIFIER, input)); }
+          )
+        )+
+
+      )?
+
+intersectionType 
+
+   ::=entryType
+
+      ( 
+        (
+          "&"
+
+          (
+            entryType
+
+//          | { displayRecognitionError(getTokenNames(), 
+//                new MismatchedTokenException(UIDENTIFIER, input)); }
+          )
+        )+
+
+      )?
+
+abbreviatedType 
+
+   ::=qualifiedType
+
+      (
+        "?"
+
+      | "[]" 
+
+      | "("
+
+          (
+            type
+
+            (
+              ","
+
+              type
+
+            )*
+          )?
+        ")"
+
+      )*
+
+unionTypeExpression 
+
+   ::=intersectionTypeExpression
+
+      ( 
+        (
+          "|"
+
+          (
+            intersectionTypeExpression
+
+//          | { displayRecognitionError(getTokenNames(), 
+//                new MismatchedTokenException(UIDENTIFIER, input)); }
+          )
+        )+
+
+      )?
+
+intersectionTypeExpression 
+
+   ::=qualifiedType
+
+      ( 
+        (
+          "&"
+
+          (
+            qualifiedType
+
+//          | { displayRecognitionError(getTokenNames(), 
+//                new MismatchedTokenException(UIDENTIFIER, input)); }
+          )
+        )+
+
+      )?
+
+qualifiedType 
+   ::=supertypeQualifier?
+      typeNameWithArguments
+
+      (
+        "." 
+        typeNameWithArguments
+
+      )*
+
+typeNameWithArguments 
+   ::=typeName
+
+      (
+        typeArguments
+
+      )?
+
+annotations ::= annotation*
+
+annotation ::= annotationName annotationArguments
+
+annotationArguments ::= arguments | literalArguments
+
+literalArguments ::= literalArgument*
+
+literalArgument ::= nonstringLiteral | myStringLiteral
+
+//special rule for syntactic predicate
+//to distinguish an interpolated expression
+//in a string template
+//this includes every token that could be 
+//the beginning of an expression, except 
+//for SIMPLESTRINGLITERAL and '['
+//interpolatedExpressionStart
+//   ::="("
+//    | "{"
+//    | LIDENTIFIER
+//    | UIDENTIFIER
+//    | selfReference
+//    | nonstringLiteral
+//    | prefixOperatorStart
+//    ;
+//
+//prefixOperatorStart
+//   ::="-"
+//    | "++"
+//    | "--"
+//    | "~"
+//    ;
+
+compilerAnnotations  ::= compilerAnnotation*
+
+
+compilerAnnotation ::= "@" annotationName ("[" myStringLiteral "]")?
+
+conditions 
+   ::="("
+
+      (
+      condition
+
+      ( "," 
+
+        (
+          condition 
+
+        |  //TODO: sometimes it should be ")"!
+        )
+      )*
+      )?
+      ")"
+
+condition 
+   ::= existsCondition
+
+    | nonemptyCondition
+
+    | isCondition
+
+    | satisfiesCondition
+
+    | booleanCondition
+
+booleanCondition 
+   ::=
+      expression
+
+    //-> ^(BOOLEAN_CONDITION expression)
+
+existsCondition 
+
+   ::= "exists" (impliedVariable | specifiedVariable) | booleanCondition
+
+nonemptyCondition 
+
+   ::= "nonempty" (impliedVariable | specifiedVariable) | booleanCondition
+
+isCondition 
+
+   ::= ("!" )? "is" type (impliedVariable | memberName specifier) | booleanCondition
+
+satisfiesCondition 
+   ::="satisfies" 
+
+      (qualifiedType 
+
+      qualifiedType 
+      )?
+    //-> ^("satisfies"_CONDITION[$"satisfies"] type+)
+
+controlStatement 
+   ::=ifElse 
+
+    | switchCaseElse 
+
+    | whileLoop 
+
+    | forElse 
+
+    | tryCatchFinally
+
+controlBlock 
+   ::= block
+
+ifElse 
+   ::=
+      ifBlock 
+
+      ( 
+        elseBlock
+
+      )?
+    //-> ^(IF_STATEMENT ifBlock elseBlock?)
+
+ifBlock 
+   ::="if" 
+
+      conditions
+
+      controlBlock
+
+elseBlock 
+   ::="else" 
+
+      (
+        elseIf 
+
+      | 
+        block
+
+      )
+
+elseIf 
+   ::=ifElse
+
+    //-> ^(BLOCK ifElse)
+
+switchCaseElse 
+   ::=
+      switchHeader 
+
+      cases
+
+    //-> ^(SWITCH_STATEMENT switchHeader cases)
+
+switchHeader 
+   ::="switch" 
+
+      "(" 
+      (
+      expression 
+
+      )?
+      ")"
+
+cases 
+   ::=
+      (
+        caseBlock
+
+      )+
+      (
+        defaultCaseBlock
+
+      )?
+    //-> ^(SWITCH_CASE_LIST caseItem+ defaultCaseItem?)
+
+caseBlock 
+   ::="case" 
+
+      "(" 
+      (
+      caseItem
+
+      )?
+      ")" 
+      block
+
+defaultCaseBlock 
+   ::="else" 
+
+      block
+
+caseItem 
+   ::= isCaseCondition
+
+    | satisfiesCaseCondition
+
+    | matchCaseCondition
+
+matchCaseCondition 
+   ::=expressions
+
+    //-> ^(MATCH_CASE expressions)
+
+isCaseCondition 
+   ::="is" 
+
+      type
+
+    //-> ^(IS_CASE[$"is"] unionType)
+
+satisfiesCaseCondition 
+   ::="satisfies" 
+
+      qualifiedType
+
+    //-> ^("satisfies"_CASE[$"satisfies"] type)
+
+forElse 
+   ::=
+      forBlock 
+
+      (
+        failBlock
+
+      )?
+    //-> ^(FOR_STATEMENT forBlock failBlock?)
+
+forBlock 
+   ::="for" 
+
+      forIterator 
+
+      controlBlock
+
+failBlock 
+   ::="else" 
+
+      block
+
+forIterator 
+
+   ::="("
+
+    compilerAnnotations
+    ( 
+      var
+      (
+
+        containment
+
+      //-> ^(VALUE_ITERATOR $v1 containment)
+      | 
+
+        "->"
+
+        var
+
+        containment
+
+      //-> ^(KEY_VALUE_ITERATOR $v1 $v2 containment)
+      )?
+    )?
+
+    ")"
+
+containment 
+   ::="in" 
+
+      (expression
+      )?
+    //-> ^(SPECIFIER_EXPRESSION expression)
+
+whileLoop 
+   ::=
+      whileBlock
+
+    //-> ^(WHILE_STATEMENT whileBlock)
+
+whileBlock 
+   ::="while"
+
+      conditions
+
+      controlBlock
+
+tryCatchFinally 
+   ::=
+      tryBlock 
+
+      (
+        catchBlock
+
+      )* 
+      ( 
+        finallyBlock
+
+      )?
+    //-> ^(TRY_CATCH_STATEMENT tryBlock catchBlock* finallyBlock?)
+
+tryBlock 
+   ::="try" 
+
+      (
+        resource
+
+        controlBlock
+
+      |
+        block
+
+      )
+
+catchBlock 
+   ::="catch" 
+
+      catchVariable
+
+      block
+
+catchVariable 
+   ::="(" 
+
+      (
+      variable 
+
+      )?
+      ")" 
+
+finallyBlock 
+   ::="finally" 
+
+      block
+
+resource 
+   ::="(" 
+
+    (
+     specifiedVariable
+
+    //-> ^(RESOURCE specifiedVariable2)
+    | expression
+
+    //-> ^(RESOURCE expression)
+    )?
+    ")"
+
+specifiedVariable 
+   ::=variable 
+
+      (
+        specifier
+
+      )?
+
+variable 
+   ::=compilerAnnotations
+      var
+
+var 
+   ::=
+    (
+      ( type 
+
+      | "void"
+
+      | "function"
+
+      | "value"
+
+      )
+      memberName 
+
+      ( 
+        parameters
+
+      )*
+    //-> ^(VARIABLE unionType memberName parameters*)
+    | 
+
+      memberName
+
+    //-> ^(VARIABLE "value" memberName)
+    | 
+
+      memberName 
+
+      (
+        parameters
+
+      )+
+    )
+    //-> ^(VARIABLE "function" memberName parameters+)
+
+impliedVariable 
+   ::=memberName 
+
+    //-> ^(VARIABLE SYNTHETIC_VARIABLE memberName ^(SPECIFIER_EXPRESSION ^(EXPRESSION ^(BASE_MEMBER_EXPRESSION memberName))))

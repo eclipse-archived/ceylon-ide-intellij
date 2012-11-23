@@ -1,0 +1,42 @@
+<idea-plugin version="2">
+    <id>org.intellij.plugins.ceylon</id>
+    <name>Ceylon Support</name>
+    <version>0.1</version>
+    <vendor email="bjansen [at] excilys.com">Bastien Jansen</vendor>
+
+    <description>Provides support for the Ceylon programming language</description>
+
+    <change-notes>
+        Version 0.1:
+        * Basic parser
+        * Syntax highlighting
+    </change-notes>
+
+    <idea-version since-build="123.4"/>
+
+    <!-- uncomment to enable plugin in all products -->
+    <depends>com.intellij.modules.lang</depends>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="org.intellij.plugins.ceylon.CeylonFileTypeFactory"/>
+        <lang.parserDefinition language="Ceylon"
+                               implementationClass="org.intellij.plugins.ceylon.parser.CeylonParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory key="Ceylon"
+                                       implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
+        <highlightVisitor implementation="org.intellij.plugins.ceylon.highlighting.CeylonHighlightVisitor"/>
+        <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.editor.CeylonCommenter"/>
+    </extensions>
+</idea-plugin>

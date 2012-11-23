@@ -1,0 +1,83 @@
+FILE
+  COMPILATION_UNIT
+    COMPILER_ANNOTATIONS
+      <empty list>
+    DECLARATION
+      ANNOTATIONS
+        <empty list>
+      CLASS_DECLARATION
+        PsiElement(class)('class')
+        TYPE_NAME_DECLARATION
+          TYPE_NAME
+            PsiElement(UIDENTIFIER)('Point')
+        PARAMETERS
+          PsiElement(()('(')
+          PARAMETER_DECLARATION
+            COMPILER_ANNOTATIONS
+              <empty list>
+            PARAMETER_REF
+              MEMBER_NAME
+                PsiElement(LIDENTIFIER)('x')
+          PsiElement(,)(',')
+          PARAMETER_DECLARATION
+            COMPILER_ANNOTATIONS
+              <empty list>
+            PARAMETER_REF
+              MEMBER_NAME
+                PsiElement(LIDENTIFIER)('y')
+          PsiElement())(')')
+        CLASS_BODY
+          PsiElement({)('{')
+          DECLARATION_OR_STATEMENT
+            COMPILER_ANNOTATIONS
+              <empty list>
+            ANNOTATION
+              ANNOTATION_NAME
+                PsiElement(LIDENTIFIER)('shared')
+              ANNOTATION_ARGUMENTS
+                LITERAL_ARGUMENTS
+                  <empty list>
+            DECLARATION
+              ANNOTATIONS
+                <empty list>
+              TYPED_METHOD_OR_ATTRIBUTE_DECLARATION
+                TYPE
+                  UNION_TYPE
+                    INTERSECTION_TYPE
+                      ENTRY_TYPE
+                        ABBREVIATED_TYPE
+                          QUALIFIED_TYPE
+                            TYPE_NAME_WITH_ARGUMENTS
+                              TYPE_NAME
+                                PsiElement(UIDENTIFIER)('Float')
+                MEMBER_NAME_DECLARATION
+                  MEMBER_NAME
+                    PsiElement(LIDENTIFIER)('x')
+                PsiElement(;)(';')
+          DECLARATION_OR_STATEMENT
+            COMPILER_ANNOTATIONS
+              <empty list>
+            ANNOTATION
+              ANNOTATION_NAME
+                PsiElement(LIDENTIFIER)('shared')
+              ANNOTATION_ARGUMENTS
+                LITERAL_ARGUMENTS
+                  <empty list>
+            DECLARATION
+              ANNOTATIONS
+                <empty list>
+              TYPED_METHOD_OR_ATTRIBUTE_DECLARATION
+                TYPE
+                  UNION_TYPE
+                    INTERSECTION_TYPE
+                      ENTRY_TYPE
+                        ABBREVIATED_TYPE
+                          QUALIFIED_TYPE
+                            TYPE_NAME_WITH_ARGUMENTS
+                              TYPE_NAME
+                                PsiElement(UIDENTIFIER)('Float')
+                MEMBER_NAME_DECLARATION
+                  MEMBER_NAME
+                    PsiElement(LIDENTIFIER)('y')
+                PsiElement(;)(';')
+          PsiElement(})('}')
