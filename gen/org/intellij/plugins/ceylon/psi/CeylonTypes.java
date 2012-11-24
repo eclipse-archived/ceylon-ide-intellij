@@ -5,6 +5,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
 import org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType;
+import org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl;
 import org.intellij.plugins.ceylon.psi.impl.*;
 
 public interface CeylonTypes {
@@ -387,7 +388,7 @@ public interface CeylonTypes {
         return new CeylonClassBodyImpl(node);
       }
       else if (type == CLASS_DECLARATION) {
-        return new CeylonClassDeclarationImpl(node);
+        return new CeylonClassImpl(node);
       }
       else if (type == COMPARABLE_TYPE) {
         return new CeylonComparableTypeImpl(node);
@@ -594,7 +595,7 @@ public interface CeylonTypes {
         return new CeylonInterfaceBodyImpl(node);
       }
       else if (type == INTERFACE_DECLARATION) {
-        return new CeylonInterfaceDeclarationImpl(node);
+        return new CeylonClassImpl(node);
       }
       else if (type == INTERSECTION_TYPE) {
         return new CeylonIntersectionTypeImpl(node);

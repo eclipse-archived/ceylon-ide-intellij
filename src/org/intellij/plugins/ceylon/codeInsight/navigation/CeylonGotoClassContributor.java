@@ -4,7 +4,7 @@ import com.intellij.navigation.GotoClassContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration;
+import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonTypeNameDeclaration;
 import org.intellij.plugins.ceylon.psi.stub.ClassIndex;
 import org.jetbrains.annotations.NotNull;
@@ -23,13 +23,13 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
-        Collection<CeylonNamedDeclaration> declarations = ClassIndex.getInstance().get(name, project, GlobalSearchScope.projectScope(project));
+        Collection<CeylonClass> declarations = ClassIndex.getInstance().get(name, project, GlobalSearchScope.projectScope(project));
 
         NavigationItem[] result = new NavigationItem[declarations.size()];
         int i = 0;
 
-        for (CeylonNamedDeclaration decl : declarations) {
-            result[i++] = decl.getTypeNameDeclaration(); // TODO getPresentation()
+        for (CeylonClass decl : declarations) {
+            result[i++] = (NavigationItem) decl.getNameIdentifier();
         }
 
         return result;
