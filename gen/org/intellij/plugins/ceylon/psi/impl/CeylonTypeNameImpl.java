@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 import org.intellij.plugins.ceylon.psi.*;
 
-public class CeylonTypeNameImpl extends CeylonCompositeElementImpl implements CeylonTypeName {
+public class CeylonTypeNameImpl extends CeylonIdentifier implements CeylonTypeName {
 
   public CeylonTypeNameImpl(ASTNode node) {
     super(node);

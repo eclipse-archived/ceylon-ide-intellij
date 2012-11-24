@@ -161,9 +161,11 @@ packagePath ::= packageName ("." packageName)*
 
 packageName ::= LIDENTIFIER | UIDENTIFIER
 
-typeName ::= UIDENTIFIER
+typeName ::= UIDENTIFIER {
+    mixin="org.intellij.plugins.ceylon.psi.impl.CeylonIdentifier"
+}
 
-annotationName ::= ("shared" | LIDENTIFIER)
+annotationName ::= LIDENTIFIER
 
 memberName ::= LIDENTIFIER
 
@@ -254,133 +256,25 @@ parameters ::= "(" (parameterDeclaration ("," parameterDeclaration)*)? ")"
 // and varargs arguments can appear in any order.  We'll have to
 // enforce the rule that the ... appears at the end of the parapmeter
 // list in a later pass of the compiler.
-parameter 
+parameter ::= parameterType memberName (parameters+ | valueParameter?) specifier?
 
-   ::= parameterType
+parameterRef ::= memberName specifier?
 
-      memberName
+parameterDeclaration ::= compilerAnnotations (parameterRef | annotations parameter)
 
-      (
-        (
-          parameters
+valueParameter ::= "->" type memberName
 
-        )+
-        |
-        (
-          valueParameter
-        )?
-        //-> ^(VALUE_PARAMETER_DECLARATION parameterType memberName specifier?)
+parameterType ::= type "..."? | "void"
 
-          //for callable parameters
-        //-> ^(FUNCTIONAL_PARAMETER_DECLARATION parameterType memberName parameters+ specifier?)
-      )
-      (
-        specifier
+typeParameters ::= "<" typeParameter ("," typeParameter)* ">"
 
-      )?
+typeParameter ::= variance? typeNameDeclaration "..."?
 
-parameterRef 
+variance ::= "in" | "out"
 
-   ::=memberName
+typeConstraint ::= compilerAnnotations "given" typeNameDeclaration parameters? caseTypes? /*metatypes?*/ satisfiedTypes? abstractedType?
 
-      (
-        specifier
-
-      )?
-
-parameterDeclaration 
-   ::=compilerAnnotations
-      (
-//        (LIDENTIFIER ("="|","|")")) =>
-        parameterRef
-
-      | 
-        annotations 
-        parameter
-
-      )
-
-valueParameter
-   ::="->" type memberName
-
-parameterType 
-   ::=type 
-
-      ( 
-        "..."
-
-      )?
-    | "void"
-
-typeParameters 
-   ::="<"
-
-      typeParameter
-
-      (
-        ","
-
-        (
-          typeParameter
-
-        | 
-        )
-      )*
-      ">"
-
-    //-> ^(TYPE_PARAMETER_LIST[$"<"] typeParameter+)
-
-typeParameter 
-   ::=
-      ( 
-        variance 
-
-      )? 
-      typeNameDeclaration
-
-      (
-        "..."
-
-      )?
-    //-> ^(TYPE_PARAMETER_DECLARATION variance? typeName)
-
-variance 
-   ::="in" //-> ^(TYPE_VARIANCE[$"in"])
-
-    | "out" //-> ^(TYPE_VARIANCE[$"out"])
-
-typeConstraint 
-   ::=compilerAnnotations
-      "given"
-
-      typeNameDeclaration 
-
-      //(typeParameters)?
-      (
-        parameters
-
-      )?
-      (
-        caseTypes
-
-      )?
-      //metatypes? 
-      (
-        satisfiedTypes
-
-      )?
-      ( 
-        abstractedType
-
-      )?
-
-typeConstraints 
-   ::=
-      (
-        typeConstraint
-
-      )+
-    //-> ^("given"_LIST typeConstraint2+)
+typeConstraints ::= typeConstraint+
 
 declarationOrStatement ::=compilerAnnotations
       ( 
@@ -389,26 +283,8 @@ declarationOrStatement ::=compilerAnnotations
       | Comment
       )
 
-declaration 
-   ::= annotations
-    ( 
-      objectDeclaration
-
-    | setterDeclaration
-
-    | voidOrInferredMethodDeclaration
-
-    | inferredAttributeDeclaration
-
-    | typedMethodOrAttributeDeclaration
-
-    | classDeclaration
-
-    | interfaceDeclaration
-
-    | aliasDeclaration
-
-    )
+declaration ::= annotations (objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration
+    | typedMethodOrAttributeDeclaration | classDeclaration | interfaceDeclaration | aliasDeclaration)
 
 //special rule for syntactic predicate
 //to distinguish between an annotation
@@ -447,193 +323,51 @@ declaration
 //    | "alias"
 //    ;
 
-statement 
-   ::=directiveStatement
+statement ::= directiveStatement | controlStatement | expressionOrSpecificationStatement
 
-    | controlStatement
+expressionOrSpecificationStatement ::= expression specifier? (";" | ",")
 
-    | expressionOrSpecificationStatement
+directiveStatement ::= directive ";"
 
-expressionOrSpecificationStatement 
+directive ::= returnDirective | throwDirective | breakDirective | continueDirective
 
-   ::=expression 
+returnDirective ::= "return" functionOrExpression?
 
-      (
-        specifier
+throwDirective ::= "throw" expression?
 
-      )?
+breakDirective ::= "break"
 
-      (
-        ";"
+continueDirective ::= "continue"
 
-      | 
-        ","
+typeSpecifier ::= "=" type
 
-      )
+specifier ::= "=" functionOrExpression
 
-directiveStatement 
-   ::=directive 
+initializer ::= ":=" expression
 
-      ";"
+expression ::= assignmentExpression
 
-directive 
-   ::=returnDirective
+base ::= nonstringLiteral | stringExpression | enumeration | selfReference | parExpression | baseReference
 
-    | throwDirective
+baseReference ::= supertypeQualifier? (memberReference | typeReference)
 
-    | breakDirective
+supertypeQualifier ::= typeName "::"
 
-    | continueDirective
+primary ::= base (qualifiedReference | arguments | indexOrIndexRange)*
 
-returnDirective 
-   ::="return" 
+qualifiedReference ::= memberSelectionOperator (memberReference | typeReference)
 
-      (
-        functionOrExpression
+memberSelectionOperator ::= "." | "?." | "[]."
 
-      )?
+elementSelectionOperator ::= "?[" | "["
 
-throwDirective 
-   ::="throw"
+enumeration ::= "{"  (sequencedArgument | comprehension)? "}"
 
-      ( 
-        expression
+expressions ::= expression ("," expression)*
 
-      )?
+memberReference ::= memberName typeArguments?
 
-breakDirective 
-   ::="break"
-
-continueDirective 
-   ::="continue"
-
-typeSpecifier 
-   ::="=" 
-
-      type
-
-    //-> ^(TYPE_SPECIFIER[$"="] type)
-
-specifier 
-   ::="=" 
-
-      functionOrExpression
-
-initializer 
-   ::=":="
-
-      expression
-
-    //-> ^(INITIALIZER_EXPRESSION[$"assign"_OP] expression)
-
-expression 
-   ::=
-      assignmentExpression
-
-base 
-   ::=nonstringLiteral
-
-    | stringExpression
-
-    | enumeration
-
-    | selfReference
-
-    | parExpression
-
-    | baseReference
-
-baseReference 
-   ::=
-    (
-      supertypeQualifier
-
-    )?
-    (
-      memberReference
-
-    | typeReference
-
-    )
-
-supertypeQualifier 
-   ::=typeName "::"
-
-primary 
-   ::=base
-
-    (   
-      //TODO: re-enable:
-        /*inlineFunctionalArgument
-      |*/ qualifiedReference
-
-      | arguments
-
-      | indexOrIndexRange 
-
-    )*
-
-qualifiedReference 
-   ::=memberSelectionOperator 
-
-      ( 
-        memberReference
-
-      | typeReference
-
-      )
-
-memberSelectionOperator 
-   ::="."
-
-    | "?."
-
-    | "[]."
-
-elementSelectionOperator 
-   ::="?["
-
-    | "["
-
-enumeration 
-   ::="{"  
-      (
-        sequencedArgument
-
-      | 
-        comprehension
-
-      )?
-      "}"
-
-expressions 
-   ::=
-      expression 
-
-      ( "," 
-
-        (
-          expression 
-
-        |  //TODO: sometimes it should be ")"!
-        )
-      )*
-
-memberReference 
-   ::=memberName
-
-      (
-         typeArguments
-
-      )?
-
-typeReference 
-   ::=typeName 
-
-      (
-        typeArguments
-
-      )?
+typeReference ::= typeName typeArguments?
 
 //special rule for syntactic predicate to 
 //determine if we have a < operator, or a
@@ -649,77 +383,19 @@ typeReference
 //    )
 //    ;
 
-indexOrIndexRange 
-    //TODO: move indexOperator to ElementOrRange and
-    //      make this rule return ElementOrRange instead
-    //      of IndexExpression, instantiating IndexExpression
-    //      from the calling primary rule
-   ::=elementSelectionOperator
+indexOrIndexRange ::= elementSelectionOperator index ("..." | ".."  index | ":" index)? "]"
 
-      index
-
-      (
-        "..."
-
-      | ".." 
-
-        index 
-
-      | ":"
-
-        index 
-
-      )?
-      "]"
-
-index 
-   ::=additiveExpression 
+index ::= additiveExpression
 
 arguments ::= positionalArguments | namedArguments
 
-namedArguments 
-   ::="{" 
+namedArguments ::= "{" namedArgument* (sequencedArgument | comprehension)? "}"
 
-      ( //TODO: get rid of the predicate and use the approach
-        //      in expressionOrSpecificationStatement
-//        (namedArgumentStart)
-        namedArgument
+sequencedArgument ::= compilerAnnotations expressions "..."?
 
-      )* 
-      ( 
-        sequencedArgument
+namedArgument ::= compilerAnnotations (namedSpecifiedArgument | namedArgumentDeclaration)
 
-      | 
-        comprehension
-
-      )?
-      "}"
-
-sequencedArgument 
-   ::=compilerAnnotations
-      expressions
-
-      (
-        "..."
-
-      )?
-
-namedArgument 
-   ::=compilerAnnotations 
-    ( 
-      namedSpecifiedArgument
-
-    | 
-      namedArgumentDeclaration
-
-    )
-
-namedSpecifiedArgument 
-   ::=memberNameDeclaration 
-
-      specifier 
-
-      ";"
+namedSpecifiedArgument ::= memberNameDeclaration specifier ";"
 
 objectArgument 
    ::="object" 
