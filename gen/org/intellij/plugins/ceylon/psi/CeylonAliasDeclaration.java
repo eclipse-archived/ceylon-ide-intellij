@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface CeylonAliasDeclaration extends CeylonCompositeElement {
+public interface CeylonAliasDeclaration extends CeylonNamedDeclaration {
 
   @Nullable
   CeylonTypeConstraints getTypeConstraints();

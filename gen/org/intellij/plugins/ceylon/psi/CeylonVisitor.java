@@ -28,7 +28,7 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitAliasDeclaration(@NotNull CeylonAliasDeclaration o) {
-    visitCompositeElement(o);
+    visitNamedDeclaration(o);
   }
 
   public void visitAnnotation(@NotNull CeylonAnnotation o) {

@@ -196,7 +196,9 @@ classDeclaration  ::= "class" typeName
     customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
 }
 
-aliasDeclaration ::= "alias" typeName typeParameters? typeConstraints? typeSpecifier? ";"
+aliasDeclaration ::= "alias" typeName typeParameters? typeConstraints? typeSpecifier? ";" {
+    implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
+}
 
 assertion ::= ASSERT conditions ";"
 

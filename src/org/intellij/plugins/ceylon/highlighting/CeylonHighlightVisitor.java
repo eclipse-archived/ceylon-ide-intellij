@@ -6,6 +6,7 @@ import com.intellij.codeInsight.daemon.impl.HighlightVisitor;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightInfoHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.plugins.ceylon.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -75,6 +76,15 @@ public class CeylonHighlightVisitor extends CeylonVisitor implements HighlightVi
                         myHolder.add(info);
                     }
                 }
+            }
+        }
+
+        if (!(o.getParent() instanceof CeylonNamedDeclaration)) {
+            PsiReference reference = o.getReference();
+
+            if (reference != null && reference.resolve() == null) {
+                HighlightInfo error = HighlightInfo.createHighlightInfo(HighlightInfoType.WRONG_REF, o, "Unresolved symbol " + o.getText());
+                myHolder.add(error);
             }
         }
     }
