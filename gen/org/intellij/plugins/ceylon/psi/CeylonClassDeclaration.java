@@ -28,7 +28,7 @@ public interface CeylonClassDeclaration extends CeylonNamedDeclaration, StubBase
   CeylonTypeConstraints getTypeConstraints();
 
   @Nullable
-  CeylonTypeNameDeclaration getTypeNameDeclaration();
+  CeylonTypeName getTypeName();
 
   @Nullable
   CeylonTypeParameters getTypeParameters();

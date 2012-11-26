@@ -11,6 +11,6 @@ public interface CeylonInferredGetterArgument extends CeylonCompositeElement {
   CeylonBlock getBlock();
 
   @NotNull
-  CeylonMemberNameDeclaration getMemberNameDeclaration();
+  CeylonMemberName getMemberName();
 
 }

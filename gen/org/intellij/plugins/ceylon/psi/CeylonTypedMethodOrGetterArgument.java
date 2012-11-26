@@ -11,7 +11,7 @@ public interface CeylonTypedMethodOrGetterArgument extends CeylonCompositeElemen
   CeylonBlock getBlock();
 
   @NotNull
-  CeylonMemberNameDeclaration getMemberNameDeclaration();
+  CeylonMemberName getMemberName();
 
   @NotNull
   List<CeylonParameters> getParametersList();

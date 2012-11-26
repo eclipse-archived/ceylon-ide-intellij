@@ -11,7 +11,7 @@ public interface CeylonVoidOrInferredMethodArgument extends CeylonCompositeEleme
   CeylonBlock getBlock();
 
   @NotNull
-  CeylonMemberNameDeclaration getMemberNameDeclaration();
+  CeylonMemberName getMemberName();
 
   @NotNull
   List<CeylonParameters> getParametersList();

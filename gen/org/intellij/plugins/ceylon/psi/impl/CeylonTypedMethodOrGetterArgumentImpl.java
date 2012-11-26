@@ -24,8 +24,8 @@ public class CeylonTypedMethodOrGetterArgumentImpl extends CeylonCompositeElemen
 
   @Override
   @NotNull
-  public CeylonMemberNameDeclaration getMemberNameDeclaration() {
-    return findNotNullChildByClass(CeylonMemberNameDeclaration.class);
+  public CeylonMemberName getMemberName() {
+    return findNotNullChildByClass(CeylonMemberName.class);
   }
 
   @Override

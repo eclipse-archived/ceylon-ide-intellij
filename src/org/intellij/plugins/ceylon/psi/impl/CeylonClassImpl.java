@@ -9,7 +9,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.intellij.util.ObjectUtils;
 import org.intellij.plugins.ceylon.codeInsight.resolve.CeylonTypeReference;
 import org.intellij.plugins.ceylon.psi.*;
 import org.intellij.plugins.ceylon.psi.stub.ClassStub;
@@ -99,14 +98,15 @@ public class CeylonClassImpl extends CeylonClassDeclarationImpl implements Ceylo
         }
     }
 
+    @Override
+    public CeylonClass getParentClass() {
+        return PsiTreeUtil.getParentOfType(this, CeylonClass.class);
+    }
+
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        CeylonTypeNameDeclaration typeNameDeclaration = getTypeNameDeclaration();
-        if (typeNameDeclaration == null) {
-            return null;
-        }
-        return ObjectUtils.chooseNotNull(typeNameDeclaration.getTypeName(), typeNameDeclaration.getMemberName());
+        return getTypeName();
     }
 
     @Override

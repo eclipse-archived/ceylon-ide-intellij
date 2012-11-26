@@ -30,8 +30,8 @@ public class CeylonObjectDeclarationImpl extends CeylonCompositeElementImpl impl
 
   @Override
   @NotNull
-  public CeylonMemberNameDeclaration getMemberNameDeclaration() {
-    return findNotNullChildByClass(CeylonMemberNameDeclaration.class);
+  public CeylonMemberName getMemberName() {
+    return findNotNullChildByClass(CeylonMemberName.class);
   }
 
   @Override

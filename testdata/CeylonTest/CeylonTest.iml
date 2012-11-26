@@ -6,6 +6,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="false" />
     </content>
+    <content url="file://$MODULE_DIR$/../../../ceylon.language">
+      <sourceFolder url="file://$MODULE_DIR$/../../../ceylon.language/src" isTestSource="false" />
+    </content>
     <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

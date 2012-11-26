@@ -23,6 +23,6 @@ public interface CeylonTypeConstraint extends CeylonCompositeElement {
   CeylonSatisfiedTypes getSatisfiedTypes();
 
   @NotNull
-  CeylonTypeNameDeclaration getTypeNameDeclaration();
+  CeylonTypeName getTypeName();
 
 }

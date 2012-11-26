@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface CeylonTypeParameter extends CeylonCompositeElement {
 
   @NotNull
-  CeylonTypeNameDeclaration getTypeNameDeclaration();
+  CeylonTypeName getTypeName();
 
   @Nullable
   CeylonVariance getVariance();

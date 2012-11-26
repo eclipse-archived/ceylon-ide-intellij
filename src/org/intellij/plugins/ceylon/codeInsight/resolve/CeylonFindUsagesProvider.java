@@ -3,9 +3,11 @@ package org.intellij.plugins.ceylon.codeInsight.resolve;
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import org.intellij.plugins.ceylon.parser.CeylonLexer;
+import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonClassDeclaration;
 import org.intellij.plugins.ceylon.psi.CeylonInterfaceDeclaration;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
@@ -17,7 +19,7 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @Nullable
     @Override
     public WordsScanner getWordsScanner() {
-        return new DefaultWordsScanner(new CeylonLexer(), TokenSet.create(CeylonTypes.TYPE_NAME_DECLARATION),
+        return new DefaultWordsScanner(new CeylonLexer(), TokenSet.create(CeylonTypes.TYPE_NAME, CeylonTypes.MEMBER_NAME),
                 TokenSet.create(CeylonTypes.LINE_COMMENT, CeylonTypes.MULTI_LINE_COMMENT), TokenSet.create(CeylonTypes.STRING_LITERAL));
     }
 
@@ -35,11 +37,10 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getType(@NotNull PsiElement element) {
-        if (element.getParent().getParent() instanceof CeylonClassDeclaration) {
-            return "Class";
-        } else if (element.getParent().getParent() instanceof CeylonInterfaceDeclaration) {
-            return "Interface";
+        if (element.getParent() instanceof CeylonClass) {
+            return ((CeylonClass) element.getParent()).isInterface() ? "Interface" : "Class";
         }
+
         return "Unknown type";
     }
 

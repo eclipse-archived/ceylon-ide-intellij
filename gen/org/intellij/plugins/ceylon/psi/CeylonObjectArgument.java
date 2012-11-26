@@ -14,7 +14,7 @@ public interface CeylonObjectArgument extends CeylonCompositeElement {
   CeylonExtendedType getExtendedType();
 
   @NotNull
-  CeylonMemberNameDeclaration getMemberNameDeclaration();
+  CeylonMemberName getMemberName();
 
   @Nullable
   CeylonSatisfiedTypes getSatisfiedTypes();

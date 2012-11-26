@@ -41,7 +41,6 @@ public interface CeylonTypes {
   IElementType COMPARABLE_TYPE = new CeylonElementType("COMPARABLE_TYPE");
   IElementType COMPARISON_EXPRESSION = new CeylonElementType("COMPARISON_EXPRESSION");
   IElementType COMPARISON_OPERATOR = new CeylonElementType("COMPARISON_OPERATOR");
-  IElementType COMPILATION_UNIT = new CeylonElementType("COMPILATION_UNIT");
   IElementType COMPILER_ANNOTATION = new CeylonElementType("COMPILER_ANNOTATION");
   IElementType COMPILER_ANNOTATIONS = new CeylonElementType("COMPILER_ANNOTATIONS");
   IElementType COMPREHENSION = new CeylonElementType("COMPREHENSION");
@@ -116,7 +115,6 @@ public interface CeylonTypes {
   IElementType LOGICAL_NEGATION_EXPRESSION = new CeylonElementType("LOGICAL_NEGATION_EXPRESSION");
   IElementType MATCH_CASE_CONDITION = new CeylonElementType("MATCH_CASE_CONDITION");
   IElementType MEMBER_NAME = new CeylonElementType("MEMBER_NAME");
-  IElementType MEMBER_NAME_DECLARATION = new CeylonElementType("MEMBER_NAME_DECLARATION");
   IElementType MEMBER_REFERENCE = new CeylonElementType("MEMBER_REFERENCE");
   IElementType MEMBER_SELECTION_OPERATOR = new CeylonElementType("MEMBER_SELECTION_OPERATOR");
   IElementType MODULE_DESCRIPTOR = new CeylonElementType("MODULE_DESCRIPTOR");
@@ -181,7 +179,6 @@ public interface CeylonTypes {
   IElementType TYPE_CONSTRAINT = new CeylonElementType("TYPE_CONSTRAINT");
   IElementType TYPE_CONSTRAINTS = new CeylonElementType("TYPE_CONSTRAINTS");
   IElementType TYPE_NAME = new CeylonElementType("TYPE_NAME");
-  IElementType TYPE_NAME_DECLARATION = new CeylonElementType("TYPE_NAME_DECLARATION");
   IElementType TYPE_NAME_WITH_ARGUMENTS = new CeylonElementType("TYPE_NAME_WITH_ARGUMENTS");
   IElementType TYPE_OPERATOR = new CeylonElementType("TYPE_OPERATOR");
   IElementType TYPE_PARAMETER = new CeylonElementType("TYPE_PARAMETER");
@@ -229,6 +226,7 @@ public interface CeylonTypes {
   IElementType KW_OF = new CeylonTokenType("of");
   IElementType KW_OUT = new CeylonTokenType("out");
   IElementType KW_OUTER = new CeylonTokenType("outer");
+  IElementType KW_PACKAGE = new CeylonTokenType("package");
   IElementType KW_RETURN = new CeylonTokenType("return");
   IElementType KW_SATISFIES = new CeylonTokenType("satisfies");
   IElementType KW_SUPER = new CeylonTokenType("super");
@@ -398,9 +396,6 @@ public interface CeylonTypes {
       }
       else if (type == COMPARISON_OPERATOR) {
         return new CeylonComparisonOperatorImpl(node);
-      }
-      else if (type == COMPILATION_UNIT) {
-        return new CeylonCompilationUnitImpl(node);
       }
       else if (type == COMPILER_ANNOTATION) {
         return new CeylonCompilerAnnotationImpl(node);
@@ -624,9 +619,6 @@ public interface CeylonTypes {
       else if (type == MEMBER_NAME) {
         return new CeylonMemberNameImpl(node);
       }
-      else if (type == MEMBER_NAME_DECLARATION) {
-        return new CeylonMemberNameDeclarationImpl(node);
-      }
       else if (type == MEMBER_REFERENCE) {
         return new CeylonMemberReferenceImpl(node);
       }
@@ -818,9 +810,6 @@ public interface CeylonTypes {
       }
       else if (type == TYPE_NAME) {
         return new CeylonTypeNameImpl(node);
-      }
-      else if (type == TYPE_NAME_DECLARATION) {
-        return new CeylonTypeNameDeclarationImpl(node);
       }
       else if (type == TYPE_NAME_WITH_ARGUMENTS) {
         return new CeylonTypeNameWithArgumentsImpl(node);

@@ -26,8 +26,9 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
         CeylonQualifiedType qualifiedType = PsiTreeUtil.getParentOfType(myElement, CeylonQualifiedType.class);
         String name = myElement.getText();
 
+
         if (qualifiedType != null) {
-            // TODO surely incomplete
+            // TODO surely incomplete, test foo.bar.MyClass:MySubclass (should get qualified name instead of text)
             CeylonSupertypeQualifier supertypeQualifier = qualifiedType.getSupertypeQualifier();
             if (supertypeQualifier != null && !supertypeQualifier.getTypeName().equals(myElement)) {
                 name = supertypeQualifier.getTypeName().getText() + "." + name;

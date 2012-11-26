@@ -51,6 +51,7 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
                 CeylonTypes.KW_OF,
                 CeylonTypes.KW_OUT,
                 CeylonTypes.KW_OUTER,
+                CeylonTypes.KW_PACKAGE,
                 CeylonTypes.KW_RETURN,
                 CeylonTypes.KW_SATISFIES,
                 CeylonTypes.KW_SUPER,
@@ -87,6 +88,7 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
         keys.put(CeylonTypes.OP_SEMI_COLUMN, SyntaxHighlighterColors.JAVA_SEMICOLON);
         keys.put(CeylonTypes.OP_COMMA, SyntaxHighlighterColors.COMMA);
 
+        // TODO better do it in the HighlightVisitor, otherwise @ may be colored before the annotation name
         keys.put(CeylonTypes.OP_ANNOTATION, CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES);
     }
 

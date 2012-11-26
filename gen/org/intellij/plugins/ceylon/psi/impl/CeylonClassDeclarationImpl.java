@@ -61,8 +61,8 @@ public class CeylonClassDeclarationImpl extends StubBasedPsiElementBase<ClassStu
 
   @Override
   @Nullable
-  public CeylonTypeNameDeclaration getTypeNameDeclaration() {
-    return findChildByClass(CeylonTypeNameDeclaration.class);
+  public CeylonTypeName getTypeName() {
+    return findChildByClass(CeylonTypeName.class);
   }
 
   @Override

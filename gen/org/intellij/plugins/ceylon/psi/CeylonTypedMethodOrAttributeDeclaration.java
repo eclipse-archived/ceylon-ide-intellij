@@ -14,7 +14,7 @@ public interface CeylonTypedMethodOrAttributeDeclaration extends CeylonComposite
   CeylonInitializer getInitializer();
 
   @NotNull
-  CeylonMemberNameDeclaration getMemberNameDeclaration();
+  CeylonMemberName getMemberName();
 
   @NotNull
   List<CeylonParameters> getParametersList();

@@ -24,8 +24,8 @@ public class CeylonSetterDeclarationImpl extends CeylonCompositeElementImpl impl
 
   @Override
   @NotNull
-  public CeylonMemberNameDeclaration getMemberNameDeclaration() {
-    return findNotNullChildByClass(CeylonMemberNameDeclaration.class);
+  public CeylonMemberName getMemberName() {
+    return findNotNullChildByClass(CeylonMemberName.class);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

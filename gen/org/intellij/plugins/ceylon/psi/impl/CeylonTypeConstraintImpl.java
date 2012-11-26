@@ -48,8 +48,8 @@ public class CeylonTypeConstraintImpl extends CeylonCompositeElementImpl impleme
 
   @Override
   @NotNull
-  public CeylonTypeNameDeclaration getTypeNameDeclaration() {
-    return findNotNullChildByClass(CeylonTypeNameDeclaration.class);
+  public CeylonTypeName getTypeName() {
+    return findNotNullChildByClass(CeylonTypeName.class);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

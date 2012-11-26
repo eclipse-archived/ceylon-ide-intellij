@@ -69,8 +69,8 @@ public class CeylonHighlightVisitor extends CeylonVisitor implements HighlightVi
             if (typeParameters != null) {
 
                 for (CeylonTypeParameter typeParameter : typeParameters.getTypeParameterList()) {
-                    CeylonTypeName typeNameDeclaration = typeParameter.getTypeNameDeclaration().getTypeName();
-                    if (typeNameDeclaration != null && o.getText().equals(typeNameDeclaration.getText())) {
+                    CeylonTypeName typeNameDeclaration = typeParameter.getTypeName();
+                    if (o.getText().equals(typeNameDeclaration.getText())) {
                         HighlightInfo info = HighlightInfo.createHighlightInfo(HighlightInfoType.TYPE_PARAMETER_NAME, o, null);
                         myHolder.add(info);
                     }

@@ -18,4 +18,14 @@ public class CeylonFile extends PsiFileBase {
     public FileType getFileType() {
         return CeylonFileType.INSTANCE;
     }
+
+    public String getPackageName() {
+        CeylonPackageDescriptor packageDescriptor = findChildByClass(CeylonPackageDescriptor.class);
+
+        if (packageDescriptor != null) {
+            return packageDescriptor.getPackagePath().getText();
+        }
+
+        return "";
+    }
 }

@@ -11,7 +11,7 @@ public interface CeylonAliasDeclaration extends CeylonCompositeElement {
   CeylonTypeConstraints getTypeConstraints();
 
   @NotNull
-  CeylonTypeNameDeclaration getTypeNameDeclaration();
+  CeylonTypeName getTypeName();
 
   @Nullable
   CeylonTypeParameters getTypeParameters();

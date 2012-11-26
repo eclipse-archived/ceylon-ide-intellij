@@ -106,17 +106,7 @@ QuotedLiteralCharacter = [^']*
 "exists"        { return CeylonTypes.KW_EXISTS; }
 "nonempty"      { return CeylonTypes.KW_NONEMPTY; }
 "module"        { return CeylonTypes.KW_MODULE; }
-
-//"shared"        { return CeylonTypes.KW_SHARED; }
-//"abstract"      { return CeylonTypes.KW_ABSTRACT; }
-//"formal"        { return CeylonTypes.KW_FORMAL; }
-//"default"       { return CeylonTypes.KW_DEFAULT; }
-//"actual"        { return CeylonTypes.KW_ACTUAL; }
-//"variable"      { return CeylonTypes.KW_VARIABLE; }
-//"deprecated"    { return CeylonTypes.KW_DEPRECATED; }
-//"literal"       { return CeylonTypes.KW_LITERAL; }
-//"small"         { return CeylonTypes.KW_SMALL; }
-
+"package"       { return CeylonTypes.KW_PACKAGE; }
 
 ","     { return CeylonTypes.OP_COMMA; }
 ";"     { return CeylonTypes.OP_SEMI_COLUMN; }

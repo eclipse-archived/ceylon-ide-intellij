@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface CeylonNamedSpecifiedArgument extends CeylonCompositeElement {
 
   @NotNull
-  CeylonMemberNameDeclaration getMemberNameDeclaration();
+  CeylonMemberName getMemberName();
 
   @NotNull
   CeylonSpecifier getSpecifier();

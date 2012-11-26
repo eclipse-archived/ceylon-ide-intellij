@@ -5,5 +5,5 @@ import org.jetbrains.annotations.Nullable;
 public interface CeylonNamedDeclaration extends CeylonCompositeElement {
 
     @Nullable
-    CeylonTypeNameDeclaration getTypeNameDeclaration();
+    CeylonTypeName getTypeName();
 }

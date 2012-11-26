@@ -116,9 +116,6 @@ public class CeylonParser implements PsiParser {
     else if (root_ == COMPARISON_OPERATOR) {
       result_ = comparisonOperator(builder_, level_ + 1);
     }
-    else if (root_ == COMPILATION_UNIT) {
-      result_ = compilationUnit(builder_, level_ + 1);
-    }
     else if (root_ == COMPILER_ANNOTATION) {
       result_ = compilerAnnotation(builder_, level_ + 1);
     }
@@ -341,9 +338,6 @@ public class CeylonParser implements PsiParser {
     else if (root_ == MEMBER_NAME) {
       result_ = memberName(builder_, level_ + 1);
     }
-    else if (root_ == MEMBER_NAME_DECLARATION) {
-      result_ = memberNameDeclaration(builder_, level_ + 1);
-    }
     else if (root_ == MEMBER_REFERENCE) {
       result_ = memberReference(builder_, level_ + 1);
     }
@@ -530,9 +524,6 @@ public class CeylonParser implements PsiParser {
     else if (root_ == TYPE_NAME) {
       result_ = typeName(builder_, level_ + 1);
     }
-    else if (root_ == TYPE_NAME_DECLARATION) {
-      result_ = typeNameDeclaration(builder_, level_ + 1);
-    }
     else if (root_ == TYPE_NAME_WITH_ARGUMENTS) {
       result_ = typeNameWithArguments(builder_, level_ + 1);
     }
@@ -603,24 +594,6 @@ public class CeylonParser implements PsiParser {
 
   protected boolean parse_root_(final IElementType root_, final PsiBuilder builder_, final int level_) {
     return parseCeylon(builder_, level_ + 1, compilationUnit_parser_);
-  }
-
-  /* ********************************************************** */
-  // LINE_COMMENT | MULTI_LINE_COMMENT
-  static boolean Comment(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "Comment")) return false;
-    if (!nextTokenIs(builder_, LINE_COMMENT) && !nextTokenIs(builder_, MULTI_LINE_COMMENT)) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = consumeToken(builder_, LINE_COMMENT);
-    if (!result_) result_ = consumeToken(builder_, MULTI_LINE_COMMENT);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
   }
 
   /* ********************************************************** */
@@ -889,14 +862,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "alias" typeNameDeclaration typeParameters? typeConstraints? typeSpecifier? ";"
+  // "alias" typeName typeParameters? typeConstraints? typeSpecifier? ";"
   public static boolean aliasDeclaration(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "aliasDeclaration")) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<alias declaration>");
     result_ = consumeToken(builder_, "alias");
-    result_ = result_ && typeNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && typeName(builder_, level_ + 1);
     result_ = result_ && aliasDeclaration_2(builder_, level_ + 1);
     result_ = result_ && aliasDeclaration_3(builder_, level_ + 1);
     result_ = result_ && aliasDeclaration_4(builder_, level_ + 1);
@@ -1519,7 +1492,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "class" typeNameDeclaration
+  // "class" typeName
   //         typeParameters? parameters? caseTypes? /*metatypes?*/ extendedType? satisfiedTypes?
   //         typeConstraints? (classBody | typeSpecifier? ";")
   public static boolean classDeclaration(PsiBuilder builder_, int level_) {
@@ -1531,7 +1504,7 @@ public class CeylonParser implements PsiParser {
     enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, null);
     result_ = consumeToken(builder_, KW_CLASS);
     pinned_ = result_; // pin = 1
-    result_ = result_ && report_error_(builder_, typeNameDeclaration(builder_, level_ + 1));
+    result_ = result_ && report_error_(builder_, typeName(builder_, level_ + 1));
     result_ = pinned_ && report_error_(builder_, classDeclaration_2(builder_, level_ + 1)) && result_;
     result_ = pinned_ && report_error_(builder_, classDeclaration_3(builder_, level_ + 1)) && result_;
     result_ = pinned_ && report_error_(builder_, classDeclaration_4(builder_, level_ + 1)) && result_;
@@ -1628,6 +1601,24 @@ public class CeylonParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "classDeclaration_8_1_0")) return false;
     typeSpecifier(builder_, level_ + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // LINE_COMMENT | MULTI_LINE_COMMENT
+  static boolean comment(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "comment")) return false;
+    if (!nextTokenIs(builder_, LINE_COMMENT) && !nextTokenIs(builder_, MULTI_LINE_COMMENT)) return false;
+    boolean result_ = false;
+    Marker marker_ = builder_.mark();
+    result_ = consumeToken(builder_, LINE_COMMENT);
+    if (!result_) result_ = consumeToken(builder_, MULTI_LINE_COMMENT);
+    if (!result_) {
+      marker_.rollbackTo();
+    }
+    else {
+      marker_.drop();
+    }
+    return result_;
   }
 
   /* ********************************************************** */
@@ -1781,22 +1772,22 @@ public class CeylonParser implements PsiParser {
   /* ********************************************************** */
   // (compilerAnnotations ";")?
   //       (
-  //         Comment
+  //         comment
   //         | compilerAnnotations annotations (moduleDescriptor | packageDescriptor)
   //         | importList? (compilerAnnotations declaration)+ // TODO was * instead of +
   //       )
-  public static boolean compilationUnit(PsiBuilder builder_, int level_) {
+  static boolean compilationUnit(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "compilationUnit")) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
-    enterErrorRecordingSection(builder_, level_, _SECTION_RECOVER_, "<compilation unit>");
+    enterErrorRecordingSection(builder_, level_, _SECTION_RECOVER_, null);
     result_ = compilationUnit_0(builder_, level_ + 1);
     result_ = result_ && compilationUnit_1(builder_, level_ + 1);
-    if (result_) {
-      marker_.done(COMPILATION_UNIT);
+    if (!result_) {
+      marker_.rollbackTo();
     }
     else {
-      marker_.rollbackTo();
+      marker_.drop();
     }
     result_ = exitErrorRecordingSection(builder_, level_, result_, false, _SECTION_RECOVER_, ceylon_statement_recover_parser_);
     return result_;
@@ -1825,14 +1816,14 @@ public class CeylonParser implements PsiParser {
     return result_;
   }
 
-  // Comment
+  // comment
   //         | compilerAnnotations annotations (moduleDescriptor | packageDescriptor)
   //         | importList? (compilerAnnotations declaration)+
   private static boolean compilationUnit_1(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "compilationUnit_1")) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
-    result_ = Comment(builder_, level_ + 1);
+    result_ = comment(builder_, level_ + 1);
     if (!result_) result_ = compilationUnit_1_1(builder_, level_ + 1);
     if (!result_) result_ = compilationUnit_1_2(builder_, level_ + 1);
     if (!result_) {
@@ -2335,7 +2326,7 @@ public class CeylonParser implements PsiParser {
   //       ( 
   //         annotation* (assertion | declaration)
   //       | statement
-  //       | Comment
+  //       | comment
   //       )
   public static boolean declarationOrStatement(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "declarationOrStatement")) return false;
@@ -2356,14 +2347,14 @@ public class CeylonParser implements PsiParser {
 
   // annotation* (assertion | declaration)
   //       | statement
-  //       | Comment
+  //       | comment
   private static boolean declarationOrStatement_1(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "declarationOrStatement_1")) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = declarationOrStatement_1_0(builder_, level_ + 1);
     if (!result_) result_ = statement(builder_, level_ + 1);
-    if (!result_) result_ = Comment(builder_, level_ + 1);
+    if (!result_) result_ = comment(builder_, level_ + 1);
     if (!result_) {
       marker_.rollbackTo();
     }
@@ -4000,14 +3991,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "value" memberNameDeclaration ((specifier | initializer)? ";" | block)
+  // "value" memberName ((specifier | initializer)? ";" | block)
   public static boolean inferredAttributeDeclaration(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "inferredAttributeDeclaration")) return false;
     if (!nextTokenIs(builder_, KW_VALUE)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = consumeToken(builder_, KW_VALUE);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && inferredAttributeDeclaration_2(builder_, level_ + 1);
     if (result_) {
       marker_.done(INFERRED_ATTRIBUTE_DECLARATION);
@@ -4074,14 +4065,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "value" memberNameDeclaration block
+  // "value" memberName block
   public static boolean inferredGetterArgument(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "inferredGetterArgument")) return false;
     if (!nextTokenIs(builder_, KW_VALUE)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = consumeToken(builder_, KW_VALUE);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && block(builder_, level_ + 1);
     if (result_) {
       marker_.done(INFERRED_GETTER_ARGUMENT);
@@ -4146,7 +4137,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "interface" typeNameDeclaration
+  // "interface" typeName
   //         typeParameters? caseTypes? /*metatypes?*/ adaptedTypes? satisfiedTypes?
   //         typeConstraints? (interfaceBody | typeSpecifier? ";")
   public static boolean interfaceDeclaration(PsiBuilder builder_, int level_) {
@@ -4158,7 +4149,7 @@ public class CeylonParser implements PsiParser {
     enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, null);
     result_ = consumeToken(builder_, KW_INTERFACE);
     pinned_ = result_; // pin = 1
-    result_ = result_ && report_error_(builder_, typeNameDeclaration(builder_, level_ + 1));
+    result_ = result_ && report_error_(builder_, typeName(builder_, level_ + 1));
     result_ = pinned_ && report_error_(builder_, interfaceDeclaration_2(builder_, level_ + 1)) && result_;
     result_ = pinned_ && report_error_(builder_, interfaceDeclaration_3(builder_, level_ + 1)) && result_;
     result_ = pinned_ && report_error_(builder_, interfaceDeclaration_4(builder_, level_ + 1)) && result_;
@@ -4250,15 +4241,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // entryType "&" entryType*
+  // entryType ("&" entryType)*
   public static boolean intersectionType(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "intersectionType")) return false;
     if (!nextTokenIs(builder_, UIDENTIFIER)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = entryType(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, OP_INTERSECTION);
-    result_ = result_ && intersectionType_2(builder_, level_ + 1);
+    result_ = result_ && intersectionType_1(builder_, level_ + 1);
     if (result_) {
       marker_.done(INTERSECTION_TYPE);
     }
@@ -4268,15 +4258,15 @@ public class CeylonParser implements PsiParser {
     return result_;
   }
 
-  // entryType*
-  private static boolean intersectionType_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "intersectionType_2")) return false;
+  // ("&" entryType)*
+  private static boolean intersectionType_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "intersectionType_1")) return false;
     int offset_ = builder_.getCurrentOffset();
     while (true) {
-      if (!entryType(builder_, level_ + 1)) break;
+      if (!intersectionType_1_0(builder_, level_ + 1)) break;
       int next_offset_ = builder_.getCurrentOffset();
       if (offset_ == next_offset_) {
-        empty_element_parsed_guard_(builder_, offset_, "intersectionType_2");
+        empty_element_parsed_guard_(builder_, offset_, "intersectionType_1");
         break;
       }
       offset_ = next_offset_;
@@ -4284,8 +4274,24 @@ public class CeylonParser implements PsiParser {
     return true;
   }
 
+  // "&" entryType
+  private static boolean intersectionType_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "intersectionType_1_0")) return false;
+    boolean result_ = false;
+    Marker marker_ = builder_.mark();
+    result_ = consumeToken(builder_, OP_INTERSECTION);
+    result_ = result_ && entryType(builder_, level_ + 1);
+    if (!result_) {
+      marker_.rollbackTo();
+    }
+    else {
+      marker_.drop();
+    }
+    return result_;
+  }
+
   /* ********************************************************** */
-  // qualifiedType (("&" qualifiedType)+)?
+  // qualifiedType ("&" qualifiedType)*
   public static boolean intersectionTypeExpression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "intersectionTypeExpression")) return false;
     if (!nextTokenIs(builder_, UIDENTIFIER)) return false;
@@ -4302,41 +4308,25 @@ public class CeylonParser implements PsiParser {
     return result_;
   }
 
-  // (("&" qualifiedType)+)?
+  // ("&" qualifiedType)*
   private static boolean intersectionTypeExpression_1(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "intersectionTypeExpression_1")) return false;
-    intersectionTypeExpression_1_0(builder_, level_ + 1);
-    return true;
-  }
-
-  // ("&" qualifiedType)+
-  private static boolean intersectionTypeExpression_1_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "intersectionTypeExpression_1_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = intersectionTypeExpression_1_0_0(builder_, level_ + 1);
     int offset_ = builder_.getCurrentOffset();
-    while (result_) {
-      if (!intersectionTypeExpression_1_0_0(builder_, level_ + 1)) break;
+    while (true) {
+      if (!intersectionTypeExpression_1_0(builder_, level_ + 1)) break;
       int next_offset_ = builder_.getCurrentOffset();
       if (offset_ == next_offset_) {
-        empty_element_parsed_guard_(builder_, offset_, "intersectionTypeExpression_1_0");
+        empty_element_parsed_guard_(builder_, offset_, "intersectionTypeExpression_1");
         break;
       }
       offset_ = next_offset_;
     }
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
+    return true;
   }
 
   // "&" qualifiedType
-  private static boolean intersectionTypeExpression_1_0_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "intersectionTypeExpression_1_0_0")) return false;
+  private static boolean intersectionTypeExpression_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "intersectionTypeExpression_1_0")) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = consumeToken(builder_, OP_INTERSECTION);
@@ -4566,27 +4556,6 @@ public class CeylonParser implements PsiParser {
     else {
       marker_.rollbackTo();
     }
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // memberName | typeName
-  public static boolean memberNameDeclaration(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "memberNameDeclaration")) return false;
-    if (!nextTokenIs(builder_, LIDENTIFIER) && !nextTokenIs(builder_, UIDENTIFIER)
-        && replaceVariants(builder_, 2, "<member name declaration>")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<member name declaration>");
-    result_ = memberName(builder_, level_ + 1);
-    if (!result_) result_ = typeName(builder_, level_ + 1);
-    if (result_) {
-      marker_.done(MEMBER_NAME_DECLARATION);
-    }
-    else {
-      marker_.rollbackTo();
-    }
-    result_ = exitErrorRecordingSection(builder_, level_, result_, false, _SECTION_GENERAL_, null);
     return result_;
   }
 
@@ -4860,15 +4829,13 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // memberNameDeclaration specifier ";"
+  // memberName specifier ";"
   public static boolean namedSpecifiedArgument(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "namedSpecifiedArgument")) return false;
-    if (!nextTokenIs(builder_, LIDENTIFIER) && !nextTokenIs(builder_, UIDENTIFIER)
-        && replaceVariants(builder_, 2, "<named specified argument>")) return false;
+    if (!nextTokenIs(builder_, LIDENTIFIER)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
-    enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<named specified argument>");
-    result_ = memberNameDeclaration(builder_, level_ + 1);
+    result_ = memberName(builder_, level_ + 1);
     result_ = result_ && specifier(builder_, level_ + 1);
     result_ = result_ && consumeToken(builder_, OP_SEMI_COLUMN);
     if (result_) {
@@ -4877,7 +4844,6 @@ public class CeylonParser implements PsiParser {
     else {
       marker_.rollbackTo();
     }
-    result_ = exitErrorRecordingSection(builder_, level_, result_, false, _SECTION_GENERAL_, null);
     return result_;
   }
 
@@ -5006,14 +4972,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "object" memberNameDeclaration extendedType? satisfiedTypes? (classBody | ";")
+  // "object" memberName extendedType? satisfiedTypes? (classBody | ";")
   public static boolean objectArgument(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "objectArgument")) return false;
     if (!nextTokenIs(builder_, KW_OBJECT)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = consumeToken(builder_, KW_OBJECT);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && objectArgument_2(builder_, level_ + 1);
     result_ = result_ && objectArgument_3(builder_, level_ + 1);
     result_ = result_ && objectArgument_4(builder_, level_ + 1);
@@ -5057,14 +5023,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "object" memberNameDeclaration extendedType? satisfiedTypes? (classBody | ";")
+  // "object" memberName extendedType? satisfiedTypes? (classBody | ";")
   public static boolean objectDeclaration(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "objectDeclaration")) return false;
     if (!nextTokenIs(builder_, KW_OBJECT)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = consumeToken(builder_, KW_OBJECT);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && objectDeclaration_2(builder_, level_ + 1);
     result_ = result_ && objectDeclaration_3(builder_, level_ + 1);
     result_ = result_ && objectDeclaration_4(builder_, level_ + 1);
@@ -5111,10 +5077,10 @@ public class CeylonParser implements PsiParser {
   // "package" packagePath ";"
   public static boolean packageDescriptor(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "packageDescriptor")) return false;
+    if (!nextTokenIs(builder_, KW_PACKAGE)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
-    enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<package descriptor>");
-    result_ = consumeToken(builder_, "package");
+    result_ = consumeToken(builder_, KW_PACKAGE);
     result_ = result_ && packagePath(builder_, level_ + 1);
     result_ = result_ && consumeToken(builder_, OP_SEMI_COLUMN);
     if (result_) {
@@ -5123,7 +5089,6 @@ public class CeylonParser implements PsiParser {
     else {
       marker_.rollbackTo();
     }
-    result_ = exitErrorRecordingSection(builder_, level_, result_, false, _SECTION_GENERAL_, null);
     return result_;
   }
 
@@ -6109,14 +6074,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "assign" memberNameDeclaration (block | ";")
+  // "assign" memberName (block | ";")
   public static boolean setterDeclaration(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "setterDeclaration")) return false;
     if (!nextTokenIs(builder_, KW_ASSIGN)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = consumeToken(builder_, KW_ASSIGN);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && setterDeclaration_2(builder_, level_ + 1);
     if (result_) {
       marker_.done(SETTER_DECLARATION);
@@ -6631,7 +6596,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // compilerAnnotations "given" typeNameDeclaration parameters? caseTypes? /*metatypes?*/ satisfiedTypes? abstractedType?
+  // compilerAnnotations "given" typeName parameters? caseTypes? /*metatypes?*/ satisfiedTypes? abstractedType?
   public static boolean typeConstraint(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "typeConstraint")) return false;
     if (!nextTokenIs(builder_, OP_ANNOTATION) && !nextTokenIs(builder_, KW_GIVEN)
@@ -6641,7 +6606,7 @@ public class CeylonParser implements PsiParser {
     enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<type constraint>");
     result_ = compilerAnnotations(builder_, level_ + 1);
     result_ = result_ && consumeToken(builder_, KW_GIVEN);
-    result_ = result_ && typeNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && typeName(builder_, level_ + 1);
     result_ = result_ && typeConstraint_3(builder_, level_ + 1);
     result_ = result_ && typeConstraint_4(builder_, level_ + 1);
     result_ = result_ && typeConstraint_5(builder_, level_ + 1);
@@ -6732,27 +6697,6 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // typeName | memberName
-  public static boolean typeNameDeclaration(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "typeNameDeclaration")) return false;
-    if (!nextTokenIs(builder_, LIDENTIFIER) && !nextTokenIs(builder_, UIDENTIFIER)
-        && replaceVariants(builder_, 2, "<type name declaration>")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<type name declaration>");
-    result_ = typeName(builder_, level_ + 1);
-    if (!result_) result_ = memberName(builder_, level_ + 1);
-    if (result_) {
-      marker_.done(TYPE_NAME_DECLARATION);
-    }
-    else {
-      marker_.rollbackTo();
-    }
-    result_ = exitErrorRecordingSection(builder_, level_, result_, false, _SECTION_GENERAL_, null);
-    return result_;
-  }
-
-  /* ********************************************************** */
   // typeName typeArguments?
   public static boolean typeNameWithArguments(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "typeNameWithArguments")) return false;
@@ -6798,14 +6742,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // variance? typeNameDeclaration "..."?
+  // variance? typeName "..."?
   public static boolean typeParameter(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "typeParameter")) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<type parameter>");
     result_ = typeParameter_0(builder_, level_ + 1);
-    result_ = result_ && typeNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && typeName(builder_, level_ + 1);
     result_ = result_ && typeParameter_2(builder_, level_ + 1);
     if (result_) {
       marker_.done(TYPE_PARAMETER);
@@ -6927,7 +6871,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // type memberNameDeclaration
+  // type memberName
   //     (
   //         typeParameters? parameters+ /*metatypes?*/ typeConstraints? (block | specifier? ";")
   //       | (specifier | initializer)? ";"
@@ -6939,7 +6883,7 @@ public class CeylonParser implements PsiParser {
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = type(builder_, level_ + 1);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && typedMethodOrAttributeDeclaration_2(builder_, level_ + 1);
     if (result_) {
       marker_.done(TYPED_METHOD_OR_ATTRIBUTE_DECLARATION);
@@ -7105,14 +7049,14 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // type memberNameDeclaration parameters* block
+  // type memberName parameters* block
   public static boolean typedMethodOrGetterArgument(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "typedMethodOrGetterArgument")) return false;
     if (!nextTokenIs(builder_, UIDENTIFIER)) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
     result_ = type(builder_, level_ + 1);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && typedMethodOrGetterArgument_2(builder_, level_ + 1);
     result_ = result_ && block(builder_, level_ + 1);
     if (result_) {
@@ -7449,7 +7393,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // ("void" | "function") memberNameDeclaration parameters* block
+  // ("void" | "function") memberName parameters* block
   public static boolean voidOrInferredMethodArgument(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "voidOrInferredMethodArgument")) return false;
     if (!nextTokenIs(builder_, KW_FUNCTION) && !nextTokenIs(builder_, KW_VOID)
@@ -7458,7 +7402,7 @@ public class CeylonParser implements PsiParser {
     Marker marker_ = builder_.mark();
     enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<void or inferred method argument>");
     result_ = voidOrInferredMethodArgument_0(builder_, level_ + 1);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && voidOrInferredMethodArgument_2(builder_, level_ + 1);
     result_ = result_ && block(builder_, level_ + 1);
     if (result_) {
@@ -7504,7 +7448,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // ("void" | "function") memberNameDeclaration typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
+  // ("void" | "function") memberName typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
   public static boolean voidOrInferredMethodDeclaration(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "voidOrInferredMethodDeclaration")) return false;
     if (!nextTokenIs(builder_, KW_FUNCTION) && !nextTokenIs(builder_, KW_VOID)
@@ -7513,7 +7457,7 @@ public class CeylonParser implements PsiParser {
     Marker marker_ = builder_.mark();
     enterErrorRecordingSection(builder_, level_, _SECTION_GENERAL_, "<void or inferred method declaration>");
     result_ = voidOrInferredMethodDeclaration_0(builder_, level_ + 1);
-    result_ = result_ && memberNameDeclaration(builder_, level_ + 1);
+    result_ = result_ && memberName(builder_, level_ + 1);
     result_ = result_ && voidOrInferredMethodDeclaration_2(builder_, level_ + 1);
     result_ = result_ && voidOrInferredMethodDeclaration_3(builder_, level_ + 1);
     result_ = result_ && voidOrInferredMethodDeclaration_4(builder_, level_ + 1);

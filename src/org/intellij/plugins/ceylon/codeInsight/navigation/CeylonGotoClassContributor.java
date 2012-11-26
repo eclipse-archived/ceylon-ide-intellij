@@ -5,7 +5,7 @@ import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
-import org.intellij.plugins.ceylon.psi.CeylonTypeNameDeclaration;
+import org.intellij.plugins.ceylon.psi.CeylonTypeName;
 import org.intellij.plugins.ceylon.psi.stub.ClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,8 +38,8 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
     @Nullable
     @Override
     public String getQualifiedName(NavigationItem item) {
-        if (item instanceof CeylonTypeNameDeclaration) {
-            return ((CeylonTypeNameDeclaration) item).getText();
+        if (item instanceof CeylonTypeName) {
+            return ((CeylonTypeName) item).getText();
         }
 
         return null;

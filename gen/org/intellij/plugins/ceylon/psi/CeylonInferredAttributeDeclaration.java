@@ -14,7 +14,7 @@ public interface CeylonInferredAttributeDeclaration extends CeylonCompositeEleme
   CeylonInitializer getInitializer();
 
   @NotNull
-  CeylonMemberNameDeclaration getMemberNameDeclaration();
+  CeylonMemberName getMemberName();
 
   @Nullable
   CeylonSpecifier getSpecifier();

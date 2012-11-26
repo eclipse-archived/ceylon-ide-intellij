@@ -132,10 +132,6 @@ public class CeylonVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitCompilationUnit(@NotNull CeylonCompilationUnit o) {
-    visitCompositeElement(o);
-  }
-
   public void visitCompilerAnnotation(@NotNull CeylonCompilerAnnotation o) {
     visitCompositeElement(o);
   }
@@ -433,10 +429,6 @@ public class CeylonVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitMemberNameDeclaration(@NotNull CeylonMemberNameDeclaration o) {
-    visitCompositeElement(o);
-  }
-
   public void visitMemberReference(@NotNull CeylonMemberReference o) {
     visitCompositeElement(o);
   }
@@ -682,10 +674,6 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitTypeName(@NotNull CeylonTypeName o) {
-    visitCompositeElement(o);
-  }
-
-  public void visitTypeNameDeclaration(@NotNull CeylonTypeNameDeclaration o) {
     visitCompositeElement(o);
   }
 

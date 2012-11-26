@@ -100,6 +100,7 @@
         KW_OF="of"
         KW_OUT="out"
         KW_OUTER="outer"
+        KW_PACKAGE="package" // not listed in documented keywords :-/
         KW_RETURN="return"
         KW_SATISFIES="satisfies"
         KW_SUPER="super"
@@ -115,17 +116,18 @@
 }
 
 external ceylon ::= parseCeylon compilationUnit
-private Comment ::= LINE_COMMENT | MULTI_LINE_COMMENT
 
-compilationUnit ::= (compilerAnnotations ";")?
+private compilationUnit ::= (compilerAnnotations ";")?
       (
-        Comment
+        comment
         | compilerAnnotations annotations (moduleDescriptor | packageDescriptor)
         | importList? (compilerAnnotations declaration)+ // TODO was * instead of +
       )
     {recoverUntil=ceylon_statement_recover}
 
 private ceylon_statement_recover ::= (!compilationUnit)
+
+private comment ::= LINE_COMMENT | MULTI_LINE_COMMENT
 
 moduleDescriptor ::= "module" packagePath QUOTED_LITERAL importModuleList
 
@@ -159,26 +161,22 @@ annotationName ::= LIDENTIFIER
 
 memberName ::= LIDENTIFIER
 
-memberNameDeclaration ::= memberName | typeName
+objectDeclaration ::= "object" memberName extendedType? satisfiedTypes? (classBody | ";")
 
-typeNameDeclaration ::= typeName | memberName
+voidOrInferredMethodDeclaration ::= ("void" | "function") memberName typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
 
-objectDeclaration ::= "object" memberNameDeclaration extendedType? satisfiedTypes? (classBody | ";")
+setterDeclaration ::= "assign" memberName (block | ";")
 
-voidOrInferredMethodDeclaration ::= ("void" | "function") memberNameDeclaration typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
+inferredAttributeDeclaration ::= "value" memberName ((specifier | initializer)? ";" | block)
 
-setterDeclaration ::= "assign" memberNameDeclaration (block | ";")
-
-inferredAttributeDeclaration ::= "value" memberNameDeclaration ((specifier | initializer)? ";" | block)
-
-typedMethodOrAttributeDeclaration ::= type memberNameDeclaration
+typedMethodOrAttributeDeclaration ::= type memberName
     (
         typeParameters? parameters+ /*metatypes?*/ typeConstraints? (block | specifier? ";")
       | (specifier | initializer)? ";"
       | block
     )
 
-interfaceDeclaration ::= "interface" typeNameDeclaration
+interfaceDeclaration ::= "interface" typeName
         typeParameters? caseTypes? /*metatypes?*/ adaptedTypes? satisfiedTypes?
         typeConstraints? (interfaceBody | typeSpecifier? ";") {
      pin=1
@@ -188,7 +186,7 @@ interfaceDeclaration ::= "interface" typeNameDeclaration
      customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
 }
 
-classDeclaration  ::= "class" typeNameDeclaration
+classDeclaration  ::= "class" typeName
         typeParameters? parameters? caseTypes? /*metatypes?*/ extendedType? satisfiedTypes?
         typeConstraints? (classBody | typeSpecifier? ";") {
     pin=1
@@ -198,7 +196,7 @@ classDeclaration  ::= "class" typeNameDeclaration
     customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
 }
 
-aliasDeclaration ::= "alias" typeNameDeclaration typeParameters? typeConstraints? typeSpecifier? ";"
+aliasDeclaration ::= "alias" typeName typeParameters? typeConstraints? typeSpecifier? ";"
 
 assertion ::= ASSERT conditions ";"
 
@@ -234,11 +232,11 @@ parameterType ::= type "..."? | "void"
 
 typeParameters ::= "<" typeParameter ("," typeParameter)* ">"
 
-typeParameter ::= variance? typeNameDeclaration "..."?
+typeParameter ::= variance? typeName "..."?
 
 variance ::= "in" | "out"
 
-typeConstraint ::= compilerAnnotations "given" typeNameDeclaration parameters? caseTypes? /*metatypes?*/ satisfiedTypes? abstractedType?
+typeConstraint ::= compilerAnnotations "given" typeName parameters? caseTypes? /*metatypes?*/ satisfiedTypes? abstractedType?
 
 typeConstraints ::= typeConstraint+
 
@@ -246,7 +244,7 @@ declarationOrStatement ::=compilerAnnotations
       ( 
         annotation* (assertion | declaration)
       | statement
-      | Comment
+      | comment
       )
 
 declaration ::= annotations (objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration
@@ -310,15 +308,15 @@ sequencedArgument ::= compilerAnnotations expressions "..."?
 
 namedArgument ::= compilerAnnotations (namedSpecifiedArgument | namedArgumentDeclaration)
 
-namedSpecifiedArgument ::= memberNameDeclaration specifier ";"
+namedSpecifiedArgument ::= memberName specifier ";"
 
-objectArgument ::= "object" memberNameDeclaration extendedType? satisfiedTypes? (classBody | ";")
+objectArgument ::= "object" memberName extendedType? satisfiedTypes? (classBody | ";")
 
-voidOrInferredMethodArgument ::= ("void" | "function") memberNameDeclaration parameters* block
+voidOrInferredMethodArgument ::= ("void" | "function") memberName parameters* block
 
-inferredGetterArgument ::= "value" memberNameDeclaration block
+inferredGetterArgument ::= "value" memberName block
 
-typedMethodOrGetterArgument ::= type memberNameDeclaration parameters* block
+typedMethodOrGetterArgument ::= type memberName parameters* block
 
 namedArgumentDeclaration ::= objectArgument | typedMethodOrGetterArgument | voidOrInferredMethodArgument | inferredGetterArgument
 
@@ -429,13 +427,13 @@ entryType ::= abbreviatedType ("->" abbreviatedType)?
 
 unionType ::= intersectionType ("|" intersectionType)*
 
-intersectionType ::= entryType "&" entryType*
+intersectionType ::= entryType ("&" entryType)*
 
 abbreviatedType ::= qualifiedType ("?" | "[]" | "(" (type ("," type)* )? ")")*
 
 unionTypeExpression ::= intersectionTypeExpression (("|" intersectionTypeExpression)+)?
 
-intersectionTypeExpression ::=qualifiedType (("&" qualifiedType)+)?
+intersectionTypeExpression ::=qualifiedType ("&" qualifiedType)*
 
 qualifiedType ::= supertypeQualifier? typeNameWithArguments ("." typeNameWithArguments)*
 
@@ -451,11 +449,11 @@ literalArguments ::= literalArgument*
 
 literalArgument ::= nonstringLiteral | myStringLiteral
 
-compilerAnnotations  ::= compilerAnnotation*
+compilerAnnotations ::= compilerAnnotation*
 
 compilerAnnotation ::= "@" annotationName ("[" myStringLiteral "]")?
 
-conditions ::="(" (condition ("," condition)*)? ")"
+conditions ::= "(" (condition ("," condition)*)? ")"
 
 condition ::= existsCondition | nonemptyCondition | isCondition | satisfiesCondition | booleanCondition
 

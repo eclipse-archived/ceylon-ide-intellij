@@ -24,8 +24,8 @@ public class CeylonAliasDeclarationImpl extends CeylonCompositeElementImpl imple
 
   @Override
   @NotNull
-  public CeylonTypeNameDeclaration getTypeNameDeclaration() {
-    return findNotNullChildByClass(CeylonTypeNameDeclaration.class);
+  public CeylonTypeName getTypeName() {
+    return findNotNullChildByClass(CeylonTypeName.class);
   }
 
   @Override

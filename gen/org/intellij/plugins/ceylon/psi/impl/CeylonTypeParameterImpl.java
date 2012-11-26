@@ -18,8 +18,8 @@ public class CeylonTypeParameterImpl extends CeylonCompositeElementImpl implemen
 
   @Override
   @NotNull
-  public CeylonTypeNameDeclaration getTypeNameDeclaration() {
-    return findNotNullChildByClass(CeylonTypeNameDeclaration.class);
+  public CeylonTypeName getTypeName() {
+    return findNotNullChildByClass(CeylonTypeName.class);
   }
 
   @Override

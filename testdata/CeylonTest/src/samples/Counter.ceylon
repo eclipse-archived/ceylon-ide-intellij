@@ -1,4 +1,6 @@
-class Counter(Integer initialValue=0) {
+package my.packagename;
+
+class CounterNopeMan(Integer initialValue=0) {
 
     @type["J4&J2"] variable value count := initialValue;
 
