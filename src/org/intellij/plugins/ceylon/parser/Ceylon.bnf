@@ -74,53 +74,43 @@
 	    OP_LOG_AND_EQ="&&="
 	    OP_ANNOTATION="@"
 
-        KW_IMPORT="import"
-        KW_CLASS="class"
-        KW_INTERFACE="interface"
-        KW_OBJECT="object"
-        KW_GIVEN="given"
-        KW_VALUE="value"
-        KW_ASSIGN="assign"
-        KW_VOID="void"
-        KW_FUNCTION="function"
-        KW_OF="of"
-        KW_EXTENDS="extends"
-        KW_SATISFIES="satisfies"
         KW_ADAPTS="adapts"
         KW_ABSTRACTS="abstracts"
-        KW_IN="in"
-        KW_OUT="out"
-        KW_RETURN="return"
+        KW_ASSIGN="assign"
         KW_BREAK="break"
-        KW_CONTINUE="continue"
-        KW_THROW="throw"
-        KW_IF="if"
-        KW_ELSE="else"
-        KW_SWITCH="switch"
         KW_CASE="case"
-        KW_FOR="for"
-        KW_WHILE="while"
-        KW_TRY="try"
         KW_CATCH="catch"
+        KW_CLASS="class"
+        KW_CONTINUE="continue"
+        KW_ELSE="else"
+        KW_EXISTS="exists"
+        KW_EXTENDS="extends"
         KW_FINALLY="finally"
+        KW_FOR="for"
+        KW_FUNCTION="function"
+        KW_GIVEN="given"
+        KW_IF="if"
+        KW_IMPORT="import"
+        KW_IN="in"
+        KW_INTERFACE="interface"
+        KW_IS="is"
+        KW_MODULE="module" // not listed in documented keywords :-/
+        KW_NONEMPTY="nonempty"
+        KW_OBJECT="object"
+        KW_OF="of"
+        KW_OUT="out"
+        KW_OUTER="outer"
+        KW_RETURN="return"
+        KW_SATISFIES="satisfies"
+        KW_SUPER="super"
+        KW_SWITCH="switch"
         KW_THEN="then"
         KW_THIS="this"
-        KW_OUTER="outer"
-        KW_SUPER="super"
-        KW_IS="is"
-        KW_EXISTS="exists"
-        KW_NONEMPTY="nonempty"
-        KW_MODULE="module"
-
-//        KW_SHARED="shared"
-//        KW_ABSTRACT="abstract"
-//        KW_FORMAL="formal"
-//        KW_DEFAULT="default"
-//        KW_ACTUAL="actual"
-//        KW_VARIABLE="variable"
-//        KW_DEPRECATED="deprecated"
-//        KW_LITERAL="literal"
-//        KW_SMALL="small"
+        KW_THROW="throw"
+        KW_TRY="try"
+        KW_VALUE="value"
+        KW_VOID="void"
+        KW_WHILE="while"
 	]
 }
 
@@ -214,10 +204,6 @@ assertion ::= ASSERT conditions ";"
 
 block ::="{" declarationOrStatement* "}"
 
-//Note: interface bodies can't really contain 
-//      statements, but error recovery works
-//      much better if we validate that later
-//      on, instead of doing it in the parser.
 interfaceBody ::= "{" declarationOrStatement* "}"
 
 classBody ::= "{" declarationOrStatement* "}"
@@ -234,30 +220,8 @@ caseTypes ::= "of" caseType ("|" caseType)*
 
 caseType ::= qualifiedType | memberName
 
-//Support for metatypes
-//Note that we don't need this for now
-/*metatypes
-   ::="is" type ('&' type)* 
-    -> ^(METATYPES[$"is"] type*)
-    ;*/
-
 parameters ::= "(" (parameterDeclaration ("," parameterDeclaration)*)? ")"
 
-//special rule for syntactic predicate
-//to distinguish between a formal 
-//parameter list and a parenthesized body 
-//of an inline callable argument
-//be careful with this one, since it 
-//matches "()", which can also be an 
-//argument list
-//parametersStart
-//   ::="(" ( annotatedDeclarationStart | ")" )
-//    ;
-
-// FIXME: This accepts more than the language spec: named arguments
-// and varargs arguments can appear in any order.  We'll have to
-// enforce the rule that the ... appears at the end of the parapmeter
-// list in a later pass of the compiler.
 parameter ::= parameterType memberName (parameters+ | valueParameter?) specifier?
 
 parameterRef ::= memberName specifier?
@@ -287,43 +251,6 @@ declarationOrStatement ::=compilerAnnotations
 
 declaration ::= annotations (objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration
     | typedMethodOrAttributeDeclaration | classDeclaration | interfaceDeclaration | aliasDeclaration)
-
-//special rule for syntactic predicate
-//to distinguish between an annotation
-//and an expression statement
-/*annotatedDeclarationStart
-   ::=declarationStart
-    | LIDENTIFIER
-      ( 
-          declarationStart
-        | LIDENTIFIER
-        | nonstringLiteral | stringLiteral
-        | arguments annotatedDeclarationStart //we need to recurse because it could be an inline callable argument
-      )
-    ;*/
-
-//annotatedDeclarationStart
-//   ::=declarationStart
-//    ;
-
-//special rule for syntactic predicates
-//that distinguish declarations from
-//expressions
-//declarationStart
-//   ::=declarationKeyword
-//    | type ("..." | LIDENTIFIER)
-//    ;
-
-//declarationKeyword
-//   ::="value"
-//    | "function"
-//    | "assign"
-//    | "void"
-//    | "interface"
-//    | "class"
-//    | "object"
-//    | "alias"
-//    ;
 
 statement ::= directiveStatement | controlStatement | expressionOrSpecificationStatement
 
@@ -371,20 +298,6 @@ memberReference ::= memberName typeArguments?
 
 typeReference ::= typeName typeArguments?
 
-//special rule for syntactic predicate to 
-//determine if we have a < operator, or a
-//type argument list
-//typeArgumentsStart
-//   ::="<"
-//    (
-//      UIDENTIFIER ('.' UIDENTIFIER)* /*| 'subtype')*/ ("default"|"[]")*
-//      (("&"|"|"|"->") UIDENTIFIER ('.' UIDENTIFIER)* ("default"|"[]")*)*
-//      (">"|"<"|","|"..."|"("|")")
-//    |
-//      ">" //for IDE only!
-//    )
-//    ;
-
 indexOrIndexRange ::= elementSelectionOperator index ("..." | ".."  index | ":" index)? "]"
 
 index ::= additiveExpression
@@ -399,468 +312,104 @@ namedArgument ::= compilerAnnotations (namedSpecifiedArgument | namedArgumentDec
 
 namedSpecifiedArgument ::= memberNameDeclaration specifier ";"
 
-objectArgument 
-   ::="object" 
+objectArgument ::= "object" memberNameDeclaration extendedType? satisfiedTypes? (classBody | ";")
 
-      memberNameDeclaration
+voidOrInferredMethodArgument ::= ("void" | "function") memberNameDeclaration parameters* block
 
-      ( 
-        extendedType
+inferredGetterArgument ::= "value" memberNameDeclaration block
 
-      )?
-      ( 
-        satisfiedTypes
+typedMethodOrGetterArgument ::= type memberNameDeclaration parameters* block
 
-      )?
-      (
-        classBody
+namedArgumentDeclaration ::= objectArgument | typedMethodOrGetterArgument | voidOrInferredMethodArgument | inferredGetterArgument
 
-      | 
-        ";"
+parExpression  ::= "(" assignmentExpression ")"
 
-      )
-    //-> ^(OBJECT_ARGUMENT[$"object"] "value" memberName extendedType? satisfiedTypes? classBody?)
+positionalArguments ::= "(" (positionalArgument ("," positionalArgument)* "..."?)? comprehension? ")"
 
-voidOrInferredMethodArgument 
-   ::=
-      (
-        "void"
+positionalArgument ::= functionOrExpression
 
-      |
-        "function"
+functionOrExpression ::= "function"? parameters parameters* "=>" expression | expression
 
-      ) 
-      memberNameDeclaration 
+comprehension ::= forComprehensionClause
 
-      (
-        parameters
+comprehensionClause ::= forComprehensionClause | ifComprehensionClause | expressionComprehensionClause
 
-      )*
-      block
+expressionComprehensionClause ::= expression
 
-    //-> ^(METHOD_ARGUMENT "void" memberName parameters* block)
+forComprehensionClause ::= "for" forIterator comprehensionClause
 
-inferredGetterArgument 
-   ::=
-      "value" 
+ifComprehensionClause ::= "if" conditions comprehensionClause
 
-      memberNameDeclaration 
+assignmentExpression ::= thenElseExpression (assignmentOperator assignmentExpression)?
 
-      block
+assignmentOperator ::= ":=" | "+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" | "^=" | "~=" | "&&=" | "||="
 
-      //-> ^(ATTRIBUTE_ARGUMENT "value" memberName block)      
+thenElseExpression ::= disjunctionExpression (thenElseOperator disjunctionExpression)*
 
-typedMethodOrGetterArgument 
+thenElseOperator ::= "else" | "then"
 
-   ::=type 
+disjunctionExpression ::= conjunctionExpression (disjunctionOperator conjunctionExpression)*
 
-      memberNameDeclaration
+disjunctionOperator ::= "||"
 
-      ( 
+conjunctionExpression ::= logicalNegationExpression (conjunctionOperator logicalNegationExpression)*
 
-        (
-          parameters
+conjunctionOperator ::= "&&"
 
-        )+
-      )?
-      block
+logicalNegationExpression ::= notOperator logicalNegationExpression | equalityExpression
 
-      //-> ^(METHOD_ARGUMENT unionType memberName parameters+ memberBody)
-      //-> ^(ATTRIBUTE_ARGUMENT unionType memberName memberBody)      
+notOperator ::= "!"
 
-namedArgumentDeclaration 
-   ::=objectArgument
+equalityExpression ::= comparisonExpression (equalityOperator comparisonExpression)?
 
-    | typedMethodOrGetterArgument
+equalityOperator ::= "==" | "!=" | "==="
 
-    | voidOrInferredMethodArgument
+comparisonExpression ::= existenceEmptinessExpression (comparisonOperator existenceEmptinessExpression | typeOperator type)?
+    | typeOperator comparableType existenceEmptinessExpression
 
-    | inferredGetterArgument
+comparableType ::= unionTypeExpression
 
-//special rule for syntactic predicate
-//to distinguish between a named argument
-//and a sequenced argument
-//namedArgumentStart
-//   ::=compilerAnnotation*
-//      (specificationStart | declarationStart)
-//    ;
+comparisonOperator ::= "<=>" | "<=" | ">=" | ">" | "<" | "in"
 
-//special rule for syntactic predicates
-//specificationStart
-//   ::=LIDENTIFIER '='
-//    ;
+typeOperator ::= "is" | "extends" | "satisfies"
 
-parExpression  
-   ::="(" 
+existenceEmptinessExpression ::= rangeIntervalEntryExpression existsNonemptyOperator? | existsNonemptyOperator rangeIntervalEntryExpression
 
-      assignmentExpression
+existsNonemptyOperator ::= "exists" | "nonempty"
 
-      ")"
+rangeIntervalEntryExpression ::= additiveExpression (rangeIntervalEntryOperator additiveExpression)?
 
-positionalArguments 
-   ::="(" 
+rangeIntervalEntryOperator ::= ".." | ":" | "->"
 
-      ( positionalArgument
+additiveExpression ::= multiplicativeExpression (additiveOperator multiplicativeExpression)*
 
-        (
-          "," 
+additiveOperator ::= "+" | "-" | "|" | "^" | "~"
 
-          (
-            positionalArgument
+multiplicativeExpression ::= defaultExpression (multiplicativeOperator defaultExpression)*
 
-          | 
-          )
-        )* 
-        (
-          "..."
+multiplicativeOperator ::= "*" | "/" | "%" | "&"
 
-        )?
-      )? 
-      (
-        comprehension
+defaultExpression ::= negationComplementExpression (defaultOperator negationComplementExpression)*
 
-      )?
-      ")"
+defaultOperator ::= "default"
 
-positionalArgument 
+negationComplementExpression ::= unaryMinusOrComplementOperator negationComplementExpression | exponentiationExpression
 
-   ::=functionOrExpression
+unaryMinusOrComplementOperator ::= "-" | "+"
 
-functionOrExpression 
-
-   ::=
-      (
-        "function" 
-
-      | "void"
-
-      )?
-      parameters
-
-      ( 
-//        (parametersStart)=>
-        parameters
-
-      )*
-      expression
-
-    /*| "value"
-      { fa.setType(new FunctionModifier($"value")); } 
-      e1=expression
-      { fa.addParameterList(new ParameterList(null));
-        fa.setExpression($e1.expression); 
-        $positionalArgument = fa; }*/
-    | expression
-
-/*inlineFunctionalArgument
-   ::=memberName ((parametersStart) => parameters)? 
-      ("(" expression ")" | block)
-    ;*/
-
-comprehension 
-
-   ::=forComprehensionClause
-
-comprehensionClause 
-   ::=forComprehensionClause 
-
-    | ifComprehensionClause 
-
-    | expressionComprehensionClause 
-
-expressionComprehensionClause 
-   ::=expression
-
-    | 
-
-forComprehensionClause 
-   ::="for"
-
-      forIterator
-
-      comprehensionClause
-
-ifComprehensionClause 
-   ::="if"
-
-      conditions
-
-      comprehensionClause
-
-assignmentExpression 
-   ::=thenElseExpression
-
-      (
-        assignmentOperator 
-
-        assignmentExpression
-
-      )?
-
-assignmentOperator 
-   ::=":="
-    //| APPLY_OP 
-    | "+="
-    | "-="
-    | "*="
-    | "/="
-    | "%="
-    | "&="
-    | "|="
-    | "^="
-    | "~="
-    | "&&="
-    | "||="
-    //| DEFAULT_"assign"_OP { $operator = new DefaultAssignOp($DEFAULT_"assign"_OP); }
-
-thenElseExpression 
-   ::=disjunctionExpression
-
-      (
-        thenElseOperator 
-
-        disjunctionExpression
-
-      )*
-
-thenElseOperator 
-   ::="else" 
-
-    | "then"
-
-disjunctionExpression 
-   ::=conjunctionExpression
-
-      (
-        disjunctionOperator 
-
-        conjunctionExpression
-
-      )*
-
-disjunctionOperator 
-   ::="||" 
-
-conjunctionExpression 
-   ::=logicalNegationExpression
-
-      (
-        conjunctionOperator 
-
-        logicalNegationExpression
-
-      )*
-
-conjunctionOperator 
-   ::="&&" 
-
-logicalNegationExpression 
-   ::=notOperator 
-
-      logicalNegationExpression
-
-    | equalityExpression
-
-notOperator 
-   ::="!" 
-
-equalityExpression 
-   ::=comparisonExpression
-
-      (
-        equalityOperator 
-
-        comparisonExpression
-
-      )?
-
-equalityOperator 
-   ::="==" 
-
-    | "!="
-
-    | "==="
-
-comparisonExpression 
-   ::=existenceEmptinessExpression
-
-      (
-        comparisonOperator 
-
-        existenceEmptinessExpression
-
-      | typeOperator
-
-        type
-
-      )?
-    | typeOperator
-
-      comparableType //TODO: support "type" here, using a predicate
-
-      existenceEmptinessExpression
-
-comparableType 
-   ::=unionTypeExpression 
-
-comparisonOperator 
-   ::="<=>" 
-
-    | "<="
-
-    | ">="
-
-    | ">"
-
-    | "<"
-
-    | "in"
-
-typeOperator 
-   ::="is"
-
-    | "extends"
-
-    | "satisfies"
-
-existenceEmptinessExpression 
-   ::=rangeIntervalEntryExpression
-
-      (
-        existsNonemptyOperator
-
-      )?
-    | existsNonemptyOperator
-
-      rangeIntervalEntryExpression
-
-existsNonemptyOperator 
-   ::="exists" 
-
-    | "nonempty"
-
-rangeIntervalEntryExpression 
-   ::=additiveExpression
-
-      (
-        rangeIntervalEntryOperator 
-
-        additiveExpression
-
-      )?
-
-rangeIntervalEntryOperator 
-   ::=".." 
-
-    | ":"
-
-    | "->"
-
-additiveExpression 
-   ::=multiplicativeExpression
-
-      (
-        additiveOperator 
-
-        multiplicativeExpression
-
-      )*
-
-additiveOperator 
-   ::="+" 
-
-    | "-"
-
-    | "|"
-
-    | "^"
-
-    | "~"
-
-multiplicativeExpression 
-   ::=defaultExpression
-
-      (
-        multiplicativeOperator 
-
-        defaultExpression
-
-      )*
-
-multiplicativeOperator 
-   ::="*" 
-
-    | "/"
-
-    | "%"
-
-    | "&"
-
-defaultExpression 
-   ::=negationComplementExpression
-
-      (
-        defaultOperator 
-
-        negationComplementExpression
-
-      )*
-
-defaultOperator 
-   ::="default" 
-
-negationComplementExpression 
-   ::=unaryMinusOrComplementOperator 
-
-      negationComplementExpression
-
-    | exponentiationExpression
-
-unaryMinusOrComplementOperator 
-   ::="-" 
-
-    | "+"
-
-exponentiationExpression 
-   ::=incrementDecrementExpression
-
-      (
-        exponentiationOperator
-
-        exponentiationExpression
-
-      )?
+exponentiationExpression ::= incrementDecrementExpression (exponentiationOperator exponentiationExpression)?
 
 exponentiationOperator ::= "**"
 
-incrementDecrementExpression 
-   ::=prefixOperator
-
-      incrementDecrementExpression
-
-    | postfixIncrementDecrementExpression
+incrementDecrementExpression ::= prefixOperator incrementDecrementExpression | postfixIncrementDecrementExpression
 
 prefixOperator ::= "--" | "++"
 
-postfixIncrementDecrementExpression 
-   ::=primary 
+postfixIncrementDecrementExpression ::= primary postfixOperator*
 
-      (
-        postfixOperator
+postfixOperator ::= "--" | "++"
 
-      )*
-
-postfixOperator 
-   ::="--" 
-
-    | "++" 
-
-selfReference 
-   ::="this"
-
-    | "super" 
-
-    | "outer"
+selfReference ::= "this" | "super" | "outer"
 
 nonstringLiteral ::= NATURAL_LITERAL | FLOAT_LITERAL | QUOTED_LITERAL | CHAR_LITERAL
 
@@ -868,91 +417,19 @@ stringExpression ::= stringTemplate | myStringLiteral
 
 myStringLiteral ::= STRING_LITERAL
 
-stringTemplate 
-   ::=myStringLiteral
+stringTemplate ::= myStringLiteral (expression myStringLiteral)+
 
-      (
-        expression myStringLiteral
+typeArguments ::= "<" typeArgument ("," typeArgument)* ">"
 
-      )+
+typeArgument ::= type "..."?
 
-typeArguments 
-   ::="<"
+type ::= unionType
 
-      typeArgument 
+entryType ::= abbreviatedType ("->" abbreviatedType)?
 
-      (
-        ","
+unionType ::= intersectionType ("|" intersectionType)*
 
-        (
-          typeArgument
-
-          | 
-        )
-      )* 
-      ">"
-
-typeArgument 
-   ::=type
-
-      ( 
-        "..."
-
-      )? 
-
-type 
-   ::=unionType 
-
-entryType 
-
-   ::=abbreviatedType
-
-      (
-        "->"
-
-        (
-          abbreviatedType
-
-//        | { displayRecognitionError(getTokenNames(), 
-//                new MismatchedTokenException(UIDENTIFIER, input)); }
-        )
-      )?
-
-unionType 
-
-   ::=intersectionType
-
-      ( 
-        (
-          "|"
-
-          (
-            intersectionType
-
-//          | { displayRecognitionError(getTokenNames(), 
-//                new MismatchedTokenException(UIDENTIFIER, input)); }
-          )
-        )+
-
-      )?
-
-intersectionType 
-
-   ::=entryType
-
-      ( 
-        (
-          "&"
-
-          (
-            entryType
-
-//          | { displayRecognitionError(getTokenNames(), 
-//                new MismatchedTokenException(UIDENTIFIER, input)); }
-          )
-        )+
-
-      )?
+intersectionType ::= entryType "&" entryType*
 
 abbreviatedType ::= qualifiedType ("?" | "[]" | "(" (type ("," type)* )? ")")*
 

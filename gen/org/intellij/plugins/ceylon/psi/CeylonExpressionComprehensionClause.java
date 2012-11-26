@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface CeylonExpressionComprehensionClause extends CeylonCompositeElement {
 
-  @Nullable
+  @NotNull
   CeylonExpression getExpression();
 
 }

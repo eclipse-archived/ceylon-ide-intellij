@@ -17,9 +17,9 @@ public class CeylonExpressionComprehensionClauseImpl extends CeylonCompositeElem
   }
 
   @Override
-  @Nullable
+  @NotNull
   public CeylonExpression getExpression() {
-    return findChildByClass(CeylonExpression.class);
+    return findNotNullChildByClass(CeylonExpression.class);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
