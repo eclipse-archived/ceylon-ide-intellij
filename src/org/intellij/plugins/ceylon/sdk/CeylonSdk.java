@@ -7,6 +7,7 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ArrayUtil;
 import org.jdom.Element;
@@ -166,7 +167,8 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
             if (libDir != null) {
                 for (VirtualFile file : libDir.getChildren()) {
                     if ("jar".equals(file.getExtension())) {
-                        sdkModificator.addRoot(file, OrderRootType.CLASSES);
+                        VirtualFile jar = JarFileSystem.getInstance().findFileByPath(file.getPath() + JarFileSystem.JAR_SEPARATOR);
+                        sdkModificator.addRoot(jar, OrderRootType.CLASSES);
                     }
                 }
             }
@@ -188,7 +190,8 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
                 String.format("repo/%s/%s/%s-%s.%s", jarName.replace('.', '/'), sdk.getVersionString(), jarName, sdk.getVersionString(), extension));
 
         if (file != null) {
-            sdkModificator.addRoot(file, OrderRootType.CLASSES);
+            VirtualFile jar = JarFileSystem.getInstance().findFileByPath(file.getPath() + JarFileSystem.JAR_SEPARATOR);
+            sdkModificator.addRoot(jar, OrderRootType.CLASSES);
         }
     }
 
