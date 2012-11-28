@@ -5,9 +5,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.intellij.plugins.ceylon.psi.CeylonClass;
-import org.intellij.plugins.ceylon.psi.CeylonQualifiedType;
-import org.intellij.plugins.ceylon.psi.CeylonSupertypeQualifier;
+import org.intellij.plugins.ceylon.psi.*;
+import org.intellij.plugins.ceylon.psi.impl.CeylonIdentifier;
 import org.intellij.plugins.ceylon.psi.stub.ClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,22 +22,47 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
     @Nullable
     @Override
     public PsiElement resolve() {
-        CeylonQualifiedType qualifiedType = PsiTreeUtil.getParentOfType(myElement, CeylonQualifiedType.class);
+        if (!(myElement instanceof CeylonIdentifier)) {
+            throw new UnsupportedOperationException();
+        }
+
         String name = myElement.getText();
+        CeylonQualifiedType qualifiedType = PsiTreeUtil.getParentOfType(myElement, CeylonQualifiedType.class);
 
+        CeylonFile containingFile = (CeylonFile) myElement.getContainingFile();
+        CeylonImportDeclaration[] potentialImports = containingFile.getPotentialImportsForType((CeylonTypeName) myElement);
 
-        if (qualifiedType != null) {
-            // TODO surely incomplete, test foo.bar.MyClass:MySubclass (should get qualified name instead of text)
-            CeylonSupertypeQualifier supertypeQualifier = qualifiedType.getSupertypeQualifier();
-            if (supertypeQualifier != null && !supertypeQualifier.getTypeName().equals(myElement)) {
-                name = supertypeQualifier.getTypeName().getText() + "." + name;
+        String fqn;
+
+        if (potentialImports.length > 0) {
+            for (CeylonImportDeclaration potentialImport : potentialImports) {
+                fqn = potentialImport.getPackagePath().getText() + "." + myElement.getText();
+                PsiElement resolved = resolveByFqn(fqn);
+
+                if (resolved != null) {
+                    return resolved;
+                }
             }
         }
 
-        if (name == null) {
-            return null;
-        }
-        Collection<CeylonClass> decls = ClassIndex.getInstance().get(name, myElement.getProject(),
+        fqn = containingFile.getPackageName() + "." + myElement.getText();
+        return resolveByFqn(fqn);
+//        if (qualifiedType != null) {
+//            // TODO surely incomplete, test foo.bar.MyClass:MySubclass (should get qualified name instead of text)
+//            // Also test class A { class B; class C extends B} and in separate file, class B
+//            CeylonSupertypeQualifier supertypeQualifier = qualifiedType.getSupertypeQualifier();
+//            if (supertypeQualifier != null && !supertypeQualifier.getTypeName().equals(myElement)) {
+//                name = supertypeQualifier.getTypeName().getText() + "." + name;
+//            }
+//        }
+//
+//        if (name == null) {
+//            return null;
+//        }
+    }
+
+    private PsiElement resolveByFqn(String fqn) {
+        Collection<CeylonClass> decls = ClassIndex.getInstance().get(fqn, myElement.getProject(),
                 GlobalSearchScope.projectScope(myElement.getProject()));
 
         if (!decls.isEmpty()) {

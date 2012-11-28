@@ -87,13 +87,14 @@ public class CeylonClassImpl extends CeylonClassDeclarationImpl implements Ceylo
 
     @Override
     public String getQualifiedName() {
-        // TODO not nice
         CeylonClass parentClass = PsiTreeUtil.getParentOfType(this, CeylonClass.class);
 
         if (parentClass != null) {
             return parentClass.getQualifiedName() + "." + getName();
         } else {
-            // TODO package name
+            if (getContainingFile() instanceof CeylonFile) {
+                return ((CeylonFile) getContainingFile()).getPackageName() + "." + getName();
+            }
             return getName();
         }
     }

@@ -31,9 +31,10 @@ public class CeylonSdkAdditionalDataConfigurable implements AdditionalDataConfig
             }
         }
 
-        if (sdk != null) {
+        Sdk internalSdk = CeylonSdk.getInternalSdk(sdk);
+        if (sdk != null && internalSdk != null) {
             for (int i = 0; i < jdkComboBox.getItemCount(); i++) {
-                if (jdkComboBox.getItemAt(i).getName().equals(CeylonSdk.getInternalSdk(sdk).getName())) {
+                if (jdkComboBox.getItemAt(i).getName().equals(internalSdk.getName())) {
                     jdkComboBox.setSelectedIndex(i);
                     break;
                 }
@@ -55,7 +56,9 @@ public class CeylonSdkAdditionalDataConfigurable implements AdditionalDataConfig
 
     @Override
     public boolean isModified() {
-        return !jdkComboBox.getSelectedItem().equals(CeylonSdk.getInternalSdk(sdk));
+        Sdk selectedItem = (Sdk) jdkComboBox.getSelectedItem();
+        Sdk internalSdk = CeylonSdk.getInternalSdk(sdk);
+        return (internalSdk == null) || !selectedItem.getName().equals(internalSdk.getName());
     }
 
     @Override

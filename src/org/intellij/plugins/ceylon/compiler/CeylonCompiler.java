@@ -64,7 +64,7 @@ public class CeylonCompiler implements TranslatingCompiler {
 
             for (Module module : moduleChunk.getNodes()) {
                 for (VirtualFile sourceRoot : context.getSourceRoots(module)) {
-                    params.add("-src", sourceRoot.getPath().replace("/", "\\"));
+                    params.add("-src", sourceRoot.getPath());
                 }
             }
 
