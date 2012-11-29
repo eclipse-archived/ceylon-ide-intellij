@@ -1,11 +1,14 @@
 package org.intellij.plugins.ceylon.codeInsight.resolve;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.PsiTreeUtil;
-import org.intellij.plugins.ceylon.psi.*;
+import org.intellij.plugins.ceylon.psi.CeylonClass;
+import org.intellij.plugins.ceylon.psi.CeylonFile;
+import org.intellij.plugins.ceylon.psi.CeylonImportDeclaration;
+import org.intellij.plugins.ceylon.psi.CeylonTypeName;
 import org.intellij.plugins.ceylon.psi.impl.CeylonIdentifier;
 import org.intellij.plugins.ceylon.psi.stub.ClassIndex;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +30,6 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
         }
 
         String name = myElement.getText();
-        CeylonQualifiedType qualifiedType = PsiTreeUtil.getParentOfType(myElement, CeylonQualifiedType.class);
 
         CeylonFile containingFile = (CeylonFile) myElement.getContainingFile();
         CeylonImportDeclaration[] potentialImports = containingFile.getPotentialImportsForType((CeylonTypeName) myElement);
@@ -36,7 +38,7 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
 
         if (potentialImports.length > 0) {
             for (CeylonImportDeclaration potentialImport : potentialImports) {
-                fqn = potentialImport.getPackagePath().getText() + "." + myElement.getText();
+                fqn = potentialImport.getPackagePath().getText() + "." + name;
                 PsiElement resolved = resolveByFqn(fqn);
 
                 if (resolved != null) {
@@ -45,8 +47,24 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
             }
         }
 
-        fqn = containingFile.getPackageName() + "." + myElement.getText();
-        return resolveByFqn(fqn);
+        fqn = containingFile.getPackageName() + "." + name;
+        PsiElement resolved = resolveByFqn(fqn);
+        if (resolved != null) {
+            return resolved;
+        }
+
+        Project project = myElement.getProject();
+
+        Collection<CeylonClass> classes = ClassIndex.getInstance().get("ceylon.language." + name, project, GlobalSearchScope.allScope(project));
+
+        if (!classes.isEmpty()) {
+            return classes.iterator().next();
+        }
+
+        return null;
+//        return JavaPsiFacade.getInstance(project).findClass("ceylon.language." + name, GlobalSearchScope.allScope(project));
+
+//        CeylonQualifiedType qualifiedType = PsiTreeUtil.getParentOfType(myElement, CeylonQualifiedType.class);
 //        if (qualifiedType != null) {
 //            // TODO surely incomplete, test foo.bar.MyClass:MySubclass (should get qualified name instead of text)
 //            // Also test class A { class B; class C extends B} and in separate file, class B
