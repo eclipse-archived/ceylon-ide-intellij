@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.editor;
+package org.intellij.plugins.ceylon.lang;
 
 import com.intellij.lang.CodeDocumentationAwareCommenterEx;
 import com.intellij.psi.PsiComment;

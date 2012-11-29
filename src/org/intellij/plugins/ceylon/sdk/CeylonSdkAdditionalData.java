@@ -13,6 +13,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizable;
 import com.intellij.openapi.util.WriteExternalException;
 import org.jdom.Element;
+import org.jetbrains.annotations.Nullable;
 
 @State(
         name = "CeylonSDK",
@@ -59,10 +60,14 @@ public class CeylonSdkAdditionalData implements ValidatableSdkAdditionalData, JD
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
         DefaultJDOMExternalizer.writeExternal(myOptions, element);
-        element.setAttribute("sdk", myOptions.myJavaSdk.getName());
+        Sdk javaSdk = myOptions.myJavaSdk;
+        if (javaSdk != null) {
+            element.setAttribute("sdk", javaSdk.getName());
+        }
     }
 
     public static class CeylonSdkOptions {
+        @Nullable
         private Sdk myJavaSdk;
     }
 

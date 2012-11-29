@@ -2,7 +2,6 @@ package org.intellij.plugins.ceylon.highlighting;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.SyntaxHighlighterColors;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
@@ -87,9 +86,6 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
         keys.put(CeylonTypes.OP_DOT, SyntaxHighlighterColors.DOT);
         keys.put(CeylonTypes.OP_SEMI_COLUMN, SyntaxHighlighterColors.JAVA_SEMICOLON);
         keys.put(CeylonTypes.OP_COMMA, SyntaxHighlighterColors.COMMA);
-
-        // TODO better do it in the HighlightVisitor, otherwise @ may be colored before the annotation name
-        keys.put(CeylonTypes.OP_ANNOTATION, CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES);
     }
 
     @NotNull

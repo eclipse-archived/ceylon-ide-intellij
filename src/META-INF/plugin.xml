@@ -35,9 +35,11 @@
         <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.parser.CeylonParserDefinition"/>
 
         <lang.syntaxHighlighterFactory key="Ceylon" implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
-        <highlightVisitor implementation="org.intellij.plugins.ceylon.highlighting.CeylonHighlightVisitor"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonAnnotator"/>
-        <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.editor.CeylonCommenter"/>
+        <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.highlighting.CeylonFileHighlightFilter"/>
+
+        <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonCommenter"/>
+        <lang.braceMatcher language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonBraceMatcher"/>
 
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>
         <stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>
