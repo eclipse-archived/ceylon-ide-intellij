@@ -53,6 +53,7 @@
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
         <sdkType implementation="org.intellij.plugins.ceylon.sdk.CeylonSdk"/>
+        <psi.clsCustomNavigationPolicy implementation="org.intellij.plugins.ceylon.psi.compiled.CeylonClsCustomNavigationPolicy" order="first"/>
         <compiler implementation="org.intellij.plugins.ceylon.compiler.CeylonCompiler"/>
     </extensions>
 </idea-plugin>
