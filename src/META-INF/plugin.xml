@@ -36,6 +36,7 @@
 
         <lang.syntaxHighlighterFactory key="Ceylon" implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
         <highlightVisitor implementation="org.intellij.plugins.ceylon.highlighting.CeylonHighlightVisitor"/>
+        <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonAnnotator"/>
         <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.editor.CeylonCommenter"/>
 
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>

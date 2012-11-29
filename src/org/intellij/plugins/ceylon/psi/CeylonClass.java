@@ -12,7 +12,14 @@ public interface CeylonClass extends PsiNameIdentifierOwner, CeylonClassDeclarat
 
     CeylonInterfaceBody getInterfaceBody();
 
+    @Nullable
+    String getPackage();
+
+    @Nullable
     String getQualifiedName();
 
+    @Nullable
     CeylonClass getParentClass();
+
+    boolean isShared();
 }

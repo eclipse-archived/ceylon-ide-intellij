@@ -79,6 +79,15 @@ public class CeylonClassImpl extends CeylonClassDeclarationImpl implements Ceylo
     }
 
     @Override
+    public String getPackage() {
+        if (getContainingFile() instanceof CeylonFile) {
+            return ((CeylonFile) getContainingFile()).getPackageName();
+        }
+
+        return null;
+    }
+
+    @Override
     public String getName() {
         PsiElement nameIdentifier = getNameIdentifier();
 
@@ -91,17 +100,28 @@ public class CeylonClassImpl extends CeylonClassDeclarationImpl implements Ceylo
 
         if (parentClass != null) {
             return parentClass.getQualifiedName() + "." + getName();
-        } else {
-            if (getContainingFile() instanceof CeylonFile) {
-                return ((CeylonFile) getContainingFile()).getPackageName() + "." + getName();
-            }
-            return getName();
         }
+
+        String myPackage = getPackage();
+        return myPackage == null ? getName() : myPackage + "." + getName();
     }
 
     @Override
     public CeylonClass getParentClass() {
         return PsiTreeUtil.getParentOfType(this, CeylonClass.class);
+    }
+
+    @Override
+    public boolean isShared() {
+        CeylonAnnotations annotations = ((CeylonDeclaration) getParent()).getAnnotations();
+
+        for (CeylonAnnotation annotation : annotations.getAnnotationList()) {
+            if (annotation.getAnnotationName().getText().equals("shared")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Nullable
