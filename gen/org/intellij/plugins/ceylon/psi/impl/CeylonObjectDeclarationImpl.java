@@ -18,8 +18,8 @@ public class CeylonObjectDeclarationImpl extends CeylonCompositeElementImpl impl
 
   @Override
   @Nullable
-  public CeylonClassBody getClassBody() {
-    return findChildByClass(CeylonClassBody.class);
+  public CeylonBlock getBlock() {
+    return findChildByClass(CeylonBlock.class);
   }
 
   @Override

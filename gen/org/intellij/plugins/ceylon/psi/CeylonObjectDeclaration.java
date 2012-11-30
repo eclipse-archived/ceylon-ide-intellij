@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface CeylonObjectDeclaration extends CeylonCompositeElement {
 
   @Nullable
-  CeylonClassBody getClassBody();
+  CeylonBlock getBlock();
 
   @Nullable
   CeylonExtendedType getExtendedType();

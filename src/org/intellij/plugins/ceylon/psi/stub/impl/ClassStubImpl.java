@@ -16,6 +16,7 @@ public class ClassStubImpl extends StubBase<CeylonClass> implements ClassStub {
     private byte flags;
 
     static final int INTERFACE = 0x01;
+    static final int OBJECT = 0x02;
 
     protected ClassStubImpl(IStubElementType elementType, StubElement parent, String name, String qualifiedName, byte flags) {
         super(parent, elementType);
@@ -50,5 +51,10 @@ public class ClassStubImpl extends StubBase<CeylonClass> implements ClassStub {
     @Override
     public boolean isInterface() {
         return (flags & INTERFACE) != 0;
+    }
+
+    @Override
+    public boolean isObject() {
+        return (flags & OBJECT) != 0;
     }
 }

@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.psi.impl;
 
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProviders;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CeylonClassImpl extends CeylonClassDeclarationImpl implements CeylonClass {
+public abstract class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implements CeylonClass {
 
     public CeylonClassImpl(ASTNode node) {
         super(node);
@@ -32,50 +33,9 @@ public class CeylonClassImpl extends CeylonClassDeclarationImpl implements Ceylo
         return kw != null;
     }
 
-    @Nullable
     @Override
-    public CeylonParameters getParameters() {
-        if (isInterface()) {
-            throw new UnsupportedOperationException("Interfaces are not parameterized");
-        } else {
-            return super.getParameters();
-        }
-    }
-
-    @Nullable
-    @Override
-    public CeylonExtendedType getExtendedType() {
-        if (isInterface()) {
-            throw new UnsupportedOperationException("Interfaces don't have extended types");
-        } else {
-            return super.getExtendedType();
-        }
-    }
-
-    @Nullable
-    @Override
-    public CeylonAdaptedTypes getAdaptedTypes() {
-        if (isInterface()) {
-            return findChildByClass(CeylonAdaptedTypes.class);
-        }
-        throw new UnsupportedOperationException("Only interfaces have adapted types");
-    }
-
-    @Nullable
-    @Override
-    public CeylonClassBody getClassBody() {
-        if (isInterface()) {
-            throw new UnsupportedOperationException("Only classes have class bodies");
-        }
-        return super.getClassBody();
-    }
-
-    @Override
-    public CeylonInterfaceBody getInterfaceBody() {
-        if (isInterface()) {
-            return findChildByClass(CeylonInterfaceBody.class);
-        }
-        throw new UnsupportedOperationException("Only interfaces have interface bodies");
+    public boolean isObject() {
+        return findChildByType(CeylonTypes.KW_OBJECT) != null;
     }
 
     @Override
@@ -127,7 +87,13 @@ public class CeylonClassImpl extends CeylonClassDeclarationImpl implements Ceylo
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        return getTypeName();
+        PsiElement name = findChildByType(CeylonTypes.TYPE_NAME);
+
+        if (name == null) {
+            name = findChildByType(CeylonTypes.MEMBER_NAME);
+        }
+
+        return name;
     }
 
     @Override

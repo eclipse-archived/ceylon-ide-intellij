@@ -111,12 +111,8 @@ public class CeylonVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitClassBody(@NotNull CeylonClassBody o) {
-    visitCompositeElement(o);
-  }
-
   public void visitClassDeclaration(@NotNull CeylonClassDeclaration o) {
-    visitNamedDeclaration(o);
+    visitCompositeElement(o);
     // visitStubBasedPsiElement(o);
   }
 
@@ -384,12 +380,8 @@ public class CeylonVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitInterfaceBody(@NotNull CeylonInterfaceBody o) {
-    visitCompositeElement(o);
-  }
-
   public void visitInterfaceDeclaration(@NotNull CeylonInterfaceDeclaration o) {
-    visitNamedDeclaration(o);
+    visitCompositeElement(o);
     // visitStubBasedPsiElement(o);
   }
 

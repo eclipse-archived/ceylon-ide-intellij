@@ -5,9 +5,8 @@ import com.intellij.lang.PairedBraceMatcher;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
+import org.intellij.plugins.ceylon.psi.CeylonBlock;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
-import org.intellij.plugins.ceylon.psi.CeylonClassBody;
-import org.intellij.plugins.ceylon.psi.CeylonInterfaceBody;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +34,7 @@ public class CeylonBraceMatcher implements PairedBraceMatcher {
         if (element == null || element instanceof PsiFile) return openingBraceOffset;
         PsiElement parent = element.getParent();
 
-        if (parent instanceof CeylonClassBody || parent instanceof CeylonInterfaceBody) {
+        if (parent instanceof CeylonBlock && parent.getParent() instanceof CeylonClass) {
             CeylonClass parentClass = (CeylonClass) parent.getParent();
             PsiElement nameIdentifier = parentClass.getNameIdentifier();
             return (nameIdentifier == null) ? parent.getTextOffset() : nameIdentifier.getTextOffset();

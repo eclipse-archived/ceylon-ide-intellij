@@ -8,12 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import org.intellij.plugins.ceylon.psi.*;
 import com.intellij.psi.stubs.IStubElementType;
+import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 
-public class CeylonInterfaceDeclarationImpl extends StubBasedPsiElementBase<ClassStub> implements CeylonInterfaceDeclaration {
+public class CeylonInterfaceDeclarationImpl extends CeylonClassImpl implements CeylonInterfaceDeclaration {
 
   public CeylonInterfaceDeclarationImpl(ASTNode node) {
     super(node);
@@ -31,14 +30,14 @@ public class CeylonInterfaceDeclarationImpl extends StubBasedPsiElementBase<Clas
 
   @Override
   @Nullable
-  public CeylonCaseTypes getCaseTypes() {
-    return findChildByClass(CeylonCaseTypes.class);
+  public CeylonBlock getBlock() {
+    return findChildByClass(CeylonBlock.class);
   }
 
   @Override
   @Nullable
-  public CeylonInterfaceBody getInterfaceBody() {
-    return findChildByClass(CeylonInterfaceBody.class);
+  public CeylonCaseTypes getCaseTypes() {
+    return findChildByClass(CeylonCaseTypes.class);
   }
 
   @Override

@@ -13,4 +13,6 @@ public interface ClassStub extends StubElement<CeylonClass> {
     String getQualifiedName();
 
     boolean isInterface();
+
+    boolean isObject();
 }

@@ -7,16 +7,16 @@ import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import com.intellij.psi.StubBasedPsiElement;
 
-public interface CeylonInterfaceDeclaration extends CeylonNamedDeclaration, StubBasedPsiElement<ClassStub> {
+public interface CeylonInterfaceDeclaration extends CeylonCompositeElement, StubBasedPsiElement<ClassStub> {
 
   @Nullable
   CeylonAdaptedTypes getAdaptedTypes();
 
   @Nullable
-  CeylonCaseTypes getCaseTypes();
+  CeylonBlock getBlock();
 
   @Nullable
-  CeylonInterfaceBody getInterfaceBody();
+  CeylonCaseTypes getCaseTypes();
 
   @Nullable
   CeylonSatisfiedTypes getSatisfiedTypes();

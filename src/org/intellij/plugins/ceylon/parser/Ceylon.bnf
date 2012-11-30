@@ -161,7 +161,7 @@ annotationName ::= LIDENTIFIER
 
 memberName ::= LIDENTIFIER
 
-objectDeclaration ::= "object" memberName extendedType? satisfiedTypes? (classBody | ";")
+objectDeclaration ::= "object" memberName extendedType? satisfiedTypes? (block | ";")
 
 voidOrInferredMethodDeclaration ::= ("void" | "function") memberName typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
 
@@ -178,22 +178,24 @@ typedMethodOrAttributeDeclaration ::= type memberName
 
 interfaceDeclaration ::= "interface" typeName
         typeParameters? caseTypes? /*metatypes?*/ adaptedTypes? satisfiedTypes?
-        typeConstraints? (interfaceBody | typeSpecifier? ";") {
+        typeConstraints? (block | typeSpecifier? ";") {
      pin=1
      stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
      elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
-     implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
-     customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
+//     implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
+//     customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
+    extends="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
 }
 
 classDeclaration  ::= "class" typeName
         typeParameters? parameters? caseTypes? /*metatypes?*/ extendedType? satisfiedTypes?
-        typeConstraints? (classBody | typeSpecifier? ";") {
+        typeConstraints? (block | typeSpecifier? ";") {
     pin=1
     stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
     elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
-    implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
-    customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
+//    implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
+//    customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
+    extends="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
 }
 
 aliasDeclaration ::= "alias" typeName typeParameters? typeConstraints? typeSpecifier? ";" {
@@ -202,11 +204,7 @@ aliasDeclaration ::= "alias" typeName typeParameters? typeConstraints? typeSpeci
 
 assertion ::= ASSERT conditions ";"
 
-block ::="{" declarationOrStatement* "}"
-
-interfaceBody ::= "{" declarationOrStatement* "}"
-
-classBody ::= "{" declarationOrStatement* "}"
+block ::= "{" declarationOrStatement* "}"
 
 extendedType ::= "extends" (qualifiedType | "super" "." typeReference) positionalArguments // TODO "positionalArguments?"
 
@@ -312,7 +310,7 @@ namedArgument ::= compilerAnnotations (namedSpecifiedArgument | namedArgumentDec
 
 namedSpecifiedArgument ::= memberName specifier ";"
 
-objectArgument ::= "object" memberName extendedType? satisfiedTypes? (classBody | ";")
+objectArgument ::= "object" memberName extendedType? satisfiedTypes? (block | ";")
 
 voidOrInferredMethodArgument ::= ("void" | "function") memberName parameters* block
 

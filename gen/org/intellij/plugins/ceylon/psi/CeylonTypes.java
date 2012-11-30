@@ -5,7 +5,6 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
 import org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType;
-import org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl;
 import org.intellij.plugins.ceylon.psi.impl.*;
 
 public interface CeylonTypes {
@@ -36,7 +35,6 @@ public interface CeylonTypes {
   IElementType CASE_TYPES = new CeylonElementType("CASE_TYPES");
   IElementType CATCH_BLOCK = new CeylonElementType("CATCH_BLOCK");
   IElementType CATCH_VARIABLE = new CeylonElementType("CATCH_VARIABLE");
-  IElementType CLASS_BODY = new CeylonElementType("CLASS_BODY");
   IElementType CLASS_DECLARATION = new ClassElementType("CLASS_DECLARATION");
   IElementType COMPARABLE_TYPE = new CeylonElementType("COMPARABLE_TYPE");
   IElementType COMPARISON_EXPRESSION = new CeylonElementType("COMPARISON_EXPRESSION");
@@ -104,7 +102,6 @@ public interface CeylonTypes {
   IElementType INFERRED_ATTRIBUTE_DECLARATION = new CeylonElementType("INFERRED_ATTRIBUTE_DECLARATION");
   IElementType INFERRED_GETTER_ARGUMENT = new CeylonElementType("INFERRED_GETTER_ARGUMENT");
   IElementType INITIALIZER = new CeylonElementType("INITIALIZER");
-  IElementType INTERFACE_BODY = new CeylonElementType("INTERFACE_BODY");
   IElementType INTERFACE_DECLARATION = new ClassElementType("INTERFACE_DECLARATION");
   IElementType INTERSECTION_TYPE = new CeylonElementType("INTERSECTION_TYPE");
   IElementType INTERSECTION_TYPE_EXPRESSION = new CeylonElementType("INTERSECTION_TYPE_EXPRESSION");
@@ -382,11 +379,8 @@ public interface CeylonTypes {
       else if (type == CATCH_VARIABLE) {
         return new CeylonCatchVariableImpl(node);
       }
-      else if (type == CLASS_BODY) {
-        return new CeylonClassBodyImpl(node);
-      }
       else if (type == CLASS_DECLARATION) {
-        return new CeylonClassImpl(node);
+        return new CeylonClassDeclarationImpl(node);
       }
       else if (type == COMPARABLE_TYPE) {
         return new CeylonComparableTypeImpl(node);
@@ -586,11 +580,8 @@ public interface CeylonTypes {
       else if (type == INITIALIZER) {
         return new CeylonInitializerImpl(node);
       }
-      else if (type == INTERFACE_BODY) {
-        return new CeylonInterfaceBodyImpl(node);
-      }
       else if (type == INTERFACE_DECLARATION) {
-        return new CeylonClassImpl(node);
+        return new CeylonInterfaceDeclarationImpl(node);
       }
       else if (type == INTERSECTION_TYPE) {
         return new CeylonIntersectionTypeImpl(node);
