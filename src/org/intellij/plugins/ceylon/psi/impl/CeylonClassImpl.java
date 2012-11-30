@@ -10,6 +10,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
+import com.yourkit.util.Strings;
 import org.intellij.plugins.ceylon.codeInsight.resolve.CeylonTypeReference;
 import org.intellij.plugins.ceylon.psi.*;
 import org.intellij.plugins.ceylon.psi.stub.ClassStub;
@@ -116,5 +117,19 @@ public abstract class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub>
     @Override
     public ItemPresentation getPresentation() {
         return ItemPresentationProviders.getItemPresentation(this);
+    }
+
+    @Override
+    public String toString() {
+        String name = Strings.notNull(getName(), " (unnamed)");
+        String type;
+
+        if (isInterface()) {
+            type = "Interface";
+        } else {
+            type = "Class";
+        }
+
+        return type + " " + name;
     }
 }

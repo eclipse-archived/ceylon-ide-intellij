@@ -163,7 +163,10 @@ memberName ::= LIDENTIFIER
 
 objectDeclaration ::= "object" memberName extendedType? satisfiedTypes? (block | ";")
 
-voidOrInferredMethodDeclaration ::= ("void" | "function") memberName typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
+voidOrInferredMethodDeclaration ::= ("void" | "function") memberName
+        typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";") {
+    implements="org.intellij.plugins.ceylon.psi.CeylonTypedDeclaration"
+}
 
 setterDeclaration ::= "assign" memberName (block | ";")
 
@@ -174,7 +177,9 @@ typedMethodOrAttributeDeclaration ::= type memberName
         typeParameters? parameters+ /*metatypes?*/ typeConstraints? (block | specifier? ";")
       | (specifier | initializer)? ";"
       | block
-    )
+    ) {
+    implements="org.intellij.plugins.ceylon.psi.CeylonTypedDeclaration"
+}
 
 interfaceDeclaration ::= "interface" typeName
         typeParameters? caseTypes? /*metatypes?*/ adaptedTypes? satisfiedTypes?
@@ -182,9 +187,8 @@ interfaceDeclaration ::= "interface" typeName
      pin=1
      stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
      elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
-//     implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
-//     customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
     extends="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
+    implements="org.intellij.plugins.ceylon.psi.CeylonTypedDeclaration"
 }
 
 classDeclaration  ::= "class" typeName
@@ -193,13 +197,12 @@ classDeclaration  ::= "class" typeName
     pin=1
     stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
     elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
-//    implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
-//    customImpl="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
     extends="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
+    implements="org.intellij.plugins.ceylon.psi.CeylonTypedDeclaration"
 }
 
 aliasDeclaration ::= "alias" typeName typeParameters? typeConstraints? typeSpecifier? ";" {
-    implements="org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration"
+    implements=["org.intellij.plugins.ceylon.psi.CeylonNamedDeclaration" "org.intellij.plugins.ceylon.psi.CeylonTypedDeclaration"]
 }
 
 assertion ::= ASSERT conditions ";"
@@ -222,7 +225,7 @@ parameters ::= "(" (parameterDeclaration ("," parameterDeclaration)*)? ")"
 
 parameter ::= parameterType memberName (parameters+ | valueParameter?) specifier?
 
-parameterRef ::= memberName specifier?
+external parameterRef ::= parseParameterRef //memberName specifier?
 
 parameterDeclaration ::= compilerAnnotations (parameterRef | annotations parameter)
 

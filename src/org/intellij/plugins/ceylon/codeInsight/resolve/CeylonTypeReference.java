@@ -61,6 +61,7 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
             return classes.iterator().next();
         }
 
+        // TODO handle references to type parameter
         return null;
 //        return JavaPsiFacade.getInstance(project).findClass("ceylon.language." + name, GlobalSearchScope.allScope(project));
 

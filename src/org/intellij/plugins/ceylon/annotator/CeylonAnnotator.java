@@ -61,28 +61,37 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
     @Override
     public void visitTypeName(@NotNull CeylonTypeName name) {
         super.visitTypeName(name);
+        boolean isTypeParameter = false;
 
         if (PsiTreeUtil.getParentOfType(name, CeylonTypeParameter.class) != null) {
             Annotation anno = annotationHolder.createInfoAnnotation(name, null);
             anno.setTextAttributes(CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES);
+            isTypeParameter = true;
         } else {
-            // TODO ugly, perhaps create an interface named TypedDeclaration with getTypeParameters()
-            CeylonVoidOrInferredMethodDeclaration decl = PsiTreeUtil.getParentOfType(name, CeylonVoidOrInferredMethodDeclaration.class);
-            CeylonTypeParameters typeParameters = (decl == null) ? null : decl.getTypeParameters();
+            PsiElement element = name;
+            CeylonTypedDeclaration decl;
 
-            if (typeParameters != null) {
-
-                for (CeylonTypeParameter typeParameter : typeParameters.getTypeParameterList()) {
-                    CeylonTypeName typeNameDeclaration = typeParameter.getTypeName();
-                    if (name.getText().equals(typeNameDeclaration.getText())) {
-                        Annotation anno = annotationHolder.createInfoAnnotation(name, null);
-                        anno.setTextAttributes(CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES);
+            // TODO refactor in function
+            while ((decl = PsiTreeUtil.getParentOfType(element, CeylonTypedDeclaration.class)) != null) {
+                CeylonTypeParameters typeParameters = decl.getTypeParameters();
+                if (typeParameters != null) {
+                    for (CeylonTypeParameter typeParameter : typeParameters.getTypeParameterList()) {
+                        CeylonTypeName typeNameDeclaration = typeParameter.getTypeName();
+                        if (name.getText().equals(typeNameDeclaration.getText())) {
+                            Annotation anno = annotationHolder.createInfoAnnotation(name, null);
+                            anno.setTextAttributes(CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES);
+                            isTypeParameter = true;
+                            decl = null;
+                            break;
+                        }
                     }
                 }
+
+                element = decl;
             }
         }
 
-        if (!(name.getParent() instanceof CeylonNamedDeclaration)) {
+        if (!isTypeParameter && !(name.getParent() instanceof CeylonNamedDeclaration)) {
             PsiReference reference = name.getReference();
 
             if (reference != null) {

@@ -34,12 +34,6 @@ public class CeylonParameterDeclarationImpl extends CeylonCompositeElementImpl i
     return findChildByClass(CeylonParameter.class);
   }
 
-  @Override
-  @Nullable
-  public CeylonParameterRef getParameterRef() {
-    return findChildByClass(CeylonParameterRef.class);
-  }
-
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitParameterDeclaration(this);
     else super.accept(visitor);

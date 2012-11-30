@@ -16,7 +16,4 @@ public interface CeylonParameterDeclaration extends CeylonCompositeElement {
   @Nullable
   CeylonParameter getParameter();
 
-  @Nullable
-  CeylonParameterRef getParameterRef();
-
 }

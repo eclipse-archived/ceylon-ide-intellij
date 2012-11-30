@@ -28,7 +28,8 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitAliasDeclaration(@NotNull CeylonAliasDeclaration o) {
-    visitNamedDeclaration(o);
+    visitTypedDeclaration(o);
+    // visitNamedDeclaration(o);
   }
 
   public void visitAnnotation(@NotNull CeylonAnnotation o) {
@@ -112,7 +113,7 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitClassDeclaration(@NotNull CeylonClassDeclaration o) {
-    visitCompositeElement(o);
+    visitTypedDeclaration(o);
     // visitStubBasedPsiElement(o);
   }
 
@@ -381,7 +382,7 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitInterfaceDeclaration(@NotNull CeylonInterfaceDeclaration o) {
-    visitCompositeElement(o);
+    visitTypedDeclaration(o);
     // visitStubBasedPsiElement(o);
   }
 
@@ -506,10 +507,6 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitParameterDeclaration(@NotNull CeylonParameterDeclaration o) {
-    visitCompositeElement(o);
-  }
-
-  public void visitParameterRef(@NotNull CeylonParameterRef o) {
     visitCompositeElement(o);
   }
 
@@ -694,7 +691,7 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitTypedMethodOrAttributeDeclaration(@NotNull CeylonTypedMethodOrAttributeDeclaration o) {
-    visitCompositeElement(o);
+    visitTypedDeclaration(o);
   }
 
   public void visitTypedMethodOrGetterArgument(@NotNull CeylonTypedMethodOrGetterArgument o) {
@@ -734,7 +731,7 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitVoidOrInferredMethodDeclaration(@NotNull CeylonVoidOrInferredMethodDeclaration o) {
-    visitCompositeElement(o);
+    visitTypedDeclaration(o);
   }
 
   public void visitWhileBlock(@NotNull CeylonWhileBlock o) {
@@ -746,6 +743,10 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitNamedDeclaration(@NotNull CeylonNamedDeclaration o) {
+    visitCompositeElement(o);
+  }
+
+  public void visitTypedDeclaration(@NotNull CeylonTypedDeclaration o) {
     visitCompositeElement(o);
   }
 

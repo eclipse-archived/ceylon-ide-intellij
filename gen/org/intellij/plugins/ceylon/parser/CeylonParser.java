@@ -398,9 +398,6 @@ public class CeylonParser implements PsiParser {
     else if (root_ == PARAMETER_DECLARATION) {
       result_ = parameterDeclaration(builder_, level_ + 1);
     }
-    else if (root_ == PARAMETER_REF) {
-      result_ = parameterRef(builder_, level_ + 1);
-    }
     else if (root_ == PARAMETER_TYPE) {
       result_ = parameterType(builder_, level_ + 1);
     }
@@ -5211,7 +5208,7 @@ public class CeylonParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "parameterDeclaration_1")) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
-    result_ = parameterRef(builder_, level_ + 1);
+    result_ = parseParameterRef(builder_, level_ + 1);
     if (!result_) result_ = parameterDeclaration_1_1(builder_, level_ + 1);
     if (!result_) {
       marker_.rollbackTo();
@@ -5236,31 +5233,6 @@ public class CeylonParser implements PsiParser {
       marker_.drop();
     }
     return result_;
-  }
-
-  /* ********************************************************** */
-  // memberName specifier?
-  public static boolean parameterRef(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "parameterRef")) return false;
-    if (!nextTokenIs(builder_, LIDENTIFIER)) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = memberName(builder_, level_ + 1);
-    result_ = result_ && parameterRef_1(builder_, level_ + 1);
-    if (result_) {
-      marker_.done(PARAMETER_REF);
-    }
-    else {
-      marker_.rollbackTo();
-    }
-    return result_;
-  }
-
-  // specifier?
-  private static boolean parameterRef_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "parameterRef_1")) return false;
-    specifier(builder_, level_ + 1);
-    return true;
   }
 
   /* ********************************************************** */
@@ -7372,7 +7344,8 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // ("void" | "function") memberName typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
+  // ("void" | "function") memberName
+  //         typeParameters? parameters* /*metatypes? */ typeConstraints? (block | specifier? ";")
   public static boolean voidOrInferredMethodDeclaration(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "voidOrInferredMethodDeclaration")) return false;
     if (!nextTokenIs(builder_, KW_FUNCTION) && !nextTokenIs(builder_, KW_VOID)

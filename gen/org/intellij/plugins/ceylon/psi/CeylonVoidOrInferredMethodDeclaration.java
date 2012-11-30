@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface CeylonVoidOrInferredMethodDeclaration extends CeylonCompositeElement {
+public interface CeylonVoidOrInferredMethodDeclaration extends CeylonTypedDeclaration {
 
   @Nullable
   CeylonBlock getBlock();

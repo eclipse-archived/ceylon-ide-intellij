@@ -134,7 +134,6 @@ public interface CeylonTypes {
   IElementType PARAMETER = new CeylonElementType("PARAMETER");
   IElementType PARAMETERS = new CeylonElementType("PARAMETERS");
   IElementType PARAMETER_DECLARATION = new CeylonElementType("PARAMETER_DECLARATION");
-  IElementType PARAMETER_REF = new CeylonElementType("PARAMETER_REF");
   IElementType PARAMETER_TYPE = new CeylonElementType("PARAMETER_TYPE");
   IElementType PAR_EXPRESSION = new CeylonElementType("PAR_EXPRESSION");
   IElementType POSITIONAL_ARGUMENT = new CeylonElementType("POSITIONAL_ARGUMENT");
@@ -675,9 +674,6 @@ public interface CeylonTypes {
       }
       else if (type == PARAMETER_DECLARATION) {
         return new CeylonParameterDeclarationImpl(node);
-      }
-      else if (type == PARAMETER_REF) {
-        return new CeylonParameterRefImpl(node);
       }
       else if (type == PARAMETER_TYPE) {
         return new CeylonParameterTypeImpl(node);
