@@ -58,10 +58,10 @@ CharacterCode = {HexDigit}{4} | {HexDigit}{8}
 HexDigit = [0-9A-Fa-f]
 
 // String literals
-StringLiteral = "\"" {StringCharacter}* "\""
+StringLiteral = "\"" {StringCharacter}* "\""?
 StringCharacter = [^\\\"]* | {EscapeSequence}
 
-QuotedLiteral = "'" {QuotedLiteralCharacter}* "'"
+QuotedLiteral = "'" {QuotedLiteralCharacter}* "'"?
 QuotedLiteralCharacter = [^']*
 
 //%debug

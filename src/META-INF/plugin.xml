@@ -40,6 +40,7 @@
 
         <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonCommenter"/>
         <lang.braceMatcher language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonBraceMatcher"/>
+        <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.lang.CeylonQuoteHandler"/>
 
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>
         <stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>
