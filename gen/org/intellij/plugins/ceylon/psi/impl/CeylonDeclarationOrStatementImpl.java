@@ -17,12 +17,6 @@ public class CeylonDeclarationOrStatementImpl extends CeylonCompositeElementImpl
   }
 
   @Override
-  @NotNull
-  public List<CeylonAnnotation> getAnnotationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonAnnotation.class);
-  }
-
-  @Override
   @Nullable
   public CeylonAssertion getAssertion() {
     return findChildByClass(CeylonAssertion.class);

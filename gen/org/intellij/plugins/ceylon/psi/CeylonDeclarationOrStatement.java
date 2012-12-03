@@ -7,9 +7,6 @@ import com.intellij.psi.PsiElement;
 
 public interface CeylonDeclarationOrStatement extends CeylonCompositeElement {
 
-  @NotNull
-  List<CeylonAnnotation> getAnnotationList();
-
   @Nullable
   CeylonAssertion getAssertion();
 

@@ -243,12 +243,7 @@ typeConstraint ::= compilerAnnotations "given" typeName parameters? caseTypes? /
 
 typeConstraints ::= typeConstraint+
 
-declarationOrStatement ::=compilerAnnotations
-      ( 
-        annotation* (assertion | declaration)
-      | statement
-      | comment
-      )
+declarationOrStatement ::=compilerAnnotations (assertion | declaration | statement | comment)
 
 declaration ::= annotations (objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration
     | typedMethodOrAttributeDeclaration | classDeclaration | interfaceDeclaration | aliasDeclaration)

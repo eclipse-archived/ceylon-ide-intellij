@@ -5,6 +5,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonImportDeclaration;
@@ -29,6 +30,10 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
             throw new UnsupportedOperationException();
         }
 
+        if (myElement.getParent() instanceof CeylonClass) {
+            return null; // type definition does not resolve to itself
+        }
+
         String name = myElement.getText();
 
         CeylonFile containingFile = (CeylonFile) myElement.getContainingFile();
@@ -47,8 +52,23 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
             }
         }
 
+        CeylonClass parentClass;
+        PsiElement element = myElement;
+        PsiElement resolved;
+
+        // TODO if multiple interfaces Foo in the same file, only one should be matched
+        while ((parentClass = PsiTreeUtil.getParentOfType(element, CeylonClass.class)) != null) {
+            fqn = parentClass.getQualifiedName() + "." + name;
+            resolved = resolveByFqn(fqn);
+            if (resolved != null) {
+                return resolved;
+            }
+            element = parentClass;
+        }
+
+
         fqn = containingFile.getPackageName() + "." + name;
-        PsiElement resolved = resolveByFqn(fqn);
+        resolved = resolveByFqn(fqn);
         if (resolved != null) {
             return resolved;
         }

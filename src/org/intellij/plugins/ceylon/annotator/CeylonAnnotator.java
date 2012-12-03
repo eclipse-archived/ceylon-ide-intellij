@@ -10,10 +10,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.intellij.plugins.ceylon.annotator.quickfix.AddAnnotationFix;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddEmptyParametersFix;
-import org.intellij.plugins.ceylon.highlighting.quickfix.AddSharedAnnotationFix;
 import org.intellij.plugins.ceylon.psi.*;
 import org.jetbrains.annotations.NotNull;
+
+import static org.intellij.plugins.ceylon.psi.CeylonPsiUtils.hasAnnotation;
 
 public class CeylonAnnotator extends CeylonVisitor implements Annotator {
     private AnnotationHolder annotationHolder;
@@ -107,10 +109,40 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
                         if (!StringUtil.equals(((CeylonFile) containingFile).getPackageName(), myPackage) && !myClass.isShared()) {
                             Annotation anno = annotationHolder.createErrorAnnotation(name, "Imported declaration is not shared");
                             anno.setHighlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL);
-                            anno.registerFix(new AddSharedAnnotationFix(myClass));
+                            anno.registerFix(new AddAnnotationFix((CeylonDeclaration) myClass.getParent(), myClass.getName(), "shared"));
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    public void visitInterfaceDeclaration(@NotNull CeylonInterfaceDeclaration o) {
+        super.visitInterfaceDeclaration(o);
+
+        CeylonBlock block = o.getBlock();
+        if (block == null) {
+            return;
+        }
+
+        for (CeylonDeclarationOrStatement declarationOrStatement : block.getDeclarationOrStatementList()) {
+            CeylonDeclaration declaration = declarationOrStatement.getDeclaration();
+            CeylonTypedMethodOrAttributeDeclaration method = (declaration == null) ? null : declaration.getTypedMethodOrAttributeDeclaration();
+
+            if (method == null) {
+                continue;
+            }
+            if (method.getBlock() == null && !hasAnnotation(declaration.getAnnotations(), "formal")) {
+                Annotation annotation = annotationHolder.createErrorAnnotation(method.getMemberName(), "Interface method must be formal or specified");
+                annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "formal"));
+            } else if (hasAnnotation(declaration.getAnnotations(), "formal") && !hasAnnotation(declaration.getAnnotations(), "shared")) {
+                Annotation annotation = annotationHolder.createErrorAnnotation(declaration, "Formal member is not shared");
+                annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "shared"));
+            } else if (hasAnnotation(declaration.getAnnotations(), "actual") && !hasAnnotation(declaration.getAnnotations(), "shared")) {
+                // TODO move in visitClassDeclaration
+                Annotation annotation = annotationHolder.createErrorAnnotation(declaration, "Actual member is not shared");
+                annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "shared"));
             }
         }
     }

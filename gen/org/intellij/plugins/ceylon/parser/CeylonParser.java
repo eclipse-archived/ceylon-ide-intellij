@@ -2278,12 +2278,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // compilerAnnotations
-  //       ( 
-  //         annotation* (assertion | declaration)
-  //       | statement
-  //       | comment
-  //       )
+  // compilerAnnotations (assertion | declaration | statement | comment)
   public static boolean declarationOrStatement(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "declarationOrStatement")) return false;
     boolean result_ = false;
@@ -2301,64 +2296,15 @@ public class CeylonParser implements PsiParser {
     return result_;
   }
 
-  // annotation* (assertion | declaration)
-  //       | statement
-  //       | comment
+  // assertion | declaration | statement | comment
   private static boolean declarationOrStatement_1(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "declarationOrStatement_1")) return false;
     boolean result_ = false;
     Marker marker_ = builder_.mark();
-    result_ = declarationOrStatement_1_0(builder_, level_ + 1);
-    if (!result_) result_ = statement(builder_, level_ + 1);
-    if (!result_) result_ = comment(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
-  }
-
-  // annotation* (assertion | declaration)
-  private static boolean declarationOrStatement_1_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "declarationOrStatement_1_0")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
-    result_ = declarationOrStatement_1_0_0(builder_, level_ + 1);
-    result_ = result_ && declarationOrStatement_1_0_1(builder_, level_ + 1);
-    if (!result_) {
-      marker_.rollbackTo();
-    }
-    else {
-      marker_.drop();
-    }
-    return result_;
-  }
-
-  // annotation*
-  private static boolean declarationOrStatement_1_0_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "declarationOrStatement_1_0_0")) return false;
-    int offset_ = builder_.getCurrentOffset();
-    while (true) {
-      if (!annotation(builder_, level_ + 1)) break;
-      int next_offset_ = builder_.getCurrentOffset();
-      if (offset_ == next_offset_) {
-        empty_element_parsed_guard_(builder_, offset_, "declarationOrStatement_1_0_0");
-        break;
-      }
-      offset_ = next_offset_;
-    }
-    return true;
-  }
-
-  // assertion | declaration
-  private static boolean declarationOrStatement_1_0_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "declarationOrStatement_1_0_1")) return false;
-    boolean result_ = false;
-    Marker marker_ = builder_.mark();
     result_ = assertion(builder_, level_ + 1);
     if (!result_) result_ = declaration(builder_, level_ + 1);
+    if (!result_) result_ = statement(builder_, level_ + 1);
+    if (!result_) result_ = comment(builder_, level_ + 1);
     if (!result_) {
       marker_.rollbackTo();
     }

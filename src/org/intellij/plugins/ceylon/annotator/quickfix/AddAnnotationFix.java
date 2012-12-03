@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.highlighting.quickfix;
+package org.intellij.plugins.ceylon.annotator.quickfix;
 
 import com.intellij.codeInsight.intention.AbstractIntentionAction;
 import com.intellij.openapi.editor.Editor;
@@ -10,26 +10,30 @@ import org.intellij.plugins.ceylon.CeylonLanguage;
 import org.intellij.plugins.ceylon.psi.*;
 import org.jetbrains.annotations.NotNull;
 
-public class AddSharedAnnotationFix extends AbstractIntentionAction {
+public class AddAnnotationFix extends AbstractIntentionAction {
 
-    private final CeylonClass myClass;
+    private final CeylonDeclaration declaration;
+    private final String declarationName;
+    private final String annotationName;
 
-    public AddSharedAnnotationFix(CeylonClass myClass) {
-        this.myClass = myClass;
+    public AddAnnotationFix(CeylonDeclaration declaration, String declarationName, String annotationName) {
+        this.declaration = declaration;
+        this.declarationName = declarationName;
+        this.annotationName = annotationName;
     }
 
     @NotNull
     @Override
     public String getText() {
-        return "Make " + myClass.getName() + " shared";
+        return String.format("Make %s %s", declarationName, annotationName);
     }
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
-        CeylonAnnotations annotations = ((CeylonDeclaration) myClass.getParent()).getAnnotations();
+        CeylonAnnotations annotations = declaration.getAnnotations();
 
         // TODO CeylonElementFactory
-        CeylonFile ceylonFile = (CeylonFile) PsiFileFactory.getInstance(myClass.getProject()).createFileFromText("dummy.ceylon", CeylonLanguage.INSTANCE, "shared class Foo(){}");
+        CeylonFile ceylonFile = (CeylonFile) PsiFileFactory.getInstance(declaration.getProject()).createFileFromText("dummy.ceylon", CeylonLanguage.INSTANCE, annotationName + " class Foo(){}");
         CeylonAnnotation annotation = (ceylonFile.findChildByClass(CeylonDeclaration.class)).getAnnotations().getAnnotationList().get(0);
         annotations.add(annotation);
     }
