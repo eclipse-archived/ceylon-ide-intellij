@@ -127,7 +127,7 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
     }
 
     @Nullable
-    public static Sdk getInternalSdk(Sdk sdk) {
+    public static Sdk getInternalSdk(@Nullable Sdk sdk) {
         if (sdk == null) {
             return null;
         }
