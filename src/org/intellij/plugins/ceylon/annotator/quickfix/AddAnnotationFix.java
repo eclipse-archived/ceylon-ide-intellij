@@ -32,10 +32,7 @@ public class AddAnnotationFix extends AbstractIntentionAction {
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         CeylonAnnotations annotations = declaration.getAnnotations();
 
-        // TODO CeylonElementFactory
-        CeylonFile ceylonFile = (CeylonFile) PsiFileFactory.getInstance(declaration.getProject()).createFileFromText("dummy.ceylon", CeylonLanguage.INSTANCE, annotationName + " class Foo(){}");
-        CeylonAnnotation annotation = (ceylonFile.findChildByClass(CeylonDeclaration.class)).getAnnotations().getAnnotationList().get(0);
-        annotations.add(annotation);
+        annotations.add(CeylonElementFactory.createAnnotation(annotationName, declaration.getProject()));
     }
 
     @Override

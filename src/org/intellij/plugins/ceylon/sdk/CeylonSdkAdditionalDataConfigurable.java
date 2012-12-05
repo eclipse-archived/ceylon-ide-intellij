@@ -9,7 +9,7 @@ import javax.swing.*;
 public class CeylonSdkAdditionalDataConfigurable implements AdditionalDataConfigurable {
 
     private Sdk sdk;
-    private JComboBox<Sdk> jdkComboBox;
+    private JComboBox jdkComboBox;
     private JPanel contentPanel;
     private SdkModel sdkModel;
     private SdkModificator sdkModificator;
@@ -34,7 +34,7 @@ public class CeylonSdkAdditionalDataConfigurable implements AdditionalDataConfig
         Sdk internalSdk = CeylonSdk.getInternalSdk(sdk);
         if (sdk != null && internalSdk != null) {
             for (int i = 0; i < jdkComboBox.getItemCount(); i++) {
-                if (jdkComboBox.getItemAt(i).getName().equals(internalSdk.getName())) {
+                if (((Sdk)jdkComboBox.getItemAt(i)).getName().equals(internalSdk.getName())) {
                     jdkComboBox.setSelectedIndex(i);
                     break;
                 }

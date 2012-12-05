@@ -5,7 +5,7 @@ import com.intellij.psi.StubBasedPsiElement;
 import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import org.jetbrains.annotations.Nullable;
 
-public interface CeylonClass extends PsiNameIdentifierOwner, CeylonNamedDeclaration, StubBasedPsiElement<ClassStub> {
+public interface CeylonClass extends PsiNameIdentifierOwner, CeylonNamedDeclaration, CeylonTypedDeclaration, StubBasedPsiElement<ClassStub> {
 
     boolean isInterface();
 

@@ -113,7 +113,7 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitClassDeclaration(@NotNull CeylonClassDeclaration o) {
-    visitTypedDeclaration(o);
+    visitClass(o);
     // visitStubBasedPsiElement(o);
   }
 
@@ -739,6 +739,10 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitWhileLoop(@NotNull CeylonWhileLoop o) {
+    visitCompositeElement(o);
+  }
+
+  public void visitClass(@NotNull CeylonClass o) {
     visitCompositeElement(o);
   }
 

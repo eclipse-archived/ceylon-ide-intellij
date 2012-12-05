@@ -48,9 +48,29 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
     public void visitClassDeclaration(@NotNull final CeylonClassDeclaration o) {
         CeylonTypeName typeName = o.getTypeName();
 
-        if (typeName != null && !((CeylonClass) o).isInterface() && o.getParameters() == null) {
+        if (typeName != null && !o.isInterface() && o.getParameters() == null) {
             annotationHolder.createErrorAnnotation(typeName, "Missing parameters list").registerFix(new AddEmptyParametersFix(o));
         }
+
+        CeylonBlock block = o.getBlock();
+        if (block == null) {
+            return;
+        }
+
+        for (CeylonDeclarationOrStatement declarationOrStatement : block.getDeclarationOrStatementList()) {
+            CeylonDeclaration declaration = declarationOrStatement.getDeclaration();
+            CeylonTypedMethodOrAttributeDeclaration method = (declaration == null) ? null : declaration.getTypedMethodOrAttributeDeclaration();
+
+            if (method == null) {
+                continue;
+            }
+
+            if (hasAnnotation(declaration.getAnnotations(), "actual") && !hasAnnotation(declaration.getAnnotations(), "shared")) {
+                Annotation annotation = annotationHolder.createErrorAnnotation(method.getMemberName(), "Actual member is not shared");
+                annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "shared"));
+            }
+        }
+
     }
 
     @Override
@@ -70,26 +90,10 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
             anno.setTextAttributes(CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES);
             isTypeParameter = true;
         } else {
-            PsiElement element = name;
-            CeylonTypedDeclaration decl;
-
-            // TODO refactor in function
-            while ((decl = PsiTreeUtil.getParentOfType(element, CeylonTypedDeclaration.class)) != null) {
-                CeylonTypeParameters typeParameters = decl.getTypeParameters();
-                if (typeParameters != null) {
-                    for (CeylonTypeParameter typeParameter : typeParameters.getTypeParameterList()) {
-                        CeylonTypeName typeNameDeclaration = typeParameter.getTypeName();
-                        if (name.getText().equals(typeNameDeclaration.getText())) {
-                            Annotation anno = annotationHolder.createInfoAnnotation(name, null);
-                            anno.setTextAttributes(CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES);
-                            isTypeParameter = true;
-                            decl = null;
-                            break;
-                        }
-                    }
-                }
-
-                element = decl;
+            if (getTypeParameterInParentDeclaration(name) != null) {
+                Annotation anno = annotationHolder.createInfoAnnotation(name, null);
+                anno.setTextAttributes(CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES);
+                isTypeParameter = true;
             }
         }
 
@@ -117,6 +121,27 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
         }
     }
 
+    private CeylonTypeName getTypeParameterInParentDeclaration(CeylonTypeName typeName) {
+        CeylonTypedDeclaration decl;
+        PsiElement element = typeName;
+
+        while ((decl = PsiTreeUtil.getParentOfType(element, CeylonTypedDeclaration.class)) != null) {
+            CeylonTypeParameters typeParameters = decl.getTypeParameters();
+            if (typeParameters != null) {
+                for (CeylonTypeParameter typeParameter : typeParameters.getTypeParameterList()) {
+                    CeylonTypeName typeNameDeclaration = typeParameter.getTypeName();
+                    if (typeName.getText().equals(typeNameDeclaration.getText())) {
+                        return typeNameDeclaration;
+                    }
+                }
+            }
+
+            element = decl;
+        }
+
+        return null;
+    }
+
     @Override
     public void visitInterfaceDeclaration(@NotNull CeylonInterfaceDeclaration o) {
         super.visitInterfaceDeclaration(o);
@@ -139,11 +164,9 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
             } else if (hasAnnotation(declaration.getAnnotations(), "formal") && !hasAnnotation(declaration.getAnnotations(), "shared")) {
                 Annotation annotation = annotationHolder.createErrorAnnotation(declaration, "Formal member is not shared");
                 annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "shared"));
-            } else if (hasAnnotation(declaration.getAnnotations(), "actual") && !hasAnnotation(declaration.getAnnotations(), "shared")) {
-                // TODO move in visitClassDeclaration
-                Annotation annotation = annotationHolder.createErrorAnnotation(declaration, "Actual member is not shared");
-                annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "shared"));
             }
         }
     }
+
+
 }

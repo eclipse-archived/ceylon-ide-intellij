@@ -198,7 +198,7 @@ classDeclaration  ::= "class" typeName
     stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
     elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
     extends="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
-    implements="org.intellij.plugins.ceylon.psi.CeylonTypedDeclaration"
+    implements="org.intellij.plugins.ceylon.psi.CeylonClass"
 }
 
 aliasDeclaration ::= "alias" typeName typeParameters? typeConstraints? typeSpecifier? ";" {

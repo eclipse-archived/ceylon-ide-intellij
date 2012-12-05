@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import com.intellij.psi.StubBasedPsiElement;
 
-public interface CeylonClassDeclaration extends CeylonTypedDeclaration, StubBasedPsiElement<ClassStub> {
+public interface CeylonClassDeclaration extends CeylonClass, StubBasedPsiElement<ClassStub> {
 
   @Nullable
   CeylonBlock getBlock();

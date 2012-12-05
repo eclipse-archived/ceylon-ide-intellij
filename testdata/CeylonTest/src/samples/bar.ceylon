@@ -1,10 +1,26 @@
-import samples.subpackage { SubPackageClass }
+import samples.subpackage {SubPackageClass }
 
-shared class Point {
-    shared Float x;
-    shared Float y;
-    SubPackageClass myClass;
+interface Plop {
+    formal shared Void bar();
+}
+doc "My wonderful class"
+class Bar() {
+    MySampleClass myClass;
+    SubPackageClass myOtherClass;
+    Integer foo;
 
-    class Plop extends SubPackageClass() {
+    interface Plop {
+        formal shared Void foo();
+    }
+
+    class PlopImpl() satisfies Plop {
+        actual shared Integer bar() {
+            return 0;
+        }
+    }
+
+    doc "foo"
+    throws (Integer)
+    void hello() {
     }
 }
