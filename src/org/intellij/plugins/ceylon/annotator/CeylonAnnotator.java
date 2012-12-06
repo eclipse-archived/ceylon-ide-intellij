@@ -1,17 +1,17 @@
 package org.intellij.plugins.ceylon.annotator;
 
 import com.intellij.codeInspection.ProblemHighlightType;
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddAnnotationFix;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddEmptyParametersFix;
+import org.intellij.plugins.ceylon.annotator.quickfix.AddModuleDependencyFix;
 import org.intellij.plugins.ceylon.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -168,5 +168,36 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
         }
     }
 
+    @Override
+    public void visitPackagePath(@NotNull CeylonPackagePath o) {
+        super.visitPackagePath(o);
 
+        if (!(o.getParent() instanceof CeylonImportDeclaration)) {
+            return;
+        }
+
+        PsiDirectory directory = o.getContainingFile().getContainingDirectory();
+        PsiFile moduleFile = (directory == null) ? null : directory.findFile("module.ceylon");
+        boolean isValidImport = false;
+
+        if (moduleFile != null) {
+            ASTNode node = moduleFile.getNode().findChildByType(CeylonTypes.MODULE_DESCRIPTOR);
+
+            if (node != null) {
+                CeylonModuleDescriptor descriptor = (CeylonModuleDescriptor) node.getPsi();
+
+                for (CeylonImportModule module : descriptor.getImportModuleList().getImportModuleList()) {
+                    if (module.getPackagePath().getText().equals(o.getText())) {
+                        isValidImport = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!isValidImport) {
+            Annotation annotation = annotationHolder.createErrorAnnotation(o, "Package not found in dependent modules");
+            annotation.registerFix(new AddModuleDependencyFix(o));
+        }
+    }
 }
