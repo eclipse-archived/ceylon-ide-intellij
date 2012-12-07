@@ -65,7 +65,20 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
                 continue;
             }
 
-            if (hasAnnotation(declaration.getAnnotations(), "actual") && !hasAnnotation(declaration.getAnnotations(), "shared")) {
+            // TODO refactor
+            if (method.getBlock() == null && !hasAnnotation(declaration.getAnnotations(), "formal")) {
+                Annotation annotation = annotationHolder.createErrorAnnotation(method.getMemberName(), "Interface method must be formal or specified");
+                annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "formal"));
+            } else if (hasAnnotation(declaration.getAnnotations(), "formal")) {
+                CeylonDeclaration classDecl = (CeylonDeclaration) o.getParent();
+                if (!hasAnnotation(classDecl.getAnnotations(), "abstract")) {
+                    Annotation annotation = annotationHolder.createErrorAnnotation(declaration, "Formal member belongs to non-abstract, non-formal class");
+                    annotation.registerFix(new AddAnnotationFix(classDecl, o.getName(), "abstract"));
+                } else if (!hasAnnotation(declaration.getAnnotations(), "shared")) {
+                    Annotation annotation = annotationHolder.createErrorAnnotation(declaration, "Formal member is not shared");
+                    annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "shared"));
+                }
+            } else if (hasAnnotation(declaration.getAnnotations(), "actual") && !hasAnnotation(declaration.getAnnotations(), "shared")) {
                 Annotation annotation = annotationHolder.createErrorAnnotation(method.getMemberName(), "Actual member is not shared");
                 annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "shared"));
             }
@@ -187,7 +200,7 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
                 CeylonModuleDescriptor descriptor = (CeylonModuleDescriptor) node.getPsi();
 
                 for (CeylonImportModule module : descriptor.getImportModuleList().getImportModuleList()) {
-                    if (module.getPackagePath().getText().equals(o.getText())) {
+                    if (module.getPackagePath().getText().equals(o.getText()) || o.getText().startsWith(module.getPackagePath().getText())) {
                         isValidImport = true;
                         break;
                     }

@@ -18,6 +18,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Chunk;
+import com.intellij.util.net.HttpConfigurable;
 import org.intellij.plugins.ceylon.CeylonFileType;
 import org.intellij.plugins.ceylon.sdk.CeylonSdk;
 import org.jetbrains.annotations.NotNull;
@@ -50,11 +51,16 @@ public class CeylonCompiler implements TranslatingCompiler {
         SimpleJavaParameters parameters = new SimpleJavaParameters();
         parameters.setJdk(jdk);
         parameters.getVMParametersList().addProperty("ceylon.system.repo", sdk.getHomePath() + "/repo");
+        if (HttpConfigurable.getInstance().USE_HTTP_PROXY) {
+            parameters.getVMParametersList().addProperty("http.proxyHost", HttpConfigurable.getInstance().PROXY_HOST);
+            parameters.getVMParametersList().addProperty("http.proxyPort", String.valueOf(HttpConfigurable.getInstance().PROXY_PORT));
+        }
         parameters.setMainClass("com.redhat.ceylon.compiler.java.Main");
 
         try {
             ParametersList params = parameters.getProgramParametersList();
             params.add("-out", context.getModuleOutputDirectory(firstModule).getPath());
+            params.add("-rep", "http://modules.ceylon-lang.org/test/");
 
             for (Module module : moduleChunk.getNodes()) {
                 for (VirtualFile sourceRoot : context.getSourceRoots(module)) {
@@ -72,6 +78,7 @@ public class CeylonCompiler implements TranslatingCompiler {
             }
 
             GeneralCommandLine cline = CommandLineBuilder.createFromJavaParameters(parameters);
+            // TODO remove me once it works properly
             context.addMessage(CompilerMessageCategory.WARNING, cline.toString(), null, 0, 0);
             Process process = cline.createProcess();
             reportErrorsIfAny(context, process);

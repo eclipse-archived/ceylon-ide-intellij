@@ -79,7 +79,7 @@ public class CeylonBlock implements Block {
 
         List<IElementType> typesRequiringNoLeftSpacing = Arrays.asList(
                 CeylonTypes.PARAMETERS, CeylonTypes.OP_RPAREN, CeylonTypes.OP_COMMA, CeylonTypes.OP_SEMI_COLUMN,
-                CeylonTypes.OP_DOT
+                CeylonTypes.OP_DOT, CeylonTypes.TYPE_PARAMETERS
         );
         List<IElementType> typesRequiringNoRightSpacing = Arrays.asList(
                 CeylonTypes.OP_LPAREN, CeylonTypes.OP_DOT
@@ -100,7 +100,9 @@ public class CeylonBlock implements Block {
                     (block1.node.getTreeParent().getElementType() == CeylonTypes.BLOCK || block1.node.getTreeParent().getElementType() == CeylonTypes.IMPORT_MODULE_LIST))) {
                 return GOTO_LINE_SPACING;
             }
-            if (typesRequiringNoRightSpacing.contains(type1) || typesRequiringNoLeftSpacing.contains(block2.node.getElementType())) {
+            if (typesRequiringNoRightSpacing.contains(type1) || typesRequiringNoLeftSpacing.contains(block2.node.getElementType())
+                    || (type1 == CeylonTypes.OP_LT && block2.node.getElementType() == CeylonTypes.TYPE_PARAMETER)
+                    || (type1 == CeylonTypes.TYPE_PARAMETER && block2.node.getElementType() == CeylonTypes.OP_GT)) {
                 return NO_SPACING;
             }
         }

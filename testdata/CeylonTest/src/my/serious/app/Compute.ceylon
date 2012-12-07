@@ -1,5 +1,11 @@
-import ceylon.math { ... }
+import ceylon.math.integer { ... }
 
-class Compute() {
+abstract class Compute<T>() {
+    formal shared T op(T param1, T param2);
+}
 
+class Smallest() extends Compute<Integer>() {
+    actual shared Integer op(Integer param1, Integer param2) {
+        return smallest(param1, param2);
+    }
 }
