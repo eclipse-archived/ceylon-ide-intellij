@@ -66,7 +66,7 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
             }
 
             // TODO refactor
-            if (method.getBlock() == null && !hasAnnotation(declaration.getAnnotations(), "formal")) {
+            if (method.getBlock() == null && !method.getParametersList().isEmpty() && !hasAnnotation(declaration.getAnnotations(), "formal")) {
                 Annotation annotation = annotationHolder.createErrorAnnotation(method.getMemberName(), "Interface method must be formal or specified");
                 annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "formal"));
             } else if (hasAnnotation(declaration.getAnnotations(), "formal")) {
