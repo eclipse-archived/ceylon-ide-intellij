@@ -5,6 +5,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
 import org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType;
+import org.intellij.plugins.ceylon.psi.stub.impl.ModuleElementType;
 import org.intellij.plugins.ceylon.psi.impl.*;
 
 public interface CeylonTypes {
@@ -114,7 +115,8 @@ public interface CeylonTypes {
   IElementType MEMBER_NAME = new CeylonElementType("MEMBER_NAME");
   IElementType MEMBER_REFERENCE = new CeylonElementType("MEMBER_REFERENCE");
   IElementType MEMBER_SELECTION_OPERATOR = new CeylonElementType("MEMBER_SELECTION_OPERATOR");
-  IElementType MODULE_DESCRIPTOR = new CeylonElementType("MODULE_DESCRIPTOR");
+  IElementType MODULE_DESCRIPTOR = new ModuleElementType("MODULE_DESCRIPTOR");
+  IElementType MODULE_VERSION = new CeylonElementType("MODULE_VERSION");
   IElementType MULTIPLICATIVE_EXPRESSION = new CeylonElementType("MULTIPLICATIVE_EXPRESSION");
   IElementType MULTIPLICATIVE_OPERATOR = new CeylonElementType("MULTIPLICATIVE_OPERATOR");
   IElementType MY_STRING_LITERAL = new CeylonElementType("MY_STRING_LITERAL");
@@ -617,6 +619,9 @@ public interface CeylonTypes {
       }
       else if (type == MODULE_DESCRIPTOR) {
         return new CeylonModuleDescriptorImpl(node);
+      }
+      else if (type == MODULE_VERSION) {
+        return new CeylonModuleVersionImpl(node);
       }
       else if (type == MULTIPLICATIVE_EXPRESSION) {
         return new CeylonMultiplicativeExpressionImpl(node);

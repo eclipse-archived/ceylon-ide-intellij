@@ -432,6 +432,11 @@ public class CeylonVisitor extends PsiElementVisitor {
 
   public void visitModuleDescriptor(@NotNull CeylonModuleDescriptor o) {
     visitCompositeElement(o);
+    // visitStubBasedPsiElement(o);
+  }
+
+  public void visitModuleVersion(@NotNull CeylonModuleVersion o) {
+    visitCompositeElement(o);
   }
 
   public void visitMultiplicativeExpression(@NotNull CeylonMultiplicativeExpression o) {

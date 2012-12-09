@@ -6,14 +6,19 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddAnnotationFix;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddEmptyParametersFix;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddModuleDependencyFix;
 import org.intellij.plugins.ceylon.psi.*;
+import org.intellij.plugins.ceylon.psi.stub.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 import static org.intellij.plugins.ceylon.psi.CeylonPsiUtils.hasAnnotation;
 
@@ -178,6 +183,33 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
                 Annotation annotation = annotationHolder.createErrorAnnotation(declaration, "Formal member is not shared");
                 annotation.registerFix(new AddAnnotationFix(declaration, method.getMemberName().getText(), "shared"));
             }
+        }
+    }
+
+    @Override
+    public void visitImportModule(@NotNull CeylonImportModule o) {
+        super.visitImportModule(o);
+
+        CeylonPackagePath packagePath = o.getPackagePath();
+
+        if (packagePath == null) {
+            return;
+        }
+
+        Project project = packagePath.getProject();
+
+        Collection<CeylonModuleDescriptor> modules = ModuleIndex.getInstance().get(packagePath.getText(), project, GlobalSearchScope.allScope(project));
+        boolean moduleIsValid = false;
+
+        for (CeylonModuleDescriptor module : modules) {
+            if (module.getModuleVersion().getText().equals(o.getModuleVersion().getText())) {
+                moduleIsValid = true;
+                break;
+            }
+        }
+
+        if (!moduleIsValid) {
+            annotationHolder.createErrorAnnotation(o, "Invalid module " + packagePath.getText());
         }
     }
 

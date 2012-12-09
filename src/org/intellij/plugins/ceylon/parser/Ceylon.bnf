@@ -129,13 +129,17 @@ private ceylon_statement_recover ::= (!compilationUnit)
 
 private comment ::= LINE_COMMENT | MULTI_LINE_COMMENT
 
-moduleDescriptor ::= "module" packagePath QUOTED_LITERAL importModuleList
+moduleDescriptor ::= "module" packagePath moduleVersion importModuleList {
+    stub="org.intellij.plugins.ceylon.psi.stub.ModuleStub"
+    elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ModuleElementType"
+}
+moduleVersion ::= QUOTED_LITERAL
 
 importModuleList ::= "{" (compilerAnnotations annotations importModule)* "}"
 
 packageDescriptor ::= "package" packagePath ";"
 
-importModule ::= "import" (QUOTED_LITERAL | packagePath) QUOTED_LITERAL ";"
+importModule ::= "import" (QUOTED_LITERAL | packagePath) moduleVersion ";"
 
 importList  ::=  importDeclaration+
 

@@ -8,18 +8,31 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
+import org.intellij.plugins.ceylon.psi.stub.ModuleStub;
 import org.intellij.plugins.ceylon.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
 
-public class CeylonModuleDescriptorImpl extends CeylonCompositeElementImpl implements CeylonModuleDescriptor {
+public class CeylonModuleDescriptorImpl extends StubBasedPsiElementBase<ModuleStub> implements CeylonModuleDescriptor {
 
   public CeylonModuleDescriptorImpl(ASTNode node) {
     super(node);
+  }
+
+  public CeylonModuleDescriptorImpl(ModuleStub stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   @Override
   @NotNull
   public CeylonImportModuleList getImportModuleList() {
     return findNotNullChildByClass(CeylonImportModuleList.class);
+  }
+
+  @Override
+  @NotNull
+  public CeylonModuleVersion getModuleVersion() {
+    return findNotNullChildByClass(CeylonModuleVersion.class);
   }
 
   @Override

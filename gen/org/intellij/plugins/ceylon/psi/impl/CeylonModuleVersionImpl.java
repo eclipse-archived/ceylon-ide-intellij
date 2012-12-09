@@ -10,26 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 import org.intellij.plugins.ceylon.psi.*;
 
-public class CeylonImportModuleImpl extends CeylonCompositeElementImpl implements CeylonImportModule {
+public class CeylonModuleVersionImpl extends CeylonCompositeElementImpl implements CeylonModuleVersion {
 
-  public CeylonImportModuleImpl(ASTNode node) {
+  public CeylonModuleVersionImpl(ASTNode node) {
     super(node);
   }
 
-  @Override
-  @NotNull
-  public CeylonModuleVersion getModuleVersion() {
-    return findNotNullChildByClass(CeylonModuleVersion.class);
-  }
-
-  @Override
-  @Nullable
-  public CeylonPackagePath getPackagePath() {
-    return findChildByClass(CeylonPackagePath.class);
-  }
-
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportModule(this);
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitModuleVersion(this);
     else super.accept(visitor);
   }
 

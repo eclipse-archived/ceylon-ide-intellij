@@ -341,6 +341,9 @@ public class CeylonParser implements PsiParser {
     else if (root_ == MODULE_DESCRIPTOR) {
       result_ = moduleDescriptor(builder_, level_ + 1);
     }
+    else if (root_ == MODULE_VERSION) {
+      result_ = moduleVersion(builder_, level_ + 1);
+    }
     else if (root_ == MULTIPLICATIVE_EXPRESSION) {
       result_ = multiplicativeExpression(builder_, level_ + 1);
     }
@@ -3637,7 +3640,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "import" (QUOTED_LITERAL | packagePath) QUOTED_LITERAL ";"
+  // "import" (QUOTED_LITERAL | packagePath) moduleVersion ";"
   public static boolean importModule(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "importModule")) return false;
     if (!nextTokenIs(builder_, KW_IMPORT)) return false;
@@ -3645,7 +3648,7 @@ public class CeylonParser implements PsiParser {
     Marker marker_ = builder_.mark();
     result_ = consumeToken(builder_, KW_IMPORT);
     result_ = result_ && importModule_1(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, QUOTED_LITERAL);
+    result_ = result_ && moduleVersion(builder_, level_ + 1);
     result_ = result_ && consumeToken(builder_, OP_SEMI_COLUMN);
     if (result_) {
       marker_.done(IMPORT_MODULE);
@@ -4472,7 +4475,7 @@ public class CeylonParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // "module" packagePath QUOTED_LITERAL importModuleList
+  // "module" packagePath moduleVersion importModuleList
   public static boolean moduleDescriptor(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "moduleDescriptor")) return false;
     if (!nextTokenIs(builder_, KW_MODULE)) return false;
@@ -4480,10 +4483,27 @@ public class CeylonParser implements PsiParser {
     Marker marker_ = builder_.mark();
     result_ = consumeToken(builder_, KW_MODULE);
     result_ = result_ && packagePath(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, QUOTED_LITERAL);
+    result_ = result_ && moduleVersion(builder_, level_ + 1);
     result_ = result_ && importModuleList(builder_, level_ + 1);
     if (result_) {
       marker_.done(MODULE_DESCRIPTOR);
+    }
+    else {
+      marker_.rollbackTo();
+    }
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // QUOTED_LITERAL
+  public static boolean moduleVersion(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "moduleVersion")) return false;
+    if (!nextTokenIs(builder_, QUOTED_LITERAL)) return false;
+    boolean result_ = false;
+    Marker marker_ = builder_.mark();
+    result_ = consumeToken(builder_, QUOTED_LITERAL);
+    if (result_) {
+      marker_.done(MODULE_VERSION);
     }
     else {
       marker_.rollbackTo();

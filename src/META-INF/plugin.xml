@@ -47,6 +47,7 @@
 
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>
         <stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>
+        <stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>
 
         <gotoClassContributor implementation="org.intellij.plugins.ceylon.codeInsight.navigation.CeylonGotoClassContributor"/>
 
