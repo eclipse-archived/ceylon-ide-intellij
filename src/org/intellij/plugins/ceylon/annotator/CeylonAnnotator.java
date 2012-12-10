@@ -14,6 +14,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddAnnotationFix;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddEmptyParametersFix;
 import org.intellij.plugins.ceylon.annotator.quickfix.AddModuleDependencyFix;
+import org.intellij.plugins.ceylon.annotator.quickfix.AddModuleFix;
 import org.intellij.plugins.ceylon.psi.*;
 import org.intellij.plugins.ceylon.psi.stub.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
@@ -209,7 +210,8 @@ public class CeylonAnnotator extends CeylonVisitor implements Annotator {
         }
 
         if (!moduleIsValid) {
-            annotationHolder.createErrorAnnotation(o, "Invalid module " + packagePath.getText());
+            Annotation annotation = annotationHolder.createErrorAnnotation(o, "Invalid module " + packagePath.getText());
+            annotation.registerFix(new AddModuleFix(o));
         }
     }
 

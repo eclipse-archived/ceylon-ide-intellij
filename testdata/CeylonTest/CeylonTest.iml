@@ -8,6 +8,15 @@
     <content url="file://$MODULE_DIR$/../../../ceylon.language" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Ceylon libs">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.ceylon/cache/ceylon/math/0.4/ceylon.math-0.4.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
