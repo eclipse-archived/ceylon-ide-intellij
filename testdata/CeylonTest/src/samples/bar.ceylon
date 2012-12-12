@@ -14,7 +14,7 @@ doc "My wonderful class" class Bar() {
     class PlopImpl() satisfies Plop {
         void poulpe() {
         }
-        actual shared Integer bar() {
+        actual shared Iteger bar() {
             return 0;
         }
     }
