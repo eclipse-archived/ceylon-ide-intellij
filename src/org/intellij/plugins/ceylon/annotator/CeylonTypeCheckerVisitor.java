@@ -59,7 +59,7 @@ class CeylonTypeCheckerVisitor extends Visitor {
         String relativePath = VfsUtil.getRelativePath(virtualFile, fileRoot, '/');
         PhasedUnit phasedUnit = checker.getPhasedUnitFromRelativePath(relativePath);
 
-        if (phasedUnit.getCompilationUnit() == null) {
+        if (phasedUnit == null || phasedUnit.getCompilationUnit() == null) {
             return;
         }
 
