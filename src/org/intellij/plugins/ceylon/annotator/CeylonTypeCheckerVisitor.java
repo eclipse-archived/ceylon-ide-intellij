@@ -3,15 +3,11 @@ package org.intellij.plugins.ceylon.annotator;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
@@ -20,8 +16,6 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
 
 class CeylonTypeCheckerVisitor extends Visitor {
 
@@ -32,32 +26,14 @@ class CeylonTypeCheckerVisitor extends Visitor {
     }
 
     public void accept(@NotNull PsiFile file) {
-        TypeCheckerBuilder builder = new TypeCheckerBuilder();
-        Module module = ModuleUtil.findModuleForPsiElement(file);
-        VirtualFile fileRoot = null;
-        VirtualFile virtualFile = file.getVirtualFile();
+        TypeCheckerManager manager = ServiceManager.getService(file.getProject(), TypeCheckerManager.class);
 
-        if (module == null || virtualFile == null) {
-            return;
-        }
+        TypeChecker typeChecker = manager.getTypeChecker();
 
-        for (VirtualFile sourceRoot : ModuleRootManager.getInstance(module).getSourceRoots()) {
-            VirtualFile commonAncestor = VfsUtil.getCommonAncestor(sourceRoot, virtualFile);
-            if (commonAncestor != null) {
-                fileRoot = commonAncestor;
-            }
-            builder.addSrcDirectory(new File(sourceRoot.getPath()));
-        }
-        builder.verbose(true);
-        TypeChecker checker = builder.getTypeChecker();
-        checker.process();
+        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(new SourceCodeVirtualFile(file));
 
-        if (fileRoot == null) {
-            return;
-        }
-
-        String relativePath = VfsUtil.getRelativePath(virtualFile, fileRoot, '/');
-        PhasedUnit phasedUnit = checker.getPhasedUnitFromRelativePath(relativePath);
+        phasedUnit.analyseTypes();
+        phasedUnit.analyseUsage();
 
         if (phasedUnit == null || phasedUnit.getCompilationUnit() == null) {
             return;
@@ -69,7 +45,7 @@ class CeylonTypeCheckerVisitor extends Visitor {
     @Override
     public void visitAny(Node that) {
         for (Message error : that.getErrors()) {
-            int numNL = error.getLine() - 1;
+            int numNL = SystemInfo.isWindows ? error.getLine() - 1 : 0;
             TextRange range = new TextRange(that.getStartIndex() - numNL, that.getStopIndex() - numNL + 1);
 
             if (that instanceof Tree.Declaration) {
