@@ -4,18 +4,25 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
+import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
+import org.antlr.runtime.ANTLRInputStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 
 class CeylonTypeCheckerVisitor extends Visitor {
 
@@ -30,12 +37,45 @@ class CeylonTypeCheckerVisitor extends Visitor {
 
         TypeChecker typeChecker = manager.getTypeChecker();
 
-        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(new SourceCodeVirtualFile(file));
+        SourceCodeVirtualFile sourceCodeVirtualFile = new SourceCodeVirtualFile(file);
+        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
 
+        CeylonLexer lexer = null;
+        try {
+            lexer = new CeylonLexer(new ANTLRInputStream(sourceCodeVirtualFile.getInputStream()));
+        } catch (IOException e) {
+            Logger.getInstance(CeylonTypeCheckerVisitor.class).error(e);
+        }
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        tokenStream.fill();
+        CeylonParser parser = new CeylonParser(tokenStream);
+
+        Tree.CompilationUnit cu = null;
+        try {
+            cu = parser.compilationUnit();
+        } catch (RecognitionException e) {
+            Logger.getInstance(CeylonTypeCheckerVisitor.class).error(e);
+        }
+
+        phasedUnit = new PhasedUnit(sourceCodeVirtualFile, phasedUnit.getSrcDir(), cu, phasedUnit.getPackage(),
+                typeChecker.getPhasedUnits().getModuleManager(), typeChecker.getContext(), tokenStream.getTokens());
+
+        phasedUnit.validateTree();
+        phasedUnit.visitSrcModulePhase();
+        phasedUnit.visitRemainingModulePhase();
+        phasedUnit.scanDeclarations();
+        phasedUnit.scanTypeDeclarations();
+        phasedUnit.validateRefinement();
         phasedUnit.analyseTypes();
         phasedUnit.analyseUsage();
+        phasedUnit.analyseFlow();
 
-        if (phasedUnit == null || phasedUnit.getCompilationUnit() == null) {
+        if (typeChecker.getPhasedUnitFromRelativePath(phasedUnit.getPathRelativeToSrcDir()) != null) {
+            typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(phasedUnit.getPathRelativeToSrcDir());
+        }
+        typeChecker.getPhasedUnits().addPhasedUnit(phasedUnit.getUnitFile(), phasedUnit);
+
+        if (phasedUnit.getCompilationUnit() == null) {
             return;
         }
 
@@ -45,12 +85,12 @@ class CeylonTypeCheckerVisitor extends Visitor {
     @Override
     public void visitAny(Node that) {
         for (Message error : that.getErrors()) {
-            int numNL = SystemInfo.isWindows ? error.getLine() - 1 : 0;
-            TextRange range = new TextRange(that.getStartIndex() - numNL, that.getStopIndex() - numNL + 1);
+            int crlfCountDiff = 0; //SystemInfo.isWindows ? (error.getLine() - 1) * 2 : 0;
+            TextRange range = new TextRange(that.getStartIndex() + crlfCountDiff, that.getStopIndex() + crlfCountDiff + 1);
 
             if (that instanceof Tree.Declaration) {
                 Tree.Identifier id = ((Tree.Declaration) that).getIdentifier();
-                range = new TextRange(id.getStartIndex() - numNL, id.getStopIndex() - numNL + 1);
+                range = new TextRange(id.getStartIndex() - crlfCountDiff, id.getStopIndex() - crlfCountDiff + 1);
             }
 
             if (error instanceof AnalysisError) {
