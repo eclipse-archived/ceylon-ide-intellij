@@ -2,7 +2,6 @@
 package org.intellij.plugins.ceylon.parser;
 
 import org.jetbrains.annotations.*;
-import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
 import com.intellij.openapi.diagnostic.Logger;
@@ -10,7 +9,6 @@ import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 import static org.intellij.plugins.ceylon.parser.CeylonParserUtil.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})

@@ -1,11 +1,19 @@
 package org.intellij.plugins.ceylon.codeInsight.resolve;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.intellij.plugins.ceylon.annotator.SourceCodeVirtualFile;
+import org.intellij.plugins.ceylon.annotator.TypeCheckerManager;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonImportDeclaration;
@@ -33,7 +41,36 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
         if (myElement.getParent() instanceof CeylonClass) {
             return null; // type definition does not resolve to itself
         }
+        if (true) {
+            PsiFile file = myElement.getContainingFile();
+            TypeCheckerManager manager = ServiceManager.getService(file.getProject(), TypeCheckerManager.class);
 
+            TypeChecker typeChecker = manager.getTypeChecker();
+
+            SourceCodeVirtualFile sourceCodeVirtualFile = new SourceCodeVirtualFile(file);
+            PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
+
+            if (phasedUnit == null) {
+                return null;
+            }
+
+            int textOffset = myElement.getTextOffset();
+            Node node = getNodeAtOffset(textOffset, phasedUnit.getCompilationUnit());
+            if (node == null) {
+                return null;
+            }
+            if (node instanceof Tree.MemberOrTypeExpression) {
+                FindReferencedNodeVisitor visitor = new FindReferencedNodeVisitor(((Tree.MemberOrTypeExpression) node).getDeclaration());
+                visitor.visit(phasedUnit.getCompilationUnit());
+                Node declaration = visitor.getDeclarationNode();
+                if (declaration instanceof Tree.Declaration) {
+                    return file.findElementAt(((Tree.Declaration) declaration).getIdentifier().getStartIndex()).getParent();
+                }
+            } else if (node instanceof Tree.Identifier) {
+            }
+
+            return null;
+        }
         String name = myElement.getText();
 
         CeylonFile containingFile = (CeylonFile) myElement.getContainingFile();
@@ -115,5 +152,29 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
     @Override
     public Object[] getVariants() {
         return PsiElement.EMPTY_ARRAY;
+    }
+
+    private Node getNodeAtOffset(int offset, Node root) {
+        if (root == null || root.getStartIndex() == null || root.getStopIndex() == null) {
+            return null;
+        }
+        if (root.getStartIndex() <= offset && offset <= root.getStopIndex()) {
+            for (Node node : root.getChildren()) {
+                Integer startIndex = node.getStartIndex();
+                if (startIndex != null && startIndex == offset) {
+                    if (node instanceof Tree.MemberOrTypeExpression || node.getChildren().isEmpty()) {
+                        return node;
+                    } else {
+                        return getNodeAtOffset(offset, node);
+                    }
+                } else {
+                    Node subNode = getNodeAtOffset(offset, node);
+                    if (subNode != null) {
+                        return subNode;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

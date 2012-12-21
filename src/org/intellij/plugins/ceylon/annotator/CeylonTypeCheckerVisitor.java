@@ -11,6 +11,8 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
+import com.redhat.ceylon.compiler.typechecker.io.impl.FileSystemVirtualFile;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
@@ -22,6 +24,7 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 
 class CeylonTypeCheckerVisitor extends Visitor {
@@ -57,7 +60,11 @@ class CeylonTypeCheckerVisitor extends Visitor {
             Logger.getInstance(CeylonTypeCheckerVisitor.class).error(e);
         }
 
-        phasedUnit = new PhasedUnit(sourceCodeVirtualFile, phasedUnit.getSrcDir(), cu, phasedUnit.getPackage(),
+        VirtualFile srcDir = (phasedUnit == null) ? new FileSystemVirtualFile(new File(file.getVirtualFile().getParent().getPath())) : phasedUnit.getSrcDir();
+        com.redhat.ceylon.compiler.typechecker.model.Package pkg = (phasedUnit == null) ?
+                typeChecker.getContext().getModules().getDefaultModule().getPackages().get(0) : phasedUnit.getPackage();
+
+        phasedUnit = new PhasedUnit(sourceCodeVirtualFile, srcDir, cu, pkg,
                 typeChecker.getPhasedUnits().getModuleManager(), typeChecker.getContext(), tokenStream.getTokens());
 
         phasedUnit.validateTree();

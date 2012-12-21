@@ -11,6 +11,6 @@ class Smallest() extends Compute < Integer > () {
     }
 
     actual shared Integer op(Integer param1, Integer param2) {
-        return smalest (param1, param2);
+        return smaplest (param1, param2);
     }
 }

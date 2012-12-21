@@ -163,7 +163,9 @@ typeName ::= UIDENTIFIER {
 
 annotationName ::= LIDENTIFIER
 
-memberName ::= LIDENTIFIER
+memberName ::= LIDENTIFIER {
+    mixin="org.intellij.plugins.ceylon.psi.impl.CeylonIdentifier"
+}
 
 objectDeclaration ::= "object" memberName extendedType? satisfiedTypes? (block | ";")
 

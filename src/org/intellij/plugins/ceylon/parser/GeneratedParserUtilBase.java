@@ -39,10 +39,6 @@ public class GeneratedParserUtilBase {
 
     public static final IElementType DUMMY_BLOCK = new DummyBlockElementType();
 
-    public interface Parser {
-        boolean parse(PsiBuilder builder, int level);
-    }
-
     public static final Parser TOKEN_ADVANCER = new Parser() {
         @Override
         public boolean parse(PsiBuilder builder, int level) {
