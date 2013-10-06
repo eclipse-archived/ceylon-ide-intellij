@@ -7,6 +7,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import org.intellij.plugins.ceylon.parser.CeylonLexer;
+import org.intellij.plugins.ceylon.parser.CeylonLexerAdapter;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonClassDeclaration;
 import org.intellij.plugins.ceylon.psi.CeylonInterfaceDeclaration;
@@ -19,7 +20,7 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @Nullable
     @Override
     public WordsScanner getWordsScanner() {
-        return new DefaultWordsScanner(new CeylonLexer(), TokenSet.create(CeylonTypes.TYPE_NAME, CeylonTypes.MEMBER_NAME),
+        return new DefaultWordsScanner(new CeylonLexerAdapter(), TokenSet.create(CeylonTypes.TYPE_NAME, CeylonTypes.MEMBER_NAME),
                 TokenSet.create(CeylonTypes.LINE_COMMENT, CeylonTypes.MULTI_LINE_COMMENT), TokenSet.create(CeylonTypes.STRING_LITERAL));
     }
 

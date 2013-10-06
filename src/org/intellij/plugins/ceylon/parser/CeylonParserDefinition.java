@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.parser;
 
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiParser;
@@ -15,6 +16,8 @@ import com.intellij.psi.tree.TokenSet;
 import org.intellij.plugins.ceylon.CeylonLanguage;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.psi.TokenTypes;
+import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
 import org.jetbrains.annotations.NotNull;
 
 public class CeylonParserDefinition implements ParserDefinition {
@@ -29,12 +32,12 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new CeylonLexer();
+        return new CeylonLexerAdapter();
     }
 
     @Override
     public PsiParser createParser(Project project) {
-        return new CeylonParser();
+        return new ANTLRCeylonParser();
     }
 
     @Override
@@ -51,19 +54,20 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public TokenSet getCommentTokens() {
-        return TokenSet.create(CeylonTypes.LINE_COMMENT, CeylonTypes.MULTI_LINE_COMMENT);
+        return TokenSet.create(TokenTypes.LINE_COMMENT.getTokenType(), TokenTypes.MULTI_COMMENT.getTokenType());
     }
 
     @NotNull
     @Override
     public TokenSet getStringLiteralElements() {
-        return TokenSet.EMPTY;
+        return TokenSet.create(TokenTypes.STRING_LITERAL.getTokenType(), TokenTypes.CHAR_LITERAL.getTokenType());
     }
 
     @NotNull
     @Override
     public PsiElement createElement(ASTNode node) {
-        return CeylonTypes.Factory.createElement(node);
+        return new CeylonCompositeElementImpl(node);
+//        return CeylonTypes.Factory.createElement(node);
     }
 
     @Override

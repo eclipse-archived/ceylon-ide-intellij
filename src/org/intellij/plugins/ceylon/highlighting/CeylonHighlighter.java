@@ -8,7 +8,9 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import gnu.trove.THashMap;
 import org.intellij.plugins.ceylon.parser.CeylonLexer;
+import org.intellij.plugins.ceylon.parser.CeylonLexerAdapter;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -24,74 +26,76 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
         keys = new THashMap<IElementType, TextAttributesKey>();
 
         TokenSet keywords = TokenSet.create(
-                CeylonTypes.KW_ABSTRACTS,
-                CeylonTypes.KW_ADAPTS,
-                CeylonTypes.KW_ASSIGN,
-                CeylonTypes.KW_BREAK,
-                CeylonTypes.KW_CASE,
-                CeylonTypes.KW_CATCH,
-                CeylonTypes.KW_CLASS,
-                CeylonTypes.KW_CONTINUE,
-                CeylonTypes.KW_ELSE,
-                CeylonTypes.KW_EXISTS,
-                CeylonTypes.KW_EXTENDS,
-                CeylonTypes.KW_FINALLY,
-                CeylonTypes.KW_FOR,
-                CeylonTypes.KW_FUNCTION,
-                CeylonTypes.KW_GIVEN,
-                CeylonTypes.KW_IF,
-                CeylonTypes.KW_IMPORT,
-                CeylonTypes.KW_IN,
-                CeylonTypes.KW_INTERFACE,
-                CeylonTypes.KW_IS,
-                CeylonTypes.KW_MODULE,
-                CeylonTypes.KW_NONEMPTY,
-                CeylonTypes.KW_OBJECT,
-                CeylonTypes.KW_OF,
-                CeylonTypes.KW_OUT,
-                CeylonTypes.KW_OUTER,
-                CeylonTypes.KW_PACKAGE,
-                CeylonTypes.KW_RETURN,
-                CeylonTypes.KW_SATISFIES,
-                CeylonTypes.KW_SUPER,
-                CeylonTypes.KW_SWITCH,
-                CeylonTypes.KW_THEN,
-                CeylonTypes.KW_THIS,
-                CeylonTypes.KW_THROW,
-                CeylonTypes.KW_TRY,
-                CeylonTypes.KW_VALUE,
-                CeylonTypes.KW_VOID,
-                CeylonTypes.KW_WHILE
+            TokenTypes.ASSEMBLY.getTokenType(),
+            TokenTypes.MODULE.getTokenType(),
+            TokenTypes.PACKAGE.getTokenType(),
+            TokenTypes.IMPORT.getTokenType(),
+            TokenTypes.ALIAS.getTokenType(),
+            TokenTypes.CLASS_DEFINITION.getTokenType(),
+            TokenTypes.INTERFACE_DEFINITION.getTokenType(),
+            TokenTypes.OBJECT_DEFINITION.getTokenType(),
+            TokenTypes.TYPE_CONSTRAINT.getTokenType(), // given
+            TokenTypes.VALUE_MODIFIER.getTokenType(),
+            TokenTypes.ASSIGN.getTokenType(),
+            TokenTypes.VOID_MODIFIER.getTokenType(),
+            TokenTypes.FUNCTION_MODIFIER.getTokenType(),
+            TokenTypes.CASE_TYPES.getTokenType(), // of
+            TokenTypes.EXTENDS.getTokenType(),
+            TokenTypes.SATISFIES.getTokenType(),
+            TokenTypes.ABSTRACTED_TYPE.getTokenType(),
+            TokenTypes.IN_OP.getTokenType(),
+            TokenTypes.OUT.getTokenType(),
+            TokenTypes.RETURN.getTokenType(),
+            TokenTypes.BREAK.getTokenType(),
+            TokenTypes.CONTINUE.getTokenType(),
+            TokenTypes.THROW.getTokenType(),
+            TokenTypes.ASSERT.getTokenType(),
+            TokenTypes.DYNAMIC.getTokenType(),
+            TokenTypes.IF_CLAUSE.getTokenType(),
+            TokenTypes.ELSE_CLAUSE.getTokenType(),
+            TokenTypes.SWITCH_CLAUSE.getTokenType(),
+            TokenTypes.CASE_CLAUSE.getTokenType(),
+            TokenTypes.FOR_CLAUSE.getTokenType(),
+            TokenTypes.WHILE_CLAUSE.getTokenType(),
+            TokenTypes.TRY_CLAUSE.getTokenType(),
+            TokenTypes.CATCH_CLAUSE.getTokenType(),
+            TokenTypes.FINALLY_CLAUSE.getTokenType(),
+            TokenTypes.THEN_CLAUSE.getTokenType(),
+            TokenTypes.THIS.getTokenType(),
+            TokenTypes.OUTER.getTokenType(),
+            TokenTypes.SUPER.getTokenType(),
+            TokenTypes.IS_OP.getTokenType(),
+            TokenTypes.EXISTS.getTokenType(),
+            TokenTypes.NONEMPTY.getTokenType()
         );
 
         fillMap(keys, keywords, KEYWORD_KEY);
 
-        keys.put(CeylonTypes.MULTI_LINE_COMMENT, SyntaxHighlighterColors.DOC_COMMENT);
-        keys.put(CeylonTypes.LINE_COMMENT, SyntaxHighlighterColors.LINE_COMMENT);
+        keys.put(TokenTypes.MULTI_COMMENT.getTokenType(), SyntaxHighlighterColors.DOC_COMMENT);
+        keys.put(TokenTypes.LINE_COMMENT.getTokenType(), SyntaxHighlighterColors.LINE_COMMENT);
 
-        keys.put(CeylonTypes.NATURAL_LITERAL, SyntaxHighlighterColors.NUMBER);
-        keys.put(CeylonTypes.FLOAT_LITERAL, SyntaxHighlighterColors.NUMBER);
-        keys.put(CeylonTypes.QUOTED_LITERAL, SyntaxHighlighterColors.STRING);
-        keys.put(CeylonTypes.CHAR_LITERAL, SyntaxHighlighterColors.STRING);
-        keys.put(CeylonTypes.STRING_LITERAL, SyntaxHighlighterColors.STRING);
+        keys.put(TokenTypes.NATURAL_LITERAL.getTokenType(), SyntaxHighlighterColors.NUMBER);
+        keys.put(TokenTypes.FLOAT_LITERAL.getTokenType(), SyntaxHighlighterColors.NUMBER);
+        keys.put(TokenTypes.CHAR_LITERAL.getTokenType(), SyntaxHighlighterColors.STRING);
+        keys.put(TokenTypes.STRING_LITERAL.getTokenType(), SyntaxHighlighterColors.STRING);
+        keys.put(TokenTypes.VERBATIM_STRING.getTokenType(), SyntaxHighlighterColors.STRING);
 
-        keys.put(CeylonTypes.OP_LPAREN, SyntaxHighlighterColors.PARENTHS);
-        keys.put(CeylonTypes.OP_RPAREN, SyntaxHighlighterColors.PARENTHS);
-        keys.put(CeylonTypes.OP_LBRACE, SyntaxHighlighterColors.BRACES);
-        keys.put(CeylonTypes.OP_RBRACE, SyntaxHighlighterColors.BRACES);
-        keys.put(CeylonTypes.OP_LBRACKET, SyntaxHighlighterColors.BRACKETS);
-        keys.put(CeylonTypes.OP_RBRACKET, SyntaxHighlighterColors.BRACKETS);
-        keys.put(CeylonTypes.OP_BRACKETS, SyntaxHighlighterColors.BRACES);
+        keys.put(TokenTypes.LPAREN.getTokenType(), SyntaxHighlighterColors.PARENTHS);
+        keys.put(TokenTypes.RPAREN.getTokenType(), SyntaxHighlighterColors.PARENTHS);
+        keys.put(TokenTypes.LBRACE.getTokenType(), SyntaxHighlighterColors.BRACES);
+        keys.put(TokenTypes.RBRACE.getTokenType(), SyntaxHighlighterColors.BRACES);
+        keys.put(TokenTypes.LBRACKET.getTokenType(), SyntaxHighlighterColors.BRACKETS);
+        keys.put(TokenTypes.RBRACKET.getTokenType(), SyntaxHighlighterColors.BRACKETS);
 
-        keys.put(CeylonTypes.OP_DOT, SyntaxHighlighterColors.DOT);
-        keys.put(CeylonTypes.OP_SEMI_COLUMN, SyntaxHighlighterColors.JAVA_SEMICOLON);
-        keys.put(CeylonTypes.OP_COMMA, SyntaxHighlighterColors.COMMA);
+        keys.put(TokenTypes.MEMBER_OP.getTokenType(), SyntaxHighlighterColors.DOT);
+        keys.put(TokenTypes.SEMICOLON.getTokenType(), SyntaxHighlighterColors.JAVA_SEMICOLON);
+        keys.put(TokenTypes.COMMA.getTokenType(), SyntaxHighlighterColors.COMMA);
     }
 
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new CeylonLexer();
+        return new CeylonLexerAdapter();
     }
 
     @NotNull

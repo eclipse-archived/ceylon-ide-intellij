@@ -7,15 +7,15 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
 import org.intellij.plugins.ceylon.psi.CeylonBlock;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
-import org.intellij.plugins.ceylon.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonBraceMatcher implements PairedBraceMatcher {
     private static final BracePair[] BRACE_PAIRS = new BracePair[]{
-            new BracePair(CeylonTypes.OP_LPAREN, CeylonTypes.OP_RPAREN, false),
-            new BracePair(CeylonTypes.OP_LBRACE, CeylonTypes.OP_RBRACE, true),
-            new BracePair(CeylonTypes.OP_LBRACKET, CeylonTypes.OP_RBRACKET, false),
+            new BracePair(TokenTypes.LPAREN.getTokenType(), TokenTypes.RPAREN.getTokenType(), false),
+            new BracePair(TokenTypes.LBRACE.getTokenType(), TokenTypes.RBRACE.getTokenType(), true),
+            new BracePair(TokenTypes.LBRACKET.getTokenType(), TokenTypes.RBRACKET.getTokenType(), false),
     };
 
     @Override

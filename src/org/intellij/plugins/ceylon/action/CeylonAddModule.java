@@ -64,7 +64,7 @@ public class CeylonAddModule extends AnAction {
         }
 
         Module module = ModuleUtil.findModuleForFile(eventSourceFile, project);
-        PsiDirectory directory = CreateClassUtil.obtainDirectoryRootForPackage(module, moduleName);
+        PsiDirectory directory = null; // TODO CreateClassUtil.obtainDirectoryRootForPackage(module, moduleName);
 
         if (directory == null) {
             return;

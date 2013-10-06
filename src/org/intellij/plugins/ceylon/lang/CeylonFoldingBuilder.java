@@ -18,7 +18,7 @@ public class CeylonFoldingBuilder extends FoldingBuilderEx {
     public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
         List<FoldingDescriptor> descriptors = new ArrayList<FoldingDescriptor>();
 
-        appendDescriptors(root, descriptors);
+//        appendDescriptors(root, descriptors);
 
         return descriptors.toArray(new FoldingDescriptor[descriptors.size()]);
     }
