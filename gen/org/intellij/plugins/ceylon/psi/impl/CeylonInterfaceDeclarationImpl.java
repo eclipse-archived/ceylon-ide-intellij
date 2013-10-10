@@ -10,7 +10,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 import org.intellij.plugins.ceylon.psi.*;
 import com.intellij.psi.stubs.IStubElementType;
-import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 
 public class CeylonInterfaceDeclarationImpl extends CeylonClassImpl implements CeylonInterfaceDeclaration {
 
@@ -18,8 +17,13 @@ public class CeylonInterfaceDeclarationImpl extends CeylonClassImpl implements C
     super(node);
   }
 
-  public CeylonInterfaceDeclarationImpl(ClassStub stub, IStubElementType nodeType) {
+  public CeylonInterfaceDeclarationImpl(org.intellij.plugins.ceylon.psi.stub.ClassStub stub, IStubElementType nodeType) {
     super(stub, nodeType);
+  }
+
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitInterfaceDeclaration(this);
+    else super.accept(visitor);
   }
 
   @Override
@@ -68,11 +72,6 @@ public class CeylonInterfaceDeclarationImpl extends CeylonClassImpl implements C
   @Nullable
   public CeylonTypeSpecifier getTypeSpecifier() {
     return findChildByClass(CeylonTypeSpecifier.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitInterfaceDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

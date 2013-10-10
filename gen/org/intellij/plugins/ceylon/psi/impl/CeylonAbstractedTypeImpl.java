@@ -16,15 +16,15 @@ public class CeylonAbstractedTypeImpl extends CeylonCompositeElementImpl impleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAbstractedType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonQualifiedType getQualifiedType() {
     return findNotNullChildByClass(CeylonQualifiedType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAbstractedType(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonVoidOrInferredMethodArgumentImpl extends CeylonCompositeEleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitVoidOrInferredMethodArgument(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonBlock getBlock() {
@@ -32,11 +37,6 @@ public class CeylonVoidOrInferredMethodArgumentImpl extends CeylonCompositeEleme
   @NotNull
   public List<CeylonParameters> getParametersList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonParameters.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitVoidOrInferredMethodArgument(this);
-    else super.accept(visitor);
   }
 
 }

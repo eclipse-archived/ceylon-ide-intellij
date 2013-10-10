@@ -16,6 +16,11 @@ public class CeylonImportElementListImpl extends CeylonCompositeElementImpl impl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportElementList(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonImportElement> getImportElementList() {
@@ -26,11 +31,6 @@ public class CeylonImportElementListImpl extends CeylonCompositeElementImpl impl
   @NotNull
   public List<CeylonImportWildcard> getImportWildcardList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonImportWildcard.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportElementList(this);
-    else super.accept(visitor);
   }
 
 }

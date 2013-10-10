@@ -16,6 +16,11 @@ public class CeylonControlStatementImpl extends CeylonCompositeElementImpl imple
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitControlStatement(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonForElse getForElse() {
@@ -44,11 +49,6 @@ public class CeylonControlStatementImpl extends CeylonCompositeElementImpl imple
   @Nullable
   public CeylonWhileLoop getWhileLoop() {
     return findChildByClass(CeylonWhileLoop.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitControlStatement(this);
-    else super.accept(visitor);
   }
 
 }

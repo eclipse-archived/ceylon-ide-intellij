@@ -16,6 +16,11 @@ public class CeylonNamedSpecifiedArgumentImpl extends CeylonCompositeElementImpl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitNamedSpecifiedArgument(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonMemberName getMemberName() {
@@ -26,11 +31,6 @@ public class CeylonNamedSpecifiedArgumentImpl extends CeylonCompositeElementImpl
   @NotNull
   public CeylonSpecifier getSpecifier() {
     return findNotNullChildByClass(CeylonSpecifier.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitNamedSpecifiedArgument(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonCasesImpl extends CeylonCompositeElementImpl implements Ceylo
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCases(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonCaseBlock> getCaseBlockList() {
@@ -26,11 +31,6 @@ public class CeylonCasesImpl extends CeylonCompositeElementImpl implements Ceylo
   @Nullable
   public CeylonDefaultCaseBlock getDefaultCaseBlock() {
     return findChildByClass(CeylonDefaultCaseBlock.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCases(this);
-    else super.accept(visitor);
   }
 
 }

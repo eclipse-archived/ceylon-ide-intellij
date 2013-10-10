@@ -16,6 +16,11 @@ public class CeylonSwitchCaseElseImpl extends CeylonCompositeElementImpl impleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSwitchCaseElse(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonCases getCases() {
@@ -26,11 +31,6 @@ public class CeylonSwitchCaseElseImpl extends CeylonCompositeElementImpl impleme
   @NotNull
   public CeylonSwitchHeader getSwitchHeader() {
     return findNotNullChildByClass(CeylonSwitchHeader.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSwitchCaseElse(this);
-    else super.accept(visitor);
   }
 
 }

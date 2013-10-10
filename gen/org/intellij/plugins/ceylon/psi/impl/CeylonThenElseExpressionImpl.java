@@ -16,6 +16,11 @@ public class CeylonThenElseExpressionImpl extends CeylonCompositeElementImpl imp
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitThenElseExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonDisjunctionExpression> getDisjunctionExpressionList() {
@@ -26,11 +31,6 @@ public class CeylonThenElseExpressionImpl extends CeylonCompositeElementImpl imp
   @NotNull
   public List<CeylonThenElseOperator> getThenElseOperatorList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonThenElseOperator.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitThenElseExpression(this);
-    else super.accept(visitor);
   }
 
 }

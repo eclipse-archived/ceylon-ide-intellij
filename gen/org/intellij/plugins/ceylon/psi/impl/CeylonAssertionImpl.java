@@ -16,15 +16,15 @@ public class CeylonAssertionImpl extends CeylonCompositeElementImpl implements C
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAssertion(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonConditions getConditions() {
     return findNotNullChildByClass(CeylonConditions.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAssertion(this);
-    else super.accept(visitor);
   }
 
 }

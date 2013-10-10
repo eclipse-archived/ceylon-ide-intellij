@@ -16,6 +16,11 @@ public class CeylonAssignmentExpressionImpl extends CeylonCompositeElementImpl i
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAssignmentExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonAssignmentExpression getAssignmentExpression() {
@@ -32,11 +37,6 @@ public class CeylonAssignmentExpressionImpl extends CeylonCompositeElementImpl i
   @NotNull
   public CeylonThenElseExpression getThenElseExpression() {
     return findNotNullChildByClass(CeylonThenElseExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAssignmentExpression(this);
-    else super.accept(visitor);
   }
 
 }

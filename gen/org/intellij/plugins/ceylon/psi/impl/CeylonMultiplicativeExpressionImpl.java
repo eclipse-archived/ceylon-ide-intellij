@@ -16,6 +16,11 @@ public class CeylonMultiplicativeExpressionImpl extends CeylonCompositeElementIm
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitMultiplicativeExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonDefaultExpression> getDefaultExpressionList() {
@@ -26,11 +31,6 @@ public class CeylonMultiplicativeExpressionImpl extends CeylonCompositeElementIm
   @NotNull
   public List<CeylonMultiplicativeOperator> getMultiplicativeOperatorList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonMultiplicativeOperator.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitMultiplicativeExpression(this);
-    else super.accept(visitor);
   }
 
 }

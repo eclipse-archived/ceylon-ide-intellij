@@ -1,6 +1,6 @@
 {
 	parserClass="org.intellij.plugins.ceylon.parser.CeylonParser"
-	stubParserClass="org.intellij.plugins.ceylon.parser.CeylonParserUtil"
+	parserUtilClass="org.intellij.plugins.ceylon.parser.CeylonParserUtil"
 
 	implements="org.intellij.plugins.ceylon.psi.CeylonCompositeElement"
 	extends="org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl"
@@ -130,7 +130,7 @@ private ceylon_statement_recover ::= (!compilationUnit)
 private comment ::= LINE_COMMENT | MULTI_LINE_COMMENT
 
 moduleDescriptor ::= "module" packagePath moduleVersion importModuleList {
-    stub="org.intellij.plugins.ceylon.psi.stub.ModuleStub"
+    stubClass="org.intellij.plugins.ceylon.psi.stub.ModuleStub"
     elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ModuleElementType"
 }
 moduleVersion ::= QUOTED_LITERAL
@@ -191,7 +191,7 @@ interfaceDeclaration ::= "interface" typeName
         typeParameters? caseTypes? /*metatypes?*/ adaptedTypes? satisfiedTypes?
         typeConstraints? (block | typeSpecifier? ";") {
      pin=1
-     stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
+     stubClass="org.intellij.plugins.ceylon.psi.stub.ClassStub"
      elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
     extends="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
     implements="org.intellij.plugins.ceylon.psi.CeylonTypedDeclaration"
@@ -201,7 +201,7 @@ classDeclaration  ::= "class" typeName
         typeParameters? parameters? caseTypes? /*metatypes?*/ extendedType? satisfiedTypes?
         typeConstraints? (block | typeSpecifier? ";") {
     pin=1
-    stub="org.intellij.plugins.ceylon.psi.stub.ClassStub"
+    stubClass="org.intellij.plugins.ceylon.psi.stub.ClassStub"
     elementTypeClass="org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType"
     extends="org.intellij.plugins.ceylon.psi.impl.CeylonClassImpl"
     implements="org.intellij.plugins.ceylon.psi.CeylonClass"

@@ -16,6 +16,11 @@ public class CeylonVoidOrInferredMethodDeclarationImpl extends CeylonCompositeEl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitVoidOrInferredMethodDeclaration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBlock getBlock() {
@@ -50,11 +55,6 @@ public class CeylonVoidOrInferredMethodDeclarationImpl extends CeylonCompositeEl
   @Nullable
   public CeylonTypeParameters getTypeParameters() {
     return findChildByClass(CeylonTypeParameters.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitVoidOrInferredMethodDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

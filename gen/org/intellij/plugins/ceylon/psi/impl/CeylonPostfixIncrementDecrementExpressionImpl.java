@@ -16,6 +16,11 @@ public class CeylonPostfixIncrementDecrementExpressionImpl extends CeylonComposi
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPostfixIncrementDecrementExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonPostfixOperator> getPostfixOperatorList() {
@@ -26,11 +31,6 @@ public class CeylonPostfixIncrementDecrementExpressionImpl extends CeylonComposi
   @NotNull
   public CeylonPrimary getPrimary() {
     return findNotNullChildByClass(CeylonPrimary.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPostfixIncrementDecrementExpression(this);
-    else super.accept(visitor);
   }
 
 }

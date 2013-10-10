@@ -16,15 +16,15 @@ public class CeylonExpressionComprehensionClauseImpl extends CeylonCompositeElem
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitExpressionComprehensionClause(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonExpression getExpression() {
     return findNotNullChildByClass(CeylonExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitExpressionComprehensionClause(this);
-    else super.accept(visitor);
   }
 
 }

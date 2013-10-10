@@ -16,6 +16,11 @@ public class CeylonQualifiedTypeImpl extends CeylonCompositeElementImpl implemen
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitQualifiedType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonSupertypeQualifier getSupertypeQualifier() {
@@ -26,11 +31,6 @@ public class CeylonQualifiedTypeImpl extends CeylonCompositeElementImpl implemen
   @NotNull
   public List<CeylonTypeNameWithArguments> getTypeNameWithArgumentsList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonTypeNameWithArguments.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitQualifiedType(this);
-    else super.accept(visitor);
   }
 
 }

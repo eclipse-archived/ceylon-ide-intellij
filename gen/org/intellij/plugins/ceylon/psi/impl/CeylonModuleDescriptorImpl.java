@@ -23,6 +23,11 @@ public class CeylonModuleDescriptorImpl extends StubBasedPsiElementBase<ModuleSt
     super(stub, nodeType);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitModuleDescriptor(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonImportModuleList getImportModuleList() {
@@ -39,11 +44,6 @@ public class CeylonModuleDescriptorImpl extends StubBasedPsiElementBase<ModuleSt
   @NotNull
   public CeylonPackagePath getPackagePath() {
     return findNotNullChildByClass(CeylonPackagePath.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitModuleDescriptor(this);
-    else super.accept(visitor);
   }
 
 }

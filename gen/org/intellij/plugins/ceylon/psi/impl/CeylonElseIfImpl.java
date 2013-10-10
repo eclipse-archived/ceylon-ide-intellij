@@ -16,15 +16,15 @@ public class CeylonElseIfImpl extends CeylonCompositeElementImpl implements Ceyl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitElseIf(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonIfElse getIfElse() {
     return findNotNullChildByClass(CeylonIfElse.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitElseIf(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonPrimaryImpl extends CeylonCompositeElementImpl implements Cey
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPrimary(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonArguments> getArgumentsList() {
@@ -38,11 +43,6 @@ public class CeylonPrimaryImpl extends CeylonCompositeElementImpl implements Cey
   @NotNull
   public List<CeylonQualifiedReference> getQualifiedReferenceList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonQualifiedReference.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPrimary(this);
-    else super.accept(visitor);
   }
 
 }

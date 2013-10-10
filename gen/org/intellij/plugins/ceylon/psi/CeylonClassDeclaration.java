@@ -4,8 +4,8 @@ package org.intellij.plugins.ceylon.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import com.intellij.psi.StubBasedPsiElement;
+import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 
 public interface CeylonClassDeclaration extends CeylonClass, StubBasedPsiElement<ClassStub> {
 

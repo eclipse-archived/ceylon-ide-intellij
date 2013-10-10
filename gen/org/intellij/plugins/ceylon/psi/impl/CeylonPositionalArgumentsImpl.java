@@ -16,6 +16,11 @@ public class CeylonPositionalArgumentsImpl extends CeylonCompositeElementImpl im
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPositionalArguments(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonComprehension getComprehension() {
@@ -26,11 +31,6 @@ public class CeylonPositionalArgumentsImpl extends CeylonCompositeElementImpl im
   @NotNull
   public List<CeylonPositionalArgument> getPositionalArgumentList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonPositionalArgument.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPositionalArguments(this);
-    else super.accept(visitor);
   }
 
 }

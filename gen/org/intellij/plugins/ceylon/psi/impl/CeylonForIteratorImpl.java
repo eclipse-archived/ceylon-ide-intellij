@@ -16,6 +16,11 @@ public class CeylonForIteratorImpl extends CeylonCompositeElementImpl implements
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitForIterator(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonCompilerAnnotations getCompilerAnnotations() {
@@ -32,11 +37,6 @@ public class CeylonForIteratorImpl extends CeylonCompositeElementImpl implements
   @NotNull
   public List<CeylonVar> getVarList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonVar.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitForIterator(this);
-    else super.accept(visitor);
   }
 
 }

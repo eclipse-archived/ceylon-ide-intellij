@@ -16,6 +16,11 @@ public class CeylonWhileBlockImpl extends CeylonCompositeElementImpl implements 
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitWhileBlock(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonConditions getConditions() {
@@ -26,11 +31,6 @@ public class CeylonWhileBlockImpl extends CeylonCompositeElementImpl implements 
   @NotNull
   public CeylonControlBlock getControlBlock() {
     return findNotNullChildByClass(CeylonControlBlock.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitWhileBlock(this);
-    else super.accept(visitor);
   }
 
 }

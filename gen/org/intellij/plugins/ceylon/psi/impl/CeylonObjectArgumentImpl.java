@@ -16,6 +16,11 @@ public class CeylonObjectArgumentImpl extends CeylonCompositeElementImpl impleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitObjectArgument(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBlock getBlock() {
@@ -38,11 +43,6 @@ public class CeylonObjectArgumentImpl extends CeylonCompositeElementImpl impleme
   @Nullable
   public CeylonSatisfiedTypes getSatisfiedTypes() {
     return findChildByClass(CeylonSatisfiedTypes.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitObjectArgument(this);
-    else super.accept(visitor);
   }
 
 }

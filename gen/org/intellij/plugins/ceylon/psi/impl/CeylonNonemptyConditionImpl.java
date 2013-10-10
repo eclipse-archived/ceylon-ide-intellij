@@ -16,6 +16,11 @@ public class CeylonNonemptyConditionImpl extends CeylonCompositeElementImpl impl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitNonemptyCondition(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBooleanCondition getBooleanCondition() {
@@ -32,11 +37,6 @@ public class CeylonNonemptyConditionImpl extends CeylonCompositeElementImpl impl
   @Nullable
   public CeylonSpecifiedVariable getSpecifiedVariable() {
     return findChildByClass(CeylonSpecifiedVariable.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitNonemptyCondition(this);
-    else super.accept(visitor);
   }
 
 }

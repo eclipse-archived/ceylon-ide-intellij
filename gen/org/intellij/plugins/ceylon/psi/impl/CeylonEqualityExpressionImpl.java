@@ -16,6 +16,11 @@ public class CeylonEqualityExpressionImpl extends CeylonCompositeElementImpl imp
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitEqualityExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonComparisonExpression> getComparisonExpressionList() {
@@ -26,11 +31,6 @@ public class CeylonEqualityExpressionImpl extends CeylonCompositeElementImpl imp
   @Nullable
   public CeylonEqualityOperator getEqualityOperator() {
     return findChildByClass(CeylonEqualityOperator.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitEqualityExpression(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,15 +16,15 @@ public class CeylonEntryTypeImpl extends CeylonCompositeElementImpl implements C
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitEntryType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonAbbreviatedType> getAbbreviatedTypeList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonAbbreviatedType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitEntryType(this);
-    else super.accept(visitor);
   }
 
 }

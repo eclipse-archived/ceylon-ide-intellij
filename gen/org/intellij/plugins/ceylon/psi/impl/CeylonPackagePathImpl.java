@@ -16,15 +16,15 @@ public class CeylonPackagePathImpl extends CeylonCompositeElementImpl implements
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPackagePath(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonPackageName> getPackageNameList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonPackageName.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPackagePath(this);
-    else super.accept(visitor);
   }
 
 }

@@ -2,7 +2,6 @@
 package org.intellij.plugins.ceylon.psi;
 
 import org.jetbrains.annotations.*;
-import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.PsiElementVisitor;
 
 public class CeylonVisitor extends PsiElementVisitor {
@@ -28,8 +27,8 @@ public class CeylonVisitor extends PsiElementVisitor {
   }
 
   public void visitAliasDeclaration(@NotNull CeylonAliasDeclaration o) {
-    visitTypedDeclaration(o);
-    // visitNamedDeclaration(o);
+    visitNamedDeclaration(o);
+    // visitTypedDeclaration(o);
   }
 
   public void visitAnnotation(@NotNull CeylonAnnotation o) {
@@ -114,7 +113,6 @@ public class CeylonVisitor extends PsiElementVisitor {
 
   public void visitClassDeclaration(@NotNull CeylonClassDeclaration o) {
     visitClass(o);
-    // visitStubBasedPsiElement(o);
   }
 
   public void visitComparableType(@NotNull CeylonComparableType o) {
@@ -383,7 +381,6 @@ public class CeylonVisitor extends PsiElementVisitor {
 
   public void visitInterfaceDeclaration(@NotNull CeylonInterfaceDeclaration o) {
     visitTypedDeclaration(o);
-    // visitStubBasedPsiElement(o);
   }
 
   public void visitIntersectionType(@NotNull CeylonIntersectionType o) {
@@ -432,7 +429,6 @@ public class CeylonVisitor extends PsiElementVisitor {
 
   public void visitModuleDescriptor(@NotNull CeylonModuleDescriptor o) {
     visitCompositeElement(o);
-    // visitStubBasedPsiElement(o);
   }
 
   public void visitModuleVersion(@NotNull CeylonModuleVersion o) {
@@ -757,10 +753,6 @@ public class CeylonVisitor extends PsiElementVisitor {
 
   public void visitTypedDeclaration(@NotNull CeylonTypedDeclaration o) {
     visitCompositeElement(o);
-  }
-
-  public void visitStubBasedPsiElement(@NotNull StubBasedPsiElement o) {
-    visitElement(o);
   }
 
   public void visitCompositeElement(@NotNull CeylonCompositeElement o) {

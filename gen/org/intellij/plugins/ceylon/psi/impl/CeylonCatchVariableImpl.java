@@ -16,15 +16,15 @@ public class CeylonCatchVariableImpl extends CeylonCompositeElementImpl implemen
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCatchVariable(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonVariable getVariable() {
     return findChildByClass(CeylonVariable.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCatchVariable(this);
-    else super.accept(visitor);
   }
 
 }

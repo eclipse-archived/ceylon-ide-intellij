@@ -16,15 +16,15 @@ public class CeylonTypeImpl extends CeylonCompositeElementImpl implements Ceylon
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonUnionType getUnionType() {
     return findNotNullChildByClass(CeylonUnionType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitType(this);
-    else super.accept(visitor);
   }
 
 }

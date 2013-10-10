@@ -16,6 +16,11 @@ public class CeylonExistenceEmptinessExpressionImpl extends CeylonCompositeEleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitExistenceEmptinessExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonExistsNonemptyOperator getExistsNonemptyOperator() {
@@ -26,11 +31,6 @@ public class CeylonExistenceEmptinessExpressionImpl extends CeylonCompositeEleme
   @NotNull
   public CeylonRangeIntervalEntryExpression getRangeIntervalEntryExpression() {
     return findNotNullChildByClass(CeylonRangeIntervalEntryExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitExistenceEmptinessExpression(this);
-    else super.accept(visitor);
   }
 
 }

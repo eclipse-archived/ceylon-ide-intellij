@@ -16,6 +16,11 @@ public class CeylonBaseReferenceImpl extends CeylonCompositeElementImpl implemen
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitBaseReference(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonMemberReference getMemberReference() {
@@ -32,11 +37,6 @@ public class CeylonBaseReferenceImpl extends CeylonCompositeElementImpl implemen
   @Nullable
   public CeylonTypeReference getTypeReference() {
     return findChildByClass(CeylonTypeReference.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitBaseReference(this);
-    else super.accept(visitor);
   }
 
 }

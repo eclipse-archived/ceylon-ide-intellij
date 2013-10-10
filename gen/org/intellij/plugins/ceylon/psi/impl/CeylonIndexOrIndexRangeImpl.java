@@ -16,6 +16,11 @@ public class CeylonIndexOrIndexRangeImpl extends CeylonCompositeElementImpl impl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIndexOrIndexRange(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonElementSelectionOperator getElementSelectionOperator() {
@@ -26,11 +31,6 @@ public class CeylonIndexOrIndexRangeImpl extends CeylonCompositeElementImpl impl
   @NotNull
   public List<CeylonIndex> getIndexList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonIndex.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIndexOrIndexRange(this);
-    else super.accept(visitor);
   }
 
 }

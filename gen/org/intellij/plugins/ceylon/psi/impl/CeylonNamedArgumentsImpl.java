@@ -16,6 +16,11 @@ public class CeylonNamedArgumentsImpl extends CeylonCompositeElementImpl impleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitNamedArguments(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonComprehension getComprehension() {
@@ -32,11 +37,6 @@ public class CeylonNamedArgumentsImpl extends CeylonCompositeElementImpl impleme
   @Nullable
   public CeylonSequencedArgument getSequencedArgument() {
     return findChildByClass(CeylonSequencedArgument.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitNamedArguments(this);
-    else super.accept(visitor);
   }
 
 }

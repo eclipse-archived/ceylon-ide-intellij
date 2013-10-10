@@ -16,15 +16,15 @@ public class CeylonComparableTypeImpl extends CeylonCompositeElementImpl impleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitComparableType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonUnionTypeExpression getUnionTypeExpression() {
     return findNotNullChildByClass(CeylonUnionTypeExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitComparableType(this);
-    else super.accept(visitor);
   }
 
 }

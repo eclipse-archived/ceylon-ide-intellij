@@ -16,6 +16,11 @@ public class CeylonCatchBlockImpl extends CeylonCompositeElementImpl implements 
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCatchBlock(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonBlock getBlock() {
@@ -26,11 +31,6 @@ public class CeylonCatchBlockImpl extends CeylonCompositeElementImpl implements 
   @NotNull
   public CeylonCatchVariable getCatchVariable() {
     return findNotNullChildByClass(CeylonCatchVariable.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCatchBlock(this);
-    else super.accept(visitor);
   }
 
 }

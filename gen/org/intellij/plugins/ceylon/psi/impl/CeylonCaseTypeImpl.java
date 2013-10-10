@@ -16,6 +16,11 @@ public class CeylonCaseTypeImpl extends CeylonCompositeElementImpl implements Ce
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCaseType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonMemberName getMemberName() {
@@ -26,11 +31,6 @@ public class CeylonCaseTypeImpl extends CeylonCompositeElementImpl implements Ce
   @Nullable
   public CeylonQualifiedType getQualifiedType() {
     return findChildByClass(CeylonQualifiedType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCaseType(this);
-    else super.accept(visitor);
   }
 
 }

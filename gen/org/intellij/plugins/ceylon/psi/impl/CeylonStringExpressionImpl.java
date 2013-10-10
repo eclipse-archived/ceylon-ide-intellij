@@ -16,6 +16,11 @@ public class CeylonStringExpressionImpl extends CeylonCompositeElementImpl imple
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitStringExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonMyStringLiteral getMyStringLiteral() {
@@ -26,11 +31,6 @@ public class CeylonStringExpressionImpl extends CeylonCompositeElementImpl imple
   @Nullable
   public CeylonStringTemplate getStringTemplate() {
     return findChildByClass(CeylonStringTemplate.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitStringExpression(this);
-    else super.accept(visitor);
   }
 
 }

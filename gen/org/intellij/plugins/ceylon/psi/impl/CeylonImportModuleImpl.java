@@ -16,6 +16,11 @@ public class CeylonImportModuleImpl extends CeylonCompositeElementImpl implement
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportModule(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonModuleVersion getModuleVersion() {
@@ -26,11 +31,6 @@ public class CeylonImportModuleImpl extends CeylonCompositeElementImpl implement
   @Nullable
   public CeylonPackagePath getPackagePath() {
     return findChildByClass(CeylonPackagePath.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportModule(this);
-    else super.accept(visitor);
   }
 
 }

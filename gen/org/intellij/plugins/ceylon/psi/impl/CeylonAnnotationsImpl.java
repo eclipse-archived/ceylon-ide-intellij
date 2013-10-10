@@ -16,15 +16,15 @@ public class CeylonAnnotationsImpl extends CeylonCompositeElementImpl implements
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAnnotations(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonAnnotation> getAnnotationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonAnnotation.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAnnotations(this);
-    else super.accept(visitor);
   }
 
 }

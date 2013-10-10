@@ -16,15 +16,15 @@ public class CeylonIndexImpl extends CeylonCompositeElementImpl implements Ceylo
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIndex(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonAdditiveExpression getAdditiveExpression() {
     return findNotNullChildByClass(CeylonAdditiveExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIndex(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonAnnotationArgumentsImpl extends CeylonCompositeElementImpl im
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAnnotationArguments(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonArguments getArguments() {
@@ -26,11 +31,6 @@ public class CeylonAnnotationArgumentsImpl extends CeylonCompositeElementImpl im
   @Nullable
   public CeylonLiteralArguments getLiteralArguments() {
     return findChildByClass(CeylonLiteralArguments.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAnnotationArguments(this);
-    else super.accept(visitor);
   }
 
 }

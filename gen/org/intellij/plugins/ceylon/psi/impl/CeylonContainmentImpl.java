@@ -16,15 +16,15 @@ public class CeylonContainmentImpl extends CeylonCompositeElementImpl implements
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitContainment(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonExpression getExpression() {
     return findChildByClass(CeylonExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitContainment(this);
-    else super.accept(visitor);
   }
 
 }

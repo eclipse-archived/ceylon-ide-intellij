@@ -16,15 +16,15 @@ public class CeylonReturnDirectiveImpl extends CeylonCompositeElementImpl implem
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitReturnDirective(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonFunctionOrExpression getFunctionOrExpression() {
     return findChildByClass(CeylonFunctionOrExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitReturnDirective(this);
-    else super.accept(visitor);
   }
 
 }

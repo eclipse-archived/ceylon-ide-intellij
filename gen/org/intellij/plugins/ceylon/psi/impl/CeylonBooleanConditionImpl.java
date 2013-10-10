@@ -16,15 +16,15 @@ public class CeylonBooleanConditionImpl extends CeylonCompositeElementImpl imple
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitBooleanCondition(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonExpression getExpression() {
     return findNotNullChildByClass(CeylonExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitBooleanCondition(this);
-    else super.accept(visitor);
   }
 
 }

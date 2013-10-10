@@ -16,6 +16,11 @@ public class CeylonTypeConstraintImpl extends CeylonCompositeElementImpl impleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypeConstraint(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonAbstractedType getAbstractedType() {
@@ -50,11 +55,6 @@ public class CeylonTypeConstraintImpl extends CeylonCompositeElementImpl impleme
   @NotNull
   public CeylonTypeName getTypeName() {
     return findNotNullChildByClass(CeylonTypeName.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypeConstraint(this);
-    else super.accept(visitor);
   }
 
 }

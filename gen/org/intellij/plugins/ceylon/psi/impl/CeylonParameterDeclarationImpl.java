@@ -16,6 +16,11 @@ public class CeylonParameterDeclarationImpl extends CeylonCompositeElementImpl i
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitParameterDeclaration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonAnnotations getAnnotations() {
@@ -32,11 +37,6 @@ public class CeylonParameterDeclarationImpl extends CeylonCompositeElementImpl i
   @Nullable
   public CeylonParameter getParameter() {
     return findChildByClass(CeylonParameter.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitParameterDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

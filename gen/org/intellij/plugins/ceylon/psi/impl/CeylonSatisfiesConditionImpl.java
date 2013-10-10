@@ -16,15 +16,15 @@ public class CeylonSatisfiesConditionImpl extends CeylonCompositeElementImpl imp
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSatisfiesCondition(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonQualifiedType> getQualifiedTypeList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonQualifiedType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSatisfiesCondition(this);
-    else super.accept(visitor);
   }
 
 }

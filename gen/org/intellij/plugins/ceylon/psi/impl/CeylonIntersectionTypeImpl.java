@@ -16,15 +16,15 @@ public class CeylonIntersectionTypeImpl extends CeylonCompositeElementImpl imple
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIntersectionType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonEntryType> getEntryTypeList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonEntryType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIntersectionType(this);
-    else super.accept(visitor);
   }
 
 }

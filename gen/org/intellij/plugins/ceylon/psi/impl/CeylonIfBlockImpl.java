@@ -16,6 +16,11 @@ public class CeylonIfBlockImpl extends CeylonCompositeElementImpl implements Cey
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIfBlock(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonConditions getConditions() {
@@ -26,11 +31,6 @@ public class CeylonIfBlockImpl extends CeylonCompositeElementImpl implements Cey
   @NotNull
   public CeylonControlBlock getControlBlock() {
     return findNotNullChildByClass(CeylonControlBlock.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIfBlock(this);
-    else super.accept(visitor);
   }
 
 }

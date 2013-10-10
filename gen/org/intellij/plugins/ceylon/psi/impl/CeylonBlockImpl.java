@@ -16,15 +16,15 @@ public class CeylonBlockImpl extends CeylonCompositeElementImpl implements Ceylo
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitBlock(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonDeclarationOrStatement> getDeclarationOrStatementList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonDeclarationOrStatement.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitBlock(this);
-    else super.accept(visitor);
   }
 
 }

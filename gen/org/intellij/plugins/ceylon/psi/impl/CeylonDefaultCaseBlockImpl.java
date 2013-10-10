@@ -16,15 +16,15 @@ public class CeylonDefaultCaseBlockImpl extends CeylonCompositeElementImpl imple
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDefaultCaseBlock(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonBlock getBlock() {
     return findNotNullChildByClass(CeylonBlock.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDefaultCaseBlock(this);
-    else super.accept(visitor);
   }
 
 }

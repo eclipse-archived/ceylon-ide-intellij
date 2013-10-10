@@ -16,6 +16,11 @@ public class CeylonDefaultExpressionImpl extends CeylonCompositeElementImpl impl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDefaultExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonDefaultOperator> getDefaultOperatorList() {
@@ -26,11 +31,6 @@ public class CeylonDefaultExpressionImpl extends CeylonCompositeElementImpl impl
   @NotNull
   public List<CeylonNegationComplementExpression> getNegationComplementExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonNegationComplementExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDefaultExpression(this);
-    else super.accept(visitor);
   }
 
 }

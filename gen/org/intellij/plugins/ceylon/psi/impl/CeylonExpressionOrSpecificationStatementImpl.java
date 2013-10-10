@@ -16,6 +16,11 @@ public class CeylonExpressionOrSpecificationStatementImpl extends CeylonComposit
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitExpressionOrSpecificationStatement(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonExpression getExpression() {
@@ -26,11 +31,6 @@ public class CeylonExpressionOrSpecificationStatementImpl extends CeylonComposit
   @Nullable
   public CeylonSpecifier getSpecifier() {
     return findChildByClass(CeylonSpecifier.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitExpressionOrSpecificationStatement(this);
-    else super.accept(visitor);
   }
 
 }

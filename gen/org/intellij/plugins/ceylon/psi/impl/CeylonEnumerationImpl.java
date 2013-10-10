@@ -16,6 +16,11 @@ public class CeylonEnumerationImpl extends CeylonCompositeElementImpl implements
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitEnumeration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonComprehension getComprehension() {
@@ -26,11 +31,6 @@ public class CeylonEnumerationImpl extends CeylonCompositeElementImpl implements
   @Nullable
   public CeylonSequencedArgument getSequencedArgument() {
     return findChildByClass(CeylonSequencedArgument.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitEnumeration(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonImportElementImpl extends CeylonCompositeElementImpl implemen
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportElement(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonCompilerAnnotations getCompilerAnnotations() {
@@ -32,11 +37,6 @@ public class CeylonImportElementImpl extends CeylonCompositeElementImpl implemen
   @NotNull
   public List<CeylonImportName> getImportNameList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonImportName.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportElement(this);
-    else super.accept(visitor);
   }
 
 }

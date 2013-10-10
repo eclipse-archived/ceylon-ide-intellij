@@ -16,6 +16,11 @@ public class CeylonIncrementDecrementExpressionImpl extends CeylonCompositeEleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIncrementDecrementExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonIncrementDecrementExpression getIncrementDecrementExpression() {
@@ -32,11 +37,6 @@ public class CeylonIncrementDecrementExpressionImpl extends CeylonCompositeEleme
   @Nullable
   public CeylonPrefixOperator getPrefixOperator() {
     return findChildByClass(CeylonPrefixOperator.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIncrementDecrementExpression(this);
-    else super.accept(visitor);
   }
 
 }

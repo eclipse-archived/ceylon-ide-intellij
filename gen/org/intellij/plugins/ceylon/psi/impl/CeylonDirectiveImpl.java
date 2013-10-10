@@ -16,6 +16,11 @@ public class CeylonDirectiveImpl extends CeylonCompositeElementImpl implements C
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDirective(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBreakDirective getBreakDirective() {
@@ -38,11 +43,6 @@ public class CeylonDirectiveImpl extends CeylonCompositeElementImpl implements C
   @Nullable
   public CeylonThrowDirective getThrowDirective() {
     return findChildByClass(CeylonThrowDirective.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDirective(this);
-    else super.accept(visitor);
   }
 
 }

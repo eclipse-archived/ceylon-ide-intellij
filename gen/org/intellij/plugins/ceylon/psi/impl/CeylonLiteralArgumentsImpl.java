@@ -16,15 +16,15 @@ public class CeylonLiteralArgumentsImpl extends CeylonCompositeElementImpl imple
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitLiteralArguments(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonLiteralArgument> getLiteralArgumentList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonLiteralArgument.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitLiteralArguments(this);
-    else super.accept(visitor);
   }
 
 }

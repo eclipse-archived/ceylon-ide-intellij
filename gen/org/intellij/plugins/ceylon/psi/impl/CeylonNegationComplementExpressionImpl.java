@@ -16,6 +16,11 @@ public class CeylonNegationComplementExpressionImpl extends CeylonCompositeEleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitNegationComplementExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonExponentiationExpression getExponentiationExpression() {
@@ -32,11 +37,6 @@ public class CeylonNegationComplementExpressionImpl extends CeylonCompositeEleme
   @Nullable
   public CeylonUnaryMinusOrComplementOperator getUnaryMinusOrComplementOperator() {
     return findChildByClass(CeylonUnaryMinusOrComplementOperator.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitNegationComplementExpression(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonConjunctionExpressionImpl extends CeylonCompositeElementImpl 
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitConjunctionExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonConjunctionOperator> getConjunctionOperatorList() {
@@ -26,11 +31,6 @@ public class CeylonConjunctionExpressionImpl extends CeylonCompositeElementImpl 
   @NotNull
   public List<CeylonLogicalNegationExpression> getLogicalNegationExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonLogicalNegationExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitConjunctionExpression(this);
-    else super.accept(visitor);
   }
 
 }

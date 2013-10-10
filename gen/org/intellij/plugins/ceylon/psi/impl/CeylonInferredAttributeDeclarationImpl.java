@@ -16,6 +16,11 @@ public class CeylonInferredAttributeDeclarationImpl extends CeylonCompositeEleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitInferredAttributeDeclaration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBlock getBlock() {
@@ -38,11 +43,6 @@ public class CeylonInferredAttributeDeclarationImpl extends CeylonCompositeEleme
   @Nullable
   public CeylonSpecifier getSpecifier() {
     return findChildByClass(CeylonSpecifier.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitInferredAttributeDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonVariableImpl extends CeylonCompositeElementImpl implements Ce
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitVariable(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonCompilerAnnotations getCompilerAnnotations() {
@@ -26,11 +31,6 @@ public class CeylonVariableImpl extends CeylonCompositeElementImpl implements Ce
   @NotNull
   public CeylonVar getVar() {
     return findNotNullChildByClass(CeylonVar.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitVariable(this);
-    else super.accept(visitor);
   }
 
 }

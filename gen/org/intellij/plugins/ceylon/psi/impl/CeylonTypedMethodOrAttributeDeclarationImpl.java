@@ -16,6 +16,11 @@ public class CeylonTypedMethodOrAttributeDeclarationImpl extends CeylonComposite
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypedMethodOrAttributeDeclaration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBlock getBlock() {
@@ -62,11 +67,6 @@ public class CeylonTypedMethodOrAttributeDeclarationImpl extends CeylonComposite
   @Nullable
   public CeylonTypeParameters getTypeParameters() {
     return findChildByClass(CeylonTypeParameters.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypedMethodOrAttributeDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

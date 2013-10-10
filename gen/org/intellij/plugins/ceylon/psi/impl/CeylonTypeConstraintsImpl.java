@@ -16,15 +16,15 @@ public class CeylonTypeConstraintsImpl extends CeylonCompositeElementImpl implem
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypeConstraints(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonTypeConstraint> getTypeConstraintList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonTypeConstraint.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypeConstraints(this);
-    else super.accept(visitor);
   }
 
 }

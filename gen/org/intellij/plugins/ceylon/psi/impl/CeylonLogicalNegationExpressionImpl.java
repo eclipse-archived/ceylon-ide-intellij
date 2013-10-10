@@ -16,6 +16,11 @@ public class CeylonLogicalNegationExpressionImpl extends CeylonCompositeElementI
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitLogicalNegationExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonEqualityExpression getEqualityExpression() {
@@ -32,11 +37,6 @@ public class CeylonLogicalNegationExpressionImpl extends CeylonCompositeElementI
   @Nullable
   public CeylonNotOperator getNotOperator() {
     return findChildByClass(CeylonNotOperator.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitLogicalNegationExpression(this);
-    else super.accept(visitor);
   }
 
 }

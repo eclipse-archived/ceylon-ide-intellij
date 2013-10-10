@@ -16,6 +16,11 @@ public class CeylonImportNameImpl extends CeylonCompositeElementImpl implements 
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportName(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonMemberName getMemberName() {
@@ -26,11 +31,6 @@ public class CeylonImportNameImpl extends CeylonCompositeElementImpl implements 
   @Nullable
   public CeylonTypeName getTypeName() {
     return findChildByClass(CeylonTypeName.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportName(this);
-    else super.accept(visitor);
   }
 
 }

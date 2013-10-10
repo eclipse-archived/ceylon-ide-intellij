@@ -16,15 +16,15 @@ public class CeylonMatchCaseConditionImpl extends CeylonCompositeElementImpl imp
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitMatchCaseCondition(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonExpressions getExpressions() {
     return findNotNullChildByClass(CeylonExpressions.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitMatchCaseCondition(this);
-    else super.accept(visitor);
   }
 
 }

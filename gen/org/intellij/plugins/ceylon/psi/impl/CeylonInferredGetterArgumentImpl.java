@@ -16,6 +16,11 @@ public class CeylonInferredGetterArgumentImpl extends CeylonCompositeElementImpl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitInferredGetterArgument(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonBlock getBlock() {
@@ -26,11 +31,6 @@ public class CeylonInferredGetterArgumentImpl extends CeylonCompositeElementImpl
   @NotNull
   public CeylonMemberName getMemberName() {
     return findNotNullChildByClass(CeylonMemberName.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitInferredGetterArgument(this);
-    else super.accept(visitor);
   }
 
 }

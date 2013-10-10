@@ -16,15 +16,15 @@ public class CeylonUnionTypeImpl extends CeylonCompositeElementImpl implements C
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitUnionType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonIntersectionType> getIntersectionTypeList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonIntersectionType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitUnionType(this);
-    else super.accept(visitor);
   }
 
 }

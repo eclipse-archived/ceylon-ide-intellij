@@ -16,6 +16,11 @@ public class CeylonComprehensionClauseImpl extends CeylonCompositeElementImpl im
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitComprehensionClause(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonExpressionComprehensionClause getExpressionComprehensionClause() {
@@ -32,11 +37,6 @@ public class CeylonComprehensionClauseImpl extends CeylonCompositeElementImpl im
   @Nullable
   public CeylonIfComprehensionClause getIfComprehensionClause() {
     return findChildByClass(CeylonIfComprehensionClause.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitComprehensionClause(this);
-    else super.accept(visitor);
   }
 
 }

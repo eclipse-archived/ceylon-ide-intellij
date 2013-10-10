@@ -16,15 +16,15 @@ public class CeylonPackageDescriptorImpl extends CeylonCompositeElementImpl impl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPackageDescriptor(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonPackagePath getPackagePath() {
     return findNotNullChildByClass(CeylonPackagePath.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPackageDescriptor(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonIsConditionImpl extends CeylonCompositeElementImpl implements
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIsCondition(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBooleanCondition getBooleanCondition() {
@@ -44,11 +49,6 @@ public class CeylonIsConditionImpl extends CeylonCompositeElementImpl implements
   @Nullable
   public CeylonType getType() {
     return findChildByClass(CeylonType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitIsCondition(this);
-    else super.accept(visitor);
   }
 
 }

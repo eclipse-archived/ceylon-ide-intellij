@@ -16,6 +16,11 @@ public class CeylonParameterImpl extends CeylonCompositeElementImpl implements C
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitParameter(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonMemberName getMemberName() {
@@ -44,11 +49,6 @@ public class CeylonParameterImpl extends CeylonCompositeElementImpl implements C
   @Nullable
   public CeylonValueParameter getValueParameter() {
     return findChildByClass(CeylonValueParameter.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitParameter(this);
-    else super.accept(visitor);
   }
 
 }

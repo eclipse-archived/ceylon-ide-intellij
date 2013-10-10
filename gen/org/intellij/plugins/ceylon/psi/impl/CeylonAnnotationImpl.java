@@ -16,6 +16,11 @@ public class CeylonAnnotationImpl extends CeylonCompositeElementImpl implements 
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAnnotation(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonAnnotationArguments getAnnotationArguments() {
@@ -26,11 +31,6 @@ public class CeylonAnnotationImpl extends CeylonCompositeElementImpl implements 
   @NotNull
   public CeylonAnnotationName getAnnotationName() {
     return findNotNullChildByClass(CeylonAnnotationName.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAnnotation(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonLiteralArgumentImpl extends CeylonCompositeElementImpl implem
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitLiteralArgument(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonMyStringLiteral getMyStringLiteral() {
@@ -26,11 +31,6 @@ public class CeylonLiteralArgumentImpl extends CeylonCompositeElementImpl implem
   @Nullable
   public CeylonNonstringLiteral getNonstringLiteral() {
     return findChildByClass(CeylonNonstringLiteral.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitLiteralArgument(this);
-    else super.accept(visitor);
   }
 
 }

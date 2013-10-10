@@ -16,15 +16,15 @@ public class CeylonCaseTypesImpl extends CeylonCompositeElementImpl implements C
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCaseTypes(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonCaseType> getCaseTypeList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonCaseType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCaseTypes(this);
-    else super.accept(visitor);
   }
 
 }

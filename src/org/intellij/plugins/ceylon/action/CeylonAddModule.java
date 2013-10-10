@@ -15,7 +15,6 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.CreateClassUtil;
 import org.intellij.plugins.ceylon.psi.stub.ModuleIndex;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,7 +63,8 @@ public class CeylonAddModule extends AnAction {
         }
 
         Module module = ModuleUtil.findModuleForFile(eventSourceFile, project);
-        PsiDirectory directory = CreateClassUtil.obtainDirectoryRootForPackage(module, moduleName);
+//        PsiDirectory directory = ModuleRootManager.getInstance(module).getSourceRoots();
+        PsiDirectory directory = null; // TODO fix me
 
         if (directory == null) {
             return;

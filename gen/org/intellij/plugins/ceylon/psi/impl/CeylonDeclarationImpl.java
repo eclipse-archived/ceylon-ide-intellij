@@ -16,6 +16,11 @@ public class CeylonDeclarationImpl extends CeylonCompositeElementImpl implements
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDeclaration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonAliasDeclaration getAliasDeclaration() {
@@ -68,11 +73,6 @@ public class CeylonDeclarationImpl extends CeylonCompositeElementImpl implements
   @Nullable
   public CeylonVoidOrInferredMethodDeclaration getVoidOrInferredMethodDeclaration() {
     return findChildByClass(CeylonVoidOrInferredMethodDeclaration.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

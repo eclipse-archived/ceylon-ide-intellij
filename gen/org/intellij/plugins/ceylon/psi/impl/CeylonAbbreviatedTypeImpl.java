@@ -16,6 +16,11 @@ public class CeylonAbbreviatedTypeImpl extends CeylonCompositeElementImpl implem
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAbbreviatedType(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonQualifiedType getQualifiedType() {
@@ -26,11 +31,6 @@ public class CeylonAbbreviatedTypeImpl extends CeylonCompositeElementImpl implem
   @NotNull
   public List<CeylonType> getTypeList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAbbreviatedType(this);
-    else super.accept(visitor);
   }
 
 }

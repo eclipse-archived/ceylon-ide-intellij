@@ -16,6 +16,11 @@ public class CeylonTypedMethodOrGetterArgumentImpl extends CeylonCompositeElemen
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypedMethodOrGetterArgument(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonBlock getBlock() {
@@ -38,11 +43,6 @@ public class CeylonTypedMethodOrGetterArgumentImpl extends CeylonCompositeElemen
   @NotNull
   public CeylonType getType() {
     return findNotNullChildByClass(CeylonType.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypedMethodOrGetterArgument(this);
-    else super.accept(visitor);
   }
 
 }

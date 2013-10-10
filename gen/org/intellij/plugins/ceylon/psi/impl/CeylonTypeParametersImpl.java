@@ -16,15 +16,15 @@ public class CeylonTypeParametersImpl extends CeylonCompositeElementImpl impleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypeParameters(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonTypeParameter> getTypeParameterList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonTypeParameter.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTypeParameters(this);
-    else super.accept(visitor);
   }
 
 }

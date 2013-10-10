@@ -16,15 +16,15 @@ public class CeylonDirectiveStatementImpl extends CeylonCompositeElementImpl imp
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDirectiveStatement(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonDirective getDirective() {
     return findNotNullChildByClass(CeylonDirective.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitDirectiveStatement(this);
-    else super.accept(visitor);
   }
 
 }

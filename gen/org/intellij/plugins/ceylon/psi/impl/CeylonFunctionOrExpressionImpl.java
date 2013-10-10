@@ -16,6 +16,11 @@ public class CeylonFunctionOrExpressionImpl extends CeylonCompositeElementImpl i
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitFunctionOrExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonExpression getExpression() {
@@ -26,11 +31,6 @@ public class CeylonFunctionOrExpressionImpl extends CeylonCompositeElementImpl i
   @NotNull
   public List<CeylonParameters> getParametersList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonParameters.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitFunctionOrExpression(this);
-    else super.accept(visitor);
   }
 
 }

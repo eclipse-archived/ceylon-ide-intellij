@@ -16,15 +16,15 @@ public class CeylonWhileLoopImpl extends CeylonCompositeElementImpl implements C
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitWhileLoop(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonWhileBlock getWhileBlock() {
     return findNotNullChildByClass(CeylonWhileBlock.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitWhileLoop(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonStatementImpl extends CeylonCompositeElementImpl implements C
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitStatement(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonControlStatement getControlStatement() {
@@ -32,11 +37,6 @@ public class CeylonStatementImpl extends CeylonCompositeElementImpl implements C
   @Nullable
   public CeylonExpressionOrSpecificationStatement getExpressionOrSpecificationStatement() {
     return findChildByClass(CeylonExpressionOrSpecificationStatement.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitStatement(this);
-    else super.accept(visitor);
   }
 
 }

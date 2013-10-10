@@ -16,15 +16,15 @@ public class CeylonUnionTypeExpressionImpl extends CeylonCompositeElementImpl im
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitUnionTypeExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonIntersectionTypeExpression> getIntersectionTypeExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonIntersectionTypeExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitUnionTypeExpression(this);
-    else super.accept(visitor);
   }
 
 }

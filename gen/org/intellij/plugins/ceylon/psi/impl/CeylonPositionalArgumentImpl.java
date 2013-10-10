@@ -16,15 +16,15 @@ public class CeylonPositionalArgumentImpl extends CeylonCompositeElementImpl imp
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPositionalArgument(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonFunctionOrExpression getFunctionOrExpression() {
     return findNotNullChildByClass(CeylonFunctionOrExpression.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitPositionalArgument(this);
-    else super.accept(visitor);
   }
 
 }

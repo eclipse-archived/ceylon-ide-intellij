@@ -16,6 +16,11 @@ public class CeylonRangeIntervalEntryExpressionImpl extends CeylonCompositeEleme
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitRangeIntervalEntryExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonAdditiveExpression> getAdditiveExpressionList() {
@@ -26,11 +31,6 @@ public class CeylonRangeIntervalEntryExpressionImpl extends CeylonCompositeEleme
   @Nullable
   public CeylonRangeIntervalEntryOperator getRangeIntervalEntryOperator() {
     return findChildByClass(CeylonRangeIntervalEntryOperator.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitRangeIntervalEntryExpression(this);
-    else super.accept(visitor);
   }
 
 }

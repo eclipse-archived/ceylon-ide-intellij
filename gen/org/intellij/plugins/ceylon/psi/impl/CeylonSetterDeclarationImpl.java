@@ -16,6 +16,11 @@ public class CeylonSetterDeclarationImpl extends CeylonCompositeElementImpl impl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSetterDeclaration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBlock getBlock() {
@@ -26,11 +31,6 @@ public class CeylonSetterDeclarationImpl extends CeylonCompositeElementImpl impl
   @NotNull
   public CeylonMemberName getMemberName() {
     return findNotNullChildByClass(CeylonMemberName.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSetterDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

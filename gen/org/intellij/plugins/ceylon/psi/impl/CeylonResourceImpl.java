@@ -16,6 +16,11 @@ public class CeylonResourceImpl extends CeylonCompositeElementImpl implements Ce
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitResource(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonExpression getExpression() {
@@ -26,11 +31,6 @@ public class CeylonResourceImpl extends CeylonCompositeElementImpl implements Ce
   @Nullable
   public CeylonSpecifiedVariable getSpecifiedVariable() {
     return findChildByClass(CeylonSpecifiedVariable.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitResource(this);
-    else super.accept(visitor);
   }
 
 }

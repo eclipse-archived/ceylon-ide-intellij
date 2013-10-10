@@ -16,6 +16,11 @@ public class CeylonImportDeclarationImpl extends CeylonCompositeElementImpl impl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportDeclaration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonImportElementList getImportElementList() {
@@ -26,11 +31,6 @@ public class CeylonImportDeclarationImpl extends CeylonCompositeElementImpl impl
   @NotNull
   public CeylonPackagePath getPackagePath() {
     return findNotNullChildByClass(CeylonPackagePath.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitImportDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

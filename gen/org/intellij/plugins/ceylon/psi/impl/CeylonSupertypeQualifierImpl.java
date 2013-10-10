@@ -16,15 +16,15 @@ public class CeylonSupertypeQualifierImpl extends CeylonCompositeElementImpl imp
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSupertypeQualifier(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonTypeName getTypeName() {
     return findNotNullChildByClass(CeylonTypeName.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSupertypeQualifier(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonSequencedArgumentImpl extends CeylonCompositeElementImpl impl
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSequencedArgument(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public CeylonCompilerAnnotations getCompilerAnnotations() {
@@ -26,11 +31,6 @@ public class CeylonSequencedArgumentImpl extends CeylonCompositeElementImpl impl
   @NotNull
   public CeylonExpressions getExpressions() {
     return findNotNullChildByClass(CeylonExpressions.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitSequencedArgument(this);
-    else super.accept(visitor);
   }
 
 }

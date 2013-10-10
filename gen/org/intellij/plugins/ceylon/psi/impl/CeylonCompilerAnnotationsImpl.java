@@ -16,15 +16,15 @@ public class CeylonCompilerAnnotationsImpl extends CeylonCompositeElementImpl im
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCompilerAnnotations(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @NotNull
   public List<CeylonCompilerAnnotation> getCompilerAnnotationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CeylonCompilerAnnotation.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitCompilerAnnotations(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonComparisonExpressionImpl extends CeylonCompositeElementImpl i
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitComparisonExpression(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonComparableType getComparableType() {
@@ -44,11 +49,6 @@ public class CeylonComparisonExpressionImpl extends CeylonCompositeElementImpl i
   @Nullable
   public CeylonTypeOperator getTypeOperator() {
     return findChildByClass(CeylonTypeOperator.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitComparisonExpression(this);
-    else super.accept(visitor);
   }
 
 }

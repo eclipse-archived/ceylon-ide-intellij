@@ -16,6 +16,11 @@ public class CeylonAliasDeclarationImpl extends CeylonCompositeElementImpl imple
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAliasDeclaration(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonTypeConstraints getTypeConstraints() {
@@ -38,11 +43,6 @@ public class CeylonAliasDeclarationImpl extends CeylonCompositeElementImpl imple
   @Nullable
   public CeylonTypeSpecifier getTypeSpecifier() {
     return findChildByClass(CeylonTypeSpecifier.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitAliasDeclaration(this);
-    else super.accept(visitor);
   }
 
 }

@@ -16,6 +16,11 @@ public class CeylonTryBlockImpl extends CeylonCompositeElementImpl implements Ce
     super(node);
   }
 
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTryBlock(this);
+    else super.accept(visitor);
+  }
+
   @Override
   @Nullable
   public CeylonBlock getBlock() {
@@ -32,11 +37,6 @@ public class CeylonTryBlockImpl extends CeylonCompositeElementImpl implements Ce
   @Nullable
   public CeylonResource getResource() {
     return findChildByClass(CeylonResource.class);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof CeylonVisitor) ((CeylonVisitor)visitor).visitTryBlock(this);
-    else super.accept(visitor);
   }
 
 }
