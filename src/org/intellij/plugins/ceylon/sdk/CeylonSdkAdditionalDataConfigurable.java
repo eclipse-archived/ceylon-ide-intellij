@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.sdk;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.projectRoots.*;
+import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -9,8 +10,8 @@ import javax.swing.*;
 public class CeylonSdkAdditionalDataConfigurable implements AdditionalDataConfigurable {
 
     private Sdk sdk;
-    private JComboBox jdkComboBox;
-    private JPanel contentPanel;
+    private JComboBox jdkComboBox = new ComboBox();
+    private JPanel contentPanel = new JPanel();
     private SdkModel sdkModel;
     private SdkModificator sdkModificator;
 
