@@ -7,9 +7,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import gnu.trove.THashMap;
-import org.intellij.plugins.ceylon.parser.CeylonLexer;
 import org.intellij.plugins.ceylon.parser.CeylonLexerAdapter;
-import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 
