@@ -14,8 +14,11 @@ import java.io.IOException;
 
 public class ClassElementType extends IStubElementType<ClassStub, CeylonClass> {
 
-    public ClassElementType(@NotNull @NonNls String debugName) {
+    private String externalId;
+
+    public ClassElementType(@NotNull @NonNls String debugName, String externalId) {
         super(debugName, CeylonLanguage.INSTANCE);
+        this.externalId = externalId;
     }
 
     @Override
@@ -41,7 +44,7 @@ public class ClassElementType extends IStubElementType<ClassStub, CeylonClass> {
 
     @Override
     public String getExternalId() {
-        return "ceylon.class";
+        return externalId;
     }
 
     @Override

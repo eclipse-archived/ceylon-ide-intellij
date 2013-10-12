@@ -1,7 +1,9 @@
 package org.intellij.plugins.ceylon.psi;
 
 import com.intellij.psi.tree.IElementType;
-import org.intellij.plugins.ceylon.CeylonLanguage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public enum TokenTypes {
 
@@ -137,25 +139,47 @@ public enum TokenTypes {
 
     ;
 
+    private static final Map<IElementType, TokenTypes> byIElementType = new HashMap<>();
+    private static final Map<Integer, TokenTypes> byIndex = new HashMap<>();
+
+    static {
+        for (TokenTypes tokenType : values()) {
+            byIElementType.put(tokenType.tokenType, tokenType);
+            byIndex.put(tokenType.getValue(), tokenType);
+        }
+    }
+
     private final int value;
     private IElementType tokenType;
     
     private TokenTypes(int value) {
         this.value = value;
-        tokenType = new IElementType(name(), CeylonLanguage.INSTANCE);
+        tokenType = new CeylonTokenType(name());
     }
 
     public IElementType getTokenType() {
         return tokenType;
     }
     
-    public static IElementType fromInt(int value) {
-        for (TokenTypes tokenType : values()) {
-            if (tokenType.value == value) {
-                return tokenType.tokenType;
-            }
-        }
+    public int getValue() {
+        return value;
+    }
 
-        return null;
+    public static IElementType fromInt(int value) {
+        final TokenTypes tt = byIndex.get(value);
+        assertNotNull(value, tt);
+        return tt.tokenType;
+    }
+
+    public static TokenTypes get(IElementType key) {
+        final TokenTypes tt = byIElementType.get(key);
+        assertNotNull(key, tt);
+        return tt;
+    }
+
+    private static void assertNotNull(Object key, TokenTypes tt) {
+        if (tt == null) {
+            throw new IllegalArgumentException("Unknown token type: " + key);
+        }
     }
 }

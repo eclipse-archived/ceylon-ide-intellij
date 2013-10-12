@@ -30,13 +30,13 @@ public abstract class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub>
 
     @Override
     public boolean isInterface() {
-        ASTNode kw = getNode().findChildByType(CeylonTypes.KW_INTERFACE);
+        ASTNode kw = getNode().findChildByType(TokenTypes.INTERFACE_DEFINITION.getTokenType());
         return kw != null;
     }
 
     @Override
     public boolean isObject() {
-        return findChildByType(CeylonTypes.KW_OBJECT) != null;
+        return findChildByType(TokenTypes.OBJECT_DEFINITION.getTokenType()) != null;
     }
 
     @Override
@@ -88,13 +88,7 @@ public abstract class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub>
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        PsiElement name = findChildByType(CeylonTypes.TYPE_NAME);
-
-        if (name == null) {
-            name = findChildByType(CeylonTypes.MEMBER_NAME);
-        }
-
-        return name;
+        return findChildByType(CeylonTypes.IDENTIFIER);
     }
 
     @Override

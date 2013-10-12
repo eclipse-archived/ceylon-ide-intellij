@@ -5,8 +5,6 @@ import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.RecognizerSharedState;
-import org.intellij.plugins.ceylon.CeylonLanguage;
-import org.intellij.plugins.ceylon.psi.CeylonElementType;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.psi.TokenTypes;
 
@@ -17,13 +15,17 @@ public class CeylonLexerAdapter extends LexerBase {
     private int endOffset;
     private int state;
 
+    public CeylonLexerAdapter() {
+        this.lexer = new CeylonLexer(null, recognizerState);
+    }
+
     @Override
     public void start(CharSequence buffer, int startOffset, int endOffset, int state) {
         this.buffer = buffer;
         this.endOffset = endOffset;
         this.state = state;
         CharStream charStream = new MyCharStream(buffer);
-        lexer = new CeylonLexer(charStream, recognizerState);
+        lexer.setCharStream(charStream);
         lexer.nextToken();
     }
 
@@ -40,7 +42,7 @@ public class CeylonLexerAdapter extends LexerBase {
 
         IElementType eltType = TokenTypes.fromInt(recognizerState.token.getType());
 
-        return eltType == null ? CeylonTypes.FOR_BLOCK : eltType;
+        return eltType == null ? CeylonTypes.FOR_CLAUSE : eltType;
 //        return new IElementType("token-" + recognizerState.token.getType(), CeylonLanguage.INSTANCE);
     }
 
