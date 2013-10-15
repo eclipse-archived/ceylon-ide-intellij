@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.psi;
 
 import com.intellij.psi.tree.IElementType;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,7 +144,19 @@ public enum TokenTypes {
     private static final Map<Integer, TokenTypes> byIndex = new HashMap<>();
 
     static {
+        final Field[] typeFields = CeylonTypes.class.getDeclaredFields();
+        final Map<String, IElementType> ceylonTypeFields = new HashMap<>();
+        for (Field typeField : typeFields) {
+            try {
+                final IElementType elt = (IElementType) typeField.get(null);
+                System.out.println("elt = " + elt);
+                ceylonTypeFields.put(typeField.getName(), elt);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Error accesing CeylonTypes fields.", e);
+            }
+        }
         for (TokenTypes tokenType : values()) {
+            tokenType.tokenType = ceylonTypeFields.get(tokenType.name());
             byIElementType.put(tokenType.tokenType, tokenType);
             byIndex.put(tokenType.getValue(), tokenType);
         }
@@ -154,7 +167,6 @@ public enum TokenTypes {
     
     private TokenTypes(int value) {
         this.value = value;
-        tokenType = new CeylonTokenType(name());
     }
 
     public IElementType getTokenType() {
