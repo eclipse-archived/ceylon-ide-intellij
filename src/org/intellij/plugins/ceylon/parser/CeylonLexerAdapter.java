@@ -42,7 +42,7 @@ public class CeylonLexerAdapter extends LexerBase {
 
         IElementType eltType = TokenTypes.fromInt(recognizerState.token.getType());
 
-        return eltType == null ? CeylonTypes.FOR_CLAUSE : eltType;
+        return eltType == null ? TokenTypes.EOF.getTokenType() : eltType;
 //        return new IElementType("token-" + recognizerState.token.getType(), CeylonLanguage.INSTANCE);
     }
 
