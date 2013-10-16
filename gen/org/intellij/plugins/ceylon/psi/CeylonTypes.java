@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.IStubFileElementType;
@@ -425,6 +426,7 @@ public interface CeylonTypes {
     IElementType VERBATIM_STRING = new CeylonTokenType("VERBATIM_STRING");
     IElementType VOID_MODIFIER = new CeylonTokenType("VOID_MODIFIER");
     IElementType WHILE_CLAUSE = new CeylonTokenType("WHILE_CLAUSE");
-    IElementType WS = new CeylonTokenType("WS");
+//    IElementType WS = new CeylonTokenType("WS");
+    IElementType WS = TokenType.WHITE_SPACE;
 
 }
