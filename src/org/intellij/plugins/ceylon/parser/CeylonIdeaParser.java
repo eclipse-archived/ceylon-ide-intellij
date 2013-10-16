@@ -3,18 +3,33 @@ package org.intellij.plugins.ceylon.parser;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
+import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.compiler.typechecker.treegen.Util;
 import org.antlr.runtime.RecognitionException;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matija Mazi <br/>
  * @created 10/7/13 6:52 PM
  */
 public class CeylonIdeaParser implements PsiParser {
+
+    public static final Key<Node> CEYLON_NODE_KEY = new Key<>("Ceylon Node");
+    public static final TokenSet NON_WS_TOKEN_SET = TokenSet.create(IElementType.enumerate(new IElementType.Predicate() {
+        @Override
+        public boolean matches(IElementType type) {
+            return !type.equals(CeylonTypes.WS);
+        }
+    }));
 
     @NotNull
     @Override
@@ -527,273 +542,40 @@ public class CeylonIdeaParser implements PsiParser {
 //                result = parser.xxx();
             } else if (root == CeylonTypes.IF_COMPREHENSION_CLAUSE) {
 //                result = parser.xxx();
-
-            } else if (root == CeylonTypes.EOF) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ABSTRACTED_TYPE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ADD_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.AIDENTIFIER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ALIAS) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.AND_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.AND_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ASSEMBLY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ASSERT) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ASSIGN) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ASTRING_LITERAL) {
-                result = parser.stringLiteral();
-            } else if (root == CeylonTypes.AVERBATIM_STRING) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.BACKTICK) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.BREAK) {
-                result = parser.breakDirective();
-            } else if (root == CeylonTypes.BinaryDigit) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.BinaryDigits) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.CASE_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.CASE_TYPES) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.CATCH_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.CHAR_LITERAL) {
-                result = parser.nonstringLiteral();
-            } else if (root == CeylonTypes.CLASS_DEFINITION) {
-//                result = parser.classDexxx();
-            } else if (root == CeylonTypes.COMMA) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.COMPARE_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.COMPILER_ANNOTATION) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.COMPLEMENT_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.COMPLEMENT_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.COMPUTE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.CONTINUE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.CharPart) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.DECREMENT_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.DIFFERENCE_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.DIVIDE_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.DYNAMIC) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.Digit) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.Digits) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ELLIPSIS) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ELSE_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.ENTRY_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.EQUAL_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.EXISTS) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.EXTENDS) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.EscapeSequence) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.Exponent) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.FINALLY_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.FLOAT_LITERAL) {
-                result = parser.nonstringLiteral();
-            } else if (root == CeylonTypes.FOR_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.FUNCTION_MODIFIER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.FractionalMagnitude) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.HexDigit) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.HexDigits) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.IDENTICAL_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.IF_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.IMPORT) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.INCREMENT_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.INTERFACE_DEFINITION) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.INTERSECTION_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.INTERSECT_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.IN_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.IS_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.IdentifierPart) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.IdentifierStart) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.LARGER_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.LARGE_AS_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.LBRACE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.LBRACKET) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.LIDENTIFIER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.LINE_COMMENT) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.LIdentifierPrefix) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.LPAREN) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.Letter) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.MEMBER_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.MODULE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.MULTIPLY_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.MULTI_COMMENT) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.Magnitude) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.NATURAL_LITERAL) {
-                result = parser.nonstringLiteral();
-            } else if (root == CeylonTypes.NONEMPTY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.NOT_EQUAL_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.NOT_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.OBJECT_DEFINITION) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.OPTIONAL) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.OR_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.OR_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.OUT) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.OUTER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.PACKAGE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.PIDENTIFIER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.POWER_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.PRODUCT_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.QUOTIENT_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.RANGE_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.RBRACE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.RBRACKET) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.REMAINDER_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.REMAINDER_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.RETURN) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.RPAREN) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SAFE_MEMBER_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SATISFIES) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SCALE_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SEGMENT_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SEMICOLON) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SMALLER_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SMALL_AS_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SPREAD_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.STRING_END) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.STRING_LITERAL) {
-                result = parser.stringLiteral();
-            } else if (root == CeylonTypes.STRING_MID) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.STRING_START) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SUBTRACT_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SUM_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SUPER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.SWITCH_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.StringPart) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.THEN_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.THIS) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.THROW) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.TRY_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.TYPE_CONSTRAINT) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.UIDENTIFIER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.UIdentifierPrefix) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.UNION_OP) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.UNION_SPECIFY) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.VALUE_MODIFIER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.VERBATIM_STRING) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.VOID_MODIFIER) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.WHILE_CLAUSE) {
-//                result = parser.xxx();
-            } else if (root == CeylonTypes.WS) {
-//                result = parser.xxx();
             }
+            // todo: token types
         } catch (RecognitionException e) {
             throw new RuntimeException("Unrecognized", e);
         }
         if (result == null) {
             throw new UnsupportedOperationException(String.format("Unsupported type: %s", root));
         }
-//        return new CompositeElement(result);
-        return builder.getTreeBuilt();
+        final RangeMapVisitor rangeMapVisitor = new RangeMapVisitor();
+        rangeMapVisitor.visitAny(result);
+
+        final ASTNode astRoot = builder.getTreeBuilt();
+        bindASTs(astRoot, result, rangeMapVisitor.getMap());
+        return astRoot;
+    }
+
+    private void bindASTs(ASTNode astNode, Node specNode, Map<TextRange, Node> map) {
+/*
+        if (!corresponds(astNode.getElementType(), (specNode.getNodeType()))) {
+            System.out.printf("Subnode type mismatch: %s <> %s%n", astNode.getElementType(), (specNode.getNodeType()));
+            return;
+        }
+*/
+//        System.out.printf("Binding %s to %s%n", astNode.getElementType(), specNode == null ? null : specNode.getClass().getSimpleName());
+        if (specNode != null) {
+            astNode.putUserData(CEYLON_NODE_KEY, specNode);
+        }
+//        final List<Node> specChildren = specNode.getChildren();
+        final ASTNode[] ijChildren = astNode.getChildren(NON_WS_TOKEN_SET);
+//        System.out.printf("SpecChildren: %d, IJChildren: %d%n", specChildren.size(), ijChildren.length);
+        for (final ASTNode ijChild : ijChildren) {
+//            final Node specChild = specChildren.get(i);
+            final Node specChild = map.get(ijChild.getTextRange());
+            bindASTs(ijChild, specChild, map);
+        }
     }
 }

@@ -18,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class CeylonParserDefinition implements ParserDefinition {
 
+    public static final TokenSet WS_TOKENS = TokenSet.create(TokenTypes.WS.getTokenType());
+
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
@@ -37,7 +39,7 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public TokenSet getWhitespaceTokens() {
-        return TokenSet.create(TokenTypes.WS.getTokenType());
+        return WS_TOKENS;
     }
 
     @NotNull
@@ -55,7 +57,7 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public PsiElement createElement(ASTNode node) {
-        return new CeylonCompositeElementImpl(node);
+        return new CeylonCompositeElementImpl(node, node.getUserData(CeylonIdeaParser.CEYLON_NODE_KEY));
 //        return CeylonTypes.Factory.createElement(node);
     }
 
