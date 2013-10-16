@@ -149,7 +149,6 @@ public enum TokenTypes {
         for (Field typeField : typeFields) {
             try {
                 final IElementType elt = (IElementType) typeField.get(null);
-                System.out.println("elt = " + elt);
                 ceylonTypeFields.put(typeField.getName(), elt);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Error accesing CeylonTypes fields.", e);
