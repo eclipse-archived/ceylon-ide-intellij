@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
 import org.intellij.plugins.ceylon.psi.impl.*;
 
-import org.intellij.plugins.ceylon.psi.CeylonPsi.*;
+import org.intellij.plugins.ceylon.psi.CeylonPsiImpl.*;
 
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 
@@ -16,467 +16,465 @@ public class CeylonPsiFactory {
         IElementType type = node.getElementType();
         if (false) {
         } else if (type == COMPILATION_UNIT) {
-            return new CompilationUnitPsi(node);
+            return new CompilationUnitPsiImpl(node);
         } else if (type == MODULE_DESCRIPTOR) {
-            return new ModuleDescriptorPsi(node);
+            return new ModuleDescriptorPsiImpl(node);
         } else if (type == PACKAGE_DESCRIPTOR) {
-            return new PackageDescriptorPsi(node);
+            return new PackageDescriptorPsiImpl(node);
         } else if (type == IMPORT_MODULE_LIST) {
-            return new ImportModuleListPsi(node);
+            return new ImportModuleListPsiImpl(node);
         } else if (type == IMPORT_MODULE) {
-            return new ImportModulePsi(node);
+            return new ImportModulePsiImpl(node);
         } else if (type == IMPORT_LIST) {
-            return new ImportListPsi(node);
+            return new ImportListPsiImpl(node);
         } else if (type == IMPORT) {
-            return new ImportPsi(node);
+            return new ImportPsiImpl(node);
         } else if (type == IMPORT_PATH) {
-            return new ImportPathPsi(node);
+            return new ImportPathPsiImpl(node);
         } else if (type == IMPORT_MEMBER_OR_TYPE_LIST) {
-            return new ImportMemberOrTypeListPsi(node);
+            return new ImportMemberOrTypeListPsiImpl(node);
         } else if (type == IMPORT_MEMBER_OR_TYPE) {
-            return new ImportMemberOrTypePsi(node);
+            return new ImportMemberOrTypePsiImpl(node);
         } else if (type == IMPORT_MEMBER) {
-            return new ImportMemberPsi(node);
+            return new ImportMemberPsiImpl(node);
         } else if (type == IMPORT_TYPE) {
-            return new ImportTypePsi(node);
+            return new ImportTypePsiImpl(node);
         } else if (type == ALIAS) {
-            return new AliasPsi(node);
+            return new AliasPsiImpl(node);
         } else if (type == IMPORT_WILDCARD) {
-            return new ImportWildcardPsi(node);
+            return new ImportWildcardPsiImpl(node);
         } else if (type == MISSING_DECLARATION) {
-            return new MissingDeclarationPsi(node);
+            return new MissingDeclarationPsiImpl(node);
         } else if (type == TYPE_ALIAS_DECLARATION) {
-            return new TypeAliasDeclarationPsi(node);
+            return new TypeAliasDeclarationPsiImpl(node);
         } else if (type == SATISFIED_TYPES) {
-            return new SatisfiedTypesPsi(node);
+            return new SatisfiedTypesPsiImpl(node);
         } else if (type == ABSTRACTED_TYPE) {
-            return new AbstractedTypePsi(node);
+            return new AbstractedTypePsiImpl(node);
         } else if (type == ADAPTED_TYPES) {
-            return new AdaptedTypesPsi(node);
+            return new AdaptedTypesPsiImpl(node);
         } else if (type == CASE_TYPES) {
-            return new CaseTypesPsi(node);
+            return new CaseTypesPsiImpl(node);
         } else if (type == EXTENDED_TYPE) {
-            return new ExtendedTypePsi(node);
+            return new ExtendedTypePsiImpl(node);
         } else if (type == TYPE_CONSTRAINT_LIST) {
-            return new TypeConstraintListPsi(node);
+            return new TypeConstraintListPsiImpl(node);
         } else if (type == TYPE_CONSTRAINT) {
-            return new TypeConstraintPsi(node);
+            return new TypeConstraintPsiImpl(node);
         } else if (type == TYPE_SPECIFIER) {
-            return new TypeSpecifierPsi(node);
+            return new TypeSpecifierPsiImpl(node);
         } else if (type == DEFAULT_TYPE_ARGUMENT) {
-            return new DefaultTypeArgumentPsi(node);
+            return new DefaultTypeArgumentPsiImpl(node);
         } else if (type == CLASS_SPECIFIER) {
-            return new ClassSpecifierPsi(node);
+            return new ClassSpecifierPsiImpl(node);
         } else if (type == ANY_CLASS) {
-            return new AnyClassPsi(node);
+            return new AnyClassPsiImpl(node);
         } else if (type == CLASS_DEFINITION) {
-            return new ClassDefinitionPsi(node);
+            return new ClassDefinitionPsiImpl(node);
         } else if (type == CLASS_DECLARATION) {
-            return new ClassDeclarationPsi(node);
+            return new ClassDeclarationPsiImpl(node);
         } else if (type == ANY_INTERFACE) {
-            return new AnyInterfacePsi(node);
+            return new AnyInterfacePsiImpl(node);
         } else if (type == INTERFACE_DEFINITION) {
-            return new InterfaceDefinitionPsi(node);
+            return new InterfaceDefinitionPsiImpl(node);
         } else if (type == INTERFACE_DECLARATION) {
-            return new InterfaceDeclarationPsi(node);
+            return new InterfaceDeclarationPsiImpl(node);
         } else if (type == ATTRIBUTE_DECLARATION) {
-            return new AttributeDeclarationPsi(node);
+            return new AttributeDeclarationPsiImpl(node);
         } else if (type == ATTRIBUTE_GETTER_DEFINITION) {
-            return new AttributeGetterDefinitionPsi(node);
+            return new AttributeGetterDefinitionPsiImpl(node);
         } else if (type == ATTRIBUTE_SETTER_DEFINITION) {
-            return new AttributeSetterDefinitionPsi(node);
+            return new AttributeSetterDefinitionPsiImpl(node);
         } else if (type == ANY_METHOD) {
-            return new AnyMethodPsi(node);
+            return new AnyMethodPsiImpl(node);
         } else if (type == METHOD_DEFINITION) {
-            return new MethodDefinitionPsi(node);
+            return new MethodDefinitionPsiImpl(node);
         } else if (type == METHOD_DECLARATION) {
-            return new MethodDeclarationPsi(node);
+            return new MethodDeclarationPsiImpl(node);
         } else if (type == VOID_MODIFIER) {
-            return new VoidModifierPsi(node);
+            return new VoidModifierPsiImpl(node);
         } else if (type == OBJECT_DEFINITION) {
-            return new ObjectDefinitionPsi(node);
+            return new ObjectDefinitionPsiImpl(node);
         } else if (type == PARAMETER_LIST) {
-            return new ParameterListPsi(node);
+            return new ParameterListPsiImpl(node);
         } else if (type == VALUE_PARAMETER_DECLARATION) {
-            return new ValueParameterDeclarationPsi(node);
+            return new ValueParameterDeclarationPsiImpl(node);
         } else if (type == FUNCTIONAL_PARAMETER_DECLARATION) {
-            return new FunctionalParameterDeclarationPsi(node);
+            return new FunctionalParameterDeclarationPsiImpl(node);
         } else if (type == INITIALIZER_PARAMETER) {
-            return new InitializerParameterPsi(node);
+            return new InitializerParameterPsiImpl(node);
         } else if (type == TYPE_PARAMETER_LIST) {
-            return new TypeParameterListPsi(node);
+            return new TypeParameterListPsiImpl(node);
         } else if (type == TYPE_PARAMETER_DECLARATION) {
-            return new TypeParameterDeclarationPsi(node);
+            return new TypeParameterDeclarationPsiImpl(node);
         } else if (type == TYPE_VARIANCE) {
-            return new TypeVariancePsi(node);
+            return new TypeVariancePsiImpl(node);
         } else if (type == BLOCK) {
-            return new BlockPsi(node);
+            return new BlockPsiImpl(node);
         } else if (type == CLASS_BODY) {
-            return new ClassBodyPsi(node);
+            return new ClassBodyPsiImpl(node);
         } else if (type == INTERFACE_BODY) {
-            return new InterfaceBodyPsi(node);
+            return new InterfaceBodyPsiImpl(node);
         } else if (type == BASE_TYPE) {
-            return new BaseTypePsi(node);
+            return new BaseTypePsiImpl(node);
         } else if (type == UNION_TYPE) {
-            return new UnionTypePsi(node);
+            return new UnionTypePsiImpl(node);
         } else if (type == INTERSECTION_TYPE) {
-            return new IntersectionTypePsi(node);
+            return new IntersectionTypePsiImpl(node);
         } else if (type == SEQUENCE_TYPE) {
-            return new SequenceTypePsi(node);
+            return new SequenceTypePsiImpl(node);
         } else if (type == ITERABLE_TYPE) {
-            return new IterableTypePsi(node);
+            return new IterableTypePsiImpl(node);
         } else if (type == OPTIONAL_TYPE) {
-            return new OptionalTypePsi(node);
+            return new OptionalTypePsiImpl(node);
         } else if (type == TUPLE_TYPE) {
-            return new TupleTypePsi(node);
+            return new TupleTypePsiImpl(node);
         } else if (type == FUNCTION_TYPE) {
-            return new FunctionTypePsi(node);
+            return new FunctionTypePsiImpl(node);
         } else if (type == ENTRY_TYPE) {
-            return new EntryTypePsi(node);
+            return new EntryTypePsiImpl(node);
         } else if (type == QUALIFIED_TYPE) {
-            return new QualifiedTypePsi(node);
+            return new QualifiedTypePsiImpl(node);
         } else if (type == SUPER_TYPE) {
-            return new SuperTypePsi(node);
+            return new SuperTypePsiImpl(node);
         } else if (type == TYPE_LITERAL) {
-            return new TypeLiteralPsi(node);
+            return new TypeLiteralPsiImpl(node);
         } else if (type == MEMBER_LITERAL) {
-            return new MemberLiteralPsi(node);
+            return new MemberLiteralPsiImpl(node);
         } else if (type == CLASS_LITERAL) {
-            return new ClassLiteralPsi(node);
+            return new ClassLiteralPsiImpl(node);
         } else if (type == INTERFACE_LITERAL) {
-            return new InterfaceLiteralPsi(node);
+            return new InterfaceLiteralPsiImpl(node);
         } else if (type == ALIAS_LITERAL) {
-            return new AliasLiteralPsi(node);
+            return new AliasLiteralPsiImpl(node);
         } else if (type == TYPE_PARAMETER_LITERAL) {
-            return new TypeParameterLiteralPsi(node);
+            return new TypeParameterLiteralPsiImpl(node);
         } else if (type == VALUE_LITERAL) {
-            return new ValueLiteralPsi(node);
+            return new ValueLiteralPsiImpl(node);
         } else if (type == FUNCTION_LITERAL) {
-            return new FunctionLiteralPsi(node);
+            return new FunctionLiteralPsiImpl(node);
         } else if (type == MODULE_LITERAL) {
-            return new ModuleLiteralPsi(node);
+            return new ModuleLiteralPsiImpl(node);
         } else if (type == PACKAGE_LITERAL) {
-            return new PackageLiteralPsi(node);
+            return new PackageLiteralPsiImpl(node);
         } else if (type == DYNAMIC_MODIFIER) {
-            return new DynamicModifierPsi(node);
+            return new DynamicModifierPsiImpl(node);
         } else if (type == VALUE_MODIFIER) {
-            return new ValueModifierPsi(node);
+            return new ValueModifierPsiImpl(node);
         } else if (type == FUNCTION_MODIFIER) {
-            return new FunctionModifierPsi(node);
+            return new FunctionModifierPsiImpl(node);
         } else if (type == SYNTHETIC_VARIABLE) {
-            return new SyntheticVariablePsi(node);
+            return new SyntheticVariablePsiImpl(node);
         } else if (type == TYPE_ARGUMENTS) {
-            return new TypeArgumentsPsi(node);
+            return new TypeArgumentsPsiImpl(node);
         } else if (type == TYPE_ARGUMENT_LIST) {
-            return new TypeArgumentListPsi(node);
+            return new TypeArgumentListPsiImpl(node);
         } else if (type == INFERRED_TYPE_ARGUMENTS) {
-            return new InferredTypeArgumentsPsi(node);
+            return new InferredTypeArgumentsPsiImpl(node);
         } else if (type == SEQUENCED_TYPE) {
-            return new SequencedTypePsi(node);
+            return new SequencedTypePsiImpl(node);
         } else if (type == DEFAULTED_TYPE) {
-            return new DefaultedTypePsi(node);
+            return new DefaultedTypePsiImpl(node);
         } else if (type == RETURN) {
-            return new ReturnPsi(node);
+            return new ReturnPsiImpl(node);
         } else if (type == THROW) {
-            return new ThrowPsi(node);
+            return new ThrowPsiImpl(node);
         } else if (type == CONTINUE) {
-            return new ContinuePsi(node);
+            return new ContinuePsiImpl(node);
         } else if (type == BREAK) {
-            return new BreakPsi(node);
+            return new BreakPsiImpl(node);
         } else if (type == COMPILER_ANNOTATION) {
-            return new CompilerAnnotationPsi(node);
+            return new CompilerAnnotationPsiImpl(node);
         } else if (type == ASSERTION) {
-            return new AssertionPsi(node);
+            return new AssertionPsiImpl(node);
         } else if (type == SPECIFIER_STATEMENT) {
-            return new SpecifierStatementPsi(node);
+            return new SpecifierStatementPsiImpl(node);
         } else if (type == EXPRESSION_STATEMENT) {
-            return new ExpressionStatementPsi(node);
+            return new ExpressionStatementPsiImpl(node);
         } else if (type == CONTROL_STATEMENT) {
-            return new ControlStatementPsi(node);
+            return new ControlStatementPsiImpl(node);
         } else if (type == CONTROL_CLAUSE) {
-            return new ControlClausePsi(node);
+            return new ControlClausePsiImpl(node);
         } else if (type == DYNAMIC_STATEMENT) {
-            return new DynamicStatementPsi(node);
+            return new DynamicStatementPsiImpl(node);
         } else if (type == DYNAMIC_CLAUSE) {
-            return new DynamicClausePsi(node);
+            return new DynamicClausePsiImpl(node);
         } else if (type == IF_STATEMENT) {
-            return new IfStatementPsi(node);
+            return new IfStatementPsiImpl(node);
         } else if (type == IF_CLAUSE) {
-            return new IfClausePsi(node);
+            return new IfClausePsiImpl(node);
         } else if (type == ELSE_CLAUSE) {
-            return new ElseClausePsi(node);
+            return new ElseClausePsiImpl(node);
         } else if (type == SWITCH_STATEMENT) {
-            return new SwitchStatementPsi(node);
+            return new SwitchStatementPsiImpl(node);
         } else if (type == SWITCH_CLAUSE) {
-            return new SwitchClausePsi(node);
+            return new SwitchClausePsiImpl(node);
         } else if (type == SWITCH_CASE_LIST) {
-            return new SwitchCaseListPsi(node);
+            return new SwitchCaseListPsiImpl(node);
         } else if (type == CASE_CLAUSE) {
-            return new CaseClausePsi(node);
+            return new CaseClausePsiImpl(node);
         } else if (type == CASE_ITEM) {
-            return new CaseItemPsi(node);
+            return new CaseItemPsiImpl(node);
         } else if (type == MATCH_CASE) {
-            return new MatchCasePsi(node);
+            return new MatchCasePsiImpl(node);
         } else if (type == IS_CASE) {
-            return new IsCasePsi(node);
+            return new IsCasePsiImpl(node);
         } else if (type == SATISFIES_CASE) {
-            return new SatisfiesCasePsi(node);
+            return new SatisfiesCasePsiImpl(node);
         } else if (type == TRY_CATCH_STATEMENT) {
-            return new TryCatchStatementPsi(node);
+            return new TryCatchStatementPsiImpl(node);
         } else if (type == TRY_CLAUSE) {
-            return new TryClausePsi(node);
+            return new TryClausePsiImpl(node);
         } else if (type == CATCH_CLAUSE) {
-            return new CatchClausePsi(node);
+            return new CatchClausePsiImpl(node);
         } else if (type == FINALLY_CLAUSE) {
-            return new FinallyClausePsi(node);
+            return new FinallyClausePsiImpl(node);
         } else if (type == RESOURCE_LIST) {
-            return new ResourceListPsi(node);
+            return new ResourceListPsiImpl(node);
         } else if (type == RESOURCE) {
-            return new ResourcePsi(node);
+            return new ResourcePsiImpl(node);
         } else if (type == CATCH_VARIABLE) {
-            return new CatchVariablePsi(node);
+            return new CatchVariablePsiImpl(node);
         } else if (type == FOR_STATEMENT) {
-            return new ForStatementPsi(node);
+            return new ForStatementPsiImpl(node);
         } else if (type == FOR_CLAUSE) {
-            return new ForClausePsi(node);
+            return new ForClausePsiImpl(node);
         } else if (type == FOR_ITERATOR) {
-            return new ForIteratorPsi(node);
+            return new ForIteratorPsiImpl(node);
         } else if (type == VALUE_ITERATOR) {
-            return new ValueIteratorPsi(node);
+            return new ValueIteratorPsiImpl(node);
         } else if (type == KEY_VALUE_ITERATOR) {
-            return new KeyValueIteratorPsi(node);
+            return new KeyValueIteratorPsiImpl(node);
         } else if (type == WHILE_STATEMENT) {
-            return new WhileStatementPsi(node);
+            return new WhileStatementPsiImpl(node);
         } else if (type == WHILE_CLAUSE) {
-            return new WhileClausePsi(node);
+            return new WhileClausePsiImpl(node);
         } else if (type == CONDITION_LIST) {
-            return new ConditionListPsi(node);
+            return new ConditionListPsiImpl(node);
         } else if (type == BOOLEAN_CONDITION) {
-            return new BooleanConditionPsi(node);
+            return new BooleanConditionPsiImpl(node);
         } else if (type == EXISTS_CONDITION) {
-            return new ExistsConditionPsi(node);
+            return new ExistsConditionPsiImpl(node);
         } else if (type == NONEMPTY_CONDITION) {
-            return new NonemptyConditionPsi(node);
+            return new NonemptyConditionPsiImpl(node);
         } else if (type == IS_CONDITION) {
-            return new IsConditionPsi(node);
+            return new IsConditionPsiImpl(node);
         } else if (type == SATISFIES_CONDITION) {
-            return new SatisfiesConditionPsi(node);
+            return new SatisfiesConditionPsiImpl(node);
         } else if (type == VARIABLE) {
-            return new VariablePsi(node);
+            return new VariablePsiImpl(node);
         } else if (type == SUM_OP) {
-            return new SumOpPsi(node);
+            return new SumOpPsiImpl(node);
         } else if (type == DIFFERENCE_OP) {
-            return new DifferenceOpPsi(node);
+            return new DifferenceOpPsiImpl(node);
         } else if (type == PRODUCT_OP) {
-            return new ProductOpPsi(node);
+            return new ProductOpPsiImpl(node);
         } else if (type == QUOTIENT_OP) {
-            return new QuotientOpPsi(node);
+            return new QuotientOpPsiImpl(node);
         } else if (type == POWER_OP) {
-            return new PowerOpPsi(node);
+            return new PowerOpPsiImpl(node);
         } else if (type == REMAINDER_OP) {
-            return new RemainderOpPsi(node);
+            return new RemainderOpPsiImpl(node);
         } else if (type == ASSIGN_OP) {
-            return new AssignOpPsi(node);
+            return new AssignOpPsiImpl(node);
         } else if (type == ADD_ASSIGN_OP) {
-            return new AddAssignOpPsi(node);
+            return new AddAssignOpPsiImpl(node);
         } else if (type == SUBTRACT_ASSIGN_OP) {
-            return new SubtractAssignOpPsi(node);
+            return new SubtractAssignOpPsiImpl(node);
         } else if (type == MULTIPLY_ASSIGN_OP) {
-            return new MultiplyAssignOpPsi(node);
+            return new MultiplyAssignOpPsiImpl(node);
         } else if (type == DIVIDE_ASSIGN_OP) {
-            return new DivideAssignOpPsi(node);
+            return new DivideAssignOpPsiImpl(node);
         } else if (type == REMAINDER_ASSIGN_OP) {
-            return new RemainderAssignOpPsi(node);
+            return new RemainderAssignOpPsiImpl(node);
         } else if (type == INTERSECT_ASSIGN_OP) {
-            return new IntersectAssignOpPsi(node);
+            return new IntersectAssignOpPsiImpl(node);
         } else if (type == UNION_ASSIGN_OP) {
-            return new UnionAssignOpPsi(node);
+            return new UnionAssignOpPsiImpl(node);
         } else if (type == XOR_ASSIGN_OP) {
-            return new XorAssignOpPsi(node);
+            return new XorAssignOpPsiImpl(node);
         } else if (type == COMPLEMENT_ASSIGN_OP) {
-            return new ComplementAssignOpPsi(node);
+            return new ComplementAssignOpPsiImpl(node);
         } else if (type == AND_ASSIGN_OP) {
-            return new AndAssignOpPsi(node);
+            return new AndAssignOpPsiImpl(node);
         } else if (type == OR_ASSIGN_OP) {
-            return new OrAssignOpPsi(node);
+            return new OrAssignOpPsiImpl(node);
         } else if (type == AND_OP) {
-            return new AndOpPsi(node);
+            return new AndOpPsiImpl(node);
         } else if (type == OR_OP) {
-            return new OrOpPsi(node);
+            return new OrOpPsiImpl(node);
         } else if (type == INTERSECTION_OP) {
-            return new IntersectionOpPsi(node);
+            return new IntersectionOpPsiImpl(node);
         } else if (type == UNION_OP) {
-            return new UnionOpPsi(node);
+            return new UnionOpPsiImpl(node);
         } else if (type == XOR_OP) {
-            return new XorOpPsi(node);
+            return new XorOpPsiImpl(node);
         } else if (type == COMPLEMENT_OP) {
-            return new ComplementOpPsi(node);
+            return new ComplementOpPsiImpl(node);
         } else if (type == EQUAL_OP) {
-            return new EqualOpPsi(node);
+            return new EqualOpPsiImpl(node);
         } else if (type == NOT_EQUAL_OP) {
-            return new NotEqualOpPsi(node);
+            return new NotEqualOpPsiImpl(node);
         } else if (type == LARGER_OP) {
-            return new LargerOpPsi(node);
+            return new LargerOpPsiImpl(node);
         } else if (type == SMALLER_OP) {
-            return new SmallerOpPsi(node);
+            return new SmallerOpPsiImpl(node);
         } else if (type == LARGE_AS_OP) {
-            return new LargeAsOpPsi(node);
+            return new LargeAsOpPsiImpl(node);
         } else if (type == SMALL_AS_OP) {
-            return new SmallAsOpPsi(node);
+            return new SmallAsOpPsiImpl(node);
         } else if (type == SCALE_OP) {
-            return new ScaleOpPsi(node);
+            return new ScaleOpPsiImpl(node);
         } else if (type == OPEN_BOUND) {
-            return new OpenBoundPsi(node);
+            return new OpenBoundPsiImpl(node);
         } else if (type == CLOSED_BOUND) {
-            return new ClosedBoundPsi(node);
+            return new ClosedBoundPsiImpl(node);
         } else if (type == WITHIN_OP) {
-            return new WithinOpPsi(node);
+            return new WithinOpPsiImpl(node);
         } else if (type == DEFAULT_OP) {
-            return new DefaultOpPsi(node);
+            return new DefaultOpPsiImpl(node);
         } else if (type == THEN_OP) {
-            return new ThenOpPsi(node);
+            return new ThenOpPsiImpl(node);
         } else if (type == IDENTICAL_OP) {
-            return new IdenticalOpPsi(node);
+            return new IdenticalOpPsiImpl(node);
         } else if (type == ENTRY_OP) {
-            return new EntryOpPsi(node);
+            return new EntryOpPsiImpl(node);
         } else if (type == RANGE_OP) {
-            return new RangeOpPsi(node);
+            return new RangeOpPsiImpl(node);
         } else if (type == SEGMENT_OP) {
-            return new SegmentOpPsi(node);
+            return new SegmentOpPsiImpl(node);
         } else if (type == COMPARE_OP) {
-            return new CompareOpPsi(node);
+            return new CompareOpPsiImpl(node);
         } else if (type == IN_OP) {
-            return new InOpPsi(node);
+            return new InOpPsiImpl(node);
         } else if (type == NOT_OP) {
-            return new NotOpPsi(node);
+            return new NotOpPsiImpl(node);
         } else if (type == EXISTS) {
-            return new ExistsPsi(node);
+            return new ExistsPsiImpl(node);
         } else if (type == NONEMPTY) {
-            return new NonemptyPsi(node);
+            return new NonemptyPsiImpl(node);
         } else if (type == NEGATIVE_OP) {
-            return new NegativeOpPsi(node);
+            return new NegativeOpPsiImpl(node);
         } else if (type == POSITIVE_OP) {
-            return new PositiveOpPsi(node);
+            return new PositiveOpPsiImpl(node);
         } else if (type == IS_OP) {
-            return new IsOpPsi(node);
+            return new IsOpPsiImpl(node);
         } else if (type == SATISFIES) {
-            return new SatisfiesPsi(node);
+            return new SatisfiesPsiImpl(node);
         } else if (type == EXTENDS) {
-            return new ExtendsPsi(node);
+            return new ExtendsPsiImpl(node);
         } else if (type == OF_OP) {
-            return new OfOpPsi(node);
+            return new OfOpPsiImpl(node);
         } else if (type == INCREMENT_OP) {
-            return new IncrementOpPsi(node);
+            return new IncrementOpPsiImpl(node);
         } else if (type == DECREMENT_OP) {
-            return new DecrementOpPsi(node);
+            return new DecrementOpPsiImpl(node);
         } else if (type == POSTFIX_INCREMENT_OP) {
-            return new PostfixIncrementOpPsi(node);
+            return new PostfixIncrementOpPsiImpl(node);
         } else if (type == POSTFIX_DECREMENT_OP) {
-            return new PostfixDecrementOpPsi(node);
+            return new PostfixDecrementOpPsiImpl(node);
         } else if (type == EXPRESSION_LIST) {
-            return new ExpressionListPsi(node);
+            return new ExpressionListPsiImpl(node);
         } else if (type == EXPRESSION) {
-            return new ExpressionPsi(node);
+            return new ExpressionPsiImpl(node);
         } else if (type == INVOCATION_EXPRESSION) {
-            return new InvocationExpressionPsi(node);
+            return new InvocationExpressionPsiImpl(node);
         } else if (type == PARAMETERIZED_EXPRESSION) {
-            return new ParameterizedExpressionPsi(node);
+            return new ParameterizedExpressionPsiImpl(node);
         } else if (type == EXTENDED_TYPE_EXPRESSION) {
-            return new ExtendedTypeExpressionPsi(node);
+            return new ExtendedTypeExpressionPsiImpl(node);
         } else if (type == BASE_MEMBER_EXPRESSION) {
-            return new BaseMemberExpressionPsi(node);
+            return new BaseMemberExpressionPsiImpl(node);
         } else if (type == BASE_TYPE_EXPRESSION) {
-            return new BaseTypeExpressionPsi(node);
+            return new BaseTypeExpressionPsiImpl(node);
         } else if (type == QUALIFIED_MEMBER_EXPRESSION) {
-            return new QualifiedMemberExpressionPsi(node);
+            return new QualifiedMemberExpressionPsiImpl(node);
         } else if (type == QUALIFIED_TYPE_EXPRESSION) {
-            return new QualifiedTypeExpressionPsi(node);
+            return new QualifiedTypeExpressionPsiImpl(node);
         } else if (type == MEMBER_OP) {
-            return new MemberOpPsi(node);
+            return new MemberOpPsiImpl(node);
         } else if (type == SAFE_MEMBER_OP) {
-            return new SafeMemberOpPsi(node);
+            return new SafeMemberOpPsiImpl(node);
         } else if (type == SPREAD_OP) {
-            return new SpreadOpPsi(node);
+            return new SpreadOpPsiImpl(node);
         } else if (type == INDEX_EXPRESSION) {
-            return new IndexExpressionPsi(node);
+            return new IndexExpressionPsiImpl(node);
         } else if (type == ELEMENT) {
-            return new ElementPsi(node);
+            return new ElementPsiImpl(node);
         } else if (type == ELEMENT_RANGE) {
-            return new ElementRangePsi(node);
+            return new ElementRangePsiImpl(node);
         } else if (type == OUTER) {
-            return new OuterPsi(node);
+            return new OuterPsiImpl(node);
         } else if (type == PACKAGE) {
-            return new PackagePsi(node);
+            return new PackagePsiImpl(node);
         } else if (type == NAMED_ARGUMENT_LIST) {
-            return new NamedArgumentListPsi(node);
+            return new NamedArgumentListPsiImpl(node);
         } else if (type == SEQUENCED_ARGUMENT) {
-            return new SequencedArgumentPsi(node);
+            return new SequencedArgumentPsiImpl(node);
         } else if (type == POSITIONAL_ARGUMENT_LIST) {
-            return new PositionalArgumentListPsi(node);
+            return new PositionalArgumentListPsiImpl(node);
         } else if (type == LISTED_ARGUMENT) {
-            return new ListedArgumentPsi(node);
+            return new ListedArgumentPsiImpl(node);
         } else if (type == SPREAD_ARGUMENT) {
-            return new SpreadArgumentPsi(node);
+            return new SpreadArgumentPsiImpl(node);
         } else if (type == FUNCTION_ARGUMENT) {
-            return new FunctionArgumentPsi(node);
+            return new FunctionArgumentPsiImpl(node);
         } else if (type == SPECIFIED_ARGUMENT) {
-            return new SpecifiedArgumentPsi(node);
+            return new SpecifiedArgumentPsiImpl(node);
         } else if (type == METHOD_ARGUMENT) {
-            return new MethodArgumentPsi(node);
+            return new MethodArgumentPsiImpl(node);
         } else if (type == ATTRIBUTE_ARGUMENT) {
-            return new AttributeArgumentPsi(node);
+            return new AttributeArgumentPsiImpl(node);
         } else if (type == OBJECT_ARGUMENT) {
-            return new ObjectArgumentPsi(node);
+            return new ObjectArgumentPsiImpl(node);
         } else if (type == SPECIFIER_EXPRESSION) {
-            return new SpecifierExpressionPsi(node);
+            return new SpecifierExpressionPsiImpl(node);
         } else if (type == LAZY_SPECIFIER_EXPRESSION) {
-            return new LazySpecifierExpressionPsi(node);
+            return new LazySpecifierExpressionPsiImpl(node);
         } else if (type == INITIALIZER_EXPRESSION) {
-            return new InitializerExpressionPsi(node);
+            return new InitializerExpressionPsiImpl(node);
         } else if (type == NATURAL_LITERAL) {
-            return new NaturalLiteralPsi(node);
+            return new NaturalLiteralPsiImpl(node);
         } else if (type == FLOAT_LITERAL) {
-            return new FloatLiteralPsi(node);
+            return new FloatLiteralPsiImpl(node);
         } else if (type == CHAR_LITERAL) {
-            return new CharLiteralPsi(node);
+            return new CharLiteralPsiImpl(node);
         } else if (type == STRING_LITERAL) {
-            return new StringLiteralPsi(node);
+            return new StringLiteralPsiImpl(node);
         } else if (type == QUOTED_LITERAL) {
-            return new QuotedLiteralPsi(node);
+            return new QuotedLiteralPsiImpl(node);
         } else if (type == DOC_LINK) {
-            return new DocLinkPsi(node);
+            return new DocLinkPsiImpl(node);
         } else if (type == THIS) {
-            return new ThisPsi(node);
+            return new ThisPsiImpl(node);
         } else if (type == SUPER) {
-            return new SuperPsi(node);
+            return new SuperPsiImpl(node);
         } else if (type == SEQUENCE_ENUMERATION) {
-            return new SequenceEnumerationPsi(node);
+            return new SequenceEnumerationPsiImpl(node);
         } else if (type == TUPLE) {
-            return new TuplePsi(node);
+            return new TuplePsiImpl(node);
         } else if (type == DYNAMIC) {
-            return new DynamicPsi(node);
+            return new DynamicPsiImpl(node);
         } else if (type == STRING_TEMPLATE) {
-            return new StringTemplatePsi(node);
+            return new StringTemplatePsiImpl(node);
         } else if (type == ANNOTATION) {
-            return new AnnotationPsi(node);
+            return new AnnotationPsiImpl(node);
         } else if (type == ANONYMOUS_ANNOTATION) {
-            return new AnonymousAnnotationPsi(node);
+            return new AnonymousAnnotationPsiImpl(node);
         } else if (type == ANNOTATION_LIST) {
-            return new AnnotationListPsi(node);
+            return new AnnotationListPsiImpl(node);
         } else if (type == IDENTIFIER) {
-            return new IdentifierPsi(node);
+            return new IdentifierPsiImpl(node);
         } else if (type == COMPREHENSION) {
-            return new ComprehensionPsi(node);
+            return new ComprehensionPsiImpl(node);
         } else if (type == EXPRESSION_COMPREHENSION_CLAUSE) {
-            return new ExpressionComprehensionClausePsi(node);
+            return new ExpressionComprehensionClausePsiImpl(node);
         } else if (type == FOR_COMPREHENSION_CLAUSE) {
-            return new ForComprehensionClausePsi(node);
+            return new ForComprehensionClausePsiImpl(node);
         } else if (type == IF_COMPREHENSION_CLAUSE) {
-            return new IfComprehensionClausePsi(node);
+            return new IfComprehensionClausePsiImpl(node);
         }
 
         return new CeylonCompositeElementImpl(node);
-//        throw new AssertionError("Unknown element type: " + type);
-
     }
 }

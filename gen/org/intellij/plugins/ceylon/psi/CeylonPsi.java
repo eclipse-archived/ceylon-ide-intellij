@@ -1,1701 +1,290 @@
 package org.intellij.plugins.ceylon.psi;
 
-import com.intellij.lang.ASTNode;
-
-import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
+import org.intellij.plugins.ceylon.psi.CeylonCompositeElement;
+/* Generated using Antlr by PsiIntfGen.g */
 
 public class CeylonPsi {
 
-    public static class CompilationUnitPsi extends CeylonCompositeElementImpl {
-        public CompilationUnitPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ModuleDescriptorPsi extends StatementOrArgumentPsi {
-        public ModuleDescriptorPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class PackageDescriptorPsi extends StatementOrArgumentPsi {
-        public PackageDescriptorPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportModuleListPsi extends CeylonCompositeElementImpl {
-        public ImportModuleListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportModulePsi extends StatementOrArgumentPsi {
-        public ImportModulePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportListPsi extends CeylonCompositeElementImpl {
-        public ImportListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportPsi extends StatementOrArgumentPsi {
-        public ImportPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportPathPsi extends CeylonCompositeElementImpl {
-        public ImportPathPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportMemberOrTypeListPsi extends CeylonCompositeElementImpl {
-        public ImportMemberOrTypeListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportMemberOrTypePsi extends StatementOrArgumentPsi {
-        public ImportMemberOrTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportMemberPsi extends ImportMemberOrTypePsi {
-        public ImportMemberPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportTypePsi extends ImportMemberOrTypePsi {
-        public ImportTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AliasPsi extends CeylonCompositeElementImpl {
-        public AliasPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ImportWildcardPsi extends CeylonCompositeElementImpl {
-        public ImportWildcardPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class DeclarationPsi extends StatementPsi {
-        public DeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class MissingDeclarationPsi extends DeclarationPsi {
-        public MissingDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class TypeDeclarationPsi extends DeclarationPsi {
-        public TypeDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ClassOrInterfacePsi extends TypeDeclarationPsi {
-        public ClassOrInterfacePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeAliasDeclarationPsi extends TypeDeclarationPsi {
-        public TypeAliasDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SatisfiedTypesPsi extends CeylonCompositeElementImpl {
-        public SatisfiedTypesPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AbstractedTypePsi extends CeylonCompositeElementImpl {
-        public AbstractedTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AdaptedTypesPsi extends CeylonCompositeElementImpl {
-        public AdaptedTypesPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class CaseTypesPsi extends CeylonCompositeElementImpl {
-        public CaseTypesPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExtendedTypePsi extends CeylonCompositeElementImpl {
-        public ExtendedTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeConstraintListPsi extends CeylonCompositeElementImpl {
-        public TypeConstraintListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeConstraintPsi extends TypeDeclarationPsi {
-        public TypeConstraintPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeSpecifierPsi extends CeylonCompositeElementImpl {
-        public TypeSpecifierPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DefaultTypeArgumentPsi extends TypeSpecifierPsi {
-        public DefaultTypeArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ClassSpecifierPsi extends CeylonCompositeElementImpl {
-        public ClassSpecifierPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AnyClassPsi extends ClassOrInterfacePsi {
-        public AnyClassPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ClassDefinitionPsi extends AnyClassPsi {
-        public ClassDefinitionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ClassDeclarationPsi extends AnyClassPsi {
-        public ClassDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AnyInterfacePsi extends ClassOrInterfacePsi {
-        public AnyInterfacePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InterfaceDefinitionPsi extends AnyInterfacePsi {
-        public InterfaceDefinitionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InterfaceDeclarationPsi extends AnyInterfacePsi {
-        public InterfaceDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class TypedDeclarationPsi extends DeclarationPsi {
-        public TypedDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class AnyAttributePsi extends TypedDeclarationPsi {
-        public AnyAttributePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AttributeDeclarationPsi extends AnyAttributePsi {
-        public AttributeDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AttributeGetterDefinitionPsi extends AnyAttributePsi {
-        public AttributeGetterDefinitionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AttributeSetterDefinitionPsi extends TypedDeclarationPsi {
-        public AttributeSetterDefinitionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AnyMethodPsi extends TypedDeclarationPsi {
-        public AnyMethodPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class MethodDefinitionPsi extends AnyMethodPsi {
-        public MethodDefinitionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class MethodDeclarationPsi extends AnyMethodPsi {
-        public MethodDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class VoidModifierPsi extends TypePsi {
-        public VoidModifierPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ObjectDefinitionPsi extends TypedDeclarationPsi {
-        public ObjectDefinitionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ParameterListPsi extends CeylonCompositeElementImpl {
-        public ParameterListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ParameterPsi extends CeylonCompositeElementImpl {
-        public ParameterPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ParameterDeclarationPsi extends ParameterPsi {
-        public ParameterDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ValueParameterDeclarationPsi extends ParameterDeclarationPsi {
-        public ValueParameterDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class FunctionalParameterDeclarationPsi extends ParameterDeclarationPsi {
-        public FunctionalParameterDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InitializerParameterPsi extends ParameterPsi {
-        public InitializerParameterPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeParameterListPsi extends CeylonCompositeElementImpl {
-        public TypeParameterListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeParameterDeclarationPsi extends DeclarationPsi {
-        public TypeParameterDeclarationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeVariancePsi extends CeylonCompositeElementImpl {
-        public TypeVariancePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class BodyPsi extends CeylonCompositeElementImpl {
-        public BodyPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class BlockPsi extends BodyPsi {
-        public BlockPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ClassBodyPsi extends BodyPsi {
-        public ClassBodyPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InterfaceBodyPsi extends BodyPsi {
-        public InterfaceBodyPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class TypePsi extends CeylonCompositeElementImpl {
-        public TypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class StaticTypePsi extends TypePsi {
-        public StaticTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class SimpleTypePsi extends StaticTypePsi {
-        public SimpleTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class BaseTypePsi extends SimpleTypePsi {
-        public BaseTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class UnionTypePsi extends StaticTypePsi {
-        public UnionTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IntersectionTypePsi extends StaticTypePsi {
-        public IntersectionTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SequenceTypePsi extends StaticTypePsi {
-        public SequenceTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IterableTypePsi extends StaticTypePsi {
-        public IterableTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class OptionalTypePsi extends StaticTypePsi {
-        public OptionalTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TupleTypePsi extends StaticTypePsi {
-        public TupleTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class FunctionTypePsi extends StaticTypePsi {
-        public FunctionTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class EntryTypePsi extends StaticTypePsi {
-        public EntryTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class QualifiedTypePsi extends SimpleTypePsi {
-        public QualifiedTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SuperTypePsi extends StaticTypePsi {
-        public SuperTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class MetaLiteralPsi extends PrimaryPsi {
-        public MetaLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeLiteralPsi extends MetaLiteralPsi {
-        public TypeLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class MemberLiteralPsi extends MetaLiteralPsi {
-        public MemberLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ClassLiteralPsi extends TypeLiteralPsi {
-        public ClassLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InterfaceLiteralPsi extends TypeLiteralPsi {
-        public InterfaceLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AliasLiteralPsi extends TypeLiteralPsi {
-        public AliasLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeParameterLiteralPsi extends TypeLiteralPsi {
-        public TypeParameterLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ValueLiteralPsi extends MemberLiteralPsi {
-        public ValueLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class FunctionLiteralPsi extends MemberLiteralPsi {
-        public FunctionLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ModuleLiteralPsi extends MetaLiteralPsi {
-        public ModuleLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class PackageLiteralPsi extends MetaLiteralPsi {
-        public PackageLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DynamicModifierPsi extends TypePsi {
-        public DynamicModifierPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class LocalModifierPsi extends TypePsi {
-        public LocalModifierPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ValueModifierPsi extends LocalModifierPsi {
-        public ValueModifierPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class FunctionModifierPsi extends LocalModifierPsi {
-        public FunctionModifierPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SyntheticVariablePsi extends ValueModifierPsi {
-        public SyntheticVariablePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeArgumentsPsi extends CeylonCompositeElementImpl {
-        public TypeArgumentsPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TypeArgumentListPsi extends TypeArgumentsPsi {
-        public TypeArgumentListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InferredTypeArgumentsPsi extends TypeArgumentsPsi {
-        public InferredTypeArgumentsPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SequencedTypePsi extends TypePsi {
-        public SequencedTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DefaultedTypePsi extends TypePsi {
-        public DefaultedTypePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class DirectivePsi extends ExecutableStatementPsi {
-        public DirectivePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ReturnPsi extends DirectivePsi {
-        public ReturnPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ThrowPsi extends DirectivePsi {
-        public ThrowPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ContinuePsi extends DirectivePsi {
-        public ContinuePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class BreakPsi extends DirectivePsi {
-        public BreakPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class StatementOrArgumentPsi extends CeylonCompositeElementImpl {
-        public StatementOrArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class StatementPsi extends StatementOrArgumentPsi {
-        public StatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class CompilerAnnotationPsi extends CeylonCompositeElementImpl {
-        public CompilerAnnotationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ExecutableStatementPsi extends StatementPsi {
-        public ExecutableStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AssertionPsi extends ExecutableStatementPsi {
-        public AssertionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SpecifierStatementPsi extends ExecutableStatementPsi {
-        public SpecifierStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExpressionStatementPsi extends ExecutableStatementPsi {
-        public ExpressionStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ControlStatementPsi extends ExecutableStatementPsi {
-        public ControlStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ControlClausePsi extends CeylonCompositeElementImpl {
-        public ControlClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DynamicStatementPsi extends ControlStatementPsi {
-        public DynamicStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DynamicClausePsi extends ControlClausePsi {
-        public DynamicClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IfStatementPsi extends ControlStatementPsi {
-        public IfStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IfClausePsi extends ControlClausePsi {
-        public IfClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ElseClausePsi extends ControlClausePsi {
-        public ElseClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SwitchStatementPsi extends ControlStatementPsi {
-        public SwitchStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SwitchClausePsi extends CeylonCompositeElementImpl {
-        public SwitchClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SwitchCaseListPsi extends CeylonCompositeElementImpl {
-        public SwitchCaseListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class CaseClausePsi extends ControlClausePsi {
-        public CaseClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class CaseItemPsi extends CeylonCompositeElementImpl {
-        public CaseItemPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class MatchCasePsi extends CaseItemPsi {
-        public MatchCasePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IsCasePsi extends CaseItemPsi {
-        public IsCasePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SatisfiesCasePsi extends CaseItemPsi {
-        public SatisfiesCasePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TryCatchStatementPsi extends ControlStatementPsi {
-        public TryCatchStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TryClausePsi extends ControlClausePsi {
-        public TryClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class CatchClausePsi extends ControlClausePsi {
-        public CatchClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class FinallyClausePsi extends ControlClausePsi {
-        public FinallyClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ResourceListPsi extends CeylonCompositeElementImpl {
-        public ResourceListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ResourcePsi extends CeylonCompositeElementImpl {
-        public ResourcePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class CatchVariablePsi extends CeylonCompositeElementImpl {
-        public CatchVariablePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ForStatementPsi extends ControlStatementPsi {
-        public ForStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ForClausePsi extends ControlClausePsi {
-        public ForClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ForIteratorPsi extends StatementOrArgumentPsi {
-        public ForIteratorPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ValueIteratorPsi extends ForIteratorPsi {
-        public ValueIteratorPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class KeyValueIteratorPsi extends ForIteratorPsi {
-        public KeyValueIteratorPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class WhileStatementPsi extends ControlStatementPsi {
-        public WhileStatementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class WhileClausePsi extends ControlClausePsi {
-        public WhileClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ConditionListPsi extends CeylonCompositeElementImpl {
-        public ConditionListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ConditionPsi extends CeylonCompositeElementImpl {
-        public ConditionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class BooleanConditionPsi extends ConditionPsi {
-        public BooleanConditionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ExistsOrNonemptyConditionPsi extends ConditionPsi {
-        public ExistsOrNonemptyConditionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExistsConditionPsi extends ExistsOrNonemptyConditionPsi {
-        public ExistsConditionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class NonemptyConditionPsi extends ExistsOrNonemptyConditionPsi {
-        public NonemptyConditionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IsConditionPsi extends ConditionPsi {
-        public IsConditionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SatisfiesConditionPsi extends ConditionPsi {
-        public SatisfiesConditionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class VariablePsi extends TypedDeclarationPsi {
-        public VariablePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class TermPsi extends CeylonCompositeElementImpl {
-        public TermPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class OperatorExpressionPsi extends TermPsi {
-        public OperatorExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class BinaryOperatorExpressionPsi extends OperatorExpressionPsi {
-        public BinaryOperatorExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ArithmeticOpPsi extends BinaryOperatorExpressionPsi {
-        public ArithmeticOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SumOpPsi extends ArithmeticOpPsi {
-        public SumOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DifferenceOpPsi extends ArithmeticOpPsi {
-        public DifferenceOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ProductOpPsi extends ArithmeticOpPsi {
-        public ProductOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class QuotientOpPsi extends ArithmeticOpPsi {
-        public QuotientOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class PowerOpPsi extends ArithmeticOpPsi {
-        public PowerOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class RemainderOpPsi extends ArithmeticOpPsi {
-        public RemainderOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class AssignmentOpPsi extends BinaryOperatorExpressionPsi {
-        public AssignmentOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AssignOpPsi extends AssignmentOpPsi {
-        public AssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ArithmeticAssignmentOpPsi extends AssignmentOpPsi {
-        public ArithmeticAssignmentOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AddAssignOpPsi extends ArithmeticAssignmentOpPsi {
-        public AddAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SubtractAssignOpPsi extends ArithmeticAssignmentOpPsi {
-        public SubtractAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class MultiplyAssignOpPsi extends ArithmeticAssignmentOpPsi {
-        public MultiplyAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DivideAssignOpPsi extends ArithmeticAssignmentOpPsi {
-        public DivideAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class RemainderAssignOpPsi extends ArithmeticAssignmentOpPsi {
-        public RemainderAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class BitwiseAssignmentOpPsi extends AssignmentOpPsi {
-        public BitwiseAssignmentOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IntersectAssignOpPsi extends BitwiseAssignmentOpPsi {
-        public IntersectAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class UnionAssignOpPsi extends BitwiseAssignmentOpPsi {
-        public UnionAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class XorAssignOpPsi extends BitwiseAssignmentOpPsi {
-        public XorAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ComplementAssignOpPsi extends BitwiseAssignmentOpPsi {
-        public ComplementAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class LogicalAssignmentOpPsi extends AssignmentOpPsi {
-        public LogicalAssignmentOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AndAssignOpPsi extends LogicalAssignmentOpPsi {
-        public AndAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class OrAssignOpPsi extends LogicalAssignmentOpPsi {
-        public OrAssignOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class LogicalOpPsi extends BinaryOperatorExpressionPsi {
-        public LogicalOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AndOpPsi extends LogicalOpPsi {
-        public AndOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class OrOpPsi extends LogicalOpPsi {
-        public OrOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class BitwiseOpPsi extends BinaryOperatorExpressionPsi {
-        public BitwiseOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IntersectionOpPsi extends BitwiseOpPsi {
-        public IntersectionOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class UnionOpPsi extends BitwiseOpPsi {
-        public UnionOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class XorOpPsi extends BitwiseOpPsi {
-        public XorOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ComplementOpPsi extends BitwiseOpPsi {
-        public ComplementOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class EqualityOpPsi extends BinaryOperatorExpressionPsi {
-        public EqualityOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class EqualOpPsi extends EqualityOpPsi {
-        public EqualOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class NotEqualOpPsi extends EqualityOpPsi {
-        public NotEqualOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ComparisonOpPsi extends BinaryOperatorExpressionPsi {
-        public ComparisonOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class LargerOpPsi extends ComparisonOpPsi {
-        public LargerOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SmallerOpPsi extends ComparisonOpPsi {
-        public SmallerOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class LargeAsOpPsi extends ComparisonOpPsi {
-        public LargeAsOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SmallAsOpPsi extends ComparisonOpPsi {
-        public SmallAsOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ScaleOpPsi extends BinaryOperatorExpressionPsi {
-        public ScaleOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class BoundPsi extends TermPsi {
-        public BoundPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class OpenBoundPsi extends BoundPsi {
-        public OpenBoundPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ClosedBoundPsi extends BoundPsi {
-        public ClosedBoundPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class WithinOpPsi extends OperatorExpressionPsi {
-        public WithinOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DefaultOpPsi extends BinaryOperatorExpressionPsi {
-        public DefaultOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ThenOpPsi extends BinaryOperatorExpressionPsi {
-        public ThenOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IdenticalOpPsi extends BinaryOperatorExpressionPsi {
-        public IdenticalOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class EntryOpPsi extends BinaryOperatorExpressionPsi {
-        public EntryOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class RangeOpPsi extends BinaryOperatorExpressionPsi {
-        public RangeOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SegmentOpPsi extends BinaryOperatorExpressionPsi {
-        public SegmentOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class CompareOpPsi extends BinaryOperatorExpressionPsi {
-        public CompareOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InOpPsi extends BinaryOperatorExpressionPsi {
-        public InOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class UnaryOperatorExpressionPsi extends OperatorExpressionPsi {
-        public UnaryOperatorExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class NotOpPsi extends UnaryOperatorExpressionPsi {
-        public NotOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExistsPsi extends UnaryOperatorExpressionPsi {
-        public ExistsPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class NonemptyPsi extends UnaryOperatorExpressionPsi {
-        public NonemptyPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class NegativeOpPsi extends UnaryOperatorExpressionPsi {
-        public NegativeOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class PositiveOpPsi extends UnaryOperatorExpressionPsi {
-        public PositiveOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class TypeOperatorExpressionPsi extends UnaryOperatorExpressionPsi {
-        public TypeOperatorExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IsOpPsi extends TypeOperatorExpressionPsi {
-        public IsOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SatisfiesPsi extends TypeOperatorExpressionPsi {
-        public SatisfiesPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExtendsPsi extends TypeOperatorExpressionPsi {
-        public ExtendsPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class OfOpPsi extends TypeOperatorExpressionPsi {
-        public OfOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class PrefixOperatorExpressionPsi extends UnaryOperatorExpressionPsi {
-        public PrefixOperatorExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IncrementOpPsi extends PrefixOperatorExpressionPsi {
-        public IncrementOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DecrementOpPsi extends PrefixOperatorExpressionPsi {
-        public DecrementOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class PostfixOperatorExpressionPsi extends UnaryOperatorExpressionPsi {
-        public PostfixOperatorExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class PostfixIncrementOpPsi extends PostfixOperatorExpressionPsi {
-        public PostfixIncrementOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class PostfixDecrementOpPsi extends PostfixOperatorExpressionPsi {
-        public PostfixDecrementOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExpressionListPsi extends CeylonCompositeElementImpl {
-        public ExpressionListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExpressionPsi extends AtomPsi {
-        public ExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class PrimaryPsi extends TermPsi {
-        public PrimaryPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class PostfixExpressionPsi extends PrimaryPsi {
-        public PostfixExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InvocationExpressionPsi extends PostfixExpressionPsi {
-        public InvocationExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ParameterizedExpressionPsi extends PrimaryPsi {
-        public ParameterizedExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class MemberOrTypeExpressionPsi extends PrimaryPsi {
-        public MemberOrTypeExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExtendedTypeExpressionPsi extends MemberOrTypeExpressionPsi {
-        public ExtendedTypeExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class StaticMemberOrTypeExpressionPsi extends MemberOrTypeExpressionPsi {
-        public StaticMemberOrTypeExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class BaseMemberOrTypeExpressionPsi extends StaticMemberOrTypeExpressionPsi {
-        public BaseMemberOrTypeExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class BaseMemberExpressionPsi extends BaseMemberOrTypeExpressionPsi {
-        public BaseMemberExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class BaseTypeExpressionPsi extends BaseMemberOrTypeExpressionPsi {
-        public BaseTypeExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class QualifiedMemberOrTypeExpressionPsi extends StaticMemberOrTypeExpressionPsi {
-        public QualifiedMemberOrTypeExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class QualifiedMemberExpressionPsi extends QualifiedMemberOrTypeExpressionPsi {
-        public QualifiedMemberExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class QualifiedTypeExpressionPsi extends QualifiedMemberOrTypeExpressionPsi {
-        public QualifiedTypeExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class MemberOperatorPsi extends CeylonCompositeElementImpl {
-        public MemberOperatorPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class MemberOpPsi extends MemberOperatorPsi {
-        public MemberOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SafeMemberOpPsi extends MemberOperatorPsi {
-        public SafeMemberOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SpreadOpPsi extends MemberOperatorPsi {
-        public SpreadOpPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IndexExpressionPsi extends PostfixExpressionPsi {
-        public IndexExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ElementOrRangePsi extends CeylonCompositeElementImpl {
-        public ElementOrRangePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ElementPsi extends ElementOrRangePsi {
-        public ElementPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ElementRangePsi extends ElementOrRangePsi {
-        public ElementRangePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class OuterPsi extends AtomPsi {
-        public OuterPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class PackagePsi extends AtomPsi {
-        public PackagePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ArgumentListPsi extends CeylonCompositeElementImpl {
-        public ArgumentListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class NamedArgumentListPsi extends ArgumentListPsi {
-        public NamedArgumentListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SequencedArgumentPsi extends StatementOrArgumentPsi {
-        public SequencedArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class PositionalArgumentListPsi extends ArgumentListPsi {
-        public PositionalArgumentListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class PositionalArgumentPsi extends CeylonCompositeElementImpl {
-        public PositionalArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ListedArgumentPsi extends PositionalArgumentPsi {
-        public ListedArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SpreadArgumentPsi extends PositionalArgumentPsi {
-        public SpreadArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class FunctionArgumentPsi extends TermPsi {
-        public FunctionArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class NamedArgumentPsi extends StatementOrArgumentPsi {
-        public NamedArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SpecifiedArgumentPsi extends NamedArgumentPsi {
-        public SpecifiedArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class TypedArgumentPsi extends NamedArgumentPsi {
-        public TypedArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class MethodArgumentPsi extends TypedArgumentPsi {
-        public MethodArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AttributeArgumentPsi extends TypedArgumentPsi {
-        public AttributeArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ObjectArgumentPsi extends TypedArgumentPsi {
-        public ObjectArgumentPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class SpecifierOrInitializerExpressionPsi extends CeylonCompositeElementImpl {
-        public SpecifierOrInitializerExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SpecifierExpressionPsi extends SpecifierOrInitializerExpressionPsi {
-        public SpecifierExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class LazySpecifierExpressionPsi extends SpecifierExpressionPsi {
-        public LazySpecifierExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class InitializerExpressionPsi extends SpecifierOrInitializerExpressionPsi {
-        public InitializerExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class AtomPsi extends PrimaryPsi {
-        public AtomPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class LiteralPsi extends AtomPsi {
-        public LiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class NaturalLiteralPsi extends LiteralPsi {
-        public NaturalLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class FloatLiteralPsi extends LiteralPsi {
-        public FloatLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class CharLiteralPsi extends LiteralPsi {
-        public CharLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class StringLiteralPsi extends LiteralPsi {
-        public StringLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class QuotedLiteralPsi extends LiteralPsi {
-        public QuotedLiteralPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DocLinkPsi extends CeylonCompositeElementImpl {
-        public DocLinkPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class SelfExpressionPsi extends AtomPsi {
-        public SelfExpressionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ThisPsi extends SelfExpressionPsi {
-        public ThisPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SuperPsi extends SelfExpressionPsi {
-        public SuperPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class SequenceEnumerationPsi extends AtomPsi {
-        public SequenceEnumerationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class TuplePsi extends AtomPsi {
-        public TuplePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class DynamicPsi extends AtomPsi {
-        public DynamicPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class StringTemplatePsi extends AtomPsi {
-        public StringTemplatePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AnnotationPsi extends InvocationExpressionPsi {
-        public AnnotationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AnonymousAnnotationPsi extends CeylonCompositeElementImpl {
-        public AnonymousAnnotationPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class AnnotationListPsi extends CeylonCompositeElementImpl {
-        public AnnotationListPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IdentifierPsi extends CeylonCompositeElementImpl {
-        public IdentifierPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ComprehensionPsi extends PositionalArgumentPsi {
-        public ComprehensionPsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static abstract class ComprehensionClausePsi extends ControlClausePsi {
-        public ComprehensionClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ExpressionComprehensionClausePsi extends ComprehensionClausePsi {
-        public ExpressionComprehensionClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class ForComprehensionClausePsi extends ComprehensionClausePsi {
-        public ForComprehensionClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
-    public static class IfComprehensionClausePsi extends ComprehensionClausePsi {
-        public IfComprehensionClausePsi(ASTNode astNode) {
-            super(astNode);
-        }
-    }
-
+    public static interface CompilationUnitPsi extends CeylonCompositeElement {} ;
+    public static interface ModuleDescriptorPsi extends StatementOrArgumentPsi {} ;
+    public static interface PackageDescriptorPsi extends StatementOrArgumentPsi {} ;
+    public static interface ImportModuleListPsi extends CeylonCompositeElement {} ;
+    public static interface ImportModulePsi extends StatementOrArgumentPsi {} ;
+    public static interface ImportListPsi extends CeylonCompositeElement {} ;
+    public static interface ImportPsi extends StatementOrArgumentPsi {} ;
+    public static interface ImportPathPsi extends CeylonCompositeElement {} ;
+    public static interface ImportMemberOrTypeListPsi extends CeylonCompositeElement {} ;
+    public static interface ImportMemberOrTypePsi extends StatementOrArgumentPsi {} ;
+    public static interface ImportMemberPsi extends ImportMemberOrTypePsi {} ;
+    public static interface ImportTypePsi extends ImportMemberOrTypePsi {} ;
+    public static interface AliasPsi extends CeylonCompositeElement {} ;
+    public static interface ImportWildcardPsi extends CeylonCompositeElement {} ;
+    public static interface DeclarationPsi extends StatementPsi {} ;
+    public static interface MissingDeclarationPsi extends DeclarationPsi {} ;
+    public static interface TypeDeclarationPsi extends DeclarationPsi {} ;
+    public static interface ClassOrInterfacePsi extends TypeDeclarationPsi {} ;
+    public static interface TypeAliasDeclarationPsi extends TypeDeclarationPsi {} ;
+    public static interface SatisfiedTypesPsi extends CeylonCompositeElement {} ;
+    public static interface AbstractedTypePsi extends CeylonCompositeElement {} ;
+    public static interface AdaptedTypesPsi extends CeylonCompositeElement {} ;
+    public static interface CaseTypesPsi extends CeylonCompositeElement {} ;
+    public static interface ExtendedTypePsi extends CeylonCompositeElement {} ;
+    public static interface TypeConstraintListPsi extends CeylonCompositeElement {} ;
+    public static interface TypeConstraintPsi extends TypeDeclarationPsi {} ;
+    public static interface TypeSpecifierPsi extends CeylonCompositeElement {} ;
+    public static interface DefaultTypeArgumentPsi extends TypeSpecifierPsi {} ;
+    public static interface ClassSpecifierPsi extends CeylonCompositeElement {} ;
+    public static interface AnyClassPsi extends ClassOrInterfacePsi {} ;
+    public static interface ClassDefinitionPsi extends AnyClassPsi {} ;
+    public static interface ClassDeclarationPsi extends AnyClassPsi {} ;
+    public static interface AnyInterfacePsi extends ClassOrInterfacePsi {} ;
+    public static interface InterfaceDefinitionPsi extends AnyInterfacePsi {} ;
+    public static interface InterfaceDeclarationPsi extends AnyInterfacePsi {} ;
+    public static interface TypedDeclarationPsi extends DeclarationPsi {} ;
+    public static interface AnyAttributePsi extends TypedDeclarationPsi {} ;
+    public static interface AttributeDeclarationPsi extends AnyAttributePsi {} ;
+    public static interface AttributeGetterDefinitionPsi extends AnyAttributePsi {} ;
+    public static interface AttributeSetterDefinitionPsi extends TypedDeclarationPsi {} ;
+    public static interface AnyMethodPsi extends TypedDeclarationPsi {} ;
+    public static interface MethodDefinitionPsi extends AnyMethodPsi {} ;
+    public static interface MethodDeclarationPsi extends AnyMethodPsi {} ;
+    public static interface VoidModifierPsi extends TypePsi {} ;
+    public static interface ObjectDefinitionPsi extends TypedDeclarationPsi {} ;
+    public static interface ParameterListPsi extends CeylonCompositeElement {} ;
+    public static interface ParameterPsi extends CeylonCompositeElement {} ;
+    public static interface ParameterDeclarationPsi extends ParameterPsi {} ;
+    public static interface ValueParameterDeclarationPsi extends ParameterDeclarationPsi {} ;
+    public static interface FunctionalParameterDeclarationPsi extends ParameterDeclarationPsi {} ;
+    public static interface InitializerParameterPsi extends ParameterPsi {} ;
+    public static interface TypeParameterListPsi extends CeylonCompositeElement {} ;
+    public static interface TypeParameterDeclarationPsi extends DeclarationPsi {} ;
+    public static interface TypeVariancePsi extends CeylonCompositeElement {} ;
+    public static interface BodyPsi extends CeylonCompositeElement {} ;
+    public static interface BlockPsi extends BodyPsi {} ;
+    public static interface ClassBodyPsi extends BodyPsi {} ;
+    public static interface InterfaceBodyPsi extends BodyPsi {} ;
+    public static interface TypePsi extends CeylonCompositeElement {} ;
+    public static interface StaticTypePsi extends TypePsi {} ;
+    public static interface SimpleTypePsi extends StaticTypePsi {} ;
+    public static interface BaseTypePsi extends SimpleTypePsi {} ;
+    public static interface UnionTypePsi extends StaticTypePsi {} ;
+    public static interface IntersectionTypePsi extends StaticTypePsi {} ;
+    public static interface SequenceTypePsi extends StaticTypePsi {} ;
+    public static interface IterableTypePsi extends StaticTypePsi {} ;
+    public static interface OptionalTypePsi extends StaticTypePsi {} ;
+    public static interface TupleTypePsi extends StaticTypePsi {} ;
+    public static interface FunctionTypePsi extends StaticTypePsi {} ;
+    public static interface EntryTypePsi extends StaticTypePsi {} ;
+    public static interface QualifiedTypePsi extends SimpleTypePsi {} ;
+    public static interface SuperTypePsi extends StaticTypePsi {} ;
+    public static interface MetaLiteralPsi extends PrimaryPsi {} ;
+    public static interface TypeLiteralPsi extends MetaLiteralPsi {} ;
+    public static interface MemberLiteralPsi extends MetaLiteralPsi {} ;
+    public static interface ClassLiteralPsi extends TypeLiteralPsi {} ;
+    public static interface InterfaceLiteralPsi extends TypeLiteralPsi {} ;
+    public static interface AliasLiteralPsi extends TypeLiteralPsi {} ;
+    public static interface TypeParameterLiteralPsi extends TypeLiteralPsi {} ;
+    public static interface ValueLiteralPsi extends MemberLiteralPsi {} ;
+    public static interface FunctionLiteralPsi extends MemberLiteralPsi {} ;
+    public static interface ModuleLiteralPsi extends MetaLiteralPsi {} ;
+    public static interface PackageLiteralPsi extends MetaLiteralPsi {} ;
+    public static interface DynamicModifierPsi extends TypePsi {} ;
+    public static interface LocalModifierPsi extends TypePsi {} ;
+    public static interface ValueModifierPsi extends LocalModifierPsi {} ;
+    public static interface FunctionModifierPsi extends LocalModifierPsi {} ;
+    public static interface SyntheticVariablePsi extends ValueModifierPsi {} ;
+    public static interface TypeArgumentsPsi extends CeylonCompositeElement {} ;
+    public static interface TypeArgumentListPsi extends TypeArgumentsPsi {} ;
+    public static interface InferredTypeArgumentsPsi extends TypeArgumentsPsi {} ;
+    public static interface SequencedTypePsi extends TypePsi {} ;
+    public static interface DefaultedTypePsi extends TypePsi {} ;
+    public static interface DirectivePsi extends ExecutableStatementPsi {} ;
+    public static interface ReturnPsi extends DirectivePsi {} ;
+    public static interface ThrowPsi extends DirectivePsi {} ;
+    public static interface ContinuePsi extends DirectivePsi {} ;
+    public static interface BreakPsi extends DirectivePsi {} ;
+    public static interface StatementOrArgumentPsi extends CeylonCompositeElement {} ;
+    public static interface StatementPsi extends StatementOrArgumentPsi {} ;
+    public static interface CompilerAnnotationPsi extends CeylonCompositeElement {} ;
+    public static interface ExecutableStatementPsi extends StatementPsi {} ;
+    public static interface AssertionPsi extends ExecutableStatementPsi {} ;
+    public static interface SpecifierStatementPsi extends ExecutableStatementPsi {} ;
+    public static interface ExpressionStatementPsi extends ExecutableStatementPsi {} ;
+    public static interface ControlStatementPsi extends ExecutableStatementPsi {} ;
+    public static interface ControlClausePsi extends CeylonCompositeElement {} ;
+    public static interface DynamicStatementPsi extends ControlStatementPsi {} ;
+    public static interface DynamicClausePsi extends ControlClausePsi {} ;
+    public static interface IfStatementPsi extends ControlStatementPsi {} ;
+    public static interface IfClausePsi extends ControlClausePsi {} ;
+    public static interface ElseClausePsi extends ControlClausePsi {} ;
+    public static interface SwitchStatementPsi extends ControlStatementPsi {} ;
+    public static interface SwitchClausePsi extends CeylonCompositeElement {} ;
+    public static interface SwitchCaseListPsi extends CeylonCompositeElement {} ;
+    public static interface CaseClausePsi extends ControlClausePsi {} ;
+    public static interface CaseItemPsi extends CeylonCompositeElement {} ;
+    public static interface MatchCasePsi extends CaseItemPsi {} ;
+    public static interface IsCasePsi extends CaseItemPsi {} ;
+    public static interface SatisfiesCasePsi extends CaseItemPsi {} ;
+    public static interface TryCatchStatementPsi extends ControlStatementPsi {} ;
+    public static interface TryClausePsi extends ControlClausePsi {} ;
+    public static interface CatchClausePsi extends ControlClausePsi {} ;
+    public static interface FinallyClausePsi extends ControlClausePsi {} ;
+    public static interface ResourceListPsi extends CeylonCompositeElement {} ;
+    public static interface ResourcePsi extends CeylonCompositeElement {} ;
+    public static interface CatchVariablePsi extends CeylonCompositeElement {} ;
+    public static interface ForStatementPsi extends ControlStatementPsi {} ;
+    public static interface ForClausePsi extends ControlClausePsi {} ;
+    public static interface ForIteratorPsi extends StatementOrArgumentPsi {} ;
+    public static interface ValueIteratorPsi extends ForIteratorPsi {} ;
+    public static interface KeyValueIteratorPsi extends ForIteratorPsi {} ;
+    public static interface WhileStatementPsi extends ControlStatementPsi {} ;
+    public static interface WhileClausePsi extends ControlClausePsi {} ;
+    public static interface ConditionListPsi extends CeylonCompositeElement {} ;
+    public static interface ConditionPsi extends CeylonCompositeElement {} ;
+    public static interface BooleanConditionPsi extends ConditionPsi {} ;
+    public static interface ExistsOrNonemptyConditionPsi extends ConditionPsi {} ;
+    public static interface ExistsConditionPsi extends ExistsOrNonemptyConditionPsi {} ;
+    public static interface NonemptyConditionPsi extends ExistsOrNonemptyConditionPsi {} ;
+    public static interface IsConditionPsi extends ConditionPsi {} ;
+    public static interface SatisfiesConditionPsi extends ConditionPsi {} ;
+    public static interface VariablePsi extends TypedDeclarationPsi {} ;
+    public static interface TermPsi extends CeylonCompositeElement {} ;
+    public static interface OperatorExpressionPsi extends TermPsi {} ;
+    public static interface BinaryOperatorExpressionPsi extends OperatorExpressionPsi {} ;
+    public static interface ArithmeticOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface SumOpPsi extends ArithmeticOpPsi {} ;
+    public static interface DifferenceOpPsi extends ArithmeticOpPsi {} ;
+    public static interface ProductOpPsi extends ArithmeticOpPsi {} ;
+    public static interface QuotientOpPsi extends ArithmeticOpPsi {} ;
+    public static interface PowerOpPsi extends ArithmeticOpPsi {} ;
+    public static interface RemainderOpPsi extends ArithmeticOpPsi {} ;
+    public static interface AssignmentOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface AssignOpPsi extends AssignmentOpPsi {} ;
+    public static interface ArithmeticAssignmentOpPsi extends AssignmentOpPsi {} ;
+    public static interface AddAssignOpPsi extends ArithmeticAssignmentOpPsi {} ;
+    public static interface SubtractAssignOpPsi extends ArithmeticAssignmentOpPsi {} ;
+    public static interface MultiplyAssignOpPsi extends ArithmeticAssignmentOpPsi {} ;
+    public static interface DivideAssignOpPsi extends ArithmeticAssignmentOpPsi {} ;
+    public static interface RemainderAssignOpPsi extends ArithmeticAssignmentOpPsi {} ;
+    public static interface BitwiseAssignmentOpPsi extends AssignmentOpPsi {} ;
+    public static interface IntersectAssignOpPsi extends BitwiseAssignmentOpPsi {} ;
+    public static interface UnionAssignOpPsi extends BitwiseAssignmentOpPsi {} ;
+    public static interface XorAssignOpPsi extends BitwiseAssignmentOpPsi {} ;
+    public static interface ComplementAssignOpPsi extends BitwiseAssignmentOpPsi {} ;
+    public static interface LogicalAssignmentOpPsi extends AssignmentOpPsi {} ;
+    public static interface AndAssignOpPsi extends LogicalAssignmentOpPsi {} ;
+    public static interface OrAssignOpPsi extends LogicalAssignmentOpPsi {} ;
+    public static interface LogicalOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface AndOpPsi extends LogicalOpPsi {} ;
+    public static interface OrOpPsi extends LogicalOpPsi {} ;
+    public static interface BitwiseOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface IntersectionOpPsi extends BitwiseOpPsi {} ;
+    public static interface UnionOpPsi extends BitwiseOpPsi {} ;
+    public static interface XorOpPsi extends BitwiseOpPsi {} ;
+    public static interface ComplementOpPsi extends BitwiseOpPsi {} ;
+    public static interface EqualityOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface EqualOpPsi extends EqualityOpPsi {} ;
+    public static interface NotEqualOpPsi extends EqualityOpPsi {} ;
+    public static interface ComparisonOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface LargerOpPsi extends ComparisonOpPsi {} ;
+    public static interface SmallerOpPsi extends ComparisonOpPsi {} ;
+    public static interface LargeAsOpPsi extends ComparisonOpPsi {} ;
+    public static interface SmallAsOpPsi extends ComparisonOpPsi {} ;
+    public static interface ScaleOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface BoundPsi extends TermPsi {} ;
+    public static interface OpenBoundPsi extends BoundPsi {} ;
+    public static interface ClosedBoundPsi extends BoundPsi {} ;
+    public static interface WithinOpPsi extends OperatorExpressionPsi {} ;
+    public static interface DefaultOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface ThenOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface IdenticalOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface EntryOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface RangeOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface SegmentOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface CompareOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface InOpPsi extends BinaryOperatorExpressionPsi {} ;
+    public static interface UnaryOperatorExpressionPsi extends OperatorExpressionPsi {} ;
+    public static interface NotOpPsi extends UnaryOperatorExpressionPsi {} ;
+    public static interface ExistsPsi extends UnaryOperatorExpressionPsi {} ;
+    public static interface NonemptyPsi extends UnaryOperatorExpressionPsi {} ;
+    public static interface NegativeOpPsi extends UnaryOperatorExpressionPsi {} ;
+    public static interface PositiveOpPsi extends UnaryOperatorExpressionPsi {} ;
+    public static interface TypeOperatorExpressionPsi extends UnaryOperatorExpressionPsi {} ;
+    public static interface IsOpPsi extends TypeOperatorExpressionPsi {} ;
+    public static interface SatisfiesPsi extends TypeOperatorExpressionPsi {} ;
+    public static interface ExtendsPsi extends TypeOperatorExpressionPsi {} ;
+    public static interface OfOpPsi extends TypeOperatorExpressionPsi {} ;
+    public static interface PrefixOperatorExpressionPsi extends UnaryOperatorExpressionPsi {} ;
+    public static interface IncrementOpPsi extends PrefixOperatorExpressionPsi {} ;
+    public static interface DecrementOpPsi extends PrefixOperatorExpressionPsi {} ;
+    public static interface PostfixOperatorExpressionPsi extends UnaryOperatorExpressionPsi {} ;
+    public static interface PostfixIncrementOpPsi extends PostfixOperatorExpressionPsi {} ;
+    public static interface PostfixDecrementOpPsi extends PostfixOperatorExpressionPsi {} ;
+    public static interface ExpressionListPsi extends CeylonCompositeElement {} ;
+    public static interface ExpressionPsi extends AtomPsi {} ;
+    public static interface PrimaryPsi extends TermPsi {} ;
+    public static interface PostfixExpressionPsi extends PrimaryPsi {} ;
+    public static interface InvocationExpressionPsi extends PostfixExpressionPsi {} ;
+    public static interface ParameterizedExpressionPsi extends PrimaryPsi {} ;
+    public static interface MemberOrTypeExpressionPsi extends PrimaryPsi {} ;
+    public static interface ExtendedTypeExpressionPsi extends MemberOrTypeExpressionPsi {} ;
+    public static interface StaticMemberOrTypeExpressionPsi extends MemberOrTypeExpressionPsi {} ;
+    public static interface BaseMemberOrTypeExpressionPsi extends StaticMemberOrTypeExpressionPsi {} ;
+    public static interface BaseMemberExpressionPsi extends BaseMemberOrTypeExpressionPsi {} ;
+    public static interface BaseTypeExpressionPsi extends BaseMemberOrTypeExpressionPsi {} ;
+    public static interface QualifiedMemberOrTypeExpressionPsi extends StaticMemberOrTypeExpressionPsi {} ;
+    public static interface QualifiedMemberExpressionPsi extends QualifiedMemberOrTypeExpressionPsi {} ;
+    public static interface QualifiedTypeExpressionPsi extends QualifiedMemberOrTypeExpressionPsi {} ;
+    public static interface MemberOperatorPsi extends CeylonCompositeElement {} ;
+    public static interface MemberOpPsi extends MemberOperatorPsi {} ;
+    public static interface SafeMemberOpPsi extends MemberOperatorPsi {} ;
+    public static interface SpreadOpPsi extends MemberOperatorPsi {} ;
+    public static interface IndexExpressionPsi extends PostfixExpressionPsi {} ;
+    public static interface ElementOrRangePsi extends CeylonCompositeElement {} ;
+    public static interface ElementPsi extends ElementOrRangePsi {} ;
+    public static interface ElementRangePsi extends ElementOrRangePsi {} ;
+    public static interface OuterPsi extends AtomPsi {} ;
+    public static interface PackagePsi extends AtomPsi {} ;
+    public static interface ArgumentListPsi extends CeylonCompositeElement {} ;
+    public static interface NamedArgumentListPsi extends ArgumentListPsi {} ;
+    public static interface SequencedArgumentPsi extends StatementOrArgumentPsi {} ;
+    public static interface PositionalArgumentListPsi extends ArgumentListPsi {} ;
+    public static interface PositionalArgumentPsi extends CeylonCompositeElement {} ;
+    public static interface ListedArgumentPsi extends PositionalArgumentPsi {} ;
+    public static interface SpreadArgumentPsi extends PositionalArgumentPsi {} ;
+    public static interface FunctionArgumentPsi extends TermPsi {} ;
+    public static interface NamedArgumentPsi extends StatementOrArgumentPsi {} ;
+    public static interface SpecifiedArgumentPsi extends NamedArgumentPsi {} ;
+    public static interface TypedArgumentPsi extends NamedArgumentPsi {} ;
+    public static interface MethodArgumentPsi extends TypedArgumentPsi {} ;
+    public static interface AttributeArgumentPsi extends TypedArgumentPsi {} ;
+    public static interface ObjectArgumentPsi extends TypedArgumentPsi {} ;
+    public static interface SpecifierOrInitializerExpressionPsi extends CeylonCompositeElement {} ;
+    public static interface SpecifierExpressionPsi extends SpecifierOrInitializerExpressionPsi {} ;
+    public static interface LazySpecifierExpressionPsi extends SpecifierExpressionPsi {} ;
+    public static interface InitializerExpressionPsi extends SpecifierOrInitializerExpressionPsi {} ;
+    public static interface AtomPsi extends PrimaryPsi {} ;
+    public static interface LiteralPsi extends AtomPsi {} ;
+    public static interface NaturalLiteralPsi extends LiteralPsi {} ;
+    public static interface FloatLiteralPsi extends LiteralPsi {} ;
+    public static interface CharLiteralPsi extends LiteralPsi {} ;
+    public static interface StringLiteralPsi extends LiteralPsi {} ;
+    public static interface QuotedLiteralPsi extends LiteralPsi {} ;
+    public static interface DocLinkPsi extends CeylonCompositeElement {} ;
+    public static interface SelfExpressionPsi extends AtomPsi {} ;
+    public static interface ThisPsi extends SelfExpressionPsi {} ;
+    public static interface SuperPsi extends SelfExpressionPsi {} ;
+    public static interface SequenceEnumerationPsi extends AtomPsi {} ;
+    public static interface TuplePsi extends AtomPsi {} ;
+    public static interface DynamicPsi extends AtomPsi {} ;
+    public static interface StringTemplatePsi extends AtomPsi {} ;
+    public static interface AnnotationPsi extends InvocationExpressionPsi {} ;
+    public static interface AnonymousAnnotationPsi extends CeylonCompositeElement {} ;
+    public static interface AnnotationListPsi extends CeylonCompositeElement {} ;
+    public static interface IdentifierPsi extends CeylonCompositeElement {} ;
+    public static interface ComprehensionPsi extends PositionalArgumentPsi {} ;
+    public static interface ComprehensionClausePsi extends ControlClausePsi {} ;
+    public static interface ExpressionComprehensionClausePsi extends ComprehensionClausePsi {} ;
+    public static interface ForComprehensionClausePsi extends ComprehensionClausePsi {} ;
+    public static interface IfComprehensionClausePsi extends ComprehensionClausePsi {} ;
 }
