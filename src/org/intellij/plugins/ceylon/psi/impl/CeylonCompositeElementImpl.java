@@ -5,6 +5,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProviders;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
 import org.intellij.plugins.ceylon.psi.CeylonCompositeElement;
 
 public class CeylonCompositeElementImpl extends ASTWrapperPsiElement implements CeylonCompositeElement {
@@ -12,7 +13,7 @@ public class CeylonCompositeElementImpl extends ASTWrapperPsiElement implements 
     private Node ceylonNode;
 
     public CeylonCompositeElementImpl(ASTNode node) {
-        this(node, null);
+        this(node, node.getUserData(CeylonIdeaParser.CEYLON_NODE_KEY));
     }
 
     public CeylonCompositeElementImpl(ASTNode node, Node ceylonNode) {

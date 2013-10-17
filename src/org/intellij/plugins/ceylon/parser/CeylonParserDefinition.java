@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
+import org.intellij.plugins.ceylon.psi.CeylonPsiFactory;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.psi.TokenTypes;
 import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
@@ -57,8 +58,7 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public PsiElement createElement(ASTNode node) {
-        return new CeylonCompositeElementImpl(node, node.getUserData(CeylonIdeaParser.CEYLON_NODE_KEY));
-//        return CeylonTypes.Factory.createElement(node);
+        return CeylonPsiFactory.createElement(node);
     }
 
     @Override
