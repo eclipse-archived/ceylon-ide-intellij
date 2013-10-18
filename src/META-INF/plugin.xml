@@ -35,6 +35,8 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <lang.documentationProvider implementationClass="org.intellij.plugins.ceylon.doc.CeylonDocProvider" language="Ceylon"/>
+
         <fileTypeFactory implementation="org.intellij.plugins.ceylon.CeylonFileTypeFactory"/>
         <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.parser.CeylonParserDefinition"/>
 
