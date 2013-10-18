@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 
+import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,8 +18,6 @@ import java.util.List;
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 
 public class CeylonFoldingBuilder extends FoldingBuilderEx {
-    private static final List<IElementType> blockTypes = Arrays.asList(
-            TYPE, ABSTRACTED_TYPE, ANY_CLASS, ANY_INTERFACE, ANY_METHOD, FOR_STATEMENT, SWITCH_STATEMENT, IF_STATEMENT, IMPORT_LIST);
 
     @NotNull
     @Override
@@ -31,7 +30,7 @@ public class CeylonFoldingBuilder extends FoldingBuilderEx {
     }
 
     private void appendDescriptors(PsiElement root, List<FoldingDescriptor> descriptors) {
-        if (blockTypes.contains(root.getNode().getElementType())) {
+        if (root instanceof CeylonPsi.BodyPsi) {
             descriptors.add(new FoldingDescriptor(root.getNode(), root.getTextRange()));
         }
 
