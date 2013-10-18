@@ -13,6 +13,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizable;
 import com.intellij.openapi.util.WriteExternalException;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @State(
@@ -29,13 +30,14 @@ public class CeylonSdkAdditionalData implements ValidatableSdkAdditionalData, JD
 
     }
 
-    public CeylonSdkAdditionalData(Sdk sdk) {
+    public CeylonSdkAdditionalData(Sdk sdk, String ceylonVersion) {
         myOptions.myJavaSdk = sdk;
+        myOptions.myCeylonVersion = ceylonVersion;
     }
 
     @SuppressWarnings("CloneDoesntCallSuperClone")
     public Object clone() throws CloneNotSupportedException {
-        return new CeylonSdkAdditionalData(myOptions.myJavaSdk);
+        return new CeylonSdkAdditionalData(myOptions.myJavaSdk, myOptions.myCeylonVersion);
     }
 
     public Sdk getJavaSdk() {
@@ -44,6 +46,10 @@ public class CeylonSdkAdditionalData implements ValidatableSdkAdditionalData, JD
 
     public void setJavaSdk(Sdk sdk) {
         myOptions.myJavaSdk = sdk;
+    }
+
+    public String getCeylonVersion() {
+        return myOptions.myCeylonVersion;
     }
 
     @Override
@@ -55,6 +61,7 @@ public class CeylonSdkAdditionalData implements ValidatableSdkAdditionalData, JD
                 myOptions.myJavaSdk = sdk;
             }
         }
+        myOptions.myCeylonVersion = element.getAttributeValue("ceylonVersion");
     }
 
     @Override
@@ -64,11 +71,15 @@ public class CeylonSdkAdditionalData implements ValidatableSdkAdditionalData, JD
         if (javaSdk != null) {
             element.setAttribute("sdk", javaSdk.getName());
         }
+        element.setAttribute("ceylonVersion", myOptions.myCeylonVersion);
     }
 
     public static class CeylonSdkOptions {
         @Nullable
         private Sdk myJavaSdk;
+
+        @NotNull
+        private String myCeylonVersion;
     }
 
     @Override

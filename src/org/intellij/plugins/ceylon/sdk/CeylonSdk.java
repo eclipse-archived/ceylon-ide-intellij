@@ -1,7 +1,5 @@
 package org.intellij.plugins.ceylon.sdk;
 
-import com.google.common.io.Files;
-import com.google.common.io.LineProcessor;
 import com.intellij.openapi.projectRoots.*;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.ui.Messages;
@@ -15,12 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CeylonSdk extends SdkType implements JavaSdkType {
+
+    private String version;
 
     public CeylonSdk() {
         super("Ceylon SDK");
@@ -46,32 +44,8 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
     @Nullable
     @Override
     public String getVersionString(String sdkHome) {
-        File cpSh = new File(sdkHome, "bin/ceylon-cp.sh");
-
-        if (cpSh.exists()) {
-            try {
-                return Files.readLines(cpSh, Charset.defaultCharset(), new LineProcessor<String>() {
-                    private String version;
-
-                    @Override
-                    public boolean processLine(String s) throws IOException {
-                        if (s.startsWith("CEYLON_VERSION=")) {
-                            version = s.substring(s.indexOf('=') + 1);
-                            return false;
-                        }
-                        return true;
-                    }
-
-                    @Override
-                    public String getResult() {
-                        return version == null ? null : version;
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        // TODO that's not nice at all :(
+        return version;
     }
 
     @Nullable
@@ -94,11 +68,14 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
         } catch (InvalidDataException e) {
             e.printStackTrace();
         }
+
+        version = additionalData.getCeylonVersion();
+
         return additionalData;
     }
 
     @Override
-    public void saveAdditionalData(SdkAdditionalData additionalData, Element additional) {
+    public void saveAdditionalData(@NotNull SdkAdditionalData additionalData, @NotNull Element additional) {
         if (additionalData instanceof CeylonSdkAdditionalData) {
             try {
                 ((CeylonSdkAdditionalData) additionalData).writeExternal(additional);
@@ -141,24 +118,37 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
 
     @Override
     public boolean setupSdkPaths(final Sdk sdk, final SdkModel sdkModel) {
-        final List<String> javaSdks = new ArrayList<String>();
-        final Sdk[] sdks = sdkModel.getSdks();
-        for (Sdk jdk : sdks) {
-            if (isValidInternalJdk(jdk)) {
-                javaSdks.add(jdk.getName());
-            }
-        }
-        final int choice = Messages.showChooseDialog("Select Java SDK to be used as the internal platform", "Select Internal Java Platform",
-                ArrayUtil.toStringArray(javaSdks), javaSdks.get(0), Messages.getQuestionIcon());
+        version = chooseCeylonVersion(sdk);
 
-        SdkModificator sdkModificator = sdk.getSdkModificator();
-
-        if (choice == -1) {
+        if (version == null) {
+            Messages.showErrorDialog("Could not find any suitable Ceylon language version", "Cannot Set Up SDK");
             return false;
         }
 
-        sdkModificator.setSdkAdditionalData(new CeylonSdkAdditionalData(sdkModel.findSdk(javaSdks.get(choice))));
+        String jdkVersion = chooseJdkVersion(sdkModel);
 
+        if (jdkVersion == null) {
+            Messages.showErrorDialog("Could not find any suitable JDK", "Cannot Set Up SDK");
+            return false;
+        }
+
+        SdkModificator sdkModificator = sdk.getSdkModificator();
+
+        sdkModificator.setSdkAdditionalData(new CeylonSdkAdditionalData(sdkModel.findSdk(jdkVersion), version));
+
+        addCeylonLibraries(sdk, sdkModificator);
+
+        sdkModificator.commitChanges();
+
+        return true;
+    }
+
+    /**
+     * Adds vital ceylon jar/car files to the classpath.
+     * @param sdk the ceylon SDK
+     * @param sdkModificator the SDK modificator
+     */
+    private void addCeylonLibraries(Sdk sdk, SdkModificator sdkModificator) {
         VirtualFile homeDirectory = sdk.getHomeDirectory();
 
         if (homeDirectory != null) {
@@ -179,15 +169,72 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
             addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.module-resolver", "jar");
             addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.typechecker", "jar");
         }
-
-        sdkModificator.commitChanges();
-
-        return true;
     }
 
+    /**
+     * Asks the user to choose which Java SDK to use for this Ceylon SDK.
+     * @param sdkModel the ceylon SDK
+     * @return the Java SDK name to use
+     */
+    private String chooseJdkVersion(SdkModel sdkModel) {
+        final List<String> javaSdks = new ArrayList<String>();
+        final Sdk[] sdks = sdkModel.getSdks();
+        for (Sdk jdk : sdks) {
+            if (isValidInternalJdk(jdk)) {
+                javaSdks.add(jdk.getName());
+            }
+        }
+        final int choice = Messages.showChooseDialog("Select Java SDK to be used as the internal platform", "Select Internal Java Platform",
+                ArrayUtil.toStringArray(javaSdks), javaSdks.get(0), Messages.getQuestionIcon());
+
+        if (choice == -1) {
+            return null;
+        }
+
+        return javaSdks.get(choice);
+    }
+
+    /**
+     * Asks the user to choose a  Ceylon language version to use for this SDK (from repo/ceylon/language/xxx).
+     *
+     * @param sdk the ceylon SDK
+     * @return the Ceylon language version to use
+     */
+    private String chooseCeylonVersion(Sdk sdk) {
+        if (sdk.getHomeDirectory() == null) {
+            return null;
+        }
+        VirtualFile languageDirectory = sdk.getHomeDirectory().findFileByRelativePath("repo/ceylon/language");
+
+        if (languageDirectory == null || !languageDirectory.exists()) {
+            return null;
+        }
+
+        List<String> versions = new ArrayList<String>();
+
+        for (VirtualFile child : languageDirectory.getChildren()) {
+            if (child.isDirectory()) {
+                versions.add(child.getName());
+            }
+        }
+
+        final int choice = Messages.showChooseDialog("Select a Ceylon language version to use", "Select Ceylon Version",
+                ArrayUtil.toStringArray(versions), versions.get(0), Messages.getQuestionIcon());
+
+        return versions.get(choice);
+    }
+
+    /**
+     * Adds a jar/car file from the Ceylon repository to the SDK's classpath.
+     * @param sdk the ceylon SDK being configured
+     * @param homeDirectory the SDK's base directory
+     * @param sdkModificator the SDK modificator
+     * @param jarName the jar to add to the classpath
+     * @param extension the file extension (car or jar)
+     */
     private void addJarFromRepo(Sdk sdk, @NotNull VirtualFile homeDirectory, SdkModificator sdkModificator, String jarName, String extension) {
         VirtualFile file = homeDirectory.findFileByRelativePath(
-                String.format("repo/%s/%s/%s-%s.%s", jarName.replace('.', '/'), sdk.getVersionString(), jarName, sdk.getVersionString(), extension));
+                String.format("repo/%s/%s/%s-%s.%s", jarName.replace('.', '/'), version, jarName, sdk.getVersionString(), extension));
 
         if (file != null) {
             VirtualFile jar = JarFileSystem.getInstance().findFileByPath(file.getPath() + JarFileSystem.JAR_SEPARATOR);
@@ -195,6 +242,11 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
         }
     }
 
+    /**
+     * Checks if the given SDK is suitable to be the Java SDK used by the Ceylon SDK (JDK 7+).
+     * @param jdk the SDK to test
+     * @return true if {@code sdk} is suitable
+     */
     private boolean isValidInternalJdk(Sdk jdk) {
         return jdk.getSdkType() instanceof JavaSdkType && JavaSdk.getInstance().isOfVersionOrHigher(jdk, JavaSdkVersion.JDK_1_7);
     }

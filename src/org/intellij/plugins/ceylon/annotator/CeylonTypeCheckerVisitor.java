@@ -22,19 +22,35 @@ import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
+import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * A visitor that visits a compilation unit returned by {@link com.redhat.ceylon.compiler.typechecker.parser.CeylonParser}
+ * to highlight errors and warnings using an {@link com.intellij.lang.annotation.AnnotationHolder}.
+ */
 class CeylonTypeCheckerVisitor extends Visitor {
 
     private AnnotationHolder annotationHolder;
 
+    private static final int[] UNRESOLVED_REFERENCE_CODES = {100, 102};
+    /**
+     * Creates a new visitor that will report errors and warnings in {@code annotationHolder}.
+     *
+     * @param annotationHolder the receiver of the annotations
+     */
     public CeylonTypeCheckerVisitor(AnnotationHolder annotationHolder) {
         this.annotationHolder = annotationHolder;
     }
 
+    /**
+     * Inspects a PSI file using the type checker.
+     *
+     * @param file the file to inspect
+     */
     public void accept(@NotNull PsiFile file) {
         TypeCheckerManager manager = ServiceManager.getService(file.getProject(), TypeCheckerManager.class);
 
@@ -103,7 +119,7 @@ class CeylonTypeCheckerVisitor extends Visitor {
             if (error instanceof AnalysisError) {
                 Annotation annotation = annotationHolder.createErrorAnnotation(range, error.getMessage());
 
-                if (error.getCode() == 102) {
+                if (ArrayUtils.contains(UNRESOLVED_REFERENCE_CODES, error.getCode())) {
                     annotation.setHighlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL);
                 }
             } else if (error instanceof UsageWarning) {
