@@ -10,7 +10,8 @@ import org.antlr.runtime.RecognitionException;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
 
 
-// todo! delegate instead of overriding since CeylonParser methods are final
+// todo! Do something about overriding final methods
+// todo: Some CeylonParser methods have abstract return types; we construct concrete corresponding AST/Psi elements.
 public class MarkingCeylonParser extends CeylonParser {
     private final int textHash;
     private PsiBuilder psiBuilder;
