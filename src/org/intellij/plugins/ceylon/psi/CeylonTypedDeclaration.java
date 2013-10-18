@@ -7,6 +7,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface CeylonTypedDeclaration extends CeylonCompositeElement {
 
-    @Nullable
-    CeylonTypeParameters getTypeParameters();
+//    @Nullable
+//    CeylonTypeParameters getTypeParameters();
 }

@@ -8,9 +8,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import org.intellij.plugins.ceylon.CeylonLanguage;
-import org.intellij.plugins.ceylon.psi.impl.*;
 import org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType;
-import org.intellij.plugins.ceylon.psi.stub.impl.ModuleElementType;
 
 public interface CeylonTypes {
 
@@ -46,7 +44,7 @@ public interface CeylonTypes {
     IElementType CLASS_SPECIFIER = new CeylonElementType("CLASS_SPECIFIER");
     IElementType ANY_CLASS = new CeylonElementType("ANY_CLASS");
 //    IElementType CLASS_DEFINITION = new CeylonElementType("CLASS_DEFINITION");
-    IElementType CLASS_DECLARATION = new CeylonElementType("CLASS_DECLARATION");
+    IElementType CLASS_DECLARATION = new ClassElementType("CLASS_DECLARATION", "ceylon.class");
     IElementType ANY_INTERFACE = new CeylonElementType("ANY_INTERFACE");
 //    IElementType INTERFACE_DEFINITION = new CeylonElementType("INTERFACE_DEFINITION");
     IElementType INTERFACE_DECLARATION = new CeylonElementType("INTERFACE_DECLARATION");

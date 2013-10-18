@@ -13,20 +13,18 @@ public class ClassStubImpl extends StubBase<CeylonClass> implements ClassStub {
 
     private String name;
     private String qualifiedName;
-    private byte flags;
 
     static final int INTERFACE = 0x01;
     static final int OBJECT = 0x02;
 
-    protected ClassStubImpl(IStubElementType elementType, StubElement parent, String name, String qualifiedName, byte flags) {
+    protected ClassStubImpl(IStubElementType elementType, StubElement parent, String name, String qualifiedName) {
         super(parent, elementType);
         this.name = name;
         this.qualifiedName = qualifiedName;
-        this.flags = flags;
     }
 
-    public ClassStubImpl(StubElement parent, StringRef name, StringRef qualifiedName, byte flags) {
-        super(parent, (IStubElementType) ((flags & INTERFACE) != 0 ? CeylonTypes.INTERFACE_DECLARATION : CeylonTypes.CLASS_DECLARATION));
+    public ClassStubImpl(StubElement parent, StringRef name, StringRef qualifiedName) {
+        super(parent, (IStubElementType) CeylonTypes.CLASS_DECLARATION);
 
         if (name != null) {
             this.name = name.getString();
@@ -34,7 +32,6 @@ public class ClassStubImpl extends StubBase<CeylonClass> implements ClassStub {
         if (qualifiedName != null) {
             this.qualifiedName = qualifiedName.getString();
         }
-        this.flags = flags;
     }
 
     @Override
@@ -48,13 +45,4 @@ public class ClassStubImpl extends StubBase<CeylonClass> implements ClassStub {
         return qualifiedName;
     }
 
-    @Override
-    public boolean isInterface() {
-        return (flags & INTERFACE) != 0;
-    }
-
-    @Override
-    public boolean isObject() {
-        return (flags & OBJECT) != 0;
-    }
 }

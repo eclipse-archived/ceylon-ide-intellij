@@ -10,37 +10,38 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.yourkit.util.Strings;
-import org.intellij.plugins.ceylon.codeInsight.resolve.CeylonTypeReference;
+import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
 import org.intellij.plugins.ceylon.psi.*;
 import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implements CeylonClass {
+public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implements CeylonClass {
+    private Tree.ClassDeclaration specClassDecl;
 
     public CeylonClassImpl(ASTNode node) {
         super(node);
+        specClassDecl = (Tree.ClassDeclaration) node.getUserData(CeylonIdeaParser.CEYLON_NODE_KEY);
     }
 
     public CeylonClassImpl(ClassStub stub, IStubElementType nodeType) {
         super(stub, nodeType);
     }
 
-    @Override
-    public boolean isInterface() {
-        ASTNode kw = getNode().findChildByType(TokenTypes.INTERFACE_DEFINITION.getTokenType());
-        return kw != null;
+/*
+    private boolean isInterface() {
+        return false;
+//        ASTNode kw = getNode().findChildByType(TokenTypes.INTERFACE_DEFINITION.getTokenType());
+//        return kw != null;
     }
-
-    @Override
-    public boolean isObject() {
-        return findChildByType(TokenTypes.OBJECT_DEFINITION.getTokenType()) != null;
-    }
+*/
 
     @Override
     public String getPackage() {
+//        return specClassDecl.getUnit().getPackage().getQualifiedNameString();
         if (getContainingFile() instanceof CeylonFile) {
             return ((CeylonFile) getContainingFile()).getPackageName();
         }
@@ -74,21 +75,14 @@ public abstract class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub>
 
     @Override
     public boolean isShared() {
-        CeylonAnnotations annotations = ((CeylonDeclaration) getParent()).getAnnotations();
-
-        for (CeylonAnnotation annotation : annotations.getAnnotationList()) {
-            if (annotation.getAnnotationName().getText().equals("shared")) {
-                return true;
-            }
-        }
-
+        // todo!
         return false;
     }
 
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        return findChildByType(CeylonTypes.IDENTIFIER);
+        return findChildByType(CeylonTypes.UIDENTIFIER);
     }
 
     @Override
@@ -100,12 +94,12 @@ public abstract class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub>
     public PsiReference getReference() {
         PsiElement identifier = getNameIdentifier();
 
-        if (identifier == null) {
+//        if (identifier == null) {
             return null;
-        } else {
-            TextRange range = TextRange.from(0, identifier.getTextLength());
-            return new CeylonTypeReference<CeylonIdentifier>((CeylonIdentifier) identifier, range, true);
-        }
+//        } else {
+//            TextRange range = TextRange.from(0, identifier.getTextLength());
+//            return new CeylonTypeReference<>((CeylonIdentifier) identifier, range, true);
+//        }
     }
 
     @Override
@@ -115,15 +109,6 @@ public abstract class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub>
 
     @Override
     public String toString() {
-        String name = Strings.notNull(getName(), " (unnamed)");
-        String type;
-
-        if (isInterface()) {
-            type = "Interface";
-        } else {
-            type = "Class";
-        }
-
-        return type + " " + name;
+        return Strings.notNull(getName(), " (unnamed)");
     }
 }
