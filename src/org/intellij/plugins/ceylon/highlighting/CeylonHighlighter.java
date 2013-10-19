@@ -1,7 +1,7 @@
 package org.intellij.plugins.ceylon.highlighting;
 
 import com.intellij.lexer.Lexer;
-import com.intellij.openapi.editor.SyntaxHighlighterColors;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
@@ -16,12 +16,10 @@ import java.util.Map;
 public class CeylonHighlighter extends SyntaxHighlighterBase {
     private static final Map<IElementType, TextAttributesKey> keys;
 
-    public static final TextAttributesKey KEYWORD_KEY = TextAttributesKey.createTextAttributesKey(
-            "CEYLON.KEYWORD", SyntaxHighlighterColors.KEYWORD.getDefaultAttributes()
-    );
+    public static final TextAttributesKey KEYWORD_KEY = TextAttributesKey.createTextAttributesKey("CEYLON.KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
 
     static {
-        keys = new THashMap<IElementType, TextAttributesKey>();
+        keys = new THashMap<>();
 
         TokenSet keywords = TokenSet.create(
             TokenTypes.ASSEMBLY.getTokenType(),
@@ -69,25 +67,25 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
 
         fillMap(keys, keywords, KEYWORD_KEY);
 
-        keys.put(TokenTypes.MULTI_COMMENT.getTokenType(), SyntaxHighlighterColors.DOC_COMMENT);
-        keys.put(TokenTypes.LINE_COMMENT.getTokenType(), SyntaxHighlighterColors.LINE_COMMENT);
+        keys.put(TokenTypes.MULTI_COMMENT.getTokenType(), DefaultLanguageHighlighterColors.DOC_COMMENT);
+        keys.put(TokenTypes.LINE_COMMENT.getTokenType(), DefaultLanguageHighlighterColors.LINE_COMMENT);
 
-        keys.put(TokenTypes.NATURAL_LITERAL.getTokenType(), SyntaxHighlighterColors.NUMBER);
-        keys.put(TokenTypes.FLOAT_LITERAL.getTokenType(), SyntaxHighlighterColors.NUMBER);
-        keys.put(TokenTypes.CHAR_LITERAL.getTokenType(), SyntaxHighlighterColors.STRING);
-        keys.put(TokenTypes.STRING_LITERAL.getTokenType(), SyntaxHighlighterColors.STRING);
-        keys.put(TokenTypes.VERBATIM_STRING.getTokenType(), SyntaxHighlighterColors.STRING);
+        keys.put(TokenTypes.NATURAL_LITERAL.getTokenType(), DefaultLanguageHighlighterColors.NUMBER);
+        keys.put(TokenTypes.FLOAT_LITERAL.getTokenType(), DefaultLanguageHighlighterColors.NUMBER);
+        keys.put(TokenTypes.CHAR_LITERAL.getTokenType(), DefaultLanguageHighlighterColors.STRING);
+        keys.put(TokenTypes.STRING_LITERAL.getTokenType(), DefaultLanguageHighlighterColors.STRING);
+        keys.put(TokenTypes.VERBATIM_STRING.getTokenType(), DefaultLanguageHighlighterColors.STRING);
 
-        keys.put(TokenTypes.LPAREN.getTokenType(), SyntaxHighlighterColors.PARENTHS);
-        keys.put(TokenTypes.RPAREN.getTokenType(), SyntaxHighlighterColors.PARENTHS);
-        keys.put(TokenTypes.LBRACE.getTokenType(), SyntaxHighlighterColors.BRACES);
-        keys.put(TokenTypes.RBRACE.getTokenType(), SyntaxHighlighterColors.BRACES);
-        keys.put(TokenTypes.LBRACKET.getTokenType(), SyntaxHighlighterColors.BRACKETS);
-        keys.put(TokenTypes.RBRACKET.getTokenType(), SyntaxHighlighterColors.BRACKETS);
+        keys.put(TokenTypes.LPAREN.getTokenType(), DefaultLanguageHighlighterColors.PARENTHESES);
+        keys.put(TokenTypes.RPAREN.getTokenType(), DefaultLanguageHighlighterColors.PARENTHESES);
+        keys.put(TokenTypes.LBRACE.getTokenType(), DefaultLanguageHighlighterColors.BRACES);
+        keys.put(TokenTypes.RBRACE.getTokenType(), DefaultLanguageHighlighterColors.BRACES);
+        keys.put(TokenTypes.LBRACKET.getTokenType(), DefaultLanguageHighlighterColors.BRACKETS);
+        keys.put(TokenTypes.RBRACKET.getTokenType(), DefaultLanguageHighlighterColors.BRACKETS);
 
-        keys.put(TokenTypes.MEMBER_OP.getTokenType(), SyntaxHighlighterColors.DOT);
-        keys.put(TokenTypes.SEMICOLON.getTokenType(), SyntaxHighlighterColors.JAVA_SEMICOLON);
-        keys.put(TokenTypes.COMMA.getTokenType(), SyntaxHighlighterColors.COMMA);
+        keys.put(TokenTypes.MEMBER_OP.getTokenType(), DefaultLanguageHighlighterColors.DOT);
+        keys.put(TokenTypes.SEMICOLON.getTokenType(), DefaultLanguageHighlighterColors.SEMICOLON);
+        keys.put(TokenTypes.COMMA.getTokenType(), DefaultLanguageHighlighterColors.COMMA);
     }
 
     @NotNull
