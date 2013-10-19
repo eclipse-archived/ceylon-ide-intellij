@@ -42,14 +42,14 @@
 
         <lang.syntaxHighlighterFactory key="Ceylon" implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonAnnotator"/>
-        <!--<problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.highlighting.CeylonFileHighlightFilter"/>-->
+        <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.highlighting.CeylonFileHighlightFilter"/>
 
         <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonCommenter"/>
         <lang.braceMatcher language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonBraceMatcher"/>
         <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.lang.CeylonQuoteHandler"/>
         <lang.foldingBuilder language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonFoldingBuilder"/>
         <!--<lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.formatting.CeylonFormattingModelBuilder"/>-->
-        <!--<lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.structureView.CeylonStructureViewFactory"/>-->
+        <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.structureView.CeylonStructureViewFactory"/>
 
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>
         <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>-->
