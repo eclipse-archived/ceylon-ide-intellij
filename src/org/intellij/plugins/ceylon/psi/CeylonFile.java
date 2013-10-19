@@ -7,6 +7,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.util.indexing.IndexingDataKeys;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.CeylonFileType;
 import org.intellij.plugins.ceylon.CeylonLanguage;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +33,11 @@ public class CeylonFile extends PsiFileBase {
         if (packageName != null) {
             return packageName;
         }
-        CeylonPackageDescriptor packageDescriptor = findChildByClass(CeylonPackageDescriptor.class);
+        final List<Tree.PackageDescriptor> packageDescriptors = ((Tree.CompilationUnit) getNode()).getPackageDescriptors();
+        final Tree.PackageDescriptor packageDescriptor = packageDescriptors.get(0); // todo! empty, null?
 
         if (packageDescriptor != null) {
-            packageName = packageDescriptor.getPackagePath().getText();
+            packageName = packageDescriptor.getImportPath().getText();
         } else {
             VirtualFile virtualFile = getVirtualFile();
             if (virtualFile == null) {
@@ -55,6 +57,7 @@ public class CeylonFile extends PsiFileBase {
         return packageName;
     }
 
+/*
     @NotNull
     public CeylonImportDeclaration[] getPotentialImportsForType(CeylonTypeName name) {
         CeylonImportList importList = findChildByClass(CeylonImportList.class);
@@ -83,4 +86,5 @@ public class CeylonFile extends PsiFileBase {
 
         return wildcardDeclarations.toArray(new CeylonImportDeclaration[wildcardDeclarations.size()]);
     }
+*/
 }

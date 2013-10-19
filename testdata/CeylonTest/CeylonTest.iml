@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../../../ceylon.language" />
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Ceylon SDK" jdkType="Ceylon SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library name="Ceylon libs">

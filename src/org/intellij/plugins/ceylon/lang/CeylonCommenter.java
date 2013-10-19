@@ -4,7 +4,7 @@ import com.intellij.lang.CodeDocumentationAwareCommenterEx;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import org.intellij.plugins.ceylon.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.psi.TokenTypes;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonCommenter implements CodeDocumentationAwareCommenterEx {
@@ -16,19 +16,19 @@ public class CeylonCommenter implements CodeDocumentationAwareCommenterEx {
     @Nullable
     @Override
     public IElementType getLineCommentTokenType() {
-        return CeylonTypes.LINE_COMMENT;
+        return TokenTypes.LINE_COMMENT.getTokenType();
     }
 
     @Nullable
     @Override
     public IElementType getBlockCommentTokenType() {
-        return CeylonTypes.MULTI_LINE_COMMENT;
+        return TokenTypes.MULTI_COMMENT.getTokenType();
     }
 
     @Nullable
     @Override
     public IElementType getDocumentationCommentTokenType() {
-        return CeylonTypes.MULTI_LINE_COMMENT;
+        return TokenTypes.MULTI_COMMENT.getTokenType();
     }
 
     @Nullable

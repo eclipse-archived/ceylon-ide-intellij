@@ -4,18 +4,18 @@ import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.tree.IElementType;
-import org.intellij.plugins.ceylon.psi.CeylonBlock;
-import org.intellij.plugins.ceylon.psi.CeylonClass;
-import org.intellij.plugins.ceylon.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonBraceMatcher implements PairedBraceMatcher {
     private static final BracePair[] BRACE_PAIRS = new BracePair[]{
-            new BracePair(CeylonTypes.OP_LPAREN, CeylonTypes.OP_RPAREN, false),
-            new BracePair(CeylonTypes.OP_LBRACE, CeylonTypes.OP_RBRACE, true),
-            new BracePair(CeylonTypes.OP_LBRACKET, CeylonTypes.OP_RBRACKET, false),
+            new BracePair(TokenTypes.LPAREN.getTokenType(), TokenTypes.RPAREN.getTokenType(), false),
+            new BracePair(TokenTypes.LBRACE.getTokenType(), TokenTypes.RBRACE.getTokenType(), true),
+            new BracePair(TokenTypes.LBRACKET.getTokenType(), TokenTypes.RBRACKET.getTokenType(), false),
     };
 
     @Override
@@ -34,9 +34,9 @@ public class CeylonBraceMatcher implements PairedBraceMatcher {
         if (element == null || element instanceof PsiFile) return openingBraceOffset;
         PsiElement parent = element.getParent();
 
-        if (parent instanceof CeylonBlock && parent.getParent() instanceof CeylonClass) {
-            CeylonClass parentClass = (CeylonClass) parent.getParent();
-            PsiElement nameIdentifier = parentClass.getNameIdentifier();
+        if (parent instanceof CeylonPsi.BlockPsi && parent.getParent() instanceof PsiNameIdentifierOwner) {
+            PsiNameIdentifierOwner namedParent = (PsiNameIdentifierOwner) parent.getParent();
+            PsiElement nameIdentifier = namedParent.getNameIdentifier();
             return (nameIdentifier == null) ? parent.getTextOffset() : nameIdentifier.getTextOffset();
         }
         return openingBraceOffset;

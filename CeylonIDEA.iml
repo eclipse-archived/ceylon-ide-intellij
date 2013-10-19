@@ -12,8 +12,70 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="CMR" level="project" />
-    <orderEntry type="module" module-name="ceylon-jps-plugin" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.ceylon/repo/com/redhat/ceylon/typechecker/0.6.1/com.redhat.ceylon.typechecker-0.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../ceylon/ceylon-spec/src" />
+          <root url="file://$MODULE_DIR$/../ceylon/ceylon-compiler/src" />
+          <root url="file://$MODULE_DIR$/../ceylon/ceylon-spec/src" />
+          <root url="file://$MODULE_DIR$/../ceylon/ceylon-spec/gensrc" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.ceylon/repo/com/redhat/ceylon/module-resolver/0.6.1/com.redhat.ceylon.module-resolver-0.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.ceylon/repo/com/redhat/ceylon/typechecker/0.6.1/com.redhat.ceylon.typechecker-0.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../ceylon/ceylon-compiler/src" />
+          <root url="file://$MODULE_DIR$/../ceylon/ceylon-spec/src" />
+          <root url="file://$MODULE_DIR$/../ceylon/ceylon-spec/gensrc" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon/ceylon-dist/dist/lib/antlr-3.4-complete.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file:///programs/antlr-3.4/tool/src/main/java" />
+          <root url="file:///programs/antlr-3.4/gunit/src/main/java" />
+          <root url="file:///programs/antlr-3.4/runtime/Java/src/main/java" />
+          <root url="file:///programs/antlr-3.4/runtime/ObjC/Framework/examples/treeparser" />
+          <root url="file:///programs/antlr-3.4/runtime/ObjC/Framework/examples/simplecTreeParser/output1" />
+          <root url="file:///programs/antlr-3.4/runtime/ObjC/Framework/examples/simplecTreeParser" />
+          <root url="file:///programs/antlr-3.4/antlr-ant/main/antlr3-task/antlr3-src" />
+          <root url="file:///programs/antlr-3.4/gunit-maven-plugin/src/main/java" />
+          <root url="file:///programs/antlr-3.4/antlr3-maven-plugin/src/main/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.ceylon/repo/com/redhat/ceylon/common/0.6.1/com.redhat.ceylon.common-0.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
