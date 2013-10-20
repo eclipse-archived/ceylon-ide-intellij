@@ -70,5 +70,9 @@
 
         <moduleService serviceInterface="org.intellij.plugins.ceylon.repo.RepositoryManager" serviceImplementation="org.intellij.plugins.ceylon.repo.RepositoryManagerImpl"/>
         <projectService serviceInterface="org.intellij.plugins.ceylon.annotator.TypeCheckerManager" serviceImplementation="org.intellij.plugins.ceylon.annotator.TypeCheckerManager"/>
+
+        <!-- Run/Debug -->
+        <configurationType implementation="org.intellij.plugins.ceylon.runner.CeylonRunConfigurationType"/>
+        <runConfigurationProducer implementation="org.intellij.plugins.ceylon.runner.CeylonRunConfigurationProducer"/>
     </extensions>
 </idea-plugin>
