@@ -113,7 +113,9 @@ class CeylonTypeCheckerVisitor extends Visitor {
 
             if (that instanceof Tree.Declaration) {
                 Tree.Identifier id = ((Tree.Declaration) that).getIdentifier();
-                range = new TextRange(id.getStartIndex() - crlfCountDiff, id.getStopIndex() - crlfCountDiff + 1);
+                if (id != null) {
+                    range = new TextRange(id.getStartIndex() - crlfCountDiff, id.getStopIndex() - crlfCountDiff + 1);
+                }
             }
 
             if (error instanceof AnalysisError) {

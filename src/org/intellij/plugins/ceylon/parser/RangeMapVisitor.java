@@ -17,7 +17,9 @@ public class RangeMapVisitor extends Visitor {
     @Override
     public void visitAny(Node that) {
         super.visitAny(that);
-        map.put(new TextRange(that.getStartIndex(), that.getStopIndex() + 1), that);
+        if (that.getStartIndex() != null && that.getStopIndex() != null) {
+            map.put(new TextRange(that.getStartIndex(), that.getStopIndex() + 1), that);
+        }
     }
 
     public Map<TextRange, Node> getMap() {
