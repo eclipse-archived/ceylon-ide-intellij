@@ -35,7 +35,7 @@ public class CeylonBuilder extends ModuleLevelBuilder {
     private static final String BUILDER_NAME = "ceylon";
 
     protected CeylonBuilder() {
-        super(BuilderCategory.OVERWRITING_TRANSLATOR);
+        super(BuilderCategory.TRANSLATOR);
     }
 
     /**
@@ -58,7 +58,7 @@ public class CeylonBuilder extends ModuleLevelBuilder {
     public ExitCode build(final CompileContext context, ModuleChunk chunk, DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder, OutputConsumer outputConsumer) throws ProjectBuildException, IOException {
 
         try {
-            final List<String> filesToBuild = new ArrayList<String>();
+            final List<String> filesToBuild = new ArrayList<>();
 
             dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
                 @Override

@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Ceylon Runtime">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/antlr-3.4-complete.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.common-0.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.module-resolver-0.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.typechecker-0.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.java-0.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.js-0.6.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
