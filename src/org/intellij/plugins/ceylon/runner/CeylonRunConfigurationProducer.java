@@ -24,6 +24,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Run
 
     @Override
     protected boolean setupConfigurationFromContext(RunConfiguration configuration, ConfigurationContext context, Ref<PsiElement> sourceElement) {
+        // TODO I think we could create a run configuration from the method under the caret (if sourceElement is an identifier and has a parent of type AnyMethodPsi)
         if (!(sourceElement.get() instanceof CeylonFile)) {
             return false;
         }
@@ -55,6 +56,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Run
             return false;
         }
 
+        // TODO be more accurate than containing file (e.g. check if we are inside the same toplevel method)
         if (!(context.getLocation().getPsiElement().getContainingFile() instanceof CeylonFile)) {
             return false;
         }

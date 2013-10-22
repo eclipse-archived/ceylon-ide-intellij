@@ -5,7 +5,6 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.execution.util.ProgramParametersUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -14,10 +13,14 @@ import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.CompilerProjectExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.apache.commons.lang.ObjectUtils;
 import org.intellij.plugins.ceylon.sdk.CeylonSdk;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,8 +48,8 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
     @NotNull
     @Override
-    public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
-        return null;
+    public SettingsEditor<? extends CeylonRunConfiguration> getConfigurationEditor() {
+        return new CeylonRunConfigurationEditor(getProject());
     }
 
     @Nullable
@@ -72,10 +75,25 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
                 params.getProgramParametersList().add("--rep", getOutputPath());
                 params.getProgramParametersList().add("default");
 
-//                ProgramParametersUtil.configureConfiguration(params, CeylonRunConfiguration.this);
                 return params;
             }
         };
+    }
+
+    @Override
+    public void readExternal(Element element) throws InvalidDataException {
+        super.readExternal(element);
+
+        setFilePath(element.getAttributeValue("file-path"));
+        setTopLevelName(element.getAttributeValue("top-level"));
+    }
+
+    @Override
+    public void writeExternal(Element element) throws WriteExternalException {
+        super.writeExternal(element);
+
+        element.setAttribute("file-path", (String) ObjectUtils.defaultIfNull(getRawFilePath(), ""));
+        element.setAttribute("top-level", (String) ObjectUtils.defaultIfNull(getTopLevelName(), ""));
     }
 
     private String getOutputPath() {
@@ -115,6 +133,9 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         return LocalFileSystem.getInstance().findFileByPath(FileUtil.toSystemIndependentName(filePath));
     }
 
+    public String getRawFilePath() {
+        return filePath;
+    }
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
