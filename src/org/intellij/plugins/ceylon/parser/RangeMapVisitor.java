@@ -9,7 +9,6 @@ import java.util.Map;
 
 /**
  * @author Matija Mazi <br/>
- * @created 10/16/13 3:55 PM
  */
 public class RangeMapVisitor extends Visitor {
     private Map<TextRange, Node> map = new HashMap<>();

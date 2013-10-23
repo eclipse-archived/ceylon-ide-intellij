@@ -10,7 +10,7 @@ import org.intellij.plugins.ceylon.psi.TokenTypes;
 import java.util.Objects;
 
 
-// NOTE! The Javadocs are copied frome Antlr 4 (because they are much more extensive and clear than in Antlr 3.4) so they maybe inaccurate!
+// NOTE! The Javadocs are copied frome Antlr 4 (because they are much more extensive and clear than in Antlr 3.4) so they may be inaccurate!
 public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
 //    private CommonToken currentToken = null;
 
