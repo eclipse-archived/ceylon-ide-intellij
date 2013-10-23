@@ -1,0 +1,78 @@
+<idea-plugin version="2">
+    <id>org.intellij.plugins.ceylon</id>
+    <name>Ceylon Support</name>
+    <version>0.1</version>
+    <vendor email="bjansen [at] excilys.com">Bastien Jansen</vendor>
+
+    <description>Provides support for the Ceylon programming language</description>
+
+    <change-notes>
+        Version 0.1:
+        * Basic parser
+        * Syntax highlighting
+        * Go to class/interface
+    </change-notes>
+
+    <idea-version since-build="123.4"/>
+
+    <!-- uncomment to enable plugin in all products -->
+    <depends>com.intellij.modules.lang</depends>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+<!--
+        <action id="AddCeylonModule" class="org.intellij.plugins.ceylon.action.CeylonAddModule" text="Ceylon Module" description="Add a new Ceylon module">
+            <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewModuleInGroup"/>
+        </action>
+-->
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <lang.documentationProvider implementationClass="org.intellij.plugins.ceylon.doc.CeylonDocProvider" language="Ceylon"/>
+
+        <fileTypeFactory implementation="org.intellij.plugins.ceylon.CeylonFileTypeFactory"/>
+        <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.parser.CeylonParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory key="Ceylon" implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
+        <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonAnnotator"/>
+        <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.highlighting.CeylonFileHighlightFilter"/>
+
+        <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonCommenter"/>
+        <lang.braceMatcher language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonBraceMatcher"/>
+        <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.lang.CeylonQuoteHandler"/>
+        <lang.foldingBuilder language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonFoldingBuilder"/>
+        <!--<lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.formatting.CeylonFormattingModelBuilder"/>-->
+        <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.structureView.CeylonStructureViewFactory"/>
+
+        <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>
+        <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>-->
+        <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>-->
+
+        <!--<gotoClassContributor implementation="org.intellij.plugins.ceylon.codeInsight.navigation.CeylonGotoClassContributor"/>-->
+
+        <!--<itemPresentationProvider forClass="org.intellij.plugins.ceylon.psi.CeylonTypeName" implementationClass="org.intellij.plugins.ceylon.presentation.ClassPresentationProvider"/>-->
+
+        <!--<lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonFindUsagesProvider"/>-->
+        <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
+        <!-- TODO <usageTypeProvider implementation=""/>-->
+
+        <sdkType implementation="org.intellij.plugins.ceylon.sdk.CeylonSdk"/>
+        <psi.clsCustomNavigationPolicy implementation="org.intellij.plugins.ceylon.psi.compiled.CeylonClsCustomNavigationPolicy" order="first"/>
+        <compiler implementation="org.intellij.plugins.ceylon.compiler.CeylonCompiler"/>
+        <compileServer.plugin classpath="ceylon-jps-plugin.jar"/>
+
+        <moduleService serviceInterface="org.intellij.plugins.ceylon.repo.RepositoryManager" serviceImplementation="org.intellij.plugins.ceylon.repo.RepositoryManagerImpl"/>
+        <projectService serviceInterface="org.intellij.plugins.ceylon.annotator.TypeCheckerManager" serviceImplementation="org.intellij.plugins.ceylon.annotator.TypeCheckerManager"/>
+
+        <!-- Run/Debug -->
+        <configurationType implementation="org.intellij.plugins.ceylon.runner.CeylonRunConfigurationType"/>
+        <runConfigurationProducer implementation="org.intellij.plugins.ceylon.runner.CeylonRunConfigurationProducer"/>
+    </extensions>
+</idea-plugin>
