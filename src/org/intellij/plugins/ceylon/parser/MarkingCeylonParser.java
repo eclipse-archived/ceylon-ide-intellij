@@ -13,33 +13,30 @@ import org.intellij.plugins.ceylon.psi.CeylonTypes;
 // todo! Do something about overriding final methods
 // todo: Some CeylonParser methods have abstract return types; we construct concrete corresponding AST/Psi elements.
 public class MarkingCeylonParser extends CeylonParser {
-    private final int textHash;
+//    private final int textHash;
     private PsiBuilder psiBuilder;
-    private int level = 0;
+//    private int level = 0;
 
     public MarkingCeylonParser(PsiBuilder psiBuilder) {
-//        super(new DebuggingPsiBuilderTokenStream(psiBuilder));
         super(new PsiBuilderTokenStream(psiBuilder));
         this.psiBuilder = psiBuilder;
-        textHash = psiBuilder.getOriginalText().hashCode();
-        print("================================================================================================%n");
-        print("== %d: new Parser ==================================================================%n", textHash);
+//        textHash = psiBuilder.getOriginalText().hashCode();
+//        print("================================================================================================%n");
+//        print("== %d: new Parser ==================================================================%n", textHash);
     }
 
 
     private PsiBuilder.Marker mark(String method) {
-        print(String.format("%%20d: %%%ds%%s%%n", ++level), textHash, "?", method);
+//        print(String.format("%%20d: %%%ds%%s%%n", ++level), textHash, "?", method);
         return psiBuilder.mark();
-//        return null;
     }
 
     private void end(PsiBuilder.Marker marker, IElementType elementType, Node node) {
         if (node == null) {
-            print(String.format("%%20d: %%%ds%%s - NULL%%n", level--), textHash, "-", elementType);
-//            marker.rollbackTo();
+//            print(String.format("%%20d: %%%ds%%s - NULL%%n", level--), textHash, "-", elementType);
             marker.drop();
         } else {
-            print(String.format("%%20d: %%%ds%%s%%n", level--), textHash, "+", elementType);
+//            print(String.format("%%20d: %%%ds%%s%%n", level--), textHash, "+", elementType);
             marker.done(elementType);
         }
     }
@@ -2033,7 +2030,9 @@ public class MarkingCeylonParser extends CeylonParser {
     }
 */
 
+/*
     private void print(String format, Object... params) {
-//        System.out.printf(format, params);
+        System.out.printf(format, params);
     }
+*/
 }
