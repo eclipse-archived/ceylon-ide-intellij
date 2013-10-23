@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.sdk;
 
 import com.intellij.openapi.projectRoots.*;
+import com.intellij.openapi.projectRoots.impl.JavaDependentSdkType;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.InvalidDataException;
@@ -16,7 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CeylonSdk extends SdkType implements JavaSdkType {
+public class CeylonSdk extends JavaDependentSdkType implements JavaSdkType {
 
     private String version;
 
@@ -32,7 +33,7 @@ public class CeylonSdk extends SdkType implements JavaSdkType {
 
     @Override
     public boolean isValidSdkHome(String path) {
-        return new File(path, "bin/ceylon").exists();
+        return new File(path, "bin/ceylon").exists() && new File(path, "repo").isDirectory();
     }
 
     @Override
