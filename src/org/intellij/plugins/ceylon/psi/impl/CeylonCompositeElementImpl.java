@@ -21,6 +21,7 @@ public class CeylonCompositeElementImpl extends ASTWrapperPsiElement implements 
         this.ceylonNode = ceylonNode;
     }
 
+    @Override
     public Node getCeylonNode() {
         return ceylonNode;
     }

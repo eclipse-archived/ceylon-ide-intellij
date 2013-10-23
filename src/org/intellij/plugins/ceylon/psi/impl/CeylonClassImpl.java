@@ -10,6 +10,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.yourkit.util.Strings;
 import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
@@ -88,6 +89,11 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
     @Override
     public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
         throw new UnsupportedOperationException("Can't set name yet");
+    }
+
+    @Override
+    public Node getCeylonNode() {
+        throw new UnsupportedOperationException("No Ceylon nodes in stubs.");
     }
 
     @Override

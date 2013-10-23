@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.runner;
 
-import com.intellij.execution.Location;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.RunConfigurationProducer;
 import com.intellij.execution.configurations.ConfigurationType;
@@ -10,11 +9,15 @@ import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.containers.ContainerUtil;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.intellij.plugins.ceylon.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * TODO
@@ -27,11 +30,12 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Run
 
     @Override
     protected boolean setupConfigurationFromContext(RunConfiguration configuration, ConfigurationContext context, Ref<PsiElement> sourceElement) {
-        PsiFile file = sourceElement.get().getContainingFile();
+        final PsiElement srcElt = sourceElement.get();
+        PsiFile file = srcElt.getContainingFile();
         if (file instanceof CeylonFile) {
             CeylonRunConfiguration runConfig = (CeylonRunConfiguration) configuration;
 
-            final ASTNode identifier = getMethodNode(context.getLocation());
+            final ASTNode identifier = getTopLevelMethodNode(srcElt);
 
             if (identifier != null) {
                 runConfig.setFilePath(file.getVirtualFile().getCanonicalPath());
@@ -46,28 +50,32 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Run
     @Override
     public boolean isConfigurationFromContext(RunConfiguration configuration, ConfigurationContext context) {
         ASTNode identifier = null;
-        if ((configuration instanceof CeylonRunConfiguration)) {
-            identifier = getMethodNode(context.getLocation());
+        if ((configuration instanceof CeylonRunConfiguration) && context.getLocation() != null) {
+            identifier = getTopLevelMethodNode(context.getLocation().getPsiElement());
         }
 
         return identifier != null && identifier.getText().equals(((CeylonRunConfiguration) configuration).getTopLevelName());
     }
 
-    private ASTNode getMethodNode(Location contextLocation) {
-        ASTNode identifier = null;
-        // TODO be more accurate than containing file (e.g. check if we are inside the same toplevel method)
-        if ((contextLocation != null && contextLocation.getPsiElement().getContainingFile() instanceof CeylonFile)) {
-            CeylonFile file = (CeylonFile) contextLocation.getPsiElement().getContainingFile();
+    private ASTNode getTopLevelMethodNode(PsiElement psiElement) {
 
-            CeylonPsi.DeclarationPsi topLevelDeclaration = file.findChildByClass(CeylonPsi.DeclarationPsi.class);
-            if (topLevelDeclaration != null) {
-                ASTNode topLevelMethod = topLevelDeclaration.getNode().findChildByType(CeylonTypes.ANY_METHOD);
+        CeylonPsi.AnyMethodPsi method = PsiTreeUtil.getTopmostParentOfType(psiElement, CeylonPsi.AnyMethodPsi.class);
 
-                if (topLevelMethod != null) {
-                    identifier = topLevelMethod.findChildByType(CeylonTypes.IDENTIFIER);
+        if (method != null) {
+            final Node ceylonNode = method.getCeylonNode();
+            if (ceylonNode != null) {
+                CeylonCompositeElement parent = method;
+                // todo: make sure this doesn't loop infinitely
+                //noinspection StatementWithEmptyBody
+                while ((parent = PsiTreeUtil.getParentOfType(parent, CeylonPsi.DeclarationPsi.class)) != null && parent.getCeylonNode() == ceylonNode);
+
+                if (parent == null) {
+                    // We're in a method with no parent declaration (except possible nodes that represent the same method).
+                    return method.getNode().findChildByType(CeylonTypes.IDENTIFIER);
                 }
             }
         }
-        return identifier;
+
+        return null;
     }
 }
