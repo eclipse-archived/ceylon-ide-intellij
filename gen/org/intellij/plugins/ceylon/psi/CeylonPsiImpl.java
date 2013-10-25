@@ -76,7 +76,7 @@ public class CeylonPsiImpl {
         public ImportWildcardPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class DeclarationPsiImpl extends StatementPsiImpl
+    public static abstract class DeclarationPsiImpl extends StatementPsiImpl
             implements CeylonPsi.DeclarationPsi {
         public DeclarationPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -86,12 +86,12 @@ public class CeylonPsiImpl {
         public MissingDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class TypeDeclarationPsiImpl extends DeclarationPsiImpl
+    public static abstract class TypeDeclarationPsiImpl extends DeclarationPsiImpl
             implements CeylonPsi.TypeDeclarationPsi {
         public TypeDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ClassOrInterfacePsiImpl extends TypeDeclarationPsiImpl
+    public static abstract class ClassOrInterfacePsiImpl extends TypeDeclarationPsiImpl
             implements CeylonPsi.ClassOrInterfacePsi {
         public ClassOrInterfacePsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -181,12 +181,12 @@ public class CeylonPsiImpl {
         public InterfaceDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class TypedDeclarationPsiImpl extends DeclarationPsiImpl
+    public static abstract class TypedDeclarationPsiImpl extends DeclarationPsiImpl
             implements CeylonPsi.TypedDeclarationPsi {
         public TypedDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class AnyAttributePsiImpl extends TypedDeclarationPsiImpl
+    public static abstract class AnyAttributePsiImpl extends TypedDeclarationPsiImpl
             implements CeylonPsi.AnyAttributePsi {
         public AnyAttributePsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -236,12 +236,12 @@ public class CeylonPsiImpl {
         public ParameterListPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ParameterPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class ParameterPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.ParameterPsi {
         public ParameterPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ParameterDeclarationPsiImpl extends ParameterPsiImpl
+    public static abstract class ParameterDeclarationPsiImpl extends ParameterPsiImpl
             implements CeylonPsi.ParameterDeclarationPsi {
         public ParameterDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -276,7 +276,7 @@ public class CeylonPsiImpl {
         public TypeVariancePsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class BodyPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class BodyPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.BodyPsi {
         public BodyPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -296,17 +296,17 @@ public class CeylonPsiImpl {
         public InterfaceBodyPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class TypePsiImpl extends CeylonCompositeElementImpl
+    public static abstract class TypePsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.TypePsi {
         public TypePsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class StaticTypePsiImpl extends TypePsiImpl
+    public static abstract class StaticTypePsiImpl extends TypePsiImpl
             implements CeylonPsi.StaticTypePsi {
         public StaticTypePsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class SimpleTypePsiImpl extends StaticTypePsiImpl
+    public static abstract class SimpleTypePsiImpl extends StaticTypePsiImpl
             implements CeylonPsi.SimpleTypePsi {
         public SimpleTypePsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -366,7 +366,7 @@ public class CeylonPsiImpl {
         public SuperTypePsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class MetaLiteralPsiImpl extends PrimaryPsiImpl
+    public static abstract class MetaLiteralPsiImpl extends PrimaryPsiImpl
             implements CeylonPsi.MetaLiteralPsi {
         public MetaLiteralPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -426,7 +426,7 @@ public class CeylonPsiImpl {
         public DynamicModifierPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class LocalModifierPsiImpl extends TypePsiImpl
+    public static abstract class LocalModifierPsiImpl extends TypePsiImpl
             implements CeylonPsi.LocalModifierPsi {
         public LocalModifierPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -471,7 +471,7 @@ public class CeylonPsiImpl {
         public DefaultedTypePsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class DirectivePsiImpl extends ExecutableStatementPsiImpl
+    public static abstract class DirectivePsiImpl extends ExecutableStatementPsiImpl
             implements CeylonPsi.DirectivePsi {
         public DirectivePsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -496,12 +496,12 @@ public class CeylonPsiImpl {
         public BreakPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class StatementOrArgumentPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class StatementOrArgumentPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.StatementOrArgumentPsi {
         public StatementOrArgumentPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class StatementPsiImpl extends StatementOrArgumentPsiImpl
+    public static abstract class StatementPsiImpl extends StatementOrArgumentPsiImpl
             implements CeylonPsi.StatementPsi {
         public StatementPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -511,7 +511,7 @@ public class CeylonPsiImpl {
         public CompilerAnnotationPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ExecutableStatementPsiImpl extends StatementPsiImpl
+    public static abstract class ExecutableStatementPsiImpl extends StatementPsiImpl
             implements CeylonPsi.ExecutableStatementPsi {
         public ExecutableStatementPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -681,7 +681,7 @@ public class CeylonPsiImpl {
         public ConditionListPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ConditionPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class ConditionPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.ConditionPsi {
         public ConditionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -691,7 +691,7 @@ public class CeylonPsiImpl {
         public BooleanConditionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ExistsOrNonemptyConditionPsiImpl extends ConditionPsiImpl
+    public static abstract class ExistsOrNonemptyConditionPsiImpl extends ConditionPsiImpl
             implements CeylonPsi.ExistsOrNonemptyConditionPsi {
         public ExistsOrNonemptyConditionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -721,22 +721,22 @@ public class CeylonPsiImpl {
         public VariablePsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class TermPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class TermPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.TermPsi {
         public TermPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class OperatorExpressionPsiImpl extends TermPsiImpl
+    public static abstract class OperatorExpressionPsiImpl extends TermPsiImpl
             implements CeylonPsi.OperatorExpressionPsi {
         public OperatorExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class BinaryOperatorExpressionPsiImpl extends OperatorExpressionPsiImpl
+    public static abstract class BinaryOperatorExpressionPsiImpl extends OperatorExpressionPsiImpl
             implements CeylonPsi.BinaryOperatorExpressionPsi {
         public BinaryOperatorExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ArithmeticOpPsiImpl extends BinaryOperatorExpressionPsiImpl
+    public static abstract class ArithmeticOpPsiImpl extends BinaryOperatorExpressionPsiImpl
             implements CeylonPsi.ArithmeticOpPsi {
         public ArithmeticOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -771,7 +771,7 @@ public class CeylonPsiImpl {
         public RemainderOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class AssignmentOpPsiImpl extends BinaryOperatorExpressionPsiImpl
+    public static abstract class AssignmentOpPsiImpl extends BinaryOperatorExpressionPsiImpl
             implements CeylonPsi.AssignmentOpPsi {
         public AssignmentOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -781,7 +781,7 @@ public class CeylonPsiImpl {
         public AssignOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ArithmeticAssignmentOpPsiImpl extends AssignmentOpPsiImpl
+    public static abstract class ArithmeticAssignmentOpPsiImpl extends AssignmentOpPsiImpl
             implements CeylonPsi.ArithmeticAssignmentOpPsi {
         public ArithmeticAssignmentOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -811,7 +811,7 @@ public class CeylonPsiImpl {
         public RemainderAssignOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class BitwiseAssignmentOpPsiImpl extends AssignmentOpPsiImpl
+    public static abstract class BitwiseAssignmentOpPsiImpl extends AssignmentOpPsiImpl
             implements CeylonPsi.BitwiseAssignmentOpPsi {
         public BitwiseAssignmentOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -836,7 +836,7 @@ public class CeylonPsiImpl {
         public ComplementAssignOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class LogicalAssignmentOpPsiImpl extends AssignmentOpPsiImpl
+    public static abstract class LogicalAssignmentOpPsiImpl extends AssignmentOpPsiImpl
             implements CeylonPsi.LogicalAssignmentOpPsi {
         public LogicalAssignmentOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -851,7 +851,7 @@ public class CeylonPsiImpl {
         public OrAssignOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class LogicalOpPsiImpl extends BinaryOperatorExpressionPsiImpl
+    public static abstract class LogicalOpPsiImpl extends BinaryOperatorExpressionPsiImpl
             implements CeylonPsi.LogicalOpPsi {
         public LogicalOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -866,7 +866,7 @@ public class CeylonPsiImpl {
         public OrOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class BitwiseOpPsiImpl extends BinaryOperatorExpressionPsiImpl
+    public static abstract class BitwiseOpPsiImpl extends BinaryOperatorExpressionPsiImpl
             implements CeylonPsi.BitwiseOpPsi {
         public BitwiseOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -891,7 +891,7 @@ public class CeylonPsiImpl {
         public ComplementOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class EqualityOpPsiImpl extends BinaryOperatorExpressionPsiImpl
+    public static abstract class EqualityOpPsiImpl extends BinaryOperatorExpressionPsiImpl
             implements CeylonPsi.EqualityOpPsi {
         public EqualityOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -906,7 +906,7 @@ public class CeylonPsiImpl {
         public NotEqualOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ComparisonOpPsiImpl extends BinaryOperatorExpressionPsiImpl
+    public static abstract class ComparisonOpPsiImpl extends BinaryOperatorExpressionPsiImpl
             implements CeylonPsi.ComparisonOpPsi {
         public ComparisonOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -936,7 +936,7 @@ public class CeylonPsiImpl {
         public ScaleOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class BoundPsiImpl extends TermPsiImpl
+    public static abstract class BoundPsiImpl extends TermPsiImpl
             implements CeylonPsi.BoundPsi {
         public BoundPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -996,7 +996,7 @@ public class CeylonPsiImpl {
         public InOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class UnaryOperatorExpressionPsiImpl extends OperatorExpressionPsiImpl
+    public static abstract class UnaryOperatorExpressionPsiImpl extends OperatorExpressionPsiImpl
             implements CeylonPsi.UnaryOperatorExpressionPsi {
         public UnaryOperatorExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1026,7 +1026,7 @@ public class CeylonPsiImpl {
         public PositiveOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class TypeOperatorExpressionPsiImpl extends UnaryOperatorExpressionPsiImpl
+    public static abstract class TypeOperatorExpressionPsiImpl extends UnaryOperatorExpressionPsiImpl
             implements CeylonPsi.TypeOperatorExpressionPsi {
         public TypeOperatorExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1051,7 +1051,7 @@ public class CeylonPsiImpl {
         public OfOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class PrefixOperatorExpressionPsiImpl extends UnaryOperatorExpressionPsiImpl
+    public static abstract class PrefixOperatorExpressionPsiImpl extends UnaryOperatorExpressionPsiImpl
             implements CeylonPsi.PrefixOperatorExpressionPsi {
         public PrefixOperatorExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1066,7 +1066,7 @@ public class CeylonPsiImpl {
         public DecrementOpPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class PostfixOperatorExpressionPsiImpl extends UnaryOperatorExpressionPsiImpl
+    public static abstract class PostfixOperatorExpressionPsiImpl extends UnaryOperatorExpressionPsiImpl
             implements CeylonPsi.PostfixOperatorExpressionPsi {
         public PostfixOperatorExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1091,12 +1091,12 @@ public class CeylonPsiImpl {
         public ExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class PrimaryPsiImpl extends TermPsiImpl
+    public static abstract class PrimaryPsiImpl extends TermPsiImpl
             implements CeylonPsi.PrimaryPsi {
         public PrimaryPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class PostfixExpressionPsiImpl extends PrimaryPsiImpl
+    public static abstract class PostfixExpressionPsiImpl extends PrimaryPsiImpl
             implements CeylonPsi.PostfixExpressionPsi {
         public PostfixExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1111,7 +1111,7 @@ public class CeylonPsiImpl {
         public ParameterizedExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class MemberOrTypeExpressionPsiImpl extends PrimaryPsiImpl
+    public static abstract class MemberOrTypeExpressionPsiImpl extends PrimaryPsiImpl
             implements CeylonPsi.MemberOrTypeExpressionPsi {
         public MemberOrTypeExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1121,12 +1121,12 @@ public class CeylonPsiImpl {
         public ExtendedTypeExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class StaticMemberOrTypeExpressionPsiImpl extends MemberOrTypeExpressionPsiImpl
+    public static abstract class StaticMemberOrTypeExpressionPsiImpl extends MemberOrTypeExpressionPsiImpl
             implements CeylonPsi.StaticMemberOrTypeExpressionPsi {
         public StaticMemberOrTypeExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class BaseMemberOrTypeExpressionPsiImpl extends StaticMemberOrTypeExpressionPsiImpl
+    public static abstract class BaseMemberOrTypeExpressionPsiImpl extends StaticMemberOrTypeExpressionPsiImpl
             implements CeylonPsi.BaseMemberOrTypeExpressionPsi {
         public BaseMemberOrTypeExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1141,7 +1141,7 @@ public class CeylonPsiImpl {
         public BaseTypeExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class QualifiedMemberOrTypeExpressionPsiImpl extends StaticMemberOrTypeExpressionPsiImpl
+    public static abstract class QualifiedMemberOrTypeExpressionPsiImpl extends StaticMemberOrTypeExpressionPsiImpl
             implements CeylonPsi.QualifiedMemberOrTypeExpressionPsi {
         public QualifiedMemberOrTypeExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1156,7 +1156,7 @@ public class CeylonPsiImpl {
         public QualifiedTypeExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class MemberOperatorPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class MemberOperatorPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.MemberOperatorPsi {
         public MemberOperatorPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1181,7 +1181,7 @@ public class CeylonPsiImpl {
         public IndexExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ElementOrRangePsiImpl extends CeylonCompositeElementImpl
+    public static abstract class ElementOrRangePsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.ElementOrRangePsi {
         public ElementOrRangePsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1206,7 +1206,7 @@ public class CeylonPsiImpl {
         public PackagePsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ArgumentListPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class ArgumentListPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.ArgumentListPsi {
         public ArgumentListPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1226,7 +1226,7 @@ public class CeylonPsiImpl {
         public PositionalArgumentListPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class PositionalArgumentPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class PositionalArgumentPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.PositionalArgumentPsi {
         public PositionalArgumentPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1246,7 +1246,7 @@ public class CeylonPsiImpl {
         public FunctionArgumentPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class NamedArgumentPsiImpl extends StatementOrArgumentPsiImpl
+    public static abstract class NamedArgumentPsiImpl extends StatementOrArgumentPsiImpl
             implements CeylonPsi.NamedArgumentPsi {
         public NamedArgumentPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1256,7 +1256,7 @@ public class CeylonPsiImpl {
         public SpecifiedArgumentPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class TypedArgumentPsiImpl extends NamedArgumentPsiImpl
+    public static abstract class TypedArgumentPsiImpl extends NamedArgumentPsiImpl
             implements CeylonPsi.TypedArgumentPsi {
         public TypedArgumentPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1276,7 +1276,7 @@ public class CeylonPsiImpl {
         public ObjectArgumentPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class SpecifierOrInitializerExpressionPsiImpl extends CeylonCompositeElementImpl
+    public static abstract class SpecifierOrInitializerExpressionPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.SpecifierOrInitializerExpressionPsi {
         public SpecifierOrInitializerExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1296,12 +1296,12 @@ public class CeylonPsiImpl {
         public InitializerExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class AtomPsiImpl extends PrimaryPsiImpl
+    public static abstract class AtomPsiImpl extends PrimaryPsiImpl
             implements CeylonPsi.AtomPsi {
         public AtomPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class LiteralPsiImpl extends AtomPsiImpl
+    public static abstract class LiteralPsiImpl extends AtomPsiImpl
             implements CeylonPsi.LiteralPsi {
         public LiteralPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1336,7 +1336,7 @@ public class CeylonPsiImpl {
         public DocLinkPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class SelfExpressionPsiImpl extends AtomPsiImpl
+    public static abstract class SelfExpressionPsiImpl extends AtomPsiImpl
             implements CeylonPsi.SelfExpressionPsi {
         public SelfExpressionPsiImpl(ASTNode astNode) { super(astNode); }
     }
@@ -1396,7 +1396,7 @@ public class CeylonPsiImpl {
         public ComprehensionPsiImpl(ASTNode astNode) { super(astNode); }
     }
 
-    public static class ComprehensionClausePsiImpl extends ControlClausePsiImpl
+    public static abstract class ComprehensionClausePsiImpl extends ControlClausePsiImpl
             implements CeylonPsi.ComprehensionClausePsi {
         public ComprehensionClausePsiImpl(ASTNode astNode) { super(astNode); }
     }
