@@ -32,14 +32,13 @@ public class CeylonIdeaParser implements PsiParser {
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
         final CeylonParser parser = new MarkingCeylonParser(builder);
-        Node result = null;
+        Node result;
 
         try {
             if (root == CeylonTypes.COMPILATION_UNIT) {
                 result = parser.compilationUnit();
-            }
 /*
-            // This seems to be unnecessary unless we're using chameleon tokens (see parse method's javadocs).
+            // This seems to be unnecessary unless we start using chameleon tokens (see parse method's javadocs).
             else if (root == CeylonTypes.MODULE_DESCRIPTOR) {
                 result = parser.moduleDescriptor();
             } else if (root == CeylonTypes.PACKAGE_DESCRIPTOR) {
@@ -50,14 +49,16 @@ public class CeylonIdeaParser implements PsiParser {
                 result = parser.importModule();
             } else if (root == CeylonTypes.IMPORT_LIST) {
                 result = parser.importElementList();
-            }
              ...
 */
+            } else {
+                throw new UnsupportedOperationException(String.format("Unsupported type: %s", root));
+            }
         } catch (RecognitionException e) {
             throw new RuntimeException("Unrecognized", e);
         }
         if (result == null) {
-            throw new UnsupportedOperationException(String.format("Unsupported type: %s", root));
+            throw new NullPointerException("CeylonParser returned null.");
         }
         final RangeMapVisitor rangeMapVisitor = new RangeMapVisitor();
         rangeMapVisitor.visitAny(result);
