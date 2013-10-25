@@ -11,7 +11,7 @@ import org.intellij.plugins.ceylon.psi.CeylonTypes;
 
 
 // todo! Do something about overriding final methods
-// todo: Some CeylonParser methods have abstract return types; we construct concrete corresponding AST/Psi elements.
+// todo: Some CeylonParser methods have abstract return types; we construct concrete corresponding AST/Psi elements. Base types on runtime class of node!
 public class MarkingCeylonParser extends CeylonParser {
 //    private final int textHash;
     private PsiBuilder psiBuilder;

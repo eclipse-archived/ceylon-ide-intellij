@@ -1,10 +1,8 @@
 package org.intellij.plugins.ceylon.psi;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
-import org.intellij.plugins.ceylon.psi.impl.*;
-
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 import org.intellij.plugins.ceylon.psi.CeylonPsiImpl.*;
 
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
