@@ -140,22 +140,22 @@ public enum TokenTypes {
 
     ;
 
-    private static final Map<IElementType, TokenTypes> byIElementType = new HashMap<>();
-    private static final Map<Integer, TokenTypes> byIndex = new HashMap<>();
+    static final Map<IElementType, TokenTypes> byIElementType = new HashMap<>();
+    static final Map<Integer, TokenTypes> byIndex = new HashMap<>();
 
     static {
-        final Field[] typeFields = CeylonTypes.class.getDeclaredFields();
-        final Map<String, IElementType> ceylonTypeFields = new HashMap<>();
-        for (Field typeField : typeFields) {
+        final Field[] fields = CeylonTokens.class.getDeclaredFields();
+        final Map<String, IElementType> ceylonTokensFields = new HashMap<>();
+        for (Field tokenField : fields) {
             try {
-                final IElementType elt = (IElementType) typeField.get(null);
-                ceylonTypeFields.put(typeField.getName(), elt);
+                final IElementType elt = (IElementType) tokenField.get(null);
+                ceylonTokensFields.put(tokenField.getName(), elt);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Error accesing CeylonTypes fields.", e);
             }
         }
         for (TokenTypes tokenType : values()) {
-            tokenType.tokenType = ceylonTypeFields.get(tokenType.name());
+            tokenType.tokenType = ceylonTokensFields.get(tokenType.name());
             byIElementType.put(tokenType.tokenType, tokenType);
             byIndex.put(tokenType.getValue(), tokenType);
         }

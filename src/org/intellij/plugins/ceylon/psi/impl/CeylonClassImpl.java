@@ -4,7 +4,6 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProviders;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
@@ -14,7 +13,9 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.yourkit.util.Strings;
 import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
-import org.intellij.plugins.ceylon.psi.*;
+import org.intellij.plugins.ceylon.psi.CeylonClass;
+import org.intellij.plugins.ceylon.psi.CeylonFile;
+import org.intellij.plugins.ceylon.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -83,7 +84,7 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        return findChildByType(CeylonTypes.UIDENTIFIER);
+        return findChildByType(CeylonTokens.UIDENTIFIER);
     }
 
     @Override

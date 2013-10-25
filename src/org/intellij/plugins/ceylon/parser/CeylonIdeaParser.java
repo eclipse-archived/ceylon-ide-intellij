@@ -10,6 +10,7 @@ import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import org.antlr.runtime.RecognitionException;
+import org.intellij.plugins.ceylon.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +25,7 @@ public class CeylonIdeaParser implements PsiParser {
     public static final TokenSet NON_WS_TOKEN_SET = TokenSet.create(IElementType.enumerate(new IElementType.Predicate() {
         @Override
         public boolean matches(IElementType type) {
-            return !type.equals(CeylonTypes.WS);
+            return !type.equals(CeylonTokens.WS);
         }
     }));
 

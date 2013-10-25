@@ -51,7 +51,7 @@
         <!--<lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.formatting.CeylonFormattingModelBuilder"/>-->
         <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.structureView.CeylonStructureViewFactory"/>
 
-        <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>
+        <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.stub.CeylonStubTypes"/>
         <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>-->
         <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>-->
 

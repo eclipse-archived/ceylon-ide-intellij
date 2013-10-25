@@ -5,17 +5,13 @@ import com.intellij.lang.folding.FoldingBuilderEx;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.tree.IElementType;
-
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 
 public class CeylonFoldingBuilder extends FoldingBuilderEx {
 

@@ -5,7 +5,6 @@ import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.RecognizerSharedState;
-import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.psi.TokenTypes;
 
 public class CeylonLexerAdapter extends LexerBase {
