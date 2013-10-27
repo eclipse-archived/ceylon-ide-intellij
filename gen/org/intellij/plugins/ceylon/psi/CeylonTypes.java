@@ -39,10 +39,10 @@ public interface CeylonTypes {
     IElementType DEFAULT_TYPE_ARGUMENT = new CeylonElementType("DEFAULT_TYPE_ARGUMENT");
     IElementType CLASS_SPECIFIER = new CeylonElementType("CLASS_SPECIFIER");
     IElementType ANY_CLASS = new CeylonElementType("ANY_CLASS");
-    IElementType CLASS_DEFINITION = new CeylonElementType("CLASS_DEFINITION");
-    IElementType CLASS_DECLARATION = new ClassElementType("CLASS_DECLARATION", "ceylon.class");
+    IElementType CLASS_DEFINITION = new ClassElementType("CLASS_DEFINITION");
+    IElementType CLASS_DECLARATION = new CeylonElementType("CLASS_DECLARATION");
     IElementType ANY_INTERFACE = new CeylonElementType("ANY_INTERFACE");
-    IElementType INTERFACE_DEFINITION = new CeylonElementType("INTERFACE_DEFINITION");
+    IElementType INTERFACE_DEFINITION = new ClassElementType("INTERFACE_DEFINITION");
     IElementType INTERFACE_DECLARATION = new CeylonElementType("INTERFACE_DECLARATION");
     IElementType TYPED_DECLARATION = new CeylonElementType("TYPED_DECLARATION");
     IElementType ANY_ATTRIBUTE = new CeylonElementType("ANY_ATTRIBUTE");

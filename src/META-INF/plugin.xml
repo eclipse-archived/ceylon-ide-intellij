@@ -51,13 +51,13 @@
         <!--<lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.formatting.CeylonFormattingModelBuilder"/>-->
         <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.structureView.CeylonStructureViewFactory"/>
 
-        <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.stub.CeylonStubTypes"/>
-        <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>-->
+        <stubElementTypeHolder class="org.intellij.plugins.ceylon.psi.CeylonTypes"/>
+        <stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ClassIndex"/>
         <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>-->
 
-        <!--<gotoClassContributor implementation="org.intellij.plugins.ceylon.codeInsight.navigation.CeylonGotoClassContributor"/>-->
+        <gotoClassContributor implementation="org.intellij.plugins.ceylon.codeInsight.navigation.CeylonGotoClassContributor"/>
 
-        <!--<itemPresentationProvider forClass="org.intellij.plugins.ceylon.psi.CeylonTypeName" implementationClass="org.intellij.plugins.ceylon.presentation.ClassPresentationProvider"/>-->
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.psi.CeylonPsi$IdentifierPsi" implementationClass="org.intellij.plugins.ceylon.presentation.ClassPresentationProvider"/>
 
         <!--<lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonFindUsagesProvider"/>-->
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->

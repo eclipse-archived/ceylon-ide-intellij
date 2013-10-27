@@ -12,4 +12,7 @@ public interface ClassStub extends StubElement<CeylonClass> {
     @Nullable
     String getQualifiedName();
 
+    byte getFlags();
+
+    boolean isInterface();
 }

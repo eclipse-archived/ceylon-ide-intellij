@@ -1,18 +1,18 @@
 package org.intellij.plugins.ceylon.psi;
 
-import com.google.common.base.Objects;
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.util.indexing.IndexingDataKeys;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.CeylonFileType;
 import org.intellij.plugins.ceylon.CeylonLanguage;
+import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CeylonFile extends PsiFileBase {
@@ -33,7 +33,14 @@ public class CeylonFile extends PsiFileBase {
         if (packageName != null) {
             return packageName;
         }
-        final List<Tree.PackageDescriptor> packageDescriptors = ((Tree.CompilationUnit) getNode()).getPackageDescriptors();
+
+        Node userData = getNode().getUserData(CeylonIdeaParser.CEYLON_NODE_KEY);
+
+        if (!(userData instanceof Tree.CompilationUnit)) {
+            return null;// TODO is always null :(
+        }
+
+        final List<Tree.PackageDescriptor> packageDescriptors = ((Tree.CompilationUnit) userData).getPackageDescriptors();
         final Tree.PackageDescriptor packageDescriptor = packageDescriptors.get(0); // todo! empty, null?
 
         if (packageDescriptor != null) {
@@ -56,35 +63,4 @@ public class CeylonFile extends PsiFileBase {
 
         return packageName;
     }
-
-/*
-    @NotNull
-    public CeylonImportDeclaration[] getPotentialImportsForType(CeylonTypeName name) {
-        CeylonImportList importList = findChildByClass(CeylonImportList.class);
-
-        if (importList == null) {
-            return new CeylonImportDeclaration[0];
-        }
-
-        List<CeylonImportDeclaration> imports = importList.getImportDeclarationList();
-
-        for (CeylonImportDeclaration anImport : imports) {
-            for (CeylonImportElement importElement : anImport.getImportElementList().getImportElementList()) {
-                if (importElement.getText().equals(name.getText())) {
-                    return new CeylonImportDeclaration[]{anImport};
-                }
-            }
-        }
-
-        List<CeylonImportDeclaration> wildcardDeclarations = new ArrayList<CeylonImportDeclaration>();
-
-        for (CeylonImportDeclaration anImport : imports) {
-            if (!anImport.getImportElementList().getImportWildcardList().isEmpty()) {
-                wildcardDeclarations.add(anImport);
-            }
-        }
-
-        return wildcardDeclarations.toArray(new CeylonImportDeclaration[wildcardDeclarations.size()]);
-    }
-*/
 }

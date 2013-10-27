@@ -15,31 +15,29 @@ import com.yourkit.util.Strings;
 import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
-import org.intellij.plugins.ceylon.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implements CeylonClass {
-    private Tree.ClassDeclaration specClassDecl;
+    private Tree.CompilationUnit specClassDecl;
 
     public CeylonClassImpl(ASTNode node) {
         super(node);
-        specClassDecl = (Tree.ClassDeclaration) node.getUserData(CeylonIdeaParser.CEYLON_NODE_KEY);
+        // TODO user data is not always available (e.g. when we deserialize stubs)
+        // Also, https://github.com/ceylon/ceylon-ide-intellij/issues/5
+//        specClassDecl = (Tree.CompilationUnit) node.getUserData(CeylonIdeaParser.CEYLON_NODE_KEY);
     }
 
     public CeylonClassImpl(ClassStub stub, IStubElementType nodeType) {
         super(stub, nodeType);
     }
 
-/*
-    private boolean isInterface() {
-        return false;
-//        ASTNode kw = getNode().findChildByType(TokenTypes.INTERFACE_DEFINITION.getTokenType());
-//        return kw != null;
+    public boolean isInterface() {
+        return getNode().getElementType() == CeylonTypes.INTERFACE_DEFINITION;
     }
-*/
 
     @Override
     public String getPackage() {
@@ -53,21 +51,21 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
 
     @Override
     public String getName() {
-        PsiElement nameIdentifier = getNameIdentifier();
-
-        return (nameIdentifier == null) ? null : nameIdentifier.getText();
+        PsiElement identifier = findChildByType(CeylonTypes.IDENTIFIER);
+        return identifier == null ? null : identifier.getText();
     }
 
     @Override
     public String getQualifiedName() {
         CeylonClass parentClass = PsiTreeUtil.getParentOfType(this, CeylonClass.class);
 
-        if (parentClass != null) {
-            return parentClass.getQualifiedName() + "." + getName();
-        }
+//        if (parentClass != null) {
+//            return parentClass.getQualifiedName() + "." + getName();
+//        }
 
         String myPackage = getPackage();
-        return myPackage == null ? getName() : myPackage + "." + getName();
+//        return myPackage == null ? getName() : myPackage + "." + getName();
+        return getName();
     }
 
     @Override
@@ -75,16 +73,10 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
         return PsiTreeUtil.getParentOfType(this, CeylonClass.class);
     }
 
-    @Override
-    public boolean isShared() {
-        // todo!
-        return false;
-    }
-
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        return findChildByType(CeylonTokens.UIDENTIFIER);
+        return findChildByType(CeylonTypes.IDENTIFIER);
     }
 
     @Override
@@ -116,6 +108,6 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
 
     @Override
     public String toString() {
-        return Strings.notNull(getName(), " (unnamed)");
+        return "Class " + Strings.notNull(getName(), " (unnamed)");
     }
 }

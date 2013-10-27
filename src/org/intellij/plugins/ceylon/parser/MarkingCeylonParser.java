@@ -85,7 +85,7 @@ public class MarkingCeylonParser extends CeylonParser {
     public Tree.AnyClass classDeclaration() throws RecognitionException {
         final PsiBuilder.Marker marker = mark("classDeclaration");
         final Tree.AnyClass node = super.classDeclaration();
-        end(marker, node);
+        end(marker, null);
         return node;
     }
 
@@ -237,7 +237,7 @@ public class MarkingCeylonParser extends CeylonParser {
     public Tree.AnyInterface interfaceDeclaration() throws RecognitionException {
         final PsiBuilder.Marker marker = mark("interfaceDeclaration");
         final Tree.AnyInterface node = super.interfaceDeclaration();
-        end(marker, node);
+        end(marker, null);
         return node;
     }
 

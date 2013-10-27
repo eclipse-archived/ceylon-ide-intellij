@@ -14,7 +14,7 @@ import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsiFactory;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.psi.TokenTypes;
-import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
+import org.intellij.plugins.ceylon.psi.stub.impl.StubbedClassDefinitionPsiImpl;
 import org.jetbrains.annotations.NotNull;
 
 public class CeylonParserDefinition implements ParserDefinition {
@@ -58,6 +58,10 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public PsiElement createElement(ASTNode node) {
+        if (node.getElementType() == CeylonTypes.CLASS_DEFINITION || node.getElementType() == CeylonTypes.INTERFACE_DEFINITION) {
+            return new StubbedClassDefinitionPsiImpl(node);
+        }
+
         return CeylonPsiFactory.createElement(node);
     }
 
