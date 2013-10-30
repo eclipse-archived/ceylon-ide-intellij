@@ -11,16 +11,22 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.CeylonFileType;
 import org.intellij.plugins.ceylon.CeylonLanguage;
 import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
+import org.intellij.plugins.ceylon.parser.MyTree;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class CeylonFile extends PsiFileBase {
 
+    private final MyTree myTree = new MyTree();
     private String packageName; // TODO should be updated if the file is moved, package is renamed etc.
 
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
+    }
+
+    public MyTree getMyTree() {
+        return myTree;
     }
 
     @NotNull

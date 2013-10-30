@@ -13,6 +13,16 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * This is a wrapper for PsiBuilder; it:
+ * <ul>
+ * <li>produces tokens from the original text (by creating a separate TokenStream),
+ * <li>simultaneously advances the PsiBuilder (and does rollbacks when necessary)
+ * </ul>
+ *
+ * Basically this uses PsiBuilder markers only for rewinds (roll-backs) since this is the only mechanism in PsiBuilder
+ * that enables this.
+ */
 public class PsiBuilderTokenStream implements TokenStream {
     private PsiBuilder psiBuilder;
     private List<PsiBuilder.Marker> markers = new ArrayList<>();

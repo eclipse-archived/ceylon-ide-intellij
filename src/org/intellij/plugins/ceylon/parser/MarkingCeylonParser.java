@@ -15,35 +15,36 @@ public class MarkingCeylonParser extends CeylonParser {
 //    private final int textHash;
     private PsiBuilder psiBuilder;
 //    private int level = 0;
+    private MyTree myTree;
 
-    public MarkingCeylonParser(PsiBuilder psiBuilder) {
+    public MarkingCeylonParser(PsiBuilder psiBuilder, MyTree tree) {
         super(new PsiBuilderTokenStream(psiBuilder));
         this.psiBuilder = psiBuilder;
 //        textHash = psiBuilder.getOriginalText().hashCode();
 //        print("================================================================================================%n");
 //        print("== %d: new Parser ==================================================================%n", textHash);
+        myTree = tree;
     }
 
-
-    private PsiBuilder.Marker mark(String method) {
+    private MyTree.MyMarker mark(String method) {
 //        print(String.format("%%20d: %%%ds%%s%%n", ++level), textHash, "?", method);
-        return psiBuilder.mark();
+        return myTree.mark(psiBuilder.mark());
     }
 
-    private void end(PsiBuilder.Marker marker, Node node) {
+    private void end(MyTree.MyMarker marker, Node node) {
         if (node == null) {
 //            print(String.format("%%20d: %%%ds%%s - NULL%%n", level--), textHash, "-", elementType);
             marker.drop();
         } else {
             IElementType elementType = NodeToIElementTypeMap.get(node);
 //            print(String.format("%%20d: %%%ds%%s%%n", level--), textHash, "+", elementType);
-            marker.done(elementType);
+            marker.done(elementType, node);
         }
     }
 
     @Override
     public Tree.ImportMemberOrTypeList importElementList() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("importElementList");
+        final MyTree.MyMarker marker = mark("importElementList");
         final Tree.ImportMemberOrTypeList node = super.importElementList();
         end(marker, node);
         return node;
@@ -51,7 +52,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Import importDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("importDeclaration");
+        final MyTree.MyMarker marker = mark("importDeclaration");
         final Tree.Import node = super.importDeclaration();
         end(marker, node);
         return node;
@@ -59,7 +60,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ImportMemberOrType importElement() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("importElement");
+        final MyTree.MyMarker marker = mark("importElement");
         final Tree.ImportMemberOrType node = super.importElement();
         end(marker, node);
         return node;
@@ -67,7 +68,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ImportModuleList importModuleList() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("importModuleList");
+        final MyTree.MyMarker marker = mark("importModuleList");
         final Tree.ImportModuleList node = super.importModuleList();
         end(marker, node);
         return node;
@@ -75,7 +76,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ImportPath packagePath() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("packagePath");
+        final MyTree.MyMarker marker = mark("packagePath");
         final Tree.ImportPath node = super.packagePath();
         end(marker, node);
         return node;
@@ -83,15 +84,15 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AnyClass classDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("classDeclaration");
+        final MyTree.MyMarker marker = mark("classDeclaration");
         final Tree.AnyClass node = super.classDeclaration();
-        end(marker, null);
+        end(marker, node);
         return node;
     }
 
     @Override
     public Tree.AnyMethod voidOrInferredMethodDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("voidOrInferredMethodDeclaration");
+        final MyTree.MyMarker marker = mark("voidOrInferredMethodDeclaration");
         final Tree.AnyMethod node = super.voidOrInferredMethodDeclaration();
         end(marker, node);
         return node;
@@ -99,7 +100,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CompilationUnit compilationUnit() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("compilationUnit");
+        final MyTree.MyMarker marker = mark("compilationUnit");
         final Tree.CompilationUnit node = super.compilationUnit();
         end(marker, node);
         return node;
@@ -107,7 +108,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.InitializerParameter parameterRef() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("parameterRef");
+        final MyTree.MyMarker marker = mark("parameterRef");
         final Tree.InitializerParameter node = super.parameterRef();
         end(marker, node);
         return node;
@@ -115,7 +116,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ModuleDescriptor moduleDescriptor() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("moduleDescriptor");
+        final MyTree.MyMarker marker = mark("moduleDescriptor");
         final Tree.ModuleDescriptor node = super.moduleDescriptor();
         end(marker, node);
         return node;
@@ -123,7 +124,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.PackageDescriptor packageDescriptor() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("packageDescriptor");
+        final MyTree.MyMarker marker = mark("packageDescriptor");
         final Tree.PackageDescriptor node = super.packageDescriptor();
         end(marker, node);
         return node;
@@ -131,7 +132,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ImportModule importModule() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("importModule");
+        final MyTree.MyMarker marker = mark("importModule");
         final Tree.ImportModule node = super.importModule();
         end(marker, node);
         return node;
@@ -139,7 +140,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ImportWildcard importWildcard() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("importWildcard");
+        final MyTree.MyMarker marker = mark("importWildcard");
         final Tree.ImportWildcard node = super.importWildcard();
         end(marker, node);
         return node;
@@ -147,7 +148,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Identifier importName() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("importName");
+        final MyTree.MyMarker marker = mark("importName");
         final Tree.Identifier node = super.importName();
         end(marker, node);
         return node;
@@ -155,7 +156,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Identifier packageName() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("packageName");
+        final MyTree.MyMarker marker = mark("packageName");
         final Tree.Identifier node = super.packageName();
         end(marker, node);
         return node;
@@ -163,7 +164,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Identifier typeName() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeName");
+        final MyTree.MyMarker marker = mark("typeName");
         final Tree.Identifier node = super.typeName();
         end(marker, node);
         return node;
@@ -171,7 +172,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Identifier annotationName() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("annotationName");
+        final MyTree.MyMarker marker = mark("annotationName");
         final Tree.Identifier node = super.annotationName();
         end(marker, node);
         return node;
@@ -179,7 +180,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Identifier memberName() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("memberName");
+        final MyTree.MyMarker marker = mark("memberName");
         final Tree.Identifier node = super.memberName();
         end(marker, node);
         return node;
@@ -187,7 +188,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Identifier memberNameDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("memberNameDeclaration");
+        final MyTree.MyMarker marker = mark("memberNameDeclaration");
         final Tree.Identifier node = super.memberNameDeclaration();
         end(marker, node);
         return node;
@@ -195,7 +196,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Identifier typeNameDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeNameDeclaration");
+        final MyTree.MyMarker marker = mark("typeNameDeclaration");
         final Tree.Identifier node = super.typeNameDeclaration();
         end(marker, node);
         return node;
@@ -203,7 +204,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ObjectDefinition objectDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("objectDeclaration");
+        final MyTree.MyMarker marker = mark("objectDeclaration");
         final Tree.ObjectDefinition node = super.objectDeclaration();
         end(marker, node);
         return node;
@@ -211,7 +212,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AttributeSetterDefinition setterDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("setterDeclaration");
+        final MyTree.MyMarker marker = mark("setterDeclaration");
         final Tree.AttributeSetterDefinition node = super.setterDeclaration();
         end(marker, node);
         return node;
@@ -219,7 +220,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AnyAttribute inferredAttributeDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("inferredAttributeDeclaration");
+        final MyTree.MyMarker marker = mark("inferredAttributeDeclaration");
         final Tree.AnyAttribute node = super.inferredAttributeDeclaration();
         end(marker, node);
         return node;
@@ -227,7 +228,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypedDeclaration typedMethodOrAttributeDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typedMethodOrAttributeDeclaration");
+        final MyTree.MyMarker marker = mark("typedMethodOrAttributeDeclaration");
         final Tree.TypedDeclaration node = super.typedMethodOrAttributeDeclaration();
         end(marker, node);
         return node;
@@ -235,15 +236,15 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AnyInterface interfaceDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("interfaceDeclaration");
+        final MyTree.MyMarker marker = mark("interfaceDeclaration");
         final Tree.AnyInterface node = super.interfaceDeclaration();
-        end(marker, null);
+        end(marker, node);
         return node;
     }
 
     @Override
     public Tree.TypeAliasDeclaration aliasDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("aliasDeclaration");
+        final MyTree.MyMarker marker = mark("aliasDeclaration");
         final Tree.TypeAliasDeclaration node = super.aliasDeclaration();
         end(marker, node);
         return node;
@@ -251,7 +252,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Assertion assertion() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("assertion");
+        final MyTree.MyMarker marker = mark("assertion");
         final Tree.Assertion node = super.assertion();
         end(marker, node);
         return node;
@@ -259,7 +260,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Block block() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("block");
+        final MyTree.MyMarker marker = mark("block");
         final Tree.Block node = super.block();
         end(marker, node);
         return node;
@@ -267,7 +268,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.InterfaceBody interfaceBody() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("interfaceBody");
+        final MyTree.MyMarker marker = mark("interfaceBody");
         final Tree.InterfaceBody node = super.interfaceBody();
         end(marker, node);
         return node;
@@ -275,7 +276,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ClassBody classBody() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("classBody");
+        final MyTree.MyMarker marker = mark("classBody");
         final Tree.ClassBody node = super.classBody();
         end(marker, node);
         return node;
@@ -283,7 +284,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ExtendedType extendedType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("extendedType");
+        final MyTree.MyMarker marker = mark("extendedType");
         final Tree.ExtendedType node = super.extendedType();
         end(marker, node);
         return node;
@@ -291,7 +292,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ClassSpecifier classSpecifier() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("classSpecifier");
+        final MyTree.MyMarker marker = mark("classSpecifier");
         final Tree.ClassSpecifier node = super.classSpecifier();
         end(marker, node);
         return node;
@@ -300,7 +301,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SatisfiedTypes satisfiedTypes() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("satisfiedTypes");
+        final MyTree.MyMarker marker = mark("satisfiedTypes");
         final Tree.SatisfiedTypes node = super.satisfiedTypes();
         end(marker, node);
         return node;
@@ -308,7 +309,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AbstractedType abstractedType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("abstractedType");
+        final MyTree.MyMarker marker = mark("abstractedType");
         final Tree.AbstractedType node = super.abstractedType();
         end(marker, node);
         return node;
@@ -316,7 +317,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CaseTypes caseTypes() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("caseTypes");
+        final MyTree.MyMarker marker = mark("caseTypes");
         final Tree.CaseTypes node = super.caseTypes();
         end(marker, node);
         return node;
@@ -325,7 +326,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ParameterList parameters() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("parameters");
+        final MyTree.MyMarker marker = mark("parameters");
         final Tree.ParameterList node = super.parameters();
         end(marker, node);
         return node;
@@ -333,7 +334,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ParameterDeclaration parameter() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("parameter");
+        final MyTree.MyMarker marker = mark("parameter");
         final Tree.ParameterDeclaration node = super.parameter();
         end(marker, node);
         return node;
@@ -341,7 +342,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Parameter parameterDeclarationOrRef() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("parameterDeclarationOrRef");
+        final MyTree.MyMarker marker = mark("parameterDeclarationOrRef");
         final Tree.Parameter node = super.parameterDeclarationOrRef();
         end(marker, node);
         return node;
@@ -349,7 +350,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeParameterList typeParameters() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeParameters");
+        final MyTree.MyMarker marker = mark("typeParameters");
         final Tree.TypeParameterList node = super.typeParameters();
         end(marker, node);
         return node;
@@ -357,7 +358,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeParameterDeclaration typeParameter() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeParameter");
+        final MyTree.MyMarker marker = mark("typeParameter");
         final Tree.TypeParameterDeclaration node = super.typeParameter();
         end(marker, node);
         return node;
@@ -365,7 +366,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeVariance variance() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("variance");
+        final MyTree.MyMarker marker = mark("variance");
         final Tree.TypeVariance node = super.variance();
         end(marker, node);
         return node;
@@ -373,7 +374,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeConstraint typeConstraint() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeConstraint");
+        final MyTree.MyMarker marker = mark("typeConstraint");
         final Tree.TypeConstraint node = super.typeConstraint();
         end(marker, node);
         return node;
@@ -381,7 +382,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeConstraintList typeConstraints() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeConstraints");
+        final MyTree.MyMarker marker = mark("typeConstraints");
         final Tree.TypeConstraintList node = super.typeConstraints();
         end(marker, node);
         return node;
@@ -390,7 +391,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Statement declarationOrStatement() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("declarationOrStatement");
+        final MyTree.MyMarker marker = mark("declarationOrStatement");
         final Tree.Statement node = super.declarationOrStatement();
         end(marker, node);
         return node;
@@ -398,7 +399,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Declaration declaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("declaration");
+        final MyTree.MyMarker marker = mark("declaration");
         final Tree.Declaration node = super.declaration();
         end(marker, node);
         return node;
@@ -407,7 +408,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Statement statement() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("statement");
+        final MyTree.MyMarker marker = mark("statement");
         final Tree.Statement node = super.statement();
         end(marker, node);
         return node;
@@ -415,7 +416,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Statement expressionOrSpecificationStatement() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("expressionOrSpecificationStatement");
+        final MyTree.MyMarker marker = mark("expressionOrSpecificationStatement");
         final Tree.Statement node = super.expressionOrSpecificationStatement();
         end(marker, node);
         return node;
@@ -423,7 +424,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Directive directiveStatement() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("directiveStatement");
+        final MyTree.MyMarker marker = mark("directiveStatement");
         final Tree.Directive node = super.directiveStatement();
         end(marker, node);
         return node;
@@ -431,7 +432,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Directive directive() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("directive");
+        final MyTree.MyMarker marker = mark("directive");
         final Tree.Directive node = super.directive();
         end(marker, node);
         return node;
@@ -439,7 +440,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Return returnDirective() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("returnDirective");
+        final MyTree.MyMarker marker = mark("returnDirective");
         final Tree.Return node = super.returnDirective();
         end(marker, node);
         return node;
@@ -447,7 +448,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Throw throwDirective() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("throwDirective");
+        final MyTree.MyMarker marker = mark("throwDirective");
         final Tree.Throw node = super.throwDirective();
         end(marker, node);
         return node;
@@ -455,7 +456,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Break breakDirective() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("breakDirective");
+        final MyTree.MyMarker marker = mark("breakDirective");
         final Tree.Break node = super.breakDirective();
         end(marker, node);
         return node;
@@ -463,7 +464,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Continue continueDirective() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("continueDirective");
+        final MyTree.MyMarker marker = mark("continueDirective");
         final Tree.Continue node = super.continueDirective();
         end(marker, node);
         return node;
@@ -471,7 +472,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeSpecifier typeSpecifier() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeSpecifier");
+        final MyTree.MyMarker marker = mark("typeSpecifier");
         final Tree.TypeSpecifier node = super.typeSpecifier();
         end(marker, node);
         return node;
@@ -479,7 +480,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeSpecifier typeDefault() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeDefault");
+        final MyTree.MyMarker marker = mark("typeDefault");
         final Tree.TypeSpecifier node = super.typeDefault();
         end(marker, node);
         return node;
@@ -487,7 +488,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SpecifierExpression specifier() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("specifier");
+        final MyTree.MyMarker marker = mark("specifier");
         final Tree.SpecifierExpression node = super.specifier();
         end(marker, node);
         return node;
@@ -495,7 +496,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SpecifierExpression lazySpecifier() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("lazySpecifier");
+        final MyTree.MyMarker marker = mark("lazySpecifier");
         final Tree.SpecifierExpression node = super.lazySpecifier();
         end(marker, node);
         return node;
@@ -503,7 +504,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SpecifierExpression functionSpecifier() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("functionSpecifier");
+        final MyTree.MyMarker marker = mark("functionSpecifier");
         final Tree.SpecifierExpression node = super.functionSpecifier();
         end(marker, node);
         return node;
@@ -511,7 +512,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Expression expression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("expression");
+        final MyTree.MyMarker marker = mark("expression");
         final Tree.Expression node = super.expression();
         end(marker, node);
         return node;
@@ -519,7 +520,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Primary base() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("base");
+        final MyTree.MyMarker marker = mark("base");
         final Tree.Primary node = super.base();
         end(marker, node);
         return node;
@@ -528,7 +529,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Primary primary() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("primary");
+        final MyTree.MyMarker marker = mark("primary");
         final Tree.Primary node = super.primary();
         end(marker, node);
         return node;
@@ -537,7 +538,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.MemberOperator memberSelectionOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("memberSelectionOperator");
+        final MyTree.MyMarker marker = mark("memberSelectionOperator");
         final Tree.MemberOperator node = super.memberSelectionOperator();
         end(marker, node);
         return node;
@@ -545,7 +546,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SequenceEnumeration enumeration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("enumeration");
+        final MyTree.MyMarker marker = mark("enumeration");
         final Tree.SequenceEnumeration node = super.enumeration();
         end(marker, node);
         return node;
@@ -553,7 +554,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Tuple tuple() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("tuple");
+        final MyTree.MyMarker marker = mark("tuple");
         final Tree.Tuple node = super.tuple();
         end(marker, node);
         return node;
@@ -561,7 +562,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Dynamic dynamicObject() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("dynamicObject");
+        final MyTree.MyMarker marker = mark("dynamicObject");
         final Tree.Dynamic node = super.dynamicObject();
         end(marker, node);
         return node;
@@ -569,7 +570,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ExpressionList expressions() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("expressions");
+        final MyTree.MyMarker marker = mark("expressions");
         final Tree.ExpressionList node = super.expressions();
         end(marker, node);
         return node;
@@ -578,7 +579,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.IndexExpression indexOrIndexRange() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("indexOrIndexRange");
+        final MyTree.MyMarker marker = mark("indexOrIndexRange");
         final Tree.IndexExpression node = super.indexOrIndexRange();
         end(marker, node);
         return node;
@@ -586,7 +587,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Expression index() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("index");
+        final MyTree.MyMarker marker = mark("index");
         final Tree.Expression node = super.index();
         end(marker, node);
         return node;
@@ -594,7 +595,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.NamedArgumentList namedArguments() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("namedArguments");
+        final MyTree.MyMarker marker = mark("namedArguments");
         final Tree.NamedArgumentList node = super.namedArguments();
         end(marker, node);
         return node;
@@ -602,7 +603,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SequencedArgument sequencedArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("sequencedArgument");
+        final MyTree.MyMarker marker = mark("sequencedArgument");
         final Tree.SequencedArgument node = super.sequencedArgument();
         end(marker, node);
         return node;
@@ -610,7 +611,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.NamedArgument namedArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("namedArgument");
+        final MyTree.MyMarker marker = mark("namedArgument");
         final Tree.NamedArgument node = super.namedArgument();
         end(marker, node);
         return node;
@@ -618,7 +619,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SpecifiedArgument namedSpecifiedArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("namedSpecifiedArgument");
+        final MyTree.MyMarker marker = mark("namedSpecifiedArgument");
         final Tree.SpecifiedArgument node = super.namedSpecifiedArgument();
         end(marker, node);
         return node;
@@ -626,7 +627,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SpecifiedArgument anonymousArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("anonymousArgument");
+        final MyTree.MyMarker marker = mark("anonymousArgument");
         final Tree.SpecifiedArgument node = super.anonymousArgument();
         end(marker, node);
         return node;
@@ -634,7 +635,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ObjectArgument objectArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("objectArgument");
+        final MyTree.MyMarker marker = mark("objectArgument");
         final Tree.ObjectArgument node = super.objectArgument();
         end(marker, node);
         return node;
@@ -642,7 +643,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.MethodArgument voidOrInferredMethodArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("voidOrInferredMethodArgument");
+        final MyTree.MyMarker marker = mark("voidOrInferredMethodArgument");
         final Tree.MethodArgument node = super.voidOrInferredMethodArgument();
         end(marker, node);
         return node;
@@ -650,7 +651,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AttributeArgument inferredGetterArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("inferredGetterArgument");
+        final MyTree.MyMarker marker = mark("inferredGetterArgument");
         final Tree.AttributeArgument node = super.inferredGetterArgument();
         end(marker, node);
         return node;
@@ -658,7 +659,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypedArgument typedMethodOrGetterArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typedMethodOrGetterArgument");
+        final MyTree.MyMarker marker = mark("typedMethodOrGetterArgument");
         final Tree.TypedArgument node = super.typedMethodOrGetterArgument();
         end(marker, node);
         return node;
@@ -666,7 +667,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypedArgument untypedMethodOrGetterArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("untypedMethodOrGetterArgument");
+        final MyTree.MyMarker marker = mark("untypedMethodOrGetterArgument");
         final Tree.TypedArgument node = super.untypedMethodOrGetterArgument();
         end(marker, node);
         return node;
@@ -674,7 +675,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.NamedArgument namedArgumentDeclaration() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("namedArgumentDeclaration");
+        final MyTree.MyMarker marker = mark("namedArgumentDeclaration");
         final Tree.NamedArgument node = super.namedArgumentDeclaration();
         end(marker, node);
         return node;
@@ -683,7 +684,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Expression parExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("parExpression");
+        final MyTree.MyMarker marker = mark("parExpression");
         final Tree.Expression node = super.parExpression();
         end(marker, node);
         return node;
@@ -691,7 +692,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.PositionalArgumentList positionalArguments() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("positionalArguments");
+        final MyTree.MyMarker marker = mark("positionalArguments");
         final Tree.PositionalArgumentList node = super.positionalArguments();
         end(marker, node);
         return node;
@@ -699,7 +700,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ListedArgument positionalArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("positionalArgument");
+        final MyTree.MyMarker marker = mark("positionalArgument");
         final Tree.ListedArgument node = super.positionalArgument();
         end(marker, node);
         return node;
@@ -707,7 +708,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SpreadArgument spreadArgument() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("spreadArgument");
+        final MyTree.MyMarker marker = mark("spreadArgument");
         final Tree.SpreadArgument node = super.spreadArgument();
         end(marker, node);
         return node;
@@ -716,7 +717,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Expression functionOrExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("functionOrExpression");
+        final MyTree.MyMarker marker = mark("functionOrExpression");
         final Tree.Expression node = super.functionOrExpression();
         end(marker, node);
         return node;
@@ -724,7 +725,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Expression anonymousFunction() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("anonymousFunction");
+        final MyTree.MyMarker marker = mark("anonymousFunction");
         final Tree.Expression node = super.anonymousFunction();
         end(marker, node);
         return node;
@@ -732,7 +733,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Comprehension comprehension() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("comprehension");
+        final MyTree.MyMarker marker = mark("comprehension");
         final Tree.Comprehension node = super.comprehension();
         end(marker, node);
         return node;
@@ -740,7 +741,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ComprehensionClause comprehensionClause() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("comprehensionClause");
+        final MyTree.MyMarker marker = mark("comprehensionClause");
         final Tree.ComprehensionClause node = super.comprehensionClause();
         end(marker, node);
         return node;
@@ -748,7 +749,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ExpressionComprehensionClause expressionComprehensionClause() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("expressionComprehensionClause");
+        final MyTree.MyMarker marker = mark("expressionComprehensionClause");
         final Tree.ExpressionComprehensionClause node = super.expressionComprehensionClause();
         end(marker, node);
         return node;
@@ -756,7 +757,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ForComprehensionClause forComprehensionClause() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("forComprehensionClause");
+        final MyTree.MyMarker marker = mark("forComprehensionClause");
         final Tree.ForComprehensionClause node = super.forComprehensionClause();
         end(marker, node);
         return node;
@@ -764,7 +765,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.IfComprehensionClause ifComprehensionClause() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("ifComprehensionClause");
+        final MyTree.MyMarker marker = mark("ifComprehensionClause");
         final Tree.IfComprehensionClause node = super.ifComprehensionClause();
         end(marker, node);
         return node;
@@ -772,7 +773,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term assignmentExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("assignmentExpression");
+        final MyTree.MyMarker marker = mark("assignmentExpression");
         final Tree.Term node = super.assignmentExpression();
         end(marker, node);
         return node;
@@ -780,7 +781,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AssignmentOp assignmentOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("assignmentOperator");
+        final MyTree.MyMarker marker = mark("assignmentOperator");
         final Tree.AssignmentOp node = super.assignmentOperator();
         end(marker, node);
         return node;
@@ -788,7 +789,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term thenElseExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("thenElseExpression");
+        final MyTree.MyMarker marker = mark("thenElseExpression");
         final Tree.Term node = super.thenElseExpression();
         end(marker, node);
         return node;
@@ -796,7 +797,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BinaryOperatorExpression thenElseOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("thenElseOperator");
+        final MyTree.MyMarker marker = mark("thenElseOperator");
         final Tree.BinaryOperatorExpression node = super.thenElseOperator();
         end(marker, node);
         return node;
@@ -804,7 +805,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term disjunctionExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("disjunctionExpression");
+        final MyTree.MyMarker marker = mark("disjunctionExpression");
         final Tree.Term node = super.disjunctionExpression();
         end(marker, node);
         return node;
@@ -812,7 +813,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.OrOp disjunctionOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("disjunctionOperator");
+        final MyTree.MyMarker marker = mark("disjunctionOperator");
         final Tree.OrOp node = super.disjunctionOperator();
         end(marker, node);
         return node;
@@ -820,7 +821,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term conjunctionExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("conjunctionExpression");
+        final MyTree.MyMarker marker = mark("conjunctionExpression");
         final Tree.Term node = super.conjunctionExpression();
         end(marker, node);
         return node;
@@ -828,7 +829,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AndOp conjunctionOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("conjunctionOperator");
+        final MyTree.MyMarker marker = mark("conjunctionOperator");
         final Tree.AndOp node = super.conjunctionOperator();
         end(marker, node);
         return node;
@@ -836,7 +837,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term logicalNegationExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("logicalNegationExpression");
+        final MyTree.MyMarker marker = mark("logicalNegationExpression");
         final Tree.Term node = super.logicalNegationExpression();
         end(marker, node);
         return node;
@@ -844,7 +845,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.NotOp notOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("notOperator");
+        final MyTree.MyMarker marker = mark("notOperator");
         final Tree.NotOp node = super.notOperator();
         end(marker, node);
         return node;
@@ -852,7 +853,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term equalityExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("equalityExpression");
+        final MyTree.MyMarker marker = mark("equalityExpression");
         final Tree.Term node = super.equalityExpression();
         end(marker, node);
         return node;
@@ -860,7 +861,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BinaryOperatorExpression equalityOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("equalityOperator");
+        final MyTree.MyMarker marker = mark("equalityOperator");
         final Tree.BinaryOperatorExpression node = super.equalityOperator();
         end(marker, node);
         return node;
@@ -868,7 +869,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term comparisonExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("comparisonExpression");
+        final MyTree.MyMarker marker = mark("comparisonExpression");
         final Tree.Term node = super.comparisonExpression();
         end(marker, node);
         return node;
@@ -876,7 +877,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ComparisonOp smallerOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("smallerOperator");
+        final MyTree.MyMarker marker = mark("smallerOperator");
         final Tree.ComparisonOp node = super.smallerOperator();
         end(marker, node);
         return node;
@@ -884,7 +885,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ComparisonOp largerOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("largerOperator");
+        final MyTree.MyMarker marker = mark("largerOperator");
         final Tree.ComparisonOp node = super.largerOperator();
         end(marker, node);
         return node;
@@ -892,7 +893,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BinaryOperatorExpression comparisonOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("comparisonOperator");
+        final MyTree.MyMarker marker = mark("comparisonOperator");
         final Tree.BinaryOperatorExpression node = super.comparisonOperator();
         end(marker, node);
         return node;
@@ -900,7 +901,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeOperatorExpression typeOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeOperator");
+        final MyTree.MyMarker marker = mark("typeOperator");
         final Tree.TypeOperatorExpression node = super.typeOperator();
         end(marker, node);
         return node;
@@ -908,7 +909,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term existenceEmptinessExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("existenceEmptinessExpression");
+        final MyTree.MyMarker marker = mark("existenceEmptinessExpression");
         final Tree.Term node = super.existenceEmptinessExpression();
         end(marker, node);
         return node;
@@ -916,7 +917,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.UnaryOperatorExpression existsNonemptyOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("existsNonemptyOperator");
+        final MyTree.MyMarker marker = mark("existsNonemptyOperator");
         final Tree.UnaryOperatorExpression node = super.existsNonemptyOperator();
         end(marker, node);
         return node;
@@ -924,7 +925,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term entryRangeExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("entryRangeExpression");
+        final MyTree.MyMarker marker = mark("entryRangeExpression");
         final Tree.Term node = super.entryRangeExpression();
         end(marker, node);
         return node;
@@ -932,7 +933,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BinaryOperatorExpression rangeIntervalEntryOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("rangeIntervalEntryOperator");
+        final MyTree.MyMarker marker = mark("rangeIntervalEntryOperator");
         final Tree.BinaryOperatorExpression node = super.rangeIntervalEntryOperator();
         end(marker, node);
         return node;
@@ -940,7 +941,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term additiveExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("additiveExpression");
+        final MyTree.MyMarker marker = mark("additiveExpression");
         final Tree.Term node = super.additiveExpression();
         end(marker, node);
         return node;
@@ -948,7 +949,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BinaryOperatorExpression additiveOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("additiveOperator");
+        final MyTree.MyMarker marker = mark("additiveOperator");
         final Tree.BinaryOperatorExpression node = super.additiveOperator();
         end(marker, node);
         return node;
@@ -956,7 +957,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term scaleExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("scaleExpression");
+        final MyTree.MyMarker marker = mark("scaleExpression");
         final Tree.Term node = super.scaleExpression();
         end(marker, node);
         return node;
@@ -964,7 +965,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term multiplicativeExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("multiplicativeExpression");
+        final MyTree.MyMarker marker = mark("multiplicativeExpression");
         final Tree.Term node = super.multiplicativeExpression();
         end(marker, node);
         return node;
@@ -972,7 +973,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BinaryOperatorExpression multiplicativeOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("multiplicativeOperator");
+        final MyTree.MyMarker marker = mark("multiplicativeOperator");
         final Tree.BinaryOperatorExpression node = super.multiplicativeOperator();
         end(marker, node);
         return node;
@@ -980,7 +981,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term unionExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("unionExpression");
+        final MyTree.MyMarker marker = mark("unionExpression");
         final Tree.Term node = super.unionExpression();
         end(marker, node);
         return node;
@@ -988,7 +989,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BinaryOperatorExpression unionOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("unionOperator");
+        final MyTree.MyMarker marker = mark("unionOperator");
         final Tree.BinaryOperatorExpression node = super.unionOperator();
         end(marker, node);
         return node;
@@ -996,7 +997,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term intersectionExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("intersectionExpression");
+        final MyTree.MyMarker marker = mark("intersectionExpression");
         final Tree.Term node = super.intersectionExpression();
         end(marker, node);
         return node;
@@ -1004,7 +1005,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BinaryOperatorExpression intersectionOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("intersectionOperator");
+        final MyTree.MyMarker marker = mark("intersectionOperator");
         final Tree.BinaryOperatorExpression node = super.intersectionOperator();
         end(marker, node);
         return node;
@@ -1012,7 +1013,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term negationComplementExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("negationComplementExpression");
+        final MyTree.MyMarker marker = mark("negationComplementExpression");
         final Tree.Term node = super.negationComplementExpression();
         end(marker, node);
         return node;
@@ -1020,7 +1021,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.UnaryOperatorExpression unaryMinusOrComplementOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("unaryMinusOrComplementOperator");
+        final MyTree.MyMarker marker = mark("unaryMinusOrComplementOperator");
         final Tree.UnaryOperatorExpression node = super.unaryMinusOrComplementOperator();
         end(marker, node);
         return node;
@@ -1028,7 +1029,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term exponentiationExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("exponentiationExpression");
+        final MyTree.MyMarker marker = mark("exponentiationExpression");
         final Tree.Term node = super.exponentiationExpression();
         end(marker, node);
         return node;
@@ -1036,7 +1037,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.PowerOp exponentiationOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("exponentiationOperator");
+        final MyTree.MyMarker marker = mark("exponentiationOperator");
         final Tree.PowerOp node = super.exponentiationOperator();
         end(marker, node);
         return node;
@@ -1044,7 +1045,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ScaleOp scaleOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("scaleOperator");
+        final MyTree.MyMarker marker = mark("scaleOperator");
         final Tree.ScaleOp node = super.scaleOperator();
         end(marker, node);
         return node;
@@ -1052,7 +1053,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term incrementDecrementExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("incrementDecrementExpression");
+        final MyTree.MyMarker marker = mark("incrementDecrementExpression");
         final Tree.Term node = super.incrementDecrementExpression();
         end(marker, node);
         return node;
@@ -1060,7 +1061,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.PrefixOperatorExpression prefixOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("prefixOperator");
+        final MyTree.MyMarker marker = mark("prefixOperator");
         final Tree.PrefixOperatorExpression node = super.prefixOperator();
         end(marker, node);
         return node;
@@ -1068,7 +1069,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Term postfixIncrementDecrementExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("postfixIncrementDecrementExpression");
+        final MyTree.MyMarker marker = mark("postfixIncrementDecrementExpression");
         final Tree.Term node = super.postfixIncrementDecrementExpression();
         end(marker, node);
         return node;
@@ -1076,7 +1077,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.PostfixOperatorExpression postfixOperator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("postfixOperator");
+        final MyTree.MyMarker marker = mark("postfixOperator");
         final Tree.PostfixOperatorExpression node = super.postfixOperator();
         end(marker, node);
         return node;
@@ -1084,7 +1085,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Atom selfReference() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("selfReference");
+        final MyTree.MyMarker marker = mark("selfReference");
         final Tree.Atom node = super.selfReference();
         end(marker, node);
         return node;
@@ -1092,7 +1093,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Literal nonstringLiteral() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("nonstringLiteral");
+        final MyTree.MyMarker marker = mark("nonstringLiteral");
         final Tree.Literal node = super.nonstringLiteral();
         end(marker, node);
         return node;
@@ -1100,7 +1101,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.StringLiteral stringLiteral() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("stringLiteral");
+        final MyTree.MyMarker marker = mark("stringLiteral");
         final Tree.StringLiteral node = super.stringLiteral();
         end(marker, node);
         return node;
@@ -1108,7 +1109,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Atom stringExpression() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("stringExpression");
+        final MyTree.MyMarker marker = mark("stringExpression");
         final Tree.Atom node = super.stringExpression();
         end(marker, node);
         return node;
@@ -1116,7 +1117,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TypeArgumentList typeArguments() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("typeArguments");
+        final MyTree.MyMarker marker = mark("typeArguments");
         final Tree.TypeArgumentList node = super.typeArguments();
         end(marker, node);
         return node;
@@ -1124,7 +1125,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Type variadicType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("variadicType");
+        final MyTree.MyMarker marker = mark("variadicType");
         final Tree.Type node = super.variadicType();
         end(marker, node);
         return node;
@@ -1132,7 +1133,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Type defaultedType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("defaultedType");
+        final MyTree.MyMarker marker = mark("defaultedType");
         final Tree.Type node = super.defaultedType();
         end(marker, node);
         return node;
@@ -1140,7 +1141,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TupleType tupleType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("tupleType");
+        final MyTree.MyMarker marker = mark("tupleType");
         final Tree.TupleType node = super.tupleType();
         end(marker, node);
         return node;
@@ -1148,7 +1149,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.StaticType groupedType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("groupedType");
+        final MyTree.MyMarker marker = mark("groupedType");
         final Tree.StaticType node = super.groupedType();
         end(marker, node);
         return node;
@@ -1156,7 +1157,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.IterableType iterableType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("iterableType");
+        final MyTree.MyMarker marker = mark("iterableType");
         final Tree.IterableType node = super.iterableType();
         end(marker, node);
         return node;
@@ -1164,7 +1165,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.MetaLiteral metaLiteral() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("metaLiteral");
+        final MyTree.MyMarker marker = mark("metaLiteral");
         final Tree.MetaLiteral node = super.metaLiteral();
         end(marker, node);
         return node;
@@ -1172,7 +1173,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.StaticType type() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("type");
+        final MyTree.MyMarker marker = mark("type");
         final Tree.StaticType node = super.type();
         end(marker, node);
         return node;
@@ -1180,7 +1181,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.StaticType unionType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("unionType");
+        final MyTree.MyMarker marker = mark("unionType");
         final Tree.StaticType node = super.unionType();
         end(marker, node);
         return node;
@@ -1188,7 +1189,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.StaticType intersectionType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("intersectionType");
+        final MyTree.MyMarker marker = mark("intersectionType");
         final Tree.StaticType node = super.intersectionType();
         end(marker, node);
         return node;
@@ -1196,7 +1197,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.StaticType qualifiedOrTupleType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("qualifiedOrTupleType");
+        final MyTree.MyMarker marker = mark("qualifiedOrTupleType");
         final Tree.StaticType node = super.qualifiedOrTupleType();
         end(marker, node);
         return node;
@@ -1204,7 +1205,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.StaticType abbreviatedType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("abbreviatedType");
+        final MyTree.MyMarker marker = mark("abbreviatedType");
         final Tree.StaticType node = super.abbreviatedType();
         end(marker, node);
         return node;
@@ -1212,7 +1213,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SimpleType qualifiedType() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("qualifiedType");
+        final MyTree.MyMarker marker = mark("qualifiedType");
         final Tree.SimpleType node = super.qualifiedType();
         end(marker, node);
         return node;
@@ -1221,7 +1222,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.AnnotationList annotations() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("annotations");
+        final MyTree.MyMarker marker = mark("annotations");
         final Tree.AnnotationList node = super.annotations();
         end(marker, node);
         return node;
@@ -1229,7 +1230,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Annotation annotation() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("annotation");
+        final MyTree.MyMarker marker = mark("annotation");
         final Tree.Annotation node = super.annotation();
         end(marker, node);
         return node;
@@ -1248,7 +1249,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CompilerAnnotation compilerAnnotation() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("compilerAnnotation");
+        final MyTree.MyMarker marker = mark("compilerAnnotation");
         final Tree.CompilerAnnotation node = super.compilerAnnotation();
         end(marker, node);
         return node;
@@ -1256,7 +1257,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ConditionList conditions() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("conditions");
+        final MyTree.MyMarker marker = mark("conditions");
         final Tree.ConditionList node = super.conditions();
         end(marker, node);
         return node;
@@ -1264,7 +1265,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Condition condition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("condition");
+        final MyTree.MyMarker marker = mark("condition");
         final Tree.Condition node = super.condition();
         end(marker, node);
         return node;
@@ -1272,7 +1273,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.BooleanCondition booleanCondition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("booleanCondition");
+        final MyTree.MyMarker marker = mark("booleanCondition");
         final Tree.BooleanCondition node = super.booleanCondition();
         end(marker, node);
         return node;
@@ -1280,7 +1281,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ExistsCondition existsCondition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("existsCondition");
+        final MyTree.MyMarker marker = mark("existsCondition");
         final Tree.ExistsCondition node = super.existsCondition();
         end(marker, node);
         return node;
@@ -1288,7 +1289,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.NonemptyCondition nonemptyCondition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("nonemptyCondition");
+        final MyTree.MyMarker marker = mark("nonemptyCondition");
         final Tree.NonemptyCondition node = super.nonemptyCondition();
         end(marker, node);
         return node;
@@ -1296,7 +1297,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.IsCondition isCondition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("isCondition");
+        final MyTree.MyMarker marker = mark("isCondition");
         final Tree.IsCondition node = super.isCondition();
         end(marker, node);
         return node;
@@ -1304,7 +1305,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SatisfiesCondition satisfiesCondition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("satisfiesCondition");
+        final MyTree.MyMarker marker = mark("satisfiesCondition");
         final Tree.SatisfiesCondition node = super.satisfiesCondition();
         end(marker, node);
         return node;
@@ -1312,7 +1313,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ControlStatement controlStatement() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("controlStatement");
+        final MyTree.MyMarker marker = mark("controlStatement");
         final Tree.ControlStatement node = super.controlStatement();
         end(marker, node);
         return node;
@@ -1320,7 +1321,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Block controlBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("controlBlock");
+        final MyTree.MyMarker marker = mark("controlBlock");
         final Tree.Block node = super.controlBlock();
         end(marker, node);
         return node;
@@ -1328,7 +1329,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.DynamicStatement dynamic() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("dynamic");
+        final MyTree.MyMarker marker = mark("dynamic");
         final Tree.DynamicStatement node = super.dynamic();
         end(marker, node);
         return node;
@@ -1336,7 +1337,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.IfStatement ifElse() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("ifElse");
+        final MyTree.MyMarker marker = mark("ifElse");
         final Tree.IfStatement node = super.ifElse();
         end(marker, node);
         return node;
@@ -1344,7 +1345,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.IfClause ifBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("ifBlock");
+        final MyTree.MyMarker marker = mark("ifBlock");
         final Tree.IfClause node = super.ifBlock();
         end(marker, node);
         return node;
@@ -1352,7 +1353,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ElseClause elseBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("elseBlock");
+        final MyTree.MyMarker marker = mark("elseBlock");
         final Tree.ElseClause node = super.elseBlock();
         end(marker, node);
         return node;
@@ -1360,7 +1361,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Block elseIf() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("elseIf");
+        final MyTree.MyMarker marker = mark("elseIf");
         final Tree.Block node = super.elseIf();
         end(marker, node);
         return node;
@@ -1368,7 +1369,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SwitchStatement switchCaseElse() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("switchCaseElse");
+        final MyTree.MyMarker marker = mark("switchCaseElse");
         final Tree.SwitchStatement node = super.switchCaseElse();
         end(marker, node);
         return node;
@@ -1376,7 +1377,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SwitchClause switchHeader() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("switchHeader");
+        final MyTree.MyMarker marker = mark("switchHeader");
         final Tree.SwitchClause node = super.switchHeader();
         end(marker, node);
         return node;
@@ -1384,7 +1385,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SwitchCaseList cases() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("cases");
+        final MyTree.MyMarker marker = mark("cases");
         final Tree.SwitchCaseList node = super.cases();
         end(marker, node);
         return node;
@@ -1392,7 +1393,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CaseClause caseBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("caseBlock");
+        final MyTree.MyMarker marker = mark("caseBlock");
         final Tree.CaseClause node = super.caseBlock();
         end(marker, node);
         return node;
@@ -1400,7 +1401,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CaseItem caseItemList() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("caseItemList");
+        final MyTree.MyMarker marker = mark("caseItemList");
         final Tree.CaseItem node = super.caseItemList();
         end(marker, node);
         return node;
@@ -1408,7 +1409,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ElseClause defaultCaseBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("defaultCaseBlock");
+        final MyTree.MyMarker marker = mark("defaultCaseBlock");
         final Tree.ElseClause node = super.defaultCaseBlock();
         end(marker, node);
         return node;
@@ -1416,7 +1417,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CaseItem caseItem() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("caseItem");
+        final MyTree.MyMarker marker = mark("caseItem");
         final Tree.CaseItem node = super.caseItem();
         end(marker, node);
         return node;
@@ -1424,7 +1425,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.MatchCase matchCaseCondition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("matchCaseCondition");
+        final MyTree.MyMarker marker = mark("matchCaseCondition");
         final Tree.MatchCase node = super.matchCaseCondition();
         end(marker, node);
         return node;
@@ -1432,7 +1433,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public CustomTree.IsCase isCaseCondition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("isCaseCondition");
+        final MyTree.MyMarker marker = mark("isCaseCondition");
         final CustomTree.IsCase node = super.isCaseCondition();
         end(marker, node);
         return node;
@@ -1440,7 +1441,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SatisfiesCase satisfiesCaseCondition() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("satisfiesCaseCondition");
+        final MyTree.MyMarker marker = mark("satisfiesCaseCondition");
         final Tree.SatisfiesCase node = super.satisfiesCaseCondition();
         end(marker, node);
         return node;
@@ -1448,7 +1449,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ForStatement forElse() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("forElse");
+        final MyTree.MyMarker marker = mark("forElse");
         final Tree.ForStatement node = super.forElse();
         end(marker, node);
         return node;
@@ -1456,7 +1457,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ForClause forBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("forBlock");
+        final MyTree.MyMarker marker = mark("forBlock");
         final Tree.ForClause node = super.forBlock();
         end(marker, node);
         return node;
@@ -1464,7 +1465,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ElseClause failBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("failBlock");
+        final MyTree.MyMarker marker = mark("failBlock");
         final Tree.ElseClause node = super.failBlock();
         end(marker, node);
         return node;
@@ -1472,7 +1473,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ForIterator forIterator() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("forIterator");
+        final MyTree.MyMarker marker = mark("forIterator");
         final Tree.ForIterator node = super.forIterator();
         end(marker, node);
         return node;
@@ -1480,7 +1481,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.SpecifierExpression containment() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("containment");
+        final MyTree.MyMarker marker = mark("containment");
         final Tree.SpecifierExpression node = super.containment();
         end(marker, node);
         return node;
@@ -1488,7 +1489,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.WhileStatement whileLoop() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("whileLoop");
+        final MyTree.MyMarker marker = mark("whileLoop");
         final Tree.WhileStatement node = super.whileLoop();
         end(marker, node);
         return node;
@@ -1496,7 +1497,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.WhileClause whileBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("whileBlock");
+        final MyTree.MyMarker marker = mark("whileBlock");
         final Tree.WhileClause node = super.whileBlock();
         end(marker, node);
         return node;
@@ -1504,7 +1505,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TryCatchStatement tryCatchFinally() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("tryCatchFinally");
+        final MyTree.MyMarker marker = mark("tryCatchFinally");
         final Tree.TryCatchStatement node = super.tryCatchFinally();
         end(marker, node);
         return node;
@@ -1512,7 +1513,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.TryClause tryBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("tryBlock");
+        final MyTree.MyMarker marker = mark("tryBlock");
         final Tree.TryClause node = super.tryBlock();
         end(marker, node);
         return node;
@@ -1520,7 +1521,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CatchClause catchBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("catchBlock");
+        final MyTree.MyMarker marker = mark("catchBlock");
         final Tree.CatchClause node = super.catchBlock();
         end(marker, node);
         return node;
@@ -1528,7 +1529,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CatchVariable catchVariable() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("catchVariable");
+        final MyTree.MyMarker marker = mark("catchVariable");
         final Tree.CatchVariable node = super.catchVariable();
         end(marker, node);
         return node;
@@ -1536,7 +1537,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.FinallyClause finallyBlock() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("finallyBlock");
+        final MyTree.MyMarker marker = mark("finallyBlock");
         final Tree.FinallyClause node = super.finallyBlock();
         end(marker, node);
         return node;
@@ -1544,7 +1545,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.ResourceList resources() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("resources");
+        final MyTree.MyMarker marker = mark("resources");
         final Tree.ResourceList node = super.resources();
         end(marker, node);
         return node;
@@ -1552,7 +1553,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.Resource resource() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("resource");
+        final MyTree.MyMarker marker = mark("resource");
         final Tree.Resource node = super.resource();
         end(marker, node);
         return node;
@@ -1560,7 +1561,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public CustomTree.Variable specifiedVariable() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("specifiedVariable");
+        final MyTree.MyMarker marker = mark("specifiedVariable");
         final CustomTree.Variable node = super.specifiedVariable();
         end(marker, node);
         return node;
@@ -1568,7 +1569,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public CustomTree.Variable variable() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("variable");
+        final MyTree.MyMarker marker = mark("variable");
         final CustomTree.Variable node = super.variable();
         end(marker, node);
         return node;
@@ -1576,7 +1577,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public CustomTree.Variable var() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("var");
+        final MyTree.MyMarker marker = mark("var");
         final CustomTree.Variable node = super.var();
         end(marker, node);
         return node;
@@ -1584,7 +1585,7 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public CustomTree.Variable impliedVariable() throws RecognitionException {
-        final PsiBuilder.Marker marker = mark("impliedVariable");
+        final MyTree.MyMarker marker = mark("impliedVariable");
         final CustomTree.Variable node = super.impliedVariable();
         end(marker, node);
         return node;
