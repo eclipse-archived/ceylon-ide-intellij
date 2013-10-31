@@ -6,14 +6,11 @@ import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MyTree {
     private MyNode root = null;
     private MyNode newNodeParent = new MyNode(null, null); // create a dummy "root parent" just to prevent NPE when adding children to parent
-    private Map<ASTNode, MyNode> ideaToMyMap = new HashMap<>();
 
     public MyTree() {
     }
@@ -27,31 +24,12 @@ public class MyTree {
         return myMarker;
     }
 
-    private boolean containsKey(ASTNode key) {
-        return ideaToMyMap.containsKey(key);
-    }
-
-    public MyNode getMyNode(ASTNode ideaNode) {
-        return ideaToMyMap.get(ideaNode);
-    }
-
     public void bindToRoot(ASTNode astRoot) {
-        root.bind(astRoot);
+        root.bindSubtree(astRoot);
     }
 
-    private void bindToMapped(ASTNode astNode) {
-        getMyNode(astNode).bind(astNode);
-    }
-
-    public void rebindFirstBoundParent(ASTNode node) {
-        ASTNode ancestor = node;
-        while (ancestor != null && !containsKey(ancestor)) {
-            ancestor = ancestor.getTreeParent();
-        }
-        if (ancestor == null) {
-            throw new IllegalArgumentException("No ancestor of node has been bound: " + node);
-        }
-        bindToMapped(ancestor);
+    public Node getRootSpecNode() {
+        return root.node;
     }
 
     private class MyNode implements MyMarker {
@@ -93,29 +71,31 @@ public class MyTree {
             return children;
         }
 
-        public Node getNode() {
-            return node;
-        }
-
         @Override
         public String toString() {
             return String.format("MyMarker{type=%s, children=%d, hash=%d}", type, children.size(), hashCode());
         }
 
-        void bind(ASTNode ideaNode) {
-            ideaToMyMap.put(ideaNode, this);
-            assert getType().equals(ideaNode.getElementType()) : getType() + " != " + ideaNode.getElementType();
-            final Node specNode = getNode();
-            ideaNode.putUserData(CeylonIdeaParser.CEYLON_NODE_KEY, specNode);
+        void bindSubtree(ASTNode ideaNode) {
+            bindNode(ideaNode);
             List<MyNode> myChildren = getChildren();
             ASTNode[] ideaChildren = ideaNode.getChildren(CeylonIdeaParser.COMPOSITE_ELEMENTS);
-            assert (myChildren.size() == ideaChildren.length) :
-                    String.format("error in %s[%s] at %s: %d != %d%n", specNode.getNodeType(), specNode.getMainToken(), specNode.getLocation(), myChildren.size(), ideaChildren.length);
+            if ((myChildren.size() != ideaChildren.length)) {
+                System.out.printf("error in %s[%s] at %s: %d != %d%n", node.getNodeType(), node.getMainToken(), node.getLocation(), myChildren.size(), ideaChildren.length);
+            } else
             for (int i = 0; i < myChildren.size(); i++) {
                 MyNode myChildNode = myChildren.get(i);
                 ASTNode ideaChildNode = ideaChildren[i];
-                myChildNode.bind(ideaChildNode);
+                myChildNode.bindSubtree(ideaChildNode);
             }
+        }
+
+        /**
+         * Just binds this to the single nodes, doesn't bind the subtrees.
+         */
+        void bindNode(ASTNode ideaNode) {
+            assert getType().equals(ideaNode.getElementType()) : getType() + " != " + ideaNode.getElementType();
+            ideaNode.putUserData(CeylonIdeaParser.CEYLON_NODE_KEY, node);
         }
     }
 
