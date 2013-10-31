@@ -46,11 +46,20 @@ public class MyTree {
 
         @Override
         public void done(IElementType type, Node node) {
-            this.type = type;
-            this.node = node;
-            psiMarker.done(type);
-            parent.addChild(this);
-            newNodeParent = this.parent;
+            if (children.size() == 1 && children.get(0).node == node) {
+                psiMarker.drop();
+                final MyNode myOnlyChild = children.get(0);
+                myOnlyChild.parent = this.parent;
+//                myOnlyChild.type = type; // perhaps this makes sense?
+                parent.addChild(myOnlyChild);
+                newNodeParent = myOnlyChild.parent;
+            } else {
+                this.type = type;
+                this.node = node;
+                psiMarker.done(type);
+                parent.addChild(this);
+                newNodeParent = this.parent;
+            }
         }
 
         @Override
