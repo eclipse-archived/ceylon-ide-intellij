@@ -47,7 +47,7 @@ public class CeylonFile extends PsiFileBase {
         }
 
         final List<Tree.PackageDescriptor> packageDescriptors = ((Tree.CompilationUnit) userData).getPackageDescriptors();
-        final Tree.PackageDescriptor packageDescriptor = packageDescriptors.get(0); // todo! empty, null?
+        final Tree.PackageDescriptor packageDescriptor = packageDescriptors.isEmpty() ? null : packageDescriptors.get(0);
 
         if (packageDescriptor != null) {
             packageName = packageDescriptor.getImportPath().getText();
