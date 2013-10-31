@@ -1,33 +1,28 @@
 FILE
-  COMPILATION_UNIT
-    COMPILER_ANNOTATIONS
-      COMPILER_ANNOTATION
-        PsiElement(@)('@')
-        ANNOTATION_NAME
-          PsiElement(LIDENTIFIER)('error')
-    ANNOTATIONS
+  COMPILER_ANNOTATION
+    PsiElement(COMPILER_ANNOTATION)('@')
+    IDENTIFIER
+      PsiElement(LIDENTIFIER)('error')
+  MISSING_DECLARATION
+    ANNOTATION_LIST
       ANNOTATION
-        ANNOTATION_NAME
+        IDENTIFIER
           PsiElement(LIDENTIFIER)('doc')
-        ANNOTATION_ARGUMENTS
-          LITERAL_ARGUMENTS
-            LITERAL_ARGUMENT
-              MY_STRING_LITERAL
-                PsiElement(STRING_LITERAL)('"Test for illegal top level module"')
+    PsiElement(STRING_LITERAL)('"Test for illegal top level module"')
+  MISSING_DECLARATION
+    ANNOTATION_LIST
       ANNOTATION
-        ANNOTATION_NAME
+        IDENTIFIER
           PsiElement(LIDENTIFIER)('license')
-        ANNOTATION_ARGUMENTS
-          LITERAL_ARGUMENTS
-            LITERAL_ARGUMENT
-              MY_STRING_LITERAL
-                PsiElement(STRING_LITERAL)('"http://www.apache.org/licenses/LICENSE-2.0.html"')
-    MODULE_DESCRIPTOR
-      PsiElement(module)('module')
-      PACKAGE_PATH
-        PACKAGE_NAME
-          PsiElement(LIDENTIFIER)('default')
-      PsiElement(QUOTED_LITERAL)(''0.2'')
-      IMPORT_MODULE_LIST
-        PsiElement({)('{')
-        PsiElement(})('}')
+    PsiElement(STRING_LITERAL)('"http://www.apache.org/licenses/LICENSE-2.0.html"')
+  MODULE_DESCRIPTOR
+    ANNOTATION_LIST
+      <empty list>
+    PsiElement(MODULE)('module')
+    IMPORT_PATH
+      IDENTIFIER
+        PsiElement(LIDENTIFIER)('default')
+    PsiElement(CHAR_LITERAL)(''0.2'')
+    IMPORT_MODULE_LIST
+      PsiElement(LBRACE)('{')
+      PsiElement(RBRACE)('}')

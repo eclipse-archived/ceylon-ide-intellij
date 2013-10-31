@@ -1,0 +1,15 @@
+FILE
+  METHOD_DEFINITION
+    ANNOTATION_LIST
+      STRING_LITERAL
+        PsiElement(STRING_LITERAL)('"Hello"')
+    METHOD_DEFINITION
+      PsiElement(VOID_MODIFIER)('void')
+      IDENTIFIER
+        PsiElement(LIDENTIFIER)('hello')
+      PARAMETER_LIST
+        PsiElement(LPAREN)('(')
+        PsiElement(RPAREN)(')')
+      BLOCK
+        PsiElement(LBRACE)('{')
+        PsiElement(RBRACE)('}')
