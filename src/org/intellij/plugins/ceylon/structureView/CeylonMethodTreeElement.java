@@ -2,10 +2,9 @@ package org.intellij.plugins.ceylon.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.lang.ASTNode;
 import com.intellij.util.PlatformIcons;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,8 +26,7 @@ public class CeylonMethodTreeElement extends PsiTreeElementBase<CeylonPsi.AnyMet
     @Nullable
     @Override
     public String getPresentableText() {
-        ASTNode identifier = getElement().getNode().findChildByType(CeylonTypes.IDENTIFIER);
-        return identifier == null ? "<unknown method>" : identifier.getText();
+        return ((Tree.AnyMethod) getElement().getCeylonNode()).getIdentifier().getText();
     }
 
     @Override

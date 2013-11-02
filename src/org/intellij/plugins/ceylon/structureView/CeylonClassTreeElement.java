@@ -2,10 +2,12 @@ package org.intellij.plugins.ceylon.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.PlatformIcons;
-import org.intellij.plugins.ceylon.psi.*;
+import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.intellij.plugins.ceylon.psi.CeylonClass;
+import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,10 +19,13 @@ import java.util.List;
 
 import static org.intellij.plugins.ceylon.structureView.CeylonFileTreeElement.getTreeElementForDeclaration;
 
-public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonPsi.ClassOrInterfacePsi> {
-    private CeylonPsi.ClassOrInterfacePsi myClass;
+/**
+ * A structure node which represents a CeylonClass (class or interface definition/declaration).
+ */
+public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonClass> {
+    private CeylonClass myClass;
 
-    public CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi element) {
+    public CeylonClassTreeElement(CeylonClass element) {
         super(element);
         this.myClass = element;
     }
@@ -28,20 +33,24 @@ public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonPsi.ClassOr
     @NotNull
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
-        ASTNode blockNode = myClass.getNode().findChildByType(TokenSet.create(CeylonTypes.CLASS_BODY, CeylonTypes.INTERFACE_BODY));
+        Tree.ClassOrInterface ceylonNode = (Tree.ClassOrInterface) myClass.getCeylonNode();
 
-        if (blockNode == null) {
-            return Collections.emptyList();
+        List<StructureViewTreeElement> elements = new ArrayList<>();
+        List<Node> bodyChildren;
+
+        if (ceylonNode instanceof CustomTree.ClassDefinition) {
+            bodyChildren = ((CustomTree.ClassDefinition) ceylonNode).getClassBody().getChildren();
+        } else if (ceylonNode instanceof Tree.InterfaceDefinition) {
+            bodyChildren = ((Tree.InterfaceDefinition) ceylonNode).getInterfaceBody().getChildren();
+        } else {
+            bodyChildren = Collections.emptyList();
         }
 
-        CeylonPsi.BodyPsi block = (CeylonPsi.BodyPsi) blockNode.getPsi();
-        List<StructureViewTreeElement> elements = new ArrayList<>();
-
-        for (ASTNode statement : block.getNode().getChildren(TokenSet.create(CeylonTypes.STATEMENT))) {
-            for (ASTNode declaration : statement.getChildren(TokenSet.create(CeylonTypes.DECLARATION))) {
-                StructureViewTreeElement node = getTreeElementForDeclaration((CeylonPsi.DeclarationPsi) declaration.getPsi());
-                if (node != null) {
-                    elements.add(node);
+        for (Node node : bodyChildren) {
+            if (node instanceof Tree.Declaration) {
+                StructureViewTreeElement child = getTreeElementForDeclaration((CeylonFile) myClass.getContainingFile(), (Tree.Declaration) node);
+                if (child != null) {
+                    elements.add(child);
                 }
             }
         }
@@ -52,12 +61,11 @@ public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonPsi.ClassOr
     @Nullable
     @Override
     public String getPresentableText() {
-        ASTNode identifier = myClass.getNode().findChildByType(CeylonTypes.IDENTIFIER);
-        return identifier == null ? "<unnamed class>" : identifier.getText();
+        return ((Tree.ClassOrInterface) myClass.getCeylonNode()).getIdentifier().getText();
     }
 
     @Override
     public Icon getIcon(boolean open) {
-        return myClass instanceof CeylonPsi.AnyInterfacePsi ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
+        return myClass.isInterface() ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
     }
 }

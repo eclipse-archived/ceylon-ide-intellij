@@ -33,7 +33,7 @@ public class ClassElementType extends IStubElementType<ClassStub, CeylonClass> {
     @NotNull
     @Override
     public String getExternalId() {
-        return "ceylon.class";
+        return "ceylon.class." + toString();
     }
 
     @Override

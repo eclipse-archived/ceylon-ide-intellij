@@ -2,7 +2,10 @@ package org.intellij.plugins.ceylon.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +16,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Shows the children declarations of a Ceylon file in the structure tool window.
+ */
 public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
 
     private CeylonFile myElement;
@@ -25,16 +31,17 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
     @NotNull
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
-        CeylonPsi.DeclarationPsi[] declarations = myElement.findChildrenByClass(CeylonPsi.DeclarationPsi.class);
+        Tree.CompilationUnit compilationUnit = (Tree.CompilationUnit) myElement.getMyTree().getRootSpecNode();
+        List<Tree.Declaration> declarations = compilationUnit.getDeclarations();
 
-        if (declarations.length == 0) {
+        if (declarations.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<StructureViewTreeElement> elements = new ArrayList<>();
 
-        for (CeylonPsi.DeclarationPsi declaration : declarations) {
-            StructureViewTreeElement node = getTreeElementForDeclaration(declaration);
+        for (Tree.Declaration declaration : declarations) {
+            StructureViewTreeElement node = getTreeElementForDeclaration(myElement, declaration);
             if (node != null) {
                 elements.add(node);
             }
@@ -43,20 +50,20 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
         return elements;
     }
 
-    static StructureViewTreeElement getTreeElementForDeclaration(CeylonPsi.DeclarationPsi declaration) {
+    static StructureViewTreeElement getTreeElementForDeclaration(CeylonFile myFile, Tree.Declaration declaration) {
         if (declaration == null) {
             return null;
         }
 
-        for (PsiElement child : declaration.getChildren()) {
-            if (child instanceof CeylonPsi.ClassOrInterfacePsi) {
-                return new CeylonClassTreeElement((CeylonPsi.ClassOrInterfacePsi) child);
-            } else if (child instanceof CeylonPsi.AnyMethodPsi) {
-                return new CeylonMethodTreeElement((CeylonPsi.AnyMethodPsi) child);
-            } else if (child instanceof CeylonPsi.TypedDeclarationPsi) {
-                return new CeylonDeclarationTreeElement((CeylonPsi.TypedDeclarationPsi) child);
-            }
+        if (declaration instanceof CustomTree.ClassOrInterface) {
+            CeylonClass psiClass = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonClass.class);
+            return new CeylonClassTreeElement(psiClass);
+        } else if (declaration instanceof Tree.AnyMethod) {
+            CeylonPsi.AnyMethodPsi psiMethod = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.AnyMethodPsi.class);
+            return new CeylonMethodTreeElement(psiMethod);
         }
+
+        // TODO support attributes?
 
         return null;
     }

@@ -22,13 +22,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implements CeylonClass {
-    private Tree.CompilationUnit specClassDecl;
+    private Tree.ClassOrInterface specClassDecl;
 
     public CeylonClassImpl(ASTNode node) {
         super(node);
         // TODO user data is not always available (e.g. when we deserialize stubs)
         // Also, https://github.com/ceylon/ceylon-ide-intellij/issues/5
-//        specClassDecl = (Tree.CompilationUnit) node.getUserData(CeylonIdeaParser.CEYLON_NODE_KEY);
+        specClassDecl = (Tree.ClassOrInterface) node.getUserData(CeylonIdeaParser.CEYLON_NODE_KEY);
     }
 
     public CeylonClassImpl(ClassStub stub, IStubElementType nodeType) {
@@ -86,7 +86,7 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
 
     @Override
     public Node getCeylonNode() {
-        throw new UnsupportedOperationException("No Ceylon nodes in stubs.");
+        return specClassDecl;
     }
 
     @Override
@@ -108,6 +108,6 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
 
     @Override
     public String toString() {
-        return "Class " + Strings.notNull(getName(), " (unnamed)");
+        return (isInterface() ? "Interface " : "Class ") + Strings.notNull(getName(), " (unnamed)");
     }
 }

@@ -25,7 +25,7 @@ public class CeylonFileTreeModel extends TextEditorBasedStructureViewModel imple
 
     @Override
     public boolean isAlwaysLeaf(StructureViewTreeElement element) {
-        return element instanceof CeylonMethodTreeElement || element instanceof CeylonDeclarationTreeElement;
+        return element instanceof CeylonMethodTreeElement;
     }
 
     // TODO filters for inherited, fields, etc.

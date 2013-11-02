@@ -3,6 +3,9 @@ package org.intellij.plugins.ceylon.presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.util.PlatformIcons;
+import com.redhat.ceylon.compiler.typechecker.model.ClassOrInterface;
+import com.redhat.ceylon.compiler.typechecker.model.TypeDeclaration;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
@@ -21,10 +24,17 @@ public class ClassPresentationProvider implements ItemPresentationProvider<Ceylo
                 @Override
                 public String getPresentableText() {
                     StringBuilder text = new StringBuilder(item.getText());
-                    CeylonClass parentClass = myClass;
+                    Tree.ClassOrInterface parentClass = (Tree.ClassOrInterface) myClass.getCeylonNode();
 
-                    while ((parentClass = parentClass.getParentClass()) != null) {
-                        text.append(" in ").append(parentClass.getName());
+                    if (parentClass != null) {
+                        ClassOrInterface model = parentClass.getDeclarationModel();
+
+                        // TODO model is always null (need to use DeclarationVisitor?)
+                        if (model != null && model.getSuperTypeDeclarations() != null) {
+                            for (TypeDeclaration superType : model.getSuperTypeDeclarations()) {
+                                text.append(" in ").append(superType.getName());
+                            }
+                        }
                     }
 
                     return text.toString();
