@@ -69,6 +69,8 @@ QuotedLiteralCharacter = [^']*
 %%
 
 /* Keywords */
+
+"`"            { return CeylonTokens.BACKTICK ; }
 "assembly"            { return CeylonTokens.ASSEMBLY ; }
 "assert"            { return CeylonTokens.ASSERT ; }
 "abstracts"            { return CeylonTokens.ABSTRACTED_TYPE; }
