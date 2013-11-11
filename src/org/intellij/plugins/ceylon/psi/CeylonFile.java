@@ -3,8 +3,10 @@ package org.intellij.plugins.ceylon.psi;
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.text.BlockSupport;
 import com.intellij.util.indexing.IndexingDataKeys;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -68,5 +70,14 @@ public class CeylonFile extends PsiFileBase {
         }
 
         return packageName;
+    }
+
+    @Override
+    public <T> T getUserData(@NotNull Key<T> key) {
+        if (BlockSupport.TREE_DEPTH_LIMIT_EXCEEDED.equals(key)) {
+            // This prevents ReparsedSuccessfullyException from ever being thrown so we can bind AST nodes to Ceylon Spec nodes in CeylonIdeaParser.
+            return (T) Boolean.TRUE;
+        }
+        return super.getUserData(key);
     }
 }
