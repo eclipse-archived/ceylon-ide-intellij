@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import org.intellij.plugins.ceylon.psi.CeylonPsiImpl.*;
+import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
 
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 
@@ -471,6 +472,8 @@ public class CeylonPsiFactory {
             return new ForComprehensionClausePsiImpl(node);
         } else if (type == IF_COMPREHENSION_CLAUSE) {
             return new IfComprehensionClausePsiImpl(node);
+        } else if (type == UNPARSED_TAIL) {
+            return new CeylonCompositeElementImpl(node);
         }
 
         throw new IllegalArgumentException("Unsupported type: " + type);

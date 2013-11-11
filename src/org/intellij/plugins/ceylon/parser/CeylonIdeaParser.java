@@ -9,6 +9,7 @@ import com.intellij.psi.impl.source.resolve.FileContextUtil;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.antlr.runtime.RecognitionException;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonTokenType;
@@ -32,37 +33,29 @@ public class CeylonIdeaParser implements PsiParser {
     @NotNull
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
+        assert root == CeylonTypes.COMPILATION_UNIT : root;
+
         final PsiFile file = builder.getUserDataUnprotected(FileContextUtil.CONTAINING_FILE_KEY);
         final MyTree myTree = ((CeylonFile)file).getMyTree();
         final MarkingCeylonParser parser = new MarkingCeylonParser(builder, myTree);
-        Node result;
 
+        final MyTree.MyMarker cuMarker = parser.mark("compilationUnit");
+        final Tree.CompilationUnit unit;
         try {
-            if (root == CeylonTypes.COMPILATION_UNIT) {
-                result = parser.compilationUnit();
-/*
-            // This seems to be unnecessary unless we start using chameleon tokens (see parse method's javadocs).
-            else if (root == CeylonTypes.MODULE_DESCRIPTOR) {
-                result = parser.moduleDescriptor();
-            } else if (root == CeylonTypes.PACKAGE_DESCRIPTOR) {
-                result = parser.packageDescriptor();
-            } else if (root == CeylonTypes.IMPORT_MODULE_LIST) {
-                result = parser.importModuleList();
-            } else if (root == CeylonTypes.IMPORT_MODULE) {
-                result = parser.importModule();
-            } else if (root == CeylonTypes.IMPORT_LIST) {
-                result = parser.importElementList();
-             ...
-*/
-            } else {
-                throw new UnsupportedOperationException(String.format("Unsupported type: %s", root));
-            }
+            unit = parser.compilationUnit();
         } catch (RecognitionException e) {
+            // todo: what's the correct way to handle this?
             throw new RuntimeException("Unrecognized", e);
         }
-        if (result == null) {
-            throw new NullPointerException("CeylonParser returned null.");
+
+        if (!builder.eof()) {
+            final PsiBuilder.Marker tail = builder.mark();
+            while(!builder.eof()) {
+                builder.advanceLexer();
+            }
+            tail.done(CeylonTypes.UNPARSED_TAIL);
         }
+        parser.end(cuMarker, unit);
 
         ASTNode astRoot = builder.getTreeBuilt();
         myTree.bindToRoot(astRoot);

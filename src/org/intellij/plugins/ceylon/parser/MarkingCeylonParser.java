@@ -26,12 +26,12 @@ public class MarkingCeylonParser extends CeylonParser {
         myTree = tree;
     }
 
-    private MyTree.MyMarker mark(String method) {
+    MyTree.MyMarker mark(String method) {
 //        print(String.format("%%20d: %%%ds%%s%%n", ++level), textHash, "?", method);
         return myTree.mark(psiBuilder.mark());
     }
 
-    private void end(MyTree.MyMarker marker, Node node) {
+    void end(MyTree.MyMarker marker, Node node) {
         if (node == null) {
 //            print(String.format("%%20d: %%%ds%%s - NULL%%n", level--), textHash, "-", elementType);
             marker.drop();
@@ -100,10 +100,8 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CompilationUnit compilationUnit() throws RecognitionException {
-        final MyTree.MyMarker marker = mark("compilationUnit");
-        final Tree.CompilationUnit node = super.compilationUnit();
-        end(marker, node);
-        return node;
+        // Markers are set by CeylonIdeaParser since the parse may fail before the end of file and the lefover stuff must be marked too.
+        return super.compilationUnit();
     }
 
     @Override
