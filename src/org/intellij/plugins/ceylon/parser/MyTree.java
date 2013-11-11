@@ -7,6 +7,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MyTree {
     private MyNode root = null;
@@ -103,7 +104,7 @@ public class MyTree {
          * Just binds this to the single nodes, doesn't bind the subtrees.
          */
         void bindNode(ASTNode ideaNode) {
-            assert getType().equals(ideaNode.getElementType()) : getType() + " != " + ideaNode.getElementType();
+            assert Objects.equals(getType(), ideaNode.getElementType()) : getType() + " != " + ideaNode.getElementType();
             ideaNode.putUserData(CeylonIdeaParser.CEYLON_NODE_KEY, node);
         }
     }
