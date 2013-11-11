@@ -291,6 +291,4 @@ public interface CeylonTypes {
     IElementType EXPRESSION_COMPREHENSION_CLAUSE = new CeylonElementType("EXPRESSION_COMPREHENSION_CLAUSE");
     IElementType FOR_COMPREHENSION_CLAUSE = new CeylonElementType("FOR_COMPREHENSION_CLAUSE");
     IElementType IF_COMPREHENSION_CLAUSE = new CeylonElementType("IF_COMPREHENSION_CLAUSE");
-
-    IElementType UNPARSED_TAIL = new CeylonElementType("UNPARSED_TAIL");
 }

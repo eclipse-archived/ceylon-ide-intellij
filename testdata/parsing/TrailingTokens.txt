@@ -13,6 +13,6 @@ FILE
       CLASS_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  UNPARSED_TAIL
+  PsiErrorElement:Unparsed tail
     PsiElement(RBRACE)('}')
     PsiElement(VOID_MODIFIER)('void')

@@ -53,7 +53,8 @@ public class CeylonIdeaParser implements PsiParser {
             while(!builder.eof()) {
                 builder.advanceLexer();
             }
-            tail.done(CeylonTypes.UNPARSED_TAIL);
+            tail.error("Unparsed tail");
+//            tail.done(CeylonTypes.UNPARSED_TAIL);
         }
         parser.end(cuMarker, unit);
 
