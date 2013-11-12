@@ -24,7 +24,7 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new CeylonLexerAdapter();
+        return new CeylonAntlrToIntellijLexerAdapter();
     }
 
     @Override

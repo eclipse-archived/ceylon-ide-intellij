@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CeylonIdeaParser implements PsiParser {
 
-    public static final Key<Node> CEYLON_NODE_KEY = new Key<>("Ceylon Node");
+    public static final Key<Node> CEYLON_NODE_KEY = new Key<>("CEYLON-SPEC_NODE");
     public static final TokenSet COMPOSITE_ELEMENTS = TokenSet.create(IElementType.enumerate(new IElementType.Predicate() {
         @Override
         public boolean matches(IElementType type) {
@@ -36,10 +36,12 @@ public class CeylonIdeaParser implements PsiParser {
         assert root == CeylonTypes.COMPILATION_UNIT : root;
 
         final PsiFile file = builder.getUserDataUnprotected(FileContextUtil.CONTAINING_FILE_KEY);
-        final MyTree myTree = ((CeylonFile)file).getMyTree();
+        assert file != null : "Containing file not found.";
+
+        final MyTree myTree = ((CeylonFile) file).getMyTree();
         final MarkingCeylonParser parser = new MarkingCeylonParser(builder, myTree);
 
-        final MyTree.MyMarker cuMarker = parser.mark("compilationUnit");
+        final MyTree.MyMarker cuMarker = parser.mark();
         final Tree.CompilationUnit unit;
         try {
             unit = parser.compilationUnit();
@@ -49,7 +51,7 @@ public class CeylonIdeaParser implements PsiParser {
         }
 
         if (!builder.eof()) {
-            final MyTree.MyMarker tail =  parser.mark("tail");
+            final MyTree.MyMarker tail =  parser.mark();
             while(!builder.eof()) {
                 builder.advanceLexer();
             }

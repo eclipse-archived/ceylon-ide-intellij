@@ -557,20 +557,20 @@ FILE
                   PsiElement(RPAREN)(')')
             PsiElement(SEMICOLON)(';')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class I
+    Interface I
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('I')
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class J
+    Interface J
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('J')
@@ -1721,10 +1721,10 @@ FILE
                 PsiElement(SEMICOLON)(';')
                 PsiElement(RBRACE)('}')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class Association
+    Interface Association
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('Association')
@@ -1740,10 +1740,10 @@ FILE
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class OneTo
+    Interface OneTo
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('OneTo')
@@ -1813,10 +1813,10 @@ FILE
       CLASS_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class Anything
+    Interface Anything
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('Anything')
@@ -1832,10 +1832,10 @@ FILE
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class SomethingUsual
+    Interface SomethingUsual
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('SomethingUsual')
@@ -1862,10 +1862,10 @@ FILE
               PsiElement(LIDENTIFIER)('something')
             PsiElement(SEMICOLON)(';')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class SomethingElse
+    Interface SomethingElse
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('SomethingElse')
@@ -2020,10 +2020,10 @@ FILE
                   PsiElement(SEMICOLON)(';')
                 PsiElement(RBRACE)('}')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class Interface
+    Interface Interface
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('Interface')
@@ -3127,10 +3127,10 @@ FILE
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
   PsiComment(MULTI_COMMENT)('/*interface Indirect of Abstract1 | Abstract2 {}\nabstract class Abstract1() {}\nabstract class Abstract2() {}\nclass Concrete1() extends Abstract1() satisfies Indirect {}\nclass Concrete2() satisfies Indirect {}\nclass Concrete3() extends Abstract1() {}*/')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class J1
+    Interface J1
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('J1')
@@ -3146,10 +3146,10 @@ FILE
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class J2
+    Interface J2
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('J2')
@@ -3161,10 +3161,10 @@ FILE
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class J3
+    Interface J3
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('J3')
@@ -3176,10 +3176,10 @@ FILE
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class J4
+    Interface J4
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('J4')
@@ -3558,10 +3558,10 @@ FILE
                 PsiElement(LBRACE)('{')
                 PsiElement(RBRACE)('}')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class Rsrc
+    Interface Rsrc
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('Rsrc')
@@ -3581,10 +3581,10 @@ FILE
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class File
+    Interface File
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('File')
@@ -3596,10 +3596,10 @@ FILE
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class Dir
+    Interface Dir
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('Dir')
@@ -3611,10 +3611,10 @@ FILE
       INTERFACE_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  Class  (unnamed)
+  Interface  (unnamed)
     ANNOTATION_LIST
       <empty list>
-    Class Link
+    Interface Link
       PsiElement(INTERFACE_DEFINITION)('interface')
       IDENTIFIER
         PsiElement(UIDENTIFIER)('Link')

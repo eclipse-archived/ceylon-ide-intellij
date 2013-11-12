@@ -1,4 +1,3 @@
-
 package org.intellij.plugins.ceylon.parser;
 
 import com.intellij.lang.PsiBuilder;
@@ -19,7 +18,7 @@ import java.util.Map;
  * <li>produces tokens from the original text (by creating a separate TokenStream),
  * <li>simultaneously advances the PsiBuilder (and does rollbacks when necessary)
  * </ul>
- *
+ * <p/>
  * Basically this uses PsiBuilder markers only for rewinds (roll-backs) since this is the only mechanism in PsiBuilder
  * that enables this.
  */
@@ -34,7 +33,6 @@ public class PsiBuilderTokenStream implements TokenStream {
     public PsiBuilderTokenStream(PsiBuilder psiBuilder) {
         this.psiBuilder = psiBuilder;
         try {
-            // todo: BufferedTokenStream handles whitespace differently.
             delegate = new CommonTokenStream(new CeylonLexer(new ANTLRReaderStream(new CharSequenceReader(psiBuilder.getOriginalText()))));
         } catch (IOException e) {
             throw new RuntimeException("Error creating lexer", e);
@@ -53,7 +51,8 @@ public class PsiBuilderTokenStream implements TokenStream {
         return delegate.LT(k);
     }
 
-    @Override public int range() {
+    @Override
+    public int range() {
         return delegate.range();
     }
 
@@ -111,7 +110,7 @@ public class PsiBuilderTokenStream implements TokenStream {
     public void rewind() {
         delegate.rewind();
         rewind(markers.size() - 1);
-        // note that this should leave the marker (or remove and create a new one)
+        // Note that this should leave the marker; since rewindo() also removes the marker, we now create a new one.
         mark();
         afterSeek = false;
     }

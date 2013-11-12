@@ -1,4 +1,3 @@
-
 package org.intellij.plugins.ceylon.parser;
 
 import com.intellij.lang.PsiBuilder;
@@ -11,6 +10,10 @@ import java.util.Objects;
 
 
 // NOTE! The Javadocs are copied frome Antlr 4 (because they are much more extensive and clear than in Antlr 3.4) so they may be inaccurate!
+
+/**
+ * This is useful for debugging the lexer/parser during development, not to be used otherwise.
+ */
 public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
 //    private CommonToken currentToken = null;
 
@@ -28,20 +31,20 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
      * method is frequently called from performance-critical code.
      * <p/>
      * This method is guaranteed to succeed if any of the following are true:
-     *
+     * <p/>
      * <ul>
-     *   <li>{@code i>0}</li>
-     *   <li>{@code i==-1} and {@link #index index()} returns a value greater
-     *     than the value of {@code index()} after the stream was constructed
-     *     and {@code LA(1)} was called in that order. Specifying the current
-     *     {@code index()} relative to the index after the stream was created
-     *     allows for filtering implementations that do not return every symbol
-     *     from the underlying source. Specifying the call to {@code LA(1)}
-     *     allows for lazily initialized streams.</li>
-     *   <li>{@code LA(i)} refers to a symbol consumed within a marked region
-     *     that has not yet been released.</li>
+     * <li>{@code i>0}</li>
+     * <li>{@code i==-1} and {@link #index index()} returns a value greater
+     * than the value of {@code index()} after the stream was constructed
+     * and {@code LA(1)} was called in that order. Specifying the current
+     * {@code index()} relative to the index after the stream was created
+     * allows for filtering implementations that do not return every symbol
+     * from the underlying source. Specifying the call to {@code LA(1)}
+     * allows for lazily initialized streams.</li>
+     * <li>{@code LA(i)} refers to a symbol consumed within a marked region
+     * that has not yet been released.</li>
      * </ul>
-     *
+     * <p/>
      * If {@code i} represents a position at or beyond the end of the stream,
      * this method returns {@link #EOF}.
      * <p/>
@@ -50,7 +53,7 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
      * the stream before calling this method.
      *
      * @throws UnsupportedOperationException if the stream does not support
-     * retrieving the value of the specified symbol
+     *                                       retrieving the value of the specified symbol
      */
     public int LA(int i) {
         print("org.intellij.plugins.ceylon.parser.PsiBuilderTokenStream.LA  %s", i);
@@ -87,7 +90,7 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
 
     private <T> void assertEquals(T my, T antlr) {
         if (!Objects.equals(my, antlr)) {
-            assert false  : String.format("Objects are different: my = %s -- antlr = %s", my, antlr);
+            assert false : String.format("Objects are different: my = %s -- antlr = %s", my, antlr);
         } else {
             print("Objects equal: my = %s -- antlr = %s", my, antlr);
         }
@@ -102,7 +105,8 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
     }
 */
 
-    @Override public int range() {
+    @Override
+    public int range() {
         print("org.intellij.plugins.ceylon.parser.PsiBuilderTokenStream.range");
         return super.range();
 //        return currentToken == null ? 0 : 1;
@@ -122,9 +126,9 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
      * of the stream. Unlike {@code seek()}, this method does not adjust
      * {@code index} to point to a non-ignored symbol.
      *
-     * @throws IllegalArgumentException if {code index} is less than 0
+     * @throws IllegalArgumentException      if {code index} is less than 0
      * @throws UnsupportedOperationException if the stream does not support
-     * retrieving the token at the specified index
+     *                                       retrieving the token at the specified index
      */
     public Token get(int i) {
         print("org.intellij.plugins.ceylon.parser.PsiBuilderTokenStream.get  %s", i);
@@ -160,7 +164,7 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
      * accurate for all of its provided tokens, this method behaves like the
      * following code. Other streams may implement this method in other ways
      * provided the behavior is consistent with this at a high level.
-     *
+     * <p/>
      * <pre>
      * TokenStream stream = ...;
      * String text = "";
@@ -170,12 +174,11 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
      * </pre>
      *
      * @param start The first token in the interval to get text for.
-     * @param stop The last token in the interval to get text for (inclusive).
+     * @param stop  The last token in the interval to get text for (inclusive).
      * @return The text of all tokens lying between the specified {@code start}
      * and {@code stop} tokens.
-     *
      * @throws UnsupportedOperationException if this stream does not support
-     * this method for the specified tokens
+     *                                       this method for the specified tokens
      */
     public String toString(Token start, Token stop) {
         print("org.intellij.plugins.ceylon.parser.PsiBuilderTokenStream.toString2");
@@ -186,24 +189,24 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
     /**
      * Consumes the current symbol in the stream. This method has the following
      * effects:
-     *
+     * <p/>
      * <ul>
-     *   <li><strong>Forward movement:</strong> The value of {@link #index index()}
-     *		before calling this method is less than the value of {@code index()}
-     *		after calling this method.</li>
-     *   <li><strong>Ordered lookahead:</strong> The value of {@code LA(1)} before
-     *		calling this method becomes the value of {@code LA(-1)} after calling
-     *		this method.</li>
+     * <li><strong>Forward movement:</strong> The value of {@link #index index()}
+     * before calling this method is less than the value of {@code index()}
+     * after calling this method.</li>
+     * <li><strong>Ordered lookahead:</strong> The value of {@code LA(1)} before
+     * calling this method becomes the value of {@code LA(-1)} after calling
+     * this method.</li>
      * </ul>
-     *
+     * <p/>
      * Note that calling this method does not guarantee that {@code index()} is
      * incremented by exactly 1, as that would preclude the ability to implement
      * filtering streams (e.g. {@link org.antlr.runtime.CommonTokenStream} which distinguishes
      * between "on-channel" and "off-channel" tokens).
      *
      * @throws IllegalStateException if an attempt is made to consume the the
-     * end of the stream (i.e. if {@code LA(1)==}{@link #EOF EOF} before calling
-     * {@code consume}).
+     *                               end of the stream (i.e. if {@code LA(1)==}{@link #EOF EOF} before calling
+     *                               {@code consume}).
      */
     public void consume() {
         print("org.intellij.plugins.ceylon.parser.PsiBuilderTokenStream.consume");
@@ -328,16 +331,16 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
      * though {@code index} was the index of the EOF symbol. After this method
      * returns without throwing an exception, the at least one of the following
      * will be true.
-     *
+     * <p/>
      * <ul>
-     *   <li>{@link #index index()} will return the index of the first symbol
-     *     appearing at or after the specified {@code index}. Specifically,
-     *     implementations which filter their sources should automatically
-     *     adjust {@code index} forward the minimum amount required for the
-     *     operation to target a non-ignored symbol.</li>
-     *   <li>{@code LA(1)} returns {@link #EOF}</li>
+     * <li>{@link #index index()} will return the index of the first symbol
+     * appearing at or after the specified {@code index}. Specifically,
+     * implementations which filter their sources should automatically
+     * adjust {@code index} forward the minimum amount required for the
+     * operation to target a non-ignored symbol.</li>
+     * <li>{@code LA(1)} returns {@link #EOF}</li>
      * </ul>
-     *
+     * <p/>
      * This operation is guaranteed to not throw an exception if {@code index}
      * lies within a marked region. For more information on marked regions, see
      * {@link #mark}. The behavior of this method is unspecified if no call to
@@ -345,10 +348,9 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
      * was constructed.
      *
      * @param index The absolute index to seek to.
-     *
-     * @throws IllegalArgumentException if {@code index} is less than 0
+     * @throws IllegalArgumentException      if {@code index} is less than 0
      * @throws UnsupportedOperationException if the stream does not support
-     * seeking to the specified index
+     *                                       seeking to the specified index
      */
     public void seek(int index) {
         print("org.intellij.plugins.ceylon.parser.PsiBuilderTokenStream.seek  %s", index);
@@ -400,7 +402,7 @@ public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
      * symbol.
      *
      * @throws UnsupportedOperationException if the size of the stream is
-     * unknown.
+     *                                       unknown.
      */
     public int size() {
         return super.size();
