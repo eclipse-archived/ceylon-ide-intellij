@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.parser;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 
@@ -69,6 +70,14 @@ public class MyTree {
             newNodeParent = this.parent;
         }
 
+        @Override
+        public void error(String message) {
+            psiMarker.error(message);
+            this.type = TokenType.ERROR_ELEMENT;
+            parent.addChild(this);
+            newNodeParent = this.parent;
+        }
+
         void addChild(MyNode child) {
             children.add(child);
         }
@@ -90,9 +99,7 @@ public class MyTree {
             bindNode(ideaNode);
             List<MyNode> myChildren = getChildren();
             ASTNode[] ideaChildren = ideaNode.getChildren(CeylonIdeaParser.COMPOSITE_ELEMENTS);
-            if ((myChildren.size() != ideaChildren.length)) {
-                System.out.printf("error in %s[%s] at %s: %d != %d%n", node.getNodeType(), node.getMainToken(), node.getLocation(), myChildren.size(), ideaChildren.length);
-            } else
+            assert myChildren.size() == ideaChildren.length : String.format("error in %s[%s] at %s: %d != %d%n", node.getNodeType(), node.getMainToken(), node.getLocation(), myChildren.size(), ideaChildren.length);
             for (int i = 0; i < myChildren.size(); i++) {
                 MyNode myChildNode = myChildren.get(i);
                 ASTNode ideaChildNode = ideaChildren[i];
@@ -111,7 +118,7 @@ public class MyTree {
 
     public static interface MyMarker {
         void done(IElementType type, Node node);
-
         void drop();
+        void error(String message);
     }
 }

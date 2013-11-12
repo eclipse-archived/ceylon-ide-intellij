@@ -49,12 +49,11 @@ public class CeylonIdeaParser implements PsiParser {
         }
 
         if (!builder.eof()) {
-            final PsiBuilder.Marker tail = builder.mark();
+            final MyTree.MyMarker tail =  parser.mark("tail");
             while(!builder.eof()) {
                 builder.advanceLexer();
             }
-            tail.error("Unparsed tail");
-//            tail.done(CeylonTypes.UNPARSED_TAIL);
+            tail.error("Uparseable code found at end of file.");
         }
         parser.end(cuMarker, unit);
 

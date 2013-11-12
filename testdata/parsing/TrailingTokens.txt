@@ -13,6 +13,6 @@ FILE
       CLASS_BODY
         PsiElement(LBRACE)('{')
         PsiElement(RBRACE)('}')
-  PsiErrorElement:Unparsed tail
+  PsiErrorElement:Uparseable code found at end of file.
     PsiElement(RBRACE)('}')
     PsiElement(VOID_MODIFIER)('void')
