@@ -60,7 +60,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Run
         CeylonPsi.AnyMethodPsi method = PsiTreeUtil.getTopmostParentOfType(psiElement, CeylonPsi.AnyMethodPsi.class);
 
         if (method != null) {
-            final Tree.AnyMethod ceylonMethod = (Tree.AnyMethod) method.getCeylonNode();
+            final Tree.AnyMethod ceylonMethod = method.getCeylonNode();
             if (ceylonMethod != null) {
                 final List<Tree.ParameterList> parameterLists = ceylonMethod.getParameterLists();
                 if (!parameterLists.isEmpty()) {

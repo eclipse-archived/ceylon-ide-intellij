@@ -60,9 +60,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof SelfExpressionPsi) {
             visitSelfExpressionPsi((SelfExpressionPsi) element);
         }
-        else if (element instanceof DocLinkPsi) {
-            visitDocLinkPsi((DocLinkPsi) element);
-        }
         else if (element instanceof QuotedLiteralPsi) {
             visitQuotedLiteralPsi((QuotedLiteralPsi) element);
         }
@@ -875,7 +872,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitSuperPsi(@NotNull SuperPsi element) {}
     public void visitThisPsi(@NotNull ThisPsi element) {}
     public void visitSelfExpressionPsi(@NotNull SelfExpressionPsi element) {}
-    public void visitDocLinkPsi(@NotNull DocLinkPsi element) {}
     public void visitQuotedLiteralPsi(@NotNull QuotedLiteralPsi element) {}
     public void visitStringLiteralPsi(@NotNull StringLiteralPsi element) {}
     public void visitCharLiteralPsi(@NotNull CharLiteralPsi element) {}

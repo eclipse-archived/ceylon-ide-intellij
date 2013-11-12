@@ -9,7 +9,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.yourkit.util.Strings;
 import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
@@ -85,7 +84,7 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
     }
 
     @Override
-    public Node getCeylonNode() {
+    public Tree.Declaration getCeylonNode() {
         return specClassDecl;
     }
 
