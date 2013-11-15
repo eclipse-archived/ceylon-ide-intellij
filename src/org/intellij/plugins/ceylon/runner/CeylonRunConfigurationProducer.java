@@ -10,6 +10,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
+import com.redhat.ceylon.compiler.typechecker.model.Module;
+import com.redhat.ceylon.compiler.typechecker.model.Package;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
@@ -30,16 +32,23 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Run
     protected boolean setupConfigurationFromContext(RunConfiguration configuration, ConfigurationContext context, Ref<PsiElement> sourceElement) {
         final PsiElement srcElt = sourceElement.get();
         PsiFile file = srcElt.getContainingFile();
-        if (file instanceof CeylonFile) {
+        if (file instanceof CeylonFile && configuration instanceof CeylonRunConfiguration) {
+            final CeylonFile ceylonFile = (CeylonFile) file;
             CeylonRunConfiguration runConfig = (CeylonRunConfiguration) configuration;
 
             final String identifier = getTopLevelMethodNode(srcElt);
-
             if (identifier != null) {
-                runConfig.setFilePath(file.getVirtualFile().getCanonicalPath());
-                runConfig.setTopLevelName(identifier);
-                runConfig.setName(identifier + "() in " + file.getName());
-                return true;
+                final Tree.CompilationUnit cu = ceylonFile.getMyTree().getCompilationUnit();
+                if (cu != null && cu.getUnit() != null && cu.getUnit().getPackage() != null && cu.getUnit().getPackage().getModule() != null) {
+                    final Package pkg = cu.getUnit().getPackage();
+                    final Module mdl = pkg.getModule();
+                    runConfig.setCeylonModule(mdl.getNameAsString());
+                    String pfx = "".equals(pkg.getNameAsString()) ? "" : pkg.getNameAsString() + ".";
+                    final String topLevelNameFull = pfx + identifier;
+                    runConfig.setTopLevelNameFull(topLevelNameFull);
+                    runConfig.setName(topLevelNameFull);
+                    return true;
+                }
             }
         }
         return false;
@@ -52,11 +61,12 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Run
             identifier = getTopLevelMethodNode(context.getLocation().getPsiElement());
         }
 
-        return identifier != null && identifier.equals(((CeylonRunConfiguration) configuration).getTopLevelName());
+        return identifier != null && identifier.equals(((CeylonRunConfiguration) configuration).getTopLevelNameFull());
     }
 
     private String getTopLevelMethodNode(PsiElement psiElement) {
 
+        // todo: top-level classes may be run too
         CeylonPsi.AnyMethodPsi method = PsiTreeUtil.getTopmostParentOfType(psiElement, CeylonPsi.AnyMethodPsi.class);
 
         if (method != null) {

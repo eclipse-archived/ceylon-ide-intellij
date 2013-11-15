@@ -36,10 +36,12 @@ public class CeylonIdeaParser implements PsiParser {
         assert root == CeylonTypes.COMPILATION_UNIT : root;
 
         final PsiFile file = builder.getUserDataUnprotected(FileContextUtil.CONTAINING_FILE_KEY);
-        assert file != null : "Containing file not found.";
+        assert file instanceof CeylonFile : "Not a ceylon file or not found.";
 
-        final MyTree myTree = ((CeylonFile) file).getMyTree();
-        final MarkingCeylonParser parser = new MarkingCeylonParser(builder, myTree);
+        final CeylonFile ceylonFile = (CeylonFile) file;
+        final MarkingCeylonParser parser = new MarkingCeylonParser(builder);
+        final MyTree myTree = parser.getMyTree();
+        ceylonFile.setMyTree(myTree);
 
         final MyTree.MyMarker cuMarker = parser.mark();
         final Tree.CompilationUnit unit;

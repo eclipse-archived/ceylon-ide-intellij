@@ -5,6 +5,7 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +31,8 @@ public class MyTree {
         root.bindSubtree(astRoot);
     }
 
-    public Node getRootSpecNode() {
-        return root.node;
+    public Tree.CompilationUnit getCompilationUnit() {
+        return root.node instanceof Tree.CompilationUnit ? (Tree.CompilationUnit) root.node : null;
     }
 
     private class MyNode implements MyMarker {

@@ -12,12 +12,15 @@ import org.intellij.plugins.ceylon.psi.NodeToIElementTypeMap;
 
 public class MarkingCeylonParser extends CeylonParser {
     private PsiBuilder psiBuilder;
-    private MyTree myTree;
+    private MyTree myTree = new MyTree();
 
-    public MarkingCeylonParser(PsiBuilder psiBuilder, MyTree tree) {
+    public MarkingCeylonParser(PsiBuilder psiBuilder) {
         super(new PsiBuilderTokenStream(psiBuilder));
         this.psiBuilder = psiBuilder;
-        myTree = tree;
+    }
+
+    public MyTree getMyTree() {
+        return myTree;
     }
 
     MyTree.MyMarker mark() {

@@ -23,6 +23,7 @@ import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.apache.commons.lang.ArrayUtils;
+import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -52,6 +53,11 @@ class CeylonTypeCheckerVisitor extends Visitor {
      * @param file the file to inspect
      */
     public void accept(@NotNull PsiFile file) {
+        if (!(file instanceof CeylonFile)) {
+            return;
+        }
+        final CeylonFile ceylonFile = (CeylonFile) file;
+
         TypeCheckerManager manager = ServiceManager.getService(file.getProject(), TypeCheckerManager.class);
 
         TypeChecker typeChecker = manager.getTypeChecker();
@@ -67,19 +73,25 @@ class CeylonTypeCheckerVisitor extends Visitor {
         }
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         tokenStream.fill();
-        CeylonParser parser = new CeylonParser(tokenStream);
 
-        Tree.CompilationUnit cu = null;
-        try {
-            cu = parser.compilationUnit();
-        } catch (RecognitionException e) {
-            Logger.getInstance(CeylonTypeCheckerVisitor.class).error(e);
+        VirtualFile srcDir;
+        com.redhat.ceylon.compiler.typechecker.model.Package pkg;
+        Tree.CompilationUnit cu = ceylonFile.getMyTree().getCompilationUnit();
+        if (cu == null) {
+            try {
+                CeylonParser parser = new CeylonParser(tokenStream);
+                cu = parser.compilationUnit();
+            } catch (RecognitionException e) {
+                Logger.getInstance(CeylonTypeCheckerVisitor.class).error(e);
+            }
         }
-
-        VirtualFile srcDir = (phasedUnit == null) ? new FileSystemVirtualFile(new File(file.getVirtualFile().getParent().getPath())) : phasedUnit.getSrcDir();
-        com.redhat.ceylon.compiler.typechecker.model.Package pkg = (phasedUnit == null) ?
-                typeChecker.getContext().getModules().getDefaultModule().getPackages().get(0) : phasedUnit.getPackage();
-
+        if (phasedUnit == null) {
+            srcDir = new FileSystemVirtualFile(new File(file.getVirtualFile().getParent().getPath()));
+            pkg = typeChecker.getContext().getModules().getDefaultModule().getPackages().get(0);
+        } else {
+            srcDir = phasedUnit.getSrcDir();
+            pkg = phasedUnit.getPackage();
+        }
         phasedUnit = new PhasedUnit(sourceCodeVirtualFile, srcDir, cu, pkg,
                 typeChecker.getPhasedUnits().getModuleManager(), typeChecker.getContext(), tokenStream.getTokens());
 

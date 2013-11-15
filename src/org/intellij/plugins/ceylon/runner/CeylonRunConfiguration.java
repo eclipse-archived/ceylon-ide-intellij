@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.runner;
 
-import com.intellij.execution.CantRunException;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
@@ -15,8 +14,6 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang.ObjectUtils;
 import org.intellij.plugins.ceylon.sdk.CeylonSdk;
@@ -32,8 +29,10 @@ import java.util.Collection;
  */
 public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule> {
 
-    private String filePath;
-    private String topLevelName;
+    private String ceylonModule;
+
+    /** Full top level name, including the package, including the module */
+    private String topLevelNameFull;
 
     public CeylonRunConfiguration(String name, RunConfigurationModule configurationModule, ConfigurationFactory factory) {
         super(name, configurationModule, factory);
@@ -55,11 +54,7 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
     @Nullable
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env) throws ExecutionException {
-        VirtualFile fileToRun = getFilePath();
-
-        if (fileToRun == null) {
-            throw new CantRunException("Cannot find file " + filePath);
-        }
+        // todo: validate
 
         return new JavaCommandLineState(env) {
             @Override
@@ -71,9 +66,9 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
                 params.setMainClass("com.redhat.ceylon.launcher.Launcher");
                 params.getClassPath().add(ceylonSdk.getHomeDirectory() + "/lib/ceylon-bootstrap.jar");
                 params.getProgramParametersList().add("run");
-                params.getProgramParametersList().add("--run", topLevelName);
+                params.getProgramParametersList().add("--run", topLevelNameFull);
                 params.getProgramParametersList().add("--rep", getOutputPath());
-                params.getProgramParametersList().add("default");
+                params.getProgramParametersList().add(getCeylonModuleOrDft());
 
                 return params;
             }
@@ -84,16 +79,16 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
     public void readExternal(Element element) throws InvalidDataException {
         super.readExternal(element);
 
-        setFilePath(element.getAttributeValue("file-path"));
-        setTopLevelName(element.getAttributeValue("top-level"));
+        setCeylonModule(element.getAttributeValue("ceylon-module"));
+        setTopLevelNameFull(element.getAttributeValue("top-level"));
     }
 
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
         super.writeExternal(element);
 
-        element.setAttribute("file-path", (String) ObjectUtils.defaultIfNull(getRawFilePath(), ""));
-        element.setAttribute("top-level", (String) ObjectUtils.defaultIfNull(getTopLevelName(), ""));
+        element.setAttribute("ceylon-module", (String) ObjectUtils.defaultIfNull(getCeylonModule(), ""));
+        element.setAttribute("top-level", (String) ObjectUtils.defaultIfNull(getTopLevelNameFull(), ""));
     }
 
     private String getOutputPath() {
@@ -127,25 +122,27 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         return null;
     }
 
-    @Nullable
-    private VirtualFile getFilePath() {
-        if (filePath == null) return null;
-        return LocalFileSystem.getInstance().findFileByPath(FileUtil.toSystemIndependentName(filePath));
+    public void setTopLevelNameFull(String topLevelNameFull) {
+        this.topLevelNameFull = topLevelNameFull;
     }
 
-    public String getRawFilePath() {
-        return filePath;
+    public String getTopLevelNameFull() {
+        return topLevelNameFull;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public String getCeylonModule() {
+        return ceylonModule;
     }
 
-    public void setTopLevelName(String topLevelName) {
-        this.topLevelName = topLevelName;
+    public String getCeylonModuleOrDft() {
+        return isDefaultModule() ? "default" : ceylonModule;
     }
 
-    public String getTopLevelName() {
-        return topLevelName;
+    private boolean isDefaultModule() {
+        return ceylonModule == null || ceylonModule.isEmpty();
+    }
+
+    public void setCeylonModule(String ceylonModule) {
+        this.ceylonModule = ceylonModule;
     }
 }

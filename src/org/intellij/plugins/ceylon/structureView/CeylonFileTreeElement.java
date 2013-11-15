@@ -31,7 +31,7 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
     @NotNull
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
-        Tree.CompilationUnit compilationUnit = (Tree.CompilationUnit) myElement.getMyTree().getRootSpecNode();
+        Tree.CompilationUnit compilationUnit = myElement.getMyTree().getCompilationUnit();
         List<Tree.Declaration> declarations = compilationUnit.getDeclarations();
 
         if (declarations.isEmpty()) {
