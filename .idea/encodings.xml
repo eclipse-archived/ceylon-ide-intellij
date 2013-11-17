@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
-    <file url="file://$PROJECT_DIR$/lib/antlr-3.4-complete.jar" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.common-0.6.1.jar" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.java-0.6.1.jar" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.js-0.6.1.jar" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.module-resolver-0.6.1.jar" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.typechecker-0.6.1.jar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/ceylon.language-1.0.0.car" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/ceylon.runtime-1.0.0.jar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.common-1.0.0.jar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.java-1.0.0.jar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.js-1.0.0.jar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.module-resolver-1.0.0.jar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/com.redhat.ceylon.typechecker-1.0.0.jar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/org.antlr.runtime-3.4.jar" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lib/org.jboss.jandex-1.0.3.Final.jar" charset="UTF-8" />
   </component>
 </project>
 

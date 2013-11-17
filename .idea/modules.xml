@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CeylonIDEA.iml" filepath="$PROJECT_DIR$/CeylonIDEA.iml" />
       <module fileurl="file://$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" filepath="$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/compiler/compiler.iml" filepath="$PROJECT_DIR$/compiler/compiler.iml" />
     </modules>
   </component>
 </project>
