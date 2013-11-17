@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.petebevin.markdown.MarkdownProcessor;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             if (annotationList != null) {
                 Tree.AnonymousAnnotation aa = annotationList.getAnonymousAnnotation();
                 if (aa != null) {
-                    return aa.getStringLiteral().getText();
+                    return new MarkdownProcessor().markdown(aa.getStringLiteral().getText());
                 }
                 for (Tree.Annotation annotation : annotationList.getAnnotations()) {
                     Tree.Primary annotPrim = annotation.getPrimary();
@@ -53,7 +54,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                                         String text = ((Tree.ListedArgument) a).getExpression()
                                                 .getTerm().getText();
                                         if (text != null) {
-                                            return text;
+                                            return new MarkdownProcessor().markdown(text);
                                         }
                                     }
                                 }

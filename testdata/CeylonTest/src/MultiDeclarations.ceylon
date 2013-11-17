@@ -3,7 +3,23 @@ void goodbye() {
 
 }
 
-doc("this is a doc for hello world")
+doc("this is a *doc* for _hello_ world
+
+      * a list
+      * with bullets
+
+     # And a header #
+
+     with text below
+
+     > a simple quote with `some code inside`
+
+         public class Foo {
+             hello();
+         }
+
+     [Ceylon-IDEA](https://github.com/ceylon/ceylon-ide-intellij) is great.
+     " )
 throws(`class Exception`)
 void hello() {
     print("Hello, beautiful world!");
