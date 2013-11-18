@@ -6,10 +6,11 @@ import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import org.intellij.plugins.ceylon.psi.*;
+import org.intellij.plugins.ceylon.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.psi.CeylonPsiVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class CeylonAnnotator extends CeylonPsiVisitor implements Annotator {
+public class CeylonTypeCheckerAnnotator extends CeylonPsiVisitor implements Annotator {
     private AnnotationHolder annotationHolder;
 
     @Override

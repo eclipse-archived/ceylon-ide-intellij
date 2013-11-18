@@ -61,6 +61,8 @@ public class CeylonIdeaParser implements PsiParser {
         }
         parser.end(cuMarker, unit);
 
+        myTree.setErrors(parser.getErrors());
+
         ASTNode astRoot = builder.getTreeBuilt();
         myTree.bindToRoot(astRoot);
         return astRoot;

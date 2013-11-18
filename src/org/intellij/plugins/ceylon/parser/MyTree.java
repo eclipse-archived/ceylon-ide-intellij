@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
 public class MyTree {
     private MyNode root = null;
     private MyNode newNodeParent = new MyNode(null, null); // create a dummy "root parent" just to prevent NPE when adding children to parent
+    private List<ParseError> errors;
 
     public MyTree() {
     }
@@ -33,6 +35,14 @@ public class MyTree {
 
     public Tree.CompilationUnit getCompilationUnit() {
         return root.node instanceof Tree.CompilationUnit ? (Tree.CompilationUnit) root.node : null;
+    }
+
+    public void setErrors(List<ParseError> errors) {
+        this.errors = errors;
+    }
+
+    public List<ParseError> getErrors() {
+        return errors;
     }
 
     private class MyNode implements MyMarker {
