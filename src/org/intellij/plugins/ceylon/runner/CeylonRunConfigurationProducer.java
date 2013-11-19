@@ -60,34 +60,37 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
             final CeylonFile ceylonFile = (CeylonFile) file;
 
             // todo: top-level classes may be run too
-            CeylonPsi.AnyMethodPsi method = PsiTreeUtil.getTopmostParentOfType(psiElement, CeylonPsi.AnyMethodPsi.class);
+            CeylonPsi.DeclarationPsi toplevel = PsiTreeUtil.getTopmostParentOfType(psiElement, CeylonPsi.DeclarationPsi.class);
 
-            if (method != null) {
-                final Tree.AnyMethod ceylonMethod = method.getCeylonNode();
-                if (ceylonMethod != null) {
+            if (toplevel != null) {
+                final Tree.Declaration ceylonNode =  toplevel.getCeylonNode();
+                // Needs to be a method with 0 parameters or class definition to be runnable.
+                if (ceylonNode instanceof Tree.AnyMethod) {
+                    final Tree.AnyMethod ceylonMethod = (Tree.AnyMethod) ceylonNode;
                     final List<Tree.ParameterList> parameterLists = ceylonMethod.getParameterLists();
-                    if (!parameterLists.isEmpty()) {
-                        if (parameterLists.get(0).getParameters().isEmpty()) {
-                            CeylonCompositeElement parent = method;
-                            // todo: make sure this doesn't loop infinitely
-                            //noinspection StatementWithEmptyBody
-                            while ((parent = PsiTreeUtil.getParentOfType(parent, CeylonPsi.DeclarationPsi.class)) != null && parent.getCeylonNode() == ceylonMethod) ;
+                    if (parameterLists.isEmpty() || !parameterLists.get(0).getParameters().isEmpty()) {
+                        return null;
+                    }
+                } else if (!(ceylonNode instanceof Tree.ClassDefinition)) {
+                    return null;
+                }
 
-                            if (parent == null) {
-                                // We're in a method with no parent declaration (except possible nodes that represent the same method).
-                                final Tree.Identifier methodIdent = ceylonMethod.getIdentifier();
-                                if (methodIdent != null) {
-                                    final String identifier = methodIdent.getText();
-                                    final Tree.CompilationUnit cu = ceylonFile.getMyTree().getCompilationUnit();
-                                    if (cu != null && cu.getUnit() != null && cu.getUnit().getPackage() != null && cu.getUnit().getPackage().getModule() != null) {
-                                        final Package pkg = cu.getUnit().getPackage();
-                                        final Module mdl = pkg.getModule();
-                                        final String moduleName = mdl.getNameAsString();
-                                        final String packageName = pkg.getNameAsString();
-                                        return new RunConfigParams(moduleName, packageName, identifier);
-                                    }
-                                }
-                            }
+                CeylonCompositeElement parent = toplevel;
+                //noinspection StatementWithEmptyBody
+                while ((parent = PsiTreeUtil.getParentOfType(parent, CeylonPsi.DeclarationPsi.class)) != null && parent.getCeylonNode() == ceylonNode) ;
+
+                if (parent == null) {
+                    // We're in a method with no parent declaration (except possible nodes that represent the same method).
+                    final Tree.Identifier methodIdent = ceylonNode.getIdentifier();
+                    if (methodIdent != null) {
+                        final String identifier = methodIdent.getText();
+                        final Tree.CompilationUnit cu = ceylonFile.getMyTree().getCompilationUnit();
+                        if (cu != null && cu.getUnit() != null && cu.getUnit().getPackage() != null && cu.getUnit().getPackage().getModule() != null) {
+                            final Package pkg = cu.getUnit().getPackage();
+                            final Module mdl = pkg.getModule();
+                            final String moduleName = mdl.getNameAsString();
+                            final String packageName = pkg.getNameAsString();
+                            return new RunConfigParams(moduleName, packageName, identifier);
                         }
                     }
                 }
