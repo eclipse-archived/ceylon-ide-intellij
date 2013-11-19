@@ -1,45 +1,91 @@
 package org.intellij.plugins.ceylon.annotator;
 
-import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import org.intellij.plugins.ceylon.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.psi.CeylonPsiVisitor;
+import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
+import com.redhat.ceylon.compiler.typechecker.io.impl.FileSystemVirtualFile;
+import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
+import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.antlr.runtime.ANTLRInputStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 
-public class CeylonTypeCheckerAnnotator extends CeylonPsiVisitor implements Annotator {
-    private AnnotationHolder annotationHolder;
+import java.io.File;
+import java.io.IOException;
+
+public class CeylonTypeCheckerAnnotator implements Annotator {
+
+    public static final Logger LOGGER = Logger.getInstance(CeylonTypeCheckerAnnotator.class);
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        this.annotationHolder = holder;
-
-        element.accept(this);
-
-        if (element instanceof PsiFile) {
-            new CeylonTypeCheckerVisitor(annotationHolder).accept((PsiFile) element);
+        if (!(element instanceof CeylonFile)) {
+            return;
         }
+        final CeylonFile ceylonFile = (CeylonFile) element;
 
-        this.annotationHolder = null;
-    }
+        TypeCheckerManager manager = ServiceManager.getService(ceylonFile.getProject(), TypeCheckerManager.class);
 
-    @Override
-    public void visitAnnotationPsi(@NotNull CeylonPsi.AnnotationPsi element) {
-        super.visitAnnotationPsi(element);
+        TypeChecker typeChecker = manager.getTypeChecker();
 
-        Annotation anno = annotationHolder.createInfoAnnotation(element, null);
-        anno.setTextAttributes(CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES);
-    }
+        SourceCodeVirtualFile sourceCodeVirtualFile = new SourceCodeVirtualFile(ceylonFile);
+        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
 
+        CeylonLexer lexer = null;
+        try {
+            lexer = new CeylonLexer(new ANTLRInputStream(sourceCodeVirtualFile.getInputStream()));
+        } catch (IOException e) {
+            LOGGER.error(e);
+        }
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        tokenStream.fill();
 
-    @Override
-    public void visitCompilerAnnotationPsi(@NotNull CeylonPsi.CompilerAnnotationPsi element) {
-        super.visitCompilerAnnotationPsi(element);
+        VirtualFile srcDir;
+        com.redhat.ceylon.compiler.typechecker.model.Package pkg;
+        Tree.CompilationUnit cu = ceylonFile.getMyTree().getCompilationUnit();
+        if (cu == null) {
+            try {
+                CeylonParser parser = new CeylonParser(tokenStream);
+                cu = parser.compilationUnit();
+            } catch (RecognitionException e) {
+                LOGGER.error(e);
+            }
+        }
+        if (phasedUnit == null) {
+            srcDir = new FileSystemVirtualFile(new File(ceylonFile.getVirtualFile().getParent().getPath()));
+            pkg = typeChecker.getContext().getModules().getDefaultModule().getPackages().get(0);
+        } else {
+            srcDir = phasedUnit.getSrcDir();
+            pkg = phasedUnit.getPackage();
+        }
+        phasedUnit = new PhasedUnit(sourceCodeVirtualFile, srcDir, cu, pkg,
+                typeChecker.getPhasedUnits().getModuleManager(), typeChecker.getContext(), tokenStream.getTokens());
 
-        Annotation anno = annotationHolder.createInfoAnnotation(element, null);
-        anno.setTextAttributes(CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES);
+        phasedUnit.validateTree();
+        phasedUnit.visitSrcModulePhase();
+        phasedUnit.visitRemainingModulePhase();
+        phasedUnit.scanDeclarations();
+        phasedUnit.scanTypeDeclarations();
+        phasedUnit.validateRefinement();
+        phasedUnit.analyseTypes();
+        phasedUnit.analyseUsage();
+        phasedUnit.analyseFlow();
+
+        if (typeChecker.getPhasedUnitFromRelativePath(phasedUnit.getPathRelativeToSrcDir()) != null) {
+            typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(phasedUnit.getPathRelativeToSrcDir());
+        }
+        typeChecker.getPhasedUnits().addPhasedUnit(phasedUnit.getUnitFile(), phasedUnit);
+
+        if (phasedUnit.getCompilationUnit() != null) {
+            phasedUnit.getCompilationUnit().visit(new CeylonTypeCheckerVisitor(holder));
+        }
     }
 }
