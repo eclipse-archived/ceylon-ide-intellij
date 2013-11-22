@@ -1,15 +1,16 @@
 FILE
-  METHOD_DEFINITION
-    ANNOTATION_LIST
-      STRING_LITERAL
-        PsiElement(STRING_LITERAL)('"foo"')
+  COMPILATION_UNIT
     METHOD_DEFINITION
-      PsiElement(VOID_MODIFIER)('void')
-      IDENTIFIER
-        PsiElement(LIDENTIFIER)('bar')
-      PARAMETER_LIST
-        PsiElement(LPAREN)('(')
-        PsiElement(RPAREN)(')')
-      BLOCK
-        PsiElement(LBRACE)('{')
-        PsiElement(RBRACE)('}')
+      ANNOTATION_LIST
+        STRING_LITERAL
+          PsiElement(STRING_LITERAL)('"foo"')
+      METHOD_DEFINITION
+        PsiElement(VOID_MODIFIER)('void')
+        IDENTIFIER
+          PsiElement(LIDENTIFIER)('bar')
+        PARAMETER_LIST
+          PsiElement(LPAREN)('(')
+          PsiElement(RPAREN)(')')
+        BLOCK
+          PsiElement(LBRACE)('{')
+          PsiElement(RBRACE)('}')

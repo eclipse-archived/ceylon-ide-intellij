@@ -6,5 +6,5 @@ import org.intellij.plugins.ceylon.CeylonLanguage;
 
 public interface CeylonStubTypes {
 
-    IFileElementType COMPILATION_UNIT = new IStubFileElementType(CeylonLanguage.INSTANCE);
+    IFileElementType CEYLON_FILE = new IStubFileElementType(CeylonLanguage.INSTANCE);
 }

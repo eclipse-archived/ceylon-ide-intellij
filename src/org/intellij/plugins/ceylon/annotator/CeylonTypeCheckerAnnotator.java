@@ -50,7 +50,7 @@ public class CeylonTypeCheckerAnnotator implements Annotator {
 
         VirtualFile srcDir;
         com.redhat.ceylon.compiler.typechecker.model.Package pkg;
-        Tree.CompilationUnit cu = ceylonFile.getMyTree().getCompilationUnit();
+        Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
         if (cu == null) {
             try {
                 CeylonParser parser = new CeylonParser(tokenStream);

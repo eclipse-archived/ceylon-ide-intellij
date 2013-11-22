@@ -1,49 +1,51 @@
 FILE
-  Class  (unnamed)
-    ANNOTATION_LIST
-      STRING_LITERAL
-        PsiElement(STRING_LITERAL)('"A point with two coordinates."')
-      ANNOTATION
+  COMPILATION_UNIT
+    Class  (unnamed)
+      ANNOTATION_LIST
+        STRING_LITERAL
+          PsiElement(STRING_LITERAL)('"A point with two coordinates."')
+        ANNOTATION
+          IDENTIFIER
+            PsiElement(LIDENTIFIER)('shared')
+      Class Point
+        PsiElement(CLASS_DEFINITION)('class')
         IDENTIFIER
-          PsiElement(LIDENTIFIER)('shared')
-    Class Point
-      PsiElement(CLASS_DEFINITION)('class')
-      IDENTIFIER
-        PsiElement(UIDENTIFIER)('Point')
-      PARAMETER_LIST
-        PsiElement(LPAREN)('(')
-        INITIALIZER_PARAMETER
-          IDENTIFIER
-            PsiElement(LIDENTIFIER)('x')
-        PsiElement(COMMA)(',')
-        INITIALIZER_PARAMETER
-          IDENTIFIER
-            PsiElement(LIDENTIFIER)('y')
-        PsiElement(RPAREN)(')')
-      CLASS_BODY
-        PsiElement(LBRACE)('{')
-        ATTRIBUTE_DECLARATION
-          ANNOTATION_LIST
-            ANNOTATION
-              IDENTIFIER
-                PsiElement(LIDENTIFIER)('shared')
-          ATTRIBUTE_DECLARATION
-            BASE_TYPE
-              IDENTIFIER
-                PsiElement(UIDENTIFIER)('Float')
+          PsiElement(UIDENTIFIER)('Point')
+        PARAMETER_LIST
+          PsiElement(LPAREN)('(')
+          INITIALIZER_PARAMETER
             IDENTIFIER
               PsiElement(LIDENTIFIER)('x')
-            PsiElement(SEMICOLON)(';')
-        ATTRIBUTE_DECLARATION
-          ANNOTATION_LIST
-            ANNOTATION
-              IDENTIFIER
-                PsiElement(LIDENTIFIER)('shared')
-          ATTRIBUTE_DECLARATION
-            BASE_TYPE
-              IDENTIFIER
-                PsiElement(UIDENTIFIER)('Float')
+          PsiElement(COMMA)(',')
+          INITIALIZER_PARAMETER
             IDENTIFIER
               PsiElement(LIDENTIFIER)('y')
-            PsiElement(SEMICOLON)(';')
-        PsiElement(RBRACE)('}')
+          PsiElement(RPAREN)(')')
+        CLASS_BODY
+          PsiElement(LBRACE)('{')
+          PsiComment(LINE_COMMENT)('// A comment.\n')
+          ATTRIBUTE_DECLARATION
+            ANNOTATION_LIST
+              ANNOTATION
+                IDENTIFIER
+                  PsiElement(LIDENTIFIER)('shared')
+            ATTRIBUTE_DECLARATION
+              BASE_TYPE
+                IDENTIFIER
+                  PsiElement(UIDENTIFIER)('Float')
+              IDENTIFIER
+                PsiElement(LIDENTIFIER)('x')
+              PsiElement(SEMICOLON)(';')
+          ATTRIBUTE_DECLARATION
+            ANNOTATION_LIST
+              ANNOTATION
+                IDENTIFIER
+                  PsiElement(LIDENTIFIER)('shared')
+            ATTRIBUTE_DECLARATION
+              BASE_TYPE
+                IDENTIFIER
+                  PsiElement(UIDENTIFIER)('Float')
+              IDENTIFIER
+                PsiElement(LIDENTIFIER)('y')
+              PsiElement(SEMICOLON)(';')
+          PsiElement(RBRACE)('}')

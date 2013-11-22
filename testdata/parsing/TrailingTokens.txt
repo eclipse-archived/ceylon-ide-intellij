@@ -1,18 +1,19 @@
 FILE
   PsiComment(LINE_COMMENT)('// This is an examaple for https://github.com/ceylon/ceylon-ide-intellij/issues/2 .\n')
-  Class  (unnamed)
-    ANNOTATION_LIST
-      <empty list>
-    Class Foo
-      PsiElement(CLASS_DEFINITION)('class')
-      IDENTIFIER
-        PsiElement(UIDENTIFIER)('Foo')
-      PARAMETER_LIST
-        PsiElement(LPAREN)('(')
-        PsiElement(RPAREN)(')')
-      CLASS_BODY
-        PsiElement(LBRACE)('{')
-        PsiElement(RBRACE)('}')
+  COMPILATION_UNIT
+    Class  (unnamed)
+      ANNOTATION_LIST
+        <empty list>
+      Class Foo
+        PsiElement(CLASS_DEFINITION)('class')
+        IDENTIFIER
+          PsiElement(UIDENTIFIER)('Foo')
+        PARAMETER_LIST
+          PsiElement(LPAREN)('(')
+          PsiElement(RPAREN)(')')
+        CLASS_BODY
+          PsiElement(LBRACE)('{')
+          PsiElement(RBRACE)('}')
   PsiErrorElement:Uparseable code found at end of file.
     PsiElement(RBRACE)('}')
     PsiElement(VOID_MODIFIER)('void')

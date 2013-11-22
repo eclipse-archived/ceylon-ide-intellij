@@ -94,8 +94,10 @@ public class MarkingCeylonParser extends CeylonParser {
 
     @Override
     public Tree.CompilationUnit compilationUnit() throws RecognitionException {
-        // Markers are set by CeylonIdeaParser since the parse may fail before the end of file and the lefover stuff must be marked too.
-        return super.compilationUnit();
+        final MyTree.MyMarker marker = mark();
+        final Tree.CompilationUnit node = super.compilationUnit();
+        end(marker, node);
+        return node;
     }
 
     @Override

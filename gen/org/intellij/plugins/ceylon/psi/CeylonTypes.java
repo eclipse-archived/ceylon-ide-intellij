@@ -8,8 +8,9 @@ import org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType;
 
 public interface CeylonTypes {
 
-//    IElementType COMPILATION_UNIT = new CeylonElementType("COMPILATION_UNIT");
-    IFileElementType COMPILATION_UNIT = CeylonStubTypes.COMPILATION_UNIT;
+    IFileElementType CEYLON_FILE = CeylonStubTypes.CEYLON_FILE;
+
+    IElementType COMPILATION_UNIT = new CeylonElementType("COMPILATION_UNIT");
     IElementType MODULE_DESCRIPTOR = new CeylonElementType("MODULE_DESCRIPTOR");
     IElementType PACKAGE_DESCRIPTOR = new CeylonElementType("PACKAGE_DESCRIPTOR");
     IElementType IMPORT_MODULE_LIST = new CeylonElementType("IMPORT_MODULE_LIST");

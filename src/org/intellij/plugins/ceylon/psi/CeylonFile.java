@@ -7,33 +7,30 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.text.BlockSupport;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.IndexingDataKeys;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.CeylonFileType;
 import org.intellij.plugins.ceylon.CeylonLanguage;
-import org.intellij.plugins.ceylon.parser.MyTree;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class CeylonFile extends PsiFileBase {
 
-    private MyTree myTree;
     private String packageName; // TODO should be updated if the file is moved, package is renamed etc.
 
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
     }
 
-    public MyTree getMyTree() {
-        return myTree;
+    private CeylonPsi.CompilationUnitPsi getCompilationUnitPsi() {
+        return PsiTreeUtil.findChildOfType(this, CeylonPsi.CompilationUnitPsi.class);
     }
 
-    public void setMyTree(MyTree myTree) {
-        if (getOriginalFile() instanceof CeylonFile && getOriginalFile() != this) {
-            ((CeylonFile)getOriginalFile()).setMyTree(myTree);
-        }
-        this.myTree = myTree;
+    public Tree.CompilationUnit getCompilationUnit() {
+        final CeylonPsi.CompilationUnitPsi cuPsi = getCompilationUnitPsi();
+        return cuPsi == null ? null : cuPsi.getCeylonNode();
     }
 
     @NotNull
@@ -47,7 +44,7 @@ public class CeylonFile extends PsiFileBase {
             return packageName;
         }
 
-        final Tree.CompilationUnit compilationUnit = getMyTree().getCompilationUnit();
+        final Tree.CompilationUnit compilationUnit = getCompilationUnit();
 
         if (compilationUnit == null) {
             return null;
@@ -81,6 +78,7 @@ public class CeylonFile extends PsiFileBase {
     public <T> T getUserData(@NotNull Key<T> key) {
         if (BlockSupport.TREE_DEPTH_LIMIT_EXCEEDED.equals(key)) {
             // This prevents ReparsedSuccessfullyException from ever being thrown so we can bind AST nodes to Ceylon Spec nodes in CeylonIdeaParser.
+            //noinspection unchecked
             return (T) Boolean.TRUE;
         }
         return super.getUserData(key);

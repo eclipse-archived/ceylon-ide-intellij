@@ -84,7 +84,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
                     final Tree.Identifier methodIdent = ceylonNode.getIdentifier();
                     if (methodIdent != null) {
                         final String identifier = methodIdent.getText();
-                        final Tree.CompilationUnit cu = ceylonFile.getMyTree().getCompilationUnit();
+                        final Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
                         if (cu != null && cu.getUnit() != null && cu.getUnit().getPackage() != null && cu.getUnit().getPackage().getModule() != null) {
                             final Package pkg = cu.getUnit().getPackage();
                             final Module mdl = pkg.getModule();

@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
@@ -34,7 +35,7 @@ public class CeylonParserDefinition implements ParserDefinition {
 
     @Override
     public IFileElementType getFileNodeType() {
-        return CeylonTypes.COMPILATION_UNIT;
+        return CeylonTypes.CEYLON_FILE;
     }
 
     @NotNull
@@ -58,7 +59,8 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public PsiElement createElement(ASTNode node) {
-        return node.getElementType() == CeylonTypes.CLASS_DEFINITION || node.getElementType() == CeylonTypes.INTERFACE_DEFINITION
+        final IElementType type = node.getElementType();
+        return type == CeylonTypes.CLASS_DEFINITION || type == CeylonTypes.INTERFACE_DEFINITION
                 ? new StubbedClassDefinitionPsiImpl(node)
                 : CeylonPsiFactory.createElement(node);
     }

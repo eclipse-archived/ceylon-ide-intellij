@@ -1,2 +1,3 @@
 FILE
-  <empty list>
+  COMPILATION_UNIT
+    <empty list>

@@ -9,12 +9,8 @@ import com.intellij.psi.impl.source.resolve.FileContextUtil;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.antlr.runtime.RecognitionException;
-import org.intellij.plugins.ceylon.psi.CeylonFile;
-import org.intellij.plugins.ceylon.psi.CeylonTokenType;
-import org.intellij.plugins.ceylon.psi.CeylonTokens;
-import org.intellij.plugins.ceylon.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,20 +29,17 @@ public class CeylonIdeaParser implements PsiParser {
     @NotNull
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
-        assert root == CeylonTypes.COMPILATION_UNIT : root;
+        assert root == CeylonTypes.CEYLON_FILE : root;
 
         final PsiFile file = builder.getUserDataUnprotected(FileContextUtil.CONTAINING_FILE_KEY);
         assert file instanceof CeylonFile : "Not a ceylon file or not found.";
 
-        final CeylonFile ceylonFile = (CeylonFile) file;
         final MarkingCeylonParser parser = new MarkingCeylonParser(builder);
         final MyTree myTree = parser.getMyTree();
-        ceylonFile.setMyTree(myTree);
 
-        final MyTree.MyMarker cuMarker = parser.mark();
-        final Tree.CompilationUnit unit;
+        final MyTree.MyMarker fileMarker = parser.mark();
         try {
-            unit = parser.compilationUnit();
+            parser.compilationUnit();
         } catch (RecognitionException e) {
             // todo: what's the correct way to handle this?
             throw new RuntimeException("Unrecognized", e);
@@ -59,11 +52,17 @@ public class CeylonIdeaParser implements PsiParser {
             }
             tail.error("Uparseable code found at end of file.");
         }
-        parser.end(cuMarker, unit);
-
-        myTree.setErrors(parser.getErrors());
+        fileMarker.done(root, null);
 
         ASTNode astRoot = builder.getTreeBuilt();
+
+        for (ASTNode node : astRoot.getChildren(null)) {
+            // these may be comments or COMPILATION_UNIT
+            if (node.getElementType() == CeylonTypes.COMPILATION_UNIT) {
+                CeylonASTUtil.setErrors(node, parser.getErrors());
+            }
+        }
+
         myTree.bindToRoot(astRoot);
         return astRoot;
     }

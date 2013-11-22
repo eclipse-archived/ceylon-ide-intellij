@@ -4,9 +4,9 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.intellij.plugins.ceylon.psi.CeylonTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import java.util.Objects;
 public class MyTree {
     private MyNode root = null;
     private MyNode newNodeParent = new MyNode(null, null); // create a dummy "root parent" just to prevent NPE when adding children to parent
-    private List<ParseError> errors;
 
     public MyTree() {
     }
@@ -37,14 +36,6 @@ public class MyTree {
         return root.node instanceof Tree.CompilationUnit ? (Tree.CompilationUnit) root.node : null;
     }
 
-    public void setErrors(List<ParseError> errors) {
-        this.errors = errors;
-    }
-
-    public List<ParseError> getErrors() {
-        return errors;
-    }
-
     private class MyNode implements MyMarker {
         private PsiBuilder.Marker psiMarker;
         private IElementType type;
@@ -59,7 +50,7 @@ public class MyTree {
 
         @Override
         public void done(IElementType type, Node node) {
-            if (children.size() == 1 && children.get(0).node == node) {
+            if (children.size() == 1 && children.get(0).node == node && type != CeylonTypes.CEYLON_FILE) {
                 psiMarker.drop();
                 final MyNode myOnlyChild = children.get(0);
                 myOnlyChild.parent = this.parent;
