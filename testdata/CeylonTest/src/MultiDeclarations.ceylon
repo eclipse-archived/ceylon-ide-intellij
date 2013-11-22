@@ -2,7 +2,6 @@ doc("this is a doc for goodbye")
 void goodbye() {
 
 }
-
 doc("this is a *doc* for _hello_ world
 
       * a list
@@ -21,11 +20,13 @@ doc("this is a *doc* for _hello_ world
      [Ceylon-IDEA](https://github.com/ceylon/ceylon-ide-intellij) is great.
      " )
 throws(`class Exception`)
-void hello() {
+shared void helloAgain() {
     print("Hello, beautiful world!");
 }
 
 doc("this is a doc for MyClass")
+see(`class Integer`)
+throws(`class Exception`, "sometimes")
 class MyClass() {
 
 }

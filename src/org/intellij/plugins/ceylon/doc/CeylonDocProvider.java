@@ -2,16 +2,15 @@ package org.intellij.plugins.ceylon.doc;
 
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.petebevin.markdown.MarkdownProcessor;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.compiler.typechecker.model.Declaration;
+import com.redhat.ceylon.compiler.typechecker.model.Interface;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * @author Matija Mazi <br/>
@@ -30,39 +29,29 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         CeylonPsi.DeclarationPsi parentDecl = PsiTreeUtil.getParentOfType(element, CeylonPsi.DeclarationPsi.class);
 
         if (parentDecl != null) {
-            Tree.Declaration specNode = (Tree.Declaration) parentDecl.getCeylonNode();
-            final Tree.AnnotationList annotationList = specNode.getAnnotationList();
+            Declaration decl = parentDecl.getCeylonNode().getDeclarationModel();
 
-            // This code is copied and slightly adapted from com.redhat.ceylon.eclipse.code.hover.CeylonHover.appendDocAnnotationContent().
+            StringBuilder builder = new StringBuilder();
 
-            if (annotationList != null) {
-                Tree.AnonymousAnnotation aa = annotationList.getAnonymousAnnotation();
-                if (aa != null) {
-                    return new MarkdownProcessor().markdown(aa.getStringLiteral().getText());
-                }
-                for (Tree.Annotation annotation : annotationList.getAnnotations()) {
-                    Tree.Primary annotPrim = annotation.getPrimary();
-                    if (annotPrim instanceof Tree.BaseMemberExpression) {
-                        String name = ((Tree.BaseMemberExpression) annotPrim).getIdentifier().getText();
-                        if ("doc".equals(name)) {
-                            Tree.PositionalArgumentList argList = annotation.getPositionalArgumentList();
-                            if (argList != null) {
-                                List<Tree.PositionalArgument> args = argList.getPositionalArguments();
-                                if (!args.isEmpty()) {
-                                    Tree.PositionalArgument a = args.get(0);
-                                    if (a instanceof Tree.ListedArgument) {
-                                        String text = ((Tree.ListedArgument) a).getExpression()
-                                                .getTerm().getText();
-                                        if (text != null) {
-                                            return new MarkdownProcessor().markdown(text);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            String pkg = DocBuilder.getPackageFor(decl);
+
+            if (StringUtil.isNotEmpty(pkg)) {
+                builder.append("<p><b>").append(pkg).append("</b></p>");
             }
+
+            String declKind = "";
+            if (decl instanceof com.redhat.ceylon.compiler.typechecker.model.Class) {
+                declKind = "class ";
+            } else if (decl instanceof Interface) {
+                declKind = "interface ";
+            }
+            builder.append("<p><code>").append(DocBuilder.getModifiers(decl)).append(declKind).append("<b>").append(decl.getQualifiedNameString()).append("</b>").append("</code></p>");
+
+            // TODO extends & implements
+
+            DocBuilder.appendDocAnnotationContent(parentDecl.getCeylonNode().getAnnotationList(), builder, decl.getScope());
+
+            return builder.toString();
         }
         return null;
     }
