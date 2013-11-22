@@ -42,6 +42,7 @@
         <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.parser.CeylonParserDefinition"/>
 
         <lang.syntaxHighlighterFactory key="Ceylon" implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
+        <languageInjector implementation="org.intellij.plugins.ceylon.lang.BacktickLanguageInjector"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonSyntaxAnnotator"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.highlighting.CeylonFileHighlightFilter"/>

@@ -5,6 +5,7 @@ import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.source.tree.injected.InjectedFileViewProvider;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
@@ -29,6 +30,9 @@ public class CeylonTypeCheckerAnnotator implements Annotator {
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         if (!(element instanceof CeylonFile)) {
             return;
+        }
+        if (((CeylonFile) element).getViewProvider() instanceof InjectedFileViewProvider) {
+            return; // Most likely highlighting in backticks, so we skip it
         }
         final CeylonFile ceylonFile = (CeylonFile) element;
 
