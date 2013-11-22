@@ -4,6 +4,7 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.psi.CeylonPsiVisitor;
@@ -23,7 +24,10 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
     public void visitAnnotationPsi(@NotNull CeylonPsi.AnnotationPsi element) {
         super.visitAnnotationPsi(element);
 
-        Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+        // Only highlight the part before the opening parenthesis
+        TextRange range = new TextRange(element.getCeylonNode().getPrimary().getStartIndex(), element.getCeylonNode().getPrimary().getStopIndex() + 1);
+
+        Annotation anno = annotationHolder.createInfoAnnotation(range, null);
         anno.setTextAttributes(CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES);
     }
 
