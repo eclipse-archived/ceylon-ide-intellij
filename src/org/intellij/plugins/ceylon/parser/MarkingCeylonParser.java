@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.parser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
+import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -34,6 +35,23 @@ public class MarkingCeylonParser extends CeylonParser {
             IElementType elementType = NodeToIElementTypeMap.get(node);
             marker.done(elementType, node);
         }
+    }
+
+    @Override
+    public void displayRecognitionError(String[] tn, RecognitionException re) {
+        super.displayRecognitionError(tn, re);
+        error(tn, re);
+    }
+
+    @Override
+    public void displayRecognitionError(String[] tn, RecognitionException re, int code) {
+        super.displayRecognitionError(tn, re, code);
+        error(tn, re);
+    }
+
+    private void error(String[] tn, RecognitionException re) {
+        psiBuilder.error(new ParseError(this, re, tn).getMessage());
+        myTree.error();
     }
 
     @Override

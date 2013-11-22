@@ -43,7 +43,6 @@
 
         <lang.syntaxHighlighterFactory key="Ceylon" implementationClass="org.intellij.plugins.ceylon.highlighting.CeylonHighlighterFactory"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonSyntaxAnnotator"/>
-        <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonParserAnnotator"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.highlighting.CeylonFileHighlightFilter"/>
 

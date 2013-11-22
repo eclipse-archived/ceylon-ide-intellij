@@ -9,12 +9,16 @@ FILE
         ANNOTATION
           IDENTIFIER
             PsiElement(LIDENTIFIER)('doc')
+          PsiErrorElement:incorrect syntax: no viable alternative at token '"Test for illegal top level module"'
+            <empty list>
       PsiElement(STRING_LITERAL)('"Test for illegal top level module"')
     MISSING_DECLARATION
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER
             PsiElement(LIDENTIFIER)('license')
+          PsiErrorElement:incorrect syntax: no viable alternative at token '"http://www.apache.org/licenses/LICENSE-2.0.html"'
+            <empty list>
       PsiElement(STRING_LITERAL)('"http://www.apache.org/licenses/LICENSE-2.0.html"')
     MODULE_DESCRIPTOR
       ANNOTATION_LIST

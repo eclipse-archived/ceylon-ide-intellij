@@ -36,6 +36,12 @@ public class MyTree {
         return root.node instanceof Tree.CompilationUnit ? (Tree.CompilationUnit) root.node : null;
     }
 
+    public void error() {
+        final MyNode myNode = new MyNode(null, newNodeParent);
+        myNode.type = TokenType.ERROR_ELEMENT;
+        newNodeParent.addChild(myNode);
+    }
+
     private class MyNode implements MyMarker {
         private PsiBuilder.Marker psiMarker;
         private IElementType type;
@@ -101,12 +107,13 @@ public class MyTree {
             bindNode(ideaNode);
             List<MyNode> myChildren = getChildren();
             ASTNode[] ideaChildren = ideaNode.getChildren(CeylonIdeaParser.COMPOSITE_ELEMENTS);
-            assert myChildren.size() == ideaChildren.length : String.format("error in %s[%s] at %s: %d != %d%n", node.getNodeType(), node.getMainToken(), node.getLocation(), myChildren.size(), ideaChildren.length);
-            for (int i = 0; i < myChildren.size(); i++) {
-                MyNode myChildNode = myChildren.get(i);
-                ASTNode ideaChildNode = ideaChildren[i];
-                myChildNode.bindSubtree(ideaChildNode);
-            }
+            if (myChildren.size() == ideaChildren.length) {
+                for (int i = 0; i < myChildren.size(); i++) {
+                    MyNode myChildNode = myChildren.get(i);
+                    ASTNode ideaChildNode = ideaChildren[i];
+                    myChildNode.bindSubtree(ideaChildNode);
+                }
+            } // else Just ignore the subtree; this happens sometimes when Idea inserts its IntellijIdeaRulezz token
         }
 
         /**

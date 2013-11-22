@@ -10,7 +10,10 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import org.antlr.runtime.RecognitionException;
-import org.intellij.plugins.ceylon.psi.*;
+import org.intellij.plugins.ceylon.psi.CeylonFile;
+import org.intellij.plugins.ceylon.psi.CeylonTokenType;
+import org.intellij.plugins.ceylon.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -55,13 +58,6 @@ public class CeylonIdeaParser implements PsiParser {
         fileMarker.done(root, null);
 
         ASTNode astRoot = builder.getTreeBuilt();
-
-        for (ASTNode node : astRoot.getChildren(null)) {
-            // these may be comments or COMPILATION_UNIT
-            if (node.getElementType() == CeylonTypes.COMPILATION_UNIT) {
-                CeylonASTUtil.setErrors(node, parser.getErrors());
-            }
-        }
 
         myTree.bindToRoot(astRoot);
         return astRoot;

@@ -263,6 +263,8 @@ FILE
                   PsiElement(UIDENTIFIER)('T')
               IDENTIFIER
                 PsiElement(ELLIPSIS)('...')
+                PsiErrorElement:incorrect syntax: extraneous token '...' expecting initial-lowercase identifier
+                  <empty list>
                 PsiElement(LIDENTIFIER)('ti')
           PsiElement(RPAREN)(')')
         TYPE_CONSTRAINT_LIST
@@ -2213,13 +2215,16 @@ FILE
                   EXPRESSION_STATEMENT
                     EXPRESSION
                       TUPLE
-                        PsiElement(LBRACKET)('[')
-                        SEQUENCED_ARGUMENT
-                          LISTED_ARGUMENT
-                            EXPRESSION
-                              STRING_LITERAL
-                                PsiElement(STRING_LITERAL)('"Interface&Sized"')
-                        PsiElement(RBRACKET)(']')
+                        TUPLE
+                          PsiElement(LBRACKET)('[')
+                          SEQUENCED_ARGUMENT
+                            LISTED_ARGUMENT
+                              EXPRESSION
+                                STRING_LITERAL
+                                  PsiElement(STRING_LITERAL)('"Interface&Sized"')
+                          PsiElement(RBRACKET)(']')
+                        PsiErrorElement:incorrect syntax: no viable alternative at token 'value'
+                          <empty list>
                     PsiElement(VALUE_MODIFIER)('value')
                 SPECIFIER_STATEMENT
                   EXPRESSION
@@ -3242,13 +3247,16 @@ FILE
                     EXPRESSION_STATEMENT
                       EXPRESSION
                         TUPLE
-                          PsiElement(LBRACKET)('[')
-                          SEQUENCED_ARGUMENT
-                            LISTED_ARGUMENT
-                              EXPRESSION
-                                STRING_LITERAL
-                                  PsiElement(STRING_LITERAL)('"J4&J2"')
-                          PsiElement(RBRACKET)(']')
+                          TUPLE
+                            PsiElement(LBRACKET)('[')
+                            SEQUENCED_ARGUMENT
+                              LISTED_ARGUMENT
+                                EXPRESSION
+                                  STRING_LITERAL
+                                    PsiElement(STRING_LITERAL)('"J4&J2"')
+                            PsiElement(RBRACKET)(']')
+                          PsiErrorElement:incorrect syntax: no viable alternative at token 'value'
+                            <empty list>
                       PsiElement(VALUE_MODIFIER)('value')
                   SPECIFIER_STATEMENT
                     EXPRESSION
@@ -3512,13 +3520,16 @@ FILE
                     EXPRESSION_STATEMENT
                       EXPRESSION
                         TUPLE
-                          PsiElement(LBRACKET)('[')
-                          SEQUENCED_ARGUMENT
-                            LISTED_ARGUMENT
-                              EXPRESSION
-                                STRING_LITERAL
-                                  PsiElement(STRING_LITERAL)('"J4&J2"')
-                          PsiElement(RBRACKET)(']')
+                          TUPLE
+                            PsiElement(LBRACKET)('[')
+                            SEQUENCED_ARGUMENT
+                              LISTED_ARGUMENT
+                                EXPRESSION
+                                  STRING_LITERAL
+                                    PsiElement(STRING_LITERAL)('"J4&J2"')
+                            PsiElement(RBRACKET)(']')
+                          PsiErrorElement:incorrect syntax: no viable alternative at token 'value'
+                            <empty list>
                       PsiElement(VALUE_MODIFIER)('value')
                   SPECIFIER_STATEMENT
                     EXPRESSION

@@ -14,6 +14,8 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
+    PsiErrorElement:incorrect syntax: missing EOF at '}'
+      <empty list>
   PsiErrorElement:Uparseable code found at end of file.
     PsiElement(RBRACE)('}')
     PsiElement(VOID_MODIFIER)('void')
