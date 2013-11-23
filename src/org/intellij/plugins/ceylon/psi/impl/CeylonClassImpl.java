@@ -10,7 +10,7 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.yourkit.util.Strings;
+import org.apache.commons.lang.ObjectUtils;
 import org.intellij.plugins.ceylon.parser.CeylonIdeaParser;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
@@ -107,6 +107,6 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
 
     @Override
     public String toString() {
-        return (isInterface() ? "Interface " : "Class ") + Strings.notNull(getName(), " (unnamed)");
+        return (isInterface() ? "Interface " : "Class ") + ObjectUtils.defaultIfNull(getName(), " (unnamed)");
     }
 }

@@ -22,12 +22,26 @@ While we are working very hard at making this a great plugin, only a few feature
 
 Other features will come soon!
 
-# Hacking
+# Testing & Hacking
 
-If you want to start hacking on this plugin, you will need:
+For the moment, we do not provide any pre-built version of the plugin, since it is under heavy development. If you want to try it, here are the steps to follow:
+
+If you want to start testing or hacking on this plugin, you will need:
 
 - a Community or Ultimate version of [IntelliJ EAP 13](http://confluence.jetbrains.com/display/IDEADEV/IDEA+13+EAP)
-- the following plugins: "Plugin DevKit", "UI Designer" + "UI Designer (core)", "PsiViewer" (optional but recommended)
-- a clone of https://github.com/JetBrains/intellij-community/ is highly recommended since you will likely have to debug code from the IntelliJ platform
+- the following plugins enabled: "Plugin DevKit", "UI Designer" + "UI Designer (core)", "PsiViewer" (optional but recommended)
+- a clone of https://github.com/JetBrains/intellij-community/ is highly recommended for hacking since you will likely have to debug code from the IntelliJ platform
+- a clone of https://github.com/ceylon/ceylon-ide-intellij (obviously)
+
+# Building & running the plugin
+
+- open the project `ceylon-ide-intellij` in IDEA
+- go to `File > Project Structure` and configure a `JDK` and an `IntelliJ Platform Plugin SDK` if needed in the `SDKs` part
+- in the `Project` part, set the previously created IntelliJ plugin SDK as the project's SDK (the `Project language level` must be at least 1.7)
+- set the `Project compiler output` to any directory you want (for example `out`)
+- apply changes and close the settings dialog
+- in the IDE's `Preferences > File Types` register `*.car` as `Archive files` under `Recognized File Types`
+- create a new run configuration with type `Plugin` and leave the default options
+- run this configuration and enjoy writing Ceylon in IntelliJ!
 
 We tried to reduce as much as possible the number of external dependencies, the plugin should be self-sufficient.
