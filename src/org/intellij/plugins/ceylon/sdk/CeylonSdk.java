@@ -4,6 +4,7 @@ import com.intellij.openapi.projectRoots.*;
 import com.intellij.openapi.projectRoots.impl.JavaDependentSdkType;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.JarFileSystem;
@@ -13,6 +14,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +146,16 @@ public class CeylonSdk extends JavaDependentSdkType implements JavaSdkType {
         return true;
     }
 
+    @Override
+    public Icon getIcon() {
+        return IconLoader.getIcon("/icons/ceylon.png");
+    }
+
+    @Override
+    public Icon getIconForAddAction() {
+        return getIcon();
+    }
+
     /**
      * Adds vital ceylon jar/car files to the classpath.
      * @param sdk the ceylon SDK
@@ -153,22 +165,22 @@ public class CeylonSdk extends JavaDependentSdkType implements JavaSdkType {
         VirtualFile homeDirectory = sdk.getHomeDirectory();
 
         if (homeDirectory != null) {
-            VirtualFile libDir = homeDirectory.findChild("lib");
-
-            if (libDir != null) {
-                for (VirtualFile file : libDir.getChildren()) {
-                    if ("jar".equals(file.getExtension())) {
-                        VirtualFile jar = JarFileSystem.getInstance().findFileByPath(file.getPath() + JarFileSystem.JAR_SEPARATOR);
-                        sdkModificator.addRoot(jar, OrderRootType.CLASSES);
-                    }
-                }
-            }
+//            VirtualFile libDir = homeDirectory.findChild("lib");
+//
+//            if (libDir != null) {
+//                for (VirtualFile file : libDir.getChildren()) {
+//                    if ("jar".equals(file.getExtension())) {
+//                        VirtualFile jar = JarFileSystem.getInstance().findFileByPath(file.getPath() + JarFileSystem.JAR_SEPARATOR);
+//                        sdkModificator.addRoot(jar, OrderRootType.CLASSES);
+//                    }
+//                }
+//            }
 
             addJarFromRepo(sdk, homeDirectory, sdkModificator, "ceylon.language", "car");
-            addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.common", "jar");
-            addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.compiler.java", "jar");
-            addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.module-resolver", "jar");
-            addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.typechecker", "jar");
+//            addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.common", "jar");
+//            addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.compiler.java", "jar");
+//            addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.module-resolver", "jar");
+//            addJarFromRepo(sdk, homeDirectory, sdkModificator, "com.redhat.ceylon.typechecker", "jar");
         }
     }
 

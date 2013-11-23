@@ -2,12 +2,14 @@ package org.intellij.plugins.ceylon.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.lang.ASTNode;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
+import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +63,14 @@ public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonClass> {
     @Nullable
     @Override
     public String getPresentableText() {
-        return ((Tree.ClassOrInterface) myClass.getCeylonNode()).getIdentifier().getText();
+        Tree.Declaration ceylonNode = myClass.getCeylonNode();
+
+        if (ceylonNode != null) {
+            return ceylonNode.getIdentifier().getText();
+        }
+
+        ASTNode identifier = myClass.getNode().findChildByType(CeylonTypes.IDENTIFIER);
+        return (identifier == null) ? null : identifier.getText();
     }
 
     @Override

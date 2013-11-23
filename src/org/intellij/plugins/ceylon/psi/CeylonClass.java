@@ -8,13 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public interface CeylonClass extends CeylonPsi.DeclarationPsi, PsiNameIdentifierOwner, CeylonNamedDeclaration, CeylonTypedDeclaration, StubBasedPsiElement<ClassStub> {
 
     @Nullable
-    String getPackage();
-
-    @Nullable
     String getQualifiedName();
-
-    @Nullable
-    CeylonClass getParentClass();
 
     boolean isInterface();
 }
