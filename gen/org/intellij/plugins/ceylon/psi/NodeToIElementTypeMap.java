@@ -289,6 +289,7 @@ public class NodeToIElementTypeMap {
         map.put(Tree.CharLiteral.class, CeylonTypes.CHAR_LITERAL);
         map.put(Tree.StringLiteral.class, CeylonTypes.STRING_LITERAL);
         map.put(Tree.QuotedLiteral.class, CeylonTypes.QUOTED_LITERAL);
+        map.put(Tree.DocLink.class, CeylonTypes.DOC_LINK);
         map.put(Tree.SelfExpression.class, CeylonTypes.SELF_EXPRESSION);
         map.put(Tree.This.class, CeylonTypes.THIS);
         map.put(Tree.Super.class, CeylonTypes.SUPER);

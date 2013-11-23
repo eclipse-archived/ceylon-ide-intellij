@@ -1597,6 +1597,12 @@ public class CeylonPsiImpl {
         @Override public Tree.QuotedLiteral getCeylonNode() { return (Tree.QuotedLiteral) super.getCeylonNode(); }
     }
 
+    public static class DocLinkPsiImpl extends CeylonCompositeElementImpl
+            implements CeylonPsi.DocLinkPsi {
+        public DocLinkPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.DocLink getCeylonNode() { return (Tree.DocLink) super.getCeylonNode(); }
+    }
+
     public static abstract class SelfExpressionPsiImpl extends AtomPsiImpl
             implements CeylonPsi.SelfExpressionPsi {
         public SelfExpressionPsiImpl(ASTNode astNode) { super(astNode); }

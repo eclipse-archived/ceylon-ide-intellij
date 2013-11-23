@@ -275,6 +275,7 @@ public interface CeylonTypes {
     IElementType CHAR_LITERAL = new CeylonElementType("CHAR_LITERAL");
     IElementType STRING_LITERAL = new CeylonElementType("STRING_LITERAL");
     IElementType QUOTED_LITERAL = new CeylonElementType("QUOTED_LITERAL");
+    IElementType DOC_LINK = new CeylonElementType("DOC_LINK");
     IElementType SELF_EXPRESSION = new CeylonElementType("SELF_EXPRESSION");
     IElementType THIS = new CeylonElementType("THIS");
     IElementType SUPER = new CeylonElementType("SUPER");

@@ -1065,6 +1065,10 @@ public class CeylonPsi {
         @Override Tree.QuotedLiteral getCeylonNode();
     }
 
+    public static interface DocLinkPsi extends CeylonCompositeElement {
+        @Override Tree.DocLink getCeylonNode();
+    }
+
     public static interface SelfExpressionPsi extends AtomPsi {
         @Override Tree.SelfExpression getCeylonNode();
     }

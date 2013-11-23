@@ -441,6 +441,8 @@ public class CeylonPsiFactory {
             return new StringLiteralPsiImpl(node);
         } else if (type == QUOTED_LITERAL) {
             return new QuotedLiteralPsiImpl(node);
+        } else if (type == DOC_LINK) {
+            return new DocLinkPsiImpl(node);
         } else if (type == THIS) {
             return new ThisPsiImpl(node);
         } else if (type == SUPER) {
