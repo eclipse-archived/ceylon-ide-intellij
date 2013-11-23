@@ -3,11 +3,9 @@ package org.intellij.plugins.ceylon.presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.util.PlatformIcons;
-import com.redhat.ceylon.compiler.typechecker.model.ClassOrInterface;
-import com.redhat.ceylon.compiler.typechecker.model.TypeDeclaration;
+import com.redhat.ceylon.compiler.typechecker.model.*;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
-import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,21 +16,23 @@ public class ClassPresentationProvider implements ItemPresentationProvider<Ceylo
     public ItemPresentation getPresentation(final CeylonPsi.IdentifierPsi item) {
         if (item.getParent() instanceof CeylonClass) {
             final CeylonClass myClass = (CeylonClass) item.getParent();
+            final Tree.ClassOrInterface parentClass = (Tree.ClassOrInterface) myClass.getCeylonNode();
 
             return new ItemPresentation() {
                 @Nullable
                 @Override
                 public String getPresentableText() {
                     StringBuilder text = new StringBuilder(item.getText());
-                    Tree.ClassOrInterface parentClass = (Tree.ClassOrInterface) myClass.getCeylonNode();
 
                     if (parentClass != null) {
                         ClassOrInterface model = parentClass.getDeclarationModel();
 
-                        // TODO model is always null (need to use DeclarationVisitor?)
-                        if (model != null && model.getSuperTypeDeclarations() != null) {
-                            for (TypeDeclaration superType : model.getSuperTypeDeclarations()) {
-                                text.append(" in ").append(superType.getName());
+                        if (model != null) {
+                            Scope container = model.getContainer();
+
+                            while (container instanceof TypeDeclaration) {
+                                text.append(" in ").append(((TypeDeclaration) container).getName());
+                                container = container.getContainer();
                             }
                         }
                     }
@@ -43,8 +43,8 @@ public class ClassPresentationProvider implements ItemPresentationProvider<Ceylo
                 @Nullable
                 @Override
                 public String getLocationString() {
-                    if (item.getContainingFile() instanceof CeylonFile) {
-                        return ((CeylonFile) item.getContainingFile()).getPackageName();
+                    if (parentClass != null) {
+                        return "(" + parentClass.getUnit().getPackage().getModule().getNameAsString() + ")";
                     }
 
                     return null;

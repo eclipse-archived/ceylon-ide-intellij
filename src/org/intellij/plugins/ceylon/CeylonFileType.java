@@ -25,7 +25,7 @@ public class CeylonFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getDescription() {
-        return "Support for the Ceylon programming language";
+        return CeylonBundle.message("file.type.ceylon");
     }
 
     @NotNull
