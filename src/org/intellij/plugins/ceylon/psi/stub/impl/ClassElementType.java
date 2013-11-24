@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.psi.stub.impl;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.*;
 import org.intellij.plugins.ceylon.CeylonLanguage;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
@@ -28,6 +29,12 @@ public class ClassElementType extends IStubElementType<ClassStub, CeylonClass> {
         byte flags = (byte) (psi.getNode().getElementType() == CeylonTypes.INTERFACE_DEFINITION ? ClassStubImpl.INTERFACE : 0);
 
         return new ClassStubImpl((IStubElementType) psi.getNode().getElementType(), parentStub, psi.getName(), psi.getQualifiedName(), flags);
+    }
+
+    @Override
+    public boolean shouldCreateStub(ASTNode node) {
+        // Workaround to avoid duplicate stubs for nested identical ClassDefinitions
+        return node.findChildByType(CeylonTypes.IDENTIFIER) != null;
     }
 
     @NotNull

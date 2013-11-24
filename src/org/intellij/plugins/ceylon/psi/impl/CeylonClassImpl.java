@@ -51,12 +51,13 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
     public String getQualifiedName() {
         // TODO while indexing, the model is null, so we can't get the qualified name
         if (specClassDecl != null && specClassDecl.getDeclarationModel() != null) {
-            return specClassDecl.getDeclarationModel().getQualifiedNameString();
+//            return specClassDecl.getDeclarationModel().getQualifiedNameString();
         } else if (stub != null) {
             return stub.getQualifiedName();
         }
 
-        return null;
+        // bad workaround for the previous to do
+        return getName();
     }
 
     @Nullable

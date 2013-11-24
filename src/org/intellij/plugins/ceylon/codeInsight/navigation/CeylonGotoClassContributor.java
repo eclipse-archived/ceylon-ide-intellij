@@ -6,7 +6,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
-import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.psi.stub.ClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +29,7 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
         int i = 0;
 
         for (CeylonClass decl : declarations) {
-            result[i++] = (NavigationItem) decl.getNameIdentifier();
+            result[i++] = decl;
         }
 
         return result;
@@ -39,8 +38,8 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
     @Nullable
     @Override
     public String getQualifiedName(NavigationItem item) {
-        if (item instanceof CeylonPsi.IdentifierPsi) {
-            return ((CeylonPsi.IdentifierPsi) item).getText();
+        if (item instanceof CeylonClass) {
+            return ((CeylonClass) item).getQualifiedName();
         }
 
         Logger.getInstance(CeylonGotoClassContributor.class).error("Couldn't get qualified name for item " + item.getClass().getName());
