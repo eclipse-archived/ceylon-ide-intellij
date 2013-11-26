@@ -69,7 +69,7 @@
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
-        <editorNotificationProvider implementation="org.intellij.plugins.ceylon.codeInsight.daemon.SetupSdkNotificationProvider"/>
+        <!--<editorNotificationProvider implementation="org.intellij.plugins.ceylon.codeInsight.daemon.SetupSdkNotificationProvider"/>-->
         <sdkType implementation="org.intellij.plugins.ceylon.sdk.CeylonSdk"/>
         <psi.clsCustomNavigationPolicy implementation="org.intellij.plugins.ceylon.psi.compiled.CeylonClsCustomNavigationPolicy" order="first"/>
         <compileServer.plugin classpath="ceylon-jps-plugin.jar;compiler.jar;com.redhat.ceylon.common-1.0.0.jar"/>
