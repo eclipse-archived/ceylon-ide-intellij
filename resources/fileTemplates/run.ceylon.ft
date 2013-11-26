@@ -1,5 +1,0 @@
-doc "Run the module `${MODULE_NAME}`."
-
-void run() {
-
-}

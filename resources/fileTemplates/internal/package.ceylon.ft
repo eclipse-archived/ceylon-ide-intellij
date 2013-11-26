@@ -1,0 +1,3 @@
+"Default documentation for package `${MODULE_NAME}`."
+
+shared package ${MODULE_NAME};
