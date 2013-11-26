@@ -29,10 +29,13 @@
 
     <actions>
 <!--
-        <action id="AddCeylonModule" class="org.intellij.plugins.ceylon.action.CeylonAddModule" text="Ceylon Module" description="Add a new Ceylon module">
+        <action id="CeylonCreateRunFileAction" class="org.intellij.plugins.ceylon.action.CreateRunFileAction" text="Ceylon Module" description="Add a new Ceylon module">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewModuleInGroup"/>
         </action>
 -->
+        <action id="AddCeylonModule" class="org.intellij.plugins.ceylon.action.CeylonAddModule" text="Ceylon Module" description="Add a new Ceylon module">
+            <add-to-group group-id="NewGroup1" anchor="before" relative-to-action="NewModuleInGroup"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

@@ -1,0 +1,4 @@
+"Default documentation for module `${MODULE_NAME}`."
+
+module ${MODULE_NAME} "${MODULE_VERSION}" {
+}
