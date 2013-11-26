@@ -84,6 +84,7 @@ public class CeylonCompiler {
 
     /**
      * Creates a list of options to pass to CeyloncTool.
+     *
      * @param chunk the module chunk being built
      * @return a list of options for CeyloncTool
      */
@@ -108,8 +109,14 @@ public class CeylonCompiler {
 
         File outputDir = chunk.representativeTarget().getOutputDir();
         if (outputDir != null) {
+            String outputPath = outputDir.getAbsolutePath();
+            // TODO temp fix until we have a real "Ceylon" project kind, with configurable paths
+            String suffixToStrip = File.separator + "production" + File.separator + chunk.getModules().iterator().next().getProject().getName();
+            if (outputPath.endsWith(suffixToStrip)) {
+                outputPath = outputPath.substring(0, outputPath.length() - suffixToStrip.length());
+            }
             options.add("-out");
-            options.add(outputDir.getAbsolutePath());
+            options.add(outputPath);
         } else {
             throw new IllegalArgumentException("Can't detect compiler output path");
         }
