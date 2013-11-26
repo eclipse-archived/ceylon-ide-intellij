@@ -35,6 +35,7 @@ If you want to start testing or hacking on this plugin, you will need:
 
 # Building & running the plugin
 
+- make sure you are using **IntelliJ 13** (won't work with the current stable version 12.x)
 - open the project `ceylon-ide-intellij` in IDEA
 - go to `File > Project Structure > SDKs`
 - click on the '+' icon and add a new `JDK` pointing to a Java SDK 1.7
