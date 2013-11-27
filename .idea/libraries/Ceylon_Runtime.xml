@@ -11,6 +11,7 @@
       <root url="jar://$PROJECT_DIR$/lib/org.jboss.jandex-1.0.3.Final.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/ceylon.language-1.0.0.car!/" />
       <root url="jar://$PROJECT_DIR$/lib/txtmark-0.8-c0dcd373ce.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ceylon-bootstrap.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

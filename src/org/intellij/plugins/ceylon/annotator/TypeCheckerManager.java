@@ -6,14 +6,11 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.projectRoots.SdkTypeId;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
-import org.intellij.plugins.ceylon.sdk.CeylonSdk;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -57,16 +54,7 @@ public class TypeCheckerManager {
                 .verbose(false)
                 .usageWarnings(true);
 
-        String systemRepoPath = null;
-        Sdk projectSdk = ProjectRootManager.getInstance(project).getProjectSdk();
-
-        if (projectSdk != null) {
-            SdkTypeId sdkType = projectSdk.getSdkType();
-
-            if (sdkType instanceof CeylonSdk) {
-                systemRepoPath = projectSdk.getHomeDirectory().findChild("repo").getCanonicalPath();
-            }
-        }
+        String systemRepoPath = null; // TODO add global settings to configure an existing installation/repo
 
         RepositoryManager manager = repoManager()
                 .cwd(new File(project.getBasePath()))

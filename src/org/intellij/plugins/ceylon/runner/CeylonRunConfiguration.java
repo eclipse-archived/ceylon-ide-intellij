@@ -15,12 +15,13 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.PathUtil;
 import org.apache.commons.lang.ObjectUtils;
-import org.intellij.plugins.ceylon.sdk.CeylonSdk;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -59,12 +60,13 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         return new JavaCommandLineState(env) {
             @Override
             protected JavaParameters createJavaParameters() throws ExecutionException {
-                Sdk ceylonSdk = getCeylonSdk();
+                Sdk projectJdk = getProjectSdk();
                 JavaParameters params = new JavaParameters();
-                params.setJdk(CeylonSdk.getInternalSdk(ceylonSdk));
+                params.setJdk(projectJdk);
 
                 params.setMainClass("com.redhat.ceylon.launcher.Launcher");
-                params.getClassPath().add(ceylonSdk.getHomeDirectory() + "/lib/ceylon-bootstrap.jar");
+                String pathToPlugin = new File(PathUtil.getJarPathForClass(CeylonRunConfiguration.class)).getParent();
+                params.getClassPath().add(pathToPlugin + "/lib/ceylon-bootstrap.jar");
                 params.getProgramParametersList().add("run");
                 params.getProgramParametersList().add("--run", topLevelNameFull);
                 params.getProgramParametersList().add("--rep", getOutputPath());
@@ -98,28 +100,20 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         if (module != null) {
             basePath = CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
         } else {
-            basePath = CompilerProjectExtension.getInstance(getProject()).getCompilerOutput().findChild(CompilerModuleExtension.PRODUCTION).findChild(getProject().getName());
+            basePath = CompilerProjectExtension.getInstance(getProject()).getCompilerOutput();
         }
 
         return basePath.getCanonicalPath();
     }
 
-    private Sdk getCeylonSdk() {
+    private Sdk getProjectSdk() {
         Module module = getConfigurationModule().getModule();
 
         if (module != null) {
-            final Sdk sdk = ModuleRootManager.getInstance(module).getSdk();
-            if (sdk != null && sdk.getSdkType() instanceof CeylonSdk) {
-                return sdk;
-            }
+            return ModuleRootManager.getInstance(module).getSdk();
         }
 
-        Sdk projectSdk = ProjectRootManager.getInstance(getConfigurationModule().getProject()).getProjectSdk();
-        if (projectSdk != null && projectSdk.getSdkType() instanceof CeylonSdk) {
-            return projectSdk;
-        }
-
-        return null;
+        return ProjectRootManager.getInstance(getConfigurationModule().getProject()).getProjectSdk();
     }
 
     public void setTopLevelNameFull(String topLevelNameFull) {
