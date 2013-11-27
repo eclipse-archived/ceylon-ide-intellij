@@ -2,7 +2,6 @@ package org.intellij.plugins.ceylon.action;
 
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
-import com.intellij.ide.util.DirectoryChooserUtil;
 import com.intellij.ide.util.DirectoryUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -16,10 +15,8 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiPackage;
-import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Properties;
@@ -74,48 +71,45 @@ public class CeylonAddModule extends AnAction {
             return;
         }
 
-        if ((eventSourceFile instanceof VirtualDirectoryImpl)) {
-            final ProjectRootManager projectRoots = ProjectRootManager.getInstance(project);
-            final VirtualDirectoryImpl eventDir = (VirtualDirectoryImpl) eventSourceFile; // ..../si/mazi
-            final VirtualFile srcRoot = projectRoots.getFileIndex().getSourceRootForFile(eventDir);
+        while (eventSourceFile != null && !(eventSourceFile instanceof VirtualDirectoryImpl)) {
+            eventSourceFile = eventSourceFile.getParent();
+        }
+        if (eventSourceFile != null) {
+            final VirtualDirectoryImpl eventDir = (VirtualDirectoryImpl) eventSourceFile;
+            final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
+            final VirtualFile srcRoot = projectRootManager.getFileIndex().getSourceRootForFile(eventDir);
 
             assert srcRoot != null;
             String eventPath = eventDir.getPath();
-            final String srcPath = srcRoot.getPath();
-            assert eventPath.startsWith(srcPath) : eventPath + " not in " + srcPath;
+            final String srcRootPath = srcRoot.getPath();
+            assert eventPath.startsWith(srcRootPath) : eventPath + " not in " + srcRootPath;
 
-            eventPath = eventPath.substring(srcPath.length() + 1); // now relative
+            // Make eventPath relative
+            eventPath = eventPath.length() <= srcRootPath.length() ? "" : eventPath.substring(srcRootPath.length() + 1);
 
             final String eventPackage = eventPath.replace('/', '.');
 
-            PsiPackage psiPackage = JavaPsiFacade.getInstance(project).findPackage(eventPackage);
+            final PsiDirectory eventPsiDir = PsiManager.getInstance(project).findDirectory(eventDir);
 
-            if (psiPackage != null) {
-                final PsiDirectory[] targetDirectories = psiPackage.getDirectories(GlobalSearchScope.allScope(project));
-                final PsiDirectory directory = targetDirectories.length == 1
-                                ? targetDirectories[0]
-                                : DirectoryChooserUtil.chooseDirectory(targetDirectories, null, project, null);
+            if (eventPsiDir != null) {
+                ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                    @Override public void run() {
+                        FileTemplateManager templateManager = FileTemplateManager.getInstance();
+                        PsiDirectory subdirectory = DirectoryUtil.createSubdirectories(moduleName, eventPsiDir, ".");
+                        Properties variables = new Properties();
+                        String fullModuleName = (eventPackage.isEmpty() ? "" : eventPackage + ".") + moduleName;
+                        variables.put("MODULE_NAME", fullModuleName);
+                        variables.put("MODULE_VERSION", "1.0.0");
 
-                if (directory != null) {
-                    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                        @Override public void run() {
-                            FileTemplateManager templateManager = FileTemplateManager.getInstance();
-                            PsiDirectory subdirectory = DirectoryUtil.createSubdirectories(moduleName, directory, ".");
-                            Properties variables = new Properties();
-                            String fullModuleName = eventPackage + "." + moduleName;
-                            variables.put("MODULE_NAME", fullModuleName);
-                            variables.put("MODULE_VERSION", "1.0.0");
-
-                            try {
-                                FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("module.ceylon"), "module.ceylon", variables, subdirectory);
-                                FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("package.ceylon"), "package.ceylon", variables, subdirectory);
-                                FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), "run.ceylon", variables, subdirectory);
-                            } catch (Exception e1) {
-                                Logger.getInstance(CeylonAddModule.class).error("Can't create file from template", e1);
-                            }
+                        try {
+                            FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("module.ceylon"), "module.ceylon", variables, subdirectory);
+                            FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("package.ceylon"), "package.ceylon", variables, subdirectory);
+                            FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), "run.ceylon", variables, subdirectory);
+                        } catch (Exception e1) {
+                            Logger.getInstance(CeylonAddModule.class).error("Can't create file from template", e1);
                         }
-                    });
-                }
+                    }
+                });
             }
         }
     }
