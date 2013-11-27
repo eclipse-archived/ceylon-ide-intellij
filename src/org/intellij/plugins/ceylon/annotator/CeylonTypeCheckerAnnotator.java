@@ -26,6 +26,9 @@ public class CeylonTypeCheckerAnnotator implements Annotator {
 
     public static final Logger LOGGER = Logger.getInstance(CeylonTypeCheckerAnnotator.class);
 
+    /*
+     * Mimics com.redhat.ceylon.eclipse.code.parse.CeylonParseController#parse
+     */
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         if (!(element instanceof CeylonFile)) {
@@ -40,6 +43,9 @@ public class CeylonTypeCheckerAnnotator implements Annotator {
 
         TypeChecker typeChecker = manager.getTypeChecker();
 
+        if (typeChecker == null) {
+            return; // not ready yet, the annotator will be called again once the type checker is instantiated
+        }
         SourceCodeVirtualFile sourceCodeVirtualFile = new SourceCodeVirtualFile(ceylonFile);
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
 
