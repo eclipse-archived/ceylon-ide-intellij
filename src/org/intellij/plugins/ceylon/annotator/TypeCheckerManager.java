@@ -1,24 +1,20 @@
 package org.intellij.plugins.ceylon.annotator;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
-import com.intellij.codeInsight.daemon.impl.DaemonProgressIndicator;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkTypeId;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vcs.changes.RunnableBackgroundableWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import org.intellij.plugins.ceylon.sdk.CeylonSdk;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
@@ -38,22 +34,19 @@ public class TypeCheckerManager {
         if (typeChecker == null && !isBuildingTypeChecker) {
             isBuildingTypeChecker = true; // TODO really thread-safe?
 
-            Runnable instantiateTypeCheckerTask = new Runnable() {
+            ApplicationManager.getApplication().invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    typeChecker = createTypeChecker();
-                    isBuildingTypeChecker = false;
-                    DaemonCodeAnalyzer.getInstance(project).restart();
+                    ProgressManager.getInstance().run(new Task.Backgroundable(project, "Preparing Ceylon project...") {
+                        @Override
+                        public void run(@NotNull ProgressIndicator indicator) {
+                            typeChecker = createTypeChecker();
+                            isBuildingTypeChecker = false;
+                            DaemonCodeAnalyzer.getInstance(project).restart();
+                        }
+                    });
                 }
-            };
-
-            RunnableBackgroundableWrapper taskWrapper = new RunnableBackgroundableWrapper(project, "Preparing Ceylon project", instantiateTypeCheckerTask);
-            ProgressIndicator progressIndicator = new BackgroundableProcessIndicator(taskWrapper);
-            progressIndicator.setIndeterminate(true);
-            progressIndicator.setText("Preparing Ceylon project...");
-
-            // We still get a (harmless?) error :(
-            ProgressManager.getInstance().runProcessWithProgressAsynchronously(taskWrapper, progressIndicator);
+            });
         }
 
         return typeChecker;
