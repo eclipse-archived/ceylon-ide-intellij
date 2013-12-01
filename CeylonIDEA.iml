@@ -14,6 +14,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ceylon-jps-plugin" />
     <orderEntry type="library" name="Ceylon Runtime" level="project" />
+    <orderEntry type="module" module-name="ceylon-ide-common" />
   </component>
 </module>
 

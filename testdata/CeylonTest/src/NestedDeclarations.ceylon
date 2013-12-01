@@ -10,4 +10,6 @@ class ClsLevel1() {
 	void methodLevel2() {}
 }
 
-void methodLevel1() {}
+void methodLevel1() {
+    ClsLevel1 plop;
+}

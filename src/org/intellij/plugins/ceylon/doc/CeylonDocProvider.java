@@ -31,27 +31,32 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         if (parentDecl != null) {
             Declaration decl = parentDecl.getCeylonNode().getDeclarationModel();
 
-            StringBuilder builder = new StringBuilder();
+            if (decl == null) {
+                // TODO once again we should have the declaration model, would be useful
+                return parentDecl.getName() + " in " + parentDecl.getContainingFile().getName();
+            } else {
+                StringBuilder builder = new StringBuilder();
 
-            String pkg = DocBuilder.getPackageFor(decl);
+                String pkg = DocBuilder.getPackageFor(decl);
 
-            if (StringUtil.isNotEmpty(pkg)) {
-                builder.append("<p><b>").append(pkg).append("</b></p>");
+                if (StringUtil.isNotEmpty(pkg)) {
+                    builder.append("<p><b>").append(pkg).append("</b></p>");
+                }
+
+                String declKind = "";
+                if (decl instanceof com.redhat.ceylon.compiler.typechecker.model.Class) {
+                    declKind = "class ";
+                } else if (decl instanceof Interface) {
+                    declKind = "interface ";
+                }
+                builder.append("<p><code>").append(DocBuilder.getModifiers(decl)).append(declKind).append("<b>").append(decl.getQualifiedNameString()).append("</b>").append("</code></p>");
+
+                // TODO extends & implements
+
+                DocBuilder.appendDocAnnotationContent(parentDecl.getCeylonNode().getAnnotationList(), builder, decl.getScope());
+
+                return builder.toString();
             }
-
-            String declKind = "";
-            if (decl instanceof com.redhat.ceylon.compiler.typechecker.model.Class) {
-                declKind = "class ";
-            } else if (decl instanceof Interface) {
-                declKind = "interface ";
-            }
-            builder.append("<p><code>").append(DocBuilder.getModifiers(decl)).append(declKind).append("<b>").append(decl.getQualifiedNameString()).append("</b>").append("</code></p>");
-
-            // TODO extends & implements
-
-            DocBuilder.appendDocAnnotationContent(parentDecl.getCeylonNode().getAnnotationList(), builder, decl.getScope());
-
-            return builder.toString();
         }
         return null;
     }

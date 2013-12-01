@@ -2,6 +2,9 @@ package org.intellij.plugins.ceylon.psi;
 
 import com.intellij.lang.ASTNode;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.intellij.plugins.ceylon.codeInsight.resolve.IdentifiableBaseMemberExpression;
+import org.intellij.plugins.ceylon.codeInsight.resolve.IdentifiableStatement;
+import org.intellij.plugins.ceylon.codeInsight.resolve.CeylonResolvable;
 import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
 /* Generated using Antlr by PsiImplGen.g */
 
@@ -91,7 +94,7 @@ public class CeylonPsiImpl {
         @Override public Tree.ImportWildcard getCeylonNode() { return (Tree.ImportWildcard) super.getCeylonNode(); }
     }
 
-    public static abstract class DeclarationPsiImpl extends StatementPsiImpl
+    public static abstract class DeclarationPsiImpl extends IdentifiableStatement
             implements CeylonPsi.DeclarationPsi {
         public DeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.Declaration getCeylonNode() { return (Tree.Declaration) super.getCeylonNode(); }
@@ -1357,7 +1360,7 @@ public class CeylonPsiImpl {
         @Override public Tree.BaseMemberOrTypeExpression getCeylonNode() { return (Tree.BaseMemberOrTypeExpression) super.getCeylonNode(); }
     }
 
-    public static class BaseMemberExpressionPsiImpl extends BaseMemberOrTypeExpressionPsiImpl
+    public static class BaseMemberExpressionPsiImpl extends IdentifiableBaseMemberExpression
             implements CeylonPsi.BaseMemberExpressionPsi {
         public BaseMemberExpressionPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.BaseMemberExpression getCeylonNode() { return (Tree.BaseMemberExpression) super.getCeylonNode(); }
@@ -1663,7 +1666,7 @@ public class CeylonPsiImpl {
         @Override public Tree.AnnotationList getCeylonNode() { return (Tree.AnnotationList) super.getCeylonNode(); }
     }
 
-    public static class IdentifierPsiImpl extends CeylonCompositeElementImpl
+    public static class IdentifierPsiImpl extends CeylonResolvable
             implements CeylonPsi.IdentifierPsi {
         public IdentifierPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.Identifier getCeylonNode() { return (Tree.Identifier) super.getCeylonNode(); }

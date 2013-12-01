@@ -5,7 +5,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProviders;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -17,6 +16,8 @@ import org.intellij.plugins.ceylon.psi.stub.ClassStub;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.google.common.base.Objects.firstNonNull;
 
 public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implements CeylonClass {
     private Tree.ClassOrInterface specClassDecl;
@@ -66,6 +67,12 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
         return findChildByType(CeylonTypes.IDENTIFIER);
     }
 
+    @NotNull
+    @Override
+    public PsiElement getNavigationElement() {
+        return firstNonNull(getNameIdentifier(), this);
+    }
+
     @Override
     public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
         throw new UnsupportedOperationException("Can't set name yet");
@@ -74,18 +81,6 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
     @Override
     public Tree.Declaration getCeylonNode() {
         return specClassDecl;
-    }
-
-    @Override
-    public PsiReference getReference() {
-        PsiElement identifier = getNameIdentifier();
-
-//        if (identifier == null) {
-            return null;
-//        } else {
-//            TextRange range = TextRange.from(0, identifier.getTextLength());
-//            return new CeylonTypeReference<>((CeylonIdentifier) identifier, range, true);
-//        }
     }
 
     @Override
