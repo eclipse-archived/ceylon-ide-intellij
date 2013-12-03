@@ -32,6 +32,7 @@ If you want to start testing or hacking on this plugin, you will need:
 - the following plugins enabled: "Plugin DevKit", "UI Designer" + "UI Designer (core)", "PsiViewer" (optional but recommended)
 - a clone of https://github.com/JetBrains/intellij-community/ is highly recommended for hacking since you will likely have to debug code from the IntelliJ platform
 - a clone of https://github.com/ceylon/ceylon-ide-intellij (obviously)
+- a clone of https://github.com/ceylon/ceylon-ide-common (shared between the Eclipse plugin and the IntelliJ plugin)
 
 # Building & running the plugin
 
