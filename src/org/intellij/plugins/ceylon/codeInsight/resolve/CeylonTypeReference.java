@@ -5,16 +5,12 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtilCore;
 import com.redhat.ceylon.compiler.typechecker.model.Declaration;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.code.resolve.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.ide.code.resolve.FindReferenceVisitor;
-import org.intellij.plugins.ceylon.psi.CeylonClass;
-import org.intellij.plugins.ceylon.psi.CeylonCompositeElement;
-import org.intellij.plugins.ceylon.psi.CeylonFile;
-import org.intellij.plugins.ceylon.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.psi.*;
 import org.intellij.plugins.ceylon.psi.stub.ClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +33,11 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
         }
 
         Tree.Identifier node = ((CeylonPsi.IdentifierPsi) myElement).getCeylonNode();
+
+        if (node == null) {
+            return null;
+        }
+
         Tree.CompilationUnit compilationUnit = ((CeylonFile) myElement.getContainingFile()).getCompilationUnit();
 
         // Try using ClassIndex
@@ -46,7 +47,12 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
         }
 
         // Try using the type checker
-        Declaration declaration = getReferencedExplicitDeclaration(((CeylonCompositeElement) myElement.getParent()).getCeylonNode(), compilationUnit);
+        Node parentNode = ((CeylonCompositeElement) myElement.getParent()).getCeylonNode();
+
+        if (parentNode instanceof Tree.InvocationExpression) {
+            parentNode = parentNode.getChildren().get(0); // TODO uh oh
+        }
+        Declaration declaration = getReferencedExplicitDeclaration(parentNode, compilationUnit);
         FindReferenceVisitor frVisitor = new FindReferenceVisitor(declaration);
         compilationUnit.visit(frVisitor);
         FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(frVisitor.getDeclaration());
@@ -54,8 +60,7 @@ public class CeylonTypeReference<T extends PsiElement> extends PsiReferenceBase<
         Tree.Declaration declarationNode = visitor.getDeclarationNode();
 
         if (declarationNode != null) {
-            PsiElement declarationPsi = PsiUtilCore.getElementAtOffset(myElement.getContainingFile(), declarationNode.getStartIndex());
-            return PsiTreeUtil.getParentOfType(declarationPsi, CeylonPsi.DeclarationPsi.class);
+            return CeylonTreeUtil.findPsiElement(declarationNode, myElement.getContainingFile());
         }
 
         if (declaration == null) {

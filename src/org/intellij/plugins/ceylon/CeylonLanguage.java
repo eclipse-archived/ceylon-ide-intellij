@@ -9,4 +9,9 @@ public class CeylonLanguage extends Language {
     protected CeylonLanguage() {
         super("Ceylon", "text/ceylon");
     }
+
+    @Override
+    public boolean isCaseSensitive() {
+        return true;
+    }
 }

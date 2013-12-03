@@ -3,6 +3,8 @@ package org.intellij.plugins.ceylon.codeInsight.resolve;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import org.intellij.plugins.ceylon.psi.CeylonPsiImpl;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
@@ -12,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.google.common.base.Objects.firstNonNull;
 
-public class IdentifiableStatement extends CeylonPsiImpl.StatementPsiImpl implements PsiNameIdentifierOwner {
+public abstract class IdentifiableStatement extends CeylonPsiImpl.StatementPsiImpl implements PsiNameIdentifierOwner {
     public IdentifiableStatement(ASTNode astNode) {
         super(astNode);
     }
@@ -39,5 +41,27 @@ public class IdentifiableStatement extends CeylonPsiImpl.StatementPsiImpl implem
     @Override
     public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
         throw new UnsupportedOperationException("Not supported yet");
+    }
+
+    @NotNull
+    @Override
+    public SearchScope getUseScope() {
+//        Scope ceylonScope = getCeylonNode().getScope();
+//
+//        if (ceylonScope instanceof Declaration) {
+//            FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor((Declaration) ceylonScope);
+//            visitor.visit(((CeylonFile) getContainingFile()).getCompilationUnit());
+//            Tree.Declaration decl = visitor.getDeclarationNode();
+//            if (decl != null) {
+//                PsiElement psiElt = PsiUtilCore.getElementAtOffset(getContainingFile(), decl.getStartIndex());
+//                if (!(psiElt instanceof CeylonPsi.DeclarationPsi)) {
+//                    psiElt = PsiTreeUtil.getParentOfType(psiElt, CeylonPsi.DeclarationPsi.class);
+//                }
+//                return new LocalSearchScope(psiElt);
+//            }
+//        }
+//
+//        return super.getUseScope();
+        return new LocalSearchScope(getContainingFile());
     }
 }
