@@ -5,10 +5,10 @@ This is an attempt at adding (awesome) support for the Ceylon programming langua
 
 # Requirements
 
-This plugin is being written using IntelliJ EAP 13. It will work on both Community and Ultimate editions.
+This plugin is being written using IntelliJ 13. It will work on both Community and Ultimate editions.
 We do not guarantee that this plugin will work with previous versions of IntelliJ (12 and below), as we may use APIs that were introduced in version 13.
 
-Only a subset of the Ceylon SDK (0.6.1) is embedded within the plugin, mainly to parse and highlight errors in `.ceylon` files. If you intend to compile/run a Ceylon project, you will also need to download the latest Ceylon SDK (currently 0.6.1).
+We embed most of the raw Ceylon installation in the plugin, so you won't necessarily have to download Ceylon separately. You may need a local repository though.
 
 # Features
 
@@ -28,7 +28,7 @@ For the moment, we do not provide any pre-built version of the plugin, since it 
 
 If you want to start testing or hacking on this plugin, you will need:
 
-- a Community or Ultimate version of **[IntelliJ EAP 13](http://confluence.jetbrains.com/display/IDEADEV/IDEA+13+EAP)**
+- a Community or Ultimate version of **[IntelliJ 13](http://www.jetbrains.com/idea/download/)**
 - the following plugins enabled: "Plugin DevKit", "UI Designer" + "UI Designer (core)", "PsiViewer" (optional but recommended)
 - a clone of https://github.com/JetBrains/intellij-community/ is highly recommended for hacking since you will likely have to debug code from the IntelliJ platform
 - a clone of https://github.com/ceylon/ceylon-ide-intellij (obviously)
