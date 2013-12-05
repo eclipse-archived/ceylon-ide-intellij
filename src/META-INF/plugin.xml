@@ -67,7 +67,7 @@
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.refactoring.CeylonRefactoringSupportProvider"/>
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.psi.CeylonElementDescriptionProvider"/>
 
-        <!--<lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonFindUsagesProvider"/>-->
+        <lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonFindUsagesProvider"/>
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
