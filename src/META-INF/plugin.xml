@@ -45,6 +45,8 @@
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.highlighting.CeylonFileHighlightFilter"/>
 
+        <moduleType id="CEYLON_MODULE" implementationClass="org.intellij.plugins.ceylon.project.CeylonModuleType"/>
+            
         <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonCommenter"/>
         <lang.braceMatcher language="Ceylon" implementationClass="org.intellij.plugins.ceylon.lang.CeylonBraceMatcher"/>
         <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.lang.CeylonQuoteHandler"/>

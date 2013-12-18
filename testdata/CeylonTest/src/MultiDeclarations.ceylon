@@ -37,6 +37,6 @@ interface MyInterface {
 	
 }
 
-"this is a declaration without definition"
-by("Bastien")
-class MyClassDeclaration;
+//"this is a declaration without definition"
+//by("Bastien")
+//class MyClassDeclaration;

@@ -18,6 +18,7 @@
       <root url="file://$PROJECT_DIR$/../ceylon-spec/src" />
       <root url="file://$PROJECT_DIR$/../ceylon-compiler/src" />
       <root url="file://$PROJECT_DIR$/../ceylon-spec/gensrc" />
+      <root url="file://$PROJECT_DIR$/../ceylon-common/src" />
     </SOURCES>
   </library>
 </component>

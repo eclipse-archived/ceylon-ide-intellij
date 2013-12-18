@@ -1,5 +1,9 @@
-doc "no way"
+"no way"
 
-class Foo[ {
+void a() {
+    Integer unused;
+}
+
+class Foo() {
 
 }
