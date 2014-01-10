@@ -1,33 +1,17 @@
 package org.intellij.plugins.ceylon.codeInsight.resolve;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import org.intellij.plugins.ceylon.annotator.TypeCheckerInvoker;
-import org.intellij.plugins.ceylon.annotator.TypeCheckerManager;
 import org.intellij.plugins.ceylon.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
-public class CeylonReferenceTest extends LightCodeInsightFixtureTestCase {
-
-    private static final String PATH = "source/org/intellij/plugins/ceylon/codeInsight/resolve/";
-    private TypeChecker typeChecker;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        TypeCheckerManager manager = ServiceManager.getService(myFixture.getProject(), TypeCheckerManager.class);
-        typeChecker = manager.createTypeChecker();
-    }
+public class CeylonReferenceTest extends CeylonReferenceTestSupport {
 
     public void testReferences() throws Exception {
         CeylonFile ceylonFile = initFile("referenceTest.ceylon");
@@ -59,23 +43,6 @@ public class CeylonReferenceTest extends LightCodeInsightFixtureTestCase {
 
         moveCaret(2, 11);
         assertRefdDeclarationAtCaret(ceylonFile, "myHelloWorld", CeylonPsi.MethodDefinitionPsi.class, 100);
-    }
-
-    @Override
-    protected String getTestDataPath() {
-        return "testdata";
-    }
-
-    private CeylonFile initFile(String filename) throws InterruptedException, TimeoutException {
-        myFixture.configureByFiles(PATH + filename);
-        final CeylonFile ceylonFile = (CeylonFile) myFixture.getFile();
-
-        TypeCheckerInvoker.invokeTypeChecker(typeChecker, ceylonFile);
-        return ceylonFile;
-    }
-
-    private void moveCaret(int columnShift, int lineShift) {
-        myFixture.getEditor().getCaretModel().moveCaretRelatively(columnShift, lineShift, false, false, true);
     }
 
     private <PSI extends CeylonPsi.DeclarationPsi> PSI assertRefdDeclarationAtCaret(CeylonFile ceylonFile, String referencedId, Class<? extends PSI> psiClass, int referencedOffest) {
