@@ -35,6 +35,10 @@ public class TypeCheckerInvoker {
         if (typeChecker == null) {
             return null;
         }
+        return invokeTypeChecker(typeChecker, ceylonFile);
+    }
+
+    public static PhasedUnit invokeTypeChecker(TypeChecker typeChecker, CeylonFile ceylonFile) {
         SourceCodeVirtualFile sourceCodeVirtualFile = new SourceCodeVirtualFile(ceylonFile);
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
 
@@ -48,7 +52,7 @@ public class TypeCheckerInvoker {
         tokenStream.fill();
 
         com.redhat.ceylon.compiler.typechecker.io.VirtualFile srcDir;
-        com.redhat.ceylon.compiler.typechecker.model.Package pkg;
+        Package pkg;
         Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
         if (cu == null) {
             try {

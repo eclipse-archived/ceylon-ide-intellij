@@ -49,7 +49,7 @@ public class TypeCheckerManager {
         return typeChecker;
     }
 
-    private TypeChecker createTypeChecker() {
+    public TypeChecker createTypeChecker() {
         TypeCheckerBuilder builder = new TypeCheckerBuilder()
                 .verbose(false)
                 .usageWarnings(true);

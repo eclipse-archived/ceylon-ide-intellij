@@ -79,7 +79,7 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
     }
 
     @Override
-    public Tree.Declaration getCeylonNode() {
+    public Tree.ClassOrInterface getCeylonNode() {
         return specClassDecl;
     }
 
