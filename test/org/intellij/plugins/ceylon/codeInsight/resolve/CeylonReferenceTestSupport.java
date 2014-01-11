@@ -9,7 +9,7 @@ import org.intellij.plugins.ceylon.psi.CeylonFile;
 
 import java.util.concurrent.TimeoutException;
 
-public class CeylonReferenceTestSupport extends LightCodeInsightFixtureTestCase {
+abstract class CeylonReferenceTestSupport extends LightCodeInsightFixtureTestCase {
     protected static final String PATH = "source/org/intellij/plugins/ceylon/codeInsight/resolve/";
     protected TypeChecker typeChecker;
 

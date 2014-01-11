@@ -1,6 +1,6 @@
 FILE
   COMPILATION_UNIT
-    Class  (unnamed)
+    Class ClassDeclarations
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER

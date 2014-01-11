@@ -1,6 +1,6 @@
 FILE
   COMPILATION_UNIT
-    Class  (unnamed)
+    Class Point
       ANNOTATION_LIST
         STRING_LITERAL
           PsiElement(STRING_LITERAL)('"A point with two coordinates."')

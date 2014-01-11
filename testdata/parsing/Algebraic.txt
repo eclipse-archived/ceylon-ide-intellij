@@ -1,6 +1,6 @@
 FILE
   COMPILATION_UNIT
-    Class  (unnamed)
+    Class Algebraic
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER
@@ -23,7 +23,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class Concrete
       ANNOTATION_LIST
         <empty list>
       Class Concrete
@@ -239,7 +239,7 @@ FILE
                     PsiElement(SEMICOLON)(';')
                   PsiElement(RBRACE)('}')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class EnumConstraint
       ANNOTATION_LIST
         <empty list>
       Class EnumConstraint
@@ -560,7 +560,7 @@ FILE
                     PsiElement(RPAREN)(')')
               PsiElement(SEMICOLON)(';')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface I
       ANNOTATION_LIST
         <empty list>
       Interface I
@@ -570,7 +570,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface J
       ANNOTATION_LIST
         <empty list>
       Interface J
@@ -865,7 +865,7 @@ FILE
                     PsiElement(RPAREN)(')')
               PsiElement(SEMICOLON)(';')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class XXX
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER
@@ -913,7 +913,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class YYY
       ANNOTATION_LIST
         <empty list>
       Class YYY
@@ -947,7 +947,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class ZZZ
       ANNOTATION_LIST
         <empty list>
       Class ZZZ
@@ -981,7 +981,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class WWW
       ANNOTATION_LIST
         <empty list>
       Class WWW
@@ -1724,7 +1724,7 @@ FILE
                   PsiElement(SEMICOLON)(';')
                   PsiElement(RBRACE)('}')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface Association
       ANNOTATION_LIST
         <empty list>
       Interface Association
@@ -1743,7 +1743,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface OneTo
       ANNOTATION_LIST
         <empty list>
       Interface OneTo
@@ -1758,7 +1758,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class OneToOne
       ANNOTATION_LIST
         <empty list>
       Class OneToOne
@@ -1776,7 +1776,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class OneToMany
       ANNOTATION_LIST
         <empty list>
       Class OneToMany
@@ -1798,7 +1798,7 @@ FILE
       PsiElement(COMPILER_ANNOTATION)('@')
       IDENTIFIER
         PsiElement(LIDENTIFIER)('error')
-    Class  (unnamed)
+    Class Broken
       ANNOTATION_LIST
         <empty list>
       Class Broken
@@ -1816,7 +1816,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface Anything
       ANNOTATION_LIST
         <empty list>
       Interface Anything
@@ -1835,7 +1835,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface SomethingUsual
       ANNOTATION_LIST
         <empty list>
       Interface SomethingUsual
@@ -1865,7 +1865,7 @@ FILE
                 PsiElement(LIDENTIFIER)('something')
               PsiElement(SEMICOLON)(';')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface SomethingElse
       ANNOTATION_LIST
         <empty list>
       Interface SomethingElse
@@ -2023,7 +2023,7 @@ FILE
                     PsiElement(SEMICOLON)(';')
                   PsiElement(RBRACE)('}')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface Interface
       ANNOTATION_LIST
         <empty list>
       Interface Interface
@@ -2042,7 +2042,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class Class1
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER
@@ -2070,7 +2070,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class Class2
       ANNOTATION_LIST
         <empty list>
       Class Class2
@@ -2133,7 +2133,7 @@ FILE
                       PsiElement(LIDENTIFIER)('false')
               PsiElement(SEMICOLON)(';')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class Class3
       ANNOTATION_LIST
         <empty list>
       Class Class3
@@ -3057,7 +3057,7 @@ FILE
       PsiElement(COMPILER_ANNOTATION)('@')
       IDENTIFIER
         PsiElement(LIDENTIFIER)('error')
-    Class  (unnamed)
+    Class NonAbstract
       ANNOTATION_LIST
         <empty list>
       Class NonAbstract
@@ -3075,7 +3075,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class SubtypeOfNonAbstract
       ANNOTATION_LIST
         <empty list>
       Class SubtypeOfNonAbstract
@@ -3099,7 +3099,7 @@ FILE
       PsiElement(COMPILER_ANNOTATION)('@')
       IDENTIFIER
         PsiElement(LIDENTIFIER)('error')
-    Class  (unnamed)
+    Class Abstract
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER
@@ -3119,7 +3119,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class NonSubtypeOfAbstract
       ANNOTATION_LIST
         <empty list>
       Class NonSubtypeOfAbstract
@@ -3133,7 +3133,7 @@ FILE
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
     PsiComment(MULTI_COMMENT)('/*interface Indirect of Abstract1 | Abstract2 {}\nabstract class Abstract1() {}\nabstract class Abstract2() {}\nclass Concrete1() extends Abstract1() satisfies Indirect {}\nclass Concrete2() satisfies Indirect {}\nclass Concrete3() extends Abstract1() {}*/')
-    Interface  (unnamed)
+    Interface J1
       ANNOTATION_LIST
         <empty list>
       Interface J1
@@ -3152,7 +3152,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface J2
       ANNOTATION_LIST
         <empty list>
       Interface J2
@@ -3167,7 +3167,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface J3
       ANNOTATION_LIST
         <empty list>
       Interface J3
@@ -3182,7 +3182,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface J4
       ANNOTATION_LIST
         <empty list>
       Interface J4
@@ -3570,7 +3570,7 @@ FILE
                   PsiElement(LBRACE)('{')
                   PsiElement(RBRACE)('}')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface Rsrc
       ANNOTATION_LIST
         <empty list>
       Interface Rsrc
@@ -3593,7 +3593,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface File
       ANNOTATION_LIST
         <empty list>
       Interface File
@@ -3608,7 +3608,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface Dir
       ANNOTATION_LIST
         <empty list>
       Interface Dir
@@ -3623,7 +3623,7 @@ FILE
         INTERFACE_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Interface  (unnamed)
+    Interface Link
       ANNOTATION_LIST
         <empty list>
       Interface Link
@@ -3842,7 +3842,7 @@ FILE
                         PsiElement(RBRACE)('}')
                 PsiElement(RBRACE)('}')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class Status
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER
@@ -3889,7 +3889,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class Failed
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER
@@ -3925,7 +3925,7 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    Class  (unnamed)
+    Class Succeeded
       ANNOTATION_LIST
         ANNOTATION
           IDENTIFIER
