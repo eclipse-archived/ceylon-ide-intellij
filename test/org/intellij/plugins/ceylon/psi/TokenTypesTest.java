@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.psi;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -8,15 +9,15 @@ import org.junit.Test;
 public class TokenTypesTest {
     @Test
     public void testTokens() throws Exception {
-        assert TokenTypes.byIElementType.size() >= 129 : TokenTypes.byIElementType.size();
-        assert TokenTypes.byIElementType.size() < 200 : TokenTypes.byIElementType.size();
-        assert TokenTypes.byIndex.size() >= 129 : TokenTypes.byIndex.size();
-        assert TokenTypes.byIndex.size() < 200 : TokenTypes.byIndex.size();
+        Assert.assertTrue(Integer.toString(TokenTypes.byIElementType.size()), TokenTypes.byIElementType.size() >= 129);
+        Assert.assertTrue(Integer.toString(TokenTypes.byIElementType.size()), TokenTypes.byIElementType.size() < 200);
+        Assert.assertTrue(Integer.toString(TokenTypes.byIndex.size()), TokenTypes.byIndex.size() >= 129);
+        Assert.assertTrue(Integer.toString(TokenTypes.byIndex.size()), TokenTypes.byIndex.size() < 200);
 
         assert TokenTypes.get(CeylonTokens.IMPORT) == TokenTypes.IMPORT;
         try {
             TokenTypes.get(CeylonTypes.IMPORT);
-            assert false : "An exception should be thrown.";
+            Assert.assertTrue("An exception should be thrown.", false);
         } catch (IllegalArgumentException expected) { }
     }
 }

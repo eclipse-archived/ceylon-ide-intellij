@@ -28,8 +28,8 @@ public class FindUsagesTest extends CeylonReferenceTestSupport {
                 editor,
                 TargetElementUtilBase.ELEMENT_NAME_ACCEPTED | TargetElementUtilBase.REFERENCED_ELEMENT_ACCEPTED,
                 offset);
-        assert targetElement != null : "Cannot find referenced element";
-        assert (targetElement instanceof PsiNameIdentifierOwner) : targetElement + " has no name identifier";
+        assertNotNull("Cannot find referenced element", targetElement);
+        assertTrue(targetElement + " has no name identifier", (targetElement instanceof PsiNameIdentifierOwner));
         final PsiNameIdentifierOwner element = (PsiNameIdentifierOwner) targetElement;
         assertEquals(identifier, element.getNameIdentifier().getText());
 

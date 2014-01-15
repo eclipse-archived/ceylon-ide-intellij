@@ -57,7 +57,7 @@ public class CeylonReferenceTest extends CeylonReferenceTestSupport {
         assertNotNull("Identifier not found at offset " + myFixture.getCaretOffset(), element);
         final PSI referenced = getReferencedElement(element);
         assertTrue(String.format("%s (%s) not instance of %s", referenced, referenced.getClass(), psiClass), psiClass.isAssignableFrom(referenced.getClass()));
-        assert referenced instanceof PsiNameIdentifierOwner : referenced;
+        assertTrue(referenced.toString(), referenced instanceof PsiNameIdentifierOwner);
         final PsiElement nameIdentifier = ((PsiNameIdentifierOwner) referenced).getNameIdentifier();
         assertNotNull(nameIdentifier);
         assertEquals(referencedOffset, nameIdentifier.getTextOffset());
