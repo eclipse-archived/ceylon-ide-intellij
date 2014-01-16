@@ -8,6 +8,7 @@ import com.redhat.ceylon.compiler.typechecker.model.Declaration;
 import com.redhat.ceylon.compiler.typechecker.model.Method;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
+import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,9 +68,11 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
         } else if (element instanceof CeylonPsi.MethodDefinitionPsi) {
             Method model = ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getDeclarationModel();
             return model == null ? ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getIdentifier().getText() : model.getQualifiedNameString();
+        } else if (element instanceof CeylonFile) {
+            return ((CeylonFile) element).getName();
         }
 
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Descriptive name not implemented for " + element.getClass());
     }
 
     @NotNull
