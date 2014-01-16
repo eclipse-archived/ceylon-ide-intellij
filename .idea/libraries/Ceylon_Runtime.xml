@@ -19,6 +19,14 @@
       <root url="file://$PROJECT_DIR$/../ceylon-compiler/src" />
       <root url="file://$PROJECT_DIR$/../ceylon-spec/gensrc" />
       <root url="file://$PROJECT_DIR$/../ceylon-common/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/api/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/spi/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/impl/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/maven/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/maven/src/test/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/ceylon/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/webdav/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/testsuite/src/test/java" />
     </SOURCES>
   </library>
 </component>
