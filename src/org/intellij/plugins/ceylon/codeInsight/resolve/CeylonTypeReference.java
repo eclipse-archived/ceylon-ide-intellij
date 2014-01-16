@@ -34,16 +34,17 @@ public class CeylonTypeReference<T extends PsiElement> extends CeylonReference<T
             return resolved;
         }
 
-        // Try implicit ceylon.language.*
-        String fqn = declaration.getContainer().getQualifiedNameString() + "." + nodeText;
-        resolved = JavaPsiFacade.getInstance(myElement.getProject()).findClass(fqn, GlobalSearchScope.allScope(myElement.getProject()));
-
-        if (resolved != null) {
-            return resolved;
+        if (declaration != null) {
+            // Try implicit ceylon.language.*
+            String fqn = declaration.getContainer().getQualifiedNameString() + "." + nodeText;
+            resolved = JavaPsiFacade.getInstance(myElement.getProject()).findClass(fqn, GlobalSearchScope.allScope(myElement.getProject()));
+            if (resolved != null) {
+                return resolved;
+            }
+            fqn += "_";
+            return JavaPsiFacade.getInstance(myElement.getProject()).findClass(fqn, GlobalSearchScope.allScope(myElement.getProject()));
         }
-
-        fqn += "_";
-        return JavaPsiFacade.getInstance(myElement.getProject()).findClass(fqn, GlobalSearchScope.allScope(myElement.getProject()));
+        return null;
     }
 
 }
