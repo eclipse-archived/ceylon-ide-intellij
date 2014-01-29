@@ -5,13 +5,14 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.intellij.plugins.ceylon.CeylonCodeInsightTestSupport;
 import org.intellij.plugins.ceylon.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 
 import java.util.List;
 
-public class CeylonReferenceTest extends CeylonReferenceTestSupport {
+public class CeylonReferenceTest extends CeylonCodeInsightTestSupport {
 
     public void testReferences() throws Exception {
         CeylonFile ceylonFile = initFile("referenceTest.ceylon");

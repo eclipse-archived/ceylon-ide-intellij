@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.codeInsight.resolve;
+package org.intellij.plugins.ceylon;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
@@ -9,7 +9,7 @@ import org.intellij.plugins.ceylon.psi.CeylonFile;
 
 import java.util.concurrent.TimeoutException;
 
-abstract class CeylonReferenceTestSupport extends LightCodeInsightFixtureTestCase {
+public abstract class CeylonCodeInsightTestSupport extends LightCodeInsightFixtureTestCase {
     protected static final String PATH = "source/org/intellij/plugins/ceylon/codeInsight/resolve/";
     protected TypeChecker typeChecker;
 
@@ -24,7 +24,7 @@ abstract class CeylonReferenceTestSupport extends LightCodeInsightFixtureTestCas
         myFixture.configureByFiles(PATH + filename);
         final CeylonFile ceylonFile = (CeylonFile) myFixture.getFile();
 
-        TypeCheckerInvoker.invokeTypeChecker(typeChecker, ceylonFile);
+        TypeCheckerInvoker.invokeTypeChecker(ceylonFile, typeChecker);
         return ceylonFile;
     }
 

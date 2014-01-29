@@ -36,18 +36,19 @@ public class TypeCheckerInvoker {
         if (typeChecker == null) {
             return null;
         }
-        return invokeTypeChecker(typeChecker, ceylonFile);
+        return invokeTypeChecker(ceylonFile, typeChecker);
     }
 
-    public static PhasedUnit invokeTypeChecker(TypeChecker typeChecker, CeylonFile ceylonFile) {
+    public static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile, TypeChecker typeChecker) {
         SourceCodeVirtualFile sourceCodeVirtualFile = new SourceCodeVirtualFile(ceylonFile);
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
 
-        CeylonLexer lexer = null;
+        CeylonLexer lexer;
         try {
             lexer = new CeylonLexer(new ANTLRInputStream(sourceCodeVirtualFile.getInputStream()));
         } catch (IOException e) {
             LOGGER.error(e);
+            throw new RuntimeException("Unexpected error", e);
         }
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         tokenStream.fill();
@@ -73,6 +74,8 @@ public class TypeCheckerInvoker {
         phasedUnit = new PhasedUnit(sourceCodeVirtualFile, srcDir, cu, pkg,
                 typeChecker.getPhasedUnits().getModuleManager(), typeChecker.getContext(), tokenStream.getTokens());
 
+//        System.out.printf("Package for %s: %s, %s; module: %s%n", ceylonFile.getName(), ceylonFile.getPackageName(), phasedUnit.getPackage(), phasedUnit.getPackage().getModule());
+
         phasedUnit.validateTree();
         phasedUnit.visitSrcModulePhase();
         phasedUnit.visitRemainingModulePhase();
@@ -82,6 +85,8 @@ public class TypeCheckerInvoker {
         phasedUnit.analyseTypes();
         phasedUnit.analyseUsage();
         phasedUnit.analyseFlow();
+
+//        System.out.printf(" -- Package assigned by typechecker: %s in %s%n", phasedUnit.getPackage(), phasedUnit.getPackage().getModule());
 
         if (typeChecker.getPhasedUnitFromRelativePath(phasedUnit.getPathRelativeToSrcDir()) != null) {
             typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(phasedUnit.getPathRelativeToSrcDir());

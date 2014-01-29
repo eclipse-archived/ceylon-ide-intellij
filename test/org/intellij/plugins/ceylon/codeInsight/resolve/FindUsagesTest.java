@@ -5,10 +5,11 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.usageView.UsageInfo;
+import org.intellij.plugins.ceylon.CeylonCodeInsightTestSupport;
 
 import java.util.Collection;
 
-public class FindUsagesTest extends CeylonReferenceTestSupport {
+public class FindUsagesTest extends CeylonCodeInsightTestSupport {
 
     public void testFindUsages() throws Exception {
         initFile("referenceTest.ceylon");
