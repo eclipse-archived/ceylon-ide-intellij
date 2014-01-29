@@ -27,6 +27,7 @@
       <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/ceylon/src/main/java" />
       <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/webdav/src/main/java" />
       <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/testsuite/src/test/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-runtime/bootstrap/src/main/java" />
     </SOURCES>
   </library>
 </component>
