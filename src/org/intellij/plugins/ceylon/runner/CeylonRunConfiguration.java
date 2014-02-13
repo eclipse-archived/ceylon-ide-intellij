@@ -14,7 +14,6 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PathUtil;
 import org.apache.commons.lang.ObjectUtils;
 import org.jdom.Element;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 /**
  * Run configuration for Ceylon files.
@@ -69,7 +69,10 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
                 params.getClassPath().add(pathToPlugin + "/lib/ceylon-bootstrap.jar");
                 params.getProgramParametersList().add("run");
                 params.getProgramParametersList().add("--run", topLevelNameFull);
-                params.getProgramParametersList().add("--rep", getOutputPath());
+                final Iterable<String> outputPaths = getOutputPaths();
+                for (String outputPath : outputPaths) {
+                    params.getProgramParametersList().add("--rep", outputPath);
+                }
                 params.getProgramParametersList().add(getCeylonModuleOrDft());
 
                 return params;
@@ -93,17 +96,20 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         element.setAttribute("top-level", (String) ObjectUtils.defaultIfNull(getTopLevelNameFull(), ""));
     }
 
-    private String getOutputPath() {
-        Module module = getConfigurationModule().getModule();
-        VirtualFile basePath;
-
-        if (module != null) {
-            basePath = CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
-        } else {
-            basePath = CompilerProjectExtension.getInstance(getProject()).getCompilerOutput();
+    private Iterable<String> getOutputPaths() {
+        final Collection<String> paths = new LinkedHashSet<>();
+        final CompilerProjectExtension cpe = CompilerProjectExtension.getInstance(getProject());
+        if (cpe != null && cpe.getCompilerOutput() != null) {
+            paths.add(cpe.getCompilerOutput().getCanonicalPath());
         }
-
-        return basePath.getCanonicalPath();
+        final Module[] modules = ModuleManager.getInstance(getProject()).getModules();
+        for (Module module : modules) {
+            final CompilerModuleExtension cme = CompilerModuleExtension.getInstance(module);
+            if (cme != null&& cme.getCompilerOutputPath() != null) {
+                paths.add(cme.getCompilerOutputPath().getCanonicalPath());
+            }
+        }
+        return paths;
     }
 
     private Sdk getProjectSdk() {
