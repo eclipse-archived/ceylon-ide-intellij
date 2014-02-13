@@ -27,6 +27,8 @@ public class CeylonModuleBuilder extends ModuleBuilder implements SourcePathsBui
     @Override
     public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
 
+        rootModel.inheritSdk();
+
         ContentEntry contentEntry = doAddContentEntry(rootModel);
         if (contentEntry != null) {
             final List<Pair<String,String>> sourcePaths = getSourcePaths();
