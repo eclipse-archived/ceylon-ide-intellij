@@ -32,9 +32,9 @@ public class CompileErrorReporter implements DiagnosticListener<JavaFileObject> 
                 break;
             case MANDATORY_WARNING:
             case WARNING:
-            case NOTE:
                 kind = BuildMessage.Kind.WARNING;
                 break;
+            case NOTE:
             default:
                 kind = BuildMessage.Kind.INFO;
         }
