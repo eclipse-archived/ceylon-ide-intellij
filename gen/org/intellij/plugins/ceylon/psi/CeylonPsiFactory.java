@@ -49,8 +49,6 @@ public class CeylonPsiFactory {
             return new SatisfiedTypesPsiImpl(node);
         } else if (type == ABSTRACTED_TYPE) {
             return new AbstractedTypePsiImpl(node);
-        } else if (type == ADAPTED_TYPES) {
-            return new AdaptedTypesPsiImpl(node);
         } else if (type == CASE_TYPES) {
             return new CaseTypesPsiImpl(node);
         } else if (type == EXTENDED_TYPE) {

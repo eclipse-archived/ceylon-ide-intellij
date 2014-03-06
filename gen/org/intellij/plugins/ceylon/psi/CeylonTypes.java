@@ -1,4 +1,3 @@
-// This is a generated file. Not intended for manual editing.
 package org.intellij.plugins.ceylon.psi;
 
 import com.intellij.psi.tree.IElementType;
@@ -6,6 +5,7 @@ import com.intellij.psi.tree.IFileElementType;
 import org.intellij.plugins.ceylon.psi.stub.CeylonStubTypes;
 import org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType;
 
+/* Generated using Antlr by IdeaAstTypesGen.g */
 public interface CeylonTypes {
 
     IFileElementType CEYLON_FILE = CeylonStubTypes.CEYLON_FILE;
@@ -31,7 +31,6 @@ public interface CeylonTypes {
     IElementType TYPE_ALIAS_DECLARATION = new CeylonElementType("TYPE_ALIAS_DECLARATION");
     IElementType SATISFIED_TYPES = new CeylonElementType("SATISFIED_TYPES");
     IElementType ABSTRACTED_TYPE = new CeylonElementType("ABSTRACTED_TYPE");
-    IElementType ADAPTED_TYPES = new CeylonElementType("ADAPTED_TYPES");
     IElementType CASE_TYPES = new CeylonElementType("CASE_TYPES");
     IElementType EXTENDED_TYPE = new CeylonElementType("EXTENDED_TYPE");
     IElementType TYPE_CONSTRAINT_LIST = new CeylonElementType("TYPE_CONSTRAINT_LIST");
@@ -289,6 +288,7 @@ public interface CeylonTypes {
     IElementType IDENTIFIER = new CeylonElementType("IDENTIFIER");
     IElementType COMPREHENSION = new CeylonElementType("COMPREHENSION");
     IElementType COMPREHENSION_CLAUSE = new CeylonElementType("COMPREHENSION_CLAUSE");
+    IElementType INITIAL_COMPREHENSION_CLAUSE = new CeylonElementType("INITIAL_COMPREHENSION_CLAUSE");
     IElementType EXPRESSION_COMPREHENSION_CLAUSE = new CeylonElementType("EXPRESSION_COMPREHENSION_CLAUSE");
     IElementType FOR_COMPREHENSION_CLAUSE = new CeylonElementType("FOR_COMPREHENSION_CLAUSE");
     IElementType IF_COMPREHENSION_CLAUSE = new CeylonElementType("IF_COMPREHENSION_CLAUSE");

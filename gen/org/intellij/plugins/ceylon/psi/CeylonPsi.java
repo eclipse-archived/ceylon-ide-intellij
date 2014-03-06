@@ -89,10 +89,6 @@ public class CeylonPsi {
         @Override Tree.AbstractedType getCeylonNode();
     }
 
-    public static interface AdaptedTypesPsi extends CeylonCompositeElement {
-        @Override Tree.AdaptedTypes getCeylonNode();
-    }
-
     public static interface CaseTypesPsi extends CeylonCompositeElement {
         @Override Tree.CaseTypes getCeylonNode();
     }
@@ -1121,15 +1117,19 @@ public class CeylonPsi {
         @Override Tree.ComprehensionClause getCeylonNode();
     }
 
+    public static interface InitialComprehensionClausePsi extends ComprehensionClausePsi {
+        @Override Tree.InitialComprehensionClause getCeylonNode();
+    }
+
     public static interface ExpressionComprehensionClausePsi extends ComprehensionClausePsi {
         @Override Tree.ExpressionComprehensionClause getCeylonNode();
     }
 
-    public static interface ForComprehensionClausePsi extends ComprehensionClausePsi {
+    public static interface ForComprehensionClausePsi extends InitialComprehensionClausePsi {
         @Override Tree.ForComprehensionClause getCeylonNode();
     }
 
-    public static interface IfComprehensionClausePsi extends ComprehensionClausePsi {
+    public static interface IfComprehensionClausePsi extends InitialComprehensionClausePsi {
         @Override Tree.IfComprehensionClause getCeylonNode();
     }
 

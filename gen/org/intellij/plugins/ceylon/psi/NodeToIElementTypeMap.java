@@ -45,7 +45,6 @@ public class NodeToIElementTypeMap {
         map.put(Tree.TypeAliasDeclaration.class, CeylonTypes.TYPE_ALIAS_DECLARATION);
         map.put(Tree.SatisfiedTypes.class, CeylonTypes.SATISFIED_TYPES);
         map.put(Tree.AbstractedType.class, CeylonTypes.ABSTRACTED_TYPE);
-        map.put(Tree.AdaptedTypes.class, CeylonTypes.ADAPTED_TYPES);
         map.put(Tree.CaseTypes.class, CeylonTypes.CASE_TYPES);
         map.put(Tree.ExtendedType.class, CeylonTypes.EXTENDED_TYPE);
         map.put(Tree.TypeConstraintList.class, CeylonTypes.TYPE_CONSTRAINT_LIST);
@@ -303,6 +302,7 @@ public class NodeToIElementTypeMap {
         map.put(Tree.Identifier.class, CeylonTypes.IDENTIFIER);
         map.put(Tree.Comprehension.class, CeylonTypes.COMPREHENSION);
         map.put(Tree.ComprehensionClause.class, CeylonTypes.COMPREHENSION_CLAUSE);
+        map.put(Tree.InitialComprehensionClause.class, CeylonTypes.INITIAL_COMPREHENSION_CLAUSE);
         map.put(Tree.ExpressionComprehensionClause.class, CeylonTypes.EXPRESSION_COMPREHENSION_CLAUSE);
         map.put(Tree.ForComprehensionClause.class, CeylonTypes.FOR_COMPREHENSION_CLAUSE);
         map.put(Tree.IfComprehensionClause.class, CeylonTypes.IF_COMPREHENSION_CLAUSE);

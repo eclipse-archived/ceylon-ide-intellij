@@ -1224,9 +1224,9 @@ public class MarkingCeylonParser extends CeylonParser {
     }
 
     @Override
-    public Tree.SimpleType qualifiedType() throws RecognitionException {
+    public Tree.StaticType qualifiedType() throws RecognitionException {
         final MyTree.MyMarker marker = mark();
-        final Tree.SimpleType node = super.qualifiedType();
+        final Tree.StaticType node = super.qualifiedType();
         end(marker, node);
         return node;
     }

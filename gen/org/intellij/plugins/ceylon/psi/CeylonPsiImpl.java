@@ -2,9 +2,9 @@ package org.intellij.plugins.ceylon.psi;
 
 import com.intellij.lang.ASTNode;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.intellij.plugins.ceylon.codeInsight.resolve.CeylonResolvable;
 import org.intellij.plugins.ceylon.codeInsight.resolve.IdentifiableBaseMemberExpression;
 import org.intellij.plugins.ceylon.codeInsight.resolve.IdentifiableStatement;
-import org.intellij.plugins.ceylon.codeInsight.resolve.CeylonResolvable;
 import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
 /* Generated using Antlr by PsiImplGen.g */
 
@@ -134,12 +134,6 @@ public class CeylonPsiImpl {
             implements CeylonPsi.AbstractedTypePsi {
         public AbstractedTypePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.AbstractedType getCeylonNode() { return (Tree.AbstractedType) super.getCeylonNode(); }
-    }
-
-    public static class AdaptedTypesPsiImpl extends CeylonCompositeElementImpl
-            implements CeylonPsi.AdaptedTypesPsi {
-        public AdaptedTypesPsiImpl(ASTNode astNode) { super(astNode); }
-        @Override public Tree.AdaptedTypes getCeylonNode() { return (Tree.AdaptedTypes) super.getCeylonNode(); }
     }
 
     public static class CaseTypesPsiImpl extends CeylonCompositeElementImpl
@@ -1684,19 +1678,25 @@ public class CeylonPsiImpl {
         @Override public Tree.ComprehensionClause getCeylonNode() { return (Tree.ComprehensionClause) super.getCeylonNode(); }
     }
 
+    public static abstract class InitialComprehensionClausePsiImpl extends ComprehensionClausePsiImpl
+            implements CeylonPsi.InitialComprehensionClausePsi {
+        public InitialComprehensionClausePsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.InitialComprehensionClause getCeylonNode() { return (Tree.InitialComprehensionClause) super.getCeylonNode(); }
+    }
+
     public static class ExpressionComprehensionClausePsiImpl extends ComprehensionClausePsiImpl
             implements CeylonPsi.ExpressionComprehensionClausePsi {
         public ExpressionComprehensionClausePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.ExpressionComprehensionClause getCeylonNode() { return (Tree.ExpressionComprehensionClause) super.getCeylonNode(); }
     }
 
-    public static class ForComprehensionClausePsiImpl extends ComprehensionClausePsiImpl
+    public static class ForComprehensionClausePsiImpl extends InitialComprehensionClausePsiImpl
             implements CeylonPsi.ForComprehensionClausePsi {
         public ForComprehensionClausePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.ForComprehensionClause getCeylonNode() { return (Tree.ForComprehensionClause) super.getCeylonNode(); }
     }
 
-    public static class IfComprehensionClausePsiImpl extends ComprehensionClausePsiImpl
+    public static class IfComprehensionClausePsiImpl extends InitialComprehensionClausePsiImpl
             implements CeylonPsi.IfComprehensionClausePsi {
         public IfComprehensionClausePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.IfComprehensionClause getCeylonNode() { return (Tree.IfComprehensionClause) super.getCeylonNode(); }

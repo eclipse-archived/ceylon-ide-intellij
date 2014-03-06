@@ -789,9 +789,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof CaseTypesPsi) {
             visitCaseTypesPsi((CaseTypesPsi) element);
         }
-        else if (element instanceof AdaptedTypesPsi) {
-            visitAdaptedTypesPsi((AdaptedTypesPsi) element);
-        }
         else if (element instanceof AbstractedTypePsi) {
             visitAbstractedTypePsi((AbstractedTypePsi) element);
         }
@@ -1115,7 +1112,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitTypeConstraintListPsi(@NotNull TypeConstraintListPsi element) {}
     public void visitExtendedTypePsi(@NotNull ExtendedTypePsi element) {}
     public void visitCaseTypesPsi(@NotNull CaseTypesPsi element) {}
-    public void visitAdaptedTypesPsi(@NotNull AdaptedTypesPsi element) {}
     public void visitAbstractedTypePsi(@NotNull AbstractedTypePsi element) {}
     public void visitSatisfiedTypesPsi(@NotNull SatisfiedTypesPsi element) {}
     public void visitTypeAliasDeclarationPsi(@NotNull TypeAliasDeclarationPsi element) {}
