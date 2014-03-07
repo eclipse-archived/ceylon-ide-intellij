@@ -1,5 +1,5 @@
 import ceylon.language {Integer}
-import <error descr="package not found in imported modules: ceylon.languagexyz">ceylon.languagexyz</error> {Integer}
+import <error descr="package not found in imported modules: ceylon.languagexyz (define a module and add module import to its module descriptor)">ceylon.languagexyz</error> {Integer}
 
 shared class Hello() {
     void sayHello() {

@@ -14,8 +14,13 @@ FILE
         CLASS_BODY
           PsiElement(LBRACE)('{')
           PsiElement(RBRACE)('}')
-    PsiErrorElement:incorrect syntax: missing EOF at '}'
-      <empty list>
-  PsiErrorElement:Uparseable code found at end of file.
     PsiElement(RBRACE)('}')
-    PsiElement(VOID_MODIFIER)('void')
+    PsiErrorElement:incorrect syntax: mismatched token 'void' expecting EOF
+      <empty list>
+    METHOD_DECLARATION
+      ANNOTATION_LIST
+        <empty list>
+      METHOD_DECLARATION
+        PsiElement(VOID_MODIFIER)('void')
+        PsiErrorElement:incorrect syntax: no viable alternative at token end of file
+          <empty list>
