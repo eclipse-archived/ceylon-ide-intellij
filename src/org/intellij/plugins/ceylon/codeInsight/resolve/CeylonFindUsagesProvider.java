@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.redhat.ceylon.compiler.typechecker.model.Declaration;
 import com.redhat.ceylon.compiler.typechecker.model.Method;
-import com.redhat.ceylon.compiler.typechecker.model.Parameter;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
@@ -31,6 +30,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return true;
         } else if (psiElement instanceof ParameterDeclarationPsiIdOwner) {
             return true;
+        } else if (psiElement instanceof CeylonPsi.TypeParameterDeclarationPsi) {
+            return true;
         }
 //        System.out.println("Can't find usages for " + psiElement);
         return false;
@@ -53,6 +54,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return "Method";
         } else if (element instanceof ParameterDeclarationPsiIdOwner) {
             return "Function parameter";
+        } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {
+            return "Type parameter";
         }
 
         throw new UnsupportedOperationException(element.toString());
@@ -75,8 +78,9 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             Method model = ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getDeclarationModel();
             return model == null ? ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getIdentifier().getText() : model.getQualifiedNameString();
         } else if (element instanceof CeylonPsi.ParameterDeclarationPsi) {
-            Parameter model = ((CeylonPsi.ParameterDeclarationPsi) element).getCeylonNode().getParameterModel();
-            return model == null ? ((CeylonPsi.ParameterDeclarationPsi) element).getCeylonNode().getTypedDeclaration().getIdentifier().getText() : model.getName();
+            return ((CeylonPsi.ParameterDeclarationPsi) element).getCeylonNode().getTypedDeclaration().getIdentifier().getText();
+        } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {
+            return ((CeylonPsi.TypeParameterDeclarationPsi) element).getCeylonNode().getIdentifier().getText();
         } else if (element instanceof CeylonFile) {
             return ((CeylonFile) element).getName();
         }
