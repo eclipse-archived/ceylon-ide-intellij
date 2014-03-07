@@ -58,7 +58,7 @@ public class TypeCheckerManager {
 
         RepositoryManager manager = repoManager()
                 .cwd(new File(project.getBasePath()))
-                .offline(true)
+                .offline(false)
                 .systemRepo(systemRepoPath)
                 .isJDKIncluded(true)
                 .buildManager();
