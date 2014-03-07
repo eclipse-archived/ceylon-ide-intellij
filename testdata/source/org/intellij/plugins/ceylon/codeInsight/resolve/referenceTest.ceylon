@@ -19,6 +19,8 @@ void myHelloWorld() {
     myHelloWorld();
 
     plop();
+
+    print(bar2.attr);
 }
 
 "documented plop"
@@ -26,9 +28,13 @@ void plop() {
     // Not the same as BarBar#plop :)
 }
 
-class BarBar() {
+class BarBar(shared Integer attr = 4) {
 
     shared void plop() {
         myHelloWorld();
     }
+}
+
+void methodWithParam(Integer par) {
+    print(par);
 }

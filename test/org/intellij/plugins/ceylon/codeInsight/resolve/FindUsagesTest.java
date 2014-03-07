@@ -16,10 +16,10 @@ public class FindUsagesTest extends CeylonCodeInsightTestSupport {
         final Editor editor = myFixture.getEditor();
         assertUsages(editor, 100, 3, "myHelloWorld");
         assertUsages(editor, 164, 3, "prout");
-        assertUsages(editor, 183, 2, "bar2");
-        assertUsages(editor, 399, 3, "BarBar");
-        assertUsages(editor, 343, 2, "plop");
-        assertUsages(editor, 427, 2, "plop");
+        assertUsages(editor, 183, 3, "bar2");
+        assertUsages(editor, 422, 3, "BarBar");
+        assertUsages(editor, 366, 2, "plop");
+        assertUsages(editor, 473, 2, "plop");
 
         assertUsages(editor, 292, 3, "myHelloWorld");
     }

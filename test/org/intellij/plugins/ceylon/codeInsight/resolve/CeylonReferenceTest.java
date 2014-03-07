@@ -19,10 +19,10 @@ public class CeylonReferenceTest extends CeylonCodeInsightTestSupport {
 
         // caret starts at (1, 1)
         moveCaret(7, 9);
-        assertRefdDeclarationAtCaret(ceylonFile, "BarBar", CeylonPsi.ClassOrInterfacePsi.class, 399);
+        assertRefdDeclarationAtCaret(ceylonFile, "BarBar", CeylonPsi.ClassOrInterfacePsi.class, 422);
 
         moveCaret(12, 0);
-        assertRefdDeclarationAtCaret(ceylonFile, "BarBar", CeylonPsi.ClassOrInterfacePsi.class, 399);
+        assertRefdDeclarationAtCaret(ceylonFile, "BarBar", CeylonPsi.ClassOrInterfacePsi.class, 422);
 
         moveCaret(-12, 2);
         assertRefdDeclarationAtCaret(ceylonFile, "prout", CeylonPsi.AttributeDeclarationPsi.class, 164);
@@ -34,21 +34,33 @@ public class CeylonReferenceTest extends CeylonCodeInsightTestSupport {
         assertRefdDeclarationAtCaret(ceylonFile, "bar2", CeylonPsi.AttributeDeclarationPsi.class, 183);
 
         moveCaret(3, 0);
-        assertRefdDeclarationAtCaret(ceylonFile, "plop", CeylonPsi.MethodDefinitionPsi.class, 427);
+        assertRefdDeclarationAtCaret(ceylonFile, "plop", CeylonPsi.MethodDefinitionPsi.class, 473);
 
         moveCaret(-3, 2);
         assertRefdDeclarationAtCaret(ceylonFile, "myHelloWorld", CeylonPsi.MethodDefinitionPsi.class, 100);
 
         moveCaret(0, 2);
-        assertRefdDeclarationAtCaret(ceylonFile, "plop", CeylonPsi.MethodDefinitionPsi.class, 343);
+        assertRefdDeclarationAtCaret(ceylonFile, "plop", CeylonPsi.MethodDefinitionPsi.class, 366);
 
-        moveCaret(2, 11);
+        moveCaret(10, 2);
+//        assertRefdParamDeclarationAtCaret(ceylonFile, "attr", CeylonPsi.ValueParameterDeclarationPsi.class, 444);
+
+        moveCaret(-8, 11);
         assertRefdDeclarationAtCaret(ceylonFile, "myHelloWorld", CeylonPsi.MethodDefinitionPsi.class, 100);
+
+        moveCaret(2, 5);
+        assertRefdParamDeclarationAtCaret(ceylonFile, "par", CeylonPsi.ValueParameterDeclarationPsi.class, 544);
     }
 
     private <PSI extends CeylonPsi.DeclarationPsi> PSI assertRefdDeclarationAtCaret(CeylonFile ceylonFile, String referencedId, Class<? extends PSI> psiClass, int referencedOffest) {
         PSI referenced = assertRefdAtCaret(ceylonFile, referencedOffest, psiClass);
         assertEquals(referencedId, referenced.getCeylonNode().getIdentifier().getText());
+        return referenced;
+    }
+
+    private <PSI extends CeylonPsi.ValueParameterDeclarationPsi> PSI assertRefdParamDeclarationAtCaret(CeylonFile ceylonFile, String referencedId, Class<? extends PSI> psiClass, int referencedOffest) {
+        PSI referenced = assertRefdAtCaret(ceylonFile, referencedOffest, psiClass);
+        assertEquals(referencedId, referenced.getCeylonNode().getTypedDeclaration().getIdentifier().getText());
         return referenced;
     }
 

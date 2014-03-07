@@ -7,15 +7,15 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import org.intellij.plugins.ceylon.psi.CeylonPsiImpl;
-import org.intellij.plugins.ceylon.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.psi.CeylonTreeUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.google.common.base.Objects.firstNonNull;
 
-public abstract class IdentifiableStatement extends CeylonPsiImpl.StatementPsiImpl implements PsiNameIdentifierOwner {
-    public IdentifiableStatement(ASTNode astNode) {
+public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.DeclarationPsiImpl implements PsiNameIdentifierOwner {
+    public DeclarationPsiNameIdOwner(ASTNode astNode) {
         super(astNode);
     }
 
@@ -29,7 +29,7 @@ public abstract class IdentifiableStatement extends CeylonPsiImpl.StatementPsiIm
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        return findChildByType(CeylonTypes.IDENTIFIER);
+        return CeylonTreeUtil.findPsiElement(getCeylonNode().getIdentifier(), getContainingFile());
     }
 
     @NotNull

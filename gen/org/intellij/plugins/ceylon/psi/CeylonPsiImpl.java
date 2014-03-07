@@ -3,8 +3,9 @@ package org.intellij.plugins.ceylon.psi;
 import com.intellij.lang.ASTNode;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.codeInsight.resolve.CeylonResolvable;
+import org.intellij.plugins.ceylon.codeInsight.resolve.DeclarationPsiNameIdOwner;
 import org.intellij.plugins.ceylon.codeInsight.resolve.IdentifiableBaseMemberExpression;
-import org.intellij.plugins.ceylon.codeInsight.resolve.IdentifiableStatement;
+import org.intellij.plugins.ceylon.codeInsight.resolve.ParameterDeclarationPsiIdOwner;
 import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
 /* Generated using Antlr by PsiImplGen.g */
 
@@ -94,19 +95,19 @@ public class CeylonPsiImpl {
         @Override public Tree.ImportWildcard getCeylonNode() { return (Tree.ImportWildcard) super.getCeylonNode(); }
     }
 
-    public static abstract class DeclarationPsiImpl extends IdentifiableStatement
+    public static abstract class DeclarationPsiImpl extends StatementPsiImpl
             implements CeylonPsi.DeclarationPsi {
         public DeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.Declaration getCeylonNode() { return (Tree.Declaration) super.getCeylonNode(); }
     }
 
-    public static class MissingDeclarationPsiImpl extends DeclarationPsiImpl
+    public static class MissingDeclarationPsiImpl extends DeclarationPsiNameIdOwner
             implements CeylonPsi.MissingDeclarationPsi {
         public MissingDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.MissingDeclaration getCeylonNode() { return (Tree.MissingDeclaration) super.getCeylonNode(); }
     }
 
-    public static abstract class TypeDeclarationPsiImpl extends DeclarationPsiImpl
+    public static abstract class TypeDeclarationPsiImpl extends DeclarationPsiNameIdOwner
             implements CeylonPsi.TypeDeclarationPsi {
         public TypeDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.TypeDeclaration getCeylonNode() { return (Tree.TypeDeclaration) super.getCeylonNode(); }
@@ -214,7 +215,7 @@ public class CeylonPsiImpl {
         @Override public Tree.InterfaceDeclaration getCeylonNode() { return (Tree.InterfaceDeclaration) super.getCeylonNode(); }
     }
 
-    public static abstract class TypedDeclarationPsiImpl extends DeclarationPsiImpl
+    public static abstract class TypedDeclarationPsiImpl extends DeclarationPsiNameIdOwner
             implements CeylonPsi.TypedDeclarationPsi {
         public TypedDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.TypedDeclaration getCeylonNode() { return (Tree.TypedDeclaration) super.getCeylonNode(); }
@@ -292,13 +293,13 @@ public class CeylonPsiImpl {
         @Override public Tree.ParameterDeclaration getCeylonNode() { return (Tree.ParameterDeclaration) super.getCeylonNode(); }
     }
 
-    public static class ValueParameterDeclarationPsiImpl extends ParameterDeclarationPsiImpl
+    public static class ValueParameterDeclarationPsiImpl extends ParameterDeclarationPsiIdOwner
             implements CeylonPsi.ValueParameterDeclarationPsi {
         public ValueParameterDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.ValueParameterDeclaration getCeylonNode() { return (Tree.ValueParameterDeclaration) super.getCeylonNode(); }
     }
 
-    public static class FunctionalParameterDeclarationPsiImpl extends ParameterDeclarationPsiImpl
+    public static class FunctionalParameterDeclarationPsiImpl extends ParameterDeclarationPsiIdOwner
             implements CeylonPsi.FunctionalParameterDeclarationPsi {
         public FunctionalParameterDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.FunctionalParameterDeclaration getCeylonNode() { return (Tree.FunctionalParameterDeclaration) super.getCeylonNode(); }
@@ -316,7 +317,7 @@ public class CeylonPsiImpl {
         @Override public Tree.TypeParameterList getCeylonNode() { return (Tree.TypeParameterList) super.getCeylonNode(); }
     }
 
-    public static class TypeParameterDeclarationPsiImpl extends DeclarationPsiImpl
+    public static class TypeParameterDeclarationPsiImpl extends DeclarationPsiNameIdOwner
             implements CeylonPsi.TypeParameterDeclarationPsi {
         public TypeParameterDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.TypeParameterDeclaration getCeylonNode() { return (Tree.TypeParameterDeclaration) super.getCeylonNode(); }
