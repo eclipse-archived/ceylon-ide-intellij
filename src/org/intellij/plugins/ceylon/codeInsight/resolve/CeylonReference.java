@@ -53,11 +53,6 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         return null;
     }
 
-    @Override
-    public boolean isReferenceTo(PsiElement element) {
-        return element.equals(resolve());
-    }
-
     @NotNull
     @Override
     public Object[] getVariants() {

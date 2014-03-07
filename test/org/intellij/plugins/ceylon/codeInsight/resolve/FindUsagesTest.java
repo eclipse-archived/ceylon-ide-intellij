@@ -20,12 +20,13 @@ public class FindUsagesTest extends CeylonCodeInsightTestSupport {
         assertUsages(editor, 422, 3, "BarBar");
         assertUsages(editor, 366, 2, "plop");
         assertUsages(editor, 473, 2, "plop");
-
         assertUsages(editor, 292, 3, "myHelloWorld");
+        assertUsages(editor, 545, 2, "par");
+        assertUsages(editor, 563, 2, "par");
     }
 
     private void assertUsages(Editor editor, int offset, int expectedCount, String identifier) {
-        final PsiElement targetElement = TargetElementUtilBase.getInstance().findTargetElement(
+        PsiElement targetElement = TargetElementUtilBase.getInstance().findTargetElement(
                 editor,
                 TargetElementUtilBase.ELEMENT_NAME_ACCEPTED | TargetElementUtilBase.REFERENCED_ELEMENT_ACCEPTED,
                 offset);
@@ -36,5 +37,9 @@ public class FindUsagesTest extends CeylonCodeInsightTestSupport {
 
         final Collection<UsageInfo> usageInfos = myFixture.findUsages(targetElement);
         assertEquals(expectedCount, usageInfos.size());
+        for (UsageInfo usageInfo : usageInfos) {
+            assertTrue(usageInfo.getElement().getText().contains(identifier));
+            assertEquals(targetElement, usageInfo.getReference().resolve());
+        }
     }
 }
