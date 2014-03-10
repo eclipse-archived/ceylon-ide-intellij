@@ -56,7 +56,8 @@ public class MyTree {
 
         @Override
         public void done(IElementType type, Node node) {
-            if (children.size() == 1 && children.get(0).node == node && type != CeylonTypes.CEYLON_FILE) {
+            // flatten the tree somewhat by collapsing single-child chains into a single node
+            if (children.size() == 1 && children.get(0).node == node && children.get(0).type == type && type != CeylonTypes.CEYLON_FILE) {
                 psiMarker.drop();
                 final MyNode myOnlyChild = children.get(0);
                 myOnlyChild.parent = this.parent;
