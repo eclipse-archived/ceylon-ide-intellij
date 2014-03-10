@@ -17,10 +17,13 @@ import java.util.List;
 public class CeylonBlock implements Block {
     private final ASTNode node;
     private final Indent indent;
+
     protected static final Spacing NO_SPACING = Spacing.createSpacing(0, 0, 0, false, 0);
     protected static final Spacing EMPTY_LINE_SPACING = Spacing.createSpacing(0, 0, 2, true, 0);
     protected static final Spacing GOTO_LINE_SPACING = Spacing.createSpacing(0, 0, 1, true, 1);
     protected static final Spacing SINGLE_SPACE_SPACING = Spacing.createSpacing(1, 1, 0, true, 1);
+
+    protected static final List<IElementType> INDENTED_CHILDREN = Arrays.asList(CeylonTypes.IMPORT_MODULE_LIST, CeylonTypes.BLOCK, CeylonTypes.CLASS_BODY);
 
     public CeylonBlock(ASTNode node, Indent indent) {
         this.node = node;
@@ -40,8 +43,7 @@ public class CeylonBlock implements Block {
 
         for (ASTNode child = node.getFirstChildNode(); child != null; child = child.getTreeNext()) {
             if (!FormatterUtil.containsWhiteSpacesOnly(child) && child.getTextLength() > 0) {
-                if ((node.getElementType() == CeylonTypes.BLOCK || node.getElementType() == CeylonTypes.IMPORT_MODULE_LIST)
-                        && child.getElementType() != TokenTypes.RBRACE.getTokenType()) {
+                if (INDENTED_CHILDREN.contains(node.getElementType()) && child.getElementType() != TokenTypes.RBRACE.getTokenType()) {
                     blocks.add(new CeylonBlock(child, Indent.getNormalIndent()));
                 } else {
                     blocks.add(new CeylonBlock(child, Indent.getNoneIndent()));
@@ -78,10 +80,10 @@ public class CeylonBlock implements Block {
 
         List<IElementType> typesRequiringNoLeftSpacing = Arrays.asList(
                 CeylonTypes.PARAMETER_LIST, TokenTypes.RPAREN.getTokenType(), TokenTypes.COMMA.getTokenType(), TokenTypes.SEMICOLON.getTokenType(),
-                TokenTypes.MEMBER_OP.getTokenType(), CeylonTypes.TYPE_PARAMETER_LIST
+                CeylonTypes.MEMBER_OP, CeylonTypes.TYPE_PARAMETER_LIST
         );
         List<IElementType> typesRequiringNoRightSpacing = Arrays.asList(
-                TokenTypes.LPAREN.getTokenType(), TokenTypes.MEMBER_OP.getTokenType()
+                TokenTypes.LPAREN.getTokenType(), CeylonTypes.MEMBER_OP
         );
         List<IElementType> typesRequiringNewLine = Arrays.asList(
                 CeylonTypes.DECLARATION, CeylonTypes.IMPORT_MODULE
@@ -99,9 +101,10 @@ public class CeylonBlock implements Block {
                     (block1.node.getTreeParent().getElementType() == CeylonTypes.BLOCK || block1.node.getTreeParent().getElementType() == CeylonTypes.IMPORT_MODULE_LIST))) {
                 return GOTO_LINE_SPACING;
             }
-            if (typesRequiringNoRightSpacing.contains(type1) || typesRequiringNoLeftSpacing.contains(block2.node.getElementType())
-                    || (type1 == TokenTypes.SMALLER_OP.getTokenType() && block2.node.getElementType() == CeylonTypes.TYPE_PARAMETER_DECLARATION)
-                    || (type1 == CeylonTypes.TYPE_PARAMETER_LITERAL && block2.node.getElementType() == TokenTypes.LARGER_OP.getTokenType())) {
+            final IElementType type2 = block2.node.getElementType();
+            if (typesRequiringNoRightSpacing.contains(type1) || typesRequiringNoLeftSpacing.contains(type2)
+                    || (type1 == CeylonTypes.SMALLER_OP && type2 == CeylonTypes.TYPE_PARAMETER_DECLARATION)
+                    || (type1 == CeylonTypes.TYPE_PARAMETER_LITERAL && type2 == CeylonTypes.LARGER_OP)) {
                 return NO_SPACING;
             }
         }
