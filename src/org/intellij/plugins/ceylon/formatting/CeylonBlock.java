@@ -21,6 +21,7 @@ public class CeylonBlock implements Block {
     private final Indent indent;
 
     protected static final Spacing NO_SPACING = Spacing.createSpacing(0, 0, 0, false, 0);
+    protected static final Spacing NO_SPACE_ALLOW_NEWLINE = Spacing.createSpacing(0, 0, 0, true, 0);
     protected static final Spacing EMPTY_LINE_SPACING = Spacing.createSpacing(0, 0, 2, true, 0);
     protected static final Spacing NEW_LINE_SPACING = Spacing.createSpacing(0, 0, 1, true, 1);
     protected static final Spacing NEW_LINE_SPACING_STRICT = Spacing.createSpacing(0, 0, 1, false, 0);
@@ -40,7 +41,7 @@ public class CeylonBlock implements Block {
     );
 
     public CeylonBlock(ASTNode node, Indent indent) {
-        System.out.printf("Indent for %s: %s%n", node.getElementType(), indent);
+//        System.out.printf("Indent for %s: %s%n", node.getElementType(), indent);
         this.node = node;
         this.indent = indent;
     }
@@ -113,13 +114,11 @@ public class CeylonBlock implements Block {
         final IElementType nodeType = node.getElementType();
         Collection<IElementType> typesRequiringNoLeftSpacing = Arrays.asList(
                 CeylonTypes.PARAMETER_LIST, CeylonTokens.RPAREN, CeylonTokens.COMMA, CeylonTokens.SEMICOLON,
-                CeylonTypes.MEMBER_OP, CeylonTokens.MEMBER_OP,
                 CeylonTypes.TYPE_PARAMETER_LIST,
                 CeylonTokens.UNION_OP, CeylonTypes.UNION_OP, CeylonTokens.INTERSECTION_OP, CeylonTypes.INTERSECTION_OP,
                 CeylonTypes.TYPE_ARGUMENT_LIST,
                 CeylonTypes.SEQUENCED_TYPE, CeylonTokens.OPTIONAL, CeylonTypes.POSITIONAL_ARGUMENT_LIST, CeylonTokens.RBRACKET,
                 CeylonTypes.INCREMENT_OP, CeylonTypes.DECREMENT_OP, CeylonTypes.POSTFIX_INCREMENT_OP, CeylonTypes.POSTFIX_DECREMENT_OP,
-                CeylonTypes.SAFE_MEMBER_OP,
                 CeylonTypes.RANGE_OP, CeylonTokens.RANGE_OP,
                 CeylonTokens.LBRACKET,
                 CeylonTokens.ENTRY_OP, CeylonTypes.ENTRY_OP
@@ -162,6 +161,8 @@ public class CeylonBlock implements Block {
             } else if ((SMALLER_OP.contains(type1) && isType(block2))
                     || (LARGER_OP.contains(type2) && isType(block1))) {
                 result = NO_SPACING;
+            } else if (Arrays.asList(CeylonTypes.MEMBER_OP, CeylonTokens.MEMBER_OP, CeylonTypes.SAFE_MEMBER_OP).contains(type2)) {
+                result = nodeType == CeylonTypes.QUALIFIED_MEMBER_EXPRESSION ? NO_SPACE_ALLOW_NEWLINE : NO_SPACING;
             }
         }
 
@@ -193,7 +194,7 @@ public class CeylonBlock implements Block {
             result = SINGLE_SPACE_SPACING;
         }
 
-        System.out.printf("Spacing between %s and %s in %s: %s%n", type1, type2, nodeType, getSpacingName(result));
+//        System.out.printf("Spacing between %s and %s in %s: %s%n", type1, type2, nodeType, getSpacingName(result));
         return result;
     }
 

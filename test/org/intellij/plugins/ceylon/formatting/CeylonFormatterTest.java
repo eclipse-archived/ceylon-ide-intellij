@@ -61,8 +61,11 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
     public void testTypeConstraints() throws Exception { testFormatting("typeConstraints"); }
     public void testAnnotationsNoArguments() throws Exception { testFormatting("annotationsNoArguments"); }
 
+    // bugs
+    public void testBug27() throws Exception { testFormatting("bugs/27"); }
+    public void testBug30() throws Exception { testFormatting("bugs/30"); }
 
-
+    ///////////////////////////////////////////////////////////////
     // only end-of-file WS handling etc.:
     public void testAssignments() throws Exception { testFormatting("assignments"); }
     public void testStringTemplates() throws Exception { testFormatting("stringTemplates"); }
@@ -70,13 +73,13 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
     public void testHelloWorldCommented() throws Exception { testFormatting("helloWorldCommented"); }
     public void testObjectArguments() throws Exception { testFormatting("objectArguments"); }
 
-    // only line comment newlines:
+    // adding redundant newlines after line comments:
     public void testThrow() throws Exception { testFormatting("throw"); }
     public void testCommentsAfterStatements() throws Exception { testFormatting("commentsAfterStatements"); }
     public void testSimpleClass() throws Exception { testFormatting("simpleClass"); }
 
 
-    // only options:
+    // ignoring options:
     public void testBraceOnOwnLine() throws Exception { testFormatting("braceOnOwnLine"); }
     public void testParamListParenWithSpaces() throws Exception { testFormatting("paramListParenWithSpaces"); }
     public void testParamListParenWithoutSpaces() throws Exception { testFormatting("paramListParenWithoutSpaces"); }
@@ -96,18 +99,18 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
     public void testObjects() throws Exception { testFormatting("objects"); }
 
 
-    // other fail:
-    public void testFunctionArguments() throws Exception { testFormatting("functionArguments"); }
-    public void testMultiLineStringIndented() throws Exception { testFormatting("multiLineStringIndented"); }
-    public void testAnnotationsPositionalArguments() throws Exception { testFormatting("annotationsPositionalArguments"); }
-    public void testNamedArguments() throws Exception { testFormatting("namedArguments"); }
-    public void testImportMultiLine() throws Exception { testFormatting("importMultiLine"); }
-    public void testDoc() throws Exception { testFormatting("doc"); }
-    public void testLongInvocation() throws Exception { testFormatting("longInvocation"); }
-    public void testMemberOp() throws Exception { testFormatting("memberOp"); }
-    public void testMultiLineParameterList() throws Exception { testFormatting("multiLineParameterList"); }
-    public void testMultiLineString() throws Exception { testFormatting("multiLineString"); }
-    public void testComments() throws Exception { testFormatting("comments"); }
+    // other fail (todo in comments)
+    public void testFunctionArguments() throws Exception { testFormatting("functionArguments"); } // no newline between functions; larger indent for anonymous function bodies
+    public void testMultiLineStringIndented() throws Exception { testFormatting("multiLineStringIndented"); }  // indent multiline strings correctly when indenting the first line
+    public void testMultiLineString() throws Exception { testFormatting("multiLineString"); } // indent multiline strings correctly when indenting the first line
+    public void testAnnotationsPositionalArguments() throws Exception { testFormatting("annotationsPositionalArguments"); }  // fix IDE error
+    public void testNamedArguments() throws Exception { testFormatting("namedArguments"); }  // fix indent for seq.args in named arg list; line comment newlines; single-line short block
+    public void testImportMultiLine() throws Exception { testFormatting("importMultiLine"); } // single-line short block; = without spaces
+    public void testDoc() throws Exception { testFormatting("doc"); } // doc annotation on separate line
+    public void testLongInvocation() throws Exception { testFormatting("longInvocation"); }  // chop down long chained member invocations; line comment newlines
+    public void testMemberOp() throws Exception { testFormatting("memberOp"); } // chop down long chained member selections
+    public void testMultiLineParameterList() throws Exception { testFormatting("multiLineParameterList"); } // chop down long parameter lists, remove intra-param linebreaks
+    public void testComments() throws Exception { testFormatting("comments"); } // format multi-line comments; don't add newlines after line comments
 
 
     private void testFormatting(String testSource) throws Exception {
