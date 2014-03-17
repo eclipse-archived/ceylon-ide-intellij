@@ -20,6 +20,9 @@ public class CeylonBlock implements Block {
     private final ASTNode node;
     private final Indent indent;
 
+    public static final ChildAttributes NORMAL_INDENT_CHILDATTR = new ChildAttributes(Indent.getNormalIndent(), null);
+    public static final ChildAttributes NO_INDENT_CHILDATTR = new ChildAttributes(Indent.getNoneIndent(), null);
+
     protected static final Spacing NO_SPACING = Spacing.createSpacing(0, 0, 0, false, 0);
     protected static final Spacing NO_SPACE_ALLOW_NEWLINE = Spacing.createSpacing(0, 0, 0, true, 0);
     protected static final Spacing EMPTY_LINE_SPACING = Spacing.createSpacing(0, 0, 2, true, 0);
@@ -213,7 +216,7 @@ public class CeylonBlock implements Block {
     @NotNull
     @Override
     public ChildAttributes getChildAttributes(int newChildIndex) {
-        return new ChildAttributes(Indent.getNoneIndent(), null);
+        return INDENT_CHILDREN_NONE.contains(node.getElementType()) ? NO_INDENT_CHILDATTR : NORMAL_INDENT_CHILDATTR;
     }
 
     @Override
