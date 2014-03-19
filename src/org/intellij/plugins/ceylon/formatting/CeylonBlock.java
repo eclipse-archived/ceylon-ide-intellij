@@ -6,6 +6,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.FormatterUtil;
 import com.intellij.psi.tree.IElementType;
+import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
@@ -196,7 +197,7 @@ public class CeylonBlock implements Block {
     }
 
     private static boolean isType(CeylonBlock block) {
-        return block.node.getElementType().toString().endsWith("TYPE");
+        return block.node.getPsi() instanceof CeylonPsi.TypePsi;
     }
 
     private Object getSpacingName(Spacing result) {
