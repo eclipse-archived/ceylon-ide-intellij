@@ -61,9 +61,9 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
     public void testTypeConstraints() throws Exception { testFormatting("typeConstraints"); }
     public void testAnnotationsNoArguments() throws Exception { testFormatting("annotationsNoArguments"); }
 
-    // bugs
-    public void testBug27() throws Exception { testFormatting("bugs/27"); }
-    public void testBug30() throws Exception { testFormatting("bugs/30"); }
+    // issues
+    public void testIssue27() throws Exception { testFormatting("issues/27"); }
+    public void testIssue30() throws Exception { testFormatting("issues/30"); }
 
     ///////////////////////////////////////////////////////////////
     // only end-of-file WS handling etc.:
@@ -111,6 +111,12 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
     public void testMemberOp() throws Exception { testFormatting("memberOp"); } // chop down long chained member selections
     public void testMultiLineParameterList() throws Exception { testFormatting("multiLineParameterList"); } // chop down long parameter lists, remove intra-param linebreaks
     public void testComments() throws Exception { testFormatting("comments"); } // format multi-line comments; don't add newlines after line comments
+    public void testComprehensionIndentation() throws Exception { testFormatting("comprehensionIndentation"); }
+    public void testIssue36() throws Exception { testFormatting("issues/36"); }
+    public void testIssue38() throws Exception { testFormatting("issues/38"); }
+    public void testRangeSpacing() throws Exception { testFormatting("rangeSpacing"); }
+    public void testi37_addIndentBefore() throws Exception { testFormatting("issues/37_addIndentBefore"); }
+    public void testi37_stack() throws Exception { testFormatting("issues/37_stack"); }
 
 
     private void testFormatting(String testSource) throws Exception {
