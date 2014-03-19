@@ -50,10 +50,10 @@ Magnitude = "k" | "M" | "G" | "T" | "P"
 FractionalMagnitude = "m" | "u" | "n" | "p" | "f"
 
 // Character literals
-CharacterLiteral = "`" {Character} "`"
-Character = {EscapeSequence} | [^`\\]*
+CharacterLiteral = "'" {Character} "'"
+Character = ({EscapeSequence} | [^'\\])*
 
-EscapeSequence = [\\] ("b" | "t" | "n" | "f" | "r" | "\" | """ | "'" | "`" | "{" {CharacterCode} "}")
+EscapeSequence = [\\] ([\\] | "b" | "t" | "n" | "f" | "r" | "\" | """ | "'" | "`" | "{" {CharacterCode} "}")
 CharacterCode = {HexDigit}{4} | {HexDigit}{8}
 HexDigit = [0-9A-Fa-f]
 
@@ -61,8 +61,8 @@ HexDigit = [0-9A-Fa-f]
 StringLiteral = "\"" {StringCharacter}* "\""?
 StringCharacter = [^\\\"]* | {EscapeSequence}
 
-QuotedLiteral = "'" {QuotedLiteralCharacter}* "'"?
-QuotedLiteralCharacter = [^']*
+//QuotedLiteral = "'" {QuotedLiteralCharacter}* "'"?
+//QuotedLiteralCharacter = [^']*
 
 //%debug
 
