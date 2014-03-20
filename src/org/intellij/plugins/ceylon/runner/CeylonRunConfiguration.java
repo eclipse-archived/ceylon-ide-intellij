@@ -75,6 +75,7 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
                 }
                 params.getProgramParametersList().add(getCeylonModuleOrDft());
 
+                params.setWorkingDirectory(getProject().getBasePath()); // todo: make settable
                 return params;
             }
         };
