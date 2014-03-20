@@ -12,7 +12,7 @@ import org.intellij.plugins.ceylon.psi.CeylonTokens;
 %unicode
 %function advance
 %type IElementType
-%eof{  return;
+%eof{
 %eof}
 //%debug
 
@@ -53,13 +53,16 @@ FractionalMagnitude = "m" | "u" | "n" | "p" | "f"
 CharacterLiteral = "'" {Character} "'"
 Character = ({EscapeSequence} | [^'\\])*
 
-EscapeSequence = [\\] ([\\] | "b" | "t" | "n" | "f" | "r" | "\" | """ | "'" | "`" | "{" {CharacterCode} "}")
+EscapeSequence = [\\] ( [^{] | "{" [^}]* "}"? )?
 CharacterCode = {HexDigit}{4} | {HexDigit}{8}
 HexDigit = [0-9A-Fa-f]
 
 // String literals
 StringLiteral = "\"" {StringCharacter}* "\""?
 StringCharacter = [^\\\"]* | {EscapeSequence}
+
+VerbatimString = "\"\"\"" ([^\"] | "\"" [^\"] | "\"\"" [^\"])* ("\"" ("\"" ("\"" ("\"" "\""?)?)?)?)?
+//VerbatimString = "\"\"\"" ([^\"] | "\"" [^\"] | "\"\"" [^\"])* "\"\"\""
 
 //QuotedLiteral = "'" {QuotedLiteralCharacter}* "'"?
 //QuotedLiteralCharacter = [^']*
@@ -172,6 +175,7 @@ StringCharacter = [^\\\"]* | {EscapeSequence}
 {FloatLiteral}                  { return CeylonTokens.FLOAT_LITERAL; }
 {CharacterLiteral}              { return CeylonTokens.CHAR_LITERAL; }
 {StringLiteral}                 { return CeylonTokens.STRING_LITERAL; }
+{VerbatimString}                { return CeylonTokens.VERBATIM_STRING; }
 //{QuotedLiteral}                 { return CeylonTokens.QUOTED_LITERAL; }
 {Whitespace}                    { return TokenType.WHITE_SPACE; }
 .                               { return TokenType.BAD_CHARACTER; }
