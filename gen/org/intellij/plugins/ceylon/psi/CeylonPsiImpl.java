@@ -437,7 +437,7 @@ public class CeylonPsiImpl {
         @Override public Tree.SuperType getCeylonNode() { return (Tree.SuperType) super.getCeylonNode(); }
     }
 
-    public static abstract class MetaLiteralPsiImpl extends InjectableLiteral
+    public static abstract class MetaLiteralPsiImpl extends PrimaryPsiImpl
             implements CeylonPsi.MetaLiteralPsi {
         public MetaLiteralPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.MetaLiteral getCeylonNode() { return (Tree.MetaLiteral) super.getCeylonNode(); }
