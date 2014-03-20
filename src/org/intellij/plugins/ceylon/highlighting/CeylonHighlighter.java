@@ -74,6 +74,9 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
         keys.put(TokenTypes.FLOAT_LITERAL.getTokenType(), DefaultLanguageHighlighterColors.NUMBER);
         keys.put(TokenTypes.CHAR_LITERAL.getTokenType(), DefaultLanguageHighlighterColors.STRING);
         keys.put(TokenTypes.STRING_LITERAL.getTokenType(), DefaultLanguageHighlighterColors.STRING);
+        keys.put(TokenTypes.STRING_START.getTokenType(), DefaultLanguageHighlighterColors.STRING);
+        keys.put(TokenTypes.STRING_MID.getTokenType(), DefaultLanguageHighlighterColors.STRING);
+        keys.put(TokenTypes.STRING_END.getTokenType(), DefaultLanguageHighlighterColors.STRING);
         keys.put(TokenTypes.VERBATIM_STRING.getTokenType(), DefaultLanguageHighlighterColors.STRING);
 
         keys.put(TokenTypes.LPAREN.getTokenType(), DefaultLanguageHighlighterColors.PARENTHESES);

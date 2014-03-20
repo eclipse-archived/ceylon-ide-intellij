@@ -33,14 +33,15 @@ NATURAL_LITERAL = {Digits} ( /* ("." ("0".."9")) => */ "." {Digits} ({Exponent}|
 //EMPTY// ASTRING_LITERAL =
 //EMPTY// AVERBATIM_STRING =
 CHAR_LITERAL = "'" {CharPart} "'"
-// todo: handle string templates properly
-//EMPTY// STRING_START =
-STRING_LITERAL = "\"" {StringPart} ( "\"" | "``" ("`")? )?
-//EMPTY// STRING_MID =
-STRING_END = "``" {StringPart} ( "\"" | "``" ("`")? )?
+/////// The STRING_* macros are taken from the spec, not from Ceylon.g as the others.
+STRING_LITERAL = "\"" {STRING_CHARACTER}* "\""
+STRING_CHARACTER = [^\\\"`] | "`" [^`] | {EscapeSequence}
+STRING_START = "\"" {STRING_CHARACTER}* "``"
+STRING_MID = "``" {STRING_CHARACTER}* "``"
+STRING_END = "``" {STRING_CHARACTER}* "\""
+//StringTemplate = {StringStart} ({ValueExpression} {StringMid})* {} {StringEnd}
 VERBATIM_STRING =	"\"\"\"" ([^\"] | "\"" [^\"] | """" [^\"])* ("\"" ("\"" ("\"" ("\"" "\""?)?)?)?)?
 CharPart = ( [^\\'] | {EscapeSequence} )*
-StringPart = ( [^\\\"`] | "`" | {EscapeSequence} )*
 EscapeSequence = "\\" ( [^{] | "{" ([^}])* "}"? )?
 WS = ( " " | "\r" | "\t" | "\f" | "\n" )+
 LINE_COMMENT = ("//"|"#!") [^\n\r]* ("\r\n" | "\r" | "\n")?
@@ -268,8 +269,8 @@ BinaryDigit = [01]
 {SPREAD_OP} { return CeylonTokens.SPREAD_OP; }
 {STRING_END} { return CeylonTokens.STRING_END; }
 {STRING_LITERAL} { return CeylonTokens.STRING_LITERAL; }
-//{STRING_MID} { return CeylonTokens.STRING_MID; }
-//{STRING_START} { return CeylonTokens.STRING_START; }
+{STRING_MID} { return CeylonTokens.STRING_MID; }
+{STRING_START} { return CeylonTokens.STRING_START; }
 {SUBTRACT_SPECIFY} { return CeylonTokens.SUBTRACT_SPECIFY; }
 {SUM_OP} { return CeylonTokens.SUM_OP; }
 {SUPER} { return CeylonTokens.SUPER; }

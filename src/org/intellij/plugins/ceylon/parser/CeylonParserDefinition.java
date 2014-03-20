@@ -53,7 +53,12 @@ public class CeylonParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public TokenSet getStringLiteralElements() {
-        return TokenSet.create(TokenTypes.STRING_LITERAL.getTokenType(), TokenTypes.CHAR_LITERAL.getTokenType());
+        return TokenSet.create(
+                TokenTypes.STRING_LITERAL.getTokenType(),
+                TokenTypes.STRING_START.getTokenType(),
+                TokenTypes.STRING_MID.getTokenType(),
+                TokenTypes.STRING_END.getTokenType(),
+                TokenTypes.CHAR_LITERAL.getTokenType());
     }
 
     @NotNull
