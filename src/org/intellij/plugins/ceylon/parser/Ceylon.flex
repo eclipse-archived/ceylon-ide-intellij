@@ -46,8 +46,12 @@ EscapeSequence = "\\" ( [^{] | "{" ([^}])* "}"? )?
 WS = ( " " | "\r" | "\t" | "\f" | "\n" )+
 LINE_COMMENT = ("//"|"#!") [^\n\r]* ("\r\n" | "\r" | "\n")?
 //MULTI_COMMENT = "/*" ( [^*/] | "/" | "*" )* "*/"?
-// todo: handle nested multi-line comments
-MULTI_COMMENT = "/*" ( [^*/] | "/" | "*" )* "*/"?
+// todo: handle nested multi-line comments properly
+MultiCommentContent = ( [^*] | ("*"+ [^*/]) )*
+MULTI_COMMENT_0 = "/*" {MultiCommentContent} "*"+ "/"
+MULTI_COMMENT_1 = "/*" ( {MULTI_COMMENT_0} | {MultiCommentContent} )* "*"+ "/"
+MULTI_COMMENT_2 = "/*" ( {MULTI_COMMENT_1} | {MultiCommentContent} )* "*"+ "/"
+MULTI_COMMENT = {MULTI_COMMENT_0} | {MULTI_COMMENT_1} | {MULTI_COMMENT_2}
  //("*/"/|{displayRecognitionError(getTokenNames(), new MismatchedSetException(null,input));})
 BACKTICK = "`"
 ASSEMBLY = "assembly"
