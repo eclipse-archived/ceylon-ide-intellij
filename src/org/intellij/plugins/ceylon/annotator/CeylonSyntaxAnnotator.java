@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.annotator;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
@@ -8,6 +9,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.psi.CeylonPsiVisitor;
+import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator {
@@ -24,9 +26,8 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
     public void visitAnnotationPsi(@NotNull CeylonPsi.AnnotationPsi element) {
         super.visitAnnotationPsi(element);
 
-        // Only highlight the part before the opening parenthesis
-        TextRange range = new TextRange(element.getCeylonNode().getPrimary().getStartIndex(), element.getCeylonNode().getPrimary().getStopIndex() + 1);
-
+        final ASTNode ident = element.getNode().findChildByType(CeylonTypes.IDENTIFIER);
+        final TextRange range = ident == null ? element.getTextRange() : ident.getTextRange();
         Annotation anno = annotationHolder.createInfoAnnotation(range, null);
         anno.setTextAttributes(CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES);
     }
