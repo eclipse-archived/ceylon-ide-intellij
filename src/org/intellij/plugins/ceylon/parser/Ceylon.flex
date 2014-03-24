@@ -16,7 +16,11 @@ import org.intellij.plugins.ceylon.psi.CeylonTokens;
 %eof}
 //%debug
 
-%state IN_IMPORT
+%xstate MCOMMENT
+
+%{
+    int multiCommentLevel = 0;
+%}
 
 Digits = {Digit} ("_" | {Digit})*
 HexDigits = {HexDigit} ("_" | {HexDigit})*
@@ -45,14 +49,6 @@ CharPart = ( [^\\'] | {EscapeSequence} )*
 EscapeSequence = "\\" ( [^{] | "{" ([^}])* "}"? )?
 WS = ( " " | "\r" | "\t" | "\f" | "\n" )+
 LINE_COMMENT = ("//"|"#!") [^\n\r]* ("\r\n" | "\r" | "\n")?
-//MULTI_COMMENT = "/*" ( [^*/] | "/" | "*" )* "*/"?
-// todo: handle nested multi-line comments properly
-MultiCommentContent = ( [^*] | ("*"+ [^*/]) )*
-MULTI_COMMENT_0 = "/*" {MultiCommentContent} "*"+ "/"
-MULTI_COMMENT_1 = "/*" ( {MULTI_COMMENT_0} | {MultiCommentContent} )* "*"+ "/"
-MULTI_COMMENT_2 = "/*" ( {MULTI_COMMENT_1} | {MultiCommentContent} )* "*"+ "/"
-MULTI_COMMENT = {MULTI_COMMENT_0} | {MULTI_COMMENT_1} | {MULTI_COMMENT_2}
- //("*/"/|{displayRecognitionError(getTokenNames(), new MismatchedSetException(null,input));})
 BACKTICK = "`"
 ASSEMBLY = "assembly"
 ASSERT = "assert"
@@ -237,7 +233,6 @@ BinaryDigit = [01]
 {MEMBER_OP} { return CeylonTokens.MEMBER_OP; }
 {MODULE} { return CeylonTokens.MODULE; }
 {MULTIPLY_SPECIFY} { return CeylonTokens.MULTIPLY_SPECIFY; }
-{MULTI_COMMENT} { return CeylonTokens.MULTI_COMMENT; }
 //{Magnitude} { return CeylonTokens.Magnitude; }
 {NATURAL_LITERAL} { return CeylonTokens.NATURAL_LITERAL; }
 //{NEW} { return CeylonTokens.NEW; }
@@ -295,5 +290,28 @@ BinaryDigit = [01]
 {WS} { return CeylonTokens.WS; }
 
 {UIDENTIFIER} { return CeylonTokens.UIDENTIFIER; }
-. { return TokenType.BAD_CHARACTER; }
 
+// Nested multiline comments.
+// This creates multiple tokens per comment, which shouldn't be a problem
+// since this lexer is not used for parsing.
+<MCOMMENT> {
+    "/"+ "*"    { ++multiCommentLevel; return CeylonTokens.MULTI_COMMENT; }
+
+    [^*/]+      { return CeylonTokens.MULTI_COMMENT; }
+
+    "*"+ [^*/]* { return CeylonTokens.MULTI_COMMENT; }
+
+    "/"+ [^*/]* { return CeylonTokens.MULTI_COMMENT; }
+
+    "*"+ "/"    {
+                    --multiCommentLevel;
+                    if (multiCommentLevel <= 0) {
+                        yybegin(YYINITIAL);
+                    }
+                    return CeylonTokens.MULTI_COMMENT;
+                }
+}
+
+"/*"        { yybegin(MCOMMENT); multiCommentLevel = 1; return CeylonTokens.MULTI_COMMENT; }
+
+. { return TokenType.BAD_CHARACTER; }
