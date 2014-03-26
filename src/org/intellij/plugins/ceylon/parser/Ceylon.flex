@@ -38,11 +38,11 @@ NATURAL_LITERAL = {Digits} ( /* ("." ("0".."9")) => */ "." {Digits} ({Exponent}|
 //EMPTY// AVERBATIM_STRING =
 CHAR_LITERAL = "'" {CharPart} "'"
 /////// The STRING_* macros are taken from the spec, not from Ceylon.g as the others.
-STRING_LITERAL = "\"" {STRING_CHARACTER}* "\""
-STRING_CHARACTER = [^\\\"`] | "`" [^`] | {EscapeSequence}
-STRING_START = "\"" {STRING_CHARACTER}* "``"
-STRING_MID = "``" {STRING_CHARACTER}* "``"
-STRING_END = "``" {STRING_CHARACTER}* "\""
+STRING_LITERAL = "\"" {StringCharacter}* "`"? "\""
+StringCharacter = [^\\\"`] | "`" [^`\"] | {EscapeSequence}
+STRING_START = "\"" {StringCharacter}* "``"
+STRING_MID = "``" {StringCharacter}* "``"
+STRING_END = "``" {StringCharacter}* "\""
 //StringTemplate = {StringStart} ({ValueExpression} {StringMid})* {} {StringEnd}
 VERBATIM_STRING =	"\"\"\"" ([^\"] | "\"" [^\"] | """" [^\"])* ("\"" ("\"" ("\"" ("\"" "\""?)?)?)?)?
 CharPart = ( [^\\'] | {EscapeSequence} )*
