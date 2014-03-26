@@ -61,6 +61,7 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
     public void testQualifiedMemberOrTypeExpression() throws Exception { testFormatting("qualifiedMemberOrTypeExpressions"); }
     public void testTypeConstraints() throws Exception { testFormatting("typeConstraints"); }
     public void testAnnotationsNoArguments() throws Exception { testFormatting("annotationsNoArguments"); }
+    public void testDoc() throws Exception { testFormatting("doc"); }
 
     // issues
     public void testIssue27() throws Exception { testFormatting("issues/27"); }
@@ -78,6 +79,7 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
     public void testThrow() throws Exception { testFormatting("throw"); }
     public void testCommentsAfterStatements() throws Exception { testFormatting("commentsAfterStatements"); }
     public void testSimpleClass() throws Exception { testFormatting("simpleClass"); }
+    public void testAnnotationsPositionalArguments() throws Exception { testFormatting("annotationsPositionalArguments"); }
 
 
     // ignoring options:
@@ -101,13 +103,11 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
 
 
     // other fail (todo in comments)
-    public void testFunctionArguments() throws Exception { testFormatting("functionArguments"); } // no newline between functions; larger indent for anonymous function bodies
+    public void testFunctionArguments() throws Exception { testFormatting("functionArguments"); } // no newline between functions (is this correct?); larger indent for anonymous function bodies
     public void testMultiLineStringIndented() throws Exception { testFormatting("multiLineStringIndented"); }  // indent multiline strings correctly when indenting the first line
     public void testMultiLineString() throws Exception { testFormatting("multiLineString"); } // indent multiline strings correctly when indenting the first line
-    public void testAnnotationsPositionalArguments() throws Exception { testFormatting("annotationsPositionalArguments"); }  // fix IDE error
     public void testNamedArguments() throws Exception { testFormatting("namedArguments"); }  // fix indent for seq.args in named arg list; line comment newlines; single-line short block
     public void testImportMultiLine() throws Exception { testFormatting("importMultiLine"); } // single-line short block; = without spaces
-    public void testDoc() throws Exception { testFormatting("doc"); } // doc annotation on separate line
     public void testLongInvocation() throws Exception { testFormatting("longInvocation"); }  // chop down long chained member invocations; line comment newlines
     public void testMemberOp() throws Exception { testFormatting("memberOp"); } // chop down long chained member selections
     public void testMultiLineParameterList() throws Exception { testFormatting("multiLineParameterList"); } // chop down long parameter lists, remove intra-param linebreaks

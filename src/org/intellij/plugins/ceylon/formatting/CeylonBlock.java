@@ -31,6 +31,7 @@ public class CeylonBlock implements Block {
     private static final Spacing NEW_LINE_SPACING_STRICT = Spacing.createSpacing(0, 0, 1, false, 0);
     private static final Spacing SINGLE_SPACE_SPACING = Spacing.createSpacing(1, 1, 0, true, 0);
     private static final Spacing SINGLE_SPACE_SPACING_INLINE = Spacing.createSpacing(1, 1, 0, false, 0);
+    private static final Spacing KEEP_SOME_SPACE = Spacing.createSpacing(1, 1, 0, true, 1);
 
     private static final List<IElementType> SMALLER_OP = Arrays.asList(CeylonTypes.SMALLER_OP, CeylonTokens.SMALLER_OP);
     private static final List<IElementType> LARGER_OP = Arrays.asList(CeylonTypes.LARGER_OP, CeylonTokens.LARGER_OP);
@@ -49,7 +50,7 @@ public class CeylonBlock implements Block {
             CeylonTypes.TYPE_PARAMETER_LIST,
             CeylonTokens.UNION_OP, CeylonTypes.UNION_OP, CeylonTokens.INTERSECTION_OP, CeylonTypes.INTERSECTION_OP,
             CeylonTypes.TYPE_ARGUMENT_LIST,
-            CeylonTypes.SEQUENCED_TYPE, CeylonTokens.OPTIONAL, CeylonTypes.POSITIONAL_ARGUMENT_LIST, CeylonTokens.RBRACKET,
+            CeylonTypes.SEQUENCED_TYPE, CeylonTokens.OPTIONAL, CeylonTokens.RBRACKET,
             CeylonTypes.INCREMENT_OP, CeylonTypes.DECREMENT_OP, CeylonTypes.POSTFIX_INCREMENT_OP, CeylonTypes.POSTFIX_DECREMENT_OP,
             CeylonTypes.RANGE_OP, CeylonTokens.RANGE_OP,
             CeylonTokens.LBRACKET,
@@ -157,7 +158,9 @@ public class CeylonBlock implements Block {
             result = NEW_LINE_SPACING;
         } else if (TYPES_REQUIRING_NO_RIGHT_SPACING.contains(type1) || TYPES_REQUIRING_NO_LEFT_SPACING.contains(type2)
                 || (type1 == CeylonTypes.SMALLER_OP && type2 == CeylonTypes.TYPE_PARAMETER_DECLARATION)
-                || (type1 == CeylonTypes.TYPE_PARAMETER_LITERAL && type2 == CeylonTypes.LARGER_OP)) {
+                || (type1 == CeylonTypes.TYPE_PARAMETER_LITERAL && type2 == CeylonTypes.LARGER_OP)
+                || (type2 == CeylonTypes.POSITIONAL_ARGUMENT_LIST && nodeType != CeylonTypes.ANNOTATION)
+                ) {
             result = NO_SPACING;
         } else if (CeylonTokens.LINE_COMMENT.equals(type1)) {
             // This is wrong because it inserts a linebreak after line comments, but better than not doing anything.
@@ -177,6 +180,8 @@ public class CeylonBlock implements Block {
             result = NO_SPACING;
         } else if (CeylonTypes.FUNCTION_TYPE.equals(nodeType)) {
             result = CeylonTokens.COMMA.equals(type1) ? SINGLE_SPACE_SPACING : NO_SPACING;
+        } else if (type1 == CeylonTypes.ANNOTATION_LIST) {
+            result = KEEP_SOME_SPACE;
         } else if (Arrays.asList(CeylonTypes.IMPORT_MEMBER, CeylonTypes.THROW, CeylonTypes.IMPORT, CeylonTypes.ASSERTION, CeylonTypes.SATISFIED_TYPES, CeylonTypes.EXTENDED_TYPE).contains(nodeType)) {
             result = SINGLE_SPACE_SPACING_INLINE;
         } else if (nodeType == CeylonTypes.ANNOTATION_LIST && type1 == CeylonTypes.STRING_LITERAL) {
@@ -188,6 +193,12 @@ public class CeylonBlock implements Block {
         } else if (INDENT_CHILDREN_NORMAL.contains(nodeType)
                 && (type2 == CeylonTokens.RBRACE && type1 != CeylonTokens.LBRACE || type2 != CeylonTokens.RBRACE && type1 == CeylonTokens.LBRACE)) {
             result = NEW_LINE_SPACING_STRICT;
+        } else if (isStatement(block1) && isStatement(block2)) {
+            result = NEW_LINE_SPACING;
+        } else if (isMetaLiteral(this) && bothTypes.contains(CeylonTokens.BACKTICK)) {
+            result = NO_SPACING;
+        } else if (nodeType == CeylonTypes.ANNOTATION && type1 == CeylonTypes.IDENTIFIER) {
+            result = SINGLE_SPACE_SPACING;
         } else {
             result = SINGLE_SPACE_SPACING;
         }
@@ -196,8 +207,16 @@ public class CeylonBlock implements Block {
         return result;
     }
 
+    private boolean isStatement(CeylonBlock block) {
+        return block.node.getPsi() instanceof CeylonPsi.StatementPsi;
+    }
+
     private static boolean isType(CeylonBlock block) {
         return block.node.getPsi() instanceof CeylonPsi.TypePsi;
+    }
+
+    private static boolean isMetaLiteral(CeylonBlock block) {
+        return block.node.getPsi() instanceof CeylonPsi.MetaLiteralPsi;
     }
 
     private Object getSpacingName(Spacing result) {
@@ -205,6 +224,10 @@ public class CeylonBlock implements Block {
                 : result == NEW_LINE_SPACING ? "NEW_LINE_SPACING"
                 : result == NO_SPACING ? "NO_SPACING"
                 : result == SINGLE_SPACE_SPACING ? "SINGLE_SPACE_SPACING"
+                : result == KEEP_SOME_SPACE ? "KEEP_SOME_SPACE"
+                : result == SINGLE_SPACE_SPACING_INLINE ? "SINGLE_SPACE_SPACING_INLINE"
+                : result == NEW_LINE_SPACING_STRICT ? "NEW_LINE_SPACING_STRICT"
+                : result == NO_SPACE_ALLOW_NEWLINE ? "NO_SPACE_ALLOW_NEWLINE"
                 : result;
     }
 
