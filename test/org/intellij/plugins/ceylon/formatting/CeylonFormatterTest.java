@@ -115,8 +115,11 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
     public void testIssue36() throws Exception { testFormatting("issues/36"); }
     public void testIssue38() throws Exception { testFormatting("issues/38"); }
     public void testRangeSpacing() throws Exception { testFormatting("rangeSpacing"); }
-    public void testi37_addIndentBefore() throws Exception { testFormatting("issues/37_addIndentBefore"); }
-    public void testi37_stack() throws Exception { testFormatting("issues/37_stack"); }
+    public void testIssue37_addIndentBefore() throws Exception { testFormatting("issues/37_addIndentBefore"); }
+    public void testIssue37_stack() throws Exception { testFormatting("issues/37_stack"); }
+    public void testIssue39() throws Exception { testFormatting("issues/39"); }
+    public void testIssue40() throws Exception { testFormatting("issues/40"); }
+    public void testIssue41() throws Exception { testFormatting("issues/41"); }
 
 
     private void testFormatting(String testSource) throws Exception {
