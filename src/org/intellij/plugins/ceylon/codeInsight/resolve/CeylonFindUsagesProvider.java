@@ -10,6 +10,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.psi.CeylonClass;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,8 +47,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getType(@NotNull PsiElement element) {
-        if (element.getParent() instanceof CeylonClass) {
-            return ((CeylonClass) element.getParent()).isInterface() ? "Interface" : "Class";
+        if (element.getParent() instanceof CeylonPsi.ClassOrInterfacePsi) {
+            return element.getNode().getElementType() == CeylonTypes.INTERFACE_DEFINITION ? "Interface" : "Class";
         } else if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
             return "Attribute";
         } else if (element instanceof CeylonPsi.MethodDefinitionPsi) {
