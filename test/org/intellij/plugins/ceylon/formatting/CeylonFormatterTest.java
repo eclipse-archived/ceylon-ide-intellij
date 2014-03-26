@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.formatting;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
@@ -139,7 +140,13 @@ public class CeylonFormatterTest extends LightCodeInsightFixtureTestCase {
 
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             @Override public void run() {
-                CodeStyleManager.getInstance(getProject()).reformat(file);
+                CommandProcessor.getInstance().runUndoTransparentAction(
+                        new Runnable() {
+                            @Override public void run() {
+                                CodeStyleManager.getInstance(getProject()).reformat(file);
+                            }
+                        }
+                );
             }
         });
         myFixture.checkResultByFile(testSource + ".formatted");
