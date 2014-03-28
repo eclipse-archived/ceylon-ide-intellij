@@ -96,7 +96,7 @@ public class TypeCheckerInvoker {
     }
 
     private static com.redhat.ceylon.compiler.typechecker.io.VirtualFile getSourceFolder(CeylonFile sourceFile) {
-        return new VFileAdapter(ProjectRootManager.getInstance(sourceFile.getProject()).getFileIndex().getSourceRootForFile(sourceFile.getVirtualFile()));
+        return VFileAdapter.createInstance(ProjectRootManager.getInstance(sourceFile.getProject()).getFileIndex().getSourceRootForFile(sourceFile.getVirtualFile()));
     }
 
     private static Package getPackage(VirtualFile file, VirtualFile srcDir,

@@ -65,7 +65,7 @@ public class TypeCheckerManager {
         builder.setRepositoryManager(manager);
 
         for (VirtualFile sourceRoot : ProjectRootManager.getInstance(project).getContentSourceRoots()) {
-            builder.addSrcDirectory(new VFileAdapter(sourceRoot));
+            builder.addSrcDirectory(VFileAdapter.createInstance(sourceRoot));
         }
 
         long startTime = System.currentTimeMillis();
