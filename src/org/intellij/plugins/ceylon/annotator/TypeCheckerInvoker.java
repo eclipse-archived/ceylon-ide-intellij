@@ -66,6 +66,9 @@ public class TypeCheckerInvoker {
         }
         if (phasedUnit == null) {
             srcDir = getSourceFolder(ceylonFile);
+            if (srcDir == null) { // happens eg. for *.ceylon files that are not within a source root. Don't do typechecking for these.
+                return null;
+            }
             pkg = getPackage(sourceCodeVirtualFile, srcDir, typeChecker);
         } else {
             srcDir = phasedUnit.getSrcDir();
