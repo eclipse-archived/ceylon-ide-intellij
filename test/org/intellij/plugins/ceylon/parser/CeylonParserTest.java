@@ -27,5 +27,5 @@ public class CeylonParserTest extends ParsingTestCase {
     public void testSimpleTest() { doTest(true); }
     public void testExpressions() { doTest(true); }
     public void testTopLevelMethod() { doTest(true); }
-    public void testTrailingTokens() { doTest(true); } // todo! adapt to ceylon 1.1.0
+    public void testTrailingTokens() { doTest(true); }
 }

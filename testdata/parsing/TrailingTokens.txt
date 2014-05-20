@@ -17,10 +17,10 @@ FILE
     PsiElement(RBRACE)('}')
     PsiErrorElement:incorrect syntax: mismatched token 'void' expecting EOF
       <empty list>
-    METHOD_DECLARATION
+    MISSING_DECLARATION
       ANNOTATION_LIST
-        <empty list>
-      METHOD_DECLARATION
-        PsiElement(VOID_MODIFIER)('void')
-        PsiErrorElement:incorrect syntax: no viable alternative at token end of file
-          <empty list>
+        ANNOTATION
+          IDENTIFIER
+            PsiElement(LIDENTIFIER)('void')
+          PsiErrorElement:incorrect syntax: no viable alternative at token end of file
+            <empty list>
