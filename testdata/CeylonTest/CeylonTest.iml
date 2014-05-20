@@ -11,7 +11,7 @@
       <library name="Ceylon libs">
         <CLASSES>
           <root url="jar://$USER_HOME$/.ceylon/cache/ceylon/math/0.4/ceylon.math-0.4.car!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/ceylon.language-1.0.0.car!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ceylon.language-1.1.0.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>

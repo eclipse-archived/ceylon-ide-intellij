@@ -73,9 +73,9 @@ public class CeylonBuilder extends ModuleLevelBuilder {
         URL[] classpath = new URL[]{
                 new File(PathUtil.getJarPathForClass(CeylonCompiler.class)).toURI().toURL(),
                 new File(pathToLibs, "org.antlr.runtime-3.4.jar").toURI().toURL(),
-                new File(pathToLibs, "com.redhat.ceylon.compiler.java-1.0.0.jar").toURI().toURL(),
-                new File(pathToLibs, "com.redhat.ceylon.module-resolver-1.0.0.jar").toURI().toURL(),
-                new File(pathToLibs, "com.redhat.ceylon.typechecker-1.0.0.jar").toURI().toURL(),
+                new File(pathToLibs, "com.redhat.ceylon.compiler.java-1.1.0.jar").toURI().toURL(),
+                new File(pathToLibs, "com.redhat.ceylon.module-resolver-1.1.0.jar").toURI().toURL(),
+                new File(pathToLibs, "com.redhat.ceylon.typechecker-1.1.0.jar").toURI().toURL(),
                 new File(pathToLibs, "txtmark-0.8-c0dcd373ce.jar").toURI().toURL(),
                 new File(pathToLibs, "org.jboss.jandex-1.0.3.Final.jar").toURI().toURL()
         };

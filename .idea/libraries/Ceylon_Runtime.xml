@@ -1,15 +1,15 @@
 <component name="libraryTable">
   <library name="Ceylon Runtime">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/ceylon.runtime-1.0.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.common-1.0.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.java-1.0.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.js-1.0.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.module-resolver-1.0.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.typechecker-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ceylon.runtime-1.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.common-1.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.java-1.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.compiler.js-1.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.module-resolver-1.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/com.redhat.ceylon.typechecker-1.1.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/org.antlr.runtime-3.4.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/org.jboss.jandex-1.0.3.Final.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/ceylon.language-1.0.0.car!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ceylon.language-1.1.0.car!/" />
       <root url="jar://$PROJECT_DIR$/lib/txtmark-0.8-c0dcd373ce.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/ceylon-bootstrap.jar!/" />
     </CLASSES>
@@ -28,6 +28,11 @@
       <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/webdav/src/main/java" />
       <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/testsuite/src/test/java" />
       <root url="file://$PROJECT_DIR$/../ceylon-runtime/bootstrap/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-runtime/api/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-runtime/spi/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-runtime/impl/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-runtime/bootstrap/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon-runtime/testsuite/src/test/java" />
     </SOURCES>
   </library>
 </component>
