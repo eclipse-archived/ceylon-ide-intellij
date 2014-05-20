@@ -214,7 +214,7 @@ public class CeylonBlock implements Block {
             result = SINGLE_SPACE_SPACING;
         }
 
-        System.out.printf("Spacing between %s and %s in %s: %s%n", type1, type2, nodeType, getSpacingName(result));
+//        System.out.printf("Spacing between %s and %s in %s: %s%n", type1, type2, nodeType, getSpacingName(result));
         return result;
     }
 
