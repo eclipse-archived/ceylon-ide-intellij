@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.compiler;
 
 import com.intellij.openapi.application.PathManager;
 import com.redhat.ceylon.common.Versions;
+import com.redhat.ceylon.compiler.java.launcher.Main;
 import com.redhat.ceylon.compiler.java.tools.CeylonLog;
 import com.redhat.ceylon.compiler.java.tools.CeyloncTaskImpl;
 import com.redhat.ceylon.compiler.java.tools.CeyloncTool;
@@ -10,9 +11,11 @@ import com.sun.source.util.TaskListener;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.messages.ProgressMessage;
+import org.jetbrains.jps.javac.PlainMessageDiagnostic;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
 
+import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
 import java.io.File;
@@ -78,6 +81,8 @@ public class CeylonCompiler {
             e.printStackTrace(printWriter);
         }
         if (!success) {
+            final Main.ExitState exitState = task.getExitState();
+            errorReporter.report(new PlainMessageDiagnostic(Diagnostic.Kind.ERROR, exitState.abortingException == null ? "Unknown error" : exitState.abortingException.toString()));
             errorReporter.failed();
         }
     }
