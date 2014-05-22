@@ -7,6 +7,7 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.CompilerProjectExtension;
@@ -63,13 +64,16 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
                 Sdk projectJdk = getProjectSdk();
                 JavaParameters params = new JavaParameters();
                 params.setJdk(projectJdk);
+//                final String repoDir = getPluginDir() + "/classes/repo/";
+                final String repoDir = CeylonRunConfiguration.class.getClassLoader().getResource("/repo/").getFile();
+                params.getVMParametersList().add("-Dceylon.system.repo=" + repoDir);
 
                 params.setMainClass("com.redhat.ceylon.launcher.Launcher");
                 String pathToPlugin = new File(PathUtil.getJarPathForClass(CeylonRunConfiguration.class)).getParent();
                 params.getClassPath().add(pathToPlugin + "/lib/ceylon-bootstrap.jar");
                 params.getProgramParametersList().add("run");
                 params.getProgramParametersList().add("--run", topLevelNameFull);
-                final Iterable<String> outputPaths = getOutputPaths();
+                final Iterable<String> outputPaths = getOutputPaths(CeylonRunConfiguration.this.getProject());
                 for (String outputPath : outputPaths) {
                     params.getProgramParametersList().add("--rep", outputPath);
                 }
@@ -80,6 +84,12 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
             }
         };
     }
+
+/*
+    public static File getPluginDir() {
+        return PluginManager.getPlugin(PluginId.getId("org.intellij.plugins.ceylon")).getPath();
+    }
+*/
 
     @Override
     public void readExternal(Element element) throws InvalidDataException {
@@ -97,13 +107,13 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         element.setAttribute("top-level", (String) ObjectUtils.defaultIfNull(getTopLevelNameFull(), ""));
     }
 
-    private Iterable<String> getOutputPaths() {
+    private static Iterable<String> getOutputPaths(Project project) {
         final Collection<String> paths = new LinkedHashSet<>();
-        final CompilerProjectExtension cpe = CompilerProjectExtension.getInstance(getProject());
+        final CompilerProjectExtension cpe = CompilerProjectExtension.getInstance(project);
         if (cpe != null && cpe.getCompilerOutput() != null) {
             paths.add(cpe.getCompilerOutput().getCanonicalPath());
         }
-        final Module[] modules = ModuleManager.getInstance(getProject()).getModules();
+        final Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             final CompilerModuleExtension cme = CompilerModuleExtension.getInstance(module);
             if (cme != null&& cme.getCompilerOutputPath() != null) {
