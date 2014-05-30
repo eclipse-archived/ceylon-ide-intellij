@@ -1,5 +1,8 @@
 package org.intellij.plugins.ceylon.annotator;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.common.util.concurrent.SettableFuture;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -16,37 +19,44 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class TypeCheckerManager {
 
     private final Project project;
-    private TypeChecker typeChecker;
-    private boolean isBuildingTypeChecker = false;
+
+    private final Supplier<TypeChecker> typeCheckerSupplier = Suppliers.memoize(
+            new Supplier<TypeChecker>() {
+                @Override
+                public TypeChecker get() {
+                    final SettableFuture<TypeChecker> resultSetter = SettableFuture.create();
+                    ApplicationManager.getApplication().invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            ProgressManager.getInstance().run(new Task.Modal(project, "Preparing Ceylon project...", false) {
+                                @Override
+                                public void run(@NotNull ProgressIndicator indicator) {
+                                    resultSetter.set(createTypeChecker());
+                                    DaemonCodeAnalyzer.getInstance(project).restart();
+                                }
+                            });
+                        }
+                    });
+                    try {
+                        return resultSetter.get(15, SECONDS);
+                    } catch (Exception e) {
+                        System.out.println("Unable to get a Ceylon TypeChecker! " + e);
+                        return null;
+                    }
+                }
+            });
 
     public TypeCheckerManager(Project project) {
         this.project = project;
     }
 
     public TypeChecker getTypeChecker() {
-        if (typeChecker == null && !isBuildingTypeChecker) {
-            isBuildingTypeChecker = true; // TODO really thread-safe?
-
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    ProgressManager.getInstance().run(new Task.Backgroundable(project, "Preparing Ceylon project...") {
-                        @Override
-                        public void run(@NotNull ProgressIndicator indicator) {
-                            typeChecker = createTypeChecker();
-                            isBuildingTypeChecker = false;
-                            DaemonCodeAnalyzer.getInstance(project).restart();
-                        }
-                    });
-                }
-            });
-        }
-
-        return typeChecker;
+        return typeCheckerSupplier.get();
     }
 
     public TypeChecker createTypeChecker() {
