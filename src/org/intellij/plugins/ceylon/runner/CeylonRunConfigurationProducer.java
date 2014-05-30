@@ -19,9 +19,6 @@ import org.intellij.plugins.ceylon.psi.CeylonPsi;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * TODO
- */
 public class CeylonRunConfigurationProducer extends RunConfigurationProducer<CeylonRunConfiguration> {
 
     protected CeylonRunConfigurationProducer() {
@@ -35,7 +32,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
         if (params == null) {
             return false;
         }
-        String pfx = "".equals(params.pkg) ? "" : params.pkg + ".";
+        String pfx = params.pkg.isEmpty() ? "" : params.pkg + ".";
         final String topLevelNameFull = pfx + params.topLevel;
         configuration.setTopLevelNameFull(topLevelNameFull);
         configuration.setName(topLevelNameFull);
@@ -63,41 +60,50 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
             CeylonPsi.DeclarationPsi toplevel = PsiTreeUtil.getTopmostParentOfType(psiElement, CeylonPsi.DeclarationPsi.class);
 
             if (toplevel != null) {
-                final Tree.Declaration ceylonNode =  toplevel.getCeylonNode();
-                // Needs to be a method with 0 parameters or class definition to be runnable.
-                if (ceylonNode instanceof Tree.AnyMethod) {
-                    final Tree.AnyMethod ceylonMethod = (Tree.AnyMethod) ceylonNode;
-                    final List<Tree.ParameterList> parameterLists = ceylonMethod.getParameterLists();
-                    if (parameterLists.isEmpty() || !parameterLists.get(0).getParameters().isEmpty()) {
-                        return null;
-                    }
-                } else if (!(ceylonNode instanceof Tree.ClassDefinition)) {
-                    return null;
-                }
-
-                CeylonCompositeElement parent = toplevel;
-                //noinspection StatementWithEmptyBody
-                while ((parent = PsiTreeUtil.getParentOfType(parent, CeylonPsi.DeclarationPsi.class)) != null && parent.getCeylonNode() == ceylonNode) ;
-
-                if (parent == null) {
-                    // We're in a method with no parent declaration (except possible nodes that represent the same method).
-                    final Tree.Identifier methodIdent = ceylonNode.getIdentifier();
-                    if (methodIdent != null) {
-                        final String identifier = methodIdent.getText();
-                        final Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
-                        if (cu != null && cu.getUnit() != null && cu.getUnit().getPackage() != null && cu.getUnit().getPackage().getModule() != null) {
-                            final Package pkg = cu.getUnit().getPackage();
-                            final Module mdl = pkg.getModule();
-                            final String moduleName = mdl.getNameAsString();
-                            final String packageName = pkg.getNameAsString();
-                            return new RunConfigParams(moduleName, packageName, identifier);
+                final Tree.Declaration ceylonNode = toplevel.getCeylonNode();
+                if (isRunnable(ceylonNode)) {
+                    CeylonCompositeElement parent = getTopMostElement(toplevel, ceylonNode);
+                    if (parent == null) {
+                        // We're in a method with no parent declaration (except possible nodes that represent the same method).
+                        final Tree.Identifier methodIdentifier = ceylonNode.getIdentifier();
+                        if (methodIdentifier != null) {
+                            final String identifier = methodIdentifier.getText();
+                            final Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
+                            if (cu != null && cu.getUnit() != null && cu.getUnit().getPackage() != null && cu.getUnit().getPackage().getModule() != null) {
+                                final Module mdl = cu.getUnit().getPackage().getModule();
+                                final String moduleName = mdl.getNameAsString();
+                                final String packageName = ceylonFile.getPackageName();
+                                return new RunConfigParams(moduleName, packageName, identifier);
+                            }
                         }
                     }
                 }
             }
         }
-
         return null;
+    }
+
+    private CeylonCompositeElement getTopMostElement(CeylonPsi.DeclarationPsi toplevel, Tree.Declaration ceylonNode) {
+        CeylonCompositeElement parent = toplevel;
+        //noinspection StatementWithEmptyBody
+        while ((parent = PsiTreeUtil.getParentOfType(parent, CeylonPsi.DeclarationPsi.class)) != null && parent.getCeylonNode() == ceylonNode) ;
+        return parent;
+    }
+
+    // Needs to be a method with 0 parameters or class definition to be runnable.
+    private boolean isRunnable(Tree.Declaration ceylonNode) {
+        if (ceylonNode instanceof Tree.AnyMethod) {
+            return isRunnableMethod((Tree.AnyMethod) ceylonNode);
+        }
+        return ceylonNode instanceof Tree.ClassDefinition;
+    }
+
+    private boolean isRunnableMethod(Tree.AnyMethod ceylonMethod) {
+        final List<Tree.ParameterList> parameterLists = ceylonMethod.getParameterLists();
+        if (parameterLists.isEmpty() || !parameterLists.get(0).getParameters().isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     static class RunConfigParams {
