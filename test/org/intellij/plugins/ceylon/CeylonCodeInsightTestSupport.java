@@ -1,10 +1,9 @@
 package org.intellij.plugins.ceylon;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.intellij.plugins.ceylon.annotator.TypeCheckerInvoker;
-import org.intellij.plugins.ceylon.annotator.TypeCheckerManager;
+import org.intellij.plugins.ceylon.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.psi.CeylonFile;
 
 import java.util.concurrent.TimeoutException;
@@ -16,8 +15,8 @@ public abstract class CeylonCodeInsightTestSupport extends LightCodeInsightFixtu
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        TypeCheckerManager manager = ServiceManager.getService(myFixture.getProject(), TypeCheckerManager.class);
-        typeChecker = manager.createTypeChecker();
+        TypeCheckerProvider typeCheckerProvider = myFixture.getProject().getComponent(TypeCheckerProvider.class);
+        typeChecker = typeCheckerProvider.createTypeChecker();
     }
 
     protected CeylonFile initFile(String filename) throws InterruptedException, TimeoutException {
