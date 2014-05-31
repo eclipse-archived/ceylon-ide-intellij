@@ -50,7 +50,7 @@ public class CeylonAddModuleAction extends AnAction {
             TypeCheckerProvider typeCheckerProvider = e.getProject().getComponent(TypeCheckerProvider.class);
             final TypeChecker typeChecker = typeCheckerProvider.getTypeChecker();
 
-            VirtualFile srcRoot = getSourceRoot(e, eventDir);
+            final VirtualFile srcRoot = getSourceRoot(e, eventDir);
             if (srcRoot != null) {
                 String eventPath = eventDir.getPath();
                 final String srcRootPath = srcRoot.getPath();
@@ -71,6 +71,7 @@ public class CeylonAddModuleAction extends AnAction {
                         public void run() {
                             FileTemplateManager templateManager = FileTemplateManager.getInstance();
                             PsiDirectory subdirectory = DirectoryUtil.createSubdirectories(moduleName, eventPsiDir, ".");
+
                             Properties variables = new Properties();
                             String fullModuleName = (eventPackage.isEmpty() ? "" : eventPackage + ".") + moduleName;
                             variables.put("MODULE_NAME", fullModuleName);
@@ -84,8 +85,9 @@ public class CeylonAddModuleAction extends AnAction {
                                 Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
                             }
 
-                            // TODO if parent folder is "source", we basically parse eveything again... is this bad?
-                            FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(new File(subdirectory.getVirtualFile().getParent().getCanonicalPath()));
+                            // FIXME com.redhat.ceylon.compiler.typechecker.context.PhasedUnits expects to parse modules from the root folder
+                            // so the only way to not parse everything here seems to be by modifying PhaseUnits or injecting a different ModuleManager into it
+                            FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(new File(srcRoot.getCanonicalPath()));
                             parseUnit(virtualFile, typeChecker, e.getProject());
                         }
                     });
