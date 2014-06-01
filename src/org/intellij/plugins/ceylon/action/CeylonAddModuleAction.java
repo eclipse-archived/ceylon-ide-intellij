@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterables.all;
+import static com.redhat.ceylon.ide.validate.NameValidator.packageNameIsLegal;
 import static java.util.Arrays.asList;
 
 public class CeylonAddModuleAction extends AnAction {
@@ -126,7 +127,6 @@ public class CeylonAddModuleAction extends AnAction {
     }
 
     private static class AddModuleInputValidator implements InputValidatorEx {
-        final Pattern pattern = Pattern.compile("([a-z_A-Z]|\\\\[iI])[a-z_A-Z0-9]*(\\.([a-z_A-Z]|\\\\[iI])[a-z_A-Z0-9]*)*");
         private final TypeChecker typeChecker;
 
         public AddModuleInputValidator(TypeChecker typeChecker) {
@@ -136,7 +136,7 @@ public class CeylonAddModuleAction extends AnAction {
 
         @Override
         public boolean checkInput(String name) {
-            return pattern.matcher(name).matches() && !moduleExists(name);
+            return !name.trim().isEmpty() && packageNameIsLegal(name) && !moduleExists(name);
         }
 
         @Override
@@ -147,9 +147,13 @@ public class CeylonAddModuleAction extends AnAction {
         @Nullable
         @Override
         public String getErrorText(String name) {
-            if (!pattern.matcher(name).matches()) {
+            if (name.trim().isEmpty()) {
+                return "Please enter a name for your module";
+            }
+            if (!packageNameIsLegal(name)) {
                 return String.format("\"%s\" is not a valid name for a module.", name);
-            } else if (moduleExists(name)) {
+            }
+            if (moduleExists(name)) {
                 return String.format("Module %s already exists.", name);
             }
             return null;
@@ -171,4 +175,5 @@ public class CeylonAddModuleAction extends AnAction {
             return true;
         }
     }
+
 }
