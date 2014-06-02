@@ -1,10 +1,7 @@
 package org.intellij.plugins.ceylon.annotator;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,36 +14,46 @@ import java.io.File;
 
 import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
 
-public class TypeCheckerManager {
+/**
+ *
+ */
+public class TypeCheckerProvider implements ProjectComponent {
 
     private final Project project;
     private TypeChecker typeChecker;
-    private boolean isBuildingTypeChecker = false;
 
-    public TypeCheckerManager(Project project) {
+    public TypeCheckerProvider(Project project) {
         this.project = project;
     }
 
+    public void initComponent() {
+
+    }
+
     public TypeChecker getTypeChecker() {
-        if (typeChecker == null && !isBuildingTypeChecker) {
-            isBuildingTypeChecker = true; // TODO really thread-safe?
-
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    ProgressManager.getInstance().run(new Task.Backgroundable(project, "Preparing Ceylon project...") {
-                        @Override
-                        public void run(@NotNull ProgressIndicator indicator) {
-                            typeChecker = createTypeChecker();
-                            isBuildingTypeChecker = false;
-                            DaemonCodeAnalyzer.getInstance(project).restart();
-                        }
-                    });
-                }
-            });
-        }
-
         return typeChecker;
+    }
+
+    public void disposeComponent() {
+
+    }
+
+    @NotNull
+    public String getComponentName() {
+        return "TypeCheckerProvider";
+    }
+
+    public void projectOpened() {
+        // called when project is opened
+        if (typeChecker == null) {
+            typeChecker = createTypeChecker();
+        }
+        DaemonCodeAnalyzer.getInstance(project).restart();
+    }
+
+    public void projectClosed() {
+        // called when project is being closed
+        typeChecker = null;
     }
 
     public TypeChecker createTypeChecker() {
@@ -79,4 +86,5 @@ public class TypeCheckerManager {
 
         return checker;
     }
+
 }

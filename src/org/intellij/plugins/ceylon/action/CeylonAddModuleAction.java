@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.action;
 
+import com.google.common.base.Preconditions;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.ide.util.DirectoryUtil;
@@ -7,8 +8,11 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
@@ -20,12 +24,18 @@ import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.io.impl.FileSystemVirtualFile;
 import com.redhat.ceylon.compiler.typechecker.model.Module;
-import org.intellij.plugins.ceylon.annotator.TypeCheckerManager;
+import org.intellij.plugins.ceylon.annotator.TypeCheckerProvider;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
+
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Iterables.all;
+import static java.util.Arrays.asList;
 
 public class CeylonAddModuleAction extends AnAction {
 
@@ -37,10 +47,10 @@ public class CeylonAddModuleAction extends AnAction {
         final VirtualFile eventDir = findEventDir(e);
 
         if (eventDir != null && e.getProject() != null) {
-            TypeCheckerManager manager = ServiceManager.getService(e.getProject(), TypeCheckerManager.class);
-            final TypeChecker typeChecker = manager.getTypeChecker();
+            TypeCheckerProvider typeCheckerProvider = e.getProject().getComponent(TypeCheckerProvider.class);
+            final TypeChecker typeChecker = typeCheckerProvider.getTypeChecker();
 
-            VirtualFile srcRoot = getSourceRoot(e, eventDir);
+            final VirtualFile srcRoot = getSourceRoot(e, eventDir);
             if (srcRoot != null) {
                 String eventPath = eventDir.getPath();
                 final String srcRootPath = srcRoot.getPath();
@@ -61,6 +71,7 @@ public class CeylonAddModuleAction extends AnAction {
                         public void run() {
                             FileTemplateManager templateManager = FileTemplateManager.getInstance();
                             PsiDirectory subdirectory = DirectoryUtil.createSubdirectories(moduleName, eventPsiDir, ".");
+
                             Properties variables = new Properties();
                             String fullModuleName = (eventPackage.isEmpty() ? "" : eventPackage + ".") + moduleName;
                             variables.put("MODULE_NAME", fullModuleName);
@@ -74,13 +85,24 @@ public class CeylonAddModuleAction extends AnAction {
                                 Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
                             }
 
-                            // TODO if parent folder is "source", we basically parse eveything again... is this bad?
-                            typeChecker.getPhasedUnits().parseUnit(new FileSystemVirtualFile(new File(subdirectory.getVirtualFile().getParent().getCanonicalPath())));
+                            // FIXME com.redhat.ceylon.compiler.typechecker.context.PhasedUnits expects to parse modules from the root folder
+                            // so the only way to not parse everything here seems to be by modifying PhaseUnits or injecting a different ModuleManager into it
+                            FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(new File(srcRoot.getCanonicalPath()));
+                            parseUnit(virtualFile, typeChecker, e.getProject());
                         }
                     });
                 }
             }
         }
+    }
+
+    private void parseUnit(final FileSystemVirtualFile virtualFile, final TypeChecker typeChecker, Project project) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Parsing Ceylon compilation units...") {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                typeChecker.getPhasedUnits().parseUnit(virtualFile);
+            }
+        });
     }
 
     private static VirtualFile getSourceRoot(AnActionEvent e, VirtualFile eventDir) {
@@ -105,10 +127,10 @@ public class CeylonAddModuleAction extends AnAction {
 
     private static class AddModuleInputValidator implements InputValidatorEx {
         final Pattern pattern = Pattern.compile("([a-z_A-Z]|\\\\[iI])[a-z_A-Z0-9]*(\\.([a-z_A-Z]|\\\\[iI])[a-z_A-Z0-9]*)*");
-        private TypeChecker typeChecker;
+        private final TypeChecker typeChecker;
 
         public AddModuleInputValidator(TypeChecker typeChecker) {
-
+            Preconditions.checkNotNull(typeChecker);
             this.typeChecker = typeChecker;
         }
 
@@ -134,13 +156,19 @@ public class CeylonAddModuleAction extends AnAction {
         }
 
         private boolean moduleExists(String moduleName) {
-            for (Module module : typeChecker.getContext().getModules().getListOfModules()) {
-                if (module.getNameAsString().equals(moduleName)) {
-                    return true;
+            Set<Module> modules;
+            if (all(asList(typeChecker, typeChecker.getContext(), typeChecker.getContext().getModules(),
+                            modules = typeChecker.getContext().getModules().getListOfModules()),
+                    notNull())) {
+                for (Module module : modules) {
+                    if (module.getNameAsString().equals(moduleName)) {
+                        return true;
+                    }
                 }
+                return false;
             }
-
-            return false;
+            // cannot tell whether the module exists, so let's be safe! Should never happen.
+            return true;
         }
     }
 }

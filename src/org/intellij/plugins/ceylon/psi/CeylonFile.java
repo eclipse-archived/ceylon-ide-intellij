@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.psi;
 
+import com.google.common.collect.Iterables;
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -17,8 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class CeylonFile extends PsiFileBase {
-
-    private String packageName; // TODO should be updated if the file is moved, package is renamed etc.
 
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
@@ -40,30 +39,20 @@ public class CeylonFile extends PsiFileBase {
     }
 
     public String getPackageName() {
-        if (packageName != null) {
-            return packageName;
-        }
-
         final Tree.CompilationUnit compilationUnit = getCompilationUnit();
 
         if (compilationUnit == null) {
             return null;
         }
+        String packageName = null;
 
         final List<Tree.PackageDescriptor> packageDescriptors = compilationUnit.getPackageDescriptors();
-        final Tree.PackageDescriptor packageDescriptor = packageDescriptors.isEmpty() ? null : packageDescriptors.get(0);
+        final Tree.PackageDescriptor packageDescriptor = Iterables.get(packageDescriptors, 0, null);
 
         if (packageDescriptor != null) {
             packageName = packageDescriptor.getImportPath().getText();
         } else {
-            VirtualFile virtualFile = getVirtualFile();
-            if (virtualFile == null) {
-                virtualFile = getOriginalFile().getVirtualFile();
-            }
-            if (virtualFile == null) {
-                virtualFile = getContainingFile().getUserData(IndexingDataKeys.VIRTUAL_FILE);
-            }
-
+            VirtualFile virtualFile = attemptToGetVirtualFile();
             if (virtualFile != null) {
                 packageName = ProjectRootManager.getInstance(getProject()).getFileIndex().getPackageNameByDirectory(virtualFile.getParent());
             } else {
@@ -72,6 +61,19 @@ public class CeylonFile extends PsiFileBase {
         }
 
         return packageName;
+    }
+
+    private VirtualFile attemptToGetVirtualFile() {
+        return firstNonNull(getVirtualFile(),
+                        getOriginalFile().getVirtualFile(),
+                        getContainingFile().getUserData(IndexingDataKeys.VIRTUAL_FILE));
+    }
+
+    private VirtualFile firstNonNull(VirtualFile... files) {
+        for (VirtualFile file : files) {
+            if (file != null) return file;
+        }
+        return null;
     }
 
     @Override
