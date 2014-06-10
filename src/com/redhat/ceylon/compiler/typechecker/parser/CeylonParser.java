@@ -1,14 +1,15 @@
-// $ANTLR 3.4 /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g 2014-03-03 12:35:26
+// $ANTLR 3.4 /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g 2014-05-19 10:13:34
 package com.redhat.ceylon.compiler.typechecker.parser;
-
-import org.antlr.runtime.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.*;
 import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.Package;
+
+import org.antlr.runtime.*;
+import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class CeylonParser extends Parser {
@@ -16436,7 +16437,7 @@ public class CeylonParser extends Parser {
             {
                 match(input,SMALLER_OP,FOLLOW_SMALLER_OP_in_groupedType16223); if (state.failed) return type;
 
-                pushFollow(FOLLOW_type_in_groupedType16233);
+                pushFollow(FOLLOW_type_in_groupedType16234);
                 t=type();
 
                 state._fsp--;
@@ -16444,7 +16445,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { type =t; }
 
-                match(input,LARGER_OP,FOLLOW_LARGER_OP_in_groupedType16249); if (state.failed) return type;
+                match(input,LARGER_OP,FOLLOW_LARGER_OP_in_groupedType16250); if (state.failed) return type;
 
             }
 
@@ -16478,11 +16479,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2434:4: ( LBRACE t= variadicType RBRACE )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2434:6: LBRACE t= variadicType RBRACE
             {
-                LBRACE402=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_iterableType16269); if (state.failed) return type;
+                LBRACE402=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_iterableType16271); if (state.failed) return type;
 
                 if ( state.backtracking==0 ) { type = new IterableType(LBRACE402); }
 
-                pushFollow(FOLLOW_variadicType_in_iterableType16285);
+                pushFollow(FOLLOW_variadicType_in_iterableType16287);
                 t=variadicType();
 
                 state._fsp--;
@@ -16490,7 +16491,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { type.setElementType(t); }
 
-                RBRACE403=(Token)match(input,RBRACE,FOLLOW_RBRACE_in_iterableType16299); if (state.failed) return type;
+                RBRACE403=(Token)match(input,RBRACE,FOLLOW_RBRACE_in_iterableType16301); if (state.failed) return type;
 
                 if ( state.backtracking==0 ) { type.setEndToken(RBRACE403); }
 
@@ -16528,7 +16529,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2444:5: (t1= unionType ( ENTRY_OP (t2= unionType ) )? )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2444:7: t1= unionType ( ENTRY_OP (t2= unionType ) )?
             {
-                pushFollow(FOLLOW_unionType_in_type16337);
+                pushFollow(FOLLOW_unionType_in_type16339);
                 t1=unionType();
 
                 state._fsp--;
@@ -16547,7 +16548,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2447:9: ENTRY_OP (t2= unionType )
                     {
-                        ENTRY_OP404=(Token)match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_type16363); if (state.failed) return type;
+                        ENTRY_OP404=(Token)match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_type16365); if (state.failed) return type;
 
                         if ( state.backtracking==0 ) { bt=new EntryType(null);
                             bt.setKeyType(type);
@@ -16557,7 +16558,7 @@ public class CeylonParser extends Parser {
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2452:9: (t2= unionType )
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2453:11: t2= unionType
                         {
-                            pushFollow(FOLLOW_unionType_in_type16397);
+                            pushFollow(FOLLOW_unionType_in_type16399);
                             t2=unionType();
 
                             state._fsp--;
@@ -16609,7 +16610,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2464:5: (it1= intersectionType ( (u= UNION_OP (it2= intersectionType ) )+ )? )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2464:7: it1= intersectionType ( (u= UNION_OP (it2= intersectionType ) )+ )?
             {
-                pushFollow(FOLLOW_intersectionType_in_unionType16462);
+                pushFollow(FOLLOW_intersectionType_in_unionType16464);
                 it1=intersectionType();
 
                 state._fsp--;
@@ -16646,14 +16647,14 @@ public class CeylonParser extends Parser {
                                 case 1 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2470:11: u= UNION_OP (it2= intersectionType )
                                 {
-                                    u=(Token)match(input,UNION_OP,FOLLOW_UNION_OP_in_unionType16503); if (state.failed) return type;
+                                    u=(Token)match(input,UNION_OP,FOLLOW_UNION_OP_in_unionType16505); if (state.failed) return type;
 
                                     if ( state.backtracking==0 ) { ut.setEndToken(u); }
 
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2472:11: (it2= intersectionType )
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2473:13: it2= intersectionType
                                     {
-                                        pushFollow(FOLLOW_intersectionType_in_unionType16543);
+                                        pushFollow(FOLLOW_intersectionType_in_unionType16545);
                                         it2=intersectionType();
 
                                         state._fsp--;
@@ -16723,7 +16724,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2488:5: (at1= abbreviatedType ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )? )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2488:7: at1= abbreviatedType ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )?
             {
-                pushFollow(FOLLOW_abbreviatedType_in_intersectionType16633);
+                pushFollow(FOLLOW_abbreviatedType_in_intersectionType16635);
                 at1=abbreviatedType();
 
                 state._fsp--;
@@ -16760,14 +16761,14 @@ public class CeylonParser extends Parser {
                                 case 1 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2494:11: i= INTERSECTION_OP (at2= abbreviatedType )
                                 {
-                                    i=(Token)match(input,INTERSECTION_OP,FOLLOW_INTERSECTION_OP_in_intersectionType16674); if (state.failed) return type;
+                                    i=(Token)match(input,INTERSECTION_OP,FOLLOW_INTERSECTION_OP_in_intersectionType16676); if (state.failed) return type;
 
                                     if ( state.backtracking==0 ) { it.setEndToken(i); }
 
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2496:11: (at2= abbreviatedType )
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2497:13: at2= abbreviatedType
                                     {
-                                        pushFollow(FOLLOW_abbreviatedType_in_intersectionType16714);
+                                        pushFollow(FOLLOW_abbreviatedType_in_intersectionType16716);
                                         at2=abbreviatedType();
 
                                         state._fsp--;
@@ -16866,7 +16867,7 @@ public class CeylonParser extends Parser {
                 case 1 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2511:7: qualifiedType
                 {
-                    pushFollow(FOLLOW_qualifiedType_in_qualifiedOrTupleType16793);
+                    pushFollow(FOLLOW_qualifiedType_in_qualifiedOrTupleType16795);
                     qualifiedType405=qualifiedType();
 
                     state._fsp--;
@@ -16879,7 +16880,7 @@ public class CeylonParser extends Parser {
                 case 2 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2513:7: tupleType
                 {
-                    pushFollow(FOLLOW_tupleType_in_qualifiedOrTupleType16810);
+                    pushFollow(FOLLOW_tupleType_in_qualifiedOrTupleType16812);
                     tupleType406=tupleType();
 
                     state._fsp--;
@@ -16892,7 +16893,7 @@ public class CeylonParser extends Parser {
                 case 3 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2515:7: iterableType
                 {
-                    pushFollow(FOLLOW_iterableType_in_qualifiedOrTupleType16827);
+                    pushFollow(FOLLOW_iterableType_in_qualifiedOrTupleType16829);
                     iterableType407=iterableType();
 
                     state._fsp--;
@@ -16943,7 +16944,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2527:5: ( qualifiedOrTupleType ( ( OPTIONAL | LBRACKET RBRACKET | LPAREN (t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN ) )* )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2527:7: qualifiedOrTupleType ( ( OPTIONAL | LBRACKET RBRACKET | LPAREN (t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN ) )*
             {
-                pushFollow(FOLLOW_qualifiedOrTupleType_in_abbreviatedType16868);
+                pushFollow(FOLLOW_qualifiedOrTupleType_in_abbreviatedType16870);
                 qualifiedOrTupleType408=qualifiedOrTupleType();
 
                 state._fsp--;
@@ -16997,7 +16998,7 @@ public class CeylonParser extends Parser {
                                 case 1 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2535:9: OPTIONAL
                                 {
-                                    OPTIONAL409=(Token)match(input,OPTIONAL,FOLLOW_OPTIONAL_in_abbreviatedType16930); if (state.failed) return type;
+                                    OPTIONAL409=(Token)match(input,OPTIONAL,FOLLOW_OPTIONAL_in_abbreviatedType16932); if (state.failed) return type;
 
                                     if ( state.backtracking==0 ) { OptionalType ot = new OptionalType(null);
                                         ot.setDefiniteType(type);
@@ -17009,9 +17010,9 @@ public class CeylonParser extends Parser {
                                 case 2 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2540:9: LBRACKET RBRACKET
                                 {
-                                    LBRACKET410=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_abbreviatedType16951); if (state.failed) return type;
+                                    LBRACKET410=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_abbreviatedType16953); if (state.failed) return type;
 
-                                    RBRACKET411=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_abbreviatedType16953); if (state.failed) return type;
+                                    RBRACKET411=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_abbreviatedType16955); if (state.failed) return type;
 
                                     if ( state.backtracking==0 ) { SequenceType st = new SequenceType(null);
                                         st.setElementType(type);
@@ -17024,7 +17025,7 @@ public class CeylonParser extends Parser {
                                 case 3 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2546:9: LPAREN (t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN
                                 {
-                                    LPAREN412=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_abbreviatedType16974); if (state.failed) return type;
+                                    LPAREN412=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_abbreviatedType16976); if (state.failed) return type;
 
                                     if ( state.backtracking==0 ) { bt = new FunctionType(null);
                                         bt.setEndToken(LPAREN412);
@@ -17042,7 +17043,7 @@ public class CeylonParser extends Parser {
                                         case 1 :
                                             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2552:13: t1= defaultedType ( COMMA t2= defaultedType )*
                                         {
-                                            pushFollow(FOLLOW_defaultedType_in_abbreviatedType17012);
+                                            pushFollow(FOLLOW_defaultedType_in_abbreviatedType17014);
                                             t1=defaultedType();
 
                                             state._fsp--;
@@ -17066,11 +17067,11 @@ public class CeylonParser extends Parser {
                                                     case 1 :
                                                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2556:15: COMMA t2= defaultedType
                                                     {
-                                                        COMMA413=(Token)match(input,COMMA,FOLLOW_COMMA_in_abbreviatedType17056); if (state.failed) return type;
+                                                        COMMA413=(Token)match(input,COMMA,FOLLOW_COMMA_in_abbreviatedType17058); if (state.failed) return type;
 
                                                         if ( state.backtracking==0 ) { bt.setEndToken(COMMA413); }
 
-                                                        pushFollow(FOLLOW_defaultedType_in_abbreviatedType17090);
+                                                        pushFollow(FOLLOW_defaultedType_in_abbreviatedType17092);
                                                         t2=defaultedType();
 
                                                         state._fsp--;
@@ -17094,7 +17095,7 @@ public class CeylonParser extends Parser {
                                     }
 
 
-                                    RPAREN414=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_abbreviatedType17144); if (state.failed) return type;
+                                    RPAREN414=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_abbreviatedType17146); if (state.failed) return type;
 
                                     if ( state.backtracking==0 ) { bt.setEndToken(RPAREN414); }
 
@@ -17164,7 +17165,7 @@ public class CeylonParser extends Parser {
                 case 1 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2571:7: ot= typeNameWithArguments
                 {
-                    pushFollow(FOLLOW_typeNameWithArguments_in_baseType17201);
+                    pushFollow(FOLLOW_typeNameWithArguments_in_baseType17203);
                     ot=typeNameWithArguments();
 
                     state._fsp--;
@@ -17181,7 +17182,7 @@ public class CeylonParser extends Parser {
                 case 2 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2578:7: groupedType
                 {
-                    pushFollow(FOLLOW_groupedType_in_baseType17223);
+                    pushFollow(FOLLOW_groupedType_in_baseType17225);
                     groupedType415=groupedType();
 
                     state._fsp--;
@@ -17224,7 +17225,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2583:5: ( baseType ( MEMBER_OP it= typeNameWithArguments )* )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2583:7: baseType ( MEMBER_OP it= typeNameWithArguments )*
             {
-                pushFollow(FOLLOW_baseType_in_qualifiedType17252);
+                pushFollow(FOLLOW_baseType_in_qualifiedType17254);
                 baseType416=baseType();
 
                 state._fsp--;
@@ -17253,9 +17254,9 @@ public class CeylonParser extends Parser {
                         case 1 :
                             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2586:9: MEMBER_OP it= typeNameWithArguments
                         {
-                            MEMBER_OP417=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_qualifiedType17278); if (state.failed) return type;
+                            MEMBER_OP417=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_qualifiedType17280); if (state.failed) return type;
 
-                            pushFollow(FOLLOW_typeNameWithArguments_in_qualifiedType17291);
+                            pushFollow(FOLLOW_typeNameWithArguments_in_qualifiedType17293);
                             it=typeNameWithArguments();
 
                             state._fsp--;
@@ -17315,7 +17316,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2598:5: ( typeName ( typeArguments )? )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2598:7: typeName ( typeArguments )?
             {
-                pushFollow(FOLLOW_typeName_in_typeNameWithArguments17331);
+                pushFollow(FOLLOW_typeName_in_typeNameWithArguments17333);
                 typeName418=typeName();
 
                 state._fsp--;
@@ -17338,7 +17339,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2601:9: typeArguments
                     {
-                        pushFollow(FOLLOW_typeArguments_in_typeNameWithArguments17358);
+                        pushFollow(FOLLOW_typeArguments_in_typeNameWithArguments17360);
                         typeArguments419=typeArguments();
 
                         state._fsp--;
@@ -17400,7 +17401,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2609:11: stringLiteral
                     {
-                        pushFollow(FOLLOW_stringLiteral_in_annotations17422);
+                        pushFollow(FOLLOW_stringLiteral_in_annotations17424);
                         stringLiteral420=stringLiteral();
 
                         state._fsp--;
@@ -17435,7 +17436,7 @@ public class CeylonParser extends Parser {
                         case 1 :
                             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2619:9: annotation
                         {
-                            pushFollow(FOLLOW_annotation_in_annotations17461);
+                            pushFollow(FOLLOW_annotation_in_annotations17463);
                             annotation421=annotation();
 
                             state._fsp--;
@@ -17494,7 +17495,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2633:5: ( annotationName ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |) )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2633:7: annotationName ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |)
             {
-                pushFollow(FOLLOW_annotationName_in_annotation17502);
+                pushFollow(FOLLOW_annotationName_in_annotation17504);
                 annotationName422=annotationName();
 
                 state._fsp--;
@@ -17568,7 +17569,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2640:7: positionalArguments
                     {
-                        pushFollow(FOLLOW_positionalArguments_in_annotation17525);
+                        pushFollow(FOLLOW_positionalArguments_in_annotation17527);
                         positionalArguments423=positionalArguments();
 
                         state._fsp--;
@@ -17581,7 +17582,7 @@ public class CeylonParser extends Parser {
                     case 2 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2642:7: ( namedAnnotationArgumentsStart )=> namedArguments
                     {
-                        pushFollow(FOLLOW_namedArguments_in_annotation17554);
+                        pushFollow(FOLLOW_namedArguments_in_annotation17556);
                         namedArguments424=namedArguments();
 
                         state._fsp--;
@@ -17685,7 +17686,7 @@ public class CeylonParser extends Parser {
                         case 1 :
                             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2659:7: compilerAnnotation
                         {
-                            pushFollow(FOLLOW_compilerAnnotation_in_compilerAnnotations17658);
+                            pushFollow(FOLLOW_compilerAnnotation_in_compilerAnnotations17660);
                             compilerAnnotation425=compilerAnnotation();
 
                             state._fsp--;
@@ -17735,11 +17736,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2665:5: ( COMPILER_ANNOTATION annotationName ( SEGMENT_OP stringLiteral )? )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2665:7: COMPILER_ANNOTATION annotationName ( SEGMENT_OP stringLiteral )?
             {
-                COMPILER_ANNOTATION426=(Token)match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_compilerAnnotation17698); if (state.failed) return annotation;
+                COMPILER_ANNOTATION426=(Token)match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_compilerAnnotation17700); if (state.failed) return annotation;
 
                 if ( state.backtracking==0 ) { annotation =new CompilerAnnotation(COMPILER_ANNOTATION426); }
 
-                pushFollow(FOLLOW_annotationName_in_compilerAnnotation17715);
+                pushFollow(FOLLOW_annotationName_in_compilerAnnotation17717);
                 annotationName427=annotationName();
 
                 state._fsp--;
@@ -17758,9 +17759,9 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2670:11: SEGMENT_OP stringLiteral
                     {
-                        match(input,SEGMENT_OP,FOLLOW_SEGMENT_OP_in_compilerAnnotation17745); if (state.failed) return annotation;
+                        match(input,SEGMENT_OP,FOLLOW_SEGMENT_OP_in_compilerAnnotation17747); if (state.failed) return annotation;
 
-                        pushFollow(FOLLOW_stringLiteral_in_compilerAnnotation17757);
+                        pushFollow(FOLLOW_stringLiteral_in_compilerAnnotation17759);
                         stringLiteral428=stringLiteral();
 
                         state._fsp--;
@@ -17809,7 +17810,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2677:5: ( LPAREN (c1= condition (c= COMMA (c2= condition |) )* )? RPAREN )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2677:7: LPAREN (c1= condition (c= COMMA (c2= condition |) )* )? RPAREN
             {
-                LPAREN429=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_conditions17799); if (state.failed) return conditionList;
+                LPAREN429=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_conditions17801); if (state.failed) return conditionList;
 
                 if ( state.backtracking==0 ) { conditionList = new ConditionList(LPAREN429); }
 
@@ -17824,7 +17825,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2680:7: c1= condition (c= COMMA (c2= condition |) )*
                     {
-                        pushFollow(FOLLOW_condition_in_conditions17825);
+                        pushFollow(FOLLOW_condition_in_conditions17827);
                         c1=condition();
 
                         state._fsp--;
@@ -17848,7 +17849,7 @@ public class CeylonParser extends Parser {
                                 case 1 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2683:9: c= COMMA (c2= condition |)
                                 {
-                                    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_conditions17845); if (state.failed) return conditionList;
+                                    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_conditions17847); if (state.failed) return conditionList;
 
                                     if ( state.backtracking==0 ) { conditionList.setEndToken(c); }
 
@@ -17874,7 +17875,7 @@ public class CeylonParser extends Parser {
                                         case 1 :
                                             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2686:11: c2= condition
                                         {
-                                            pushFollow(FOLLOW_condition_in_conditions17880);
+                                            pushFollow(FOLLOW_condition_in_conditions17882);
                                             c2=condition();
 
                                             state._fsp--;
@@ -17913,7 +17914,7 @@ public class CeylonParser extends Parser {
                 }
 
 
-                RPAREN430=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_conditions17942); if (state.failed) return conditionList;
+                RPAREN430=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_conditions17944); if (state.failed) return conditionList;
 
                 if ( state.backtracking==0 ) { conditionList.setEndToken(RPAREN430); }
 
@@ -18033,7 +18034,7 @@ public class CeylonParser extends Parser {
                 case 1 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2700:7: existsCondition
                 {
-                    pushFollow(FOLLOW_existsCondition_in_condition17971);
+                    pushFollow(FOLLOW_existsCondition_in_condition17973);
                     existsCondition431=existsCondition();
 
                     state._fsp--;
@@ -18046,7 +18047,7 @@ public class CeylonParser extends Parser {
                 case 2 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2702:7: nonemptyCondition
                 {
-                    pushFollow(FOLLOW_nonemptyCondition_in_condition17987);
+                    pushFollow(FOLLOW_nonemptyCondition_in_condition17989);
                     nonemptyCondition432=nonemptyCondition();
 
                     state._fsp--;
@@ -18059,7 +18060,7 @@ public class CeylonParser extends Parser {
                 case 3 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2704:7: isCondition
                 {
-                    pushFollow(FOLLOW_isCondition_in_condition18003);
+                    pushFollow(FOLLOW_isCondition_in_condition18005);
                     isCondition433=isCondition();
 
                     state._fsp--;
@@ -18072,7 +18073,7 @@ public class CeylonParser extends Parser {
                 case 4 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2706:7: satisfiesCondition
                 {
-                    pushFollow(FOLLOW_satisfiesCondition_in_condition18020);
+                    pushFollow(FOLLOW_satisfiesCondition_in_condition18022);
                     satisfiesCondition434=satisfiesCondition();
 
                     state._fsp--;
@@ -18085,7 +18086,7 @@ public class CeylonParser extends Parser {
                 case 5 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2708:7: booleanCondition
                 {
-                    pushFollow(FOLLOW_booleanCondition_in_condition18036);
+                    pushFollow(FOLLOW_booleanCondition_in_condition18038);
                     booleanCondition435=booleanCondition();
 
                     state._fsp--;
@@ -18127,7 +18128,7 @@ public class CeylonParser extends Parser {
             {
                 if ( state.backtracking==0 ) { condition = new BooleanCondition(null); }
 
-                pushFollow(FOLLOW_expression_in_booleanCondition18077);
+                pushFollow(FOLLOW_expression_in_booleanCondition18079);
                 expression436=expression();
 
                 state._fsp--;
@@ -18170,7 +18171,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2719:5: ( EXISTS ( ( compilerAnnotations ( declarationStart | specificationStart ) )=> specifiedVariable | ( LIDENTIFIER )=> impliedVariable | expression ) )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2719:7: EXISTS ( ( compilerAnnotations ( declarationStart | specificationStart ) )=> specifiedVariable | ( LIDENTIFIER )=> impliedVariable | expression )
             {
-                EXISTS437=(Token)match(input,EXISTS,FOLLOW_EXISTS_in_existsCondition18110); if (state.failed) return condition;
+                EXISTS437=(Token)match(input,EXISTS,FOLLOW_EXISTS_in_existsCondition18112); if (state.failed) return condition;
 
                 if ( state.backtracking==0 ) { condition = new ExistsCondition(EXISTS437); }
 
@@ -18298,7 +18299,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2721:7: ( compilerAnnotations ( declarationStart | specificationStart ) )=> specifiedVariable
                     {
-                        pushFollow(FOLLOW_specifiedVariable_in_existsCondition18147);
+                        pushFollow(FOLLOW_specifiedVariable_in_existsCondition18149);
                         specifiedVariable438=specifiedVariable();
 
                         state._fsp--;
@@ -18311,7 +18312,7 @@ public class CeylonParser extends Parser {
                     case 2 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2725:9: ( LIDENTIFIER )=> impliedVariable
                     {
-                        pushFollow(FOLLOW_impliedVariable_in_existsCondition18182);
+                        pushFollow(FOLLOW_impliedVariable_in_existsCondition18184);
                         impliedVariable439=impliedVariable();
 
                         state._fsp--;
@@ -18324,7 +18325,7 @@ public class CeylonParser extends Parser {
                     case 3 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2727:9: expression
                     {
-                        pushFollow(FOLLOW_expression_in_existsCondition18202);
+                        pushFollow(FOLLOW_expression_in_existsCondition18204);
                         expression440=expression();
 
                         state._fsp--;
@@ -18373,7 +18374,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2733:5: ( NONEMPTY ( ( compilerAnnotations ( declarationStart | specificationStart ) )=> specifiedVariable | ( LIDENTIFIER )=> impliedVariable | expression ) )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2733:7: NONEMPTY ( ( compilerAnnotations ( declarationStart | specificationStart ) )=> specifiedVariable | ( LIDENTIFIER )=> impliedVariable | expression )
             {
-                NONEMPTY441=(Token)match(input,NONEMPTY,FOLLOW_NONEMPTY_in_nonemptyCondition18243); if (state.failed) return condition;
+                NONEMPTY441=(Token)match(input,NONEMPTY,FOLLOW_NONEMPTY_in_nonemptyCondition18245); if (state.failed) return condition;
 
                 if ( state.backtracking==0 ) { condition = new NonemptyCondition(NONEMPTY441); }
 
@@ -18501,7 +18502,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2735:7: ( compilerAnnotations ( declarationStart | specificationStart ) )=> specifiedVariable
                     {
-                        pushFollow(FOLLOW_specifiedVariable_in_nonemptyCondition18278);
+                        pushFollow(FOLLOW_specifiedVariable_in_nonemptyCondition18280);
                         specifiedVariable442=specifiedVariable();
 
                         state._fsp--;
@@ -18514,7 +18515,7 @@ public class CeylonParser extends Parser {
                     case 2 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2739:7: ( LIDENTIFIER )=> impliedVariable
                     {
-                        pushFollow(FOLLOW_impliedVariable_in_nonemptyCondition18307);
+                        pushFollow(FOLLOW_impliedVariable_in_nonemptyCondition18309);
                         impliedVariable443=impliedVariable();
 
                         state._fsp--;
@@ -18527,7 +18528,7 @@ public class CeylonParser extends Parser {
                     case 3 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2741:7: expression
                     {
-                        pushFollow(FOLLOW_expression_in_nonemptyCondition18324);
+                        pushFollow(FOLLOW_expression_in_nonemptyCondition18326);
                         expression444=expression();
 
                         state._fsp--;
@@ -18590,7 +18591,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2748:9: NOT_OP
                     {
-                        NOT_OP445=(Token)match(input,NOT_OP,FOLLOW_NOT_OP_in_isCondition18369); if (state.failed) return condition;
+                        NOT_OP445=(Token)match(input,NOT_OP,FOLLOW_NOT_OP_in_isCondition18371); if (state.failed) return condition;
 
                         if ( state.backtracking==0 ) { condition = new IsCondition(NOT_OP445);
                             condition.setNot(true); }
@@ -18601,12 +18602,12 @@ public class CeylonParser extends Parser {
                 }
 
 
-                IS_OP446=(Token)match(input,IS_OP,FOLLOW_IS_OP_in_isCondition18396); if (state.failed) return condition;
+                IS_OP446=(Token)match(input,IS_OP,FOLLOW_IS_OP_in_isCondition18398); if (state.failed) return condition;
 
                 if ( state.backtracking==0 ) { if (condition==null)
                     condition = new IsCondition(IS_OP446); }
 
-                pushFollow(FOLLOW_type_in_isCondition18413);
+                pushFollow(FOLLOW_type_in_isCondition18415);
                 type447=type();
 
                 state._fsp--;
@@ -18652,7 +18653,7 @@ public class CeylonParser extends Parser {
                             v.setType(new ValueModifier(null));
                             condition.setVariable(v); }
 
-                        pushFollow(FOLLOW_memberName_in_isCondition18451);
+                        pushFollow(FOLLOW_memberName_in_isCondition18453);
                         memberName448=memberName();
 
                         state._fsp--;
@@ -18660,7 +18661,7 @@ public class CeylonParser extends Parser {
 
                         if ( state.backtracking==0 ) { condition.getVariable().setIdentifier(memberName448); }
 
-                        pushFollow(FOLLOW_specifier_in_isCondition18467);
+                        pushFollow(FOLLOW_specifier_in_isCondition18469);
                         specifier449=specifier();
 
                         state._fsp--;
@@ -18673,7 +18674,7 @@ public class CeylonParser extends Parser {
                     case 2 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2766:7: impliedVariable
                     {
-                        pushFollow(FOLLOW_impliedVariable_in_isCondition18490);
+                        pushFollow(FOLLOW_impliedVariable_in_isCondition18492);
                         impliedVariable450=impliedVariable();
 
                         state._fsp--;
@@ -18720,11 +18721,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2772:5: ( SATISFIES type typeName )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2772:7: SATISFIES type typeName
             {
-                SATISFIES451=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiesCondition18526); if (state.failed) return condition;
+                SATISFIES451=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiesCondition18528); if (state.failed) return condition;
 
                 if ( state.backtracking==0 ) { condition = new SatisfiesCondition(SATISFIES451); }
 
-                pushFollow(FOLLOW_type_in_satisfiesCondition18543);
+                pushFollow(FOLLOW_type_in_satisfiesCondition18545);
                 type452=type();
 
                 state._fsp--;
@@ -18732,7 +18733,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { condition.setType(type452); }
 
-                pushFollow(FOLLOW_typeName_in_satisfiesCondition18560);
+                pushFollow(FOLLOW_typeName_in_satisfiesCondition18562);
                 typeName453=typeName();
 
                 state._fsp--;
@@ -18823,7 +18824,7 @@ public class CeylonParser extends Parser {
                 case 1 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2781:7: ifElse
                 {
-                    pushFollow(FOLLOW_ifElse_in_controlStatement18589);
+                    pushFollow(FOLLOW_ifElse_in_controlStatement18591);
                     ifElse454=ifElse();
 
                     state._fsp--;
@@ -18836,7 +18837,7 @@ public class CeylonParser extends Parser {
                 case 2 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2783:7: switchCaseElse
                 {
-                    pushFollow(FOLLOW_switchCaseElse_in_controlStatement18606);
+                    pushFollow(FOLLOW_switchCaseElse_in_controlStatement18608);
                     switchCaseElse455=switchCaseElse();
 
                     state._fsp--;
@@ -18849,7 +18850,7 @@ public class CeylonParser extends Parser {
                 case 3 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2785:7: whileLoop
                 {
-                    pushFollow(FOLLOW_whileLoop_in_controlStatement18623);
+                    pushFollow(FOLLOW_whileLoop_in_controlStatement18625);
                     whileLoop456=whileLoop();
 
                     state._fsp--;
@@ -18862,7 +18863,7 @@ public class CeylonParser extends Parser {
                 case 4 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2787:7: forElse
                 {
-                    pushFollow(FOLLOW_forElse_in_controlStatement18640);
+                    pushFollow(FOLLOW_forElse_in_controlStatement18642);
                     forElse457=forElse();
 
                     state._fsp--;
@@ -18875,7 +18876,7 @@ public class CeylonParser extends Parser {
                 case 5 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2789:7: tryCatchFinally
                 {
-                    pushFollow(FOLLOW_tryCatchFinally_in_controlStatement18657);
+                    pushFollow(FOLLOW_tryCatchFinally_in_controlStatement18659);
                     tryCatchFinally458=tryCatchFinally();
 
                     state._fsp--;
@@ -18888,7 +18889,7 @@ public class CeylonParser extends Parser {
                 case 6 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2791:7: dynamic
                 {
-                    pushFollow(FOLLOW_dynamic_in_controlStatement18673);
+                    pushFollow(FOLLOW_dynamic_in_controlStatement18675);
                     dynamic459=dynamic();
 
                     state._fsp--;
@@ -18965,7 +18966,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2796:9: ( LBRACE )=>b= block
                     {
-                        pushFollow(FOLLOW_block_in_controlBlock18711);
+                        pushFollow(FOLLOW_block_in_controlBlock18713);
                         b=block();
 
                         state._fsp--;
@@ -19021,12 +19022,12 @@ public class CeylonParser extends Parser {
             {
                 if ( state.backtracking==0 ) { statement =new DynamicStatement(null); }
 
-                DYNAMIC460=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_dynamic18777); if (state.failed) return statement;
+                DYNAMIC460=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_dynamic18779); if (state.failed) return statement;
 
                 if ( state.backtracking==0 ) { dc = new DynamicClause(DYNAMIC460);
                     statement.setDynamicClause(dc); }
 
-                pushFollow(FOLLOW_controlBlock_in_dynamic18794);
+                pushFollow(FOLLOW_controlBlock_in_dynamic18796);
                 controlBlock461=controlBlock();
 
                 state._fsp--;
@@ -19068,7 +19069,7 @@ public class CeylonParser extends Parser {
             {
                 if ( state.backtracking==0 ) { statement =new IfStatement(null); }
 
-                pushFollow(FOLLOW_ifBlock_in_ifElse18831);
+                pushFollow(FOLLOW_ifBlock_in_ifElse18833);
                 ifBlock462=ifBlock();
 
                 state._fsp--;
@@ -19087,7 +19088,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2818:9: elseBlock
                     {
-                        pushFollow(FOLLOW_elseBlock_in_ifElse18859);
+                        pushFollow(FOLLOW_elseBlock_in_ifElse18861);
                         elseBlock463=elseBlock();
 
                         state._fsp--;
@@ -19134,11 +19135,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2824:5: ( IF_CLAUSE conditions controlBlock )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2824:7: IF_CLAUSE conditions controlBlock
             {
-                IF_CLAUSE464=(Token)match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_ifBlock18899); if (state.failed) return clause;
+                IF_CLAUSE464=(Token)match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_ifBlock18901); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new IfClause(IF_CLAUSE464); }
 
-                pushFollow(FOLLOW_conditions_in_ifBlock18916);
+                pushFollow(FOLLOW_conditions_in_ifBlock18918);
                 conditions465=conditions();
 
                 state._fsp--;
@@ -19146,7 +19147,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { clause.setConditionList(conditions465); }
 
-                pushFollow(FOLLOW_controlBlock_in_ifBlock18932);
+                pushFollow(FOLLOW_controlBlock_in_ifBlock18934);
                 controlBlock466=controlBlock();
 
                 state._fsp--;
@@ -19187,7 +19188,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2833:5: ( ELSE_CLAUSE ( elseIf | block ) )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2833:7: ELSE_CLAUSE ( elseIf | block )
             {
-                ELSE_CLAUSE467=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_elseBlock18961); if (state.failed) return clause;
+                ELSE_CLAUSE467=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_elseBlock18963); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE467); }
 
@@ -19213,7 +19214,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2836:9: elseIf
                     {
-                        pushFollow(FOLLOW_elseIf_in_elseBlock18988);
+                        pushFollow(FOLLOW_elseIf_in_elseBlock18990);
                         elseIf468=elseIf();
 
                         state._fsp--;
@@ -19226,7 +19227,7 @@ public class CeylonParser extends Parser {
                     case 2 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2839:9: block
                     {
-                        pushFollow(FOLLOW_block_in_elseBlock19018);
+                        pushFollow(FOLLOW_block_in_elseBlock19020);
                         block469=block();
 
                         state._fsp--;
@@ -19270,7 +19271,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2845:5: ( ifElse )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2845:7: ifElse
             {
-                pushFollow(FOLLOW_ifElse_in_elseIf19057);
+                pushFollow(FOLLOW_ifElse_in_elseIf19059);
                 ifElse470=ifElse();
 
                 state._fsp--;
@@ -19313,7 +19314,7 @@ public class CeylonParser extends Parser {
             {
                 if ( state.backtracking==0 ) { statement = new SwitchStatement(null); }
 
-                pushFollow(FOLLOW_switchHeader_in_switchCaseElse19094);
+                pushFollow(FOLLOW_switchHeader_in_switchCaseElse19096);
                 switchHeader471=switchHeader();
 
                 state._fsp--;
@@ -19321,7 +19322,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { statement.setSwitchClause(switchHeader471); }
 
-                pushFollow(FOLLOW_cases_in_switchCaseElse19111);
+                pushFollow(FOLLOW_cases_in_switchCaseElse19113);
                 cases472=cases();
 
                 state._fsp--;
@@ -19383,11 +19384,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2882:5: ( SWITCH_CLAUSE LPAREN ( expression )? RPAREN )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2882:7: SWITCH_CLAUSE LPAREN ( expression )? RPAREN
             {
-                SWITCH_CLAUSE473=(Token)match(input,SWITCH_CLAUSE,FOLLOW_SWITCH_CLAUSE_in_switchHeader19140); if (state.failed) return clause;
+                SWITCH_CLAUSE473=(Token)match(input,SWITCH_CLAUSE,FOLLOW_SWITCH_CLAUSE_in_switchHeader19142); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new SwitchClause(SWITCH_CLAUSE473); }
 
-                match(input,LPAREN,FOLLOW_LPAREN_in_switchHeader19157); if (state.failed) return clause;
+                match(input,LPAREN,FOLLOW_LPAREN_in_switchHeader19159); if (state.failed) return clause;
 
                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2885:7: ( expression )?
                 int alt234=2;
@@ -19400,7 +19401,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2886:7: expression
                     {
-                        pushFollow(FOLLOW_expression_in_switchHeader19174);
+                        pushFollow(FOLLOW_expression_in_switchHeader19176);
                         expression474=expression();
 
                         state._fsp--;
@@ -19414,7 +19415,7 @@ public class CeylonParser extends Parser {
                 }
 
 
-                match(input,RPAREN,FOLLOW_RPAREN_in_switchHeader19200); if (state.failed) return clause;
+                match(input,RPAREN,FOLLOW_RPAREN_in_switchHeader19202); if (state.failed) return clause;
 
             }
 
@@ -19466,7 +19467,7 @@ public class CeylonParser extends Parser {
                         case 1 :
                             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2895:9: caseBlock
                         {
-                            pushFollow(FOLLOW_caseBlock_in_cases19239);
+                            pushFollow(FOLLOW_caseBlock_in_cases19241);
                             caseBlock475=caseBlock();
 
                             state._fsp--;
@@ -19499,7 +19500,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2899:9: defaultCaseBlock
                     {
-                        pushFollow(FOLLOW_defaultCaseBlock_in_cases19276);
+                        pushFollow(FOLLOW_defaultCaseBlock_in_cases19278);
                         defaultCaseBlock476=defaultCaseBlock();
 
                         state._fsp--;
@@ -19546,11 +19547,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2905:5: ( CASE_CLAUSE caseItemList block )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2905:7: CASE_CLAUSE caseItemList block
             {
-                CASE_CLAUSE477=(Token)match(input,CASE_CLAUSE,FOLLOW_CASE_CLAUSE_in_caseBlock19320); if (state.failed) return clause;
+                CASE_CLAUSE477=(Token)match(input,CASE_CLAUSE,FOLLOW_CASE_CLAUSE_in_caseBlock19322); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new CaseClause(CASE_CLAUSE477); }
 
-                pushFollow(FOLLOW_caseItemList_in_caseBlock19337);
+                pushFollow(FOLLOW_caseItemList_in_caseBlock19339);
                 caseItemList478=caseItemList();
 
                 state._fsp--;
@@ -19558,7 +19559,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { clause.setCaseItem(caseItemList478); }
 
-                pushFollow(FOLLOW_block_in_caseBlock19353);
+                pushFollow(FOLLOW_block_in_caseBlock19355);
                 block479=block();
 
                 state._fsp--;
@@ -19597,7 +19598,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2914:5: ( LPAREN (ci= caseItem )? RPAREN )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2914:7: LPAREN (ci= caseItem )? RPAREN
             {
-                match(input,LPAREN,FOLLOW_LPAREN_in_caseItemList19382); if (state.failed) return item;
+                match(input,LPAREN,FOLLOW_LPAREN_in_caseItemList19384); if (state.failed) return item;
 
                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2915:7: (ci= caseItem )?
                 int alt237=2;
@@ -19610,7 +19611,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2916:9: ci= caseItem
                     {
-                        pushFollow(FOLLOW_caseItem_in_caseItemList19403);
+                        pushFollow(FOLLOW_caseItem_in_caseItemList19405);
                         ci=caseItem();
 
                         state._fsp--;
@@ -19624,7 +19625,7 @@ public class CeylonParser extends Parser {
                 }
 
 
-                RPAREN480=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_caseItemList19430); if (state.failed) return item;
+                RPAREN480=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_caseItemList19432); if (state.failed) return item;
 
                 if ( state.backtracking==0 ) { if (item!=null)
                     item.setEndToken(RPAREN480); }
@@ -19660,11 +19661,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2925:5: ( ELSE_CLAUSE block )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2925:7: ELSE_CLAUSE block
             {
-                ELSE_CLAUSE481=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock19460); if (state.failed) return clause;
+                ELSE_CLAUSE481=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock19462); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE481); }
 
-                pushFollow(FOLLOW_block_in_defaultCaseBlock19477);
+                pushFollow(FOLLOW_block_in_defaultCaseBlock19479);
                 block482=block();
 
                 state._fsp--;
@@ -19728,7 +19729,7 @@ public class CeylonParser extends Parser {
                 case 1 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2932:7: ( IS_OP )=> isCaseCondition
                 {
-                    pushFollow(FOLLOW_isCaseCondition_in_caseItem19510);
+                    pushFollow(FOLLOW_isCaseCondition_in_caseItem19512);
                     isCaseCondition483=isCaseCondition();
 
                     state._fsp--;
@@ -19741,7 +19742,7 @@ public class CeylonParser extends Parser {
                 case 2 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2934:7: ( SATISFIES )=> satisfiesCaseCondition
                 {
-                    pushFollow(FOLLOW_satisfiesCaseCondition_in_caseItem19531);
+                    pushFollow(FOLLOW_satisfiesCaseCondition_in_caseItem19533);
                     satisfiesCaseCondition484=satisfiesCaseCondition();
 
                     state._fsp--;
@@ -19754,7 +19755,7 @@ public class CeylonParser extends Parser {
                 case 3 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2936:7: matchCaseCondition
                 {
-                    pushFollow(FOLLOW_matchCaseCondition_in_caseItem19547);
+                    pushFollow(FOLLOW_matchCaseCondition_in_caseItem19549);
                     matchCaseCondition485=matchCaseCondition();
 
                     state._fsp--;
@@ -19794,7 +19795,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2941:5: ( expressions )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2941:7: expressions
             {
-                pushFollow(FOLLOW_expressions_in_matchCaseCondition19576);
+                pushFollow(FOLLOW_expressions_in_matchCaseCondition19578);
                 expressions486=expressions();
 
                 state._fsp--;
@@ -19834,11 +19835,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2947:5: ( IS_OP type )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2947:7: IS_OP type
             {
-                IS_OP487=(Token)match(input,IS_OP,FOLLOW_IS_OP_in_isCaseCondition19605); if (state.failed) return item;
+                IS_OP487=(Token)match(input,IS_OP,FOLLOW_IS_OP_in_isCaseCondition19607); if (state.failed) return item;
 
                 if ( state.backtracking==0 ) { item = new IsCase(IS_OP487); }
 
-                pushFollow(FOLLOW_type_in_isCaseCondition19622);
+                pushFollow(FOLLOW_type_in_isCaseCondition19624);
                 type488=type();
 
                 state._fsp--;
@@ -19877,11 +19878,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2954:5: ( SATISFIES type )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2954:7: SATISFIES type
             {
-                SATISFIES489=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiesCaseCondition19651); if (state.failed) return item;
+                SATISFIES489=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiesCaseCondition19653); if (state.failed) return item;
 
                 if ( state.backtracking==0 ) { item = new SatisfiesCase(SATISFIES489); }
 
-                pushFollow(FOLLOW_type_in_satisfiesCaseCondition19668);
+                pushFollow(FOLLOW_type_in_satisfiesCaseCondition19670);
                 type490=type();
 
                 state._fsp--;
@@ -19923,7 +19924,7 @@ public class CeylonParser extends Parser {
             {
                 if ( state.backtracking==0 ) { statement =new ForStatement(null); }
 
-                pushFollow(FOLLOW_forBlock_in_forElse19705);
+                pushFollow(FOLLOW_forBlock_in_forElse19707);
                 forBlock491=forBlock();
 
                 state._fsp--;
@@ -19942,7 +19943,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2965:9: failBlock
                     {
-                        pushFollow(FOLLOW_failBlock_in_forElse19732);
+                        pushFollow(FOLLOW_failBlock_in_forElse19734);
                         failBlock492=failBlock();
 
                         state._fsp--;
@@ -19989,11 +19990,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2971:5: ( FOR_CLAUSE forIterator controlBlock )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2971:7: FOR_CLAUSE forIterator controlBlock
             {
-                FOR_CLAUSE493=(Token)match(input,FOR_CLAUSE,FOLLOW_FOR_CLAUSE_in_forBlock19772); if (state.failed) return clause;
+                FOR_CLAUSE493=(Token)match(input,FOR_CLAUSE,FOLLOW_FOR_CLAUSE_in_forBlock19774); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new ForClause(FOR_CLAUSE493); }
 
-                pushFollow(FOLLOW_forIterator_in_forBlock19789);
+                pushFollow(FOLLOW_forIterator_in_forBlock19791);
                 forIterator494=forIterator();
 
                 state._fsp--;
@@ -20001,7 +20002,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { clause.setForIterator(forIterator494); }
 
-                pushFollow(FOLLOW_controlBlock_in_forBlock19806);
+                pushFollow(FOLLOW_controlBlock_in_forBlock19808);
                 controlBlock495=controlBlock();
 
                 state._fsp--;
@@ -20040,11 +20041,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2980:5: ( ELSE_CLAUSE controlBlock )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2980:7: ELSE_CLAUSE controlBlock
             {
-                ELSE_CLAUSE496=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_failBlock19835); if (state.failed) return clause;
+                ELSE_CLAUSE496=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_failBlock19837); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE496); }
 
-                pushFollow(FOLLOW_controlBlock_in_failBlock19852);
+                pushFollow(FOLLOW_controlBlock_in_failBlock19854);
                 controlBlock497=controlBlock();
 
                 state._fsp--;
@@ -20094,13 +20095,13 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2989:5: ( LPAREN compilerAnnotations (v1= var (c1= containment | ENTRY_OP v2= var c2= containment )? )? RPAREN )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2989:7: LPAREN compilerAnnotations (v1= var (c1= containment | ENTRY_OP v2= var c2= containment )? )? RPAREN
             {
-                LPAREN498=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_forIterator19890); if (state.failed) return iterator;
+                LPAREN498=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_forIterator19892); if (state.failed) return iterator;
 
                 if ( state.backtracking==0 ) { vi = new ValueIterator(LPAREN498);
                     kvi = new KeyValueIterator(LPAREN498);
                     iterator = vi; }
 
-                pushFollow(FOLLOW_compilerAnnotations_in_forIterator19902);
+                pushFollow(FOLLOW_compilerAnnotations_in_forIterator19904);
                 compilerAnnotations499=compilerAnnotations();
 
                 state._fsp--;
@@ -20117,7 +20118,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2995:7: v1= var (c1= containment | ENTRY_OP v2= var c2= containment )?
                     {
-                        pushFollow(FOLLOW_var_in_forIterator19919);
+                        pushFollow(FOLLOW_var_in_forIterator19921);
                         v1=var();
 
                         state._fsp--;
@@ -20139,7 +20140,7 @@ public class CeylonParser extends Parser {
                             {
                                 if ( state.backtracking==0 ) { vi.setVariable(v1); }
 
-                                pushFollow(FOLLOW_containment_in_forIterator19949);
+                                pushFollow(FOLLOW_containment_in_forIterator19951);
                                 c1=containment();
 
                                 state._fsp--;
@@ -20154,11 +20155,11 @@ public class CeylonParser extends Parser {
                             {
                                 if ( state.backtracking==0 ) { iterator = kvi; }
 
-                                match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_forIterator19988); if (state.failed) return iterator;
+                                match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_forIterator19990); if (state.failed) return iterator;
 
                                 if ( state.backtracking==0 ) { kvi.setKeyVariable(v1); }
 
-                                pushFollow(FOLLOW_var_in_forIterator20010);
+                                pushFollow(FOLLOW_var_in_forIterator20012);
                                 v2=var();
 
                                 state._fsp--;
@@ -20166,7 +20167,7 @@ public class CeylonParser extends Parser {
 
                                 if ( state.backtracking==0 ) { kvi.setValueVariable(v2); }
 
-                                pushFollow(FOLLOW_containment_in_forIterator20032);
+                                pushFollow(FOLLOW_containment_in_forIterator20034);
                                 c2=containment();
 
                                 state._fsp--;
@@ -20189,7 +20190,7 @@ public class CeylonParser extends Parser {
                 if ( state.backtracking==0 ) { if (iterator!=null)
                     iterator.getCompilerAnnotations().addAll(compilerAnnotations499); }
 
-                RPAREN500=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_forIterator20070); if (state.failed) return iterator;
+                RPAREN500=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_forIterator20072); if (state.failed) return iterator;
 
                 if ( state.backtracking==0 ) { iterator.setEndToken(RPAREN500); }
 
@@ -20224,7 +20225,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3017:5: ( IN_OP ( expression )? )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3017:7: IN_OP ( expression )?
             {
-                IN_OP501=(Token)match(input,IN_OP,FOLLOW_IN_OP_in_containment20101); if (state.failed) return specifierExpression;
+                IN_OP501=(Token)match(input,IN_OP,FOLLOW_IN_OP_in_containment20103); if (state.failed) return specifierExpression;
 
                 if ( state.backtracking==0 ) { specifierExpression = new SpecifierExpression(IN_OP501); }
 
@@ -20239,7 +20240,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3019:8: expression
                     {
-                        pushFollow(FOLLOW_expression_in_containment20119);
+                        pushFollow(FOLLOW_expression_in_containment20121);
                         expression502=expression();
 
                         state._fsp--;
@@ -20285,7 +20286,7 @@ public class CeylonParser extends Parser {
             {
                 if ( state.backtracking==0 ) { statement = new WhileStatement(null); }
 
-                pushFollow(FOLLOW_whileBlock_in_whileLoop20162);
+                pushFollow(FOLLOW_whileBlock_in_whileLoop20164);
                 whileBlock503=whileBlock();
 
                 state._fsp--;
@@ -20326,11 +20327,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3030:5: ( WHILE_CLAUSE conditions controlBlock )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3030:7: WHILE_CLAUSE conditions controlBlock
             {
-                WHILE_CLAUSE504=(Token)match(input,WHILE_CLAUSE,FOLLOW_WHILE_CLAUSE_in_whileBlock20191); if (state.failed) return clause;
+                WHILE_CLAUSE504=(Token)match(input,WHILE_CLAUSE,FOLLOW_WHILE_CLAUSE_in_whileBlock20193); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new WhileClause(WHILE_CLAUSE504); }
 
-                pushFollow(FOLLOW_conditions_in_whileBlock20207);
+                pushFollow(FOLLOW_conditions_in_whileBlock20209);
                 conditions505=conditions();
 
                 state._fsp--;
@@ -20338,7 +20339,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { clause.setConditionList(conditions505); }
 
-                pushFollow(FOLLOW_controlBlock_in_whileBlock20223);
+                pushFollow(FOLLOW_controlBlock_in_whileBlock20225);
                 controlBlock506=controlBlock();
 
                 state._fsp--;
@@ -20382,7 +20383,7 @@ public class CeylonParser extends Parser {
             {
                 if ( state.backtracking==0 ) { statement = new TryCatchStatement(null); }
 
-                pushFollow(FOLLOW_tryBlock_in_tryCatchFinally20260);
+                pushFollow(FOLLOW_tryBlock_in_tryCatchFinally20262);
                 tryBlock507=tryBlock();
 
                 state._fsp--;
@@ -20405,7 +20406,7 @@ public class CeylonParser extends Parser {
                         case 1 :
                             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3043:9: catchBlock
                         {
-                            pushFollow(FOLLOW_catchBlock_in_tryCatchFinally20287);
+                            pushFollow(FOLLOW_catchBlock_in_tryCatchFinally20289);
                             catchBlock508=catchBlock();
 
                             state._fsp--;
@@ -20433,7 +20434,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3047:9: finallyBlock
                     {
-                        pushFollow(FOLLOW_finallyBlock_in_tryCatchFinally20324);
+                        pushFollow(FOLLOW_finallyBlock_in_tryCatchFinally20326);
                         finallyBlock509=finallyBlock();
 
                         state._fsp--;
@@ -20482,7 +20483,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3053:5: ( TRY_CLAUSE ( resources controlBlock | block ) )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3053:7: TRY_CLAUSE ( resources controlBlock | block )
             {
-                TRY_CLAUSE510=(Token)match(input,TRY_CLAUSE,FOLLOW_TRY_CLAUSE_in_tryBlock20362); if (state.failed) return clause;
+                TRY_CLAUSE510=(Token)match(input,TRY_CLAUSE,FOLLOW_TRY_CLAUSE_in_tryBlock20364); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new TryClause(TRY_CLAUSE510); }
 
@@ -20508,7 +20509,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3056:9: resources controlBlock
                     {
-                        pushFollow(FOLLOW_resources_in_tryBlock20389);
+                        pushFollow(FOLLOW_resources_in_tryBlock20391);
                         resources511=resources();
 
                         state._fsp--;
@@ -20516,7 +20517,7 @@ public class CeylonParser extends Parser {
 
                         if ( state.backtracking==0 ) { clause.setResourceList(resources511); }
 
-                        pushFollow(FOLLOW_controlBlock_in_tryBlock20409);
+                        pushFollow(FOLLOW_controlBlock_in_tryBlock20411);
                         controlBlock512=controlBlock();
 
                         state._fsp--;
@@ -20529,7 +20530,7 @@ public class CeylonParser extends Parser {
                     case 2 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3061:9: block
                     {
-                        pushFollow(FOLLOW_block_in_tryBlock20437);
+                        pushFollow(FOLLOW_block_in_tryBlock20439);
                         block513=block();
 
                         state._fsp--;
@@ -20576,11 +20577,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3067:5: ( CATCH_CLAUSE catchVariable controlBlock )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3067:7: CATCH_CLAUSE catchVariable controlBlock
             {
-                CATCH_CLAUSE514=(Token)match(input,CATCH_CLAUSE,FOLLOW_CATCH_CLAUSE_in_catchBlock20476); if (state.failed) return clause;
+                CATCH_CLAUSE514=(Token)match(input,CATCH_CLAUSE,FOLLOW_CATCH_CLAUSE_in_catchBlock20478); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new CatchClause(CATCH_CLAUSE514); }
 
-                pushFollow(FOLLOW_catchVariable_in_catchBlock20493);
+                pushFollow(FOLLOW_catchVariable_in_catchBlock20495);
                 catchVariable515=catchVariable();
 
                 state._fsp--;
@@ -20588,7 +20589,7 @@ public class CeylonParser extends Parser {
 
                 if ( state.backtracking==0 ) { clause.setCatchVariable(catchVariable515); }
 
-                pushFollow(FOLLOW_controlBlock_in_catchBlock20509);
+                pushFollow(FOLLOW_controlBlock_in_catchBlock20511);
                 controlBlock516=controlBlock();
 
                 state._fsp--;
@@ -20628,7 +20629,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3076:5: ( LPAREN ( variable )? RPAREN )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3076:7: LPAREN ( variable )? RPAREN
             {
-                LPAREN517=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_catchVariable20538); if (state.failed) return catchVariable;
+                LPAREN517=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_catchVariable20540); if (state.failed) return catchVariable;
 
                 if ( state.backtracking==0 ) { catchVariable =new CatchVariable(LPAREN517); }
 
@@ -20643,7 +20644,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3079:7: variable
                     {
-                        pushFollow(FOLLOW_variable_in_catchVariable20563);
+                        pushFollow(FOLLOW_variable_in_catchVariable20565);
                         variable518=variable();
 
                         state._fsp--;
@@ -20657,7 +20658,7 @@ public class CeylonParser extends Parser {
                 }
 
 
-                RPAREN519=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_catchVariable20589); if (state.failed) return catchVariable;
+                RPAREN519=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_catchVariable20591); if (state.failed) return catchVariable;
 
                 if ( state.backtracking==0 ) { catchVariable.setEndToken(RPAREN519); }
 
@@ -20692,11 +20693,11 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3088:5: ( FINALLY_CLAUSE controlBlock )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3088:7: FINALLY_CLAUSE controlBlock
             {
-                FINALLY_CLAUSE520=(Token)match(input,FINALLY_CLAUSE,FOLLOW_FINALLY_CLAUSE_in_finallyBlock20620); if (state.failed) return clause;
+                FINALLY_CLAUSE520=(Token)match(input,FINALLY_CLAUSE,FOLLOW_FINALLY_CLAUSE_in_finallyBlock20622); if (state.failed) return clause;
 
                 if ( state.backtracking==0 ) { clause = new FinallyClause(FINALLY_CLAUSE520); }
 
-                pushFollow(FOLLOW_controlBlock_in_finallyBlock20637);
+                pushFollow(FOLLOW_controlBlock_in_finallyBlock20639);
                 controlBlock521=controlBlock();
 
                 state._fsp--;
@@ -20739,7 +20740,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3095:5: ( LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3095:7: LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN
             {
-                LPAREN522=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_resources20666); if (state.failed) return resources;
+                LPAREN522=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_resources20668); if (state.failed) return resources;
 
                 if ( state.backtracking==0 ) { resources = new ResourceList(LPAREN522); }
 
@@ -20754,7 +20755,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3098:5: r1= resource (c= COMMA r2= resource )*
                     {
-                        pushFollow(FOLLOW_resource_in_resources20687);
+                        pushFollow(FOLLOW_resource_in_resources20689);
                         r1=resource();
 
                         state._fsp--;
@@ -20777,11 +20778,11 @@ public class CeylonParser extends Parser {
                                 case 1 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3101:7: c= COMMA r2= resource
                                 {
-                                    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_resources20709); if (state.failed) return resources;
+                                    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_resources20711); if (state.failed) return resources;
 
                                     if ( state.backtracking==0 ) { resources.setEndToken(c); }
 
-                                    pushFollow(FOLLOW_resource_in_resources20728);
+                                    pushFollow(FOLLOW_resource_in_resources20730);
                                     r2=resource();
 
                                     state._fsp--;
@@ -20805,7 +20806,7 @@ public class CeylonParser extends Parser {
                 }
 
 
-                RPAREN523=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_resources20756); if (state.failed) return resources;
+                RPAREN523=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_resources20758); if (state.failed) return resources;
 
                 if ( state.backtracking==0 ) { resources.setEndToken(RPAREN523); }
 
@@ -20963,7 +20964,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3114:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
                     {
-                        pushFollow(FOLLOW_specifiedVariable_in_resource20813);
+                        pushFollow(FOLLOW_specifiedVariable_in_resource20815);
                         specifiedVariable524=specifiedVariable();
 
                         state._fsp--;
@@ -20976,7 +20977,7 @@ public class CeylonParser extends Parser {
                     case 2 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3117:9: expression
                     {
-                        pushFollow(FOLLOW_expression_in_resource20833);
+                        pushFollow(FOLLOW_expression_in_resource20835);
                         expression525=expression();
 
                         state._fsp--;
@@ -21022,7 +21023,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3123:5: (v= variable ( specifier )? )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3123:7: v= variable ( specifier )?
             {
-                pushFollow(FOLLOW_variable_in_specifiedVariable20874);
+                pushFollow(FOLLOW_variable_in_specifiedVariable20876);
                 v=variable();
 
                 state._fsp--;
@@ -21041,7 +21042,7 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3126:9: specifier
                     {
-                        pushFollow(FOLLOW_specifier_in_specifiedVariable20901);
+                        pushFollow(FOLLOW_specifier_in_specifiedVariable20903);
                         specifier526=specifier();
 
                         state._fsp--;
@@ -21087,13 +21088,13 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3132:5: ( compilerAnnotations var )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3132:7: compilerAnnotations var
             {
-                pushFollow(FOLLOW_compilerAnnotations_in_variable20941);
+                pushFollow(FOLLOW_compilerAnnotations_in_variable20943);
                 compilerAnnotations528=compilerAnnotations();
 
                 state._fsp--;
                 if (state.failed) return variable;
 
-                pushFollow(FOLLOW_var_in_variable20949);
+                pushFollow(FOLLOW_var_in_variable20951);
                 var527=var();
 
                 state._fsp--;
@@ -21223,7 +21224,7 @@ public class CeylonParser extends Parser {
                             case 1 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3141:9: type
                             {
-                                pushFollow(FOLLOW_type_in_var20998);
+                                pushFollow(FOLLOW_type_in_var21000);
                                 type529=type();
 
                                 state._fsp--;
@@ -21236,7 +21237,7 @@ public class CeylonParser extends Parser {
                             case 2 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3143:9: VOID_MODIFIER
                             {
-                                VOID_MODIFIER530=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_var21019); if (state.failed) return variable;
+                                VOID_MODIFIER530=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_var21021); if (state.failed) return variable;
 
                                 if ( state.backtracking==0 ) { variable.setType(new VoidModifier(VOID_MODIFIER530)); }
 
@@ -21245,7 +21246,7 @@ public class CeylonParser extends Parser {
                             case 3 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3145:9: FUNCTION_MODIFIER
                             {
-                                FUNCTION_MODIFIER531=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_var21039); if (state.failed) return variable;
+                                FUNCTION_MODIFIER531=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_var21041); if (state.failed) return variable;
 
                                 if ( state.backtracking==0 ) { variable.setType(new FunctionModifier(FUNCTION_MODIFIER531)); }
 
@@ -21254,7 +21255,7 @@ public class CeylonParser extends Parser {
                             case 4 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3147:9: VALUE_MODIFIER
                             {
-                                VALUE_MODIFIER532=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_var21059); if (state.failed) return variable;
+                                VALUE_MODIFIER532=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_var21061); if (state.failed) return variable;
 
                                 if ( state.backtracking==0 ) { variable.setType(new ValueModifier(VALUE_MODIFIER532)); }
 
@@ -21264,7 +21265,7 @@ public class CeylonParser extends Parser {
                         }
 
 
-                        pushFollow(FOLLOW_memberName_in_var21087);
+                        pushFollow(FOLLOW_memberName_in_var21089);
                         mn1=memberName();
 
                         state._fsp--;
@@ -21287,7 +21288,7 @@ public class CeylonParser extends Parser {
                                 case 1 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3153:9: p1= parameters
                                 {
-                                    pushFollow(FOLLOW_parameters_in_var21117);
+                                    pushFollow(FOLLOW_parameters_in_var21119);
                                     p1=parameters();
 
                                     state._fsp--;
@@ -21311,7 +21312,7 @@ public class CeylonParser extends Parser {
                     {
                         if ( state.backtracking==0 ) { variable.setType( new ValueModifier(null) ); }
 
-                        pushFollow(FOLLOW_memberName_in_var21161);
+                        pushFollow(FOLLOW_memberName_in_var21163);
                         mn2=memberName();
 
                         state._fsp--;
@@ -21326,7 +21327,7 @@ public class CeylonParser extends Parser {
                     {
                         if ( state.backtracking==0 ) { variable.setType( new FunctionModifier(null) ); }
 
-                        pushFollow(FOLLOW_memberName_in_var21194);
+                        pushFollow(FOLLOW_memberName_in_var21196);
                         mn3=memberName();
 
                         state._fsp--;
@@ -21350,7 +21351,7 @@ public class CeylonParser extends Parser {
                                 case 1 :
                                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3165:9: p3= parameters
                                 {
-                                    pushFollow(FOLLOW_parameters_in_var21223);
+                                    pushFollow(FOLLOW_parameters_in_var21225);
                                     p3=parameters();
 
                                     state._fsp--;
@@ -21408,7 +21409,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3172:5: ( memberName )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3172:7: memberName
             {
-                pushFollow(FOLLOW_memberName_in_impliedVariable21269);
+                pushFollow(FOLLOW_memberName_in_impliedVariable21271);
                 memberName533=memberName();
 
                 state._fsp--;
@@ -21526,7 +21527,7 @@ public class CeylonParser extends Parser {
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3199:5: (d1= BACKTICK ( MODULE p1= packagePath | PACKAGE p2= packagePath | CLASS_DEFINITION (ct= type |ot= memberName ) | INTERFACE_DEFINITION it= type | ALIAS at= type | TYPE_CONSTRAINT tt= type | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? vm= memberName | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? fm= memberName | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? ) d2= BACKTICK )
             // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3199:7: d1= BACKTICK ( MODULE p1= packagePath | PACKAGE p2= packagePath | CLASS_DEFINITION (ct= type |ot= memberName ) | INTERFACE_DEFINITION it= type | ALIAS at= type | TYPE_CONSTRAINT tt= type | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? vm= memberName | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? fm= memberName | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? ) d2= BACKTICK
             {
-                d1=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral21311); if (state.failed) return meta;
+                d1=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral21313); if (state.failed) return meta;
 
                 if ( state.backtracking==0 ) { tl = new TypeLiteral(d1);
                     meta = tl; }
@@ -21691,13 +21692,13 @@ public class CeylonParser extends Parser {
                     case 1 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3203:7: MODULE p1= packagePath
                     {
-                        MODULE534=(Token)match(input,MODULE,FOLLOW_MODULE_in_metaLiteral21333); if (state.failed) return meta;
+                        MODULE534=(Token)match(input,MODULE,FOLLOW_MODULE_in_metaLiteral21335); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { m = new ModuleLiteral(d1);
                             m.setEndToken(MODULE534);
                             meta =m; }
 
-                        pushFollow(FOLLOW_packagePath_in_metaLiteral21351);
+                        pushFollow(FOLLOW_packagePath_in_metaLiteral21353);
                         p1=packagePath();
 
                         state._fsp--;
@@ -21711,13 +21712,13 @@ public class CeylonParser extends Parser {
                     case 2 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3211:7: PACKAGE p2= packagePath
                     {
-                        PACKAGE535=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_metaLiteral21373); if (state.failed) return meta;
+                        PACKAGE535=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_metaLiteral21375); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { p = new PackageLiteral(d1);
                             p.setEndToken(PACKAGE535);
                             meta =p; }
 
-                        pushFollow(FOLLOW_packagePath_in_metaLiteral21391);
+                        pushFollow(FOLLOW_packagePath_in_metaLiteral21393);
                         p2=packagePath();
 
                         state._fsp--;
@@ -21731,7 +21732,7 @@ public class CeylonParser extends Parser {
                     case 3 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3219:7: CLASS_DEFINITION (ct= type |ot= memberName )
                     {
-                        CLASS_DEFINITION536=(Token)match(input,CLASS_DEFINITION,FOLLOW_CLASS_DEFINITION_in_metaLiteral21413); if (state.failed) return meta;
+                        CLASS_DEFINITION536=(Token)match(input,CLASS_DEFINITION,FOLLOW_CLASS_DEFINITION_in_metaLiteral21415); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { c = new ClassLiteral(d1);
                             c.setEndToken(CLASS_DEFINITION536);
@@ -21759,7 +21760,7 @@ public class CeylonParser extends Parser {
                             case 1 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3224:9: ct= type
                             {
-                                pushFollow(FOLLOW_type_in_metaLiteral21441);
+                                pushFollow(FOLLOW_type_in_metaLiteral21443);
                                 ct=type();
 
                                 state._fsp--;
@@ -21773,7 +21774,7 @@ public class CeylonParser extends Parser {
                             case 2 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3228:9: ot= memberName
                             {
-                                pushFollow(FOLLOW_memberName_in_metaLiteral21471);
+                                pushFollow(FOLLOW_memberName_in_metaLiteral21473);
                                 ot=memberName();
 
                                 state._fsp--;
@@ -21795,13 +21796,13 @@ public class CeylonParser extends Parser {
                     case 4 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3235:7: INTERFACE_DEFINITION it= type
                     {
-                        INTERFACE_DEFINITION537=(Token)match(input,INTERFACE_DEFINITION,FOLLOW_INTERFACE_DEFINITION_in_metaLiteral21503); if (state.failed) return meta;
+                        INTERFACE_DEFINITION537=(Token)match(input,INTERFACE_DEFINITION,FOLLOW_INTERFACE_DEFINITION_in_metaLiteral21505); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { i = new InterfaceLiteral(d1);
                             i.setEndToken(INTERFACE_DEFINITION537);
                             meta =i; }
 
-                        pushFollow(FOLLOW_type_in_metaLiteral21521);
+                        pushFollow(FOLLOW_type_in_metaLiteral21523);
                         it=type();
 
                         state._fsp--;
@@ -21815,13 +21816,13 @@ public class CeylonParser extends Parser {
                     case 5 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3243:7: ALIAS at= type
                     {
-                        ALIAS538=(Token)match(input,ALIAS,FOLLOW_ALIAS_in_metaLiteral21543); if (state.failed) return meta;
+                        ALIAS538=(Token)match(input,ALIAS,FOLLOW_ALIAS_in_metaLiteral21545); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { a = new AliasLiteral(d1);
                             a.setEndToken(ALIAS538);
                             meta =a; }
 
-                        pushFollow(FOLLOW_type_in_metaLiteral21561);
+                        pushFollow(FOLLOW_type_in_metaLiteral21563);
                         at=type();
 
                         state._fsp--;
@@ -21835,13 +21836,13 @@ public class CeylonParser extends Parser {
                     case 6 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3251:7: TYPE_CONSTRAINT tt= type
                     {
-                        TYPE_CONSTRAINT539=(Token)match(input,TYPE_CONSTRAINT,FOLLOW_TYPE_CONSTRAINT_in_metaLiteral21583); if (state.failed) return meta;
+                        TYPE_CONSTRAINT539=(Token)match(input,TYPE_CONSTRAINT,FOLLOW_TYPE_CONSTRAINT_in_metaLiteral21585); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { tp = new TypeParameterLiteral(d1);
                             tp.setEndToken(TYPE_CONSTRAINT539);
                             meta =tp; }
 
-                        pushFollow(FOLLOW_type_in_metaLiteral21601);
+                        pushFollow(FOLLOW_type_in_metaLiteral21603);
                         tt=type();
 
                         state._fsp--;
@@ -21877,7 +21878,7 @@ public class CeylonParser extends Parser {
                             case 1 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3260:9: VALUE_MODIFIER
                             {
-                                VALUE_MODIFIER540=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_metaLiteral21633); if (state.failed) return meta;
+                                VALUE_MODIFIER540=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_metaLiteral21635); if (state.failed) return meta;
 
                                 if ( state.backtracking==0 ) { v = new ValueLiteral(d1);
                                     v.setEndToken(VALUE_MODIFIER540);
@@ -21888,7 +21889,7 @@ public class CeylonParser extends Parser {
                             case 2 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3265:9: OBJECT_DEFINITION
                             {
-                                OBJECT_DEFINITION541=(Token)match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_metaLiteral21661); if (state.failed) return meta;
+                                OBJECT_DEFINITION541=(Token)match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_metaLiteral21663); if (state.failed) return meta;
 
                                 if ( state.backtracking==0 ) { v = new ValueLiteral(d1);
                                     v.setEndToken(OBJECT_DEFINITION541);
@@ -21941,7 +21942,7 @@ public class CeylonParser extends Parser {
                                     case 1 :
                                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3273:11: vt= type
                                     {
-                                        pushFollow(FOLLOW_type_in_metaLiteral21711);
+                                        pushFollow(FOLLOW_type_in_metaLiteral21713);
                                         vt=type();
 
                                         state._fsp--;
@@ -21955,7 +21956,7 @@ public class CeylonParser extends Parser {
                                     case 2 :
                                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3277:11: vom= memberName
                                     {
-                                        pushFollow(FOLLOW_memberName_in_metaLiteral21747);
+                                        pushFollow(FOLLOW_memberName_in_metaLiteral21749);
                                         vom=memberName();
 
                                         state._fsp--;
@@ -21973,7 +21974,7 @@ public class CeylonParser extends Parser {
                                 }
 
 
-                                vo=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral21781); if (state.failed) return meta;
+                                vo=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral21783); if (state.failed) return meta;
 
                                 if ( state.backtracking==0 ) { v.setEndToken(vo); }
 
@@ -21983,7 +21984,7 @@ public class CeylonParser extends Parser {
                         }
 
 
-                        pushFollow(FOLLOW_memberName_in_metaLiteral21810);
+                        pushFollow(FOLLOW_memberName_in_metaLiteral21812);
                         vm=memberName();
 
                         state._fsp--;
@@ -21997,7 +21998,7 @@ public class CeylonParser extends Parser {
                     case 8 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3291:7: FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? fm= memberName
                     {
-                        FUNCTION_MODIFIER542=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_metaLiteral21832); if (state.failed) return meta;
+                        FUNCTION_MODIFIER542=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_metaLiteral21834); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { f = new FunctionLiteral(d1);
                             f.setEndToken(FUNCTION_MODIFIER542);
@@ -22043,7 +22044,7 @@ public class CeylonParser extends Parser {
                                     case 1 :
                                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3297:11: ft= type
                                     {
-                                        pushFollow(FOLLOW_type_in_metaLiteral21872);
+                                        pushFollow(FOLLOW_type_in_metaLiteral21874);
                                         ft=type();
 
                                         state._fsp--;
@@ -22057,7 +22058,7 @@ public class CeylonParser extends Parser {
                                     case 2 :
                                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3301:11: fom= memberName
                                     {
-                                        pushFollow(FOLLOW_memberName_in_metaLiteral21908);
+                                        pushFollow(FOLLOW_memberName_in_metaLiteral21910);
                                         fom=memberName();
 
                                         state._fsp--;
@@ -22075,7 +22076,7 @@ public class CeylonParser extends Parser {
                                 }
 
 
-                                fo=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral21942); if (state.failed) return meta;
+                                fo=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral21944); if (state.failed) return meta;
 
                                 if ( state.backtracking==0 ) { f.setEndToken(fo); }
 
@@ -22085,7 +22086,7 @@ public class CeylonParser extends Parser {
                         }
 
 
-                        pushFollow(FOLLOW_memberName_in_metaLiteral21971);
+                        pushFollow(FOLLOW_memberName_in_metaLiteral21973);
                         fm=memberName();
 
                         state._fsp--;
@@ -22102,7 +22103,7 @@ public class CeylonParser extends Parser {
                         if ( state.backtracking==0 ) { ml = new MemberLiteral(d1);
                             meta = ml; }
 
-                        pushFollow(FOLLOW_abbreviatedType_in_metaLiteral22017);
+                        pushFollow(FOLLOW_abbreviatedType_in_metaLiteral22019);
                         at=abbreviatedType();
 
                         state._fsp--;
@@ -22110,11 +22111,11 @@ public class CeylonParser extends Parser {
 
                         if ( state.backtracking==0 ) { ml.setType(at); }
 
-                        o1=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral22035); if (state.failed) return meta;
+                        o1=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral22037); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { ml.setEndToken(o1); }
 
-                        pushFollow(FOLLOW_memberName_in_metaLiteral22053);
+                        pushFollow(FOLLOW_memberName_in_metaLiteral22055);
                         m1=memberName();
 
                         state._fsp--;
@@ -22134,7 +22135,7 @@ public class CeylonParser extends Parser {
                             case 1 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3326:9: ta1= typeArguments
                             {
-                                pushFollow(FOLLOW_typeArguments_in_metaLiteral22081);
+                                pushFollow(FOLLOW_typeArguments_in_metaLiteral22083);
                                 ta1=typeArguments();
 
                                 state._fsp--;
@@ -22156,7 +22157,7 @@ public class CeylonParser extends Parser {
                         if ( state.backtracking==0 ) { ml = new MemberLiteral(d1);
                             meta = ml; }
 
-                        pushFollow(FOLLOW_groupedType_in_metaLiteral22139);
+                        pushFollow(FOLLOW_groupedType_in_metaLiteral22141);
                         gt=groupedType();
 
                         state._fsp--;
@@ -22164,11 +22165,11 @@ public class CeylonParser extends Parser {
 
                         if ( state.backtracking==0 ) { ml.setType(gt); }
 
-                        o2=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral22157); if (state.failed) return meta;
+                        o2=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral22159); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { ml.setEndToken(o2); }
 
-                        pushFollow(FOLLOW_memberName_in_metaLiteral22175);
+                        pushFollow(FOLLOW_memberName_in_metaLiteral22177);
                         m2=memberName();
 
                         state._fsp--;
@@ -22188,7 +22189,7 @@ public class CeylonParser extends Parser {
                             case 1 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3341:9: ta2= typeArguments
                             {
-                                pushFollow(FOLLOW_typeArguments_in_metaLiteral22203);
+                                pushFollow(FOLLOW_typeArguments_in_metaLiteral22205);
                                 ta2=typeArguments();
 
                                 state._fsp--;
@@ -22210,7 +22211,7 @@ public class CeylonParser extends Parser {
                         if ( state.backtracking==0 ) { ml = new MemberLiteral(d1);
                             meta = ml; }
 
-                        pushFollow(FOLLOW_memberName_in_metaLiteral22260);
+                        pushFollow(FOLLOW_memberName_in_metaLiteral22262);
                         mn=memberName();
 
                         state._fsp--;
@@ -22221,11 +22222,11 @@ public class CeylonParser extends Parser {
                             bme.setTypeArguments(new InferredTypeArguments(null));
                             ml.setObjectExpression(bme); }
 
-                        o1=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral22278); if (state.failed) return meta;
+                        o1=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_metaLiteral22280); if (state.failed) return meta;
 
                         if ( state.backtracking==0 ) { ml.setEndToken(o1); }
 
-                        pushFollow(FOLLOW_memberName_in_metaLiteral22296);
+                        pushFollow(FOLLOW_memberName_in_metaLiteral22298);
                         m4=memberName();
 
                         state._fsp--;
@@ -22245,7 +22246,7 @@ public class CeylonParser extends Parser {
                             case 1 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3359:9: ta1= typeArguments
                             {
-                                pushFollow(FOLLOW_typeArguments_in_metaLiteral22324);
+                                pushFollow(FOLLOW_typeArguments_in_metaLiteral22326);
                                 ta1=typeArguments();
 
                                 state._fsp--;
@@ -22264,7 +22265,7 @@ public class CeylonParser extends Parser {
                     case 12 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3363:7: t= type
                     {
-                        pushFollow(FOLLOW_type_in_metaLiteral22360);
+                        pushFollow(FOLLOW_type_in_metaLiteral22362);
                         t=type();
 
                         state._fsp--;
@@ -22279,7 +22280,7 @@ public class CeylonParser extends Parser {
                     case 13 :
                         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3368:7: m3= memberName (ta3= typeArguments )?
                     {
-                        pushFollow(FOLLOW_memberName_in_metaLiteral22385);
+                        pushFollow(FOLLOW_memberName_in_metaLiteral22387);
                         m3=memberName();
 
                         state._fsp--;
@@ -22300,7 +22301,7 @@ public class CeylonParser extends Parser {
                             case 1 :
                                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3373:9: ta3= typeArguments
                             {
-                                pushFollow(FOLLOW_typeArguments_in_metaLiteral22413);
+                                pushFollow(FOLLOW_typeArguments_in_metaLiteral22415);
                                 ta3=typeArguments();
 
                                 state._fsp--;
@@ -22320,7 +22321,7 @@ public class CeylonParser extends Parser {
                 }
 
 
-                d2=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral22448); if (state.failed) return meta;
+                d2=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral22450); if (state.failed) return meta;
 
                 if ( state.backtracking==0 ) { meta.setEndToken(d2); }
 
@@ -22670,7 +22671,7 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2642:7: ( namedAnnotationArgumentsStart )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2642:8: namedAnnotationArgumentsStart
         {
-            pushFollow(FOLLOW_namedAnnotationArgumentsStart_in_synpred16_Ceylon17542);
+            pushFollow(FOLLOW_namedAnnotationArgumentsStart_in_synpred16_Ceylon17544);
             namedAnnotationArgumentsStart();
 
             state._fsp--;
@@ -22686,7 +22687,7 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2721:7: ( compilerAnnotations ( declarationStart | specificationStart ) )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2721:8: compilerAnnotations ( declarationStart | specificationStart )
         {
-            pushFollow(FOLLOW_compilerAnnotations_in_synpred17_Ceylon18128);
+            pushFollow(FOLLOW_compilerAnnotations_in_synpred17_Ceylon18130);
             compilerAnnotations();
 
             state._fsp--;
@@ -22714,7 +22715,7 @@ public class CeylonParser extends Parser {
                 case 1 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2721:29: declarationStart
                 {
-                    pushFollow(FOLLOW_declarationStart_in_synpred17_Ceylon18131);
+                    pushFollow(FOLLOW_declarationStart_in_synpred17_Ceylon18133);
                     declarationStart();
 
                     state._fsp--;
@@ -22725,7 +22726,7 @@ public class CeylonParser extends Parser {
                 case 2 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2721:46: specificationStart
                 {
-                    pushFollow(FOLLOW_specificationStart_in_synpred17_Ceylon18133);
+                    pushFollow(FOLLOW_specificationStart_in_synpred17_Ceylon18135);
                     specificationStart();
 
                     state._fsp--;
@@ -22747,7 +22748,7 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2725:9: ( LIDENTIFIER )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2725:10: LIDENTIFIER
         {
-            match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred18_Ceylon18178); if (state.failed) return ;
+            match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred18_Ceylon18180); if (state.failed) return ;
 
         }
 
@@ -22759,7 +22760,7 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2735:7: ( compilerAnnotations ( declarationStart | specificationStart ) )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2735:8: compilerAnnotations ( declarationStart | specificationStart )
         {
-            pushFollow(FOLLOW_compilerAnnotations_in_synpred19_Ceylon18261);
+            pushFollow(FOLLOW_compilerAnnotations_in_synpred19_Ceylon18263);
             compilerAnnotations();
 
             state._fsp--;
@@ -22787,7 +22788,7 @@ public class CeylonParser extends Parser {
                 case 1 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2735:29: declarationStart
                 {
-                    pushFollow(FOLLOW_declarationStart_in_synpred19_Ceylon18264);
+                    pushFollow(FOLLOW_declarationStart_in_synpred19_Ceylon18266);
                     declarationStart();
 
                     state._fsp--;
@@ -22798,7 +22799,7 @@ public class CeylonParser extends Parser {
                 case 2 :
                     // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2735:46: specificationStart
                 {
-                    pushFollow(FOLLOW_specificationStart_in_synpred19_Ceylon18266);
+                    pushFollow(FOLLOW_specificationStart_in_synpred19_Ceylon18268);
                     specificationStart();
 
                     state._fsp--;
@@ -22820,7 +22821,7 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2739:7: ( LIDENTIFIER )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2739:8: LIDENTIFIER
         {
-            match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred20_Ceylon18303); if (state.failed) return ;
+            match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred20_Ceylon18305); if (state.failed) return ;
 
         }
 
@@ -22832,9 +22833,9 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2757:7: ( LIDENTIFIER SPECIFY )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2757:8: LIDENTIFIER SPECIFY
         {
-            match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred21_Ceylon18430); if (state.failed) return ;
+            match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred21_Ceylon18432); if (state.failed) return ;
 
-            match(input,SPECIFY,FOLLOW_SPECIFY_in_synpred21_Ceylon18432); if (state.failed) return ;
+            match(input,SPECIFY,FOLLOW_SPECIFY_in_synpred21_Ceylon18434); if (state.failed) return ;
 
         }
 
@@ -22846,7 +22847,7 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2796:9: ( LBRACE )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2796:10: LBRACE
         {
-            match(input,LBRACE,FOLLOW_LBRACE_in_synpred22_Ceylon18705); if (state.failed) return ;
+            match(input,LBRACE,FOLLOW_LBRACE_in_synpred22_Ceylon18707); if (state.failed) return ;
 
         }
 
@@ -22858,7 +22859,7 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2932:7: ( IS_OP )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2932:8: IS_OP
         {
-            match(input,IS_OP,FOLLOW_IS_OP_in_synpred23_Ceylon19507); if (state.failed) return ;
+            match(input,IS_OP,FOLLOW_IS_OP_in_synpred23_Ceylon19509); if (state.failed) return ;
 
         }
 
@@ -22870,7 +22871,7 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2934:7: ( SATISFIES )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:2934:8: SATISFIES
         {
-            match(input,SATISFIES,FOLLOW_SATISFIES_in_synpred24_Ceylon19528); if (state.failed) return ;
+            match(input,SATISFIES,FOLLOW_SATISFIES_in_synpred24_Ceylon19530); if (state.failed) return ;
 
         }
 
@@ -22922,14 +22923,14 @@ public class CeylonParser extends Parser {
             case 1 :
                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3114:10: COMPILER_ANNOTATION
             {
-                match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_synpred25_Ceylon20795); if (state.failed) return ;
+                match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_synpred25_Ceylon20797); if (state.failed) return ;
 
             }
             break;
             case 2 :
                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3114:30: declarationStart
             {
-                pushFollow(FOLLOW_declarationStart_in_synpred25_Ceylon20797);
+                pushFollow(FOLLOW_declarationStart_in_synpred25_Ceylon20799);
                 declarationStart();
 
                 state._fsp--;
@@ -22940,7 +22941,7 @@ public class CeylonParser extends Parser {
             case 3 :
                 // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3114:47: specificationStart
             {
-                pushFollow(FOLLOW_specificationStart_in_synpred25_Ceylon20799);
+                pushFollow(FOLLOW_specificationStart_in_synpred25_Ceylon20801);
                 specificationStart();
 
                 state._fsp--;
@@ -22958,13 +22959,13 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3315:7: ( abbreviatedType MEMBER_OP )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3315:8: abbreviatedType MEMBER_OP
         {
-            pushFollow(FOLLOW_abbreviatedType_in_synpred26_Ceylon21994);
+            pushFollow(FOLLOW_abbreviatedType_in_synpred26_Ceylon21996);
             abbreviatedType();
 
             state._fsp--;
             if (state.failed) return ;
 
-            match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_synpred26_Ceylon21996); if (state.failed) return ;
+            match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_synpred26_Ceylon21998); if (state.failed) return ;
 
         }
 
@@ -22976,13 +22977,13 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3330:7: ( groupedType MEMBER_OP )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3330:8: groupedType MEMBER_OP
         {
-            pushFollow(FOLLOW_groupedType_in_synpred27_Ceylon22116);
+            pushFollow(FOLLOW_groupedType_in_synpred27_Ceylon22118);
             groupedType();
 
             state._fsp--;
             if (state.failed) return ;
 
-            match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_synpred27_Ceylon22118); if (state.failed) return ;
+            match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_synpred27_Ceylon22120); if (state.failed) return ;
 
         }
 
@@ -22994,13 +22995,13 @@ public class CeylonParser extends Parser {
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3345:7: ( memberName MEMBER_OP )
         // /Users/matic/Projects/ceylon/ceylon-spec/Ceylon.g:3345:8: memberName MEMBER_OP
         {
-            pushFollow(FOLLOW_memberName_in_synpred28_Ceylon22237);
+            pushFollow(FOLLOW_memberName_in_synpred28_Ceylon22239);
             memberName();
 
             state._fsp--;
             if (state.failed) return ;
 
-            match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_synpred28_Ceylon22239); if (state.failed) return ;
+            match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_synpred28_Ceylon22241); if (state.failed) return ;
 
         }
 
@@ -24800,217 +24801,217 @@ public class CeylonParser extends Parser {
     public static final BitSet FOLLOW_defaultedType_in_tupleType16154 = new BitSet(new long[]{0x0000000001000000L,0x0000000200000000L});
     public static final BitSet FOLLOW_RBRACKET_in_tupleType16194 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_SMALLER_OP_in_groupedType16223 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_type_in_groupedType16233 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000001L});
-    public static final BitSet FOLLOW_LARGER_OP_in_groupedType16249 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LBRACE_in_iterableType16269 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_variadicType_in_iterableType16285 = new BitSet(new long[]{0x0000000000000000L,0x0000000100000000L});
-    public static final BitSet FOLLOW_RBRACE_in_iterableType16299 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_unionType_in_type16337 = new BitSet(new long[]{0x0000010000000002L});
-    public static final BitSet FOLLOW_ENTRY_OP_in_type16363 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_unionType_in_type16397 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_intersectionType_in_unionType16462 = new BitSet(new long[]{0x0000000000000002L,0x8000000000000000L});
-    public static final BitSet FOLLOW_UNION_OP_in_unionType16503 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_intersectionType_in_unionType16543 = new BitSet(new long[]{0x0000000000000002L,0x8000000000000000L});
-    public static final BitSet FOLLOW_abbreviatedType_in_intersectionType16633 = new BitSet(new long[]{0x0400000000000002L});
-    public static final BitSet FOLLOW_INTERSECTION_OP_in_intersectionType16674 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_abbreviatedType_in_intersectionType16714 = new BitSet(new long[]{0x0400000000000002L});
-    public static final BitSet FOLLOW_qualifiedType_in_qualifiedOrTupleType16793 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tupleType_in_qualifiedOrTupleType16810 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_iterableType_in_qualifiedOrTupleType16827 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_qualifiedOrTupleType_in_abbreviatedType16868 = new BitSet(new long[]{0x0000000000000002L,0x0000000000200108L});
-    public static final BitSet FOLLOW_OPTIONAL_in_abbreviatedType16930 = new BitSet(new long[]{0x0000000000000002L,0x0000000000200108L});
-    public static final BitSet FOLLOW_LBRACKET_in_abbreviatedType16951 = new BitSet(new long[]{0x0000000000000000L,0x0000000200000000L});
-    public static final BitSet FOLLOW_RBRACKET_in_abbreviatedType16953 = new BitSet(new long[]{0x0000000000000002L,0x0000000000200108L});
-    public static final BitSet FOLLOW_LPAREN_in_abbreviatedType16974 = new BitSet(new long[]{0x0000000000000000L,0x200008200000000CL});
-    public static final BitSet FOLLOW_defaultedType_in_abbreviatedType17012 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_COMMA_in_abbreviatedType17056 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_defaultedType_in_abbreviatedType17090 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_abbreviatedType17144 = new BitSet(new long[]{0x0000000000000002L,0x0000000000200108L});
-    public static final BitSet FOLLOW_typeNameWithArguments_in_baseType17201 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_groupedType_in_baseType17223 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_baseType_in_qualifiedType17252 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_qualifiedType17278 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000000L});
-    public static final BitSet FOLLOW_typeNameWithArguments_in_qualifiedType17291 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
-    public static final BitSet FOLLOW_typeName_in_typeNameWithArguments17331 = new BitSet(new long[]{0x0000000000000002L,0x0000080000000000L});
-    public static final BitSet FOLLOW_typeArguments_in_typeNameWithArguments17358 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_stringLiteral_in_annotations17422 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000020L});
-    public static final BitSet FOLLOW_annotation_in_annotations17461 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000020L});
-    public static final BitSet FOLLOW_annotationName_in_annotation17502 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000104L});
-    public static final BitSet FOLLOW_positionalArguments_in_annotation17525 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_namedArguments_in_annotation17554 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_compilerAnnotation_in_compilerAnnotations17658 = new BitSet(new long[]{0x0000000004000002L});
-    public static final BitSet FOLLOW_COMPILER_ANNOTATION_in_compilerAnnotation17698 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_annotationName_in_compilerAnnotation17715 = new BitSet(new long[]{0x0000000000000002L,0x0000020000000000L});
-    public static final BitSet FOLLOW_SEGMENT_OP_in_compilerAnnotation17745 = new BitSet(new long[]{0x0000000000000000L,0x0001000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_stringLiteral_in_compilerAnnotation17757 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_conditions17799 = new BitSet(new long[]{0x2100840300408000L,0x223500A0060A812CL,0x0000000000000006L});
-    public static final BitSet FOLLOW_condition_in_conditions17825 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_COMMA_in_conditions17845 = new BitSet(new long[]{0x2100840301408000L,0x223500A0060A812CL,0x0000000000000006L});
-    public static final BitSet FOLLOW_condition_in_conditions17880 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_conditions17942 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_existsCondition_in_condition17971 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_nonemptyCondition_in_condition17987 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_isCondition_in_condition18003 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_satisfiesCondition_in_condition18020 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_booleanCondition_in_condition18036 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_booleanCondition18077 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_EXISTS_in_existsCondition18110 = new BitSet(new long[]{0x0102800304408000L,0x223508000608812CL,0x000000000000000EL});
-    public static final BitSet FOLLOW_specifiedVariable_in_existsCondition18147 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_impliedVariable_in_existsCondition18182 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_existsCondition18202 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NONEMPTY_in_nonemptyCondition18243 = new BitSet(new long[]{0x0102800304408000L,0x223508000608812CL,0x000000000000000EL});
-    public static final BitSet FOLLOW_specifiedVariable_in_nonemptyCondition18278 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_impliedVariable_in_nonemptyCondition18307 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_nonemptyCondition18324 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_OP_in_isCondition18369 = new BitSet(new long[]{0x2000000000000000L});
-    public static final BitSet FOLLOW_IS_OP_in_isCondition18396 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_type_in_isCondition18413 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberName_in_isCondition18451 = new BitSet(new long[]{0x0000000000000000L,0x0000200000000000L});
-    public static final BitSet FOLLOW_specifier_in_isCondition18467 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_impliedVariable_in_isCondition18490 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SATISFIES_in_satisfiesCondition18526 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_type_in_satisfiesCondition18543 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000000L});
-    public static final BitSet FOLLOW_typeName_in_satisfiesCondition18560 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ifElse_in_controlStatement18589 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_switchCaseElse_in_controlStatement18606 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_whileLoop_in_controlStatement18623 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_forElse_in_controlStatement18640 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tryCatchFinally_in_controlStatement18657 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_dynamic_in_controlStatement18673 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_controlBlock18711 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DYNAMIC_in_dynamic18777 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_dynamic18794 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ifBlock_in_ifElse18831 = new BitSet(new long[]{0x0000008000000002L});
-    public static final BitSet FOLLOW_elseBlock_in_ifElse18859 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IF_CLAUSE_in_ifBlock18899 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_conditions_in_ifBlock18916 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_ifBlock18932 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ELSE_CLAUSE_in_elseBlock18961 = new BitSet(new long[]{0x0040000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_elseIf_in_elseBlock18988 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_elseBlock19018 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ifElse_in_elseIf19057 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_switchHeader_in_switchCaseElse19094 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_cases_in_switchCaseElse19111 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SWITCH_CLAUSE_in_switchHeader19140 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_LPAREN_in_switchHeader19157 = new BitSet(new long[]{0x0100800300408000L,0x223500200608812CL,0x0000000000000006L});
-    public static final BitSet FOLLOW_expression_in_switchHeader19174 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_switchHeader19200 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_caseBlock_in_cases19239 = new BitSet(new long[]{0x0000008000080002L});
-    public static final BitSet FOLLOW_defaultCaseBlock_in_cases19276 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CASE_CLAUSE_in_caseBlock19320 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_caseItemList_in_caseBlock19337 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_caseBlock19353 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_caseItemList19382 = new BitSet(new long[]{0x2100800300408000L,0x223500A00608812CL,0x0000000000000006L});
-    public static final BitSet FOLLOW_caseItem_in_caseItemList19403 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_caseItemList19430 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock19460 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_defaultCaseBlock19477 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_isCaseCondition_in_caseItem19510 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_satisfiesCaseCondition_in_caseItem19531 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_matchCaseCondition_in_caseItem19547 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expressions_in_matchCaseCondition19576 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IS_OP_in_isCaseCondition19605 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_type_in_isCaseCondition19622 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SATISFIES_in_satisfiesCaseCondition19651 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_type_in_satisfiesCaseCondition19668 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_forBlock_in_forElse19705 = new BitSet(new long[]{0x0000008000000002L});
-    public static final BitSet FOLLOW_failBlock_in_forElse19732 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FOR_CLAUSE_in_forBlock19772 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_forIterator_in_forBlock19789 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_forBlock19806 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ELSE_CLAUSE_in_failBlock19835 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_failBlock19852 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_forIterator19890 = new BitSet(new long[]{0x0002000004000000L,0x200008200000002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_compilerAnnotations_in_forIterator19902 = new BitSet(new long[]{0x0002000000000000L,0x200008200000002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_var_in_forIterator19919 = new BitSet(new long[]{0x1000010000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_containment_in_forIterator19949 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_ENTRY_OP_in_forIterator19988 = new BitSet(new long[]{0x0002000000000000L,0x200008000000002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_var_in_forIterator20010 = new BitSet(new long[]{0x1000000000000000L});
-    public static final BitSet FOLLOW_containment_in_forIterator20032 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_forIterator20070 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IN_OP_in_containment20101 = new BitSet(new long[]{0x0100800300408002L,0x223500000608812CL,0x0000000000000006L});
-    public static final BitSet FOLLOW_expression_in_containment20119 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_whileBlock_in_whileLoop20162 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_WHILE_CLAUSE_in_whileBlock20191 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_conditions_in_whileBlock20207 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_whileBlock20223 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tryBlock_in_tryCatchFinally20260 = new BitSet(new long[]{0x0000400000200002L});
-    public static final BitSet FOLLOW_catchBlock_in_tryCatchFinally20287 = new BitSet(new long[]{0x0000400000200002L});
-    public static final BitSet FOLLOW_finallyBlock_in_tryCatchFinally20324 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TRY_CLAUSE_in_tryBlock20362 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000104L});
-    public static final BitSet FOLLOW_resources_in_tryBlock20389 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_tryBlock20409 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_tryBlock20437 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CATCH_CLAUSE_in_catchBlock20476 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_catchVariable_in_catchBlock20493 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_catchBlock20509 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_catchVariable20538 = new BitSet(new long[]{0x0002000004000000L,0x200008200000002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_variable_in_catchVariable20563 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_catchVariable20589 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FINALLY_CLAUSE_in_finallyBlock20620 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_finallyBlock20637 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_resources20666 = new BitSet(new long[]{0x0102800304408000L,0x223508200608812CL,0x000000000000000EL});
-    public static final BitSet FOLLOW_resource_in_resources20687 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_COMMA_in_resources20709 = new BitSet(new long[]{0x0102800304408000L,0x223508000608812CL,0x000000000000000EL});
-    public static final BitSet FOLLOW_resource_in_resources20728 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_resources20756 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_specifiedVariable_in_resource20813 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_resource20833 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_variable_in_specifiedVariable20874 = new BitSet(new long[]{0x0000000000000002L,0x0000200000000000L});
-    public static final BitSet FOLLOW_specifier_in_specifiedVariable20901 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_compilerAnnotations_in_variable20941 = new BitSet(new long[]{0x0002000000000000L,0x200008000000002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_var_in_variable20949 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_type_in_var20998 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_VOID_MODIFIER_in_var21019 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_var21039 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_VALUE_MODIFIER_in_var21059 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberName_in_var21087 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
-    public static final BitSet FOLLOW_parameters_in_var21117 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
-    public static final BitSet FOLLOW_memberName_in_var21161 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_memberName_in_var21194 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_parameters_in_var21223 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
-    public static final BitSet FOLLOW_memberName_in_impliedVariable21269 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BACKTICK_in_metaLiteral21311 = new BitSet(new long[]{0x0202000000800080L,0x300008000410082CL,0x0000000000000002L});
-    public static final BitSet FOLLOW_MODULE_in_metaLiteral21333 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000020L});
-    public static final BitSet FOLLOW_packagePath_in_metaLiteral21351 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_PACKAGE_in_metaLiteral21373 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000020L});
-    public static final BitSet FOLLOW_packagePath_in_metaLiteral21391 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_CLASS_DEFINITION_in_metaLiteral21413 = new BitSet(new long[]{0x0000000000000000L,0x200008000000002CL});
-    public static final BitSet FOLLOW_type_in_metaLiteral21441 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral21471 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_INTERFACE_DEFINITION_in_metaLiteral21503 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_type_in_metaLiteral21521 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_ALIAS_in_metaLiteral21543 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_type_in_metaLiteral21561 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_TYPE_CONSTRAINT_in_metaLiteral21583 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
-    public static final BitSet FOLLOW_type_in_metaLiteral21601 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_VALUE_MODIFIER_in_metaLiteral21633 = new BitSet(new long[]{0x0000000000000000L,0x200008000000002CL});
-    public static final BitSet FOLLOW_OBJECT_DEFINITION_in_metaLiteral21661 = new BitSet(new long[]{0x0000000000000000L,0x200008000000002CL});
-    public static final BitSet FOLLOW_type_in_metaLiteral21711 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral21747 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral21781 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral21810 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_metaLiteral21832 = new BitSet(new long[]{0x0000000000000000L,0x200008000000002CL});
-    public static final BitSet FOLLOW_type_in_metaLiteral21872 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral21908 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral21942 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral21971 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_abbreviatedType_in_metaLiteral22017 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral22035 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral22053 = new BitSet(new long[]{0x0000000000008000L,0x0000080000000000L});
-    public static final BitSet FOLLOW_typeArguments_in_metaLiteral22081 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_groupedType_in_metaLiteral22139 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral22157 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral22175 = new BitSet(new long[]{0x0000000000008000L,0x0000080000000000L});
-    public static final BitSet FOLLOW_typeArguments_in_metaLiteral22203 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral22260 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral22278 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral22296 = new BitSet(new long[]{0x0000000000008000L,0x0000080000000000L});
-    public static final BitSet FOLLOW_typeArguments_in_metaLiteral22324 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_type_in_metaLiteral22360 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_memberName_in_metaLiteral22385 = new BitSet(new long[]{0x0000000000008000L,0x0000080000000000L});
-    public static final BitSet FOLLOW_typeArguments_in_metaLiteral22413 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_BACKTICK_in_metaLiteral22448 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_groupedType16234 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000001L});
+    public static final BitSet FOLLOW_LARGER_OP_in_groupedType16250 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LBRACE_in_iterableType16271 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_variadicType_in_iterableType16287 = new BitSet(new long[]{0x0000000000000000L,0x0000000100000000L});
+    public static final BitSet FOLLOW_RBRACE_in_iterableType16301 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_unionType_in_type16339 = new BitSet(new long[]{0x0000010000000002L});
+    public static final BitSet FOLLOW_ENTRY_OP_in_type16365 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_unionType_in_type16399 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_intersectionType_in_unionType16464 = new BitSet(new long[]{0x0000000000000002L,0x8000000000000000L});
+    public static final BitSet FOLLOW_UNION_OP_in_unionType16505 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_intersectionType_in_unionType16545 = new BitSet(new long[]{0x0000000000000002L,0x8000000000000000L});
+    public static final BitSet FOLLOW_abbreviatedType_in_intersectionType16635 = new BitSet(new long[]{0x0400000000000002L});
+    public static final BitSet FOLLOW_INTERSECTION_OP_in_intersectionType16676 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_abbreviatedType_in_intersectionType16716 = new BitSet(new long[]{0x0400000000000002L});
+    public static final BitSet FOLLOW_qualifiedType_in_qualifiedOrTupleType16795 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_tupleType_in_qualifiedOrTupleType16812 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_iterableType_in_qualifiedOrTupleType16829 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_qualifiedOrTupleType_in_abbreviatedType16870 = new BitSet(new long[]{0x0000000000000002L,0x0000000000200108L});
+    public static final BitSet FOLLOW_OPTIONAL_in_abbreviatedType16932 = new BitSet(new long[]{0x0000000000000002L,0x0000000000200108L});
+    public static final BitSet FOLLOW_LBRACKET_in_abbreviatedType16953 = new BitSet(new long[]{0x0000000000000000L,0x0000000200000000L});
+    public static final BitSet FOLLOW_RBRACKET_in_abbreviatedType16955 = new BitSet(new long[]{0x0000000000000002L,0x0000000000200108L});
+    public static final BitSet FOLLOW_LPAREN_in_abbreviatedType16976 = new BitSet(new long[]{0x0000000000000000L,0x200008200000000CL});
+    public static final BitSet FOLLOW_defaultedType_in_abbreviatedType17014 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_COMMA_in_abbreviatedType17058 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_defaultedType_in_abbreviatedType17092 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_abbreviatedType17146 = new BitSet(new long[]{0x0000000000000002L,0x0000000000200108L});
+    public static final BitSet FOLLOW_typeNameWithArguments_in_baseType17203 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_groupedType_in_baseType17225 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_baseType_in_qualifiedType17254 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_qualifiedType17280 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000000L});
+    public static final BitSet FOLLOW_typeNameWithArguments_in_qualifiedType17293 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
+    public static final BitSet FOLLOW_typeName_in_typeNameWithArguments17333 = new BitSet(new long[]{0x0000000000000002L,0x0000080000000000L});
+    public static final BitSet FOLLOW_typeArguments_in_typeNameWithArguments17360 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_stringLiteral_in_annotations17424 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000020L});
+    public static final BitSet FOLLOW_annotation_in_annotations17463 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000020L});
+    public static final BitSet FOLLOW_annotationName_in_annotation17504 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000104L});
+    public static final BitSet FOLLOW_positionalArguments_in_annotation17527 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_namedArguments_in_annotation17556 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_compilerAnnotation_in_compilerAnnotations17660 = new BitSet(new long[]{0x0000000004000002L});
+    public static final BitSet FOLLOW_COMPILER_ANNOTATION_in_compilerAnnotation17700 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_annotationName_in_compilerAnnotation17717 = new BitSet(new long[]{0x0000000000000002L,0x0000020000000000L});
+    public static final BitSet FOLLOW_SEGMENT_OP_in_compilerAnnotation17747 = new BitSet(new long[]{0x0000000000000000L,0x0001000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_stringLiteral_in_compilerAnnotation17759 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_conditions17801 = new BitSet(new long[]{0x2100840300408000L,0x223500A0060A812CL,0x0000000000000006L});
+    public static final BitSet FOLLOW_condition_in_conditions17827 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_COMMA_in_conditions17847 = new BitSet(new long[]{0x2100840301408000L,0x223500A0060A812CL,0x0000000000000006L});
+    public static final BitSet FOLLOW_condition_in_conditions17882 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_conditions17944 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_existsCondition_in_condition17973 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_nonemptyCondition_in_condition17989 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_isCondition_in_condition18005 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_satisfiesCondition_in_condition18022 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_booleanCondition_in_condition18038 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_booleanCondition18079 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_EXISTS_in_existsCondition18112 = new BitSet(new long[]{0x0102800304408000L,0x223508000608812CL,0x000000000000000EL});
+    public static final BitSet FOLLOW_specifiedVariable_in_existsCondition18149 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_impliedVariable_in_existsCondition18184 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_existsCondition18204 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NONEMPTY_in_nonemptyCondition18245 = new BitSet(new long[]{0x0102800304408000L,0x223508000608812CL,0x000000000000000EL});
+    public static final BitSet FOLLOW_specifiedVariable_in_nonemptyCondition18280 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_impliedVariable_in_nonemptyCondition18309 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_nonemptyCondition18326 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_OP_in_isCondition18371 = new BitSet(new long[]{0x2000000000000000L});
+    public static final BitSet FOLLOW_IS_OP_in_isCondition18398 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_type_in_isCondition18415 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberName_in_isCondition18453 = new BitSet(new long[]{0x0000000000000000L,0x0000200000000000L});
+    public static final BitSet FOLLOW_specifier_in_isCondition18469 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_impliedVariable_in_isCondition18492 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SATISFIES_in_satisfiesCondition18528 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_type_in_satisfiesCondition18545 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000000L});
+    public static final BitSet FOLLOW_typeName_in_satisfiesCondition18562 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ifElse_in_controlStatement18591 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_switchCaseElse_in_controlStatement18608 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_whileLoop_in_controlStatement18625 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_forElse_in_controlStatement18642 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_tryCatchFinally_in_controlStatement18659 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_dynamic_in_controlStatement18675 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_controlBlock18713 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DYNAMIC_in_dynamic18779 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_dynamic18796 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ifBlock_in_ifElse18833 = new BitSet(new long[]{0x0000008000000002L});
+    public static final BitSet FOLLOW_elseBlock_in_ifElse18861 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IF_CLAUSE_in_ifBlock18901 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_conditions_in_ifBlock18918 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_ifBlock18934 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ELSE_CLAUSE_in_elseBlock18963 = new BitSet(new long[]{0x0040000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_elseIf_in_elseBlock18990 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_elseBlock19020 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ifElse_in_elseIf19059 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_switchHeader_in_switchCaseElse19096 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_cases_in_switchCaseElse19113 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SWITCH_CLAUSE_in_switchHeader19142 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_LPAREN_in_switchHeader19159 = new BitSet(new long[]{0x0100800300408000L,0x223500200608812CL,0x0000000000000006L});
+    public static final BitSet FOLLOW_expression_in_switchHeader19176 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_switchHeader19202 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_caseBlock_in_cases19241 = new BitSet(new long[]{0x0000008000080002L});
+    public static final BitSet FOLLOW_defaultCaseBlock_in_cases19278 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CASE_CLAUSE_in_caseBlock19322 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_caseItemList_in_caseBlock19339 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_caseBlock19355 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_caseItemList19384 = new BitSet(new long[]{0x2100800300408000L,0x223500A00608812CL,0x0000000000000006L});
+    public static final BitSet FOLLOW_caseItem_in_caseItemList19405 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_caseItemList19432 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock19462 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_defaultCaseBlock19479 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_isCaseCondition_in_caseItem19512 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_satisfiesCaseCondition_in_caseItem19533 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_matchCaseCondition_in_caseItem19549 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expressions_in_matchCaseCondition19578 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IS_OP_in_isCaseCondition19607 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_type_in_isCaseCondition19624 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SATISFIES_in_satisfiesCaseCondition19653 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_type_in_satisfiesCaseCondition19670 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_forBlock_in_forElse19707 = new BitSet(new long[]{0x0000008000000002L});
+    public static final BitSet FOLLOW_failBlock_in_forElse19734 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FOR_CLAUSE_in_forBlock19774 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_forIterator_in_forBlock19791 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_forBlock19808 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ELSE_CLAUSE_in_failBlock19837 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_failBlock19854 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_forIterator19892 = new BitSet(new long[]{0x0002000004000000L,0x200008200000002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_compilerAnnotations_in_forIterator19904 = new BitSet(new long[]{0x0002000000000000L,0x200008200000002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_var_in_forIterator19921 = new BitSet(new long[]{0x1000010000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_containment_in_forIterator19951 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_ENTRY_OP_in_forIterator19990 = new BitSet(new long[]{0x0002000000000000L,0x200008000000002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_var_in_forIterator20012 = new BitSet(new long[]{0x1000000000000000L});
+    public static final BitSet FOLLOW_containment_in_forIterator20034 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_forIterator20072 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IN_OP_in_containment20103 = new BitSet(new long[]{0x0100800300408002L,0x223500000608812CL,0x0000000000000006L});
+    public static final BitSet FOLLOW_expression_in_containment20121 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_whileBlock_in_whileLoop20164 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_WHILE_CLAUSE_in_whileBlock20193 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_conditions_in_whileBlock20209 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_whileBlock20225 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_tryBlock_in_tryCatchFinally20262 = new BitSet(new long[]{0x0000400000200002L});
+    public static final BitSet FOLLOW_catchBlock_in_tryCatchFinally20289 = new BitSet(new long[]{0x0000400000200002L});
+    public static final BitSet FOLLOW_finallyBlock_in_tryCatchFinally20326 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TRY_CLAUSE_in_tryBlock20364 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000104L});
+    public static final BitSet FOLLOW_resources_in_tryBlock20391 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_tryBlock20411 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_tryBlock20439 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CATCH_CLAUSE_in_catchBlock20478 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_catchVariable_in_catchBlock20495 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_catchBlock20511 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_catchVariable20540 = new BitSet(new long[]{0x0002000004000000L,0x200008200000002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_variable_in_catchVariable20565 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_catchVariable20591 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FINALLY_CLAUSE_in_finallyBlock20622 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_finallyBlock20639 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_resources20668 = new BitSet(new long[]{0x0102800304408000L,0x223508200608812CL,0x000000000000000EL});
+    public static final BitSet FOLLOW_resource_in_resources20689 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_COMMA_in_resources20711 = new BitSet(new long[]{0x0102800304408000L,0x223508000608812CL,0x000000000000000EL});
+    public static final BitSet FOLLOW_resource_in_resources20730 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_resources20758 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_specifiedVariable_in_resource20815 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_resource20835 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_variable_in_specifiedVariable20876 = new BitSet(new long[]{0x0000000000000002L,0x0000200000000000L});
+    public static final BitSet FOLLOW_specifier_in_specifiedVariable20903 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_compilerAnnotations_in_variable20943 = new BitSet(new long[]{0x0002000000000000L,0x200008000000002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_var_in_variable20951 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_var21000 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_VOID_MODIFIER_in_var21021 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_var21041 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_VALUE_MODIFIER_in_var21061 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberName_in_var21089 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
+    public static final BitSet FOLLOW_parameters_in_var21119 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
+    public static final BitSet FOLLOW_memberName_in_var21163 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_memberName_in_var21196 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_parameters_in_var21225 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
+    public static final BitSet FOLLOW_memberName_in_impliedVariable21271 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BACKTICK_in_metaLiteral21313 = new BitSet(new long[]{0x0202000000800080L,0x300008000410082CL,0x0000000000000002L});
+    public static final BitSet FOLLOW_MODULE_in_metaLiteral21335 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000020L});
+    public static final BitSet FOLLOW_packagePath_in_metaLiteral21353 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_PACKAGE_in_metaLiteral21375 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000020L});
+    public static final BitSet FOLLOW_packagePath_in_metaLiteral21393 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_CLASS_DEFINITION_in_metaLiteral21415 = new BitSet(new long[]{0x0000000000000000L,0x200008000000002CL});
+    public static final BitSet FOLLOW_type_in_metaLiteral21443 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral21473 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_INTERFACE_DEFINITION_in_metaLiteral21505 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_type_in_metaLiteral21523 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_ALIAS_in_metaLiteral21545 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_type_in_metaLiteral21563 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_TYPE_CONSTRAINT_in_metaLiteral21585 = new BitSet(new long[]{0x0000000000000000L,0x200008000000000CL});
+    public static final BitSet FOLLOW_type_in_metaLiteral21603 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_VALUE_MODIFIER_in_metaLiteral21635 = new BitSet(new long[]{0x0000000000000000L,0x200008000000002CL});
+    public static final BitSet FOLLOW_OBJECT_DEFINITION_in_metaLiteral21663 = new BitSet(new long[]{0x0000000000000000L,0x200008000000002CL});
+    public static final BitSet FOLLOW_type_in_metaLiteral21713 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral21749 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral21783 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral21812 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_metaLiteral21834 = new BitSet(new long[]{0x0000000000000000L,0x200008000000002CL});
+    public static final BitSet FOLLOW_type_in_metaLiteral21874 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral21910 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral21944 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral21973 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_abbreviatedType_in_metaLiteral22019 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral22037 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral22055 = new BitSet(new long[]{0x0000000000008000L,0x0000080000000000L});
+    public static final BitSet FOLLOW_typeArguments_in_metaLiteral22083 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_groupedType_in_metaLiteral22141 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral22159 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral22177 = new BitSet(new long[]{0x0000000000008000L,0x0000080000000000L});
+    public static final BitSet FOLLOW_typeArguments_in_metaLiteral22205 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral22262 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_metaLiteral22280 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral22298 = new BitSet(new long[]{0x0000000000008000L,0x0000080000000000L});
+    public static final BitSet FOLLOW_typeArguments_in_metaLiteral22326 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_type_in_metaLiteral22362 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_memberName_in_metaLiteral22387 = new BitSet(new long[]{0x0000000000008000L,0x0000080000000000L});
+    public static final BitSet FOLLOW_typeArguments_in_metaLiteral22415 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_BACKTICK_in_metaLiteral22450 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_compilerAnnotations_in_synpred1_Ceylon164 = new BitSet(new long[]{0x0000000000000000L,0x0001000000000820L,0x0000000000000004L});
     public static final BitSet FOLLOW_annotations_in_synpred1_Ceylon166 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000800L});
     public static final BitSet FOLLOW_MODULE_in_synpred1_Ceylon168 = new BitSet(new long[]{0x0000000000000002L});
@@ -25033,28 +25034,28 @@ public class CeylonParser extends Parser {
     public static final BitSet FOLLOW_set_in_synpred14_Ceylon15839 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_type_in_synpred15_Ceylon15968 = new BitSet(new long[]{0x0000000000000000L,0x0000200000000000L});
     public static final BitSet FOLLOW_SPECIFY_in_synpred15_Ceylon15971 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_namedAnnotationArgumentsStart_in_synpred16_Ceylon17542 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_compilerAnnotations_in_synpred17_Ceylon18128 = new BitSet(new long[]{0x0202000800801080L,0x200008000010002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_declarationStart_in_synpred17_Ceylon18131 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_specificationStart_in_synpred17_Ceylon18133 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LIDENTIFIER_in_synpred18_Ceylon18178 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_compilerAnnotations_in_synpred19_Ceylon18261 = new BitSet(new long[]{0x0202000800801080L,0x200008000010002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_declarationStart_in_synpred19_Ceylon18264 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_specificationStart_in_synpred19_Ceylon18266 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LIDENTIFIER_in_synpred20_Ceylon18303 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LIDENTIFIER_in_synpred21_Ceylon18430 = new BitSet(new long[]{0x0000000000000000L,0x0000200000000000L});
-    public static final BitSet FOLLOW_SPECIFY_in_synpred21_Ceylon18432 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LBRACE_in_synpred22_Ceylon18705 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IS_OP_in_synpred23_Ceylon19507 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SATISFIES_in_synpred24_Ceylon19528 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COMPILER_ANNOTATION_in_synpred25_Ceylon20795 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_declarationStart_in_synpred25_Ceylon20797 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_specificationStart_in_synpred25_Ceylon20799 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_abbreviatedType_in_synpred26_Ceylon21994 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_synpred26_Ceylon21996 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_groupedType_in_synpred27_Ceylon22116 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_synpred27_Ceylon22118 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_memberName_in_synpred28_Ceylon22237 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_synpred28_Ceylon22239 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_namedAnnotationArgumentsStart_in_synpred16_Ceylon17544 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_compilerAnnotations_in_synpred17_Ceylon18130 = new BitSet(new long[]{0x0202000800801080L,0x200008000010002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_declarationStart_in_synpred17_Ceylon18133 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_specificationStart_in_synpred17_Ceylon18135 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LIDENTIFIER_in_synpred18_Ceylon18180 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_compilerAnnotations_in_synpred19_Ceylon18263 = new BitSet(new long[]{0x0202000800801080L,0x200008000010002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_declarationStart_in_synpred19_Ceylon18266 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_specificationStart_in_synpred19_Ceylon18268 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LIDENTIFIER_in_synpred20_Ceylon18305 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LIDENTIFIER_in_synpred21_Ceylon18432 = new BitSet(new long[]{0x0000000000000000L,0x0000200000000000L});
+    public static final BitSet FOLLOW_SPECIFY_in_synpred21_Ceylon18434 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LBRACE_in_synpred22_Ceylon18707 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IS_OP_in_synpred23_Ceylon19509 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SATISFIES_in_synpred24_Ceylon19530 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COMPILER_ANNOTATION_in_synpred25_Ceylon20797 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_declarationStart_in_synpred25_Ceylon20799 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_specificationStart_in_synpred25_Ceylon20801 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_abbreviatedType_in_synpred26_Ceylon21996 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_synpred26_Ceylon21998 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_groupedType_in_synpred27_Ceylon22118 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_synpred27_Ceylon22120 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_memberName_in_synpred28_Ceylon22239 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_synpred28_Ceylon22241 = new BitSet(new long[]{0x0000000000000002L});
 
 }
