@@ -62,7 +62,7 @@ public class CeylonModuleType extends ModuleType<CeylonModuleBuilder> {
     public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull CeylonModuleBuilder moduleBuilder, @NotNull ModulesProvider modulesProvider) {
         ArrayList<ModuleWizardStep> steps = new ArrayList<>();
 
-        if (!wizardContext.isNewWizard()) {
+        if (!wizardContext.isCreatingNewProject()) {
             steps.add(new PageOneWizardStep(moduleBuilder));
             steps.add(new PageTwoWizardStep(moduleBuilder));
         }
