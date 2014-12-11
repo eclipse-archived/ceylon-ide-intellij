@@ -12,15 +12,7 @@ public class NodeToIElementTypeMap {
     private static final Map<Class<? extends Node>, IElementType> map = new HashMap<>();
 
     public static IElementType get(Node node) {
-        Class<? extends Node> nodeClass = node.getClass();
-        Class<?> enclosingClass;
-        while (nodeClass != null && (enclosingClass = nodeClass.getEnclosingClass()) != null && CustomTree.class.isAssignableFrom(enclosingClass)) {
-            nodeClass = (Class<? extends Node>) nodeClass.getSuperclass();
-        }
-        if (!map.containsKey(nodeClass)) {
-            throw new IllegalArgumentException("Type unknown for node " + nodeClass);
-        }
-        return map.get(nodeClass);
+        return map.get(node.getClass());
     }
 
     static {
@@ -53,19 +45,19 @@ public class NodeToIElementTypeMap {
         map.put(Tree.DefaultTypeArgument.class, CeylonTypes.DEFAULT_TYPE_ARGUMENT);
         map.put(Tree.ClassSpecifier.class, CeylonTypes.CLASS_SPECIFIER);
         map.put(Tree.AnyClass.class, CeylonTypes.ANY_CLASS);
-        map.put(Tree.ClassDefinition.class, CeylonTypes.CLASS_DEFINITION);
+        map.put(CustomTree.ClassDefinition.class, CeylonTypes.CLASS_DEFINITION);
         map.put(Tree.ClassDeclaration.class, CeylonTypes.CLASS_DECLARATION);
         map.put(Tree.AnyInterface.class, CeylonTypes.ANY_INTERFACE);
         map.put(Tree.InterfaceDefinition.class, CeylonTypes.INTERFACE_DEFINITION);
         map.put(Tree.InterfaceDeclaration.class, CeylonTypes.INTERFACE_DECLARATION);
         map.put(Tree.TypedDeclaration.class, CeylonTypes.TYPED_DECLARATION);
         map.put(Tree.AnyAttribute.class, CeylonTypes.ANY_ATTRIBUTE);
-        map.put(Tree.AttributeDeclaration.class, CeylonTypes.ATTRIBUTE_DECLARATION);
+        map.put(CustomTree.AttributeDeclaration.class, CeylonTypes.ATTRIBUTE_DECLARATION);
         map.put(Tree.AttributeGetterDefinition.class, CeylonTypes.ATTRIBUTE_GETTER_DEFINITION);
         map.put(Tree.AttributeSetterDefinition.class, CeylonTypes.ATTRIBUTE_SETTER_DEFINITION);
         map.put(Tree.AnyMethod.class, CeylonTypes.ANY_METHOD);
-        map.put(Tree.MethodDefinition.class, CeylonTypes.METHOD_DEFINITION);
-        map.put(Tree.MethodDeclaration.class, CeylonTypes.METHOD_DECLARATION);
+        map.put(CustomTree.MethodDefinition.class, CeylonTypes.METHOD_DEFINITION);
+        map.put(CustomTree.MethodDeclaration.class, CeylonTypes.METHOD_DECLARATION);
         map.put(Tree.VoidModifier.class, CeylonTypes.VOID_MODIFIER);
         map.put(Tree.ObjectDefinition.class, CeylonTypes.OBJECT_DEFINITION);
         map.put(Tree.ParameterList.class, CeylonTypes.PARAMETER_LIST);
@@ -83,8 +75,10 @@ public class NodeToIElementTypeMap {
         map.put(Tree.InterfaceBody.class, CeylonTypes.INTERFACE_BODY);
         map.put(Tree.Type.class, CeylonTypes.TYPE);
         map.put(Tree.StaticType.class, CeylonTypes.STATIC_TYPE);
+        map.put(Tree.GroupedType.class, CeylonTypes.GROUPED_TYPE);
         map.put(Tree.SimpleType.class, CeylonTypes.SIMPLE_TYPE);
         map.put(Tree.BaseType.class, CeylonTypes.BASE_TYPE);
+        map.put(Tree.QualifiedType.class, CeylonTypes.QUALIFIED_TYPE);
         map.put(Tree.UnionType.class, CeylonTypes.UNION_TYPE);
         map.put(Tree.IntersectionType.class, CeylonTypes.INTERSECTION_TYPE);
         map.put(Tree.SequenceType.class, CeylonTypes.SEQUENCE_TYPE);
@@ -93,7 +87,6 @@ public class NodeToIElementTypeMap {
         map.put(Tree.TupleType.class, CeylonTypes.TUPLE_TYPE);
         map.put(Tree.FunctionType.class, CeylonTypes.FUNCTION_TYPE);
         map.put(Tree.EntryType.class, CeylonTypes.ENTRY_TYPE);
-        map.put(Tree.QualifiedType.class, CeylonTypes.QUALIFIED_TYPE);
         map.put(Tree.SuperType.class, CeylonTypes.SUPER_TYPE);
         map.put(Tree.MetaLiteral.class, CeylonTypes.META_LITERAL);
         map.put(Tree.TypeLiteral.class, CeylonTypes.TYPE_LITERAL);
@@ -141,7 +134,7 @@ public class NodeToIElementTypeMap {
         map.put(Tree.CaseClause.class, CeylonTypes.CASE_CLAUSE);
         map.put(Tree.CaseItem.class, CeylonTypes.CASE_ITEM);
         map.put(Tree.MatchCase.class, CeylonTypes.MATCH_CASE);
-        map.put(Tree.IsCase.class, CeylonTypes.IS_CASE);
+        map.put(CustomTree.IsCase.class, CeylonTypes.IS_CASE);
         map.put(Tree.SatisfiesCase.class, CeylonTypes.SATISFIES_CASE);
         map.put(Tree.TryCatchStatement.class, CeylonTypes.TRY_CATCH_STATEMENT);
         map.put(Tree.TryClause.class, CeylonTypes.TRY_CLAUSE);
@@ -165,7 +158,7 @@ public class NodeToIElementTypeMap {
         map.put(Tree.NonemptyCondition.class, CeylonTypes.NONEMPTY_CONDITION);
         map.put(Tree.IsCondition.class, CeylonTypes.IS_CONDITION);
         map.put(Tree.SatisfiesCondition.class, CeylonTypes.SATISFIES_CONDITION);
-        map.put(Tree.Variable.class, CeylonTypes.VARIABLE);
+        map.put(CustomTree.Variable.class, CeylonTypes.VARIABLE);
         map.put(Tree.Term.class, CeylonTypes.TERM);
         map.put(Tree.OperatorExpression.class, CeylonTypes.OPERATOR_EXPRESSION);
         map.put(Tree.BinaryOperatorExpression.class, CeylonTypes.BINARY_OPERATOR_EXPRESSION);
@@ -187,7 +180,6 @@ public class NodeToIElementTypeMap {
         map.put(Tree.BitwiseAssignmentOp.class, CeylonTypes.BITWISE_ASSIGNMENT_OP);
         map.put(Tree.IntersectAssignOp.class, CeylonTypes.INTERSECT_ASSIGN_OP);
         map.put(Tree.UnionAssignOp.class, CeylonTypes.UNION_ASSIGN_OP);
-        map.put(Tree.XorAssignOp.class, CeylonTypes.XOR_ASSIGN_OP);
         map.put(Tree.ComplementAssignOp.class, CeylonTypes.COMPLEMENT_ASSIGN_OP);
         map.put(Tree.LogicalAssignmentOp.class, CeylonTypes.LOGICAL_ASSIGNMENT_OP);
         map.put(Tree.AndAssignOp.class, CeylonTypes.AND_ASSIGN_OP);
@@ -198,7 +190,6 @@ public class NodeToIElementTypeMap {
         map.put(Tree.BitwiseOp.class, CeylonTypes.BITWISE_OP);
         map.put(Tree.IntersectionOp.class, CeylonTypes.INTERSECTION_OP);
         map.put(Tree.UnionOp.class, CeylonTypes.UNION_OP);
-        map.put(Tree.XorOp.class, CeylonTypes.XOR_OP);
         map.put(Tree.ComplementOp.class, CeylonTypes.COMPLEMENT_OP);
         map.put(Tree.EqualityOp.class, CeylonTypes.EQUALITY_OP);
         map.put(Tree.EqualOp.class, CeylonTypes.EQUAL_OP);
@@ -245,7 +236,7 @@ public class NodeToIElementTypeMap {
         map.put(Tree.InvocationExpression.class, CeylonTypes.INVOCATION_EXPRESSION);
         map.put(Tree.ParameterizedExpression.class, CeylonTypes.PARAMETERIZED_EXPRESSION);
         map.put(Tree.MemberOrTypeExpression.class, CeylonTypes.MEMBER_OR_TYPE_EXPRESSION);
-        map.put(Tree.ExtendedTypeExpression.class, CeylonTypes.EXTENDED_TYPE_EXPRESSION);
+        map.put(CustomTree.ExtendedTypeExpression.class, CeylonTypes.EXTENDED_TYPE_EXPRESSION);
         map.put(Tree.StaticMemberOrTypeExpression.class, CeylonTypes.STATIC_MEMBER_OR_TYPE_EXPRESSION);
         map.put(Tree.BaseMemberOrTypeExpression.class, CeylonTypes.BASE_MEMBER_OR_TYPE_EXPRESSION);
         map.put(Tree.BaseMemberExpression.class, CeylonTypes.BASE_MEMBER_EXPRESSION);
@@ -270,7 +261,7 @@ public class NodeToIElementTypeMap {
         map.put(Tree.PositionalArgument.class, CeylonTypes.POSITIONAL_ARGUMENT);
         map.put(Tree.ListedArgument.class, CeylonTypes.LISTED_ARGUMENT);
         map.put(Tree.SpreadArgument.class, CeylonTypes.SPREAD_ARGUMENT);
-        map.put(Tree.FunctionArgument.class, CeylonTypes.FUNCTION_ARGUMENT);
+        map.put(CustomTree.FunctionArgument.class, CeylonTypes.FUNCTION_ARGUMENT);
         map.put(Tree.NamedArgument.class, CeylonTypes.NAMED_ARGUMENT);
         map.put(Tree.SpecifiedArgument.class, CeylonTypes.SPECIFIED_ARGUMENT);
         map.put(Tree.TypedArgument.class, CeylonTypes.TYPED_ARGUMENT);

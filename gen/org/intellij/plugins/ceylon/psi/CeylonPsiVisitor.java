@@ -327,9 +327,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof ComplementOpPsi) {
             visitComplementOpPsi((ComplementOpPsi) element);
         }
-        else if (element instanceof XorOpPsi) {
-            visitXorOpPsi((XorOpPsi) element);
-        }
+//        else if (element instanceof XorOpPsi) {
+//            visitXorOpPsi((XorOpPsi) element);
+//        }
         else if (element instanceof UnionOpPsi) {
             visitUnionOpPsi((UnionOpPsi) element);
         }
@@ -360,9 +360,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof ComplementAssignOpPsi) {
             visitComplementAssignOpPsi((ComplementAssignOpPsi) element);
         }
-        else if (element instanceof XorAssignOpPsi) {
-            visitXorAssignOpPsi((XorAssignOpPsi) element);
-        }
+//        else if (element instanceof XorAssignOpPsi) {
+//            visitXorAssignOpPsi((XorAssignOpPsi) element);
+//        }
         else if (element instanceof UnionAssignOpPsi) {
             visitUnionAssignOpPsi((UnionAssignOpPsi) element);
         }
@@ -958,7 +958,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitEqualOpPsi(@NotNull EqualOpPsi element) {}
     public void visitEqualityOpPsi(@NotNull EqualityOpPsi element) {}
     public void visitComplementOpPsi(@NotNull ComplementOpPsi element) {}
-    public void visitXorOpPsi(@NotNull XorOpPsi element) {}
+//    public void visitXorOpPsi(@NotNull XorOpPsi element) {}
     public void visitUnionOpPsi(@NotNull UnionOpPsi element) {}
     public void visitIntersectionOpPsi(@NotNull IntersectionOpPsi element) {}
     public void visitBitwiseOpPsi(@NotNull BitwiseOpPsi element) {}
@@ -969,7 +969,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitAndAssignOpPsi(@NotNull AndAssignOpPsi element) {}
     public void visitLogicalAssignmentOpPsi(@NotNull LogicalAssignmentOpPsi element) {}
     public void visitComplementAssignOpPsi(@NotNull ComplementAssignOpPsi element) {}
-    public void visitXorAssignOpPsi(@NotNull XorAssignOpPsi element) {}
+//    public void visitXorAssignOpPsi(@NotNull XorAssignOpPsi element) {}
     public void visitUnionAssignOpPsi(@NotNull UnionAssignOpPsi element) {}
     public void visitIntersectAssignOpPsi(@NotNull IntersectAssignOpPsi element) {}
     public void visitBitwiseAssignmentOpPsi(@NotNull BitwiseAssignmentOpPsi element) {}

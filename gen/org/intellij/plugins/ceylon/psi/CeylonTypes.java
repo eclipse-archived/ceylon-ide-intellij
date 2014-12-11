@@ -39,10 +39,10 @@ public interface CeylonTypes {
     IElementType DEFAULT_TYPE_ARGUMENT = new CeylonElementType("DEFAULT_TYPE_ARGUMENT");
     IElementType CLASS_SPECIFIER = new CeylonElementType("CLASS_SPECIFIER");
     IElementType ANY_CLASS = new CeylonElementType("ANY_CLASS");
-    IElementType CLASS_DEFINITION = new ClassElementType("CLASS_DEFINITION");
+    IElementType CLASS_DEFINITION = new CeylonElementType("CLASS_DEFINITION");
     IElementType CLASS_DECLARATION = new CeylonElementType("CLASS_DECLARATION");
     IElementType ANY_INTERFACE = new CeylonElementType("ANY_INTERFACE");
-    IElementType INTERFACE_DEFINITION = new ClassElementType("INTERFACE_DEFINITION");
+    IElementType INTERFACE_DEFINITION = new CeylonElementType("INTERFACE_DEFINITION");
     IElementType INTERFACE_DECLARATION = new CeylonElementType("INTERFACE_DECLARATION");
     IElementType TYPED_DECLARATION = new CeylonElementType("TYPED_DECLARATION");
     IElementType ANY_ATTRIBUTE = new CeylonElementType("ANY_ATTRIBUTE");
@@ -69,8 +69,10 @@ public interface CeylonTypes {
     IElementType INTERFACE_BODY = new CeylonElementType("INTERFACE_BODY");
     IElementType TYPE = new CeylonElementType("TYPE");
     IElementType STATIC_TYPE = new CeylonElementType("STATIC_TYPE");
+    IElementType GROUPED_TYPE = new CeylonElementType("GROUPED_TYPE");
     IElementType SIMPLE_TYPE = new CeylonElementType("SIMPLE_TYPE");
     IElementType BASE_TYPE = new CeylonElementType("BASE_TYPE");
+    IElementType QUALIFIED_TYPE = new CeylonElementType("QUALIFIED_TYPE");
     IElementType UNION_TYPE = new CeylonElementType("UNION_TYPE");
     IElementType INTERSECTION_TYPE = new CeylonElementType("INTERSECTION_TYPE");
     IElementType SEQUENCE_TYPE = new CeylonElementType("SEQUENCE_TYPE");
@@ -79,7 +81,6 @@ public interface CeylonTypes {
     IElementType TUPLE_TYPE = new CeylonElementType("TUPLE_TYPE");
     IElementType FUNCTION_TYPE = new CeylonElementType("FUNCTION_TYPE");
     IElementType ENTRY_TYPE = new CeylonElementType("ENTRY_TYPE");
-    IElementType QUALIFIED_TYPE = new CeylonElementType("QUALIFIED_TYPE");
     IElementType SUPER_TYPE = new CeylonElementType("SUPER_TYPE");
     IElementType META_LITERAL = new CeylonElementType("META_LITERAL");
     IElementType TYPE_LITERAL = new CeylonElementType("TYPE_LITERAL");
@@ -173,7 +174,6 @@ public interface CeylonTypes {
     IElementType BITWISE_ASSIGNMENT_OP = new CeylonElementType("BITWISE_ASSIGNMENT_OP");
     IElementType INTERSECT_ASSIGN_OP = new CeylonElementType("INTERSECT_ASSIGN_OP");
     IElementType UNION_ASSIGN_OP = new CeylonElementType("UNION_ASSIGN_OP");
-    IElementType XOR_ASSIGN_OP = new CeylonElementType("XOR_ASSIGN_OP");
     IElementType COMPLEMENT_ASSIGN_OP = new CeylonElementType("COMPLEMENT_ASSIGN_OP");
     IElementType LOGICAL_ASSIGNMENT_OP = new CeylonElementType("LOGICAL_ASSIGNMENT_OP");
     IElementType AND_ASSIGN_OP = new CeylonElementType("AND_ASSIGN_OP");
@@ -184,7 +184,6 @@ public interface CeylonTypes {
     IElementType BITWISE_OP = new CeylonElementType("BITWISE_OP");
     IElementType INTERSECTION_OP = new CeylonElementType("INTERSECTION_OP");
     IElementType UNION_OP = new CeylonElementType("UNION_OP");
-    IElementType XOR_OP = new CeylonElementType("XOR_OP");
     IElementType COMPLEMENT_OP = new CeylonElementType("COMPLEMENT_OP");
     IElementType EQUALITY_OP = new CeylonElementType("EQUALITY_OP");
     IElementType EQUAL_OP = new CeylonElementType("EQUAL_OP");
@@ -292,4 +291,5 @@ public interface CeylonTypes {
     IElementType EXPRESSION_COMPREHENSION_CLAUSE = new CeylonElementType("EXPRESSION_COMPREHENSION_CLAUSE");
     IElementType FOR_COMPREHENSION_CLAUSE = new CeylonElementType("FOR_COMPREHENSION_CLAUSE");
     IElementType IF_COMPREHENSION_CLAUSE = new CeylonElementType("IF_COMPREHENSION_CLAUSE");
+
 }

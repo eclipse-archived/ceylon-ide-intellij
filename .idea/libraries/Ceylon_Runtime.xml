@@ -10,8 +10,9 @@
       <root url="jar://$PROJECT_DIR$/resources/repo/org/antlr/runtime/3.4/org.antlr.runtime-3.4.jar!/" />
       <root url="jar://$PROJECT_DIR$/resources/repo/org/jboss/jandex/1.0.3.Final/org.jboss.jandex-1.0.3.Final.jar!/" />
       <root url="jar://$PROJECT_DIR$/resources/repo/ceylon/language/1.1.0/ceylon.language-1.1.0.car!/" />
-      <root url="jar://$PROJECT_DIR$/resources/repo/com/github/rjeschke/txtmark/0.8-c0dcd373ce/com.github.rjeschke.txtmark-0.8-c0dcd373ce.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/ceylon-bootstrap.jar!/" />
+      <root url="jar://$PROJECT_DIR$/resources/repo/com/github/rjeschke/txtmark/0.11/com.github.rjeschke.txtmark-0.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/resources/repo/net/minidev/json-smart/1.1.1/net.minidev.json-smart-1.1.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

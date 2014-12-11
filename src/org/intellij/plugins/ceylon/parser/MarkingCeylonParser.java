@@ -581,15 +581,6 @@ public class MarkingCeylonParser extends CeylonParser {
     }
 
     @Override
-    public Tree.ExpressionList expressions() throws RecognitionException {
-        final MyTree.MyMarker marker = mark();
-        final Tree.ExpressionList node = super.expressions();
-        end(marker, node);
-        return node;
-    }
-
-
-    @Override
     public Tree.IndexExpression indexOrIndexRange() throws RecognitionException {
         final MyTree.MyMarker marker = mark();
         final Tree.IndexExpression node = super.indexOrIndexRange();
@@ -736,9 +727,9 @@ public class MarkingCeylonParser extends CeylonParser {
     }
 
     @Override
-    public Tree.Expression anonymousFunction() throws RecognitionException {
+    public CustomTree.FunctionArgument anonymousFunction() throws RecognitionException {
         final MyTree.MyMarker marker = mark();
-        final Tree.Expression node = super.anonymousFunction();
+        final CustomTree.FunctionArgument node = super.anonymousFunction();
         end(marker, node);
         return node;
     }
@@ -1160,9 +1151,9 @@ public class MarkingCeylonParser extends CeylonParser {
     }
 
     @Override
-    public Tree.StaticType groupedType() throws RecognitionException {
+    public Tree.GroupedType groupedType() throws RecognitionException {
         final MyTree.MyMarker marker = mark();
-        final Tree.StaticType node = super.groupedType();
+        final Tree.GroupedType node = super.groupedType();
         end(marker, node);
         return node;
     }

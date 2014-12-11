@@ -35,15 +35,15 @@ public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonClass> {
     @NotNull
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
-        Tree.ClassOrInterface ceylonNode = (Tree.ClassOrInterface) myClass.getCeylonNode();
+        Tree.ClassOrInterface ceylonNode = myClass.getCeylonNode();
 
         List<StructureViewTreeElement> elements = new ArrayList<>();
-        List<Node> bodyChildren;
+        List<Tree.Statement> bodyChildren;
 
         if (ceylonNode instanceof CustomTree.ClassDefinition) {
-            bodyChildren = ((CustomTree.ClassDefinition) ceylonNode).getClassBody().getChildren();
+            bodyChildren = ((CustomTree.ClassDefinition) ceylonNode).getClassBody().getStatements();
         } else if (ceylonNode instanceof Tree.InterfaceDefinition) {
-            bodyChildren = ((Tree.InterfaceDefinition) ceylonNode).getInterfaceBody().getChildren();
+            bodyChildren = ((Tree.InterfaceDefinition) ceylonNode).getInterfaceBody().getStatements();
         } else {
             bodyChildren = Collections.emptyList();
         }

@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import org.intellij.plugins.ceylon.psi.CeylonPsiImpl.*;
+import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
 
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 
@@ -111,8 +112,12 @@ public class CeylonPsiFactory {
             return new ClassBodyPsiImpl(node);
         } else if (type == INTERFACE_BODY) {
             return new InterfaceBodyPsiImpl(node);
+        } else if (type == GROUPED_TYPE) {
+            return new GroupedTypePsiImpl(node);
         } else if (type == BASE_TYPE) {
             return new BaseTypePsiImpl(node);
+        } else if (type == QUALIFIED_TYPE) {
+            return new QualifiedTypePsiImpl(node);
         } else if (type == UNION_TYPE) {
             return new UnionTypePsiImpl(node);
         } else if (type == INTERSECTION_TYPE) {
@@ -129,8 +134,6 @@ public class CeylonPsiFactory {
             return new FunctionTypePsiImpl(node);
         } else if (type == ENTRY_TYPE) {
             return new EntryTypePsiImpl(node);
-        } else if (type == QUALIFIED_TYPE) {
-            return new QualifiedTypePsiImpl(node);
         } else if (type == SUPER_TYPE) {
             return new SuperTypePsiImpl(node);
         } else if (type == TYPE_LITERAL) {
@@ -287,8 +290,6 @@ public class CeylonPsiFactory {
             return new IntersectAssignOpPsiImpl(node);
         } else if (type == UNION_ASSIGN_OP) {
             return new UnionAssignOpPsiImpl(node);
-        } else if (type == XOR_ASSIGN_OP) {
-            return new XorAssignOpPsiImpl(node);
         } else if (type == COMPLEMENT_ASSIGN_OP) {
             return new ComplementAssignOpPsiImpl(node);
         } else if (type == AND_ASSIGN_OP) {
@@ -303,8 +304,6 @@ public class CeylonPsiFactory {
             return new IntersectionOpPsiImpl(node);
         } else if (type == UNION_OP) {
             return new UnionOpPsiImpl(node);
-        } else if (type == XOR_OP) {
-            return new XorOpPsiImpl(node);
         } else if (type == COMPLEMENT_OP) {
             return new ComplementOpPsiImpl(node);
         } else if (type == EQUAL_OP) {
@@ -471,6 +470,6 @@ public class CeylonPsiFactory {
             return new IfComprehensionClausePsiImpl(node);
         }
 
-        throw new IllegalArgumentException("Unsupported type: " + type);
+        return new CeylonCompositeElementImpl(node);
     }
 }

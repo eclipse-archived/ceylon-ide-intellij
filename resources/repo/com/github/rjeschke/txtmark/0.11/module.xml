@@ -22,19 +22,11 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.1" name="ceylon.runtime" slot="1.1.0">
+<module xmlns="urn:jboss:module:1.0" name="com.github.rjeschke.txtmark" slot="0.11">
     <resources>
-        <resource-root path="ceylon.runtime-1.1.0.jar"/>
+        <resource-root path="com.github.rjeschke.txtmark-0.11"/>
     </resources>
 
-    <main-class name="ceylon.modules.Main"/>
-
     <dependencies>
-        <module name="ceylon.language" slot="1.1.0"/>
-        <module name="com.redhat.ceylon.common" slot="1.1.0" export="true" services="export"/>
-        <module name="com.redhat.ceylon.module-resolver" slot="1.1.0"/>
-        <module name="com.redhat.ceylon.maven-support" slot="2.0" services="import" optional="true"/>
-        <module name="org.jboss.modules" slot="1.3.3.Final"/>
-        <module name="org.jboss.logmanager" slot="1.4.0.Final"/>
     </dependencies>
 </module>

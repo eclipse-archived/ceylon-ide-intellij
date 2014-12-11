@@ -16,7 +16,7 @@ public class RepositoryManagerImpl implements RepositoryManager {
     @Override
     public Collection<ModuleSearchResult.ModuleDetails> findArchivesByName(String moduleName) throws Exception {
         String repoUrl = "https://modules.ceylon-lang.org/test/";
-        Repository repository = new RepositoryManagerBuilder(null, false).repositoryBuilder().buildRepository(repoUrl);
+        Repository repository = new RepositoryManagerBuilder(null).repositoryBuilder().buildRepository(repoUrl);
 
         ModuleQuery query = new ModuleQuery(moduleName, ModuleQuery.Type.JVM);
         ModuleSearchResult result = new ModuleSearchResult();

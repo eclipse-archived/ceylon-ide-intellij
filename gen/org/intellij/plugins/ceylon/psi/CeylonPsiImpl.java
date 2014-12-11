@@ -365,6 +365,12 @@ public class CeylonPsiImpl {
         @Override public Tree.StaticType getCeylonNode() { return (Tree.StaticType) super.getCeylonNode(); }
     }
 
+    public static class GroupedTypePsiImpl extends StaticTypePsiImpl
+            implements CeylonPsi.GroupedTypePsi {
+        public GroupedTypePsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.GroupedType getCeylonNode() { return (Tree.GroupedType) super.getCeylonNode(); }
+    }
+
     public static abstract class SimpleTypePsiImpl extends StaticTypePsiImpl
             implements CeylonPsi.SimpleTypePsi {
         public SimpleTypePsiImpl(ASTNode astNode) { super(astNode); }
@@ -375,6 +381,12 @@ public class CeylonPsiImpl {
             implements CeylonPsi.BaseTypePsi {
         public BaseTypePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.BaseType getCeylonNode() { return (Tree.BaseType) super.getCeylonNode(); }
+    }
+
+    public static class QualifiedTypePsiImpl extends SimpleTypePsiImpl
+            implements CeylonPsi.QualifiedTypePsi {
+        public QualifiedTypePsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.QualifiedType getCeylonNode() { return (Tree.QualifiedType) super.getCeylonNode(); }
     }
 
     public static class UnionTypePsiImpl extends StaticTypePsiImpl
@@ -423,12 +435,6 @@ public class CeylonPsiImpl {
             implements CeylonPsi.EntryTypePsi {
         public EntryTypePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.EntryType getCeylonNode() { return (Tree.EntryType) super.getCeylonNode(); }
-    }
-
-    public static class QualifiedTypePsiImpl extends SimpleTypePsiImpl
-            implements CeylonPsi.QualifiedTypePsi {
-        public QualifiedTypePsiImpl(ASTNode astNode) { super(astNode); }
-        @Override public Tree.QualifiedType getCeylonNode() { return (Tree.QualifiedType) super.getCeylonNode(); }
     }
 
     public static class SuperTypePsiImpl extends StaticTypePsiImpl
@@ -989,12 +995,6 @@ public class CeylonPsiImpl {
         @Override public Tree.UnionAssignOp getCeylonNode() { return (Tree.UnionAssignOp) super.getCeylonNode(); }
     }
 
-    public static class XorAssignOpPsiImpl extends BitwiseAssignmentOpPsiImpl
-            implements CeylonPsi.XorAssignOpPsi {
-        public XorAssignOpPsiImpl(ASTNode astNode) { super(astNode); }
-        @Override public Tree.XorAssignOp getCeylonNode() { return (Tree.XorAssignOp) super.getCeylonNode(); }
-    }
-
     public static class ComplementAssignOpPsiImpl extends BitwiseAssignmentOpPsiImpl
             implements CeylonPsi.ComplementAssignOpPsi {
         public ComplementAssignOpPsiImpl(ASTNode astNode) { super(astNode); }
@@ -1053,12 +1053,6 @@ public class CeylonPsiImpl {
             implements CeylonPsi.UnionOpPsi {
         public UnionOpPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.UnionOp getCeylonNode() { return (Tree.UnionOp) super.getCeylonNode(); }
-    }
-
-    public static class XorOpPsiImpl extends BitwiseOpPsiImpl
-            implements CeylonPsi.XorOpPsi {
-        public XorOpPsiImpl(ASTNode astNode) { super(astNode); }
-        @Override public Tree.XorOp getCeylonNode() { return (Tree.XorOp) super.getCeylonNode(); }
     }
 
     public static class ComplementOpPsiImpl extends BitwiseOpPsiImpl

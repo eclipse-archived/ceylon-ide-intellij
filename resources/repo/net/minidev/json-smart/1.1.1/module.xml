@@ -22,13 +22,11 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.0" name="com.googlecode.sardine" slot="314">
+<module xmlns="urn:jboss:module:1.0" name="net.minidev.json-smart" slot="1.1.1">
     <resources>
-        <resource-root path="com.googlecode.sardine-314.jar"/>
+        <resource-root path="net.minidev.json-smart-1.1.1.jar"/>
     </resources>
 
     <dependencies>
-        <module name="org.apache.httpcomponents.httpclient" slot="4.1.1"/>
-        <module name="org.slf4j.api" slot="1.6.1"/>
     </dependencies>
 </module>

@@ -37,7 +37,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         Node parentNode = ((CeylonCompositeElement) myElement.getParent()).getCeylonNode();
 
         if (parentNode instanceof Tree.InvocationExpression) {
-            parentNode = parentNode.getChildren().get(0); // TODO uh oh
+            parentNode = ((Tree.InvocationExpression) parentNode).getPrimary();
         }
         declaration = getReferencedExplicitDeclaration(parentNode, compilationUnit);
         if (declaration == null) {

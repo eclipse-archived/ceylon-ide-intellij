@@ -241,12 +241,20 @@ public class CeylonPsi {
         @Override Tree.StaticType getCeylonNode();
     }
 
+    public static interface GroupedTypePsi extends StaticTypePsi {
+        @Override Tree.GroupedType getCeylonNode();
+    }
+
     public static interface SimpleTypePsi extends StaticTypePsi {
         @Override Tree.SimpleType getCeylonNode();
     }
 
     public static interface BaseTypePsi extends SimpleTypePsi {
         @Override Tree.BaseType getCeylonNode();
+    }
+
+    public static interface QualifiedTypePsi extends SimpleTypePsi {
+        @Override Tree.QualifiedType getCeylonNode();
     }
 
     public static interface UnionTypePsi extends StaticTypePsi {
@@ -279,10 +287,6 @@ public class CeylonPsi {
 
     public static interface EntryTypePsi extends StaticTypePsi {
         @Override Tree.EntryType getCeylonNode();
-    }
-
-    public static interface QualifiedTypePsi extends SimpleTypePsi {
-        @Override Tree.QualifiedType getCeylonNode();
     }
 
     public static interface SuperTypePsi extends StaticTypePsi {
@@ -657,10 +661,6 @@ public class CeylonPsi {
         @Override Tree.UnionAssignOp getCeylonNode();
     }
 
-    public static interface XorAssignOpPsi extends BitwiseAssignmentOpPsi {
-        @Override Tree.XorAssignOp getCeylonNode();
-    }
-
     public static interface ComplementAssignOpPsi extends BitwiseAssignmentOpPsi {
         @Override Tree.ComplementAssignOp getCeylonNode();
     }
@@ -699,10 +699,6 @@ public class CeylonPsi {
 
     public static interface UnionOpPsi extends BitwiseOpPsi {
         @Override Tree.UnionOp getCeylonNode();
-    }
-
-    public static interface XorOpPsi extends BitwiseOpPsi {
-        @Override Tree.XorOp getCeylonNode();
     }
 
     public static interface ComplementOpPsi extends BitwiseOpPsi {
