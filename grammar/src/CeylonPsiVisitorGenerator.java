@@ -1,7 +1,6 @@
-package org.intellij.plugins.ceylon;
-
 import org.intellij.plugins.ceylon.psi.CeylonPsi;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -11,7 +10,7 @@ import java.io.IOException;
 public class CeylonPsiVisitorGenerator {
 
     public static void main(String[] args) throws IOException {
-        FileOutputStream os = new FileOutputStream("gen/org/intellij/plugins/ceylon/psi/CeylonPsiVisitor.java");
+        FileOutputStream os = new FileOutputStream(new File(args[0], "org/intellij/plugins/ceylon/psi/CeylonPsiVisitor.java"));
 
         os.write(("package org.intellij.plugins.ceylon.psi;\n" +
                 "\n" +

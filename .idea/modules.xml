@@ -3,10 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CeylonIDEA.iml" filepath="$PROJECT_DIR$/CeylonIDEA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/grammar/Grammar.iml" filepath="$PROJECT_DIR$/grammar/Grammar.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ceylon-ide-common/ceylon-ide-common.iml" filepath="$PROJECT_DIR$/../ceylon-ide-common/ceylon-ide-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" filepath="$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/compiler/compiler.iml" filepath="$PROJECT_DIR$/compiler/compiler.iml" />
     </modules>
   </component>
 </project>
-
