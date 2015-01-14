@@ -1,0 +1,23 @@
+<component name="ArtifactManager">
+  <artifact name="CeylonIDEA Plugin Package">
+    <output-path>$PROJECT_DIR$/out/artifacts/CeylonIDEA_Plugin_Package</output-path>
+    <root id="root">
+      <element id="archive" name="CeylonIDEA.zip">
+        <element id="directory" name="CeylonIDEA">
+          <element id="directory" name="classes">
+            <element id="module-output" name="ceylon-ide-common" />
+            <element id="module-output" name="ceylon-jps-plugin" />
+            <element id="module-output" name="CeylonIDEA" />
+            <element id="module-output" name="compiler" />
+          </element>
+          <element id="directory" name="lib">
+            <element id="library" level="project" name="Ceylon Runtime" />
+          </element>
+          <element id="directory" name="META-INF">
+            <element id="dir-copy" path="$PROJECT_DIR$/META-INF" />
+          </element>
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
