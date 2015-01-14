@@ -21,6 +21,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof ExpressionComprehensionClausePsi) {
             visitExpressionComprehensionClausePsi((ExpressionComprehensionClausePsi) element);
         }
+        else if (element instanceof InitialComprehensionClausePsi) {
+            visitInitialComprehensionClausePsi((InitialComprehensionClausePsi) element);
+        }
         else if (element instanceof ComprehensionClausePsi) {
             visitComprehensionClausePsi((ComprehensionClausePsi) element);
         }
@@ -59,6 +62,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         }
         else if (element instanceof SelfExpressionPsi) {
             visitSelfExpressionPsi((SelfExpressionPsi) element);
+        }
+        else if (element instanceof DocLinkPsi) {
+            visitDocLinkPsi((DocLinkPsi) element);
         }
         else if (element instanceof QuotedLiteralPsi) {
             visitQuotedLiteralPsi((QuotedLiteralPsi) element);
@@ -110,6 +116,15 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         }
         else if (element instanceof NamedArgumentPsi) {
             visitNamedArgumentPsi((NamedArgumentPsi) element);
+        }
+        else if (element instanceof SwitchExpressionPsi) {
+            visitSwitchExpressionPsi((SwitchExpressionPsi) element);
+        }
+        else if (element instanceof IfExpressionPsi) {
+            visitIfExpressionPsi((IfExpressionPsi) element);
+        }
+        else if (element instanceof ObjectExpressionPsi) {
+            visitObjectExpressionPsi((ObjectExpressionPsi) element);
         }
         else if (element instanceof FunctionArgumentPsi) {
             visitFunctionArgumentPsi((FunctionArgumentPsi) element);
@@ -327,9 +342,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof ComplementOpPsi) {
             visitComplementOpPsi((ComplementOpPsi) element);
         }
-//        else if (element instanceof XorOpPsi) {
-//            visitXorOpPsi((XorOpPsi) element);
-//        }
         else if (element instanceof UnionOpPsi) {
             visitUnionOpPsi((UnionOpPsi) element);
         }
@@ -360,9 +372,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof ComplementAssignOpPsi) {
             visitComplementAssignOpPsi((ComplementAssignOpPsi) element);
         }
-//        else if (element instanceof XorAssignOpPsi) {
-//            visitXorAssignOpPsi((XorAssignOpPsi) element);
-//        }
         else if (element instanceof UnionAssignOpPsi) {
             visitUnionAssignOpPsi((UnionAssignOpPsi) element);
         }
@@ -459,8 +468,8 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof WhileStatementPsi) {
             visitWhileStatementPsi((WhileStatementPsi) element);
         }
-        else if (element instanceof KeyValueIteratorPsi) {
-            visitKeyValueIteratorPsi((KeyValueIteratorPsi) element);
+        else if (element instanceof PatternIteratorPsi) {
+            visitPatternIteratorPsi((PatternIteratorPsi) element);
         }
         else if (element instanceof ValueIteratorPsi) {
             visitValueIteratorPsi((ValueIteratorPsi) element);
@@ -513,6 +522,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof SwitchCaseListPsi) {
             visitSwitchCaseListPsi((SwitchCaseListPsi) element);
         }
+        else if (element instanceof SwitchedPsi) {
+            visitSwitchedPsi((SwitchedPsi) element);
+        }
         else if (element instanceof SwitchClausePsi) {
             visitSwitchClausePsi((SwitchClausePsi) element);
         }
@@ -528,6 +540,12 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof IfStatementPsi) {
             visitIfStatementPsi((IfStatementPsi) element);
         }
+        else if (element instanceof LetClausePsi) {
+            visitLetClausePsi((LetClausePsi) element);
+        }
+        else if (element instanceof LetExpressionPsi) {
+            visitLetExpressionPsi((LetExpressionPsi) element);
+        }
         else if (element instanceof DynamicClausePsi) {
             visitDynamicClausePsi((DynamicClausePsi) element);
         }
@@ -539,6 +557,21 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         }
         else if (element instanceof ControlStatementPsi) {
             visitControlStatementPsi((ControlStatementPsi) element);
+        }
+        else if (element instanceof DestructurePsi) {
+            visitDestructurePsi((DestructurePsi) element);
+        }
+        else if (element instanceof KeyValuePatternPsi) {
+            visitKeyValuePatternPsi((KeyValuePatternPsi) element);
+        }
+        else if (element instanceof TuplePatternPsi) {
+            visitTuplePatternPsi((TuplePatternPsi) element);
+        }
+        else if (element instanceof VariablePatternPsi) {
+            visitVariablePatternPsi((VariablePatternPsi) element);
+        }
+        else if (element instanceof PatternPsi) {
+            visitPatternPsi((PatternPsi) element);
         }
         else if (element instanceof ExpressionStatementPsi) {
             visitExpressionStatementPsi((ExpressionStatementPsi) element);
@@ -575,6 +608,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         }
         else if (element instanceof DirectivePsi) {
             visitDirectivePsi((DirectivePsi) element);
+        }
+        else if (element instanceof SpreadTypePsi) {
+            visitSpreadTypePsi((SpreadTypePsi) element);
         }
         else if (element instanceof DefaultedTypePsi) {
             visitDefaultedTypePsi((DefaultedTypePsi) element);
@@ -627,6 +663,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof InterfaceLiteralPsi) {
             visitInterfaceLiteralPsi((InterfaceLiteralPsi) element);
         }
+        else if (element instanceof NewLiteralPsi) {
+            visitNewLiteralPsi((NewLiteralPsi) element);
+        }
         else if (element instanceof ClassLiteralPsi) {
             visitClassLiteralPsi((ClassLiteralPsi) element);
         }
@@ -641,9 +680,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         }
         else if (element instanceof SuperTypePsi) {
             visitSuperTypePsi((SuperTypePsi) element);
-        }
-        else if (element instanceof QualifiedTypePsi) {
-            visitQualifiedTypePsi((QualifiedTypePsi) element);
         }
         else if (element instanceof EntryTypePsi) {
             visitEntryTypePsi((EntryTypePsi) element);
@@ -669,11 +705,17 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof UnionTypePsi) {
             visitUnionTypePsi((UnionTypePsi) element);
         }
+        else if (element instanceof QualifiedTypePsi) {
+            visitQualifiedTypePsi((QualifiedTypePsi) element);
+        }
         else if (element instanceof BaseTypePsi) {
             visitBaseTypePsi((BaseTypePsi) element);
         }
         else if (element instanceof SimpleTypePsi) {
             visitSimpleTypePsi((SimpleTypePsi) element);
+        }
+        else if (element instanceof GroupedTypePsi) {
+            visitGroupedTypePsi((GroupedTypePsi) element);
         }
         else if (element instanceof StaticTypePsi) {
             visitStaticTypePsi((StaticTypePsi) element);
@@ -761,6 +803,12 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         }
         else if (element instanceof ClassDeclarationPsi) {
             visitClassDeclarationPsi((ClassDeclarationPsi) element);
+        }
+        else if (element instanceof DelegatedConstructorPsi) {
+            visitDelegatedConstructorPsi((DelegatedConstructorPsi) element);
+        }
+        else if (element instanceof ConstructorPsi) {
+            visitConstructorPsi((ConstructorPsi) element);
         }
         else if (element instanceof ClassDefinitionPsi) {
             visitClassDefinitionPsi((ClassDefinitionPsi) element);
@@ -856,6 +904,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitIfComprehensionClausePsi(@NotNull IfComprehensionClausePsi element) {}
     public void visitForComprehensionClausePsi(@NotNull ForComprehensionClausePsi element) {}
     public void visitExpressionComprehensionClausePsi(@NotNull ExpressionComprehensionClausePsi element) {}
+    public void visitInitialComprehensionClausePsi(@NotNull InitialComprehensionClausePsi element) {}
     public void visitComprehensionClausePsi(@NotNull ComprehensionClausePsi element) {}
     public void visitComprehensionPsi(@NotNull ComprehensionPsi element) {}
     public void visitIdentifierPsi(@NotNull IdentifierPsi element) {}
@@ -869,6 +918,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitSuperPsi(@NotNull SuperPsi element) {}
     public void visitThisPsi(@NotNull ThisPsi element) {}
     public void visitSelfExpressionPsi(@NotNull SelfExpressionPsi element) {}
+    public void visitDocLinkPsi(@NotNull DocLinkPsi element) {}
     public void visitQuotedLiteralPsi(@NotNull QuotedLiteralPsi element) {}
     public void visitStringLiteralPsi(@NotNull StringLiteralPsi element) {}
     public void visitCharLiteralPsi(@NotNull CharLiteralPsi element) {}
@@ -886,6 +936,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitTypedArgumentPsi(@NotNull TypedArgumentPsi element) {}
     public void visitSpecifiedArgumentPsi(@NotNull SpecifiedArgumentPsi element) {}
     public void visitNamedArgumentPsi(@NotNull NamedArgumentPsi element) {}
+    public void visitSwitchExpressionPsi(@NotNull SwitchExpressionPsi element) {}
+    public void visitIfExpressionPsi(@NotNull IfExpressionPsi element) {}
+    public void visitObjectExpressionPsi(@NotNull ObjectExpressionPsi element) {}
     public void visitFunctionArgumentPsi(@NotNull FunctionArgumentPsi element) {}
     public void visitSpreadArgumentPsi(@NotNull SpreadArgumentPsi element) {}
     public void visitListedArgumentPsi(@NotNull ListedArgumentPsi element) {}
@@ -958,7 +1011,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitEqualOpPsi(@NotNull EqualOpPsi element) {}
     public void visitEqualityOpPsi(@NotNull EqualityOpPsi element) {}
     public void visitComplementOpPsi(@NotNull ComplementOpPsi element) {}
-//    public void visitXorOpPsi(@NotNull XorOpPsi element) {}
     public void visitUnionOpPsi(@NotNull UnionOpPsi element) {}
     public void visitIntersectionOpPsi(@NotNull IntersectionOpPsi element) {}
     public void visitBitwiseOpPsi(@NotNull BitwiseOpPsi element) {}
@@ -969,7 +1021,6 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitAndAssignOpPsi(@NotNull AndAssignOpPsi element) {}
     public void visitLogicalAssignmentOpPsi(@NotNull LogicalAssignmentOpPsi element) {}
     public void visitComplementAssignOpPsi(@NotNull ComplementAssignOpPsi element) {}
-//    public void visitXorAssignOpPsi(@NotNull XorAssignOpPsi element) {}
     public void visitUnionAssignOpPsi(@NotNull UnionAssignOpPsi element) {}
     public void visitIntersectAssignOpPsi(@NotNull IntersectAssignOpPsi element) {}
     public void visitBitwiseAssignmentOpPsi(@NotNull BitwiseAssignmentOpPsi element) {}
@@ -1002,7 +1053,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitConditionListPsi(@NotNull ConditionListPsi element) {}
     public void visitWhileClausePsi(@NotNull WhileClausePsi element) {}
     public void visitWhileStatementPsi(@NotNull WhileStatementPsi element) {}
-    public void visitKeyValueIteratorPsi(@NotNull KeyValueIteratorPsi element) {}
+    public void visitPatternIteratorPsi(@NotNull PatternIteratorPsi element) {}
     public void visitValueIteratorPsi(@NotNull ValueIteratorPsi element) {}
     public void visitForIteratorPsi(@NotNull ForIteratorPsi element) {}
     public void visitForClausePsi(@NotNull ForClausePsi element) {}
@@ -1020,15 +1071,23 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitCaseItemPsi(@NotNull CaseItemPsi element) {}
     public void visitCaseClausePsi(@NotNull CaseClausePsi element) {}
     public void visitSwitchCaseListPsi(@NotNull SwitchCaseListPsi element) {}
+    public void visitSwitchedPsi(@NotNull SwitchedPsi element) {}
     public void visitSwitchClausePsi(@NotNull SwitchClausePsi element) {}
     public void visitSwitchStatementPsi(@NotNull SwitchStatementPsi element) {}
     public void visitElseClausePsi(@NotNull ElseClausePsi element) {}
     public void visitIfClausePsi(@NotNull IfClausePsi element) {}
     public void visitIfStatementPsi(@NotNull IfStatementPsi element) {}
+    public void visitLetClausePsi(@NotNull LetClausePsi element) {}
+    public void visitLetExpressionPsi(@NotNull LetExpressionPsi element) {}
     public void visitDynamicClausePsi(@NotNull DynamicClausePsi element) {}
     public void visitDynamicStatementPsi(@NotNull DynamicStatementPsi element) {}
     public void visitControlClausePsi(@NotNull ControlClausePsi element) {}
     public void visitControlStatementPsi(@NotNull ControlStatementPsi element) {}
+    public void visitDestructurePsi(@NotNull DestructurePsi element) {}
+    public void visitKeyValuePatternPsi(@NotNull KeyValuePatternPsi element) {}
+    public void visitTuplePatternPsi(@NotNull TuplePatternPsi element) {}
+    public void visitVariablePatternPsi(@NotNull VariablePatternPsi element) {}
+    public void visitPatternPsi(@NotNull PatternPsi element) {}
     public void visitExpressionStatementPsi(@NotNull ExpressionStatementPsi element) {}
     public void visitSpecifierStatementPsi(@NotNull SpecifierStatementPsi element) {}
     public void visitAssertionPsi(@NotNull AssertionPsi element) {}
@@ -1041,6 +1100,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitThrowPsi(@NotNull ThrowPsi element) {}
     public void visitReturnPsi(@NotNull ReturnPsi element) {}
     public void visitDirectivePsi(@NotNull DirectivePsi element) {}
+    public void visitSpreadTypePsi(@NotNull SpreadTypePsi element) {}
     public void visitDefaultedTypePsi(@NotNull DefaultedTypePsi element) {}
     public void visitSequencedTypePsi(@NotNull SequencedTypePsi element) {}
     public void visitInferredTypeArgumentsPsi(@NotNull InferredTypeArgumentsPsi element) {}
@@ -1058,12 +1118,12 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitTypeParameterLiteralPsi(@NotNull TypeParameterLiteralPsi element) {}
     public void visitAliasLiteralPsi(@NotNull AliasLiteralPsi element) {}
     public void visitInterfaceLiteralPsi(@NotNull InterfaceLiteralPsi element) {}
+    public void visitNewLiteralPsi(@NotNull NewLiteralPsi element) {}
     public void visitClassLiteralPsi(@NotNull ClassLiteralPsi element) {}
     public void visitMemberLiteralPsi(@NotNull MemberLiteralPsi element) {}
     public void visitTypeLiteralPsi(@NotNull TypeLiteralPsi element) {}
     public void visitMetaLiteralPsi(@NotNull MetaLiteralPsi element) {}
     public void visitSuperTypePsi(@NotNull SuperTypePsi element) {}
-    public void visitQualifiedTypePsi(@NotNull QualifiedTypePsi element) {}
     public void visitEntryTypePsi(@NotNull EntryTypePsi element) {}
     public void visitFunctionTypePsi(@NotNull FunctionTypePsi element) {}
     public void visitTupleTypePsi(@NotNull TupleTypePsi element) {}
@@ -1072,8 +1132,10 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitSequenceTypePsi(@NotNull SequenceTypePsi element) {}
     public void visitIntersectionTypePsi(@NotNull IntersectionTypePsi element) {}
     public void visitUnionTypePsi(@NotNull UnionTypePsi element) {}
+    public void visitQualifiedTypePsi(@NotNull QualifiedTypePsi element) {}
     public void visitBaseTypePsi(@NotNull BaseTypePsi element) {}
     public void visitSimpleTypePsi(@NotNull SimpleTypePsi element) {}
+    public void visitGroupedTypePsi(@NotNull GroupedTypePsi element) {}
     public void visitStaticTypePsi(@NotNull StaticTypePsi element) {}
     public void visitTypePsi(@NotNull TypePsi element) {}
     public void visitInterfaceBodyPsi(@NotNull InterfaceBodyPsi element) {}
@@ -1103,6 +1165,8 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitInterfaceDefinitionPsi(@NotNull InterfaceDefinitionPsi element) {}
     public void visitAnyInterfacePsi(@NotNull AnyInterfacePsi element) {}
     public void visitClassDeclarationPsi(@NotNull ClassDeclarationPsi element) {}
+    public void visitDelegatedConstructorPsi(@NotNull DelegatedConstructorPsi element) {}
+    public void visitConstructorPsi(@NotNull ConstructorPsi element) {}
     public void visitClassDefinitionPsi(@NotNull ClassDefinitionPsi element) {}
     public void visitAnyClassPsi(@NotNull AnyClassPsi element) {}
     public void visitClassSpecifierPsi(@NotNull ClassSpecifierPsi element) {}

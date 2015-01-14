@@ -1,10 +1,11 @@
 package org.intellij.plugins.ceylon.psi;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.PsiElement;
+import com.intellij.lang.ASTNode;
+import org.intellij.plugins.ceylon.psi.impl.*;
+
 import org.intellij.plugins.ceylon.psi.CeylonPsiImpl.*;
-import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
 
 import static org.intellij.plugins.ceylon.psi.CeylonTypes.*;
 
@@ -68,6 +69,10 @@ public class CeylonPsiFactory {
             return new AnyClassPsiImpl(node);
         } else if (type == CLASS_DEFINITION) {
             return new ClassDefinitionPsiImpl(node);
+        } else if (type == CONSTRUCTOR) {
+            return new ConstructorPsiImpl(node);
+        } else if (type == DELEGATED_CONSTRUCTOR) {
+            return new DelegatedConstructorPsiImpl(node);
         } else if (type == CLASS_DECLARATION) {
             return new ClassDeclarationPsiImpl(node);
         } else if (type == ANY_INTERFACE) {
@@ -142,6 +147,8 @@ public class CeylonPsiFactory {
             return new MemberLiteralPsiImpl(node);
         } else if (type == CLASS_LITERAL) {
             return new ClassLiteralPsiImpl(node);
+        } else if (type == NEW_LITERAL) {
+            return new NewLiteralPsiImpl(node);
         } else if (type == INTERFACE_LITERAL) {
             return new InterfaceLiteralPsiImpl(node);
         } else if (type == ALIAS_LITERAL) {
@@ -174,6 +181,8 @@ public class CeylonPsiFactory {
             return new SequencedTypePsiImpl(node);
         } else if (type == DEFAULTED_TYPE) {
             return new DefaultedTypePsiImpl(node);
+        } else if (type == SPREAD_TYPE) {
+            return new SpreadTypePsiImpl(node);
         } else if (type == RETURN) {
             return new ReturnPsiImpl(node);
         } else if (type == THROW) {
@@ -190,6 +199,14 @@ public class CeylonPsiFactory {
             return new SpecifierStatementPsiImpl(node);
         } else if (type == EXPRESSION_STATEMENT) {
             return new ExpressionStatementPsiImpl(node);
+        } else if (type == VARIABLE_PATTERN) {
+            return new VariablePatternPsiImpl(node);
+        } else if (type == TUPLE_PATTERN) {
+            return new TuplePatternPsiImpl(node);
+        } else if (type == KEY_VALUE_PATTERN) {
+            return new KeyValuePatternPsiImpl(node);
+        } else if (type == DESTRUCTURE) {
+            return new DestructurePsiImpl(node);
         } else if (type == CONTROL_STATEMENT) {
             return new ControlStatementPsiImpl(node);
         } else if (type == CONTROL_CLAUSE) {
@@ -198,6 +215,10 @@ public class CeylonPsiFactory {
             return new DynamicStatementPsiImpl(node);
         } else if (type == DYNAMIC_CLAUSE) {
             return new DynamicClausePsiImpl(node);
+        } else if (type == LET_EXPRESSION) {
+            return new LetExpressionPsiImpl(node);
+        } else if (type == LET_CLAUSE) {
+            return new LetClausePsiImpl(node);
         } else if (type == IF_STATEMENT) {
             return new IfStatementPsiImpl(node);
         } else if (type == IF_CLAUSE) {
@@ -208,6 +229,8 @@ public class CeylonPsiFactory {
             return new SwitchStatementPsiImpl(node);
         } else if (type == SWITCH_CLAUSE) {
             return new SwitchClausePsiImpl(node);
+        } else if (type == SWITCHED) {
+            return new SwitchedPsiImpl(node);
         } else if (type == SWITCH_CASE_LIST) {
             return new SwitchCaseListPsiImpl(node);
         } else if (type == CASE_CLAUSE) {
@@ -242,8 +265,8 @@ public class CeylonPsiFactory {
             return new ForIteratorPsiImpl(node);
         } else if (type == VALUE_ITERATOR) {
             return new ValueIteratorPsiImpl(node);
-        } else if (type == KEY_VALUE_ITERATOR) {
-            return new KeyValueIteratorPsiImpl(node);
+        } else if (type == PATTERN_ITERATOR) {
+            return new PatternIteratorPsiImpl(node);
         } else if (type == WHILE_STATEMENT) {
             return new WhileStatementPsiImpl(node);
         } else if (type == WHILE_CLAUSE) {
@@ -414,6 +437,12 @@ public class CeylonPsiFactory {
             return new SpreadArgumentPsiImpl(node);
         } else if (type == FUNCTION_ARGUMENT) {
             return new FunctionArgumentPsiImpl(node);
+        } else if (type == OBJECT_EXPRESSION) {
+            return new ObjectExpressionPsiImpl(node);
+        } else if (type == IF_EXPRESSION) {
+            return new IfExpressionPsiImpl(node);
+        } else if (type == SWITCH_EXPRESSION) {
+            return new SwitchExpressionPsiImpl(node);
         } else if (type == SPECIFIED_ARGUMENT) {
             return new SpecifiedArgumentPsiImpl(node);
         } else if (type == METHOD_ARGUMENT) {

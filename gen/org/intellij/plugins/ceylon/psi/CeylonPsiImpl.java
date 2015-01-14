@@ -2,10 +2,7 @@ package org.intellij.plugins.ceylon.psi;
 
 import com.intellij.lang.ASTNode;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.codeInsight.resolve.CeylonResolvable;
-import org.intellij.plugins.ceylon.codeInsight.resolve.DeclarationPsiNameIdOwner;
-import org.intellij.plugins.ceylon.codeInsight.resolve.IdentifiableBaseMemberExpression;
-import org.intellij.plugins.ceylon.codeInsight.resolve.ParameterDeclarationPsiIdOwner;
+import org.intellij.plugins.ceylon.codeInsight.resolve.*;
 import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;
 /* Generated using Antlr by PsiImplGen.g */
 
@@ -189,6 +186,18 @@ public class CeylonPsiImpl {
             implements CeylonPsi.ClassDefinitionPsi {
         public ClassDefinitionPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.ClassDefinition getCeylonNode() { return (Tree.ClassDefinition) super.getCeylonNode(); }
+    }
+
+    public static class ConstructorPsiImpl extends DeclarationPsiNameIdOwner
+            implements CeylonPsi.ConstructorPsi {
+        public ConstructorPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.Constructor getCeylonNode() { return (Tree.Constructor) super.getCeylonNode(); }
+    }
+
+    public static class DelegatedConstructorPsiImpl extends CeylonCompositeElementImpl
+            implements CeylonPsi.DelegatedConstructorPsi {
+        public DelegatedConstructorPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.DelegatedConstructor getCeylonNode() { return (Tree.DelegatedConstructor) super.getCeylonNode(); }
     }
 
     public static class ClassDeclarationPsiImpl extends AnyClassPsiImpl
@@ -467,6 +476,12 @@ public class CeylonPsiImpl {
         @Override public Tree.ClassLiteral getCeylonNode() { return (Tree.ClassLiteral) super.getCeylonNode(); }
     }
 
+    public static class NewLiteralPsiImpl extends TypeLiteralPsiImpl
+            implements CeylonPsi.NewLiteralPsi {
+        public NewLiteralPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.NewLiteral getCeylonNode() { return (Tree.NewLiteral) super.getCeylonNode(); }
+    }
+
     public static class InterfaceLiteralPsiImpl extends TypeLiteralPsiImpl
             implements CeylonPsi.InterfaceLiteralPsi {
         public InterfaceLiteralPsiImpl(ASTNode astNode) { super(astNode); }
@@ -569,6 +584,12 @@ public class CeylonPsiImpl {
         @Override public Tree.DefaultedType getCeylonNode() { return (Tree.DefaultedType) super.getCeylonNode(); }
     }
 
+    public static class SpreadTypePsiImpl extends TypePsiImpl
+            implements CeylonPsi.SpreadTypePsi {
+        public SpreadTypePsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.SpreadType getCeylonNode() { return (Tree.SpreadType) super.getCeylonNode(); }
+    }
+
     public static abstract class DirectivePsiImpl extends ExecutableStatementPsiImpl
             implements CeylonPsi.DirectivePsi {
         public DirectivePsiImpl(ASTNode astNode) { super(astNode); }
@@ -641,6 +662,36 @@ public class CeylonPsiImpl {
         @Override public Tree.ExpressionStatement getCeylonNode() { return (Tree.ExpressionStatement) super.getCeylonNode(); }
     }
 
+    public static abstract class PatternPsiImpl extends CeylonCompositeElementImpl
+            implements CeylonPsi.PatternPsi {
+        public PatternPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.Pattern getCeylonNode() { return (Tree.Pattern) super.getCeylonNode(); }
+    }
+
+    public static class VariablePatternPsiImpl extends PatternPsiImpl
+            implements CeylonPsi.VariablePatternPsi {
+        public VariablePatternPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.VariablePattern getCeylonNode() { return (Tree.VariablePattern) super.getCeylonNode(); }
+    }
+
+    public static class TuplePatternPsiImpl extends PatternPsiImpl
+            implements CeylonPsi.TuplePatternPsi {
+        public TuplePatternPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.TuplePattern getCeylonNode() { return (Tree.TuplePattern) super.getCeylonNode(); }
+    }
+
+    public static class KeyValuePatternPsiImpl extends PatternPsiImpl
+            implements CeylonPsi.KeyValuePatternPsi {
+        public KeyValuePatternPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.KeyValuePattern getCeylonNode() { return (Tree.KeyValuePattern) super.getCeylonNode(); }
+    }
+
+    public static class DestructurePsiImpl extends ExecutableStatementPsiImpl
+            implements CeylonPsi.DestructurePsi {
+        public DestructurePsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.Destructure getCeylonNode() { return (Tree.Destructure) super.getCeylonNode(); }
+    }
+
     public static class ControlStatementPsiImpl extends ExecutableStatementPsiImpl
             implements CeylonPsi.ControlStatementPsi {
         public ControlStatementPsiImpl(ASTNode astNode) { super(astNode); }
@@ -663,6 +714,18 @@ public class CeylonPsiImpl {
             implements CeylonPsi.DynamicClausePsi {
         public DynamicClausePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.DynamicClause getCeylonNode() { return (Tree.DynamicClause) super.getCeylonNode(); }
+    }
+
+    public static class LetExpressionPsiImpl extends TermPsiImpl
+            implements CeylonPsi.LetExpressionPsi {
+        public LetExpressionPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.LetExpression getCeylonNode() { return (Tree.LetExpression) super.getCeylonNode(); }
+    }
+
+    public static class LetClausePsiImpl extends ControlClausePsiImpl
+            implements CeylonPsi.LetClausePsi {
+        public LetClausePsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.LetClause getCeylonNode() { return (Tree.LetClause) super.getCeylonNode(); }
     }
 
     public static class IfStatementPsiImpl extends ControlStatementPsiImpl
@@ -693,6 +756,12 @@ public class CeylonPsiImpl {
             implements CeylonPsi.SwitchClausePsi {
         public SwitchClausePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.SwitchClause getCeylonNode() { return (Tree.SwitchClause) super.getCeylonNode(); }
+    }
+
+    public static class SwitchedPsiImpl extends CeylonCompositeElementImpl
+            implements CeylonPsi.SwitchedPsi {
+        public SwitchedPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.Switched getCeylonNode() { return (Tree.Switched) super.getCeylonNode(); }
     }
 
     public static class SwitchCaseListPsiImpl extends CeylonCompositeElementImpl
@@ -797,10 +866,10 @@ public class CeylonPsiImpl {
         @Override public Tree.ValueIterator getCeylonNode() { return (Tree.ValueIterator) super.getCeylonNode(); }
     }
 
-    public static class KeyValueIteratorPsiImpl extends ForIteratorPsiImpl
-            implements CeylonPsi.KeyValueIteratorPsi {
-        public KeyValueIteratorPsiImpl(ASTNode astNode) { super(astNode); }
-        @Override public Tree.KeyValueIterator getCeylonNode() { return (Tree.KeyValueIterator) super.getCeylonNode(); }
+    public static class PatternIteratorPsiImpl extends ForIteratorPsiImpl
+            implements CeylonPsi.PatternIteratorPsi {
+        public PatternIteratorPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.PatternIterator getCeylonNode() { return (Tree.PatternIterator) super.getCeylonNode(); }
     }
 
     public static class WhileStatementPsiImpl extends ControlStatementPsiImpl
@@ -1485,6 +1554,24 @@ public class CeylonPsiImpl {
             implements CeylonPsi.FunctionArgumentPsi {
         public FunctionArgumentPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.FunctionArgument getCeylonNode() { return (Tree.FunctionArgument) super.getCeylonNode(); }
+    }
+
+    public static class ObjectExpressionPsiImpl extends PrimaryPsiImpl
+            implements CeylonPsi.ObjectExpressionPsi {
+        public ObjectExpressionPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.ObjectExpression getCeylonNode() { return (Tree.ObjectExpression) super.getCeylonNode(); }
+    }
+
+    public static class IfExpressionPsiImpl extends TermPsiImpl
+            implements CeylonPsi.IfExpressionPsi {
+        public IfExpressionPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.IfExpression getCeylonNode() { return (Tree.IfExpression) super.getCeylonNode(); }
+    }
+
+    public static class SwitchExpressionPsiImpl extends TermPsiImpl
+            implements CeylonPsi.SwitchExpressionPsi {
+        public SwitchExpressionPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.SwitchExpression getCeylonNode() { return (Tree.SwitchExpression) super.getCeylonNode(); }
     }
 
     public static abstract class NamedArgumentPsiImpl extends StatementOrArgumentPsiImpl

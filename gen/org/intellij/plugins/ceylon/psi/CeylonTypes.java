@@ -1,13 +1,15 @@
 package org.intellij.plugins.ceylon.psi;
 
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.PsiElement;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.IFileElementType;
 import org.intellij.plugins.ceylon.psi.stub.CeylonStubTypes;
 import org.intellij.plugins.ceylon.psi.stub.impl.ClassElementType;
+import org.intellij.plugins.ceylon.psi.impl.*;
 
 /* Generated using Antlr by IdeaAstTypesGen.g */
 public interface CeylonTypes {
-
     IFileElementType CEYLON_FILE = CeylonStubTypes.CEYLON_FILE;
 
     IElementType COMPILATION_UNIT = new CeylonElementType("COMPILATION_UNIT");
@@ -40,6 +42,8 @@ public interface CeylonTypes {
     IElementType CLASS_SPECIFIER = new CeylonElementType("CLASS_SPECIFIER");
     IElementType ANY_CLASS = new CeylonElementType("ANY_CLASS");
     IElementType CLASS_DEFINITION = new CeylonElementType("CLASS_DEFINITION");
+    IElementType CONSTRUCTOR = new CeylonElementType("CONSTRUCTOR");
+    IElementType DELEGATED_CONSTRUCTOR = new CeylonElementType("DELEGATED_CONSTRUCTOR");
     IElementType CLASS_DECLARATION = new CeylonElementType("CLASS_DECLARATION");
     IElementType ANY_INTERFACE = new CeylonElementType("ANY_INTERFACE");
     IElementType INTERFACE_DEFINITION = new CeylonElementType("INTERFACE_DEFINITION");
@@ -86,6 +90,7 @@ public interface CeylonTypes {
     IElementType TYPE_LITERAL = new CeylonElementType("TYPE_LITERAL");
     IElementType MEMBER_LITERAL = new CeylonElementType("MEMBER_LITERAL");
     IElementType CLASS_LITERAL = new CeylonElementType("CLASS_LITERAL");
+    IElementType NEW_LITERAL = new CeylonElementType("NEW_LITERAL");
     IElementType INTERFACE_LITERAL = new CeylonElementType("INTERFACE_LITERAL");
     IElementType ALIAS_LITERAL = new CeylonElementType("ALIAS_LITERAL");
     IElementType TYPE_PARAMETER_LITERAL = new CeylonElementType("TYPE_PARAMETER_LITERAL");
@@ -103,6 +108,7 @@ public interface CeylonTypes {
     IElementType INFERRED_TYPE_ARGUMENTS = new CeylonElementType("INFERRED_TYPE_ARGUMENTS");
     IElementType SEQUENCED_TYPE = new CeylonElementType("SEQUENCED_TYPE");
     IElementType DEFAULTED_TYPE = new CeylonElementType("DEFAULTED_TYPE");
+    IElementType SPREAD_TYPE = new CeylonElementType("SPREAD_TYPE");
     IElementType DIRECTIVE = new CeylonElementType("DIRECTIVE");
     IElementType RETURN = new CeylonElementType("RETURN");
     IElementType THROW = new CeylonElementType("THROW");
@@ -115,15 +121,23 @@ public interface CeylonTypes {
     IElementType ASSERTION = new CeylonElementType("ASSERTION");
     IElementType SPECIFIER_STATEMENT = new CeylonElementType("SPECIFIER_STATEMENT");
     IElementType EXPRESSION_STATEMENT = new CeylonElementType("EXPRESSION_STATEMENT");
+    IElementType PATTERN = new CeylonElementType("PATTERN");
+    IElementType VARIABLE_PATTERN = new CeylonElementType("VARIABLE_PATTERN");
+    IElementType TUPLE_PATTERN = new CeylonElementType("TUPLE_PATTERN");
+    IElementType KEY_VALUE_PATTERN = new CeylonElementType("KEY_VALUE_PATTERN");
+    IElementType DESTRUCTURE = new CeylonElementType("DESTRUCTURE");
     IElementType CONTROL_STATEMENT = new CeylonElementType("CONTROL_STATEMENT");
     IElementType CONTROL_CLAUSE = new CeylonElementType("CONTROL_CLAUSE");
     IElementType DYNAMIC_STATEMENT = new CeylonElementType("DYNAMIC_STATEMENT");
     IElementType DYNAMIC_CLAUSE = new CeylonElementType("DYNAMIC_CLAUSE");
+    IElementType LET_EXPRESSION = new CeylonElementType("LET_EXPRESSION");
+    IElementType LET_CLAUSE = new CeylonElementType("LET_CLAUSE");
     IElementType IF_STATEMENT = new CeylonElementType("IF_STATEMENT");
     IElementType IF_CLAUSE = new CeylonElementType("IF_CLAUSE");
     IElementType ELSE_CLAUSE = new CeylonElementType("ELSE_CLAUSE");
     IElementType SWITCH_STATEMENT = new CeylonElementType("SWITCH_STATEMENT");
     IElementType SWITCH_CLAUSE = new CeylonElementType("SWITCH_CLAUSE");
+    IElementType SWITCHED = new CeylonElementType("SWITCHED");
     IElementType SWITCH_CASE_LIST = new CeylonElementType("SWITCH_CASE_LIST");
     IElementType CASE_CLAUSE = new CeylonElementType("CASE_CLAUSE");
     IElementType CASE_ITEM = new CeylonElementType("CASE_ITEM");
@@ -141,7 +155,7 @@ public interface CeylonTypes {
     IElementType FOR_CLAUSE = new CeylonElementType("FOR_CLAUSE");
     IElementType FOR_ITERATOR = new CeylonElementType("FOR_ITERATOR");
     IElementType VALUE_ITERATOR = new CeylonElementType("VALUE_ITERATOR");
-    IElementType KEY_VALUE_ITERATOR = new CeylonElementType("KEY_VALUE_ITERATOR");
+    IElementType PATTERN_ITERATOR = new CeylonElementType("PATTERN_ITERATOR");
     IElementType WHILE_STATEMENT = new CeylonElementType("WHILE_STATEMENT");
     IElementType WHILE_CLAUSE = new CeylonElementType("WHILE_CLAUSE");
     IElementType CONDITION_LIST = new CeylonElementType("CONDITION_LIST");
@@ -256,6 +270,9 @@ public interface CeylonTypes {
     IElementType LISTED_ARGUMENT = new CeylonElementType("LISTED_ARGUMENT");
     IElementType SPREAD_ARGUMENT = new CeylonElementType("SPREAD_ARGUMENT");
     IElementType FUNCTION_ARGUMENT = new CeylonElementType("FUNCTION_ARGUMENT");
+    IElementType OBJECT_EXPRESSION = new CeylonElementType("OBJECT_EXPRESSION");
+    IElementType IF_EXPRESSION = new CeylonElementType("IF_EXPRESSION");
+    IElementType SWITCH_EXPRESSION = new CeylonElementType("SWITCH_EXPRESSION");
     IElementType NAMED_ARGUMENT = new CeylonElementType("NAMED_ARGUMENT");
     IElementType SPECIFIED_ARGUMENT = new CeylonElementType("SPECIFIED_ARGUMENT");
     IElementType TYPED_ARGUMENT = new CeylonElementType("TYPED_ARGUMENT");

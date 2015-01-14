@@ -125,6 +125,14 @@ public class CeylonPsi {
         @Override Tree.ClassDefinition getCeylonNode();
     }
 
+    public static interface ConstructorPsi extends DeclarationPsi {
+        @Override Tree.Constructor getCeylonNode();
+    }
+
+    public static interface DelegatedConstructorPsi extends CeylonCompositeElement {
+        @Override Tree.DelegatedConstructor getCeylonNode();
+    }
+
     public static interface ClassDeclarationPsi extends AnyClassPsi {
         @Override Tree.ClassDeclaration getCeylonNode();
     }
@@ -309,6 +317,10 @@ public class CeylonPsi {
         @Override Tree.ClassLiteral getCeylonNode();
     }
 
+    public static interface NewLiteralPsi extends TypeLiteralPsi {
+        @Override Tree.NewLiteral getCeylonNode();
+    }
+
     public static interface InterfaceLiteralPsi extends TypeLiteralPsi {
         @Override Tree.InterfaceLiteral getCeylonNode();
     }
@@ -377,6 +389,10 @@ public class CeylonPsi {
         @Override Tree.DefaultedType getCeylonNode();
     }
 
+    public static interface SpreadTypePsi extends TypePsi {
+        @Override Tree.SpreadType getCeylonNode();
+    }
+
     public static interface DirectivePsi extends ExecutableStatementPsi {
         @Override Tree.Directive getCeylonNode();
     }
@@ -425,6 +441,26 @@ public class CeylonPsi {
         @Override Tree.ExpressionStatement getCeylonNode();
     }
 
+    public static interface PatternPsi extends CeylonCompositeElement {
+        @Override Tree.Pattern getCeylonNode();
+    }
+
+    public static interface VariablePatternPsi extends PatternPsi {
+        @Override Tree.VariablePattern getCeylonNode();
+    }
+
+    public static interface TuplePatternPsi extends PatternPsi {
+        @Override Tree.TuplePattern getCeylonNode();
+    }
+
+    public static interface KeyValuePatternPsi extends PatternPsi {
+        @Override Tree.KeyValuePattern getCeylonNode();
+    }
+
+    public static interface DestructurePsi extends ExecutableStatementPsi {
+        @Override Tree.Destructure getCeylonNode();
+    }
+
     public static interface ControlStatementPsi extends ExecutableStatementPsi {
         @Override Tree.ControlStatement getCeylonNode();
     }
@@ -439,6 +475,14 @@ public class CeylonPsi {
 
     public static interface DynamicClausePsi extends ControlClausePsi {
         @Override Tree.DynamicClause getCeylonNode();
+    }
+
+    public static interface LetExpressionPsi extends TermPsi {
+        @Override Tree.LetExpression getCeylonNode();
+    }
+
+    public static interface LetClausePsi extends ControlClausePsi {
+        @Override Tree.LetClause getCeylonNode();
     }
 
     public static interface IfStatementPsi extends ControlStatementPsi {
@@ -459,6 +503,10 @@ public class CeylonPsi {
 
     public static interface SwitchClausePsi extends CeylonCompositeElement {
         @Override Tree.SwitchClause getCeylonNode();
+    }
+
+    public static interface SwitchedPsi extends CeylonCompositeElement {
+        @Override Tree.Switched getCeylonNode();
     }
 
     public static interface SwitchCaseListPsi extends CeylonCompositeElement {
@@ -529,8 +577,8 @@ public class CeylonPsi {
         @Override Tree.ValueIterator getCeylonNode();
     }
 
-    public static interface KeyValueIteratorPsi extends ForIteratorPsi {
-        @Override Tree.KeyValueIterator getCeylonNode();
+    public static interface PatternIteratorPsi extends ForIteratorPsi {
+        @Override Tree.PatternIterator getCeylonNode();
     }
 
     public static interface WhileStatementPsi extends ControlStatementPsi {
@@ -987,6 +1035,18 @@ public class CeylonPsi {
 
     public static interface FunctionArgumentPsi extends TermPsi {
         @Override Tree.FunctionArgument getCeylonNode();
+    }
+
+    public static interface ObjectExpressionPsi extends PrimaryPsi {
+        @Override Tree.ObjectExpression getCeylonNode();
+    }
+
+    public static interface IfExpressionPsi extends TermPsi {
+        @Override Tree.IfExpression getCeylonNode();
+    }
+
+    public static interface SwitchExpressionPsi extends TermPsi {
+        @Override Tree.SwitchExpression getCeylonNode();
     }
 
     public static interface NamedArgumentPsi extends StatementOrArgumentPsi {
