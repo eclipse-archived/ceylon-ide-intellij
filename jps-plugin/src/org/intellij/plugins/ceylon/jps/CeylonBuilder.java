@@ -1,7 +1,7 @@
 package org.intellij.plugins.ceylon.jps;
 
 import com.intellij.util.PathUtil;
-import com.redhat.ceylon.common.Versions;
+import com.redhat.ceylon.launcher.Launcher;
 import org.intellij.plugins.ceylon.compiler.CeylonCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * TODO
@@ -55,6 +56,16 @@ public class CeylonBuilder extends ModuleLevelBuilder {
         }
     }
 
+    private static final String[] searchedArchives = {
+            "org.antlr.runtime",
+            "org.jboss.jandex",
+            "com.github.rjeschke.txtmark",
+            "com.redhat.ceylon.compiler.java",
+            "com.redhat.ceylon.module-resolver",
+            "com.redhat.ceylon.typechecker",
+            "com.redhat.ceylon.common"
+    };
+
     private ExitCode compile(final CompileContext ctx, ModuleChunk chunk, List<String> filesToBuild) throws IOException {
 
         if (filesToBuild.isEmpty()) {
@@ -62,25 +73,33 @@ public class CeylonBuilder extends ModuleLevelBuilder {
         }
 
         // Required JARs should be located in the same folder as common.jar
-        File pathToLibs = new File(PathUtil.getJarPathForClass(Versions.class));
+        File pathToLibs = new File(PathUtil.getJarPathForClass(Launcher.class));
 
         if (pathToLibs.isFile()) {
             pathToLibs = pathToLibs.getParentFile();
         }
 
         // Load the required JARs in a separate confined classloader to avoid conflicts with classes from the JDK
-        // TODO could we use JARs from defaultRepository instead?
-        URL[] classpath = new URL[]{
-                new File(PathUtil.getJarPathForClass(CeylonCompiler.class)).toURI().toURL(),
-                new File(pathToLibs, "org.antlr.runtime-3.4.jar").toURI().toURL(),
-                new File(pathToLibs, "com.redhat.ceylon.compiler.java-1.1.0.jar").toURI().toURL(),
-                new File(pathToLibs, "com.redhat.ceylon.module-resolver-1.1.0.jar").toURI().toURL(),
-                new File(pathToLibs, "com.redhat.ceylon.typechecker-1.1.0.jar").toURI().toURL(),
-                new File(pathToLibs, "com.github.rjeschke.txtmark-0.11.jar").toURI().toURL(),
-                new File(pathToLibs, "org.jboss.jandex-1.0.3.Final.jar").toURI().toURL()
-        };
+        List<URL> classpath = new ArrayList<>();
+        classpath.add(new File(PathUtil.getJarPathForClass(CeylonCompiler.class)).toURI().toURL());
 
-        ChildFirstURLClassLoader loader = new ChildFirstURLClassLoader(classpath, getClass().getClassLoader(),
+        for (String searchedArchive : searchedArchives) {
+            File archiveToAdd = null;
+            for (File archive : pathToLibs.listFiles()) {
+                if (archive.getName().matches("^" + Pattern.quote(searchedArchive) + "-.+\\.jar$")) {
+                    archiveToAdd = archive;
+                    break;
+                }
+            }
+            if (archiveToAdd == null) {
+                new IOException("Ceylon archive " + searchedArchive +
+                        " required by '" + CeylonBuilder.class.getName() +
+                        "' was not found in directory '" + pathToLibs + "'");
+            }
+            classpath.add(archiveToAdd.toURI().toURL());
+        }
+
+        ChildFirstURLClassLoader loader = new ChildFirstURLClassLoader(classpath.toArray(new URL[0]), getClass().getClassLoader(),
                 new String[]{"com.sun.source", "com.sun.tools.javac", "org.intellij.plugins.ceylon.compiler"},
                 new String[]{"com.sun.tools.javac.resources.compiler"}
         );
