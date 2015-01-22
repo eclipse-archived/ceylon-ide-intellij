@@ -1,12 +1,11 @@
 <idea-plugin version="2">
-  <id>com.yourcompany.unique.plugin.id</id>
-  <name>Plugin display name here</name>
-  <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <id>org.intellij.plugins.ceylon.runtime</id>
+  <name>Ceylon Runtime</name>
+  <version>1.1.1</version>
+  <vendor email="support@ceylon.org" url="http://www.ceylon-lang.org">RedHat JBoss</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      Runtime components required to use Ceylon modules inside an IntelliJ plugin.
     ]]></description>
 
   <change-notes><![CDATA[
@@ -20,18 +19,15 @@
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
-  <!-- uncomment to enable plugin in all products
   <depends>com.intellij.modules.lang</depends>
-  -->
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
   </extensions>
 
   <application-components>
-    <!-- Add your application components here -->
     <component>
-      <implementation-class>Startup</implementation-class>
+      <implementation-class>org.intellij.plugins.ceylon.runtime.CeylonRuntime</implementation-class>
     </component>
   </application-components>
 

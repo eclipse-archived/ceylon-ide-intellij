@@ -18,9 +18,12 @@
 
     <!-- uncomment to enable plugin in all products -->
     <depends>com.intellij.modules.lang</depends>
+    <depends>org.intellij.plugins.ceylon.runtime</depends>
 
     <application-components>
-        <!-- Add your application components here -->
+        <component>
+            <implementation-class>org.intellij.plugins.ceylon.IdePluginCeylonStartup</implementation-class>
+        </component>
     </application-components>
 
     <project-components>
@@ -70,7 +73,7 @@
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
-        <compileServer.plugin classpath="ceylon-jps-plugin.jar;compiler.jar;ceylon-bootstrap.jar"/>
+        <compileServer.plugin classpath=".;./classes/"/>
 
         <moduleService serviceInterface="org.intellij.plugins.ceylon.repo.RepositoryManager" serviceImplementation="org.intellij.plugins.ceylon.repo.RepositoryManagerImpl"/>
 

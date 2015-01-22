@@ -1,7 +1,6 @@
 package org.intellij.plugins.ceylon.jps;
 
 import com.intellij.util.PathUtil;
-import com.redhat.ceylon.launcher.Launcher;
 import org.intellij.plugins.ceylon.compiler.CeylonCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
@@ -16,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -63,8 +64,24 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             "com.redhat.ceylon.compiler.java",
             "com.redhat.ceylon.module-resolver",
             "com.redhat.ceylon.typechecker",
-            "com.redhat.ceylon.common"
+            "com.redhat.ceylon.common",
+            "ceylon.language"
     };
+
+    public void searchArchivesFromRepo(File path, Map<String, File> filesToAddToClasspath) {
+        if (path.isDirectory()) {
+            for (File f : path.listFiles()) {
+                searchArchivesFromRepo(f, filesToAddToClasspath);
+            }
+        } else if (path.isFile()) {
+            for (String searchedArchive : searchedArchives) {
+                if (path.getName().matches("^" + Pattern.quote(searchedArchive) + "-.+\\.(j|c)ar$")) {
+                    filesToAddToClasspath.put(searchedArchive, path);
+                    break;
+                }
+            }
+        }
+    }
 
     private ExitCode compile(final CompileContext ctx, ModuleChunk chunk, List<String> filesToBuild) throws IOException {
 
@@ -72,31 +89,38 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             return ExitCode.NOTHING_DONE;
         }
 
-        // Required JARs should be located in the same folder as common.jar
-        File pathToLibs = new File(PathUtil.getJarPathForClass(Launcher.class));
+        File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonCompiler.class));
 
-        if (pathToLibs.isFile()) {
-            pathToLibs = pathToLibs.getParentFile();
+        if (pluginClassesDir.isFile()) {
+            throw new IOException("'CeylonCompiler' class is within a Jar file while it should be in a 'classes' directory.\n" +
+                    "The Ceylon IDEA plugin should have been deployed in 'directory' mode.");
         }
 
         // Load the required JARs in a separate confined classloader to avoid conflicts with classes from the JDK
         List<URL> classpath = new ArrayList<>();
-        classpath.add(new File(PathUtil.getJarPathForClass(CeylonCompiler.class)).toURI().toURL());
+        classpath.add(pluginClassesDir.toURI().toURL());
 
+        File ceylonRepoDir = new File(pluginClassesDir, "repo");
+        if (! ceylonRepoDir.exists()) {
+            throw new IOException("The Ceylon IDEA plugin 'classes' directory doesn't contain the embedded Ceylon repository.");
+        }
+
+        Map<String, File> filesToAddToClasspath = new HashMap<>();
+        searchArchivesFromRepo(ceylonRepoDir, filesToAddToClasspath);
+        List<String> missingCeylonArchives = new ArrayList<>();
         for (String searchedArchive : searchedArchives) {
-            File archiveToAdd = null;
-            for (File archive : pathToLibs.listFiles()) {
-                if (archive.getName().matches("^" + Pattern.quote(searchedArchive) + "-.+\\.jar$")) {
-                    archiveToAdd = archive;
-                    break;
-                }
-            }
+            File archiveToAdd = filesToAddToClasspath.get(searchedArchive);
             if (archiveToAdd == null) {
-                new IOException("Ceylon archive " + searchedArchive +
-                        " required by '" + CeylonBuilder.class.getName() +
-                        "' was not found in directory '" + pathToLibs + "'");
+                missingCeylonArchives.add(searchedArchive);
+            } else {
+                classpath.add(archiveToAdd.toURI().toURL());
             }
-            classpath.add(archiveToAdd.toURI().toURL());
+        }
+
+        if (! missingCeylonArchives.isEmpty()) {
+            throw new IOException("Ceylon archives " + missingCeylonArchives.toArray().toString() +
+                    " required by '" + CeylonBuilder.class.getName() +
+                    "' was not found\nin the following Ceylon repository directory : '" + ceylonRepoDir + "'");
         }
 
         ChildFirstURLClassLoader loader = new ChildFirstURLClassLoader(classpath.toArray(new URL[0]), getClass().getClassLoader(),
