@@ -2,7 +2,6 @@ package org.intellij.plugins.ceylon.parser;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
-import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
@@ -11,7 +10,7 @@ import org.antlr.runtime.RecognitionException;
 import org.intellij.plugins.ceylon.psi.NodeToIElementTypeMap;
 
 
-public class MarkingCeylonParser extends CeylonParser {
+public class MarkingCeylonParser extends PsiCompatibleCeylonParser {
     private PsiBuilder psiBuilder;
     private MyTree myTree = new MyTree();
 
@@ -38,19 +37,21 @@ public class MarkingCeylonParser extends CeylonParser {
     }
 
     @Override
-    public void displayRecognitionError(String[] tn, RecognitionException re) {
-        super.displayRecognitionError(tn, re);
-        error(tn, re);
+    public ParseError newParseError(String[] tn, RecognitionException re) {
+        ParseError parseError = super.newParseError(tn, re);
+        error(parseError);
+        return parseError;
     }
 
     @Override
-    public void displayRecognitionError(String[] tn, RecognitionException re, int code) {
-        super.displayRecognitionError(tn, re, code);
-        error(tn, re);
+    public ParseError newParseError(String[] tn, RecognitionException re, int code) {
+        ParseError parseError = super.newParseError(tn, re, code);
+        error(parseError);
+        return parseError;
     }
 
-    private void error(String[] tn, RecognitionException re) {
-        psiBuilder.error(new ParseError(this, re, tn).getMessage());
+    private void error(ParseError parseError) {
+        psiBuilder.error(parseError.getMessage());
         myTree.error();
     }
 
@@ -178,6 +179,238 @@ public class MarkingCeylonParser extends CeylonParser {
     public Tree.Identifier typeName() throws RecognitionException {
         final MyTree.MyMarker marker = mark();
         final Tree.Identifier node = super.typeName();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Declaration toplevelDeclaration() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Declaration node = super.toplevelDeclaration();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.ObjectExpression objectExpression() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.ObjectExpression node = super.objectExpression();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Pattern variableOrTuplePattern() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Pattern node = super.variableOrTuplePattern();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Pattern pattern() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Pattern node = super.pattern();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Pattern tupleOrEntryPattern() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Pattern node = super.tupleOrEntryPattern();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.VariablePattern variablePattern() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.VariablePattern node = super.variablePattern();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.TuplePattern tuplePattern() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.TuplePattern node = super.tuplePattern();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Pattern variadicPattern() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Pattern node = super.variadicPattern();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public CustomTree.Variable variadicVariable() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final CustomTree.Variable node = super.variadicVariable();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.KeyValuePattern keyItemPattern() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.KeyValuePattern node = super.keyItemPattern();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Destructure destructure() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Destructure node = super.destructure();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Constructor constructor() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Constructor node = super.constructor();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.DelegatedConstructor delegatedConstructor() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.DelegatedConstructor node = super.delegatedConstructor();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.TypedDeclaration parameterDeclaration() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.TypedDeclaration node = super.parameterDeclaration();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.ExpressionList valueCaseList() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.ExpressionList node = super.valueCaseList();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.LetExpression let() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.LetExpression node = super.let();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Statement letVariable() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Statement node = super.letVariable();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.LetClause letClause() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.LetClause node = super.letClause();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Term conditionalExpression() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Term node = super.conditionalExpression();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.SwitchExpression switchExpression() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.SwitchExpression node = super.switchExpression();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.SwitchCaseList caseExpressions() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.SwitchCaseList node = super.caseExpressions();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.CaseClause caseExpression() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.CaseClause node = super.caseExpression();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.ElseClause defaultCaseExpression() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.ElseClause node = super.defaultCaseExpression();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.IfExpression ifExpression() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.IfExpression node = super.ifExpression();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Expression conditionalBranch() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Expression node = super.conditionalBranch();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Type spreadType() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Type node = super.spreadType();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.StaticType baseType() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.StaticType node = super.baseType();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public CustomTree.Variable isConditionVariable() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final CustomTree.Variable node = super.isConditionVariable();
+        end(marker, node);
+        return node;
+    }
+
+    @Override
+    public Tree.Switched switched() throws RecognitionException {
+        final MyTree.MyMarker marker = mark();
+        final Tree.Switched node = super.switched();
         end(marker, node);
         return node;
     }
@@ -1787,4 +2020,166 @@ public class MarkingCeylonParser extends CeylonParser {
         super.synpred27_Ceylon_fragment();
         marker.drop();
     }
+
+    @Override
+    public void synpred28_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred28_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred29_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred29_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred30_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred30_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred31_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred31_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred32_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred32_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred33_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred33_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred34_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred34_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred35_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred35_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred36_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred36_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred37_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred37_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred38_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred38_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred39_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred39_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred40_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred40_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred41_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred41_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred42_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred42_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred43_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred43_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred44_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred44_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred45_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred45_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred46_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred46_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred47_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred47_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred48_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred48_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred49_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred49_Ceylon_fragment();
+        marker.drop();
+    }
+
+    @Override
+    public void synpred50_Ceylon_fragment() throws RecognitionException {
+        final PsiBuilder.Marker marker = psiBuilder.mark();
+        super.synpred50_Ceylon_fragment();
+        marker.drop();
+    }
 }
+

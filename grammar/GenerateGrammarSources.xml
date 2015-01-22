@@ -159,11 +159,12 @@
         <copy todir="../gen" overwrite="true" >
             <fileset dir="gen" includes="**/*.java"/>
         </copy>
-        <copy todir="../gen/com/redhat/ceylon/compiler/typechecker/parser" overwrite="true">
-            <globmapper from="*CeylonParser.java" to="*CeylonParser.java"/>
+
+        <copy todir="../gen/org/intellij/plugins/ceylon/parser" overwrite="true">
+            <globmapper from="*CeylonParser.java" to="*PsiCompatibleCeylonParser.java"/>
             <fileset dir="../../ceylon-spec/gensrc/com/redhat/ceylon/compiler/typechecker/parser" includes="CeylonParser.java"/>
         </copy>
-        <replace file="../gen/com/redhat/ceylon/compiler/typechecker/parser/CeylonParser.java">
+        <replace file="../gen/org/intellij/plugins/ceylon/parser/PsiCompatibleCeylonParser.java">
             <replacefilter>
                 <replacetoken>import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.*;</replacetoken>
                 <replacevalue>import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.MethodDeclaration;
@@ -175,8 +176,16 @@ import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.ClassDefini
 import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.IsCase;
 import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.ExtendedTypeExpression;
 import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.*;
+
+import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
                 </replacevalue>
             </replacefilter>
+            <replacefilter
+                    token="package com.redhat.ceylon.compiler.typechecker.parser;"
+                    value="package org.intellij.plugins.ceylon.parser;"/>
+            <replacefilter
+                    token="CeylonParser"
+                    value="PsiCompatibleCeylonParser"/>
             <replacefilter
                     token="public final "
                     value="public "/>

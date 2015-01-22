@@ -1,5 +1,5 @@
-// $ANTLR 3.4 /home/david/git/ceylon-spec/Ceylon.g 2015-01-12 16:58:16
- package com.redhat.ceylon.compiler.typechecker.parser;
+// $ANTLR 3.4 /home/david/git/ceylon-spec/Ceylon.g 2015-01-20 14:48:27
+ package org.intellij.plugins.ceylon.parser;
                   import com.redhat.ceylon.compiler.typechecker.tree.MissingToken;
                   import com.redhat.ceylon.compiler.typechecker.tree.Node;
                   import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.MethodDeclaration;
@@ -11,6 +11,8 @@ import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.ClassDefini
 import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.IsCase;
 import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.ExtendedTypeExpression;
 import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.*;
+
+import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
                 
                   import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.Package; 
 
@@ -22,7 +24,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 @SuppressWarnings({"all", "warnings", "unchecked"})
-public class CeylonParser extends Parser {
+public class PsiCompatibleCeylonParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ABSTRACTED_TYPE", "ADD_SPECIFY", "AIDENTIFIER", "ALIAS", "AND_OP", "AND_SPECIFY", "ASSEMBLY", "ASSERT", "ASSIGN", "ASTRING_LITERAL", "AVERBATIM_STRING", "BACKTICK", "BREAK", "BinaryDigit", "BinaryDigits", "CASE_CLAUSE", "CASE_TYPES", "CATCH_CLAUSE", "CHAR_LITERAL", "CLASS_DEFINITION", "COMMA", "COMPARE_OP", "COMPILER_ANNOTATION", "COMPLEMENT_OP", "COMPLEMENT_SPECIFY", "COMPUTE", "CONTINUE", "CharPart", "DECREMENT_OP", "DIFFERENCE_OP", "DIVIDE_SPECIFY", "DYNAMIC", "Digit", "Digits", "ELLIPSIS", "ELSE_CLAUSE", "ENTRY_OP", "EQUAL_OP", "EXISTS", "EXTENDS", "EscapeSequence", "Exponent", "FINALLY_CLAUSE", "FLOAT_LITERAL", "FOR_CLAUSE", "FUNCTION_MODIFIER", "FractionalMagnitude", "HexDigit", "HexDigits", "IDENTICAL_OP", "IF_CLAUSE", "IMPORT", "INCREMENT_OP", "INTERFACE_DEFINITION", "INTERSECTION_OP", "INTERSECT_SPECIFY", "IN_OP", "IS_OP", "IdentifierPart", "IdentifierStart", "LARGER_OP", "LARGE_AS_OP", "LBRACE", "LBRACKET", "LET", "LIDENTIFIER", "LINE_COMMENT", "LIdentifierPrefix", "LPAREN", "Letter", "MEMBER_OP", "MODULE", "MULTIPLY_SPECIFY", "MULTI_COMMENT", "Magnitude", "NATURAL_LITERAL", "NEW", "NONEMPTY", "NOT_EQUAL_OP", "NOT_OP", "OBJECT_DEFINITION", "OPTIONAL", "OR_OP", "OR_SPECIFY", "OUT", "OUTER", "PACKAGE", "PIDENTIFIER", "POWER_OP", "PRODUCT_OP", "QUOTIENT_OP", "RANGE_OP", "RBRACE", "RBRACKET", "REMAINDER_OP", "REMAINDER_SPECIFY", "RETURN", "RPAREN", "SAFE_MEMBER_OP", "SATISFIES", "SCALE_OP", "SEGMENT_OP", "SEMICOLON", "SMALLER_OP", "SMALL_AS_OP", "SPECIFY", "SPREAD_OP", "STRING_END", "STRING_LITERAL", "STRING_MID", "STRING_START", "SUBTRACT_SPECIFY", "SUM_OP", "SUPER", "SWITCH_CLAUSE", "StringPart", "THEN_CLAUSE", "THIS", "THROW", "TRY_CLAUSE", "TYPE_CONSTRAINT", "UIDENTIFIER", "UIdentifierPrefix", "UNION_OP", "UNION_SPECIFY", "VALUE_MODIFIER", "VERBATIM_STRING", "VOID_MODIFIER", "WHILE_CLAUSE", "WS"
     };
@@ -167,28 +169,45 @@ public class CeylonParser extends Parser {
     // delegators
 
 
-    public CeylonParser(TokenStream input) {
+    public PsiCompatibleCeylonParser(TokenStream input) {
         this(input, new RecognizerSharedState());
     }
-    public CeylonParser(TokenStream input, RecognizerSharedState state) {
+    public PsiCompatibleCeylonParser(TokenStream input, RecognizerSharedState state) {
         super(input, state);
         this.state.ruleMemo = new HashMap[297+1];
          
 
     }
 
-    public String[] getTokenNames() { return CeylonParser.tokenNames; }
+    public String[] getTokenNames() { return PsiCompatibleCeylonParser.tokenNames; }
     public String getGrammarFileName() { return "/home/david/git/ceylon-spec/Ceylon.g"; }
 
 
         private java.util.List<ParseError> errors 
                 = new java.util.ArrayList<ParseError>();
+
+        public ParseError newParseError(String[] tn,
+                RecognitionException re) {
+            ParseError parseError = new ParseError(this, re, expecting, tn);
+            expecting = -1;
+            return parseError;
+        }
+        
+        public ParseError newParseError(String[] tn, 
+                RecognitionException re,
+                int code) {
+            ParseError parseError = new ParseError(this, re, tn, code);
+            return parseError;
+        }
+
         @Override public void displayRecognitionError(String[] tn,
                 RecognitionException re) {
-            errors.add(new ParseError(this, re, tn));
+            errors.add(newParseError(tn, re));
         }
-        public void displayRecognitionError(String[] tn, RecognitionException re, int code) {
-            errors.add(new ParseError(this, re, tn, code));
+        public void displayRecognitionError(String[] tn,
+                RecognitionException re, 
+                int code) {
+            errors.add(newParseError(tn, re, code));
         }
         public java.util.List<ParseError> getErrors() {
             return errors;
@@ -218,7 +237,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "compilationUnit"
-    // /home/david/git/ceylon-spec/Ceylon.g:62:1: compilationUnit returns [CompilationUnit compilationUnit] : (ca= compilerAnnotations SEMICOLON )? ( importDeclaration | ( annotatedModuleDescriptorStart )=> moduleDescriptor | ( annotatedPackageDescriptorStart )=> packageDescriptor | toplevelDeclaration | RBRACE )* EOF ;
+    // /home/david/git/ceylon-spec/Ceylon.g:79:1: compilationUnit returns [CompilationUnit compilationUnit] : (ca= compilerAnnotations SEMICOLON )? ( importDeclaration | ( annotatedModuleDescriptorStart )=> moduleDescriptor | ( annotatedPackageDescriptorStart )=> packageDescriptor | toplevelDeclaration | RBRACE )* EOF ;
     public CompilationUnit compilationUnit() throws RecognitionException {
         CompilationUnit compilationUnit = null;
 
@@ -238,15 +257,15 @@ public class CeylonParser extends Parser {
                     ImportList importList = new ImportList(null); 
                     compilationUnit.setImportList(importList); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:66:5: ( (ca= compilerAnnotations SEMICOLON )? ( importDeclaration | ( annotatedModuleDescriptorStart )=> moduleDescriptor | ( annotatedPackageDescriptorStart )=> packageDescriptor | toplevelDeclaration | RBRACE )* EOF )
-            // /home/david/git/ceylon-spec/Ceylon.g:66:7: (ca= compilerAnnotations SEMICOLON )? ( importDeclaration | ( annotatedModuleDescriptorStart )=> moduleDescriptor | ( annotatedPackageDescriptorStart )=> packageDescriptor | toplevelDeclaration | RBRACE )* EOF
+            // /home/david/git/ceylon-spec/Ceylon.g:83:5: ( (ca= compilerAnnotations SEMICOLON )? ( importDeclaration | ( annotatedModuleDescriptorStart )=> moduleDescriptor | ( annotatedPackageDescriptorStart )=> packageDescriptor | toplevelDeclaration | RBRACE )* EOF )
+            // /home/david/git/ceylon-spec/Ceylon.g:83:7: (ca= compilerAnnotations SEMICOLON )? ( importDeclaration | ( annotatedModuleDescriptorStart )=> moduleDescriptor | ( annotatedPackageDescriptorStart )=> packageDescriptor | toplevelDeclaration | RBRACE )* EOF
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:66:7: (ca= compilerAnnotations SEMICOLON )?
+            // /home/david/git/ceylon-spec/Ceylon.g:83:7: (ca= compilerAnnotations SEMICOLON )?
             int alt1=2;
             alt1 = dfa1.predict(input);
             switch (alt1) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:67:9: ca= compilerAnnotations SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:84:9: ca= compilerAnnotations SEMICOLON
                     {
                     pushFollow(FOLLOW_compilerAnnotations_in_compilationUnit86);
                     ca=compilerAnnotations();
@@ -264,7 +283,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:71:7: ( importDeclaration | ( annotatedModuleDescriptorStart )=> moduleDescriptor | ( annotatedPackageDescriptorStart )=> packageDescriptor | toplevelDeclaration | RBRACE )*
+            // /home/david/git/ceylon-spec/Ceylon.g:88:7: ( importDeclaration | ( annotatedModuleDescriptorStart )=> moduleDescriptor | ( annotatedPackageDescriptorStart )=> packageDescriptor | toplevelDeclaration | RBRACE )*
             loop2:
             do {
                 int alt2=6;
@@ -349,7 +368,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt2) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:72:9: importDeclaration
+            	    // /home/david/git/ceylon-spec/Ceylon.g:89:9: importDeclaration
             	    {
             	    pushFollow(FOLLOW_importDeclaration_in_compilationUnit134);
             	    importDeclaration1=importDeclaration();
@@ -363,7 +382,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:76:9: ( annotatedModuleDescriptorStart )=> moduleDescriptor
+            	    // /home/david/git/ceylon-spec/Ceylon.g:93:9: ( annotatedModuleDescriptorStart )=> moduleDescriptor
             	    {
             	    pushFollow(FOLLOW_moduleDescriptor_in_compilationUnit177);
             	    moduleDescriptor2=moduleDescriptor();
@@ -376,7 +395,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 3 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:80:9: ( annotatedPackageDescriptorStart )=> packageDescriptor
+            	    // /home/david/git/ceylon-spec/Ceylon.g:97:9: ( annotatedPackageDescriptorStart )=> packageDescriptor
             	    {
             	    pushFollow(FOLLOW_packageDescriptor_in_compilationUnit220);
             	    packageDescriptor3=packageDescriptor();
@@ -389,7 +408,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 4 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:84:9: toplevelDeclaration
+            	    // /home/david/git/ceylon-spec/Ceylon.g:101:9: toplevelDeclaration
             	    {
             	    pushFollow(FOLLOW_toplevelDeclaration_in_compilationUnit248);
             	    toplevelDeclaration4=toplevelDeclaration();
@@ -403,7 +422,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 5 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:87:9: RBRACE
+            	    // /home/david/git/ceylon-spec/Ceylon.g:104:9: RBRACE
             	    {
             	    match(input,RBRACE,FOLLOW_RBRACE_in_compilationUnit268); if (state.failed) return compilationUnit;
 
@@ -439,7 +458,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "toplevelDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:94:1: toplevelDeclaration returns [Declaration declaration] : ca= compilerAnnotations d= declaration ;
+    // /home/david/git/ceylon-spec/Ceylon.g:111:1: toplevelDeclaration returns [Declaration declaration] : ca= compilerAnnotations d= declaration ;
     public Declaration toplevelDeclaration() throws RecognitionException {
         Declaration declaration = null;
 
@@ -450,8 +469,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:95:5: (ca= compilerAnnotations d= declaration )
-            // /home/david/git/ceylon-spec/Ceylon.g:95:7: ca= compilerAnnotations d= declaration
+            // /home/david/git/ceylon-spec/Ceylon.g:112:5: (ca= compilerAnnotations d= declaration )
+            // /home/david/git/ceylon-spec/Ceylon.g:112:7: ca= compilerAnnotations d= declaration
             {
             pushFollow(FOLLOW_compilerAnnotations_in_toplevelDeclaration318);
             ca=compilerAnnotations();
@@ -487,11 +506,11 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "annotatedModuleDescriptorStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:102:1: annotatedModuleDescriptorStart : compilerAnnotations annotations MODULE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:119:1: annotatedModuleDescriptorStart : compilerAnnotations annotations MODULE ;
     public void annotatedModuleDescriptorStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:103:5: ( compilerAnnotations annotations MODULE )
-            // /home/david/git/ceylon-spec/Ceylon.g:103:7: compilerAnnotations annotations MODULE
+            // /home/david/git/ceylon-spec/Ceylon.g:120:5: ( compilerAnnotations annotations MODULE )
+            // /home/david/git/ceylon-spec/Ceylon.g:120:7: compilerAnnotations annotations MODULE
             {
             pushFollow(FOLLOW_compilerAnnotations_in_annotatedModuleDescriptorStart354);
             compilerAnnotations();
@@ -525,11 +544,11 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "annotatedPackageDescriptorStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:106:1: annotatedPackageDescriptorStart : compilerAnnotations annotations PACKAGE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:123:1: annotatedPackageDescriptorStart : compilerAnnotations annotations PACKAGE ;
     public void annotatedPackageDescriptorStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:107:5: ( compilerAnnotations annotations PACKAGE )
-            // /home/david/git/ceylon-spec/Ceylon.g:107:7: compilerAnnotations annotations PACKAGE
+            // /home/david/git/ceylon-spec/Ceylon.g:124:5: ( compilerAnnotations annotations PACKAGE )
+            // /home/david/git/ceylon-spec/Ceylon.g:124:7: compilerAnnotations annotations PACKAGE
             {
             pushFollow(FOLLOW_compilerAnnotations_in_annotatedPackageDescriptorStart375);
             compilerAnnotations();
@@ -563,7 +582,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "moduleDescriptor"
-    // /home/david/git/ceylon-spec/Ceylon.g:110:1: moduleDescriptor returns [ModuleDescriptor moduleDescriptor] : compilerAnnotations annotations MODULE packagePath ( CHAR_LITERAL | STRING_LITERAL ) importModuleList ;
+    // /home/david/git/ceylon-spec/Ceylon.g:127:1: moduleDescriptor returns [ModuleDescriptor moduleDescriptor] : compilerAnnotations annotations MODULE packagePath ( CHAR_LITERAL | STRING_LITERAL ) importModuleList ;
     public ModuleDescriptor moduleDescriptor() throws RecognitionException {
         ModuleDescriptor moduleDescriptor = null;
 
@@ -581,8 +600,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:111:5: ( compilerAnnotations annotations MODULE packagePath ( CHAR_LITERAL | STRING_LITERAL ) importModuleList )
-            // /home/david/git/ceylon-spec/Ceylon.g:111:7: compilerAnnotations annotations MODULE packagePath ( CHAR_LITERAL | STRING_LITERAL ) importModuleList
+            // /home/david/git/ceylon-spec/Ceylon.g:128:5: ( compilerAnnotations annotations MODULE packagePath ( CHAR_LITERAL | STRING_LITERAL ) importModuleList )
+            // /home/david/git/ceylon-spec/Ceylon.g:128:7: compilerAnnotations annotations MODULE packagePath ( CHAR_LITERAL | STRING_LITERAL ) importModuleList
             {
             pushFollow(FOLLOW_compilerAnnotations_in_moduleDescriptor400);
             compilerAnnotations7=compilerAnnotations();
@@ -610,7 +629,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { moduleDescriptor.setImportPath(packagePath8); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:118:7: ( CHAR_LITERAL | STRING_LITERAL )
+            // /home/david/git/ceylon-spec/Ceylon.g:135:7: ( CHAR_LITERAL | STRING_LITERAL )
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -630,7 +649,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt3) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:119:9: CHAR_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:136:9: CHAR_LITERAL
                     {
                     CHAR_LITERAL9=(Token)match(input,CHAR_LITERAL,FOLLOW_CHAR_LITERAL_in_moduleDescriptor453); if (state.failed) return moduleDescriptor;
 
@@ -639,7 +658,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:122:9: STRING_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:139:9: STRING_LITERAL
                     {
                     STRING_LITERAL10=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_moduleDescriptor481); if (state.failed) return moduleDescriptor;
 
@@ -677,7 +696,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "importModuleList"
-    // /home/david/git/ceylon-spec/Ceylon.g:129:1: importModuleList returns [ImportModuleList importModuleList] : LBRACE ( compilerAnnotations annotations importModule )* RBRACE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:146:1: importModuleList returns [ImportModuleList importModuleList] : LBRACE ( compilerAnnotations annotations importModule )* RBRACE ;
     public ImportModuleList importModuleList() throws RecognitionException {
         ImportModuleList importModuleList = null;
 
@@ -692,14 +711,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:130:5: ( LBRACE ( compilerAnnotations annotations importModule )* RBRACE )
-            // /home/david/git/ceylon-spec/Ceylon.g:130:7: LBRACE ( compilerAnnotations annotations importModule )* RBRACE
+            // /home/david/git/ceylon-spec/Ceylon.g:147:5: ( LBRACE ( compilerAnnotations annotations importModule )* RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:147:7: LBRACE ( compilerAnnotations annotations importModule )* RBRACE
             {
             LBRACE12=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_importModuleList536); if (state.failed) return importModuleList;
 
             if ( state.backtracking==0 ) { importModuleList = new ImportModuleList(LBRACE12); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:132:7: ( compilerAnnotations annotations importModule )*
+            // /home/david/git/ceylon-spec/Ceylon.g:149:7: ( compilerAnnotations annotations importModule )*
             loop4:
             do {
                 int alt4=2;
@@ -712,7 +731,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt4) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:133:9: compilerAnnotations annotations importModule
+            	    // /home/david/git/ceylon-spec/Ceylon.g:150:9: compilerAnnotations annotations importModule
             	    {
             	    pushFollow(FOLLOW_compilerAnnotations_in_importModuleList562);
             	    compilerAnnotations15=compilerAnnotations();
@@ -770,7 +789,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "packageDescriptor"
-    // /home/david/git/ceylon-spec/Ceylon.g:146:1: packageDescriptor returns [PackageDescriptor packageDescriptor] : compilerAnnotations annotations PACKAGE packagePath SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:163:1: packageDescriptor returns [PackageDescriptor packageDescriptor] : compilerAnnotations annotations PACKAGE packagePath SEMICOLON ;
     public PackageDescriptor packageDescriptor() throws RecognitionException {
         PackageDescriptor packageDescriptor = null;
 
@@ -785,8 +804,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:147:5: ( compilerAnnotations annotations PACKAGE packagePath SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:147:7: compilerAnnotations annotations PACKAGE packagePath SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:164:5: ( compilerAnnotations annotations PACKAGE packagePath SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:164:7: compilerAnnotations annotations PACKAGE packagePath SEMICOLON
             {
             pushFollow(FOLLOW_compilerAnnotations_in_packageDescriptor630);
             compilerAnnotations19=compilerAnnotations();
@@ -838,7 +857,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "importModule"
-    // /home/david/git/ceylon-spec/Ceylon.g:160:1: importModule returns [ImportModule importModule] : IMPORT (c1= CHAR_LITERAL |s1= STRING_LITERAL | packagePath ) (c2= CHAR_LITERAL |s2= STRING_LITERAL )? SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:177:1: importModule returns [ImportModule importModule] : IMPORT (c1= CHAR_LITERAL |s1= STRING_LITERAL | packagePath ) (c2= CHAR_LITERAL |s2= STRING_LITERAL )? SEMICOLON ;
     public ImportModule importModule() throws RecognitionException {
         ImportModule importModule = null;
 
@@ -853,14 +872,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:161:5: ( IMPORT (c1= CHAR_LITERAL |s1= STRING_LITERAL | packagePath ) (c2= CHAR_LITERAL |s2= STRING_LITERAL )? SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:161:7: IMPORT (c1= CHAR_LITERAL |s1= STRING_LITERAL | packagePath ) (c2= CHAR_LITERAL |s2= STRING_LITERAL )? SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:178:5: ( IMPORT (c1= CHAR_LITERAL |s1= STRING_LITERAL | packagePath ) (c2= CHAR_LITERAL |s2= STRING_LITERAL )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:178:7: IMPORT (c1= CHAR_LITERAL |s1= STRING_LITERAL | packagePath ) (c2= CHAR_LITERAL |s2= STRING_LITERAL )? SEMICOLON
             {
             IMPORT22=(Token)match(input,IMPORT,FOLLOW_IMPORT_in_importModule702); if (state.failed) return importModule;
 
             if ( state.backtracking==0 ) { importModule = new ImportModule(IMPORT22); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:163:7: (c1= CHAR_LITERAL |s1= STRING_LITERAL | packagePath )
+            // /home/david/git/ceylon-spec/Ceylon.g:180:7: (c1= CHAR_LITERAL |s1= STRING_LITERAL | packagePath )
             int alt5=3;
             switch ( input.LA(1) ) {
             case CHAR_LITERAL:
@@ -890,7 +909,7 @@ public class CeylonParser extends Parser {
 
             switch (alt5) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:164:9: c1= CHAR_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:181:9: c1= CHAR_LITERAL
                     {
                     c1=(Token)match(input,CHAR_LITERAL,FOLLOW_CHAR_LITERAL_in_importModule731); if (state.failed) return importModule;
 
@@ -899,7 +918,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:167:9: s1= STRING_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:184:9: s1= STRING_LITERAL
                     {
                     s1=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_importModule761); if (state.failed) return importModule;
 
@@ -908,7 +927,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:170:9: packagePath
+                    // /home/david/git/ceylon-spec/Ceylon.g:187:9: packagePath
                     {
                     pushFollow(FOLLOW_packagePath_in_importModule789);
                     packagePath23=packagePath();
@@ -924,7 +943,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:173:7: (c2= CHAR_LITERAL |s2= STRING_LITERAL )?
+            // /home/david/git/ceylon-spec/Ceylon.g:190:7: (c2= CHAR_LITERAL |s2= STRING_LITERAL )?
             int alt6=3;
             int LA6_0 = input.LA(1);
 
@@ -936,7 +955,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt6) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:174:9: c2= CHAR_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:191:9: c2= CHAR_LITERAL
                     {
                     c2=(Token)match(input,CHAR_LITERAL,FOLLOW_CHAR_LITERAL_in_importModule827); if (state.failed) return importModule;
 
@@ -946,7 +965,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:178:9: s2= STRING_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:195:9: s2= STRING_LITERAL
                     {
                     s2=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_importModule857); if (state.failed) return importModule;
 
@@ -982,7 +1001,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "importDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:187:1: importDeclaration returns [Import importDeclaration] : IMPORT ( packagePath |) importElementList ;
+    // /home/david/git/ceylon-spec/Ceylon.g:204:1: importDeclaration returns [Import importDeclaration] : IMPORT ( packagePath |) importElementList ;
     public Import importDeclaration() throws RecognitionException {
         Import importDeclaration = null;
 
@@ -994,14 +1013,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:188:5: ( IMPORT ( packagePath |) importElementList )
-            // /home/david/git/ceylon-spec/Ceylon.g:188:7: IMPORT ( packagePath |) importElementList
+            // /home/david/git/ceylon-spec/Ceylon.g:205:5: ( IMPORT ( packagePath |) importElementList )
+            // /home/david/git/ceylon-spec/Ceylon.g:205:7: IMPORT ( packagePath |) importElementList
             {
             IMPORT25=(Token)match(input,IMPORT,FOLLOW_IMPORT_in_importDeclaration913); if (state.failed) return importDeclaration;
 
             if ( state.backtracking==0 ) { importDeclaration = new Import(IMPORT25); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:190:7: ( packagePath |)
+            // /home/david/git/ceylon-spec/Ceylon.g:207:7: ( packagePath |)
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -1021,7 +1040,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:191:9: packagePath
+                    // /home/david/git/ceylon-spec/Ceylon.g:208:9: packagePath
                     {
                     pushFollow(FOLLOW_packagePath_in_importDeclaration941);
                     packagePath26=packagePath();
@@ -1034,7 +1053,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:193:9: 
+                    // /home/david/git/ceylon-spec/Ceylon.g:210:9: 
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                   new MismatchedTokenException(LIDENTIFIER, input)); }
@@ -1071,7 +1090,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "importElementList"
-    // /home/david/git/ceylon-spec/Ceylon.g:200:1: importElementList returns [ImportMemberOrTypeList importMemberOrTypeList] : LBRACE (ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )* |iw= importWildcard )? RBRACE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:217:1: importElementList returns [ImportMemberOrTypeList importMemberOrTypeList] : LBRACE (ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )* |iw= importWildcard )? RBRACE ;
     public ImportMemberOrTypeList importElementList() throws RecognitionException {
         ImportMemberOrTypeList importMemberOrTypeList = null;
 
@@ -1089,15 +1108,15 @@ public class CeylonParser extends Parser {
          ImportMemberOrTypeList il=null; 
                     boolean wildcarded = false; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:203:5: ( LBRACE (ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )* |iw= importWildcard )? RBRACE )
-            // /home/david/git/ceylon-spec/Ceylon.g:204:5: LBRACE (ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )* |iw= importWildcard )? RBRACE
+            // /home/david/git/ceylon-spec/Ceylon.g:220:5: ( LBRACE (ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )* |iw= importWildcard )? RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:221:5: LBRACE (ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )* |iw= importWildcard )? RBRACE
             {
             LBRACE28=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_importElementList1019); if (state.failed) return importMemberOrTypeList;
 
             if ( state.backtracking==0 ) { il = new ImportMemberOrTypeList(LBRACE28);
                   importMemberOrTypeList = il; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:207:5: (ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )* |iw= importWildcard )?
+            // /home/david/git/ceylon-spec/Ceylon.g:224:5: (ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )* |iw= importWildcard )?
             int alt10=3;
             int LA10_0 = input.LA(1);
 
@@ -1109,7 +1128,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt10) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:208:7: ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:225:7: ie1= importElement (c1= COMMA (ie2= importElement |iw= importWildcard |) )*
                     {
                     pushFollow(FOLLOW_importElement_in_importElementList1042);
                     ie1=importElement();
@@ -1120,7 +1139,7 @@ public class CeylonParser extends Parser {
                     if ( state.backtracking==0 ) { if (ie1!=null)
                                 il.addImportMemberOrType(ie1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:211:7: (c1= COMMA (ie2= importElement |iw= importWildcard |) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:228:7: (c1= COMMA (ie2= importElement |iw= importWildcard |) )*
                     loop9:
                     do {
                         int alt9=2;
@@ -1133,7 +1152,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt9) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:212:9: c1= COMMA (ie2= importElement |iw= importWildcard |)
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:229:9: c1= COMMA (ie2= importElement |iw= importWildcard |)
                     	    {
                     	    c1=(Token)match(input,COMMA,FOLLOW_COMMA_in_importElementList1073); if (state.failed) return importMemberOrTypeList;
 
@@ -1142,7 +1161,7 @@ public class CeylonParser extends Parser {
                     	                  displayRecognitionError(getTokenNames(), 
                     	                      new MismatchedTokenException(RBRACE, input)); }
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:217:9: (ie2= importElement |iw= importWildcard |)
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:234:9: (ie2= importElement |iw= importWildcard |)
                     	    int alt8=3;
                     	    switch ( input.LA(1) ) {
                     	    case ALIAS:
@@ -1222,7 +1241,7 @@ public class CeylonParser extends Parser {
 
                     	    switch (alt8) {
                     	        case 1 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:218:11: ie2= importElement
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:235:11: ie2= importElement
                     	            {
                     	            pushFollow(FOLLOW_importElement_in_importElementList1108);
                     	            ie2=importElement();
@@ -1238,7 +1257,7 @@ public class CeylonParser extends Parser {
                     	            }
                     	            break;
                     	        case 2 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:223:11: iw= importWildcard
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:240:11: iw= importWildcard
                     	            {
                     	            pushFollow(FOLLOW_importWildcard_in_importElementList1136);
                     	            iw=importWildcard();
@@ -1255,7 +1274,7 @@ public class CeylonParser extends Parser {
                     	            }
                     	            break;
                     	        case 3 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:229:11: 
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:246:11: 
                     	            {
                     	            if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                     	                            new MismatchedTokenException(ELLIPSIS, input)); }
@@ -1278,7 +1297,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:233:7: iw= importWildcard
+                    // /home/david/git/ceylon-spec/Ceylon.g:250:7: iw= importWildcard
                     {
                     pushFollow(FOLLOW_importWildcard_in_importElementList1190);
                     iw=importWildcard();
@@ -1316,7 +1335,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "importElement"
-    // /home/david/git/ceylon-spec/Ceylon.g:239:1: importElement returns [ImportMemberOrType importMemberOrType] : compilerAnnotations (in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )? ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:256:1: importElement returns [ImportMemberOrType importMemberOrType] : compilerAnnotations (in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )? ) ;
     public ImportMemberOrType importElement() throws RecognitionException {
         ImportMemberOrType importMemberOrType = null;
 
@@ -1333,8 +1352,8 @@ public class CeylonParser extends Parser {
 
          Alias alias = null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:241:5: ( compilerAnnotations (in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )? ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:241:7: compilerAnnotations (in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:258:5: ( compilerAnnotations (in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )? ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:258:7: compilerAnnotations (in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )? )
             {
             pushFollow(FOLLOW_compilerAnnotations_in_importElement1241);
             compilerAnnotations31=compilerAnnotations();
@@ -1342,8 +1361,8 @@ public class CeylonParser extends Parser {
             state._fsp--;
             if (state.failed) return importMemberOrType;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:242:5: (in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:242:7: in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )?
+            // /home/david/git/ceylon-spec/Ceylon.g:259:5: (in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:259:7: in1= importName ( SPECIFY (in2= importName |) )? (iel2= importElementList )?
             {
             pushFollow(FOLLOW_importName_in_importElement1251);
             in1=importName();
@@ -1354,7 +1373,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { importMemberOrType = new ImportMember(null);
                     importMemberOrType.setIdentifier(in1); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:245:7: ( SPECIFY (in2= importName |) )?
+            // /home/david/git/ceylon-spec/Ceylon.g:262:7: ( SPECIFY (in2= importName |) )?
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -1363,7 +1382,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt12) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:245:9: SPECIFY (in2= importName |)
+                    // /home/david/git/ceylon-spec/Ceylon.g:262:9: SPECIFY (in2= importName |)
                     {
                     SPECIFY30=(Token)match(input,SPECIFY,FOLLOW_SPECIFY_in_importElement1270); if (state.failed) return importMemberOrType;
 
@@ -1372,7 +1391,7 @@ public class CeylonParser extends Parser {
                               importMemberOrType.setAlias(alias); 
                               importMemberOrType.setIdentifier(null); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:250:9: (in2= importName |)
+                    // /home/david/git/ceylon-spec/Ceylon.g:267:9: (in2= importName |)
                     int alt11=2;
                     int LA11_0 = input.LA(1);
 
@@ -1392,7 +1411,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt11) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:251:11: in2= importName
+                            // /home/david/git/ceylon-spec/Ceylon.g:268:11: in2= importName
                             {
                             pushFollow(FOLLOW_importName_in_importElement1304);
                             in2=importName();
@@ -1405,7 +1424,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:253:11: 
+                            // /home/david/git/ceylon-spec/Ceylon.g:270:11: 
                             {
                             if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                               new MismatchedTokenException(in1.getToken().getType(), input)); }
@@ -1422,7 +1441,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:257:7: (iel2= importElementList )?
+            // /home/david/git/ceylon-spec/Ceylon.g:274:7: (iel2= importElementList )?
             int alt13=2;
             int LA13_0 = input.LA(1);
 
@@ -1431,7 +1450,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt13) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:258:9: iel2= importElementList
+                    // /home/david/git/ceylon-spec/Ceylon.g:275:9: iel2= importElementList
                     {
                     pushFollow(FOLLOW_importElementList_in_importElement1368);
                     iel2=importElementList();
@@ -1471,7 +1490,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "importWildcard"
-    // /home/david/git/ceylon-spec/Ceylon.g:266:1: importWildcard returns [ImportWildcard importWildcard] : ELLIPSIS ;
+    // /home/david/git/ceylon-spec/Ceylon.g:283:1: importWildcard returns [ImportWildcard importWildcard] : ELLIPSIS ;
     public ImportWildcard importWildcard() throws RecognitionException {
         ImportWildcard importWildcard = null;
 
@@ -1479,8 +1498,8 @@ public class CeylonParser extends Parser {
         Token ELLIPSIS32=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:267:5: ( ELLIPSIS )
-            // /home/david/git/ceylon-spec/Ceylon.g:267:7: ELLIPSIS
+            // /home/david/git/ceylon-spec/Ceylon.g:284:5: ( ELLIPSIS )
+            // /home/david/git/ceylon-spec/Ceylon.g:284:7: ELLIPSIS
             {
             ELLIPSIS32=(Token)match(input,ELLIPSIS,FOLLOW_ELLIPSIS_in_importWildcard1420); if (state.failed) return importWildcard;
 
@@ -1504,7 +1523,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "importName"
-    // /home/david/git/ceylon-spec/Ceylon.g:271:1: importName returns [Identifier identifier] : ( memberName | typeName );
+    // /home/david/git/ceylon-spec/Ceylon.g:288:1: importName returns [Identifier identifier] : ( memberName | typeName );
     public Identifier importName() throws RecognitionException {
         Identifier identifier = null;
 
@@ -1515,7 +1534,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:272:5: ( memberName | typeName )
+            // /home/david/git/ceylon-spec/Ceylon.g:289:5: ( memberName | typeName )
             int alt14=2;
             int LA14_0 = input.LA(1);
 
@@ -1535,7 +1554,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt14) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:272:7: memberName
+                    // /home/david/git/ceylon-spec/Ceylon.g:289:7: memberName
                     {
                     pushFollow(FOLLOW_memberName_in_importName1449);
                     memberName33=memberName();
@@ -1548,7 +1567,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:273:7: typeName
+                    // /home/david/git/ceylon-spec/Ceylon.g:290:7: typeName
                     {
                     pushFollow(FOLLOW_typeName_in_importName1459);
                     typeName34=typeName();
@@ -1578,7 +1597,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "packagePath"
-    // /home/david/git/ceylon-spec/Ceylon.g:276:1: packagePath returns [ImportPath importPath] : pn1= packageName (m= MEMBER_OP (pn2= packageName |) )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:293:1: packagePath returns [ImportPath importPath] : pn1= packageName (m= MEMBER_OP (pn2= packageName |) )* ;
     public ImportPath packagePath() throws RecognitionException {
         ImportPath importPath = null;
 
@@ -1591,8 +1610,8 @@ public class CeylonParser extends Parser {
 
          importPath = new ImportPath(null); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:278:5: (pn1= packageName (m= MEMBER_OP (pn2= packageName |) )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:278:7: pn1= packageName (m= MEMBER_OP (pn2= packageName |) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:295:5: (pn1= packageName (m= MEMBER_OP (pn2= packageName |) )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:295:7: pn1= packageName (m= MEMBER_OP (pn2= packageName |) )*
             {
             pushFollow(FOLLOW_packageName_in_packagePath1493);
             pn1=packageName();
@@ -1603,7 +1622,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { if (pn1!=null) 
                         importPath.addIdentifier(pn1); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:281:7: (m= MEMBER_OP (pn2= packageName |) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:298:7: (m= MEMBER_OP (pn2= packageName |) )*
             loop16:
             do {
                 int alt16=2;
@@ -1616,13 +1635,13 @@ public class CeylonParser extends Parser {
 
                 switch (alt16) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:282:9: m= MEMBER_OP (pn2= packageName |)
+            	    // /home/david/git/ceylon-spec/Ceylon.g:299:9: m= MEMBER_OP (pn2= packageName |)
             	    {
             	    m=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_packagePath1524); if (state.failed) return importPath;
 
             	    if ( state.backtracking==0 ) { importPath.setEndToken(m); }
 
-            	    // /home/david/git/ceylon-spec/Ceylon.g:284:9: (pn2= packageName |)
+            	    // /home/david/git/ceylon-spec/Ceylon.g:301:9: (pn2= packageName |)
             	    int alt15=2;
             	    int LA15_0 = input.LA(1);
 
@@ -1642,7 +1661,7 @@ public class CeylonParser extends Parser {
             	    }
             	    switch (alt15) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:285:11: pn2= packageName
+            	            // /home/david/git/ceylon-spec/Ceylon.g:302:11: pn2= packageName
             	            {
             	            pushFollow(FOLLOW_packageName_in_packagePath1559);
             	            pn2=packageName();
@@ -1656,7 +1675,7 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:288:11: 
+            	            // /home/david/git/ceylon-spec/Ceylon.g:305:11: 
             	            {
             	            if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
             	                            new MismatchedTokenException(LIDENTIFIER, input)); }
@@ -1694,7 +1713,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "packageName"
-    // /home/david/git/ceylon-spec/Ceylon.g:294:1: packageName returns [Identifier identifier] : ( LIDENTIFIER | UIDENTIFIER );
+    // /home/david/git/ceylon-spec/Ceylon.g:311:1: packageName returns [Identifier identifier] : ( LIDENTIFIER | UIDENTIFIER );
     public Identifier packageName() throws RecognitionException {
         Identifier identifier = null;
 
@@ -1703,7 +1722,7 @@ public class CeylonParser extends Parser {
         Token UIDENTIFIER36=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:295:5: ( LIDENTIFIER | UIDENTIFIER )
+            // /home/david/git/ceylon-spec/Ceylon.g:312:5: ( LIDENTIFIER | UIDENTIFIER )
             int alt17=2;
             int LA17_0 = input.LA(1);
 
@@ -1723,7 +1742,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt17) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:295:7: LIDENTIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:312:7: LIDENTIFIER
                     {
                     LIDENTIFIER35=(Token)match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_packageName1624); if (state.failed) return identifier;
 
@@ -1733,7 +1752,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:298:7: UIDENTIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:315:7: UIDENTIFIER
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(),
                                   new MismatchedTokenException(LIDENTIFIER, input), 5001); }
@@ -1763,7 +1782,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeName"
-    // /home/david/git/ceylon-spec/Ceylon.g:305:1: typeName returns [Identifier identifier] : UIDENTIFIER ;
+    // /home/david/git/ceylon-spec/Ceylon.g:322:1: typeName returns [Identifier identifier] : UIDENTIFIER ;
     public Identifier typeName() throws RecognitionException {
         Identifier identifier = null;
 
@@ -1771,8 +1790,8 @@ public class CeylonParser extends Parser {
         Token UIDENTIFIER37=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:306:5: ( UIDENTIFIER )
-            // /home/david/git/ceylon-spec/Ceylon.g:306:7: UIDENTIFIER
+            // /home/david/git/ceylon-spec/Ceylon.g:323:5: ( UIDENTIFIER )
+            // /home/david/git/ceylon-spec/Ceylon.g:323:7: UIDENTIFIER
             {
             UIDENTIFIER37=(Token)match(input,UIDENTIFIER,FOLLOW_UIDENTIFIER_in_typeName1677); if (state.failed) return identifier;
 
@@ -1796,7 +1815,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "annotationName"
-    // /home/david/git/ceylon-spec/Ceylon.g:310:1: annotationName returns [Identifier identifier] : LIDENTIFIER ;
+    // /home/david/git/ceylon-spec/Ceylon.g:327:1: annotationName returns [Identifier identifier] : LIDENTIFIER ;
     public Identifier annotationName() throws RecognitionException {
         Identifier identifier = null;
 
@@ -1804,8 +1823,8 @@ public class CeylonParser extends Parser {
         Token LIDENTIFIER38=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:311:5: ( LIDENTIFIER )
-            // /home/david/git/ceylon-spec/Ceylon.g:311:7: LIDENTIFIER
+            // /home/david/git/ceylon-spec/Ceylon.g:328:5: ( LIDENTIFIER )
+            // /home/david/git/ceylon-spec/Ceylon.g:328:7: LIDENTIFIER
             {
             LIDENTIFIER38=(Token)match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_annotationName1706); if (state.failed) return identifier;
 
@@ -1830,7 +1849,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "memberName"
-    // /home/david/git/ceylon-spec/Ceylon.g:316:1: memberName returns [Identifier identifier] : LIDENTIFIER ;
+    // /home/david/git/ceylon-spec/Ceylon.g:333:1: memberName returns [Identifier identifier] : LIDENTIFIER ;
     public Identifier memberName() throws RecognitionException {
         Identifier identifier = null;
 
@@ -1838,8 +1857,8 @@ public class CeylonParser extends Parser {
         Token LIDENTIFIER39=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:317:5: ( LIDENTIFIER )
-            // /home/david/git/ceylon-spec/Ceylon.g:317:7: LIDENTIFIER
+            // /home/david/git/ceylon-spec/Ceylon.g:334:5: ( LIDENTIFIER )
+            // /home/david/git/ceylon-spec/Ceylon.g:334:7: LIDENTIFIER
             {
             LIDENTIFIER39=(Token)match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_memberName1735); if (state.failed) return identifier;
 
@@ -1863,7 +1882,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "memberNameDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:321:1: memberNameDeclaration returns [Identifier identifier] : ( memberName | typeName );
+    // /home/david/git/ceylon-spec/Ceylon.g:338:1: memberNameDeclaration returns [Identifier identifier] : ( memberName | typeName );
     public Identifier memberNameDeclaration() throws RecognitionException {
         Identifier identifier = null;
 
@@ -1874,7 +1893,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:322:5: ( memberName | typeName )
+            // /home/david/git/ceylon-spec/Ceylon.g:339:5: ( memberName | typeName )
             int alt18=2;
             int LA18_0 = input.LA(1);
 
@@ -1894,7 +1913,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt18) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:322:7: memberName
+                    // /home/david/git/ceylon-spec/Ceylon.g:339:7: memberName
                     {
                     pushFollow(FOLLOW_memberName_in_memberNameDeclaration1768);
                     memberName40=memberName();
@@ -1907,7 +1926,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:323:7: typeName
+                    // /home/david/git/ceylon-spec/Ceylon.g:340:7: typeName
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                   new MismatchedTokenException(LIDENTIFIER, input), 5001); }
@@ -1940,7 +1959,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeNameDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:329:1: typeNameDeclaration returns [Identifier identifier] : ( typeName | memberName );
+    // /home/david/git/ceylon-spec/Ceylon.g:346:1: typeNameDeclaration returns [Identifier identifier] : ( typeName | memberName );
     public Identifier typeNameDeclaration() throws RecognitionException {
         Identifier identifier = null;
 
@@ -1951,7 +1970,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:330:5: ( typeName | memberName )
+            // /home/david/git/ceylon-spec/Ceylon.g:347:5: ( typeName | memberName )
             int alt19=2;
             int LA19_0 = input.LA(1);
 
@@ -1971,7 +1990,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt19) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:330:7: typeName
+                    // /home/david/git/ceylon-spec/Ceylon.g:347:7: typeName
                     {
                     pushFollow(FOLLOW_typeName_in_typeNameDeclaration1816);
                     typeName42=typeName();
@@ -1984,7 +2003,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:331:7: memberName
+                    // /home/david/git/ceylon-spec/Ceylon.g:348:7: memberName
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                   new MismatchedTokenException(UIDENTIFIER, input), 5002); }
@@ -2017,7 +2036,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "objectDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:337:1: objectDeclaration returns [ObjectDefinition declaration] : OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:354:1: objectDeclaration returns [ObjectDefinition declaration] : OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON ) ;
     public ObjectDefinition objectDeclaration() throws RecognitionException {
         ObjectDefinition declaration = null;
 
@@ -2034,8 +2053,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:338:5: ( OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:338:7: OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:355:5: ( OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:355:7: OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON )
             {
             OBJECT_DEFINITION44=(Token)match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_objectDeclaration1864); if (state.failed) return declaration;
 
@@ -2050,7 +2069,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { declaration.setIdentifier(memberNameDeclaration45); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:343:7: ( extendedType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:360:7: ( extendedType )?
             int alt20=2;
             int LA20_0 = input.LA(1);
 
@@ -2059,7 +2078,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt20) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:344:9: extendedType
+                    // /home/david/git/ceylon-spec/Ceylon.g:361:9: extendedType
                     {
                     pushFollow(FOLLOW_extendedType_in_objectDeclaration1907);
                     extendedType46=extendedType();
@@ -2075,7 +2094,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:347:7: ( satisfiedTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:364:7: ( satisfiedTypes )?
             int alt21=2;
             int LA21_0 = input.LA(1);
 
@@ -2084,7 +2103,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt21) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:348:9: satisfiedTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:365:9: satisfiedTypes
                     {
                     pushFollow(FOLLOW_satisfiedTypes_in_objectDeclaration1946);
                     satisfiedTypes47=satisfiedTypes();
@@ -2100,7 +2119,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:351:7: ( classBody | SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:368:7: ( classBody | SEMICOLON )
             int alt22=2;
             int LA22_0 = input.LA(1);
 
@@ -2120,7 +2139,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt22) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:352:9: classBody
+                    // /home/david/git/ceylon-spec/Ceylon.g:369:9: classBody
                     {
                     pushFollow(FOLLOW_classBody_in_objectDeclaration1984);
                     classBody48=classBody();
@@ -2133,7 +2152,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:354:9: SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:371:9: SEMICOLON
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                   new MismatchedTokenException(LBRACE, input)); }
@@ -2166,7 +2185,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "objectExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:361:1: objectExpression returns [ObjectExpression objectExpression] : OBJECT_DEFINITION ( extendedType )? ( satisfiedTypes )? classBody ;
+    // /home/david/git/ceylon-spec/Ceylon.g:378:1: objectExpression returns [ObjectExpression objectExpression] : OBJECT_DEFINITION ( extendedType )? ( satisfiedTypes )? classBody ;
     public ObjectExpression objectExpression() throws RecognitionException {
         ObjectExpression objectExpression = null;
 
@@ -2180,14 +2199,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:362:5: ( OBJECT_DEFINITION ( extendedType )? ( satisfiedTypes )? classBody )
-            // /home/david/git/ceylon-spec/Ceylon.g:362:7: OBJECT_DEFINITION ( extendedType )? ( satisfiedTypes )? classBody
+            // /home/david/git/ceylon-spec/Ceylon.g:379:5: ( OBJECT_DEFINITION ( extendedType )? ( satisfiedTypes )? classBody )
+            // /home/david/git/ceylon-spec/Ceylon.g:379:7: OBJECT_DEFINITION ( extendedType )? ( satisfiedTypes )? classBody
             {
             OBJECT_DEFINITION50=(Token)match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_objectExpression2053); if (state.failed) return objectExpression;
 
             if ( state.backtracking==0 ) { objectExpression = new ObjectExpression(OBJECT_DEFINITION50); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:364:7: ( extendedType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:381:7: ( extendedType )?
             int alt23=2;
             int LA23_0 = input.LA(1);
 
@@ -2196,7 +2215,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt23) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:365:9: extendedType
+                    // /home/david/git/ceylon-spec/Ceylon.g:382:9: extendedType
                     {
                     pushFollow(FOLLOW_extendedType_in_objectExpression2080);
                     extendedType51=extendedType();
@@ -2212,7 +2231,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:368:7: ( satisfiedTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:385:7: ( satisfiedTypes )?
             int alt24=2;
             int LA24_0 = input.LA(1);
 
@@ -2221,7 +2240,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt24) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:369:9: satisfiedTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:386:9: satisfiedTypes
                     {
                     pushFollow(FOLLOW_satisfiedTypes_in_objectExpression2119);
                     satisfiedTypes52=satisfiedTypes();
@@ -2263,7 +2282,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "voidOrInferredMethodDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:376:1: voidOrInferredMethodDeclaration returns [AnyMethod declaration] : ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( typeParameters )? ( parameters )* ( typeConstraints )? ( block | ( functionSpecifier )? SEMICOLON ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:393:1: voidOrInferredMethodDeclaration returns [AnyMethod declaration] : ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( typeParameters )? ( parameters )* ( typeConstraints )? ( block | ( functionSpecifier )? SEMICOLON ) ;
     public AnyMethod voidOrInferredMethodDeclaration() throws RecognitionException {
         AnyMethod declaration = null;
 
@@ -2287,10 +2306,10 @@ public class CeylonParser extends Parser {
          MethodDefinition def=null;
                     MethodDeclaration dec=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:379:5: ( ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( typeParameters )? ( parameters )* ( typeConstraints )? ( block | ( functionSpecifier )? SEMICOLON ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:379:7: ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( typeParameters )? ( parameters )* ( typeConstraints )? ( block | ( functionSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:396:5: ( ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( typeParameters )? ( parameters )* ( typeConstraints )? ( block | ( functionSpecifier )? SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:396:7: ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( typeParameters )? ( parameters )* ( typeConstraints )? ( block | ( functionSpecifier )? SEMICOLON )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:379:7: ( VOID_MODIFIER | FUNCTION_MODIFIER )
+            // /home/david/git/ceylon-spec/Ceylon.g:396:7: ( VOID_MODIFIER | FUNCTION_MODIFIER )
             int alt25=2;
             int LA25_0 = input.LA(1);
 
@@ -2310,7 +2329,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt25) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:380:9: VOID_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:397:9: VOID_MODIFIER
                     {
                     VOID_MODIFIER54=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_voidOrInferredMethodDeclaration2195); if (state.failed) return declaration;
 
@@ -2324,7 +2343,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:387:9: FUNCTION_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:404:9: FUNCTION_MODIFIER
                     {
                     FUNCTION_MODIFIER55=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_voidOrInferredMethodDeclaration2215); if (state.failed) return declaration;
 
@@ -2350,7 +2369,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { dec.setIdentifier(memberNameDeclaration56); 
                     def.setIdentifier(memberNameDeclaration56); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:398:7: ( typeParameters )?
+            // /home/david/git/ceylon-spec/Ceylon.g:415:7: ( typeParameters )?
             int alt26=2;
             int LA26_0 = input.LA(1);
 
@@ -2359,7 +2378,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt26) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:399:9: typeParameters
+                    // /home/david/git/ceylon-spec/Ceylon.g:416:9: typeParameters
                     {
                     pushFollow(FOLLOW_typeParameters_in_voidOrInferredMethodDeclaration2267);
                     typeParameters57=typeParameters();
@@ -2376,7 +2395,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:403:7: ( parameters )*
+            // /home/david/git/ceylon-spec/Ceylon.g:420:7: ( parameters )*
             loop27:
             do {
                 int alt27=2;
@@ -2389,7 +2408,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt27) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:404:9: parameters
+            	    // /home/david/git/ceylon-spec/Ceylon.g:421:9: parameters
             	    {
             	    pushFollow(FOLLOW_parameters_in_voidOrInferredMethodDeclaration2312);
             	    parameters58=parameters();
@@ -2409,7 +2428,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:409:7: ( typeConstraints )?
+            // /home/david/git/ceylon-spec/Ceylon.g:426:7: ( typeConstraints )?
             int alt28=2;
             int LA28_0 = input.LA(1);
 
@@ -2418,7 +2437,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt28) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:410:9: typeConstraints
+                    // /home/david/git/ceylon-spec/Ceylon.g:427:9: typeConstraints
                     {
                     pushFollow(FOLLOW_typeConstraints_in_voidOrInferredMethodDeclaration2356);
                     typeConstraints59=typeConstraints();
@@ -2435,7 +2454,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:414:7: ( block | ( functionSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:431:7: ( block | ( functionSpecifier )? SEMICOLON )
             int alt30=2;
             int LA30_0 = input.LA(1);
 
@@ -2455,7 +2474,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt30) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:415:9: block
+                    // /home/david/git/ceylon-spec/Ceylon.g:432:9: block
                     {
                     if ( state.backtracking==0 ) { declaration = def; }
 
@@ -2470,9 +2489,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:419:9: ( functionSpecifier )? SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:436:9: ( functionSpecifier )? SEMICOLON
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:419:9: ( functionSpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:436:9: ( functionSpecifier )?
                     int alt29=2;
                     int LA29_0 = input.LA(1);
 
@@ -2481,7 +2500,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt29) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:420:11: functionSpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:437:11: functionSpecifier
                             {
                             pushFollow(FOLLOW_functionSpecifier_in_voidOrInferredMethodDeclaration2446);
                             functionSpecifier61=functionSpecifier();
@@ -2529,7 +2548,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "setterDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:430:1: setterDeclaration returns [AttributeSetterDefinition declaration] : ASSIGN memberNameDeclaration ( block | ( functionSpecifier )? SEMICOLON ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:447:1: setterDeclaration returns [AttributeSetterDefinition declaration] : ASSIGN memberNameDeclaration ( block | ( functionSpecifier )? SEMICOLON ) ;
     public AttributeSetterDefinition setterDeclaration() throws RecognitionException {
         AttributeSetterDefinition declaration = null;
 
@@ -2544,8 +2563,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:431:5: ( ASSIGN memberNameDeclaration ( block | ( functionSpecifier )? SEMICOLON ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:431:7: ASSIGN memberNameDeclaration ( block | ( functionSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:448:5: ( ASSIGN memberNameDeclaration ( block | ( functionSpecifier )? SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:448:7: ASSIGN memberNameDeclaration ( block | ( functionSpecifier )? SEMICOLON )
             {
             ASSIGN63=(Token)match(input,ASSIGN,FOLLOW_ASSIGN_in_setterDeclaration2538); if (state.failed) return declaration;
 
@@ -2560,7 +2579,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { declaration.setIdentifier(memberNameDeclaration64); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:436:7: ( block | ( functionSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:453:7: ( block | ( functionSpecifier )? SEMICOLON )
             int alt32=2;
             int LA32_0 = input.LA(1);
 
@@ -2580,7 +2599,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt32) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:437:9: block
+                    // /home/david/git/ceylon-spec/Ceylon.g:454:9: block
                     {
                     pushFollow(FOLLOW_block_in_setterDeclaration2583);
                     block65=block();
@@ -2593,9 +2612,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:440:9: ( functionSpecifier )? SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:457:9: ( functionSpecifier )? SEMICOLON
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:440:9: ( functionSpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:457:9: ( functionSpecifier )?
                     int alt31=2;
                     int LA31_0 = input.LA(1);
 
@@ -2604,7 +2623,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt31) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:441:11: functionSpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:458:11: functionSpecifier
                             {
                             pushFollow(FOLLOW_functionSpecifier_in_setterDeclaration2624);
                             functionSpecifier66=functionSpecifier();
@@ -2651,15 +2670,15 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "tuplePatternStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:451:1: tuplePatternStart : LBRACKET ( compilerAnnotations LIDENTIFIER | ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart ) | tuplePatternStart ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:468:1: tuplePatternStart : LBRACKET ( compilerAnnotations LIDENTIFIER | ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart ) | tuplePatternStart ) ;
     public void tuplePatternStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:452:5: ( LBRACKET ( compilerAnnotations LIDENTIFIER | ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart ) | tuplePatternStart ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:452:7: LBRACKET ( compilerAnnotations LIDENTIFIER | ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart ) | tuplePatternStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:469:5: ( LBRACKET ( compilerAnnotations LIDENTIFIER | ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart ) | tuplePatternStart ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:469:7: LBRACKET ( compilerAnnotations LIDENTIFIER | ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart ) | tuplePatternStart )
             {
             match(input,LBRACKET,FOLLOW_LBRACKET_in_tuplePatternStart2702); if (state.failed) return ;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:453:7: ( compilerAnnotations LIDENTIFIER | ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart ) | tuplePatternStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:470:7: ( compilerAnnotations LIDENTIFIER | ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart ) | tuplePatternStart )
             int alt33=3;
             int LA33_0 = input.LA(1);
 
@@ -2751,7 +2770,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt33) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:454:9: compilerAnnotations LIDENTIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:471:9: compilerAnnotations LIDENTIFIER
                     {
                     pushFollow(FOLLOW_compilerAnnotations_in_tuplePatternStart2720);
                     compilerAnnotations();
@@ -2764,10 +2783,10 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:456:9: ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart )
+                    // /home/david/git/ceylon-spec/Ceylon.g:473:9: ( compilerAnnotations declarationStart )=> ( compilerAnnotations declarationStart )
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:457:9: ( compilerAnnotations declarationStart )
-                    // /home/david/git/ceylon-spec/Ceylon.g:457:10: compilerAnnotations declarationStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:474:9: ( compilerAnnotations declarationStart )
+                    // /home/david/git/ceylon-spec/Ceylon.g:474:10: compilerAnnotations declarationStart
                     {
                     pushFollow(FOLLOW_compilerAnnotations_in_tuplePatternStart2758);
                     compilerAnnotations();
@@ -2787,7 +2806,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:459:9: tuplePatternStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:476:9: tuplePatternStart
                     {
                     pushFollow(FOLLOW_tuplePatternStart_in_tuplePatternStart2779);
                     tuplePatternStart();
@@ -2819,7 +2838,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "variableOrTuplePattern"
-    // /home/david/git/ceylon-spec/Ceylon.g:463:1: variableOrTuplePattern returns [Pattern pattern] : ( ( tuplePatternStart )=> tuplePattern | variablePattern );
+    // /home/david/git/ceylon-spec/Ceylon.g:480:1: variableOrTuplePattern returns [Pattern pattern] : ( ( tuplePatternStart )=> tuplePattern | variablePattern );
     public Pattern variableOrTuplePattern() throws RecognitionException {
         Pattern pattern = null;
 
@@ -2830,7 +2849,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:464:5: ( ( tuplePatternStart )=> tuplePattern | variablePattern )
+            // /home/david/git/ceylon-spec/Ceylon.g:481:5: ( ( tuplePatternStart )=> tuplePattern | variablePattern )
             int alt34=2;
             int LA34_0 = input.LA(1);
 
@@ -2865,7 +2884,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt34) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:465:7: ( tuplePatternStart )=> tuplePattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:482:7: ( tuplePatternStart )=> tuplePattern
                     {
                     pushFollow(FOLLOW_tuplePattern_in_variableOrTuplePattern2821);
                     tuplePattern68=tuplePattern();
@@ -2878,7 +2897,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:468:7: variablePattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:485:7: variablePattern
                     {
                     pushFollow(FOLLOW_variablePattern_in_variableOrTuplePattern2844);
                     variablePattern69=variablePattern();
@@ -2908,7 +2927,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "pattern"
-    // /home/david/git/ceylon-spec/Ceylon.g:472:1: pattern returns [Pattern pattern] : ( ( variable ENTRY_OP )=>ki1= keyItemPattern | ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern | ( tuplePatternStart )=> tuplePattern | variablePattern );
+    // /home/david/git/ceylon-spec/Ceylon.g:489:1: pattern returns [Pattern pattern] : ( ( variable ENTRY_OP )=>ki1= keyItemPattern | ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern | ( tuplePatternStart )=> tuplePattern | variablePattern );
     public Pattern pattern() throws RecognitionException {
         Pattern pattern = null;
 
@@ -2923,7 +2942,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:473:5: ( ( variable ENTRY_OP )=>ki1= keyItemPattern | ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern | ( tuplePatternStart )=> tuplePattern | variablePattern )
+            // /home/david/git/ceylon-spec/Ceylon.g:490:5: ( ( variable ENTRY_OP )=>ki1= keyItemPattern | ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern | ( tuplePatternStart )=> tuplePattern | variablePattern )
             int alt35=4;
             switch ( input.LA(1) ) {
             case LBRACKET:
@@ -3147,7 +3166,7 @@ public class CeylonParser extends Parser {
 
             switch (alt35) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:474:7: ( variable ENTRY_OP )=>ki1= keyItemPattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:491:7: ( variable ENTRY_OP )=>ki1= keyItemPattern
                     {
                     pushFollow(FOLLOW_keyItemPattern_in_pattern2896);
                     ki1=keyItemPattern();
@@ -3160,7 +3179,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:478:7: ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:495:7: ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern
                     {
                     pushFollow(FOLLOW_keyItemPattern_in_pattern2934);
                     ki2=keyItemPattern();
@@ -3173,7 +3192,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:482:7: ( tuplePatternStart )=> tuplePattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:499:7: ( tuplePatternStart )=> tuplePattern
                     {
                     pushFollow(FOLLOW_tuplePattern_in_pattern2969);
                     tuplePattern70=tuplePattern();
@@ -3186,7 +3205,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:486:7: variablePattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:503:7: variablePattern
                     {
                     pushFollow(FOLLOW_variablePattern_in_pattern2992);
                     variablePattern71=variablePattern();
@@ -3216,7 +3235,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "tupleOrEntryPattern"
-    // /home/david/git/ceylon-spec/Ceylon.g:490:1: tupleOrEntryPattern returns [Pattern pattern] : ( ( variable ENTRY_OP )=>ki1= keyItemPattern | ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern | tuplePattern );
+    // /home/david/git/ceylon-spec/Ceylon.g:507:1: tupleOrEntryPattern returns [Pattern pattern] : ( ( variable ENTRY_OP )=>ki1= keyItemPattern | ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern | tuplePattern );
     public Pattern tupleOrEntryPattern() throws RecognitionException {
         Pattern pattern = null;
 
@@ -3229,7 +3248,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:491:5: ( ( variable ENTRY_OP )=>ki1= keyItemPattern | ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern | tuplePattern )
+            // /home/david/git/ceylon-spec/Ceylon.g:508:5: ( ( variable ENTRY_OP )=>ki1= keyItemPattern | ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern | tuplePattern )
             int alt36=3;
             switch ( input.LA(1) ) {
             case LBRACKET:
@@ -3426,7 +3445,7 @@ public class CeylonParser extends Parser {
 
             switch (alt36) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:492:7: ( variable ENTRY_OP )=>ki1= keyItemPattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:509:7: ( variable ENTRY_OP )=>ki1= keyItemPattern
                     {
                     pushFollow(FOLLOW_keyItemPattern_in_tupleOrEntryPattern3044);
                     ki1=keyItemPattern();
@@ -3439,7 +3458,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:496:7: ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:513:7: ( tuplePattern ENTRY_OP )=>ki2= keyItemPattern
                     {
                     pushFollow(FOLLOW_keyItemPattern_in_tupleOrEntryPattern3082);
                     ki2=keyItemPattern();
@@ -3452,7 +3471,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:500:7: tuplePattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:517:7: tuplePattern
                     {
                     pushFollow(FOLLOW_tuplePattern_in_tupleOrEntryPattern3104);
                     tuplePattern72=tuplePattern();
@@ -3482,7 +3501,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "variablePattern"
-    // /home/david/git/ceylon-spec/Ceylon.g:504:1: variablePattern returns [VariablePattern pattern] : variable ;
+    // /home/david/git/ceylon-spec/Ceylon.g:521:1: variablePattern returns [VariablePattern pattern] : variable ;
     public VariablePattern variablePattern() throws RecognitionException {
         VariablePattern pattern = null;
 
@@ -3491,8 +3510,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:505:5: ( variable )
-            // /home/david/git/ceylon-spec/Ceylon.g:505:7: variable
+            // /home/david/git/ceylon-spec/Ceylon.g:522:5: ( variable )
+            // /home/david/git/ceylon-spec/Ceylon.g:522:7: variable
             {
             pushFollow(FOLLOW_variable_in_variablePattern3133);
             variable73=variable();
@@ -3521,7 +3540,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "tuplePattern"
-    // /home/david/git/ceylon-spec/Ceylon.g:510:1: tuplePattern returns [TuplePattern pattern] : LBRACKET (v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )* )? RBRACKET ;
+    // /home/david/git/ceylon-spec/Ceylon.g:527:1: tuplePattern returns [TuplePattern pattern] : LBRACKET (v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )* )? RBRACKET ;
     public TuplePattern tuplePattern() throws RecognitionException {
         TuplePattern pattern = null;
 
@@ -3535,14 +3554,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:511:5: ( LBRACKET (v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )* )? RBRACKET )
-            // /home/david/git/ceylon-spec/Ceylon.g:511:7: LBRACKET (v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )* )? RBRACKET
+            // /home/david/git/ceylon-spec/Ceylon.g:528:5: ( LBRACKET (v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )* )? RBRACKET )
+            // /home/david/git/ceylon-spec/Ceylon.g:528:7: LBRACKET (v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )* )? RBRACKET
             {
             LBRACKET74=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_tuplePattern3162); if (state.failed) return pattern;
 
             if ( state.backtracking==0 ) { pattern = new TuplePattern(LBRACKET74); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:513:7: (v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )* )?
+            // /home/david/git/ceylon-spec/Ceylon.g:530:7: (v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )* )?
             int alt38=2;
             int LA38_0 = input.LA(1);
 
@@ -3551,7 +3570,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt38) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:514:9: v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:531:9: v1= variadicPattern (c1= COMMA (v2= variadicPattern ) )*
                     {
                     pushFollow(FOLLOW_variadicPattern_in_tuplePattern3190);
                     v1=variadicPattern();
@@ -3561,7 +3580,7 @@ public class CeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { pattern.addPattern(v1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:516:9: (c1= COMMA (v2= variadicPattern ) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:533:9: (c1= COMMA (v2= variadicPattern ) )*
                     loop37:
                     do {
                         int alt37=2;
@@ -3574,14 +3593,14 @@ public class CeylonParser extends Parser {
 
                         switch (alt37) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:517:11: c1= COMMA (v2= variadicPattern )
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:534:11: c1= COMMA (v2= variadicPattern )
                     	    {
                     	    c1=(Token)match(input,COMMA,FOLLOW_COMMA_in_tuplePattern3224); if (state.failed) return pattern;
 
                     	    if ( state.backtracking==0 ) { pattern.setEndToken(c1); }
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:519:11: (v2= variadicPattern )
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:520:13: v2= variadicPattern
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:536:11: (v2= variadicPattern )
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:537:13: v2= variadicPattern
                     	    {
                     	    pushFollow(FOLLOW_variadicPattern_in_tuplePattern3264);
                     	    v2=variadicPattern();
@@ -3632,7 +3651,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "variadicPattern"
-    // /home/david/git/ceylon-spec/Ceylon.g:530:1: variadicPattern returns [Pattern pattern] : ( ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable |p= pattern ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:547:1: variadicPattern returns [Pattern pattern] : ( ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable |p= pattern ) ;
     public Pattern variadicPattern() throws RecognitionException {
         Pattern pattern = null;
 
@@ -3643,10 +3662,10 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:531:5: ( ( ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable |p= pattern ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:531:7: ( ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable |p= pattern )
+            // /home/david/git/ceylon-spec/Ceylon.g:548:5: ( ( ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable |p= pattern ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:548:7: ( ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable |p= pattern )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:531:7: ( ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable |p= pattern )
+            // /home/david/git/ceylon-spec/Ceylon.g:548:7: ( ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable |p= pattern )
             int alt39=2;
             int LA39_0 = input.LA(1);
 
@@ -3756,7 +3775,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt39) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:532:9: ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable
+                    // /home/david/git/ceylon-spec/Ceylon.g:549:9: ( compilerAnnotations ( unionType )? PRODUCT_OP )=> variadicVariable
                     {
                     pushFollow(FOLLOW_variadicVariable_in_variadicPattern3376);
                     variadicVariable76=variadicVariable();
@@ -3771,7 +3790,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:538:9: p= pattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:555:9: p= pattern
                     {
                     pushFollow(FOLLOW_pattern_in_variadicPattern3405);
                     p=pattern();
@@ -3805,7 +3824,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "variadicVariable"
-    // /home/david/git/ceylon-spec/Ceylon.g:543:1: variadicVariable returns [Variable variable] : compilerAnnotations ( unionType )? ( PRODUCT_OP ) ( memberName )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:560:1: variadicVariable returns [Variable variable] : compilerAnnotations ( unionType )? ( PRODUCT_OP ) ( memberName )? ;
     public Variable variadicVariable() throws RecognitionException {
         Variable variable = null;
 
@@ -3821,8 +3840,8 @@ public class CeylonParser extends Parser {
          variable = new Variable(null); 
                     Type t = new ValueModifier(null); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:546:5: ( compilerAnnotations ( unionType )? ( PRODUCT_OP ) ( memberName )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:546:7: compilerAnnotations ( unionType )? ( PRODUCT_OP ) ( memberName )?
+            // /home/david/git/ceylon-spec/Ceylon.g:563:5: ( compilerAnnotations ( unionType )? ( PRODUCT_OP ) ( memberName )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:563:7: compilerAnnotations ( unionType )? ( PRODUCT_OP ) ( memberName )?
             {
             pushFollow(FOLLOW_compilerAnnotations_in_variadicVariable3452);
             compilerAnnotations77=compilerAnnotations();
@@ -3832,7 +3851,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { variable.getCompilerAnnotations().addAll(compilerAnnotations77); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:548:7: ( unionType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:565:7: ( unionType )?
             int alt40=2;
             int LA40_0 = input.LA(1);
 
@@ -3841,7 +3860,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt40) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:549:9: unionType
+                    // /home/david/git/ceylon-spec/Ceylon.g:566:9: unionType
                     {
                     pushFollow(FOLLOW_unionType_in_variadicVariable3478);
                     unionType78=unionType();
@@ -3857,8 +3876,8 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:552:7: ( PRODUCT_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:553:9: PRODUCT_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:569:7: ( PRODUCT_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:570:9: PRODUCT_OP
             {
             PRODUCT_OP79=(Token)match(input,PRODUCT_OP,FOLLOW_PRODUCT_OP_in_variadicVariable3515); if (state.failed) return variable;
 
@@ -3870,7 +3889,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:565:7: ( memberName )?
+            // /home/david/git/ceylon-spec/Ceylon.g:582:7: ( memberName )?
             int alt41=2;
             int LA41_0 = input.LA(1);
 
@@ -3879,7 +3898,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt41) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:566:9: memberName
+                    // /home/david/git/ceylon-spec/Ceylon.g:583:9: memberName
                     {
                     pushFollow(FOLLOW_memberName_in_variadicVariable3559);
                     memberName80=memberName();
@@ -3913,7 +3932,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "keyItemPattern"
-    // /home/david/git/ceylon-spec/Ceylon.g:571:1: keyItemPattern returns [KeyValuePattern pattern] : v1= variableOrTuplePattern ENTRY_OP (v2= variableOrTuplePattern )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:588:1: keyItemPattern returns [KeyValuePattern pattern] : v1= variableOrTuplePattern ENTRY_OP (v2= variableOrTuplePattern )? ;
     public KeyValuePattern keyItemPattern() throws RecognitionException {
         KeyValuePattern pattern = null;
 
@@ -3925,8 +3944,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:572:5: (v1= variableOrTuplePattern ENTRY_OP (v2= variableOrTuplePattern )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:572:7: v1= variableOrTuplePattern ENTRY_OP (v2= variableOrTuplePattern )?
+            // /home/david/git/ceylon-spec/Ceylon.g:589:5: (v1= variableOrTuplePattern ENTRY_OP (v2= variableOrTuplePattern )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:589:7: v1= variableOrTuplePattern ENTRY_OP (v2= variableOrTuplePattern )?
             {
             pushFollow(FOLLOW_variableOrTuplePattern_in_keyItemPattern3601);
             v1=variableOrTuplePattern();
@@ -3941,7 +3960,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { pattern.setEndToken(ENTRY_OP81); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:577:7: (v2= variableOrTuplePattern )?
+            // /home/david/git/ceylon-spec/Ceylon.g:594:7: (v2= variableOrTuplePattern )?
             int alt42=2;
             int LA42_0 = input.LA(1);
 
@@ -3950,7 +3969,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt42) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:578:9: v2= variableOrTuplePattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:595:9: v2= variableOrTuplePattern
                     {
                     pushFollow(FOLLOW_variableOrTuplePattern_in_keyItemPattern3645);
                     v2=variableOrTuplePattern();
@@ -3985,7 +4004,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "destructure"
-    // /home/david/git/ceylon-spec/Ceylon.g:584:1: destructure returns [Destructure destructure] : VALUE_MODIFIER tupleOrEntryPattern ( specifier )? SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:601:1: destructure returns [Destructure destructure] : VALUE_MODIFIER tupleOrEntryPattern ( specifier )? SEMICOLON ;
     public Destructure destructure() throws RecognitionException {
         Destructure destructure = null;
 
@@ -3998,8 +4017,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:585:5: ( VALUE_MODIFIER tupleOrEntryPattern ( specifier )? SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:585:7: VALUE_MODIFIER tupleOrEntryPattern ( specifier )? SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:602:5: ( VALUE_MODIFIER tupleOrEntryPattern ( specifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:602:7: VALUE_MODIFIER tupleOrEntryPattern ( specifier )? SEMICOLON
             {
             VALUE_MODIFIER82=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_destructure3685); if (state.failed) return destructure;
 
@@ -4015,7 +4034,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { destructure.setPattern(tupleOrEntryPattern83); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:591:7: ( specifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:608:7: ( specifier )?
             int alt43=2;
             int LA43_0 = input.LA(1);
 
@@ -4024,7 +4043,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt43) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:592:9: specifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:609:9: specifier
                     {
                     pushFollow(FOLLOW_specifier_in_destructure3727);
                     specifier84=specifier();
@@ -4065,7 +4084,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "inferredAttributeDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:601:1: inferredAttributeDeclaration returns [AnyAttribute declaration] : VALUE_MODIFIER memberNameDeclaration ( ( specifier | lazySpecifier )? SEMICOLON | block ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:618:1: inferredAttributeDeclaration returns [AnyAttribute declaration] : VALUE_MODIFIER memberNameDeclaration ( ( specifier | lazySpecifier )? SEMICOLON | block ) ;
     public AnyAttribute inferredAttributeDeclaration() throws RecognitionException {
         AnyAttribute declaration = null;
 
@@ -4084,8 +4103,8 @@ public class CeylonParser extends Parser {
          AttributeGetterDefinition def=null;
                     AttributeDeclaration dec=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:604:5: ( VALUE_MODIFIER memberNameDeclaration ( ( specifier | lazySpecifier )? SEMICOLON | block ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:604:7: VALUE_MODIFIER memberNameDeclaration ( ( specifier | lazySpecifier )? SEMICOLON | block )
+            // /home/david/git/ceylon-spec/Ceylon.g:621:5: ( VALUE_MODIFIER memberNameDeclaration ( ( specifier | lazySpecifier )? SEMICOLON | block ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:621:7: VALUE_MODIFIER memberNameDeclaration ( ( specifier | lazySpecifier )? SEMICOLON | block )
             {
             VALUE_MODIFIER86=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_inferredAttributeDeclaration3802); if (state.failed) return declaration;
 
@@ -4105,7 +4124,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { dec.setIdentifier(memberNameDeclaration87); 
                     def.setIdentifier(memberNameDeclaration87); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:614:7: ( ( specifier | lazySpecifier )? SEMICOLON | block )
+            // /home/david/git/ceylon-spec/Ceylon.g:631:7: ( ( specifier | lazySpecifier )? SEMICOLON | block )
             int alt45=2;
             int LA45_0 = input.LA(1);
 
@@ -4125,9 +4144,9 @@ public class CeylonParser extends Parser {
             }
             switch (alt45) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:615:9: ( specifier | lazySpecifier )? SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:632:9: ( specifier | lazySpecifier )? SEMICOLON
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:615:9: ( specifier | lazySpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:632:9: ( specifier | lazySpecifier )?
                     int alt44=3;
                     int LA44_0 = input.LA(1);
 
@@ -4139,7 +4158,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt44) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:616:11: specifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:633:11: specifier
                             {
                             pushFollow(FOLLOW_specifier_in_inferredAttributeDeclaration3858);
                             specifier88=specifier();
@@ -4152,7 +4171,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:619:11: lazySpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:636:11: lazySpecifier
                             {
                             pushFollow(FOLLOW_lazySpecifier_in_inferredAttributeDeclaration3893);
                             lazySpecifier89=lazySpecifier();
@@ -4178,7 +4197,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:627:9: block
+                    // /home/david/git/ceylon-spec/Ceylon.g:644:9: block
                     {
                     if ( state.backtracking==0 ) { declaration = def; }
 
@@ -4214,7 +4233,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typedMethodOrAttributeDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:633:1: typedMethodOrAttributeDeclaration returns [TypedDeclaration declaration] : ( variadicType | DYNAMIC ) memberNameDeclaration ( ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON ) | (as= specifier |ac= lazySpecifier )? s2= SEMICOLON |b2= block ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:650:1: typedMethodOrAttributeDeclaration returns [TypedDeclaration declaration] : ( variadicType | DYNAMIC ) memberNameDeclaration ( ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON ) | (as= specifier |ac= lazySpecifier )? s2= SEMICOLON |b2= block ) ;
     public TypedDeclaration typedMethodOrAttributeDeclaration() throws RecognitionException {
         TypedDeclaration declaration = null;
 
@@ -4249,10 +4268,10 @@ public class CeylonParser extends Parser {
                     MethodDeclaration mdec=new MethodDeclaration(null); 
                     declaration = adec; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:639:5: ( ( variadicType | DYNAMIC ) memberNameDeclaration ( ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON ) | (as= specifier |ac= lazySpecifier )? s2= SEMICOLON |b2= block ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:639:7: ( variadicType | DYNAMIC ) memberNameDeclaration ( ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON ) | (as= specifier |ac= lazySpecifier )? s2= SEMICOLON |b2= block )
+            // /home/david/git/ceylon-spec/Ceylon.g:656:5: ( ( variadicType | DYNAMIC ) memberNameDeclaration ( ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON ) | (as= specifier |ac= lazySpecifier )? s2= SEMICOLON |b2= block ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:656:7: ( variadicType | DYNAMIC ) memberNameDeclaration ( ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON ) | (as= specifier |ac= lazySpecifier )? s2= SEMICOLON |b2= block )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:639:7: ( variadicType | DYNAMIC )
+            // /home/david/git/ceylon-spec/Ceylon.g:656:7: ( variadicType | DYNAMIC )
             int alt46=2;
             int LA46_0 = input.LA(1);
 
@@ -4272,7 +4291,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt46) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:639:9: variadicType
+                    // /home/david/git/ceylon-spec/Ceylon.g:656:9: variadicType
                     {
                     pushFollow(FOLLOW_variadicType_in_typedMethodOrAttributeDeclaration4025);
                     variadicType92=variadicType();
@@ -4288,7 +4307,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:644:9: DYNAMIC
+                    // /home/david/git/ceylon-spec/Ceylon.g:661:9: DYNAMIC
                     {
                     DYNAMIC93=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_typedMethodOrAttributeDeclaration4045); if (state.failed) return declaration;
 
@@ -4315,7 +4334,7 @@ public class CeylonParser extends Parser {
                     mdef.setIdentifier(memberNameDeclaration94);
                     mdec.setIdentifier(memberNameDeclaration94); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:656:7: ( ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON ) | (as= specifier |ac= lazySpecifier )? s2= SEMICOLON |b2= block )
+            // /home/david/git/ceylon-spec/Ceylon.g:673:7: ( ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON ) | (as= specifier |ac= lazySpecifier )? s2= SEMICOLON |b2= block )
             int alt53=3;
             switch ( input.LA(1) ) {
             case LPAREN:
@@ -4347,11 +4366,11 @@ public class CeylonParser extends Parser {
 
             switch (alt53) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:657:9: ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON )
+                    // /home/david/git/ceylon-spec/Ceylon.g:674:9: ( typeParameters )? ( parameters )+ ( typeConstraints )? (b1= block | (ms= functionSpecifier )? s1= SEMICOLON )
                     {
                     if ( state.backtracking==0 ) { declaration = mdec; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:658:9: ( typeParameters )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:675:9: ( typeParameters )?
                     int alt47=2;
                     int LA47_0 = input.LA(1);
 
@@ -4360,7 +4379,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt47) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:659:11: typeParameters
+                            // /home/david/git/ceylon-spec/Ceylon.g:676:11: typeParameters
                             {
                             pushFollow(FOLLOW_typeParameters_in_typedMethodOrAttributeDeclaration4120);
                             typeParameters95=typeParameters();
@@ -4377,7 +4396,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:663:9: ( parameters )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:680:9: ( parameters )+
                     int cnt48=0;
                     loop48:
                     do {
@@ -4391,7 +4410,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt48) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:664:11: parameters
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:681:11: parameters
                     	    {
                     	    pushFollow(FOLLOW_parameters_in_typedMethodOrAttributeDeclaration4165);
                     	    parameters96=parameters();
@@ -4416,7 +4435,7 @@ public class CeylonParser extends Parser {
                     } while (true);
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:669:9: ( typeConstraints )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:686:9: ( typeConstraints )?
                     int alt49=2;
                     int LA49_0 = input.LA(1);
 
@@ -4425,7 +4444,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt49) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:670:11: typeConstraints
+                            // /home/david/git/ceylon-spec/Ceylon.g:687:11: typeConstraints
                             {
                             pushFollow(FOLLOW_typeConstraints_in_typedMethodOrAttributeDeclaration4220);
                             typeConstraints97=typeConstraints();
@@ -4442,7 +4461,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:674:9: (b1= block | (ms= functionSpecifier )? s1= SEMICOLON )
+                    // /home/david/git/ceylon-spec/Ceylon.g:691:9: (b1= block | (ms= functionSpecifier )? s1= SEMICOLON )
                     int alt51=2;
                     int LA51_0 = input.LA(1);
 
@@ -4462,7 +4481,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt51) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:675:11: b1= block
+                            // /home/david/git/ceylon-spec/Ceylon.g:692:11: b1= block
                             {
                             if ( state.backtracking==0 ) { declaration = mdef; }
 
@@ -4477,9 +4496,9 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:679:11: (ms= functionSpecifier )? s1= SEMICOLON
+                            // /home/david/git/ceylon-spec/Ceylon.g:696:11: (ms= functionSpecifier )? s1= SEMICOLON
                             {
-                            // /home/david/git/ceylon-spec/Ceylon.g:679:11: (ms= functionSpecifier )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:696:11: (ms= functionSpecifier )?
                             int alt50=2;
                             int LA50_0 = input.LA(1);
 
@@ -4488,7 +4507,7 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt50) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:680:13: ms= functionSpecifier
+                                    // /home/david/git/ceylon-spec/Ceylon.g:697:13: ms= functionSpecifier
                                     {
                                     pushFollow(FOLLOW_functionSpecifier_in_typedMethodOrAttributeDeclaration4330);
                                     ms=functionSpecifier();
@@ -4520,9 +4539,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:689:9: (as= specifier |ac= lazySpecifier )? s2= SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:706:9: (as= specifier |ac= lazySpecifier )? s2= SEMICOLON
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:689:9: (as= specifier |ac= lazySpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:706:9: (as= specifier |ac= lazySpecifier )?
                     int alt52=3;
                     int LA52_0 = input.LA(1);
 
@@ -4534,7 +4553,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt52) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:690:11: as= specifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:707:11: as= specifier
                             {
                             pushFollow(FOLLOW_specifier_in_typedMethodOrAttributeDeclaration4437);
                             as=specifier();
@@ -4547,7 +4566,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:693:11: ac= lazySpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:710:11: ac= lazySpecifier
                             {
                             pushFollow(FOLLOW_lazySpecifier_in_typedMethodOrAttributeDeclaration4475);
                             ac=lazySpecifier();
@@ -4573,7 +4592,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:701:9: b2= block
+                    // /home/david/git/ceylon-spec/Ceylon.g:718:9: b2= block
                     {
                     if ( state.backtracking==0 ) { declaration = adef; }
 
@@ -4609,7 +4628,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "interfaceDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:707:1: interfaceDeclaration returns [AnyInterface declaration] : ( INTERFACE_DEFINITION | DYNAMIC ) typeNameDeclaration ( typeParameters )? ( caseTypes )? ( satisfiedTypes )? ( typeConstraints )? ( interfaceBody | ( typeSpecifier )? SEMICOLON ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:724:1: interfaceDeclaration returns [AnyInterface declaration] : ( INTERFACE_DEFINITION | DYNAMIC ) typeNameDeclaration ( typeParameters )? ( caseTypes )? ( satisfiedTypes )? ( typeConstraints )? ( interfaceBody | ( typeSpecifier )? SEMICOLON ) ;
     public AnyInterface interfaceDeclaration() throws RecognitionException {
         AnyInterface declaration = null;
 
@@ -4635,10 +4654,10 @@ public class CeylonParser extends Parser {
          InterfaceDefinition def=null; 
                     InterfaceDeclaration dec=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:710:5: ( ( INTERFACE_DEFINITION | DYNAMIC ) typeNameDeclaration ( typeParameters )? ( caseTypes )? ( satisfiedTypes )? ( typeConstraints )? ( interfaceBody | ( typeSpecifier )? SEMICOLON ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:710:7: ( INTERFACE_DEFINITION | DYNAMIC ) typeNameDeclaration ( typeParameters )? ( caseTypes )? ( satisfiedTypes )? ( typeConstraints )? ( interfaceBody | ( typeSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:727:5: ( ( INTERFACE_DEFINITION | DYNAMIC ) typeNameDeclaration ( typeParameters )? ( caseTypes )? ( satisfiedTypes )? ( typeConstraints )? ( interfaceBody | ( typeSpecifier )? SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:727:7: ( INTERFACE_DEFINITION | DYNAMIC ) typeNameDeclaration ( typeParameters )? ( caseTypes )? ( satisfiedTypes )? ( typeConstraints )? ( interfaceBody | ( typeSpecifier )? SEMICOLON )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:710:7: ( INTERFACE_DEFINITION | DYNAMIC )
+            // /home/david/git/ceylon-spec/Ceylon.g:727:7: ( INTERFACE_DEFINITION | DYNAMIC )
             int alt54=2;
             int LA54_0 = input.LA(1);
 
@@ -4658,7 +4677,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt54) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:711:9: INTERFACE_DEFINITION
+                    // /home/david/git/ceylon-spec/Ceylon.g:728:9: INTERFACE_DEFINITION
                     {
                     INTERFACE_DEFINITION98=(Token)match(input,INTERFACE_DEFINITION,FOLLOW_INTERFACE_DEFINITION_in_interfaceDeclaration4621); if (state.failed) return declaration;
 
@@ -4669,7 +4688,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:716:9: DYNAMIC
+                    // /home/david/git/ceylon-spec/Ceylon.g:733:9: DYNAMIC
                     {
                     DYNAMIC99=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_interfaceDeclaration4650); if (state.failed) return declaration;
 
@@ -4693,7 +4712,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { dec.setIdentifier(typeNameDeclaration100); 
                     def.setIdentifier(typeNameDeclaration100); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:725:7: ( typeParameters )?
+            // /home/david/git/ceylon-spec/Ceylon.g:742:7: ( typeParameters )?
             int alt55=2;
             int LA55_0 = input.LA(1);
 
@@ -4702,7 +4721,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt55) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:726:9: typeParameters
+                    // /home/david/git/ceylon-spec/Ceylon.g:743:9: typeParameters
                     {
                     pushFollow(FOLLOW_typeParameters_in_interfaceDeclaration4703);
                     typeParameters101=typeParameters();
@@ -4719,7 +4738,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:730:7: ( caseTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:747:7: ( caseTypes )?
             int alt56=2;
             int LA56_0 = input.LA(1);
 
@@ -4728,7 +4747,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt56) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:731:9: caseTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:748:9: caseTypes
                     {
                     pushFollow(FOLLOW_caseTypes_in_interfaceDeclaration4741);
                     caseTypes102=caseTypes();
@@ -4745,7 +4764,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:740:7: ( satisfiedTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:757:7: ( satisfiedTypes )?
             int alt57=2;
             int LA57_0 = input.LA(1);
 
@@ -4754,7 +4773,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt57) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:741:9: satisfiedTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:758:9: satisfiedTypes
                     {
                     pushFollow(FOLLOW_satisfiedTypes_in_interfaceDeclaration4795);
                     satisfiedTypes103=satisfiedTypes();
@@ -4771,7 +4790,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:745:7: ( typeConstraints )?
+            // /home/david/git/ceylon-spec/Ceylon.g:762:7: ( typeConstraints )?
             int alt58=2;
             int LA58_0 = input.LA(1);
 
@@ -4780,7 +4799,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt58) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:746:9: typeConstraints
+                    // /home/david/git/ceylon-spec/Ceylon.g:763:9: typeConstraints
                     {
                     pushFollow(FOLLOW_typeConstraints_in_interfaceDeclaration4832);
                     typeConstraints104=typeConstraints();
@@ -4797,7 +4816,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:750:7: ( interfaceBody | ( typeSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:767:7: ( interfaceBody | ( typeSpecifier )? SEMICOLON )
             int alt60=2;
             int LA60_0 = input.LA(1);
 
@@ -4817,7 +4836,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt60) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:751:9: interfaceBody
+                    // /home/david/git/ceylon-spec/Ceylon.g:768:9: interfaceBody
                     {
                     if ( state.backtracking==0 ) { declaration = def; }
 
@@ -4832,9 +4851,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:755:9: ( typeSpecifier )? SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:772:9: ( typeSpecifier )? SEMICOLON
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:755:9: ( typeSpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:772:9: ( typeSpecifier )?
                     int alt59=2;
                     int LA59_0 = input.LA(1);
 
@@ -4843,7 +4862,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt59) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:756:11: typeSpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:773:11: typeSpecifier
                             {
                             pushFollow(FOLLOW_typeSpecifier_in_interfaceDeclaration4920);
                             typeSpecifier106=typeSpecifier();
@@ -4890,7 +4909,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "classDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:766:1: classDeclaration returns [AnyClass declaration] : CLASS_DEFINITION typeNameDeclaration ( typeParameters )? ( parameters )? ( caseTypes )? ( extendedType )? ( satisfiedTypes )? ( typeConstraints )? ( classBody | ( classSpecifier )? SEMICOLON ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:783:1: classDeclaration returns [AnyClass declaration] : CLASS_DEFINITION typeNameDeclaration ( typeParameters )? ( parameters )? ( caseTypes )? ( extendedType )? ( satisfiedTypes )? ( typeConstraints )? ( classBody | ( classSpecifier )? SEMICOLON ) ;
     public AnyClass classDeclaration() throws RecognitionException {
         AnyClass declaration = null;
 
@@ -4919,8 +4938,8 @@ public class CeylonParser extends Parser {
          ClassDefinition def=null; 
                     ClassDeclaration dec=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:769:5: ( CLASS_DEFINITION typeNameDeclaration ( typeParameters )? ( parameters )? ( caseTypes )? ( extendedType )? ( satisfiedTypes )? ( typeConstraints )? ( classBody | ( classSpecifier )? SEMICOLON ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:769:7: CLASS_DEFINITION typeNameDeclaration ( typeParameters )? ( parameters )? ( caseTypes )? ( extendedType )? ( satisfiedTypes )? ( typeConstraints )? ( classBody | ( classSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:786:5: ( CLASS_DEFINITION typeNameDeclaration ( typeParameters )? ( parameters )? ( caseTypes )? ( extendedType )? ( satisfiedTypes )? ( typeConstraints )? ( classBody | ( classSpecifier )? SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:786:7: CLASS_DEFINITION typeNameDeclaration ( typeParameters )? ( parameters )? ( caseTypes )? ( extendedType )? ( satisfiedTypes )? ( typeConstraints )? ( classBody | ( classSpecifier )? SEMICOLON )
             {
             CLASS_DEFINITION108=(Token)match(input,CLASS_DEFINITION,FOLLOW_CLASS_DEFINITION_in_classDeclaration5012); if (state.failed) return declaration;
 
@@ -4937,7 +4956,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { dec.setIdentifier(typeNameDeclaration109); 
                     def.setIdentifier(typeNameDeclaration109); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:776:7: ( typeParameters )?
+            // /home/david/git/ceylon-spec/Ceylon.g:793:7: ( typeParameters )?
             int alt61=2;
             int LA61_0 = input.LA(1);
 
@@ -4946,7 +4965,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt61) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:777:9: typeParameters
+                    // /home/david/git/ceylon-spec/Ceylon.g:794:9: typeParameters
                     {
                     pushFollow(FOLLOW_typeParameters_in_classDeclaration5055);
                     typeParameters110=typeParameters();
@@ -4963,7 +4982,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:781:7: ( parameters )?
+            // /home/david/git/ceylon-spec/Ceylon.g:798:7: ( parameters )?
             int alt62=2;
             int LA62_0 = input.LA(1);
 
@@ -4972,7 +4991,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt62) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:782:9: parameters
+                    // /home/david/git/ceylon-spec/Ceylon.g:799:9: parameters
                     {
                     pushFollow(FOLLOW_parameters_in_classDeclaration5092);
                     parameters111=parameters();
@@ -4989,7 +5008,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:786:7: ( caseTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:803:7: ( caseTypes )?
             int alt63=2;
             int LA63_0 = input.LA(1);
 
@@ -4998,7 +5017,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt63) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:787:9: caseTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:804:9: caseTypes
                     {
                     pushFollow(FOLLOW_caseTypes_in_classDeclaration5129);
                     caseTypes112=caseTypes();
@@ -5015,7 +5034,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:792:7: ( extendedType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:809:7: ( extendedType )?
             int alt64=2;
             int LA64_0 = input.LA(1);
 
@@ -5024,7 +5043,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt64) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:793:9: extendedType
+                    // /home/david/git/ceylon-spec/Ceylon.g:810:9: extendedType
                     {
                     pushFollow(FOLLOW_extendedType_in_classDeclaration5175);
                     extendedType113=extendedType();
@@ -5041,7 +5060,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:797:7: ( satisfiedTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:814:7: ( satisfiedTypes )?
             int alt65=2;
             int LA65_0 = input.LA(1);
 
@@ -5050,7 +5069,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt65) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:798:9: satisfiedTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:815:9: satisfiedTypes
                     {
                     pushFollow(FOLLOW_satisfiedTypes_in_classDeclaration5213);
                     satisfiedTypes114=satisfiedTypes();
@@ -5067,7 +5086,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:802:7: ( typeConstraints )?
+            // /home/david/git/ceylon-spec/Ceylon.g:819:7: ( typeConstraints )?
             int alt66=2;
             int LA66_0 = input.LA(1);
 
@@ -5076,7 +5095,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt66) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:803:9: typeConstraints
+                    // /home/david/git/ceylon-spec/Ceylon.g:820:9: typeConstraints
                     {
                     pushFollow(FOLLOW_typeConstraints_in_classDeclaration5250);
                     typeConstraints115=typeConstraints();
@@ -5093,7 +5112,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:807:7: ( classBody | ( classSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:824:7: ( classBody | ( classSpecifier )? SEMICOLON )
             int alt68=2;
             int LA68_0 = input.LA(1);
 
@@ -5113,7 +5132,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt68) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:808:9: classBody
+                    // /home/david/git/ceylon-spec/Ceylon.g:825:9: classBody
                     {
                     if ( state.backtracking==0 ) { declaration = def; }
 
@@ -5128,9 +5147,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:812:9: ( classSpecifier )? SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:829:9: ( classSpecifier )? SEMICOLON
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:812:9: ( classSpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:829:9: ( classSpecifier )?
                     int alt67=2;
                     int LA67_0 = input.LA(1);
 
@@ -5139,7 +5158,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt67) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:813:11: classSpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:830:11: classSpecifier
                             {
                             pushFollow(FOLLOW_classSpecifier_in_classDeclaration5338);
                             classSpecifier117=classSpecifier();
@@ -5186,7 +5205,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "constructor"
-    // /home/david/git/ceylon-spec/Ceylon.g:823:1: constructor returns [Constructor declaration] : NEW typeNameDeclaration ( parameters )? (dc= delegatedConstructor )? block ;
+    // /home/david/git/ceylon-spec/Ceylon.g:840:1: constructor returns [Constructor declaration] : NEW typeNameDeclaration ( parameters )? (dc= delegatedConstructor )? block ;
     public Constructor constructor() throws RecognitionException {
         Constructor declaration = null;
 
@@ -5202,8 +5221,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:824:5: ( NEW typeNameDeclaration ( parameters )? (dc= delegatedConstructor )? block )
-            // /home/david/git/ceylon-spec/Ceylon.g:824:7: NEW typeNameDeclaration ( parameters )? (dc= delegatedConstructor )? block
+            // /home/david/git/ceylon-spec/Ceylon.g:841:5: ( NEW typeNameDeclaration ( parameters )? (dc= delegatedConstructor )? block )
+            // /home/david/git/ceylon-spec/Ceylon.g:841:7: NEW typeNameDeclaration ( parameters )? (dc= delegatedConstructor )? block
             {
             NEW119=(Token)match(input,NEW,FOLLOW_NEW_in_constructor5420); if (state.failed) return declaration;
 
@@ -5217,7 +5236,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { declaration.setIdentifier(typeNameDeclaration120); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:828:7: ( parameters )?
+            // /home/david/git/ceylon-spec/Ceylon.g:845:7: ( parameters )?
             int alt69=2;
             int LA69_0 = input.LA(1);
 
@@ -5226,7 +5245,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt69) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:829:9: parameters
+                    // /home/david/git/ceylon-spec/Ceylon.g:846:9: parameters
                     {
                     pushFollow(FOLLOW_parameters_in_constructor5462);
                     parameters121=parameters();
@@ -5242,7 +5261,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:832:7: (dc= delegatedConstructor )?
+            // /home/david/git/ceylon-spec/Ceylon.g:849:7: (dc= delegatedConstructor )?
             int alt70=2;
             int LA70_0 = input.LA(1);
 
@@ -5251,7 +5270,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt70) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:833:9: dc= delegatedConstructor
+                    // /home/david/git/ceylon-spec/Ceylon.g:850:9: dc= delegatedConstructor
                     {
                     pushFollow(FOLLOW_delegatedConstructor_in_constructor5503);
                     dc=delegatedConstructor();
@@ -5293,25 +5312,25 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "delegatedConstructor"
-    // /home/david/git/ceylon-spec/Ceylon.g:840:1: delegatedConstructor returns [DelegatedConstructor delegatedConstructor] : EXTENDS (ci= classInstantiation ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:857:1: delegatedConstructor returns [DelegatedConstructor delegatedConstructor] : EXTENDS (ci= classInstantiation ) ;
     public DelegatedConstructor delegatedConstructor() throws RecognitionException {
         DelegatedConstructor delegatedConstructor = null;
 
 
         Token EXTENDS123=null;
-        CeylonParser.classInstantiation_return ci =null;
+        PsiCompatibleCeylonParser.classInstantiation_return ci =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:841:5: ( EXTENDS (ci= classInstantiation ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:841:7: EXTENDS (ci= classInstantiation )
+            // /home/david/git/ceylon-spec/Ceylon.g:858:5: ( EXTENDS (ci= classInstantiation ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:858:7: EXTENDS (ci= classInstantiation )
             {
             EXTENDS123=(Token)match(input,EXTENDS,FOLLOW_EXTENDS_in_delegatedConstructor5559); if (state.failed) return delegatedConstructor;
 
             if ( state.backtracking==0 ) { delegatedConstructor = new DelegatedConstructor(EXTENDS123); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:843:7: (ci= classInstantiation )
-            // /home/david/git/ceylon-spec/Ceylon.g:844:9: ci= classInstantiation
+            // /home/david/git/ceylon-spec/Ceylon.g:860:7: (ci= classInstantiation )
+            // /home/david/git/ceylon-spec/Ceylon.g:861:9: ci= classInstantiation
             {
             pushFollow(FOLLOW_classInstantiation_in_delegatedConstructor5587);
             ci=classInstantiation();
@@ -5343,7 +5362,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "aliasDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:850:1: aliasDeclaration returns [TypeAliasDeclaration declaration] : ALIAS typeNameDeclaration ( typeParameters )? ( typeConstraints )? ( typeSpecifier )? SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:867:1: aliasDeclaration returns [TypeAliasDeclaration declaration] : ALIAS typeNameDeclaration ( typeParameters )? ( typeConstraints )? ( typeSpecifier )? SEMICOLON ;
     public TypeAliasDeclaration aliasDeclaration() throws RecognitionException {
         TypeAliasDeclaration declaration = null;
 
@@ -5360,8 +5379,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:851:5: ( ALIAS typeNameDeclaration ( typeParameters )? ( typeConstraints )? ( typeSpecifier )? SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:851:7: ALIAS typeNameDeclaration ( typeParameters )? ( typeConstraints )? ( typeSpecifier )? SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:868:5: ( ALIAS typeNameDeclaration ( typeParameters )? ( typeConstraints )? ( typeSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:868:7: ALIAS typeNameDeclaration ( typeParameters )? ( typeConstraints )? ( typeSpecifier )? SEMICOLON
             {
             ALIAS124=(Token)match(input,ALIAS,FOLLOW_ALIAS_in_aliasDeclaration5626); if (state.failed) return declaration;
 
@@ -5375,7 +5394,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { declaration.setIdentifier(typeNameDeclaration125); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:855:7: ( typeParameters )?
+            // /home/david/git/ceylon-spec/Ceylon.g:872:7: ( typeParameters )?
             int alt71=2;
             int LA71_0 = input.LA(1);
 
@@ -5384,7 +5403,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt71) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:856:9: typeParameters
+                    // /home/david/git/ceylon-spec/Ceylon.g:873:9: typeParameters
                     {
                     pushFollow(FOLLOW_typeParameters_in_aliasDeclaration5669);
                     typeParameters126=typeParameters();
@@ -5400,7 +5419,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:859:7: ( typeConstraints )?
+            // /home/david/git/ceylon-spec/Ceylon.g:876:7: ( typeConstraints )?
             int alt72=2;
             int LA72_0 = input.LA(1);
 
@@ -5409,7 +5428,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt72) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:860:9: typeConstraints
+                    // /home/david/git/ceylon-spec/Ceylon.g:877:9: typeConstraints
                     {
                     pushFollow(FOLLOW_typeConstraints_in_aliasDeclaration5707);
                     typeConstraints127=typeConstraints();
@@ -5425,7 +5444,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:863:7: ( typeSpecifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:880:7: ( typeSpecifier )?
             int alt73=2;
             int LA73_0 = input.LA(1);
 
@@ -5434,7 +5453,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt73) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:864:9: typeSpecifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:881:9: typeSpecifier
                     {
                     pushFollow(FOLLOW_typeSpecifier_in_aliasDeclaration5744);
                     typeSpecifier128=typeSpecifier();
@@ -5475,7 +5494,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "assertion"
-    // /home/david/git/ceylon-spec/Ceylon.g:873:1: assertion returns [Assertion assertion] : annotations ASSERT conditions SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:890:1: assertion returns [Assertion assertion] : annotations ASSERT conditions SEMICOLON ;
     public Assertion assertion() throws RecognitionException {
         Assertion assertion = null;
 
@@ -5488,8 +5507,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:874:5: ( annotations ASSERT conditions SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:874:7: annotations ASSERT conditions SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:891:5: ( annotations ASSERT conditions SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:891:7: annotations ASSERT conditions SEMICOLON
             {
             pushFollow(FOLLOW_annotations_in_assertion5808);
             annotations131=annotations();
@@ -5535,7 +5554,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "block"
-    // /home/david/git/ceylon-spec/Ceylon.g:886:1: block returns [Block block] : LBRACE ( declarationOrStatement )* RBRACE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:903:1: block returns [Block block] : LBRACE ( declarationOrStatement )* RBRACE ;
     public Block block() throws RecognitionException {
         Block block = null;
 
@@ -5546,14 +5565,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:887:5: ( LBRACE ( declarationOrStatement )* RBRACE )
-            // /home/david/git/ceylon-spec/Ceylon.g:887:7: LBRACE ( declarationOrStatement )* RBRACE
+            // /home/david/git/ceylon-spec/Ceylon.g:904:5: ( LBRACE ( declarationOrStatement )* RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:904:7: LBRACE ( declarationOrStatement )* RBRACE
             {
             LBRACE134=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_block5885); if (state.failed) return block;
 
             if ( state.backtracking==0 ) { block = new Block(LBRACE134); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:889:7: ( declarationOrStatement )*
+            // /home/david/git/ceylon-spec/Ceylon.g:906:7: ( declarationOrStatement )*
             loop74:
             do {
                 int alt74=2;
@@ -5566,7 +5585,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt74) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:890:9: declarationOrStatement
+            	    // /home/david/git/ceylon-spec/Ceylon.g:907:9: declarationOrStatement
             	    {
             	    pushFollow(FOLLOW_declarationOrStatement_in_block5912);
             	    declarationOrStatement135=declarationOrStatement();
@@ -5608,7 +5627,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "interfaceBody"
-    // /home/david/git/ceylon-spec/Ceylon.g:902:1: interfaceBody returns [InterfaceBody interfaceBody] : LBRACE ( declarationOrStatement )* RBRACE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:919:1: interfaceBody returns [InterfaceBody interfaceBody] : LBRACE ( declarationOrStatement )* RBRACE ;
     public InterfaceBody interfaceBody() throws RecognitionException {
         InterfaceBody interfaceBody = null;
 
@@ -5619,14 +5638,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:903:5: ( LBRACE ( declarationOrStatement )* RBRACE )
-            // /home/david/git/ceylon-spec/Ceylon.g:903:7: LBRACE ( declarationOrStatement )* RBRACE
+            // /home/david/git/ceylon-spec/Ceylon.g:920:5: ( LBRACE ( declarationOrStatement )* RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:920:7: LBRACE ( declarationOrStatement )* RBRACE
             {
             LBRACE137=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_interfaceBody5972); if (state.failed) return interfaceBody;
 
             if ( state.backtracking==0 ) { interfaceBody = new InterfaceBody(LBRACE137); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:905:7: ( declarationOrStatement )*
+            // /home/david/git/ceylon-spec/Ceylon.g:922:7: ( declarationOrStatement )*
             loop75:
             do {
                 int alt75=2;
@@ -5639,7 +5658,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt75) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:906:9: declarationOrStatement
+            	    // /home/david/git/ceylon-spec/Ceylon.g:923:9: declarationOrStatement
             	    {
             	    pushFollow(FOLLOW_declarationOrStatement_in_interfaceBody5999);
             	    declarationOrStatement138=declarationOrStatement();
@@ -5681,7 +5700,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "classBody"
-    // /home/david/git/ceylon-spec/Ceylon.g:914:1: classBody returns [ClassBody classBody] : LBRACE ( declarationOrStatement )* RBRACE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:931:1: classBody returns [ClassBody classBody] : LBRACE ( declarationOrStatement )* RBRACE ;
     public ClassBody classBody() throws RecognitionException {
         ClassBody classBody = null;
 
@@ -5692,14 +5711,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:915:5: ( LBRACE ( declarationOrStatement )* RBRACE )
-            // /home/david/git/ceylon-spec/Ceylon.g:915:7: LBRACE ( declarationOrStatement )* RBRACE
+            // /home/david/git/ceylon-spec/Ceylon.g:932:5: ( LBRACE ( declarationOrStatement )* RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:932:7: LBRACE ( declarationOrStatement )* RBRACE
             {
             LBRACE140=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_classBody6055); if (state.failed) return classBody;
 
             if ( state.backtracking==0 ) { classBody = new ClassBody(LBRACE140); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:917:7: ( declarationOrStatement )*
+            // /home/david/git/ceylon-spec/Ceylon.g:934:7: ( declarationOrStatement )*
             loop76:
             do {
                 int alt76=2;
@@ -5712,7 +5731,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt76) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:918:9: declarationOrStatement
+            	    // /home/david/git/ceylon-spec/Ceylon.g:935:9: declarationOrStatement
             	    {
             	    pushFollow(FOLLOW_declarationOrStatement_in_classBody6081);
             	    declarationOrStatement141=declarationOrStatement();
@@ -5754,24 +5773,24 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "extendedType"
-    // /home/david/git/ceylon-spec/Ceylon.g:926:1: extendedType returns [ExtendedType extendedType] : EXTENDS (ci= classInstantiation )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:943:1: extendedType returns [ExtendedType extendedType] : EXTENDS (ci= classInstantiation )? ;
     public ExtendedType extendedType() throws RecognitionException {
         ExtendedType extendedType = null;
 
 
         Token EXTENDS143=null;
-        CeylonParser.classInstantiation_return ci =null;
+        PsiCompatibleCeylonParser.classInstantiation_return ci =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:927:5: ( EXTENDS (ci= classInstantiation )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:927:7: EXTENDS (ci= classInstantiation )?
+            // /home/david/git/ceylon-spec/Ceylon.g:944:5: ( EXTENDS (ci= classInstantiation )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:944:7: EXTENDS (ci= classInstantiation )?
             {
             EXTENDS143=(Token)match(input,EXTENDS,FOLLOW_EXTENDS_in_extendedType6137); if (state.failed) return extendedType;
 
             if ( state.backtracking==0 ) { extendedType = new ExtendedType(EXTENDS143); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:928:7: (ci= classInstantiation )?
+            // /home/david/git/ceylon-spec/Ceylon.g:945:7: (ci= classInstantiation )?
             int alt77=2;
             int LA77_0 = input.LA(1);
 
@@ -5780,7 +5799,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt77) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:929:9: ci= classInstantiation
+                    // /home/david/git/ceylon-spec/Ceylon.g:946:9: ci= classInstantiation
                     {
                     pushFollow(FOLLOW_classInstantiation_in_extendedType6161);
                     ci=classInstantiation();
@@ -5815,21 +5834,21 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "classSpecifier"
-    // /home/david/git/ceylon-spec/Ceylon.g:935:1: classSpecifier returns [ClassSpecifier classSpecifier] : ( COMPUTE | SPECIFY ) (ci= classInstantiation )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:952:1: classSpecifier returns [ClassSpecifier classSpecifier] : ( COMPUTE | SPECIFY ) (ci= classInstantiation )? ;
     public ClassSpecifier classSpecifier() throws RecognitionException {
         ClassSpecifier classSpecifier = null;
 
 
         Token COMPUTE144=null;
         Token SPECIFY145=null;
-        CeylonParser.classInstantiation_return ci =null;
+        PsiCompatibleCeylonParser.classInstantiation_return ci =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:936:5: ( ( COMPUTE | SPECIFY ) (ci= classInstantiation )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:936:7: ( COMPUTE | SPECIFY ) (ci= classInstantiation )?
+            // /home/david/git/ceylon-spec/Ceylon.g:953:5: ( ( COMPUTE | SPECIFY ) (ci= classInstantiation )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:953:7: ( COMPUTE | SPECIFY ) (ci= classInstantiation )?
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:936:7: ( COMPUTE | SPECIFY )
+            // /home/david/git/ceylon-spec/Ceylon.g:953:7: ( COMPUTE | SPECIFY )
             int alt78=2;
             int LA78_0 = input.LA(1);
 
@@ -5849,7 +5868,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt78) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:937:9: COMPUTE
+                    // /home/david/git/ceylon-spec/Ceylon.g:954:9: COMPUTE
                     {
                     COMPUTE144=(Token)match(input,COMPUTE,FOLLOW_COMPUTE_in_classSpecifier6211); if (state.failed) return classSpecifier;
 
@@ -5858,7 +5877,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:940:9: SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:957:9: SPECIFY
                     {
                     SPECIFY145=(Token)match(input,SPECIFY,FOLLOW_SPECIFY_in_classSpecifier6240); if (state.failed) return classSpecifier;
 
@@ -5870,7 +5889,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:943:7: (ci= classInstantiation )?
+            // /home/david/git/ceylon-spec/Ceylon.g:960:7: (ci= classInstantiation )?
             int alt79=2;
             int LA79_0 = input.LA(1);
 
@@ -5879,7 +5898,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt79) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:944:9: ci= classInstantiation
+                    // /home/david/git/ceylon-spec/Ceylon.g:961:9: ci= classInstantiation
                     {
                     pushFollow(FOLLOW_classInstantiation_in_classSpecifier6279);
                     ci=classInstantiation();
@@ -5919,28 +5938,28 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "classInstantiation"
-    // /home/david/git/ceylon-spec/Ceylon.g:950:1: classInstantiation returns [SimpleType type, InvocationExpression invocationExpression] : (t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )? | SUPER MEMBER_OP t2= typeNameWithArguments ) ( positionalArguments )? ;
-    public CeylonParser.classInstantiation_return classInstantiation() throws RecognitionException {
-        CeylonParser.classInstantiation_return retval = new CeylonParser.classInstantiation_return();
+    // /home/david/git/ceylon-spec/Ceylon.g:967:1: classInstantiation returns [SimpleType type, InvocationExpression invocationExpression] : (t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )? | SUPER MEMBER_OP t2= typeNameWithArguments ) ( positionalArguments )? ;
+    public PsiCompatibleCeylonParser.classInstantiation_return classInstantiation() throws RecognitionException {
+        PsiCompatibleCeylonParser.classInstantiation_return retval = new PsiCompatibleCeylonParser.classInstantiation_return();
         retval.start = input.LT(1);
 
 
         Token SUPER146=null;
-        CeylonParser.typeNameWithArguments_return t1 =null;
+        PsiCompatibleCeylonParser.typeNameWithArguments_return t1 =null;
 
-        CeylonParser.typeNameWithArguments_return t3 =null;
+        PsiCompatibleCeylonParser.typeNameWithArguments_return t3 =null;
 
-        CeylonParser.typeNameWithArguments_return t2 =null;
+        PsiCompatibleCeylonParser.typeNameWithArguments_return t2 =null;
 
         PositionalArgumentList positionalArguments147 =null;
 
 
          Primary p=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:952:5: ( (t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )? | SUPER MEMBER_OP t2= typeNameWithArguments ) ( positionalArguments )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:952:7: (t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )? | SUPER MEMBER_OP t2= typeNameWithArguments ) ( positionalArguments )?
+            // /home/david/git/ceylon-spec/Ceylon.g:969:5: ( (t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )? | SUPER MEMBER_OP t2= typeNameWithArguments ) ( positionalArguments )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:969:7: (t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )? | SUPER MEMBER_OP t2= typeNameWithArguments ) ( positionalArguments )?
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:952:7: (t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )? | SUPER MEMBER_OP t2= typeNameWithArguments )
+            // /home/david/git/ceylon-spec/Ceylon.g:969:7: (t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )? | SUPER MEMBER_OP t2= typeNameWithArguments )
             int alt81=2;
             int LA81_0 = input.LA(1);
 
@@ -5960,7 +5979,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt81) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:953:9: t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:970:9: t1= typeNameWithArguments ( MEMBER_OP t3= typeNameWithArguments )?
                     {
                     pushFollow(FOLLOW_typeNameWithArguments_in_classInstantiation6340);
                     t1=typeNameWithArguments();
@@ -5977,7 +5996,7 @@ public class CeylonParser extends Parser {
                               ete.setExtendedType(retval.type); 
                               p = ete; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:962:9: ( MEMBER_OP t3= typeNameWithArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:979:9: ( MEMBER_OP t3= typeNameWithArguments )?
                     int alt80=2;
                     int LA80_0 = input.LA(1);
 
@@ -5986,7 +6005,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt80) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:963:11: MEMBER_OP t3= typeNameWithArguments
+                            // /home/david/git/ceylon-spec/Ceylon.g:980:11: MEMBER_OP t3= typeNameWithArguments
                             {
                             match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_classInstantiation6372); if (state.failed) return retval;
 
@@ -6015,7 +6034,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:975:9: SUPER MEMBER_OP t2= typeNameWithArguments
+                    // /home/david/git/ceylon-spec/Ceylon.g:992:9: SUPER MEMBER_OP t2= typeNameWithArguments
                     {
                     SUPER146=(Token)match(input,SUPER,FOLLOW_SUPER_in_classInstantiation6419); if (state.failed) return retval;
 
@@ -6044,7 +6063,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:988:7: ( positionalArguments )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1005:7: ( positionalArguments )?
             int alt82=2;
             int LA82_0 = input.LA(1);
 
@@ -6053,7 +6072,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt82) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:989:9: positionalArguments
+                    // /home/david/git/ceylon-spec/Ceylon.g:1006:9: positionalArguments
                     {
                     pushFollow(FOLLOW_positionalArguments_in_classInstantiation6471);
                     positionalArguments147=positionalArguments();
@@ -6094,7 +6113,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "satisfiedTypes"
-    // /home/david/git/ceylon-spec/Ceylon.g:1005:1: satisfiedTypes returns [SatisfiedTypes satisfiedTypes] : SATISFIES (t1= abbreviatedType ) ( (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType ) )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1022:1: satisfiedTypes returns [SatisfiedTypes satisfiedTypes] : SATISFIES (t1= abbreviatedType ) ( (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType ) )* ;
     public SatisfiedTypes satisfiedTypes() throws RecognitionException {
         SatisfiedTypes satisfiedTypes = null;
 
@@ -6107,15 +6126,15 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1006:5: ( SATISFIES (t1= abbreviatedType ) ( (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType ) )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:1006:7: SATISFIES (t1= abbreviatedType ) ( (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType ) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1023:5: ( SATISFIES (t1= abbreviatedType ) ( (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType ) )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:1023:7: SATISFIES (t1= abbreviatedType ) ( (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType ) )*
             {
             SATISFIES148=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiedTypes6521); if (state.failed) return satisfiedTypes;
 
             if ( state.backtracking==0 ) { satisfiedTypes = new SatisfiedTypes(SATISFIES148); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1008:7: (t1= abbreviatedType )
-            // /home/david/git/ceylon-spec/Ceylon.g:1009:9: t1= abbreviatedType
+            // /home/david/git/ceylon-spec/Ceylon.g:1025:7: (t1= abbreviatedType )
+            // /home/david/git/ceylon-spec/Ceylon.g:1026:9: t1= abbreviatedType
             {
             pushFollow(FOLLOW_abbreviatedType_in_satisfiedTypes6551);
             t1=abbreviatedType();
@@ -6128,7 +6147,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1012:7: ( (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType ) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1029:7: ( (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType ) )*
             loop84:
             do {
                 int alt84=2;
@@ -6141,9 +6160,9 @@ public class CeylonParser extends Parser {
 
                 switch (alt84) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1013:9: (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType )
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1030:9: (i= INTERSECTION_OP | COMMA | UNION_OP ) (t2= abbreviatedType )
             	    {
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1013:9: (i= INTERSECTION_OP | COMMA | UNION_OP )
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1030:9: (i= INTERSECTION_OP | COMMA | UNION_OP )
             	    int alt83=3;
             	    switch ( input.LA(1) ) {
             	    case INTERSECTION_OP:
@@ -6172,7 +6191,7 @@ public class CeylonParser extends Parser {
 
             	    switch (alt83) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1014:11: i= INTERSECTION_OP
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1031:11: i= INTERSECTION_OP
             	            {
             	            i=(Token)match(input,INTERSECTION_OP,FOLLOW_INTERSECTION_OP_in_satisfiedTypes6603); if (state.failed) return satisfiedTypes;
 
@@ -6181,14 +6200,14 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1017:11: COMMA
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1034:11: COMMA
             	            {
             	            match(input,COMMA,FOLLOW_COMMA_in_satisfiedTypes6638); if (state.failed) return satisfiedTypes;
 
             	            }
             	            break;
             	        case 3 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1017:17: UNION_OP
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1034:17: UNION_OP
             	            {
             	            match(input,UNION_OP,FOLLOW_UNION_OP_in_satisfiedTypes6640); if (state.failed) return satisfiedTypes;
 
@@ -6201,8 +6220,8 @@ public class CeylonParser extends Parser {
             	    }
 
 
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1021:9: (t2= abbreviatedType )
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1022:11: t2= abbreviatedType
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1038:9: (t2= abbreviatedType )
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1039:11: t2= abbreviatedType
             	    {
             	    pushFollow(FOLLOW_abbreviatedType_in_satisfiedTypes6686);
             	    t2=abbreviatedType();
@@ -6244,21 +6263,21 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "caseTypes"
-    // /home/david/git/ceylon-spec/Ceylon.g:1030:1: caseTypes returns [CaseTypes caseTypes] : CASE_TYPES ct1= caseType ( (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType ) )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1047:1: caseTypes returns [CaseTypes caseTypes] : CASE_TYPES ct1= caseType ( (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType ) )* ;
     public CaseTypes caseTypes() throws RecognitionException {
         CaseTypes caseTypes = null;
 
 
         Token u=null;
         Token CASE_TYPES149=null;
-        CeylonParser.caseType_return ct1 =null;
+        PsiCompatibleCeylonParser.caseType_return ct1 =null;
 
-        CeylonParser.caseType_return ct2 =null;
+        PsiCompatibleCeylonParser.caseType_return ct2 =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1031:5: ( CASE_TYPES ct1= caseType ( (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType ) )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:1031:7: CASE_TYPES ct1= caseType ( (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType ) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1048:5: ( CASE_TYPES ct1= caseType ( (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType ) )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:1048:7: CASE_TYPES ct1= caseType ( (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType ) )*
             {
             CASE_TYPES149=(Token)match(input,CASE_TYPES,FOLLOW_CASE_TYPES_in_caseTypes6738); if (state.failed) return caseTypes;
 
@@ -6273,7 +6292,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { if ((ct1!=null?ct1.type:null)!=null) caseTypes.addType((ct1!=null?ct1.type:null)); 
                     if ((ct1!=null?ct1.instance:null)!=null) caseTypes.addBaseMemberExpression((ct1!=null?ct1.instance:null)); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1036:7: ( (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType ) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1053:7: ( (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType ) )*
             loop86:
             do {
                 int alt86=2;
@@ -6286,9 +6305,9 @@ public class CeylonParser extends Parser {
 
                 switch (alt86) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1037:9: (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType )
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1054:9: (u= UNION_OP | COMMA | INTERSECTION_OP ) (ct2= caseType )
             	    {
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1037:9: (u= UNION_OP | COMMA | INTERSECTION_OP )
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1054:9: (u= UNION_OP | COMMA | INTERSECTION_OP )
             	    int alt85=3;
             	    switch ( input.LA(1) ) {
             	    case UNION_OP:
@@ -6317,7 +6336,7 @@ public class CeylonParser extends Parser {
 
             	    switch (alt85) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1038:11: u= UNION_OP
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1055:11: u= UNION_OP
             	            {
             	            u=(Token)match(input,UNION_OP,FOLLOW_UNION_OP_in_caseTypes6798); if (state.failed) return caseTypes;
 
@@ -6326,14 +6345,14 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1041:11: COMMA
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1058:11: COMMA
             	            {
             	            match(input,COMMA,FOLLOW_COMMA_in_caseTypes6834); if (state.failed) return caseTypes;
 
             	            }
             	            break;
             	        case 3 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1041:17: INTERSECTION_OP
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1058:17: INTERSECTION_OP
             	            {
             	            match(input,INTERSECTION_OP,FOLLOW_INTERSECTION_OP_in_caseTypes6836); if (state.failed) return caseTypes;
 
@@ -6346,8 +6365,8 @@ public class CeylonParser extends Parser {
             	    }
 
 
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1045:9: (ct2= caseType )
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1046:11: ct2= caseType
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1062:9: (ct2= caseType )
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1063:11: ct2= caseType
             	    {
             	    pushFollow(FOLLOW_caseType_in_caseTypes6882);
             	    ct2=caseType();
@@ -6394,9 +6413,9 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "caseType"
-    // /home/david/git/ceylon-spec/Ceylon.g:1054:1: caseType returns [StaticType type, BaseMemberExpression instance] : (t= abbreviatedType | memberName );
-    public CeylonParser.caseType_return caseType() throws RecognitionException {
-        CeylonParser.caseType_return retval = new CeylonParser.caseType_return();
+    // /home/david/git/ceylon-spec/Ceylon.g:1071:1: caseType returns [StaticType type, BaseMemberExpression instance] : (t= abbreviatedType | memberName );
+    public PsiCompatibleCeylonParser.caseType_return caseType() throws RecognitionException {
+        PsiCompatibleCeylonParser.caseType_return retval = new PsiCompatibleCeylonParser.caseType_return();
         retval.start = input.LT(1);
 
 
@@ -6406,7 +6425,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1055:5: (t= abbreviatedType | memberName )
+            // /home/david/git/ceylon-spec/Ceylon.g:1072:5: (t= abbreviatedType | memberName )
             int alt87=2;
             int LA87_0 = input.LA(1);
 
@@ -6426,7 +6445,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt87) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1055:7: t= abbreviatedType
+                    // /home/david/git/ceylon-spec/Ceylon.g:1072:7: t= abbreviatedType
                     {
                     pushFollow(FOLLOW_abbreviatedType_in_caseType6936);
                     t=abbreviatedType();
@@ -6439,7 +6458,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1057:7: memberName
+                    // /home/david/git/ceylon-spec/Ceylon.g:1074:7: memberName
                     {
                     pushFollow(FOLLOW_memberName_in_caseType6953);
                     memberName150=memberName();
@@ -6474,7 +6493,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "abstractedType"
-    // /home/david/git/ceylon-spec/Ceylon.g:1065:1: abstractedType returns [AbstractedType abstractedType] : ABSTRACTED_TYPE abbreviatedType ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1082:1: abstractedType returns [AbstractedType abstractedType] : ABSTRACTED_TYPE abbreviatedType ;
     public AbstractedType abstractedType() throws RecognitionException {
         AbstractedType abstractedType = null;
 
@@ -6484,8 +6503,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1066:5: ( ABSTRACTED_TYPE abbreviatedType )
-            // /home/david/git/ceylon-spec/Ceylon.g:1066:7: ABSTRACTED_TYPE abbreviatedType
+            // /home/david/git/ceylon-spec/Ceylon.g:1083:5: ( ABSTRACTED_TYPE abbreviatedType )
+            // /home/david/git/ceylon-spec/Ceylon.g:1083:7: ABSTRACTED_TYPE abbreviatedType
             {
             ABSTRACTED_TYPE151=(Token)match(input,ABSTRACTED_TYPE,FOLLOW_ABSTRACTED_TYPE_in_abstractedType6988); if (state.failed) return abstractedType;
 
@@ -6517,7 +6536,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "parameters"
-    // /home/david/git/ceylon-spec/Ceylon.g:1072:1: parameters returns [ParameterList parameterList] : LPAREN (ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )* )? RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1089:1: parameters returns [ParameterList parameterList] : LPAREN (ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )* )? RPAREN ;
     public ParameterList parameters() throws RecognitionException {
         ParameterList parameterList = null;
 
@@ -6531,14 +6550,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1073:5: ( LPAREN (ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )* )? RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:1073:7: LPAREN (ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )* )? RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:1090:5: ( LPAREN (ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )* )? RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:1090:7: LPAREN (ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )* )? RPAREN
             {
             LPAREN153=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_parameters7033); if (state.failed) return parameterList;
 
             if ( state.backtracking==0 ) { parameterList =new ParameterList(LPAREN153); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1075:7: (ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )* )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1092:7: (ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )* )?
             int alt90=2;
             int LA90_0 = input.LA(1);
 
@@ -6547,7 +6566,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt90) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1076:9: ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:1093:9: ap1= parameterDeclarationOrRef (c= COMMA (ap2= parameterDeclarationOrRef |) )*
                     {
                     pushFollow(FOLLOW_parameterDeclarationOrRef_in_parameters7061);
                     ap1=parameterDeclarationOrRef();
@@ -6558,7 +6577,7 @@ public class CeylonParser extends Parser {
                     if ( state.backtracking==0 ) { if (ap1!=null)
                                   parameterList.addParameter(ap1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1079:9: (c= COMMA (ap2= parameterDeclarationOrRef |) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:1096:9: (c= COMMA (ap2= parameterDeclarationOrRef |) )*
                     loop89:
                     do {
                         int alt89=2;
@@ -6571,13 +6590,13 @@ public class CeylonParser extends Parser {
 
                         switch (alt89) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:1080:11: c= COMMA (ap2= parameterDeclarationOrRef |)
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:1097:11: c= COMMA (ap2= parameterDeclarationOrRef |)
                     	    {
                     	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_parameters7096); if (state.failed) return parameterList;
 
                     	    if ( state.backtracking==0 ) { parameterList.setEndToken(c); }
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:1082:11: (ap2= parameterDeclarationOrRef |)
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:1099:11: (ap2= parameterDeclarationOrRef |)
                     	    int alt88=2;
                     	    int LA88_0 = input.LA(1);
 
@@ -6597,7 +6616,7 @@ public class CeylonParser extends Parser {
                     	    }
                     	    switch (alt88) {
                     	        case 1 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:1083:13: ap2= parameterDeclarationOrRef
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:1100:13: ap2= parameterDeclarationOrRef
                     	            {
                     	            pushFollow(FOLLOW_parameterDeclarationOrRef_in_parameters7136);
                     	            ap2=parameterDeclarationOrRef();
@@ -6612,7 +6631,7 @@ public class CeylonParser extends Parser {
                     	            }
                     	            break;
                     	        case 2 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:1088:13: 
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:1105:13: 
                     	            {
                     	            if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(),
                     	                            new MismatchedTokenException(UIDENTIFIER, input)); }
@@ -6660,7 +6679,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "parameter"
-    // /home/david/git/ceylon-spec/Ceylon.g:1097:1: parameter returns [ParameterDeclaration parameter] : compilerAnnotations annotations parameterDeclaration ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1114:1: parameter returns [ParameterDeclaration parameter] : compilerAnnotations annotations parameterDeclaration ;
     public ParameterDeclaration parameter() throws RecognitionException {
         ParameterDeclaration parameter = null;
 
@@ -6673,8 +6692,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1098:5: ( compilerAnnotations annotations parameterDeclaration )
-            // /home/david/git/ceylon-spec/Ceylon.g:1098:7: compilerAnnotations annotations parameterDeclaration
+            // /home/david/git/ceylon-spec/Ceylon.g:1115:5: ( compilerAnnotations annotations parameterDeclaration )
+            // /home/david/git/ceylon-spec/Ceylon.g:1115:7: compilerAnnotations annotations parameterDeclaration
             {
             pushFollow(FOLLOW_compilerAnnotations_in_parameter7245);
             compilerAnnotations156=compilerAnnotations();
@@ -6727,7 +6746,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "parameterDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:1117:1: parameterDeclaration returns [TypedDeclaration declaration] : ( variadicType | VOID_MODIFIER | FUNCTION_MODIFIER | DYNAMIC | VALUE_MODIFIER ) memberName ( ( specifier )? | ( parameters )+ ( functionSpecifier )? ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1134:1: parameterDeclaration returns [TypedDeclaration declaration] : ( variadicType | VOID_MODIFIER | FUNCTION_MODIFIER | DYNAMIC | VALUE_MODIFIER ) memberName ( ( specifier )? | ( parameters )+ ( functionSpecifier )? ) ;
     public TypedDeclaration parameterDeclaration() throws RecognitionException {
         TypedDeclaration declaration = null;
 
@@ -6751,10 +6770,10 @@ public class CeylonParser extends Parser {
                     MethodDeclaration m = new MethodDeclaration(null);
                     declaration = a; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1121:5: ( ( variadicType | VOID_MODIFIER | FUNCTION_MODIFIER | DYNAMIC | VALUE_MODIFIER ) memberName ( ( specifier )? | ( parameters )+ ( functionSpecifier )? ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1121:7: ( variadicType | VOID_MODIFIER | FUNCTION_MODIFIER | DYNAMIC | VALUE_MODIFIER ) memberName ( ( specifier )? | ( parameters )+ ( functionSpecifier )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1138:5: ( ( variadicType | VOID_MODIFIER | FUNCTION_MODIFIER | DYNAMIC | VALUE_MODIFIER ) memberName ( ( specifier )? | ( parameters )+ ( functionSpecifier )? ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1138:7: ( variadicType | VOID_MODIFIER | FUNCTION_MODIFIER | DYNAMIC | VALUE_MODIFIER ) memberName ( ( specifier )? | ( parameters )+ ( functionSpecifier )? )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:1121:7: ( variadicType | VOID_MODIFIER | FUNCTION_MODIFIER | DYNAMIC | VALUE_MODIFIER )
+            // /home/david/git/ceylon-spec/Ceylon.g:1138:7: ( variadicType | VOID_MODIFIER | FUNCTION_MODIFIER | DYNAMIC | VALUE_MODIFIER )
             int alt91=5;
             switch ( input.LA(1) ) {
             case LBRACE:
@@ -6796,7 +6815,7 @@ public class CeylonParser extends Parser {
 
             switch (alt91) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1122:9: variadicType
+                    // /home/david/git/ceylon-spec/Ceylon.g:1139:9: variadicType
                     {
                     pushFollow(FOLLOW_variadicType_in_parameterDeclaration7314);
                     variadicType158=variadicType();
@@ -6810,7 +6829,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1125:9: VOID_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1142:9: VOID_MODIFIER
                     {
                     VOID_MODIFIER159=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_parameterDeclaration7334); if (state.failed) return declaration;
 
@@ -6820,7 +6839,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1128:9: FUNCTION_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1145:9: FUNCTION_MODIFIER
                     {
                     FUNCTION_MODIFIER160=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_parameterDeclaration7354); if (state.failed) return declaration;
 
@@ -6830,7 +6849,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1131:9: DYNAMIC
+                    // /home/david/git/ceylon-spec/Ceylon.g:1148:9: DYNAMIC
                     {
                     DYNAMIC161=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_parameterDeclaration7374); if (state.failed) return declaration;
 
@@ -6840,7 +6859,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1134:9: VALUE_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1151:9: VALUE_MODIFIER
                     {
                     VALUE_MODIFIER162=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_parameterDeclaration7394); if (state.failed) return declaration;
 
@@ -6861,7 +6880,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { a.setIdentifier(memberName163);
                     m.setIdentifier(memberName163); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1140:7: ( ( specifier )? | ( parameters )+ ( functionSpecifier )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1157:7: ( ( specifier )? | ( parameters )+ ( functionSpecifier )? )
             int alt95=2;
             int LA95_0 = input.LA(1);
 
@@ -6881,9 +6900,9 @@ public class CeylonParser extends Parser {
             }
             switch (alt95) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1141:9: ( specifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1158:9: ( specifier )?
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:1141:9: ( specifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1158:9: ( specifier )?
                     int alt92=2;
                     int LA92_0 = input.LA(1);
 
@@ -6892,7 +6911,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt92) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1142:11: specifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:1159:11: specifier
                             {
                             pushFollow(FOLLOW_specifier_in_parameterDeclaration7458);
                             specifier164=specifier();
@@ -6911,9 +6930,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1146:9: ( parameters )+ ( functionSpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1163:9: ( parameters )+ ( functionSpecifier )?
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:1146:9: ( parameters )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:1163:9: ( parameters )+
                     int cnt93=0;
                     loop93:
                     do {
@@ -6927,7 +6946,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt93) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:1147:11: parameters
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:1164:11: parameters
                     	    {
                     	    pushFollow(FOLLOW_parameters_in_parameterDeclaration7511);
                     	    parameters165=parameters();
@@ -6952,7 +6971,7 @@ public class CeylonParser extends Parser {
                     } while (true);
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1151:9: ( functionSpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1168:9: ( functionSpecifier )?
                     int alt94=2;
                     int LA94_0 = input.LA(1);
 
@@ -6961,7 +6980,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt94) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1152:11: functionSpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:1169:11: functionSpecifier
                             {
                             pushFollow(FOLLOW_functionSpecifier_in_parameterDeclaration7556);
                             functionSpecifier166=functionSpecifier();
@@ -7001,7 +7020,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "parameterRef"
-    // /home/david/git/ceylon-spec/Ceylon.g:1158:1: parameterRef returns [InitializerParameter parameter] : memberName ( specifier )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1175:1: parameterRef returns [InitializerParameter parameter] : memberName ( specifier )? ;
     public InitializerParameter parameterRef() throws RecognitionException {
         InitializerParameter parameter = null;
 
@@ -7012,8 +7031,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1159:5: ( memberName ( specifier )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:1159:7: memberName ( specifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1176:5: ( memberName ( specifier )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1176:7: memberName ( specifier )?
             {
             pushFollow(FOLLOW_memberName_in_parameterRef7608);
             memberName167=memberName();
@@ -7024,7 +7043,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { parameter = new InitializerParameter(null);
                     parameter.setIdentifier(memberName167); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1162:7: ( specifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1179:7: ( specifier )?
             int alt96=2;
             int LA96_0 = input.LA(1);
 
@@ -7033,7 +7052,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt96) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1163:9: specifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:1180:9: specifier
                     {
                     pushFollow(FOLLOW_specifier_in_parameterRef7634);
                     specifier168=specifier();
@@ -7067,7 +7086,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "parameterDeclarationOrRef"
-    // /home/david/git/ceylon-spec/Ceylon.g:1168:1: parameterDeclarationOrRef returns [Parameter parameter] : (r= parameterRef |p= parameter );
+    // /home/david/git/ceylon-spec/Ceylon.g:1185:1: parameterDeclarationOrRef returns [Parameter parameter] : (r= parameterRef |p= parameter );
     public Parameter parameterDeclarationOrRef() throws RecognitionException {
         Parameter parameter = null;
 
@@ -7078,7 +7097,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1169:5: (r= parameterRef |p= parameter )
+            // /home/david/git/ceylon-spec/Ceylon.g:1186:5: (r= parameterRef |p= parameter )
             int alt97=2;
             int LA97_0 = input.LA(1);
 
@@ -7113,7 +7132,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt97) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1170:7: r= parameterRef
+                    // /home/david/git/ceylon-spec/Ceylon.g:1187:7: r= parameterRef
                     {
                     pushFollow(FOLLOW_parameterRef_in_parameterDeclarationOrRef7682);
                     r=parameterRef();
@@ -7126,7 +7145,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1173:7: p= parameter
+                    // /home/david/git/ceylon-spec/Ceylon.g:1190:7: p= parameter
                     {
                     pushFollow(FOLLOW_parameter_in_parameterDeclarationOrRef7707);
                     p=parameter();
@@ -7156,7 +7175,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeParameters"
-    // /home/david/git/ceylon-spec/Ceylon.g:1177:1: typeParameters returns [TypeParameterList typeParameterList] : SMALLER_OP tp1= typeParameter (c= COMMA (tp2= typeParameter |) )* LARGER_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1194:1: typeParameters returns [TypeParameterList typeParameterList] : SMALLER_OP tp1= typeParameter (c= COMMA (tp2= typeParameter |) )* LARGER_OP ;
     public TypeParameterList typeParameters() throws RecognitionException {
         TypeParameterList typeParameterList = null;
 
@@ -7170,8 +7189,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1178:5: ( SMALLER_OP tp1= typeParameter (c= COMMA (tp2= typeParameter |) )* LARGER_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:1178:7: SMALLER_OP tp1= typeParameter (c= COMMA (tp2= typeParameter |) )* LARGER_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:1195:5: ( SMALLER_OP tp1= typeParameter (c= COMMA (tp2= typeParameter |) )* LARGER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:1195:7: SMALLER_OP tp1= typeParameter (c= COMMA (tp2= typeParameter |) )* LARGER_OP
             {
             SMALLER_OP169=(Token)match(input,SMALLER_OP,FOLLOW_SMALLER_OP_in_typeParameters7736); if (state.failed) return typeParameterList;
 
@@ -7186,7 +7205,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { if (tp1 instanceof TypeParameterDeclaration)
                         typeParameterList.addTypeParameterDeclaration(tp1); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1183:7: (c= COMMA (tp2= typeParameter |) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1200:7: (c= COMMA (tp2= typeParameter |) )*
             loop99:
             do {
                 int alt99=2;
@@ -7199,13 +7218,13 @@ public class CeylonParser extends Parser {
 
                 switch (alt99) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1184:9: c= COMMA (tp2= typeParameter |)
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1201:9: c= COMMA (tp2= typeParameter |)
             	    {
             	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_typeParameters7782); if (state.failed) return typeParameterList;
 
             	    if ( state.backtracking==0 ) { typeParameterList.setEndToken(c); }
 
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1186:9: (tp2= typeParameter |)
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1203:9: (tp2= typeParameter |)
             	    int alt98=2;
             	    int LA98_0 = input.LA(1);
 
@@ -7225,7 +7244,7 @@ public class CeylonParser extends Parser {
             	    }
             	    switch (alt98) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1187:11: tp2= typeParameter
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1204:11: tp2= typeParameter
             	            {
             	            pushFollow(FOLLOW_typeParameter_in_typeParameters7816);
             	            tp2=typeParameter();
@@ -7240,7 +7259,7 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1191:11: 
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1208:11: 
             	            {
             	            if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
             	                            new MismatchedTokenException(UIDENTIFIER, input)); }
@@ -7282,7 +7301,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeParameter"
-    // /home/david/git/ceylon-spec/Ceylon.g:1199:1: typeParameter returns [TypeParameterDeclaration typeParameter] : compilerAnnotations ( variance )? typeNameDeclaration ( typeDefault )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1216:1: typeParameter returns [TypeParameterDeclaration typeParameter] : compilerAnnotations ( variance )? typeNameDeclaration ( typeDefault )? ;
     public TypeParameterDeclaration typeParameter() throws RecognitionException {
         TypeParameterDeclaration typeParameter = null;
 
@@ -7297,8 +7316,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1200:5: ( compilerAnnotations ( variance )? typeNameDeclaration ( typeDefault )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:1200:7: compilerAnnotations ( variance )? typeNameDeclaration ( typeDefault )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1217:5: ( compilerAnnotations ( variance )? typeNameDeclaration ( typeDefault )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1217:7: compilerAnnotations ( variance )? typeNameDeclaration ( typeDefault )?
             {
             if ( state.backtracking==0 ) { typeParameter = new TypeParameterDeclaration(null); }
 
@@ -7308,7 +7327,7 @@ public class CeylonParser extends Parser {
             state._fsp--;
             if (state.failed) return typeParameter;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1202:7: ( variance )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1219:7: ( variance )?
             int alt100=2;
             int LA100_0 = input.LA(1);
 
@@ -7317,7 +7336,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt100) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1203:9: variance
+                    // /home/david/git/ceylon-spec/Ceylon.g:1220:9: variance
                     {
                     pushFollow(FOLLOW_variance_in_typeParameter7923);
                     variance171=variance();
@@ -7341,7 +7360,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { typeParameter.setIdentifier(typeNameDeclaration172); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1208:7: ( typeDefault )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1225:7: ( typeDefault )?
             int alt101=2;
             int LA101_0 = input.LA(1);
 
@@ -7350,7 +7369,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt101) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1209:9: typeDefault
+                    // /home/david/git/ceylon-spec/Ceylon.g:1226:9: typeDefault
                     {
                     pushFollow(FOLLOW_typeDefault_in_typeParameter7979);
                     typeDefault173=typeDefault();
@@ -7386,7 +7405,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "variance"
-    // /home/david/git/ceylon-spec/Ceylon.g:1215:1: variance returns [TypeVariance typeVariance] : ( IN_OP | OUT );
+    // /home/david/git/ceylon-spec/Ceylon.g:1232:1: variance returns [TypeVariance typeVariance] : ( IN_OP | OUT );
     public TypeVariance variance() throws RecognitionException {
         TypeVariance typeVariance = null;
 
@@ -7395,7 +7414,7 @@ public class CeylonParser extends Parser {
         Token OUT176=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1216:5: ( IN_OP | OUT )
+            // /home/david/git/ceylon-spec/Ceylon.g:1233:5: ( IN_OP | OUT )
             int alt102=2;
             int LA102_0 = input.LA(1);
 
@@ -7415,7 +7434,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt102) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1216:7: IN_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:1233:7: IN_OP
                     {
                     IN_OP175=(Token)match(input,IN_OP,FOLLOW_IN_OP_in_variance8027); if (state.failed) return typeVariance;
 
@@ -7424,7 +7443,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1218:7: OUT
+                    // /home/david/git/ceylon-spec/Ceylon.g:1235:7: OUT
                     {
                     OUT176=(Token)match(input,OUT,FOLLOW_OUT_in_variance8043); if (state.failed) return typeVariance;
 
@@ -7450,7 +7469,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeConstraint"
-    // /home/david/git/ceylon-spec/Ceylon.g:1222:1: typeConstraint returns [TypeConstraint typeConstraint] : compilerAnnotations TYPE_CONSTRAINT typeNameDeclaration ( parameters )? ( caseTypes )? ( satisfiedTypes )? ( abstractedType )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1239:1: typeConstraint returns [TypeConstraint typeConstraint] : compilerAnnotations TYPE_CONSTRAINT typeNameDeclaration ( parameters )? ( caseTypes )? ( satisfiedTypes )? ( abstractedType )? ;
     public TypeConstraint typeConstraint() throws RecognitionException {
         TypeConstraint typeConstraint = null;
 
@@ -7470,8 +7489,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1223:5: ( compilerAnnotations TYPE_CONSTRAINT typeNameDeclaration ( parameters )? ( caseTypes )? ( satisfiedTypes )? ( abstractedType )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:1223:7: compilerAnnotations TYPE_CONSTRAINT typeNameDeclaration ( parameters )? ( caseTypes )? ( satisfiedTypes )? ( abstractedType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1240:5: ( compilerAnnotations TYPE_CONSTRAINT typeNameDeclaration ( parameters )? ( caseTypes )? ( satisfiedTypes )? ( abstractedType )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1240:7: compilerAnnotations TYPE_CONSTRAINT typeNameDeclaration ( parameters )? ( caseTypes )? ( satisfiedTypes )? ( abstractedType )?
             {
             pushFollow(FOLLOW_compilerAnnotations_in_typeConstraint8076);
             compilerAnnotations178=compilerAnnotations();
@@ -7492,7 +7511,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { typeConstraint.setIdentifier(typeNameDeclaration179); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1230:7: ( parameters )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1247:7: ( parameters )?
             int alt103=2;
             int LA103_0 = input.LA(1);
 
@@ -7501,7 +7520,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt103) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1231:9: parameters
+                    // /home/david/git/ceylon-spec/Ceylon.g:1248:9: parameters
                     {
                     pushFollow(FOLLOW_parameters_in_typeConstraint8134);
                     parameters180=parameters();
@@ -7517,7 +7536,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1234:7: ( caseTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1251:7: ( caseTypes )?
             int alt104=2;
             int LA104_0 = input.LA(1);
 
@@ -7526,7 +7545,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt104) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1235:9: caseTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:1252:9: caseTypes
                     {
                     pushFollow(FOLLOW_caseTypes_in_typeConstraint8171);
                     caseTypes181=caseTypes();
@@ -7542,7 +7561,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1239:7: ( satisfiedTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1256:7: ( satisfiedTypes )?
             int alt105=2;
             int LA105_0 = input.LA(1);
 
@@ -7551,7 +7570,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt105) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1240:9: satisfiedTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:1257:9: satisfiedTypes
                     {
                     pushFollow(FOLLOW_satisfiedTypes_in_typeConstraint8215);
                     satisfiedTypes182=satisfiedTypes();
@@ -7567,7 +7586,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1243:7: ( abstractedType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1260:7: ( abstractedType )?
             int alt106=2;
             int LA106_0 = input.LA(1);
 
@@ -7576,7 +7595,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt106) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1244:9: abstractedType
+                    // /home/david/git/ceylon-spec/Ceylon.g:1261:9: abstractedType
                     {
                     pushFollow(FOLLOW_abstractedType_in_typeConstraint8253);
                     abstractedType183=abstractedType();
@@ -7610,7 +7629,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeConstraints"
-    // /home/david/git/ceylon-spec/Ceylon.g:1249:1: typeConstraints returns [TypeConstraintList typeConstraintList] : ( typeConstraint )+ ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1266:1: typeConstraints returns [TypeConstraintList typeConstraintList] : ( typeConstraint )+ ;
     public TypeConstraintList typeConstraints() throws RecognitionException {
         TypeConstraintList typeConstraintList = null;
 
@@ -7619,12 +7638,12 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1250:5: ( ( typeConstraint )+ )
-            // /home/david/git/ceylon-spec/Ceylon.g:1250:7: ( typeConstraint )+
+            // /home/david/git/ceylon-spec/Ceylon.g:1267:5: ( ( typeConstraint )+ )
+            // /home/david/git/ceylon-spec/Ceylon.g:1267:7: ( typeConstraint )+
             {
             if ( state.backtracking==0 ) { typeConstraintList =new TypeConstraintList(null); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1251:7: ( typeConstraint )+
+            // /home/david/git/ceylon-spec/Ceylon.g:1268:7: ( typeConstraint )+
             int cnt107=0;
             loop107:
             do {
@@ -7638,7 +7657,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt107) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1252:9: typeConstraint
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1269:9: typeConstraint
             	    {
             	    pushFollow(FOLLOW_typeConstraint_in_typeConstraints8311);
             	    typeConstraint184=typeConstraint();
@@ -7681,13 +7700,13 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "annotationListStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:1258:1: annotationListStart : ( stringLiteral | annotation ) ( LIDENTIFIER | UIDENTIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER | VOID_MODIFIER ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1275:1: annotationListStart : ( stringLiteral | annotation ) ( LIDENTIFIER | UIDENTIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER | VOID_MODIFIER ) ;
     public void annotationListStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1259:5: ( ( stringLiteral | annotation ) ( LIDENTIFIER | UIDENTIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER | VOID_MODIFIER ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1259:7: ( stringLiteral | annotation ) ( LIDENTIFIER | UIDENTIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER | VOID_MODIFIER )
+            // /home/david/git/ceylon-spec/Ceylon.g:1276:5: ( ( stringLiteral | annotation ) ( LIDENTIFIER | UIDENTIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER | VOID_MODIFIER ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1276:7: ( stringLiteral | annotation ) ( LIDENTIFIER | UIDENTIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER | VOID_MODIFIER )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:1259:7: ( stringLiteral | annotation )
+            // /home/david/git/ceylon-spec/Ceylon.g:1276:7: ( stringLiteral | annotation )
             int alt108=2;
             int LA108_0 = input.LA(1);
 
@@ -7707,7 +7726,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt108) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1259:8: stringLiteral
+                    // /home/david/git/ceylon-spec/Ceylon.g:1276:8: stringLiteral
                     {
                     pushFollow(FOLLOW_stringLiteral_in_annotationListStart8348);
                     stringLiteral();
@@ -7718,7 +7737,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1259:22: annotation
+                    // /home/david/git/ceylon-spec/Ceylon.g:1276:22: annotation
                     {
                     pushFollow(FOLLOW_annotation_in_annotationListStart8350);
                     annotation();
@@ -7762,11 +7781,11 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "destructureStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:1263:1: destructureStart : VALUE_MODIFIER compilerAnnotations ( LBRACKET | UIDENTIFIER | VOID_MODIFIER | VALUE_MODIFIER | FUNCTION_MODIFIER | LIDENTIFIER ENTRY_OP ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1280:1: destructureStart : VALUE_MODIFIER compilerAnnotations ( LBRACKET | UIDENTIFIER | VOID_MODIFIER | VALUE_MODIFIER | FUNCTION_MODIFIER | LIDENTIFIER ENTRY_OP ) ;
     public void destructureStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1264:5: ( VALUE_MODIFIER compilerAnnotations ( LBRACKET | UIDENTIFIER | VOID_MODIFIER | VALUE_MODIFIER | FUNCTION_MODIFIER | LIDENTIFIER ENTRY_OP ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1264:7: VALUE_MODIFIER compilerAnnotations ( LBRACKET | UIDENTIFIER | VOID_MODIFIER | VALUE_MODIFIER | FUNCTION_MODIFIER | LIDENTIFIER ENTRY_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:1281:5: ( VALUE_MODIFIER compilerAnnotations ( LBRACKET | UIDENTIFIER | VOID_MODIFIER | VALUE_MODIFIER | FUNCTION_MODIFIER | LIDENTIFIER ENTRY_OP ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1281:7: VALUE_MODIFIER compilerAnnotations ( LBRACKET | UIDENTIFIER | VOID_MODIFIER | VALUE_MODIFIER | FUNCTION_MODIFIER | LIDENTIFIER ENTRY_OP )
             {
             match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_destructureStart8387); if (state.failed) return ;
 
@@ -7776,7 +7795,7 @@ public class CeylonParser extends Parser {
             state._fsp--;
             if (state.failed) return ;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1265:7: ( LBRACKET | UIDENTIFIER | VOID_MODIFIER | VALUE_MODIFIER | FUNCTION_MODIFIER | LIDENTIFIER ENTRY_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:1282:7: ( LBRACKET | UIDENTIFIER | VOID_MODIFIER | VALUE_MODIFIER | FUNCTION_MODIFIER | LIDENTIFIER ENTRY_OP )
             int alt109=6;
             switch ( input.LA(1) ) {
             case LBRACKET:
@@ -7820,42 +7839,42 @@ public class CeylonParser extends Parser {
 
             switch (alt109) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1265:8: LBRACKET
+                    // /home/david/git/ceylon-spec/Ceylon.g:1282:8: LBRACKET
                     {
                     match(input,LBRACKET,FOLLOW_LBRACKET_in_destructureStart8399); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1265:17: UIDENTIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1282:17: UIDENTIFIER
                     {
                     match(input,UIDENTIFIER,FOLLOW_UIDENTIFIER_in_destructureStart8401); if (state.failed) return ;
 
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1265:29: VOID_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1282:29: VOID_MODIFIER
                     {
                     match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_destructureStart8403); if (state.failed) return ;
 
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1265:43: VALUE_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1282:43: VALUE_MODIFIER
                     {
                     match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_destructureStart8405); if (state.failed) return ;
 
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1265:58: FUNCTION_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1282:58: FUNCTION_MODIFIER
                     {
                     match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_destructureStart8407); if (state.failed) return ;
 
                     }
                     break;
                 case 6 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1265:76: LIDENTIFIER ENTRY_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:1282:76: LIDENTIFIER ENTRY_OP
                     {
                     match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_destructureStart8409); if (state.failed) return ;
 
@@ -7885,7 +7904,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "declarationOrStatement"
-    // /home/david/git/ceylon-spec/Ceylon.g:1268:1: declarationOrStatement returns [Statement statement] options {memoize=true; } : compilerAnnotations ( ( destructureStart )=> destructure | ( annotatedDeclarationStart )=>d1= declaration | ( annotatedAssertionStart )=> assertion | ( annotationListStart )=>d2= declaration |s= statement ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1285:1: declarationOrStatement returns [Statement statement] options {memoize=true; } : compilerAnnotations ( ( destructureStart )=> destructure | ( annotatedDeclarationStart )=>d1= declaration | ( annotatedAssertionStart )=> assertion | ( annotationListStart )=>d2= declaration |s= statement ) ;
     public Statement declarationOrStatement() throws RecognitionException {
         Statement statement = null;
 
@@ -7907,8 +7926,8 @@ public class CeylonParser extends Parser {
         try {
             if ( state.backtracking>0 && alreadyParsedRule(input, 65) ) { return statement; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1270:5: ( compilerAnnotations ( ( destructureStart )=> destructure | ( annotatedDeclarationStart )=>d1= declaration | ( annotatedAssertionStart )=> assertion | ( annotationListStart )=>d2= declaration |s= statement ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1270:7: compilerAnnotations ( ( destructureStart )=> destructure | ( annotatedDeclarationStart )=>d1= declaration | ( annotatedAssertionStart )=> assertion | ( annotationListStart )=>d2= declaration |s= statement )
+            // /home/david/git/ceylon-spec/Ceylon.g:1287:5: ( compilerAnnotations ( ( destructureStart )=> destructure | ( annotatedDeclarationStart )=>d1= declaration | ( annotatedAssertionStart )=> assertion | ( annotationListStart )=>d2= declaration |s= statement ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1287:7: compilerAnnotations ( ( destructureStart )=> destructure | ( annotatedDeclarationStart )=>d1= declaration | ( annotatedAssertionStart )=> assertion | ( annotationListStart )=>d2= declaration |s= statement )
             {
             pushFollow(FOLLOW_compilerAnnotations_in_declarationOrStatement8444);
             compilerAnnotations187=compilerAnnotations();
@@ -7916,7 +7935,7 @@ public class CeylonParser extends Parser {
             state._fsp--;
             if (state.failed) return statement;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1271:7: ( ( destructureStart )=> destructure | ( annotatedDeclarationStart )=>d1= declaration | ( annotatedAssertionStart )=> assertion | ( annotationListStart )=>d2= declaration |s= statement )
+            // /home/david/git/ceylon-spec/Ceylon.g:1288:7: ( ( destructureStart )=> destructure | ( annotatedDeclarationStart )=>d1= declaration | ( annotatedAssertionStart )=> assertion | ( annotationListStart )=>d2= declaration |s= statement )
             int alt110=5;
             int LA110_0 = input.LA(1);
 
@@ -8278,7 +8297,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt110) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1272:9: ( destructureStart )=> destructure
+                    // /home/david/git/ceylon-spec/Ceylon.g:1289:9: ( destructureStart )=> destructure
                     {
                     pushFollow(FOLLOW_destructure_in_declarationOrStatement8468);
                     destructure185=destructure();
@@ -8291,7 +8310,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1274:9: ( annotatedDeclarationStart )=>d1= declaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1291:9: ( annotatedDeclarationStart )=>d1= declaration
                     {
                     pushFollow(FOLLOW_declaration_in_declarationOrStatement8496);
                     d1=declaration();
@@ -8304,7 +8323,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1276:9: ( annotatedAssertionStart )=> assertion
+                    // /home/david/git/ceylon-spec/Ceylon.g:1293:9: ( annotatedAssertionStart )=> assertion
                     {
                     pushFollow(FOLLOW_assertion_in_declarationOrStatement8522);
                     assertion186=assertion();
@@ -8317,7 +8336,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1278:9: ( annotationListStart )=>d2= declaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1295:9: ( annotationListStart )=>d2= declaration
                     {
                     pushFollow(FOLLOW_declaration_in_declarationOrStatement8550);
                     d2=declaration();
@@ -8330,7 +8349,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1280:9: s= statement
+                    // /home/david/git/ceylon-spec/Ceylon.g:1297:9: s= statement
                     {
                     pushFollow(FOLLOW_statement_in_declarationOrStatement8572);
                     s=statement();
@@ -8369,7 +8388,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "declaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:1287:1: declaration returns [Declaration declaration] : annotations ( classDeclaration | ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration | aliasDeclaration | objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration | typedMethodOrAttributeDeclaration | constructor ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1304:1: declaration returns [Declaration declaration] : annotations ( classDeclaration | ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration | aliasDeclaration | objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration | typedMethodOrAttributeDeclaration | constructor ) ;
     public Declaration declaration() throws RecognitionException {
         Declaration declaration = null;
 
@@ -8398,8 +8417,8 @@ public class CeylonParser extends Parser {
          MissingDeclaration md = new MissingDeclaration(null); 
                     declaration = md; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1290:5: ( annotations ( classDeclaration | ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration | aliasDeclaration | objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration | typedMethodOrAttributeDeclaration | constructor ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1290:7: annotations ( classDeclaration | ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration | aliasDeclaration | objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration | typedMethodOrAttributeDeclaration | constructor )
+            // /home/david/git/ceylon-spec/Ceylon.g:1307:5: ( annotations ( classDeclaration | ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration | aliasDeclaration | objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration | typedMethodOrAttributeDeclaration | constructor ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1307:7: annotations ( classDeclaration | ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration | aliasDeclaration | objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration | typedMethodOrAttributeDeclaration | constructor )
             {
             pushFollow(FOLLOW_annotations_in_declaration8628);
             annotations188=annotations();
@@ -8409,7 +8428,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { md.setAnnotationList(annotations188); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1292:5: ( classDeclaration | ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration | aliasDeclaration | objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration | typedMethodOrAttributeDeclaration | constructor )
+            // /home/david/git/ceylon-spec/Ceylon.g:1309:5: ( classDeclaration | ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration | aliasDeclaration | objectDeclaration | setterDeclaration | voidOrInferredMethodDeclaration | inferredAttributeDeclaration | typedMethodOrAttributeDeclaration | constructor )
             int alt111=9;
             int LA111_0 = input.LA(1);
 
@@ -8468,7 +8487,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt111) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1293:7: classDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1310:7: classDeclaration
                     {
                     pushFollow(FOLLOW_classDeclaration_in_declaration8651);
                     classDeclaration189=classDeclaration();
@@ -8481,7 +8500,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1295:7: ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1312:7: ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )=> interfaceDeclaration
                     {
                     pushFollow(FOLLOW_interfaceDeclaration_in_declaration8677);
                     interfaceDeclaration190=interfaceDeclaration();
@@ -8494,7 +8513,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1297:7: aliasDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1314:7: aliasDeclaration
                     {
                     pushFollow(FOLLOW_aliasDeclaration_in_declaration8693);
                     aliasDeclaration191=aliasDeclaration();
@@ -8507,7 +8526,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1299:7: objectDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1316:7: objectDeclaration
                     {
                     pushFollow(FOLLOW_objectDeclaration_in_declaration8709);
                     objectDeclaration192=objectDeclaration();
@@ -8520,7 +8539,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1301:7: setterDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1318:7: setterDeclaration
                     {
                     pushFollow(FOLLOW_setterDeclaration_in_declaration8725);
                     setterDeclaration193=setterDeclaration();
@@ -8533,7 +8552,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1303:7: voidOrInferredMethodDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1320:7: voidOrInferredMethodDeclaration
                     {
                     pushFollow(FOLLOW_voidOrInferredMethodDeclaration_in_declaration8741);
                     voidOrInferredMethodDeclaration194=voidOrInferredMethodDeclaration();
@@ -8546,7 +8565,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1305:7: inferredAttributeDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1322:7: inferredAttributeDeclaration
                     {
                     pushFollow(FOLLOW_inferredAttributeDeclaration_in_declaration8757);
                     inferredAttributeDeclaration195=inferredAttributeDeclaration();
@@ -8559,7 +8578,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 8 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1307:7: typedMethodOrAttributeDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1324:7: typedMethodOrAttributeDeclaration
                     {
                     pushFollow(FOLLOW_typedMethodOrAttributeDeclaration_in_declaration8773);
                     typedMethodOrAttributeDeclaration196=typedMethodOrAttributeDeclaration();
@@ -8572,7 +8591,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 9 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1309:7: constructor
+                    // /home/david/git/ceylon-spec/Ceylon.g:1326:7: constructor
                     {
                     pushFollow(FOLLOW_constructor_in_declaration8789);
                     constructor197=constructor();
@@ -8609,13 +8628,13 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "annotatedDeclarationStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:1320:1: annotatedDeclarationStart : ( stringLiteral )? ( annotation )* ( ( unambiguousType )=> unambiguousType | declarationStart ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1337:1: annotatedDeclarationStart : ( stringLiteral )? ( annotation )* ( ( unambiguousType )=> unambiguousType | declarationStart ) ;
     public void annotatedDeclarationStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1321:5: ( ( stringLiteral )? ( annotation )* ( ( unambiguousType )=> unambiguousType | declarationStart ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1321:7: ( stringLiteral )? ( annotation )* ( ( unambiguousType )=> unambiguousType | declarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:1338:5: ( ( stringLiteral )? ( annotation )* ( ( unambiguousType )=> unambiguousType | declarationStart ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1338:7: ( stringLiteral )? ( annotation )* ( ( unambiguousType )=> unambiguousType | declarationStart )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:1321:7: ( stringLiteral )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1338:7: ( stringLiteral )?
             int alt112=2;
             int LA112_0 = input.LA(1);
 
@@ -8624,7 +8643,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt112) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1321:7: stringLiteral
+                    // /home/david/git/ceylon-spec/Ceylon.g:1338:7: stringLiteral
                     {
                     pushFollow(FOLLOW_stringLiteral_in_annotatedDeclarationStart8832);
                     stringLiteral();
@@ -8638,7 +8657,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1321:22: ( annotation )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1338:22: ( annotation )*
             loop113:
             do {
                 int alt113=2;
@@ -8651,7 +8670,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt113) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1321:22: annotation
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1338:22: annotation
             	    {
             	    pushFollow(FOLLOW_annotation_in_annotatedDeclarationStart8835);
             	    annotation();
@@ -8668,7 +8687,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1322:7: ( ( unambiguousType )=> unambiguousType | declarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:1339:7: ( ( unambiguousType )=> unambiguousType | declarationStart )
             int alt114=2;
             switch ( input.LA(1) ) {
             case UIDENTIFIER:
@@ -8776,7 +8795,7 @@ public class CeylonParser extends Parser {
 
             switch (alt114) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1322:8: ( unambiguousType )=> unambiguousType
+                    // /home/david/git/ceylon-spec/Ceylon.g:1339:8: ( unambiguousType )=> unambiguousType
                     {
                     pushFollow(FOLLOW_unambiguousType_in_annotatedDeclarationStart8852);
                     unambiguousType();
@@ -8787,7 +8806,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1322:47: declarationStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:1339:47: declarationStart
                     {
                     pushFollow(FOLLOW_declarationStart_in_annotatedDeclarationStart8856);
                     declarationStart();
@@ -8819,13 +8838,13 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "annotatedAssertionStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:1325:1: annotatedAssertionStart : ( stringLiteral )? ( annotation )* ASSERT ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1342:1: annotatedAssertionStart : ( stringLiteral )? ( annotation )* ASSERT ;
     public void annotatedAssertionStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1326:5: ( ( stringLiteral )? ( annotation )* ASSERT )
-            // /home/david/git/ceylon-spec/Ceylon.g:1326:7: ( stringLiteral )? ( annotation )* ASSERT
+            // /home/david/git/ceylon-spec/Ceylon.g:1343:5: ( ( stringLiteral )? ( annotation )* ASSERT )
+            // /home/david/git/ceylon-spec/Ceylon.g:1343:7: ( stringLiteral )? ( annotation )* ASSERT
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:1326:7: ( stringLiteral )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1343:7: ( stringLiteral )?
             int alt115=2;
             int LA115_0 = input.LA(1);
 
@@ -8834,7 +8853,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt115) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1326:7: stringLiteral
+                    // /home/david/git/ceylon-spec/Ceylon.g:1343:7: stringLiteral
                     {
                     pushFollow(FOLLOW_stringLiteral_in_annotatedAssertionStart8874);
                     stringLiteral();
@@ -8848,7 +8867,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1326:22: ( annotation )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1343:22: ( annotation )*
             loop116:
             do {
                 int alt116=2;
@@ -8861,7 +8880,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt116) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1326:22: annotation
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1343:22: annotation
             	    {
             	    pushFollow(FOLLOW_annotation_in_annotatedAssertionStart8877);
             	    annotation();
@@ -8898,10 +8917,10 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "declarationStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:1332:1: declarationStart : ( VALUE_MODIFIER | FUNCTION_MODIFIER ( LIDENTIFIER | UIDENTIFIER ) | VOID_MODIFIER ( LIDENTIFIER | UIDENTIFIER ) | ASSIGN | INTERFACE_DEFINITION | CLASS_DEFINITION | OBJECT_DEFINITION ( LIDENTIFIER | UIDENTIFIER ) | NEW | ALIAS | variadicType LIDENTIFIER | DYNAMIC ( LIDENTIFIER | UIDENTIFIER ) );
+    // /home/david/git/ceylon-spec/Ceylon.g:1349:1: declarationStart : ( VALUE_MODIFIER | FUNCTION_MODIFIER ( LIDENTIFIER | UIDENTIFIER ) | VOID_MODIFIER ( LIDENTIFIER | UIDENTIFIER ) | ASSIGN | INTERFACE_DEFINITION | CLASS_DEFINITION | OBJECT_DEFINITION ( LIDENTIFIER | UIDENTIFIER ) | NEW | ALIAS | variadicType LIDENTIFIER | DYNAMIC ( LIDENTIFIER | UIDENTIFIER ) );
     public void declarationStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1333:5: ( VALUE_MODIFIER | FUNCTION_MODIFIER ( LIDENTIFIER | UIDENTIFIER ) | VOID_MODIFIER ( LIDENTIFIER | UIDENTIFIER ) | ASSIGN | INTERFACE_DEFINITION | CLASS_DEFINITION | OBJECT_DEFINITION ( LIDENTIFIER | UIDENTIFIER ) | NEW | ALIAS | variadicType LIDENTIFIER | DYNAMIC ( LIDENTIFIER | UIDENTIFIER ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1350:5: ( VALUE_MODIFIER | FUNCTION_MODIFIER ( LIDENTIFIER | UIDENTIFIER ) | VOID_MODIFIER ( LIDENTIFIER | UIDENTIFIER ) | ASSIGN | INTERFACE_DEFINITION | CLASS_DEFINITION | OBJECT_DEFINITION ( LIDENTIFIER | UIDENTIFIER ) | NEW | ALIAS | variadicType LIDENTIFIER | DYNAMIC ( LIDENTIFIER | UIDENTIFIER ) )
             int alt117=11;
             switch ( input.LA(1) ) {
             case VALUE_MODIFIER:
@@ -8973,14 +8992,14 @@ public class CeylonParser extends Parser {
 
             switch (alt117) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1333:7: VALUE_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1350:7: VALUE_MODIFIER
                     {
                     match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_declarationStart8900); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1334:7: FUNCTION_MODIFIER ( LIDENTIFIER | UIDENTIFIER )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1351:7: FUNCTION_MODIFIER ( LIDENTIFIER | UIDENTIFIER )
                     {
                     match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_declarationStart8908); if (state.failed) return ;
 
@@ -8999,7 +9018,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1335:7: VOID_MODIFIER ( LIDENTIFIER | UIDENTIFIER )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1352:7: VOID_MODIFIER ( LIDENTIFIER | UIDENTIFIER )
                     {
                     match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_declarationStart8923); if (state.failed) return ;
 
@@ -9018,28 +9037,28 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1336:7: ASSIGN
+                    // /home/david/git/ceylon-spec/Ceylon.g:1353:7: ASSIGN
                     {
                     match(input,ASSIGN,FOLLOW_ASSIGN_in_declarationStart8938); if (state.failed) return ;
 
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1337:7: INTERFACE_DEFINITION
+                    // /home/david/git/ceylon-spec/Ceylon.g:1354:7: INTERFACE_DEFINITION
                     {
                     match(input,INTERFACE_DEFINITION,FOLLOW_INTERFACE_DEFINITION_in_declarationStart8946); if (state.failed) return ;
 
                     }
                     break;
                 case 6 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1338:7: CLASS_DEFINITION
+                    // /home/david/git/ceylon-spec/Ceylon.g:1355:7: CLASS_DEFINITION
                     {
                     match(input,CLASS_DEFINITION,FOLLOW_CLASS_DEFINITION_in_declarationStart8954); if (state.failed) return ;
 
                     }
                     break;
                 case 7 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1339:7: OBJECT_DEFINITION ( LIDENTIFIER | UIDENTIFIER )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1356:7: OBJECT_DEFINITION ( LIDENTIFIER | UIDENTIFIER )
                     {
                     match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_declarationStart8962); if (state.failed) return ;
 
@@ -9058,21 +9077,21 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 8 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1340:7: NEW
+                    // /home/david/git/ceylon-spec/Ceylon.g:1357:7: NEW
                     {
                     match(input,NEW,FOLLOW_NEW_in_declarationStart8977); if (state.failed) return ;
 
                     }
                     break;
                 case 9 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1341:7: ALIAS
+                    // /home/david/git/ceylon-spec/Ceylon.g:1358:7: ALIAS
                     {
                     match(input,ALIAS,FOLLOW_ALIAS_in_declarationStart8985); if (state.failed) return ;
 
                     }
                     break;
                 case 10 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1342:7: variadicType LIDENTIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1359:7: variadicType LIDENTIFIER
                     {
                     pushFollow(FOLLOW_variadicType_in_declarationStart8994);
                     variadicType();
@@ -9085,7 +9104,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 11 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1343:7: DYNAMIC ( LIDENTIFIER | UIDENTIFIER )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1360:7: DYNAMIC ( LIDENTIFIER | UIDENTIFIER )
                     {
                     match(input,DYNAMIC,FOLLOW_DYNAMIC_in_declarationStart9004); if (state.failed) return ;
 
@@ -9121,10 +9140,10 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "unambiguousType"
-    // /home/david/git/ceylon-spec/Ceylon.g:1349:1: unambiguousType : ( qualifiedType ( ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType )? ( OPTIONAL | LBRACKET RBRACKET ) | LBRACE qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( PRODUCT_OP | SUM_OP ) RBRACE | LBRACKET qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? )* ( PRODUCT_OP | SUM_OP ) RBRACKET );
+    // /home/david/git/ceylon-spec/Ceylon.g:1366:1: unambiguousType : ( qualifiedType ( ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType )? ( OPTIONAL | LBRACKET RBRACKET ) | LBRACE qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( PRODUCT_OP | SUM_OP ) RBRACE | LBRACKET qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? )* ( PRODUCT_OP | SUM_OP ) RBRACKET );
     public void unambiguousType() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1350:5: ( qualifiedType ( ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType )? ( OPTIONAL | LBRACKET RBRACKET ) | LBRACE qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( PRODUCT_OP | SUM_OP ) RBRACE | LBRACKET qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? )* ( PRODUCT_OP | SUM_OP ) RBRACKET )
+            // /home/david/git/ceylon-spec/Ceylon.g:1367:5: ( qualifiedType ( ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType )? ( OPTIONAL | LBRACKET RBRACKET ) | LBRACE qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( PRODUCT_OP | SUM_OP ) RBRACE | LBRACKET qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? )* ( PRODUCT_OP | SUM_OP ) RBRACKET )
             int alt131=3;
             switch ( input.LA(1) ) {
             case SMALLER_OP:
@@ -9154,7 +9173,7 @@ public class CeylonParser extends Parser {
 
             switch (alt131) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1350:7: qualifiedType ( ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType )? ( OPTIONAL | LBRACKET RBRACKET )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1367:7: qualifiedType ( ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType )? ( OPTIONAL | LBRACKET RBRACKET )
                     {
                     pushFollow(FOLLOW_qualifiedType_in_unambiguousType9034);
                     qualifiedType();
@@ -9162,7 +9181,7 @@ public class CeylonParser extends Parser {
                     state._fsp--;
                     if (state.failed) return ;
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1351:7: ( ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1368:7: ( ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType )?
                     int alt119=2;
                     switch ( input.LA(1) ) {
                         case OPTIONAL:
@@ -9196,9 +9215,9 @@ public class CeylonParser extends Parser {
 
                     switch (alt119) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1352:9: ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType
+                            // /home/david/git/ceylon-spec/Ceylon.g:1369:9: ( OPTIONAL | LBRACKET RBRACKET )? ENTRY_OP qualifiedType
                             {
-                            // /home/david/git/ceylon-spec/Ceylon.g:1352:9: ( OPTIONAL | LBRACKET RBRACKET )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:1369:9: ( OPTIONAL | LBRACKET RBRACKET )?
                             int alt118=3;
                             int LA118_0 = input.LA(1);
 
@@ -9210,14 +9229,14 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt118) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:1352:10: OPTIONAL
+                                    // /home/david/git/ceylon-spec/Ceylon.g:1369:10: OPTIONAL
                                     {
                                     match(input,OPTIONAL,FOLLOW_OPTIONAL_in_unambiguousType9054); if (state.failed) return ;
 
                                     }
                                     break;
                                 case 2 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:1352:21: LBRACKET RBRACKET
+                                    // /home/david/git/ceylon-spec/Ceylon.g:1369:21: LBRACKET RBRACKET
                                     {
                                     match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9058); if (state.failed) return ;
 
@@ -9243,7 +9262,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1355:7: ( OPTIONAL | LBRACKET RBRACKET )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1372:7: ( OPTIONAL | LBRACKET RBRACKET )
                     int alt120=2;
                     int LA120_0 = input.LA(1);
 
@@ -9263,14 +9282,14 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt120) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1355:8: OPTIONAL
+                            // /home/david/git/ceylon-spec/Ceylon.g:1372:8: OPTIONAL
                             {
                             match(input,OPTIONAL,FOLLOW_OPTIONAL_in_unambiguousType9093); if (state.failed) return ;
 
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1355:19: LBRACKET RBRACKET
+                            // /home/david/git/ceylon-spec/Ceylon.g:1372:19: LBRACKET RBRACKET
                             {
                             match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9097); if (state.failed) return ;
 
@@ -9285,7 +9304,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1356:7: LBRACE qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( PRODUCT_OP | SUM_OP ) RBRACE
+                    // /home/david/git/ceylon-spec/Ceylon.g:1373:7: LBRACE qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( PRODUCT_OP | SUM_OP ) RBRACE
                     {
                     match(input,LBRACE,FOLLOW_LBRACE_in_unambiguousType9108); if (state.failed) return ;
 
@@ -9295,7 +9314,7 @@ public class CeylonParser extends Parser {
                     state._fsp--;
                     if (state.failed) return ;
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1357:21: ( OPTIONAL | LBRACKET RBRACKET )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1374:21: ( OPTIONAL | LBRACKET RBRACKET )?
                     int alt121=3;
                     int LA121_0 = input.LA(1);
 
@@ -9307,14 +9326,14 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt121) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1357:22: OPTIONAL
+                            // /home/david/git/ceylon-spec/Ceylon.g:1374:22: OPTIONAL
                             {
                             match(input,OPTIONAL,FOLLOW_OPTIONAL_in_unambiguousType9120); if (state.failed) return ;
 
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1357:33: LBRACKET RBRACKET
+                            // /home/david/git/ceylon-spec/Ceylon.g:1374:33: LBRACKET RBRACKET
                             {
                             match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9124); if (state.failed) return ;
 
@@ -9326,7 +9345,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1358:7: ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1375:7: ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )?
                     int alt123=2;
                     int LA123_0 = input.LA(1);
 
@@ -9335,7 +9354,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt123) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1359:9: ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:1376:9: ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )?
                             {
                             match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_unambiguousType9146); if (state.failed) return ;
 
@@ -9345,7 +9364,7 @@ public class CeylonParser extends Parser {
                             state._fsp--;
                             if (state.failed) return ;
 
-                            // /home/david/git/ceylon-spec/Ceylon.g:1360:9: ( OPTIONAL | LBRACKET RBRACKET )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:1377:9: ( OPTIONAL | LBRACKET RBRACKET )?
                             int alt122=3;
                             int LA122_0 = input.LA(1);
 
@@ -9357,14 +9376,14 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt122) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:1360:10: OPTIONAL
+                                    // /home/david/git/ceylon-spec/Ceylon.g:1377:10: OPTIONAL
                                     {
                                     match(input,OPTIONAL,FOLLOW_OPTIONAL_in_unambiguousType9160); if (state.failed) return ;
 
                                     }
                                     break;
                                 case 2 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:1360:21: LBRACKET RBRACKET
+                                    // /home/david/git/ceylon-spec/Ceylon.g:1377:21: LBRACKET RBRACKET
                                     {
                                     match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9164); if (state.failed) return ;
 
@@ -9399,7 +9418,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1364:7: LBRACKET qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? )* ( PRODUCT_OP | SUM_OP ) RBRACKET
+                    // /home/david/git/ceylon-spec/Ceylon.g:1381:7: LBRACKET qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? ( COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? )* ( PRODUCT_OP | SUM_OP ) RBRACKET
                     {
                     match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9207); if (state.failed) return ;
 
@@ -9409,7 +9428,7 @@ public class CeylonParser extends Parser {
                     state._fsp--;
                     if (state.failed) return ;
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1365:21: ( OPTIONAL | LBRACKET RBRACKET )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1382:21: ( OPTIONAL | LBRACKET RBRACKET )?
                     int alt124=3;
                     int LA124_0 = input.LA(1);
 
@@ -9421,14 +9440,14 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt124) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1365:22: OPTIONAL
+                            // /home/david/git/ceylon-spec/Ceylon.g:1382:22: OPTIONAL
                             {
                             match(input,OPTIONAL,FOLLOW_OPTIONAL_in_unambiguousType9219); if (state.failed) return ;
 
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1365:33: LBRACKET RBRACKET
+                            // /home/david/git/ceylon-spec/Ceylon.g:1382:33: LBRACKET RBRACKET
                             {
                             match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9223); if (state.failed) return ;
 
@@ -9440,7 +9459,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1366:7: ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1383:7: ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )?
                     int alt126=2;
                     int LA126_0 = input.LA(1);
 
@@ -9449,7 +9468,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt126) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1367:9: ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:1384:9: ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )?
                             {
                             match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_unambiguousType9246); if (state.failed) return ;
 
@@ -9459,7 +9478,7 @@ public class CeylonParser extends Parser {
                             state._fsp--;
                             if (state.failed) return ;
 
-                            // /home/david/git/ceylon-spec/Ceylon.g:1368:9: ( OPTIONAL | LBRACKET RBRACKET )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:1385:9: ( OPTIONAL | LBRACKET RBRACKET )?
                             int alt125=3;
                             int LA125_0 = input.LA(1);
 
@@ -9471,14 +9490,14 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt125) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:1368:10: OPTIONAL
+                                    // /home/david/git/ceylon-spec/Ceylon.g:1385:10: OPTIONAL
                                     {
                                     match(input,OPTIONAL,FOLLOW_OPTIONAL_in_unambiguousType9259); if (state.failed) return ;
 
                                     }
                                     break;
                                 case 2 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:1368:21: LBRACKET RBRACKET
+                                    // /home/david/git/ceylon-spec/Ceylon.g:1385:21: LBRACKET RBRACKET
                                     {
                                     match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9263); if (state.failed) return ;
 
@@ -9496,7 +9515,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1370:7: ( COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:1387:7: ( COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )? )*
                     loop130:
                     do {
                         int alt130=2;
@@ -9509,7 +9528,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt130) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:1371:9: COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )?
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:1388:9: COMMA qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )?
                     	    {
                     	    match(input,COMMA,FOLLOW_COMMA_in_unambiguousType9295); if (state.failed) return ;
 
@@ -9519,7 +9538,7 @@ public class CeylonParser extends Parser {
                     	    state._fsp--;
                     	    if (state.failed) return ;
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:1372:23: ( OPTIONAL | LBRACKET RBRACKET )?
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:1389:23: ( OPTIONAL | LBRACKET RBRACKET )?
                     	    int alt127=3;
                     	    int LA127_0 = input.LA(1);
 
@@ -9531,14 +9550,14 @@ public class CeylonParser extends Parser {
                     	    }
                     	    switch (alt127) {
                     	        case 1 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:1372:24: OPTIONAL
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:1389:24: OPTIONAL
                     	            {
                     	            match(input,OPTIONAL,FOLLOW_OPTIONAL_in_unambiguousType9309); if (state.failed) return ;
 
                     	            }
                     	            break;
                     	        case 2 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:1372:35: LBRACKET RBRACKET
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:1389:35: LBRACKET RBRACKET
                     	            {
                     	            match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9313); if (state.failed) return ;
 
@@ -9550,7 +9569,7 @@ public class CeylonParser extends Parser {
                     	    }
 
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:1373:9: ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )?
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:1390:9: ( ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )? )?
                     	    int alt129=2;
                     	    int LA129_0 = input.LA(1);
 
@@ -9559,7 +9578,7 @@ public class CeylonParser extends Parser {
                     	    }
                     	    switch (alt129) {
                     	        case 1 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:1374:11: ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )?
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:1391:11: ENTRY_OP qualifiedType ( OPTIONAL | LBRACKET RBRACKET )?
                     	            {
                     	            match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_unambiguousType9340); if (state.failed) return ;
 
@@ -9569,7 +9588,7 @@ public class CeylonParser extends Parser {
                     	            state._fsp--;
                     	            if (state.failed) return ;
 
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:1375:11: ( OPTIONAL | LBRACKET RBRACKET )?
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:1392:11: ( OPTIONAL | LBRACKET RBRACKET )?
                     	            int alt128=3;
                     	            int LA128_0 = input.LA(1);
 
@@ -9581,14 +9600,14 @@ public class CeylonParser extends Parser {
                     	            }
                     	            switch (alt128) {
                     	                case 1 :
-                    	                    // /home/david/git/ceylon-spec/Ceylon.g:1375:12: OPTIONAL
+                    	                    // /home/david/git/ceylon-spec/Ceylon.g:1392:12: OPTIONAL
                     	                    {
                     	                    match(input,OPTIONAL,FOLLOW_OPTIONAL_in_unambiguousType9356); if (state.failed) return ;
 
                     	                    }
                     	                    break;
                     	                case 2 :
-                    	                    // /home/david/git/ceylon-spec/Ceylon.g:1375:23: LBRACKET RBRACKET
+                    	                    // /home/david/git/ceylon-spec/Ceylon.g:1392:23: LBRACKET RBRACKET
                     	                    {
                     	                    match(input,LBRACKET,FOLLOW_LBRACKET_in_unambiguousType9360); if (state.failed) return ;
 
@@ -9649,7 +9668,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "statement"
-    // /home/david/git/ceylon-spec/Ceylon.g:1382:1: statement returns [Statement statement] : ( directiveStatement | controlStatement | expressionOrSpecificationStatement );
+    // /home/david/git/ceylon-spec/Ceylon.g:1399:1: statement returns [Statement statement] : ( directiveStatement | controlStatement | expressionOrSpecificationStatement );
     public Statement statement() throws RecognitionException {
         Statement statement = null;
 
@@ -9662,7 +9681,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1383:5: ( directiveStatement | controlStatement | expressionOrSpecificationStatement )
+            // /home/david/git/ceylon-spec/Ceylon.g:1400:5: ( directiveStatement | controlStatement | expressionOrSpecificationStatement )
             int alt132=3;
             switch ( input.LA(1) ) {
             case BREAK:
@@ -9739,7 +9758,7 @@ public class CeylonParser extends Parser {
 
             switch (alt132) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1383:7: directiveStatement
+                    // /home/david/git/ceylon-spec/Ceylon.g:1400:7: directiveStatement
                     {
                     pushFollow(FOLLOW_directiveStatement_in_statement9427);
                     directiveStatement198=directiveStatement();
@@ -9752,7 +9771,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1385:7: controlStatement
+                    // /home/david/git/ceylon-spec/Ceylon.g:1402:7: controlStatement
                     {
                     pushFollow(FOLLOW_controlStatement_in_statement9443);
                     controlStatement199=controlStatement();
@@ -9765,7 +9784,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1387:7: expressionOrSpecificationStatement
+                    // /home/david/git/ceylon-spec/Ceylon.g:1404:7: expressionOrSpecificationStatement
                     {
                     pushFollow(FOLLOW_expressionOrSpecificationStatement_in_statement9459);
                     expressionOrSpecificationStatement200=expressionOrSpecificationStatement();
@@ -9795,7 +9814,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "expressionOrSpecificationStatement"
-    // /home/david/git/ceylon-spec/Ceylon.g:1391:1: expressionOrSpecificationStatement returns [Statement statement] : expression ( lazySpecifier )? ( SEMICOLON | COMMA ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1408:1: expressionOrSpecificationStatement returns [Statement statement] : expression ( lazySpecifier )? ( SEMICOLON | COMMA ) ;
     public Statement expressionOrSpecificationStatement() throws RecognitionException {
         Statement statement = null;
 
@@ -9810,8 +9829,8 @@ public class CeylonParser extends Parser {
          SpecifierStatement ss=new SpecifierStatement(null); 
                     ExpressionStatement es=new ExpressionStatement(null); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1394:5: ( expression ( lazySpecifier )? ( SEMICOLON | COMMA ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1394:7: expression ( lazySpecifier )? ( SEMICOLON | COMMA )
+            // /home/david/git/ceylon-spec/Ceylon.g:1411:5: ( expression ( lazySpecifier )? ( SEMICOLON | COMMA ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1411:7: expression ( lazySpecifier )? ( SEMICOLON | COMMA )
             {
             pushFollow(FOLLOW_expression_in_expressionOrSpecificationStatement9497);
             expression201=expression();
@@ -9841,7 +9860,7 @@ public class CeylonParser extends Parser {
                     }
                   }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1416:7: ( lazySpecifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1433:7: ( lazySpecifier )?
             int alt133=2;
             int LA133_0 = input.LA(1);
 
@@ -9850,7 +9869,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt133) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1422:9: lazySpecifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:1439:9: lazySpecifier
                     {
                     pushFollow(FOLLOW_lazySpecifier_in_expressionOrSpecificationStatement9533);
                     lazySpecifier202=lazySpecifier();
@@ -9870,7 +9889,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { expecting=SEMICOLON; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1428:7: ( SEMICOLON | COMMA )
+            // /home/david/git/ceylon-spec/Ceylon.g:1445:7: ( SEMICOLON | COMMA )
             int alt134=2;
             int LA134_0 = input.LA(1);
 
@@ -9890,7 +9909,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt134) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1429:9: SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:1446:9: SEMICOLON
                     {
                     SEMICOLON203=(Token)match(input,SEMICOLON,FOLLOW_SEMICOLON_in_expressionOrSpecificationStatement9578); if (state.failed) return statement;
 
@@ -9899,7 +9918,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1431:9: COMMA
+                    // /home/david/git/ceylon-spec/Ceylon.g:1448:9: COMMA
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                   new MismatchedTokenException(SEMICOLON, input)); }
@@ -9934,7 +9953,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "directiveStatement"
-    // /home/david/git/ceylon-spec/Ceylon.g:1439:1: directiveStatement returns [Directive directive] : d= directive SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1456:1: directiveStatement returns [Directive directive] : d= directive SEMICOLON ;
     public Directive directiveStatement() throws RecognitionException {
         Directive directive = null;
 
@@ -9944,8 +9963,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1440:5: (d= directive SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:1440:7: d= directive SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:1457:5: (d= directive SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:1457:7: d= directive SEMICOLON
             {
             pushFollow(FOLLOW_directive_in_directiveStatement9657);
             d=directive();
@@ -9979,7 +9998,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "directive"
-    // /home/david/git/ceylon-spec/Ceylon.g:1448:1: directive returns [Directive directive] : ( returnDirective | throwDirective | breakDirective | continueDirective );
+    // /home/david/git/ceylon-spec/Ceylon.g:1465:1: directive returns [Directive directive] : ( returnDirective | throwDirective | breakDirective | continueDirective );
     public Directive directive() throws RecognitionException {
         Directive directive = null;
 
@@ -9994,7 +10013,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1449:5: ( returnDirective | throwDirective | breakDirective | continueDirective )
+            // /home/david/git/ceylon-spec/Ceylon.g:1466:5: ( returnDirective | throwDirective | breakDirective | continueDirective )
             int alt135=4;
             switch ( input.LA(1) ) {
             case RETURN:
@@ -10028,7 +10047,7 @@ public class CeylonParser extends Parser {
 
             switch (alt135) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1449:7: returnDirective
+                    // /home/david/git/ceylon-spec/Ceylon.g:1466:7: returnDirective
                     {
                     pushFollow(FOLLOW_returnDirective_in_directive9703);
                     returnDirective206=returnDirective();
@@ -10041,7 +10060,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1451:7: throwDirective
+                    // /home/david/git/ceylon-spec/Ceylon.g:1468:7: throwDirective
                     {
                     pushFollow(FOLLOW_throwDirective_in_directive9719);
                     throwDirective207=throwDirective();
@@ -10054,7 +10073,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1453:7: breakDirective
+                    // /home/david/git/ceylon-spec/Ceylon.g:1470:7: breakDirective
                     {
                     pushFollow(FOLLOW_breakDirective_in_directive9735);
                     breakDirective208=breakDirective();
@@ -10067,7 +10086,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1455:7: continueDirective
+                    // /home/david/git/ceylon-spec/Ceylon.g:1472:7: continueDirective
                     {
                     pushFollow(FOLLOW_continueDirective_in_directive9751);
                     continueDirective209=continueDirective();
@@ -10097,7 +10116,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "returnDirective"
-    // /home/david/git/ceylon-spec/Ceylon.g:1459:1: returnDirective returns [Return directive] : RETURN ( functionOrExpression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1476:1: returnDirective returns [Return directive] : RETURN ( functionOrExpression )? ;
     public Return returnDirective() throws RecognitionException {
         Return directive = null;
 
@@ -10107,14 +10126,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1460:5: ( RETURN ( functionOrExpression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:1460:7: RETURN ( functionOrExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1477:5: ( RETURN ( functionOrExpression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1477:7: RETURN ( functionOrExpression )?
             {
             RETURN210=(Token)match(input,RETURN,FOLLOW_RETURN_in_returnDirective9780); if (state.failed) return directive;
 
             if ( state.backtracking==0 ) { directive = new Return(RETURN210); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1462:7: ( functionOrExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1479:7: ( functionOrExpression )?
             int alt136=2;
             int LA136_0 = input.LA(1);
 
@@ -10123,7 +10142,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt136) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1463:9: functionOrExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:1480:9: functionOrExpression
                     {
                     pushFollow(FOLLOW_functionOrExpression_in_returnDirective9807);
                     functionOrExpression211=functionOrExpression();
@@ -10157,7 +10176,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "throwDirective"
-    // /home/david/git/ceylon-spec/Ceylon.g:1468:1: throwDirective returns [Throw directive] : THROW ( expression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1485:1: throwDirective returns [Throw directive] : THROW ( expression )? ;
     public Throw throwDirective() throws RecognitionException {
         Throw directive = null;
 
@@ -10167,14 +10186,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1469:5: ( THROW ( expression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:1469:7: THROW ( expression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1486:5: ( THROW ( expression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1486:7: THROW ( expression )?
             {
             THROW212=(Token)match(input,THROW,FOLLOW_THROW_in_throwDirective9847); if (state.failed) return directive;
 
             if ( state.backtracking==0 ) { directive = new Throw(THROW212); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1471:7: ( expression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1488:7: ( expression )?
             int alt137=2;
             int LA137_0 = input.LA(1);
 
@@ -10183,7 +10202,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt137) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1472:9: expression
+                    // /home/david/git/ceylon-spec/Ceylon.g:1489:9: expression
                     {
                     pushFollow(FOLLOW_expression_in_throwDirective9874);
                     expression213=expression();
@@ -10217,7 +10236,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "breakDirective"
-    // /home/david/git/ceylon-spec/Ceylon.g:1477:1: breakDirective returns [Break directive] : BREAK ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1494:1: breakDirective returns [Break directive] : BREAK ;
     public Break breakDirective() throws RecognitionException {
         Break directive = null;
 
@@ -10225,8 +10244,8 @@ public class CeylonParser extends Parser {
         Token BREAK214=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1478:5: ( BREAK )
-            // /home/david/git/ceylon-spec/Ceylon.g:1478:7: BREAK
+            // /home/david/git/ceylon-spec/Ceylon.g:1495:5: ( BREAK )
+            // /home/david/git/ceylon-spec/Ceylon.g:1495:7: BREAK
             {
             BREAK214=(Token)match(input,BREAK,FOLLOW_BREAK_in_breakDirective9914); if (state.failed) return directive;
 
@@ -10250,7 +10269,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "continueDirective"
-    // /home/david/git/ceylon-spec/Ceylon.g:1482:1: continueDirective returns [Continue directive] : CONTINUE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1499:1: continueDirective returns [Continue directive] : CONTINUE ;
     public Continue continueDirective() throws RecognitionException {
         Continue directive = null;
 
@@ -10258,8 +10277,8 @@ public class CeylonParser extends Parser {
         Token CONTINUE215=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1483:5: ( CONTINUE )
-            // /home/david/git/ceylon-spec/Ceylon.g:1483:7: CONTINUE
+            // /home/david/git/ceylon-spec/Ceylon.g:1500:5: ( CONTINUE )
+            // /home/david/git/ceylon-spec/Ceylon.g:1500:7: CONTINUE
             {
             CONTINUE215=(Token)match(input,CONTINUE,FOLLOW_CONTINUE_in_continueDirective9943); if (state.failed) return directive;
 
@@ -10283,7 +10302,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeSpecifier"
-    // /home/david/git/ceylon-spec/Ceylon.g:1487:1: typeSpecifier returns [TypeSpecifier typeSpecifier] : ( COMPUTE | SPECIFY ) ( type )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1504:1: typeSpecifier returns [TypeSpecifier typeSpecifier] : ( COMPUTE | SPECIFY ) ( type )? ;
     public TypeSpecifier typeSpecifier() throws RecognitionException {
         TypeSpecifier typeSpecifier = null;
 
@@ -10294,10 +10313,10 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1488:5: ( ( COMPUTE | SPECIFY ) ( type )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:1488:7: ( COMPUTE | SPECIFY ) ( type )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1505:5: ( ( COMPUTE | SPECIFY ) ( type )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1505:7: ( COMPUTE | SPECIFY ) ( type )?
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:1488:7: ( COMPUTE | SPECIFY )
+            // /home/david/git/ceylon-spec/Ceylon.g:1505:7: ( COMPUTE | SPECIFY )
             int alt138=2;
             int LA138_0 = input.LA(1);
 
@@ -10317,7 +10336,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt138) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1489:9: COMPUTE
+                    // /home/david/git/ceylon-spec/Ceylon.g:1506:9: COMPUTE
                     {
                     COMPUTE216=(Token)match(input,COMPUTE,FOLLOW_COMPUTE_in_typeSpecifier9982); if (state.failed) return typeSpecifier;
 
@@ -10326,7 +10345,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1492:9: SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:1509:9: SPECIFY
                     {
                     SPECIFY217=(Token)match(input,SPECIFY,FOLLOW_SPECIFY_in_typeSpecifier10011); if (state.failed) return typeSpecifier;
 
@@ -10338,7 +10357,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1495:7: ( type )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1512:7: ( type )?
             int alt139=2;
             int LA139_0 = input.LA(1);
 
@@ -10347,7 +10366,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt139) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1496:9: type
+                    // /home/david/git/ceylon-spec/Ceylon.g:1513:9: type
                     {
                     pushFollow(FOLLOW_type_in_typeSpecifier10048);
                     type218=type();
@@ -10381,7 +10400,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeDefault"
-    // /home/david/git/ceylon-spec/Ceylon.g:1501:1: typeDefault returns [TypeSpecifier typeSpecifier] : SPECIFY type ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1518:1: typeDefault returns [TypeSpecifier typeSpecifier] : SPECIFY type ;
     public TypeSpecifier typeDefault() throws RecognitionException {
         TypeSpecifier typeSpecifier = null;
 
@@ -10391,8 +10410,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1502:5: ( SPECIFY type )
-            // /home/david/git/ceylon-spec/Ceylon.g:1502:7: SPECIFY type
+            // /home/david/git/ceylon-spec/Ceylon.g:1519:5: ( SPECIFY type )
+            // /home/david/git/ceylon-spec/Ceylon.g:1519:7: SPECIFY type
             {
             SPECIFY219=(Token)match(input,SPECIFY,FOLLOW_SPECIFY_in_typeDefault10088); if (state.failed) return typeSpecifier;
 
@@ -10424,7 +10443,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "specifier"
-    // /home/david/git/ceylon-spec/Ceylon.g:1508:1: specifier returns [SpecifierExpression specifierExpression] : SPECIFY functionOrExpression ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1525:1: specifier returns [SpecifierExpression specifierExpression] : SPECIFY functionOrExpression ;
     public SpecifierExpression specifier() throws RecognitionException {
         SpecifierExpression specifierExpression = null;
 
@@ -10434,8 +10453,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1509:5: ( SPECIFY functionOrExpression )
-            // /home/david/git/ceylon-spec/Ceylon.g:1509:7: SPECIFY functionOrExpression
+            // /home/david/git/ceylon-spec/Ceylon.g:1526:5: ( SPECIFY functionOrExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:1526:7: SPECIFY functionOrExpression
             {
             SPECIFY221=(Token)match(input,SPECIFY,FOLLOW_SPECIFY_in_specifier10134); if (state.failed) return specifierExpression;
 
@@ -10467,7 +10486,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "lazySpecifier"
-    // /home/david/git/ceylon-spec/Ceylon.g:1515:1: lazySpecifier returns [SpecifierExpression specifierExpression] : COMPUTE functionOrExpression ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1532:1: lazySpecifier returns [SpecifierExpression specifierExpression] : COMPUTE functionOrExpression ;
     public SpecifierExpression lazySpecifier() throws RecognitionException {
         SpecifierExpression specifierExpression = null;
 
@@ -10477,8 +10496,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1516:5: ( COMPUTE functionOrExpression )
-            // /home/david/git/ceylon-spec/Ceylon.g:1516:7: COMPUTE functionOrExpression
+            // /home/david/git/ceylon-spec/Ceylon.g:1533:5: ( COMPUTE functionOrExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:1533:7: COMPUTE functionOrExpression
             {
             COMPUTE223=(Token)match(input,COMPUTE,FOLLOW_COMPUTE_in_lazySpecifier10179); if (state.failed) return specifierExpression;
 
@@ -10510,7 +10529,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "functionSpecifier"
-    // /home/david/git/ceylon-spec/Ceylon.g:1522:1: functionSpecifier returns [SpecifierExpression specifierExpression] : ( COMPUTE | SPECIFY ) functionOrExpression ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1539:1: functionSpecifier returns [SpecifierExpression specifierExpression] : ( COMPUTE | SPECIFY ) functionOrExpression ;
     public SpecifierExpression functionSpecifier() throws RecognitionException {
         SpecifierExpression specifierExpression = null;
 
@@ -10521,10 +10540,10 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1523:5: ( ( COMPUTE | SPECIFY ) functionOrExpression )
-            // /home/david/git/ceylon-spec/Ceylon.g:1523:7: ( COMPUTE | SPECIFY ) functionOrExpression
+            // /home/david/git/ceylon-spec/Ceylon.g:1540:5: ( ( COMPUTE | SPECIFY ) functionOrExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:1540:7: ( COMPUTE | SPECIFY ) functionOrExpression
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:1523:7: ( COMPUTE | SPECIFY )
+            // /home/david/git/ceylon-spec/Ceylon.g:1540:7: ( COMPUTE | SPECIFY )
             int alt140=2;
             int LA140_0 = input.LA(1);
 
@@ -10544,7 +10563,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt140) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1524:9: COMPUTE
+                    // /home/david/git/ceylon-spec/Ceylon.g:1541:9: COMPUTE
                     {
                     COMPUTE225=(Token)match(input,COMPUTE,FOLLOW_COMPUTE_in_functionSpecifier10234); if (state.failed) return specifierExpression;
 
@@ -10553,7 +10572,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1527:9: SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:1544:9: SPECIFY
                     {
                     SPECIFY226=(Token)match(input,SPECIFY,FOLLOW_SPECIFY_in_functionSpecifier10262); if (state.failed) return specifierExpression;
 
@@ -10591,7 +10610,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "expression"
-    // /home/david/git/ceylon-spec/Ceylon.g:1534:1: expression returns [Expression expression] : assignmentExpression ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1551:1: expression returns [Expression expression] : assignmentExpression ;
     public Expression expression() throws RecognitionException {
         Expression expression = null;
 
@@ -10600,8 +10619,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1535:5: ( assignmentExpression )
-            // /home/david/git/ceylon-spec/Ceylon.g:1535:7: assignmentExpression
+            // /home/david/git/ceylon-spec/Ceylon.g:1552:5: ( assignmentExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:1552:7: assignmentExpression
             {
             if ( state.backtracking==0 ) { expression = new Expression(null); }
 
@@ -10631,7 +10650,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "base"
-    // /home/david/git/ceylon-spec/Ceylon.g:1540:1: base returns [Primary primary] : ( nonstringLiteral | stringExpression | metaLiteral | enumeration | tuple | dynamicObject | objectExpression | selfReference | parExpression | baseReference );
+    // /home/david/git/ceylon-spec/Ceylon.g:1557:1: base returns [Primary primary] : ( nonstringLiteral | stringExpression | metaLiteral | enumeration | tuple | dynamicObject | objectExpression | selfReference | parExpression | baseReference );
     public Primary base() throws RecognitionException {
         Primary primary = null;
 
@@ -10654,11 +10673,11 @@ public class CeylonParser extends Parser {
 
         Expression parExpression237 =null;
 
-        CeylonParser.baseReference_return baseReference238 =null;
+        PsiCompatibleCeylonParser.baseReference_return baseReference238 =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1541:5: ( nonstringLiteral | stringExpression | metaLiteral | enumeration | tuple | dynamicObject | objectExpression | selfReference | parExpression | baseReference )
+            // /home/david/git/ceylon-spec/Ceylon.g:1558:5: ( nonstringLiteral | stringExpression | metaLiteral | enumeration | tuple | dynamicObject | objectExpression | selfReference | parExpression | baseReference )
             int alt141=10;
             switch ( input.LA(1) ) {
             case CHAR_LITERAL:
@@ -10730,7 +10749,7 @@ public class CeylonParser extends Parser {
 
             switch (alt141) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1541:7: nonstringLiteral
+                    // /home/david/git/ceylon-spec/Ceylon.g:1558:7: nonstringLiteral
                     {
                     pushFollow(FOLLOW_nonstringLiteral_in_base10354);
                     nonstringLiteral229=nonstringLiteral();
@@ -10743,7 +10762,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1543:7: stringExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:1560:7: stringExpression
                     {
                     pushFollow(FOLLOW_stringExpression_in_base10370);
                     stringExpression230=stringExpression();
@@ -10756,7 +10775,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1545:7: metaLiteral
+                    // /home/david/git/ceylon-spec/Ceylon.g:1562:7: metaLiteral
                     {
                     pushFollow(FOLLOW_metaLiteral_in_base10386);
                     metaLiteral231=metaLiteral();
@@ -10769,7 +10788,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1547:7: enumeration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1564:7: enumeration
                     {
                     pushFollow(FOLLOW_enumeration_in_base10402);
                     enumeration232=enumeration();
@@ -10782,7 +10801,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1549:7: tuple
+                    // /home/david/git/ceylon-spec/Ceylon.g:1566:7: tuple
                     {
                     pushFollow(FOLLOW_tuple_in_base10418);
                     tuple233=tuple();
@@ -10795,7 +10814,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1551:7: dynamicObject
+                    // /home/david/git/ceylon-spec/Ceylon.g:1568:7: dynamicObject
                     {
                     pushFollow(FOLLOW_dynamicObject_in_base10434);
                     dynamicObject234=dynamicObject();
@@ -10808,7 +10827,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1553:7: objectExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:1570:7: objectExpression
                     {
                     pushFollow(FOLLOW_objectExpression_in_base10450);
                     objectExpression235=objectExpression();
@@ -10821,7 +10840,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 8 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1555:7: selfReference
+                    // /home/david/git/ceylon-spec/Ceylon.g:1572:7: selfReference
                     {
                     pushFollow(FOLLOW_selfReference_in_base10466);
                     selfReference236=selfReference();
@@ -10834,7 +10853,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 9 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1557:7: parExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:1574:7: parExpression
                     {
                     pushFollow(FOLLOW_parExpression_in_base10482);
                     parExpression237=parExpression();
@@ -10847,7 +10866,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 10 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1559:7: baseReference
+                    // /home/david/git/ceylon-spec/Ceylon.g:1576:7: baseReference
                     {
                     pushFollow(FOLLOW_baseReference_in_base10498);
                     baseReference238=baseReference();
@@ -10892,22 +10911,22 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "baseReference"
-    // /home/david/git/ceylon-spec/Ceylon.g:1572:1: baseReference returns [Identifier identifier, TypeArgumentList typeArgumentList, \n boolean isMember] : ( memberReference | typeReference ) ;
-    public CeylonParser.baseReference_return baseReference() throws RecognitionException {
-        CeylonParser.baseReference_return retval = new CeylonParser.baseReference_return();
+    // /home/david/git/ceylon-spec/Ceylon.g:1589:1: baseReference returns [Identifier identifier, TypeArgumentList typeArgumentList, \n boolean isMember] : ( memberReference | typeReference ) ;
+    public PsiCompatibleCeylonParser.baseReference_return baseReference() throws RecognitionException {
+        PsiCompatibleCeylonParser.baseReference_return retval = new PsiCompatibleCeylonParser.baseReference_return();
         retval.start = input.LT(1);
 
 
-        CeylonParser.memberReference_return memberReference239 =null;
+        PsiCompatibleCeylonParser.memberReference_return memberReference239 =null;
 
-        CeylonParser.typeReference_return typeReference240 =null;
+        PsiCompatibleCeylonParser.typeReference_return typeReference240 =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1574:5: ( ( memberReference | typeReference ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1575:5: ( memberReference | typeReference )
+            // /home/david/git/ceylon-spec/Ceylon.g:1591:5: ( ( memberReference | typeReference ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1592:5: ( memberReference | typeReference )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:1575:5: ( memberReference | typeReference )
+            // /home/david/git/ceylon-spec/Ceylon.g:1592:5: ( memberReference | typeReference )
             int alt142=2;
             int LA142_0 = input.LA(1);
 
@@ -10927,7 +10946,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt142) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1576:7: memberReference
+                    // /home/david/git/ceylon-spec/Ceylon.g:1593:7: memberReference
                     {
                     pushFollow(FOLLOW_memberReference_in_baseReference10540);
                     memberReference239=memberReference();
@@ -10942,7 +10961,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1580:7: typeReference
+                    // /home/david/git/ceylon-spec/Ceylon.g:1597:7: typeReference
                     {
                     pushFollow(FOLLOW_typeReference_in_baseReference10556);
                     typeReference240=typeReference();
@@ -10981,14 +11000,14 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "primary"
-    // /home/david/git/ceylon-spec/Ceylon.g:1587:1: primary returns [Primary primary] : base ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1604:1: primary returns [Primary primary] : base ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )* ;
     public Primary primary() throws RecognitionException {
         Primary primary = null;
 
 
         Primary base241 =null;
 
-        CeylonParser.qualifiedReference_return qualifiedReference242 =null;
+        PsiCompatibleCeylonParser.qualifiedReference_return qualifiedReference242 =null;
 
         IndexExpression indexOrIndexRange243 =null;
 
@@ -11000,8 +11019,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1588:5: ( base ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:1588:7: base ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1605:5: ( base ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:1605:7: base ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )*
             {
             pushFollow(FOLLOW_base_in_primary10591);
             base241=base();
@@ -11011,14 +11030,14 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { primary =base241; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1590:5: ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1607:5: ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )*
             loop143:
             do {
                 int alt143=6;
                 alt143 = dfa143.predict(input);
                 switch (alt143) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1593:11: qualifiedReference
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1610:11: qualifiedReference
             	    {
             	    pushFollow(FOLLOW_qualifiedReference_in_primary10624);
             	    qualifiedReference242=qualifiedReference();
@@ -11042,7 +11061,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1606:9: indexOrIndexRange
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1623:9: indexOrIndexRange
             	    {
             	    pushFollow(FOLLOW_indexOrIndexRange_in_primary10642);
             	    indexOrIndexRange243=indexOrIndexRange();
@@ -11056,7 +11075,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 3 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1609:9: ( specifierParametersStart )=> parameters
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1626:9: ( specifierParametersStart )=> parameters
             	    {
             	    pushFollow(FOLLOW_parameters_in_primary10668);
             	    parameters244=parameters();
@@ -11077,7 +11096,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 4 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1619:9: positionalArguments
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1636:9: positionalArguments
             	    {
             	    pushFollow(FOLLOW_positionalArguments_in_primary10688);
             	    positionalArguments245=positionalArguments();
@@ -11093,7 +11112,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 5 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1624:9: namedArguments
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1641:9: namedArguments
             	    {
             	    pushFollow(FOLLOW_namedArguments_in_primary10709);
             	    namedArguments246=namedArguments();
@@ -11133,15 +11152,15 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "specifierParametersStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:1632:1: specifierParametersStart : LPAREN ( RPAREN ( SPECIFY | COMPUTE | specifierParametersStart ) | compilerAnnotations annotatedDeclarationStart ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1649:1: specifierParametersStart : LPAREN ( RPAREN ( SPECIFY | COMPUTE | specifierParametersStart ) | compilerAnnotations annotatedDeclarationStart ) ;
     public void specifierParametersStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1633:5: ( LPAREN ( RPAREN ( SPECIFY | COMPUTE | specifierParametersStart ) | compilerAnnotations annotatedDeclarationStart ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1633:7: LPAREN ( RPAREN ( SPECIFY | COMPUTE | specifierParametersStart ) | compilerAnnotations annotatedDeclarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:1650:5: ( LPAREN ( RPAREN ( SPECIFY | COMPUTE | specifierParametersStart ) | compilerAnnotations annotatedDeclarationStart ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1650:7: LPAREN ( RPAREN ( SPECIFY | COMPUTE | specifierParametersStart ) | compilerAnnotations annotatedDeclarationStart )
             {
             match(input,LPAREN,FOLLOW_LPAREN_in_specifierParametersStart10743); if (state.failed) return ;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1634:5: ( RPAREN ( SPECIFY | COMPUTE | specifierParametersStart ) | compilerAnnotations annotatedDeclarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:1651:5: ( RPAREN ( SPECIFY | COMPUTE | specifierParametersStart ) | compilerAnnotations annotatedDeclarationStart )
             int alt145=2;
             int LA145_0 = input.LA(1);
 
@@ -11161,11 +11180,11 @@ public class CeylonParser extends Parser {
             }
             switch (alt145) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1635:7: RPAREN ( SPECIFY | COMPUTE | specifierParametersStart )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1652:7: RPAREN ( SPECIFY | COMPUTE | specifierParametersStart )
                     {
                     match(input,RPAREN,FOLLOW_RPAREN_in_specifierParametersStart10759); if (state.failed) return ;
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1635:14: ( SPECIFY | COMPUTE | specifierParametersStart )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1652:14: ( SPECIFY | COMPUTE | specifierParametersStart )
                     int alt144=3;
                     switch ( input.LA(1) ) {
                     case SPECIFY:
@@ -11194,21 +11213,21 @@ public class CeylonParser extends Parser {
 
                     switch (alt144) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1635:15: SPECIFY
+                            // /home/david/git/ceylon-spec/Ceylon.g:1652:15: SPECIFY
                             {
                             match(input,SPECIFY,FOLLOW_SPECIFY_in_specifierParametersStart10762); if (state.failed) return ;
 
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1635:23: COMPUTE
+                            // /home/david/git/ceylon-spec/Ceylon.g:1652:23: COMPUTE
                             {
                             match(input,COMPUTE,FOLLOW_COMPUTE_in_specifierParametersStart10764); if (state.failed) return ;
 
                             }
                             break;
                         case 3 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1635:31: specifierParametersStart
+                            // /home/david/git/ceylon-spec/Ceylon.g:1652:31: specifierParametersStart
                             {
                             pushFollow(FOLLOW_specifierParametersStart_in_specifierParametersStart10766);
                             specifierParametersStart();
@@ -11225,7 +11244,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1637:7: compilerAnnotations annotatedDeclarationStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:1654:7: compilerAnnotations annotatedDeclarationStart
                     {
                     pushFollow(FOLLOW_compilerAnnotations_in_specifierParametersStart10782);
                     compilerAnnotations();
@@ -11270,22 +11289,22 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "qualifiedReference"
-    // /home/david/git/ceylon-spec/Ceylon.g:1641:1: qualifiedReference returns [Identifier identifier, MemberOperator operator, \n TypeArgumentList typeArgumentList, boolean isMember] : memberSelectionOperator ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>) ;
-    public CeylonParser.qualifiedReference_return qualifiedReference() throws RecognitionException {
-        CeylonParser.qualifiedReference_return retval = new CeylonParser.qualifiedReference_return();
+    // /home/david/git/ceylon-spec/Ceylon.g:1658:1: qualifiedReference returns [Identifier identifier, MemberOperator operator, \n TypeArgumentList typeArgumentList, boolean isMember] : memberSelectionOperator ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>) ;
+    public PsiCompatibleCeylonParser.qualifiedReference_return qualifiedReference() throws RecognitionException {
+        PsiCompatibleCeylonParser.qualifiedReference_return retval = new PsiCompatibleCeylonParser.qualifiedReference_return();
         retval.start = input.LT(1);
 
 
         MemberOperator memberSelectionOperator247 =null;
 
-        CeylonParser.memberReference_return memberReference248 =null;
+        PsiCompatibleCeylonParser.memberReference_return memberReference248 =null;
 
-        CeylonParser.typeReference_return typeReference249 =null;
+        PsiCompatibleCeylonParser.typeReference_return typeReference249 =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1643:5: ( memberSelectionOperator ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1643:7: memberSelectionOperator ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>)
+            // /home/david/git/ceylon-spec/Ceylon.g:1660:5: ( memberSelectionOperator ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1660:7: memberSelectionOperator ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>)
             {
             pushFollow(FOLLOW_memberSelectionOperator_in_qualifiedReference10811);
             memberSelectionOperator247=memberSelectionOperator();
@@ -11298,12 +11317,12 @@ public class CeylonParser extends Parser {
                     retval.identifier.setText("");
                     retval.isMember =true; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1648:7: ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>)
+            // /home/david/git/ceylon-spec/Ceylon.g:1665:7: ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>)
             int alt146=3;
             alt146 = dfa146.predict(input);
             switch (alt146) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1649:9: memberReference
+                    // /home/david/git/ceylon-spec/Ceylon.g:1666:9: memberReference
                     {
                     pushFollow(FOLLOW_memberReference_in_qualifiedReference10839);
                     memberReference248=memberReference();
@@ -11317,7 +11336,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1652:9: typeReference
+                    // /home/david/git/ceylon-spec/Ceylon.g:1669:9: typeReference
                     {
                     pushFollow(FOLLOW_typeReference_in_qualifiedReference10859);
                     typeReference249=typeReference();
@@ -11332,7 +11351,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1656:9: (~ ( LIDENTIFIER | UIDENTIFIER ) )=>
+                    // /home/david/git/ceylon-spec/Ceylon.g:1673:9: (~ ( LIDENTIFIER | UIDENTIFIER ) )=>
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                   new MismatchedTokenException(LIDENTIFIER, input)); }
@@ -11364,7 +11383,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "memberSelectionOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:1662:1: memberSelectionOperator returns [MemberOperator operator] : ( MEMBER_OP | SAFE_MEMBER_OP | SPREAD_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:1679:1: memberSelectionOperator returns [MemberOperator operator] : ( MEMBER_OP | SAFE_MEMBER_OP | SPREAD_OP );
     public MemberOperator memberSelectionOperator() throws RecognitionException {
         MemberOperator operator = null;
 
@@ -11374,7 +11393,7 @@ public class CeylonParser extends Parser {
         Token SPREAD_OP252=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1663:5: ( MEMBER_OP | SAFE_MEMBER_OP | SPREAD_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:1680:5: ( MEMBER_OP | SAFE_MEMBER_OP | SPREAD_OP )
             int alt147=3;
             switch ( input.LA(1) ) {
             case MEMBER_OP:
@@ -11403,7 +11422,7 @@ public class CeylonParser extends Parser {
 
             switch (alt147) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1663:7: MEMBER_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:1680:7: MEMBER_OP
                     {
                     MEMBER_OP250=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_memberSelectionOperator10926); if (state.failed) return operator;
 
@@ -11412,7 +11431,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1665:7: SAFE_MEMBER_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:1682:7: SAFE_MEMBER_OP
                     {
                     SAFE_MEMBER_OP251=(Token)match(input,SAFE_MEMBER_OP,FOLLOW_SAFE_MEMBER_OP_in_memberSelectionOperator10942); if (state.failed) return operator;
 
@@ -11421,7 +11440,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1667:7: SPREAD_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:1684:7: SPREAD_OP
                     {
                     SPREAD_OP252=(Token)match(input,SPREAD_OP,FOLLOW_SPREAD_OP_in_memberSelectionOperator10958); if (state.failed) return operator;
 
@@ -11447,7 +11466,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "enumeration"
-    // /home/david/git/ceylon-spec/Ceylon.g:1671:1: enumeration returns [SequenceEnumeration sequenceEnumeration] : LBRACE ( sequencedArgument )? RBRACE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1688:1: enumeration returns [SequenceEnumeration sequenceEnumeration] : LBRACE ( sequencedArgument )? RBRACE ;
     public SequenceEnumeration enumeration() throws RecognitionException {
         SequenceEnumeration sequenceEnumeration = null;
 
@@ -11458,14 +11477,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1672:5: ( LBRACE ( sequencedArgument )? RBRACE )
-            // /home/david/git/ceylon-spec/Ceylon.g:1672:7: LBRACE ( sequencedArgument )? RBRACE
+            // /home/david/git/ceylon-spec/Ceylon.g:1689:5: ( LBRACE ( sequencedArgument )? RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:1689:7: LBRACE ( sequencedArgument )? RBRACE
             {
             LBRACE253=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_enumeration10987); if (state.failed) return sequenceEnumeration;
 
             if ( state.backtracking==0 ) { sequenceEnumeration = new SequenceEnumeration(LBRACE253); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1674:7: ( sequencedArgument )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1691:7: ( sequencedArgument )?
             int alt148=2;
             int LA148_0 = input.LA(1);
 
@@ -11474,7 +11493,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt148) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1675:9: sequencedArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:1692:9: sequencedArgument
                     {
                     pushFollow(FOLLOW_sequencedArgument_in_enumeration11015);
                     sequencedArgument254=sequencedArgument();
@@ -11512,7 +11531,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "tuple"
-    // /home/david/git/ceylon-spec/Ceylon.g:1682:1: tuple returns [Tuple tuple] : LBRACKET ( sequencedArgument )? RBRACKET ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1699:1: tuple returns [Tuple tuple] : LBRACKET ( sequencedArgument )? RBRACKET ;
     public Tuple tuple() throws RecognitionException {
         Tuple tuple = null;
 
@@ -11523,14 +11542,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1683:5: ( LBRACKET ( sequencedArgument )? RBRACKET )
-            // /home/david/git/ceylon-spec/Ceylon.g:1683:7: LBRACKET ( sequencedArgument )? RBRACKET
+            // /home/david/git/ceylon-spec/Ceylon.g:1700:5: ( LBRACKET ( sequencedArgument )? RBRACKET )
+            // /home/david/git/ceylon-spec/Ceylon.g:1700:7: LBRACKET ( sequencedArgument )? RBRACKET
             {
             LBRACKET256=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_tuple11071); if (state.failed) return tuple;
 
             if ( state.backtracking==0 ) { tuple = new Tuple(LBRACKET256); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1685:7: ( sequencedArgument )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1702:7: ( sequencedArgument )?
             int alt149=2;
             int LA149_0 = input.LA(1);
 
@@ -11539,7 +11558,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt149) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1686:9: sequencedArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:1703:9: sequencedArgument
                     {
                     pushFollow(FOLLOW_sequencedArgument_in_tuple11098);
                     sequencedArgument257=sequencedArgument();
@@ -11577,7 +11596,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "dynamicObject"
-    // /home/david/git/ceylon-spec/Ceylon.g:1693:1: dynamicObject returns [Dynamic dynamic] : DYNAMIC LBRACKET ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACKET ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1710:1: dynamicObject returns [Dynamic dynamic] : DYNAMIC LBRACKET ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACKET ;
     public Dynamic dynamicObject() throws RecognitionException {
         Dynamic dynamic = null;
 
@@ -11594,8 +11613,8 @@ public class CeylonParser extends Parser {
 
          NamedArgumentList nal=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1695:5: ( DYNAMIC LBRACKET ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACKET )
-            // /home/david/git/ceylon-spec/Ceylon.g:1695:7: DYNAMIC LBRACKET ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACKET
+            // /home/david/git/ceylon-spec/Ceylon.g:1712:5: ( DYNAMIC LBRACKET ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACKET )
+            // /home/david/git/ceylon-spec/Ceylon.g:1712:7: DYNAMIC LBRACKET ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACKET
             {
             DYNAMIC259=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_dynamicObject11167); if (state.failed) return dynamic;
 
@@ -11605,7 +11624,7 @@ public class CeylonParser extends Parser {
                     nal = new NamedArgumentList(LBRACKET260); 
                     dynamic.setNamedArgumentList(nal); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1699:7: ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1716:7: ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )*
             loop150:
             do {
                 int alt150=3;
@@ -11906,7 +11925,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt150) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1701:9: ( namedArgumentStart )=> namedArgument
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1718:9: ( namedArgumentStart )=> namedArgument
             	    {
             	    pushFollow(FOLLOW_namedArgument_in_dynamicObject11220);
             	    namedArgument261=namedArgument();
@@ -11920,7 +11939,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1705:9: ( anonymousArgument )=> anonymousArgument
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1722:9: ( anonymousArgument )=> anonymousArgument
             	    {
             	    pushFollow(FOLLOW_anonymousArgument_in_dynamicObject11254);
             	    anonymousArgument262=anonymousArgument();
@@ -11940,7 +11959,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1710:7: ( sequencedArgument )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1727:7: ( sequencedArgument )?
             int alt151=2;
             int LA151_0 = input.LA(1);
 
@@ -11949,7 +11968,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt151) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1711:9: sequencedArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:1728:9: sequencedArgument
                     {
                     pushFollow(FOLLOW_sequencedArgument_in_dynamicObject11292);
                     sequencedArgument263=sequencedArgument();
@@ -11987,7 +12006,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "valueCaseList"
-    // /home/david/git/ceylon-spec/Ceylon.g:1718:1: valueCaseList returns [ExpressionList expressionList] :ie1= intersectionExpression ( (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |) )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1735:1: valueCaseList returns [ExpressionList expressionList] :ie1= intersectionExpression ( (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |) )* ;
     public ExpressionList valueCaseList() throws RecognitionException {
         ExpressionList expressionList = null;
 
@@ -12000,8 +12019,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1719:5: (ie1= intersectionExpression ( (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |) )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:1719:7: ie1= intersectionExpression ( (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1736:5: (ie1= intersectionExpression ( (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |) )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:1736:7: ie1= intersectionExpression ( (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |) )*
             {
             if ( state.backtracking==0 ) { expressionList = new ExpressionList(null); }
 
@@ -12015,7 +12034,7 @@ public class CeylonParser extends Parser {
                     e.setTerm(ie1);
                     expressionList.addExpression(e); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1724:7: ( (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1741:7: ( (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |) )*
             loop154:
             do {
                 int alt154=2;
@@ -12028,9 +12047,9 @@ public class CeylonParser extends Parser {
 
                 switch (alt154) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1725:9: (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |)
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1742:9: (c= COMMA |u= UNION_OP ) (ie2= intersectionExpression |)
             	    {
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1725:9: (c= COMMA |u= UNION_OP )
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1742:9: (c= COMMA |u= UNION_OP )
             	    int alt152=2;
             	    int LA152_0 = input.LA(1);
 
@@ -12050,7 +12069,7 @@ public class CeylonParser extends Parser {
             	    }
             	    switch (alt152) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1726:11: c= COMMA
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1743:11: c= COMMA
             	            {
             	            c=(Token)match(input,COMMA,FOLLOW_COMMA_in_valueCaseList11404); if (state.failed) return expressionList;
 
@@ -12059,7 +12078,7 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1728:11: u= UNION_OP
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1745:11: u= UNION_OP
             	            {
             	            u=(Token)match(input,UNION_OP,FOLLOW_UNION_OP_in_valueCaseList11431); if (state.failed) return expressionList;
 
@@ -12071,7 +12090,7 @@ public class CeylonParser extends Parser {
             	    }
 
 
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1731:9: (ie2= intersectionExpression |)
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1748:9: (ie2= intersectionExpression |)
             	    int alt153=2;
             	    int LA153_0 = input.LA(1);
 
@@ -12091,7 +12110,7 @@ public class CeylonParser extends Parser {
             	    }
             	    switch (alt153) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1732:11: ie2= intersectionExpression
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1749:11: ie2= intersectionExpression
             	            {
             	            pushFollow(FOLLOW_intersectionExpression_in_valueCaseList11477);
             	            ie2=intersectionExpression();
@@ -12108,7 +12127,7 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1738:11: 
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1755:11: 
             	            {
             	            if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
             	                          new MismatchedTokenException(LIDENTIFIER, input)); }
@@ -12151,9 +12170,9 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "memberReference"
-    // /home/david/git/ceylon-spec/Ceylon.g:1744:1: memberReference returns [Identifier identifier, \n TypeArgumentList typeArgumentList] : memberName ( ( typeArgumentsStart )=> typeArguments )? ;
-    public CeylonParser.memberReference_return memberReference() throws RecognitionException {
-        CeylonParser.memberReference_return retval = new CeylonParser.memberReference_return();
+    // /home/david/git/ceylon-spec/Ceylon.g:1761:1: memberReference returns [Identifier identifier, \n TypeArgumentList typeArgumentList] : memberName ( ( typeArgumentsStart )=> typeArguments )? ;
+    public PsiCompatibleCeylonParser.memberReference_return memberReference() throws RecognitionException {
+        PsiCompatibleCeylonParser.memberReference_return retval = new PsiCompatibleCeylonParser.memberReference_return();
         retval.start = input.LT(1);
 
 
@@ -12163,8 +12182,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1746:5: ( memberName ( ( typeArgumentsStart )=> typeArguments )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:1746:7: memberName ( ( typeArgumentsStart )=> typeArguments )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1763:5: ( memberName ( ( typeArgumentsStart )=> typeArguments )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1763:7: memberName ( ( typeArgumentsStart )=> typeArguments )?
             {
             pushFollow(FOLLOW_memberName_in_memberReference11542);
             memberName265=memberName();
@@ -12174,12 +12193,12 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { retval.identifier = memberName265; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1748:7: ( ( typeArgumentsStart )=> typeArguments )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1765:7: ( ( typeArgumentsStart )=> typeArguments )?
             int alt155=2;
             alt155 = dfa155.predict(input);
             switch (alt155) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1749:9: ( typeArgumentsStart )=> typeArguments
+                    // /home/david/git/ceylon-spec/Ceylon.g:1766:9: ( typeArgumentsStart )=> typeArguments
                     {
                     pushFollow(FOLLOW_typeArguments_in_memberReference11582);
                     typeArguments266=typeArguments();
@@ -12221,9 +12240,9 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeReference"
-    // /home/david/git/ceylon-spec/Ceylon.g:1755:1: typeReference returns [Identifier identifier, \n TypeArgumentList typeArgumentList] : typeName ( ( typeArgumentsStart )=> typeArguments )? ;
-    public CeylonParser.typeReference_return typeReference() throws RecognitionException {
-        CeylonParser.typeReference_return retval = new CeylonParser.typeReference_return();
+    // /home/david/git/ceylon-spec/Ceylon.g:1772:1: typeReference returns [Identifier identifier, \n TypeArgumentList typeArgumentList] : typeName ( ( typeArgumentsStart )=> typeArguments )? ;
+    public PsiCompatibleCeylonParser.typeReference_return typeReference() throws RecognitionException {
+        PsiCompatibleCeylonParser.typeReference_return retval = new PsiCompatibleCeylonParser.typeReference_return();
         retval.start = input.LT(1);
 
 
@@ -12233,8 +12252,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1757:5: ( typeName ( ( typeArgumentsStart )=> typeArguments )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:1757:7: typeName ( ( typeArgumentsStart )=> typeArguments )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1774:5: ( typeName ( ( typeArgumentsStart )=> typeArguments )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1774:7: typeName ( ( typeArgumentsStart )=> typeArguments )?
             {
             pushFollow(FOLLOW_typeName_in_typeReference11622);
             typeName267=typeName();
@@ -12244,12 +12263,12 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { retval.identifier = typeName267; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1759:7: ( ( typeArgumentsStart )=> typeArguments )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1776:7: ( ( typeArgumentsStart )=> typeArguments )?
             int alt156=2;
             alt156 = dfa156.predict(input);
             switch (alt156) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1760:9: ( typeArgumentsStart )=> typeArguments
+                    // /home/david/git/ceylon-spec/Ceylon.g:1777:9: ( typeArgumentsStart )=> typeArguments
                     {
                     pushFollow(FOLLOW_typeArguments_in_typeReference11663);
                     typeArguments268=typeArguments();
@@ -12286,15 +12305,15 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeArgumentsStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:1769:1: typeArgumentsStart : SMALLER_OP ( type ( LARGER_OP | SMALLER_OP | COMMA ) | SMALLER_OP | LARGER_OP ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1786:1: typeArgumentsStart : SMALLER_OP ( type ( LARGER_OP | SMALLER_OP | COMMA ) | SMALLER_OP | LARGER_OP ) ;
     public void typeArgumentsStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1770:5: ( SMALLER_OP ( type ( LARGER_OP | SMALLER_OP | COMMA ) | SMALLER_OP | LARGER_OP ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1770:7: SMALLER_OP ( type ( LARGER_OP | SMALLER_OP | COMMA ) | SMALLER_OP | LARGER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:1787:5: ( SMALLER_OP ( type ( LARGER_OP | SMALLER_OP | COMMA ) | SMALLER_OP | LARGER_OP ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1787:7: SMALLER_OP ( type ( LARGER_OP | SMALLER_OP | COMMA ) | SMALLER_OP | LARGER_OP )
             {
             match(input,SMALLER_OP,FOLLOW_SMALLER_OP_in_typeArgumentsStart11702); if (state.failed) return ;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1771:5: ( type ( LARGER_OP | SMALLER_OP | COMMA ) | SMALLER_OP | LARGER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:1788:5: ( type ( LARGER_OP | SMALLER_OP | COMMA ) | SMALLER_OP | LARGER_OP )
             int alt157=3;
             switch ( input.LA(1) ) {
             case LBRACE:
@@ -12340,7 +12359,7 @@ public class CeylonParser extends Parser {
 
             switch (alt157) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1772:7: type ( LARGER_OP | SMALLER_OP | COMMA )
+                    // /home/david/git/ceylon-spec/Ceylon.g:1789:7: type ( LARGER_OP | SMALLER_OP | COMMA )
                     {
                     pushFollow(FOLLOW_type_in_typeArgumentsStart11716);
                     type();
@@ -12363,14 +12382,14 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1775:7: SMALLER_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:1792:7: SMALLER_OP
                     {
                     match(input,SMALLER_OP,FOLLOW_SMALLER_OP_in_typeArgumentsStart11744); if (state.failed) return ;
 
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1777:7: LARGER_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:1794:7: LARGER_OP
                     {
                     match(input,LARGER_OP,FOLLOW_LARGER_OP_in_typeArgumentsStart11759); if (state.failed) return ;
 
@@ -12398,7 +12417,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "indexOrIndexRange"
-    // /home/david/git/ceylon-spec/Ceylon.g:1781:1: indexOrIndexRange returns [IndexExpression indexExpression] : LBRACKET (e1= ELLIPSIS i= index |l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )? ) RBRACKET ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1798:1: indexOrIndexRange returns [IndexExpression indexExpression] : LBRACKET (e1= ELLIPSIS i= index |l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )? ) RBRACKET ;
     public IndexExpression indexOrIndexRange() throws RecognitionException {
         IndexExpression indexExpression = null;
 
@@ -12419,14 +12438,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1786:5: ( LBRACKET (e1= ELLIPSIS i= index |l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )? ) RBRACKET )
-            // /home/david/git/ceylon-spec/Ceylon.g:1786:7: LBRACKET (e1= ELLIPSIS i= index |l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )? ) RBRACKET
+            // /home/david/git/ceylon-spec/Ceylon.g:1803:5: ( LBRACKET (e1= ELLIPSIS i= index |l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )? ) RBRACKET )
+            // /home/david/git/ceylon-spec/Ceylon.g:1803:7: LBRACKET (e1= ELLIPSIS i= index |l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )? ) RBRACKET
             {
             LBRACKET269=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_indexOrIndexRange11807); if (state.failed) return indexExpression;
 
             if ( state.backtracking==0 ) { indexExpression = new IndexExpression(LBRACKET269); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1788:7: (e1= ELLIPSIS i= index |l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:1805:7: (e1= ELLIPSIS i= index |l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )? )
             int alt159=2;
             int LA159_0 = input.LA(1);
 
@@ -12446,7 +12465,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt159) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1789:9: e1= ELLIPSIS i= index
+                    // /home/david/git/ceylon-spec/Ceylon.g:1806:9: e1= ELLIPSIS i= index
                     {
                     e1=(Token)match(input,ELLIPSIS,FOLLOW_ELLIPSIS_in_indexOrIndexRange11835); if (state.failed) return indexExpression;
 
@@ -12466,7 +12485,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1797:9: l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1814:9: l= index (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )?
                     {
                     pushFollow(FOLLOW_index_in_indexOrIndexRange11887);
                     l=index();
@@ -12478,7 +12497,7 @@ public class CeylonParser extends Parser {
                               e.setExpression(l); 
                               indexExpression.setElementOrRange(e); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:1801:9: (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1818:9: (e2= ELLIPSIS | RANGE_OP u= index | SEGMENT_OP s= index )?
                     int alt158=4;
                     switch ( input.LA(1) ) {
                         case ELLIPSIS:
@@ -12500,7 +12519,7 @@ public class CeylonParser extends Parser {
 
                     switch (alt158) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1802:11: e2= ELLIPSIS
+                            // /home/david/git/ceylon-spec/Ceylon.g:1819:11: e2= ELLIPSIS
                             {
                             e2=(Token)match(input,ELLIPSIS,FOLLOW_ELLIPSIS_in_indexOrIndexRange11921); if (state.failed) return indexExpression;
 
@@ -12512,7 +12531,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1808:11: RANGE_OP u= index
+                            // /home/david/git/ceylon-spec/Ceylon.g:1825:11: RANGE_OP u= index
                             {
                             RANGE_OP270=(Token)match(input,RANGE_OP,FOLLOW_RANGE_OP_in_indexOrIndexRange11956); if (state.failed) return indexExpression;
 
@@ -12533,7 +12552,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 3 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1816:11: SEGMENT_OP s= index
+                            // /home/david/git/ceylon-spec/Ceylon.g:1833:11: SEGMENT_OP s= index
                             {
                             SEGMENT_OP271=(Token)match(input,SEGMENT_OP,FOLLOW_SEGMENT_OP_in_indexOrIndexRange12008); if (state.failed) return indexExpression;
 
@@ -12585,7 +12604,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "index"
-    // /home/david/git/ceylon-spec/Ceylon.g:1830:1: index returns [Expression expression] : additiveExpression ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1847:1: index returns [Expression expression] : additiveExpression ;
     public Expression index() throws RecognitionException {
         Expression expression = null;
 
@@ -12594,8 +12613,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1831:5: ( additiveExpression )
-            // /home/david/git/ceylon-spec/Ceylon.g:1831:7: additiveExpression
+            // /home/david/git/ceylon-spec/Ceylon.g:1848:5: ( additiveExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:1848:7: additiveExpression
             {
             pushFollow(FOLLOW_additiveExpression_in_index12103);
             additiveExpression273=additiveExpression();
@@ -12624,7 +12643,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "namedArguments"
-    // /home/david/git/ceylon-spec/Ceylon.g:1836:1: namedArguments returns [NamedArgumentList namedArgumentList] : LBRACE ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1853:1: namedArguments returns [NamedArgumentList namedArgumentList] : LBRACE ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACE ;
     public NamedArgumentList namedArguments() throws RecognitionException {
         NamedArgumentList namedArgumentList = null;
 
@@ -12639,14 +12658,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1837:5: ( LBRACE ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACE )
-            // /home/david/git/ceylon-spec/Ceylon.g:1837:7: LBRACE ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACE
+            // /home/david/git/ceylon-spec/Ceylon.g:1854:5: ( LBRACE ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:1854:7: LBRACE ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )* ( sequencedArgument )? RBRACE
             {
             LBRACE274=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_namedArguments12133); if (state.failed) return namedArgumentList;
 
             if ( state.backtracking==0 ) { namedArgumentList = new NamedArgumentList(LBRACE274); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1839:7: ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1856:7: ( ( namedArgumentStart )=> namedArgument | ( anonymousArgument )=> anonymousArgument )*
             loop160:
             do {
                 int alt160=3;
@@ -12947,7 +12966,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt160) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1841:9: ( namedArgumentStart )=> namedArgument
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1858:9: ( namedArgumentStart )=> namedArgument
             	    {
             	    pushFollow(FOLLOW_namedArgument_in_namedArguments12185);
             	    namedArgument275=namedArgument();
@@ -12961,7 +12980,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1845:9: ( anonymousArgument )=> anonymousArgument
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1862:9: ( anonymousArgument )=> anonymousArgument
             	    {
             	    pushFollow(FOLLOW_anonymousArgument_in_namedArguments12219);
             	    anonymousArgument276=anonymousArgument();
@@ -12981,7 +13000,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1850:7: ( sequencedArgument )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1867:7: ( sequencedArgument )?
             int alt161=2;
             int LA161_0 = input.LA(1);
 
@@ -12990,7 +13009,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt161) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1851:9: sequencedArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:1868:9: sequencedArgument
                     {
                     pushFollow(FOLLOW_sequencedArgument_in_namedArguments12257);
                     sequencedArgument277=sequencedArgument();
@@ -13028,7 +13047,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "sequencedArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:1858:1: sequencedArgument returns [SequencedArgument sequencedArgument] : compilerAnnotations ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension |pa1= positionalArgument |sa1= spreadArgument ) (c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |) )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1875:1: sequencedArgument returns [SequencedArgument sequencedArgument] : compilerAnnotations ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension |pa1= positionalArgument |sa1= spreadArgument ) (c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |) )* ;
     public SequencedArgument sequencedArgument() throws RecognitionException {
         SequencedArgument sequencedArgument = null;
 
@@ -13050,8 +13069,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1859:5: ( compilerAnnotations ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension |pa1= positionalArgument |sa1= spreadArgument ) (c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |) )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:1859:7: compilerAnnotations ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension |pa1= positionalArgument |sa1= spreadArgument ) (c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1876:5: ( compilerAnnotations ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension |pa1= positionalArgument |sa1= spreadArgument ) (c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |) )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:1876:7: compilerAnnotations ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension |pa1= positionalArgument |sa1= spreadArgument ) (c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |) )*
             {
             pushFollow(FOLLOW_compilerAnnotations_in_sequencedArgument12313);
             compilerAnnotations279=compilerAnnotations();
@@ -13062,7 +13081,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { sequencedArgument = new SequencedArgument(null);
                     sequencedArgument.getCompilerAnnotations().addAll(compilerAnnotations279); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1862:9: ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension |pa1= positionalArgument |sa1= spreadArgument )
+            // /home/david/git/ceylon-spec/Ceylon.g:1879:9: ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension |pa1= positionalArgument |sa1= spreadArgument )
             int alt162=3;
             int LA162_0 = input.LA(1);
 
@@ -13103,7 +13122,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt162) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1863:11: ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension
+                    // /home/david/git/ceylon-spec/Ceylon.g:1880:11: ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c1= comprehension
                     {
                     pushFollow(FOLLOW_comprehension_in_sequencedArgument12369);
                     c1=comprehension();
@@ -13117,7 +13136,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1868:11: pa1= positionalArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:1885:11: pa1= positionalArgument
                     {
                     pushFollow(FOLLOW_positionalArgument_in_sequencedArgument12406);
                     pa1=positionalArgument();
@@ -13131,7 +13150,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1872:11: sa1= spreadArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:1889:11: sa1= spreadArgument
                     {
                     pushFollow(FOLLOW_spreadArgument_in_sequencedArgument12442);
                     sa1=spreadArgument();
@@ -13148,7 +13167,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1876:9: (c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |) )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1893:9: (c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |) )*
             loop164:
             do {
                 int alt164=2;
@@ -13161,13 +13180,13 @@ public class CeylonParser extends Parser {
 
                 switch (alt164) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1877:11: c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |)
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1894:11: c= COMMA ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |)
             	    {
             	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_sequencedArgument12488); if (state.failed) return sequencedArgument;
 
             	    if ( state.backtracking==0 ) { sequencedArgument.setEndToken(c); }
 
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1879:11: ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |)
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1896:11: ( ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension |pa2= positionalArgument |sa2= spreadArgument |)
             	    int alt163=4;
             	    int LA163_0 = input.LA(1);
 
@@ -13211,7 +13230,7 @@ public class CeylonParser extends Parser {
             	    }
             	    switch (alt163) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1880:13: ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1897:13: ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )=>c2= comprehension
             	            {
             	            pushFollow(FOLLOW_comprehension_in_sequencedArgument12554);
             	            c2=comprehension();
@@ -13226,7 +13245,7 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1886:13: pa2= positionalArgument
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1903:13: pa2= positionalArgument
             	            {
             	            pushFollow(FOLLOW_positionalArgument_in_sequencedArgument12597);
             	            pa2=positionalArgument();
@@ -13241,7 +13260,7 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 3 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1891:13: sa2= spreadArgument
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1908:13: sa2= spreadArgument
             	            {
             	            pushFollow(FOLLOW_spreadArgument_in_sequencedArgument12640);
             	            sa2=spreadArgument();
@@ -13256,7 +13275,7 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 4 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:1896:13: 
+            	            // /home/david/git/ceylon-spec/Ceylon.g:1913:13: 
             	            {
             	            if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
             	                            new MismatchedTokenException(LIDENTIFIER, input)); }
@@ -13294,7 +13313,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "namedArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:1902:1: namedArgument returns [NamedArgument namedArgument] : compilerAnnotations ( namedSpecifiedArgument | namedArgumentDeclaration ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1919:1: namedArgument returns [NamedArgument namedArgument] : compilerAnnotations ( namedSpecifiedArgument | namedArgumentDeclaration ) ;
     public NamedArgument namedArgument() throws RecognitionException {
         NamedArgument namedArgument = null;
 
@@ -13307,8 +13326,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1903:5: ( compilerAnnotations ( namedSpecifiedArgument | namedArgumentDeclaration ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1903:7: compilerAnnotations ( namedSpecifiedArgument | namedArgumentDeclaration )
+            // /home/david/git/ceylon-spec/Ceylon.g:1920:5: ( compilerAnnotations ( namedSpecifiedArgument | namedArgumentDeclaration ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1920:7: compilerAnnotations ( namedSpecifiedArgument | namedArgumentDeclaration )
             {
             pushFollow(FOLLOW_compilerAnnotations_in_namedArgument12725);
             compilerAnnotations282=compilerAnnotations();
@@ -13316,7 +13335,7 @@ public class CeylonParser extends Parser {
             state._fsp--;
             if (state.failed) return namedArgument;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1904:5: ( namedSpecifiedArgument | namedArgumentDeclaration )
+            // /home/david/git/ceylon-spec/Ceylon.g:1921:5: ( namedSpecifiedArgument | namedArgumentDeclaration )
             int alt165=2;
             int LA165_0 = input.LA(1);
 
@@ -13351,7 +13370,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt165) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1905:7: namedSpecifiedArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:1922:7: namedSpecifiedArgument
                     {
                     pushFollow(FOLLOW_namedSpecifiedArgument_in_namedArgument12742);
                     namedSpecifiedArgument280=namedSpecifiedArgument();
@@ -13364,7 +13383,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1908:7: namedArgumentDeclaration
+                    // /home/david/git/ceylon-spec/Ceylon.g:1925:7: namedArgumentDeclaration
                     {
                     pushFollow(FOLLOW_namedArgumentDeclaration_in_namedArgument12764);
                     namedArgumentDeclaration281=namedArgumentDeclaration();
@@ -13401,7 +13420,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "namedSpecifiedArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:1915:1: namedSpecifiedArgument returns [SpecifiedArgument specifiedArgument] : memberName ( specifier )? SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1932:1: namedSpecifiedArgument returns [SpecifiedArgument specifiedArgument] : memberName ( specifier )? SEMICOLON ;
     public SpecifiedArgument namedSpecifiedArgument() throws RecognitionException {
         SpecifiedArgument specifiedArgument = null;
 
@@ -13413,8 +13432,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1916:5: ( memberName ( specifier )? SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:1916:7: memberName ( specifier )? SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:1933:5: ( memberName ( specifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:1933:7: memberName ( specifier )? SEMICOLON
             {
             pushFollow(FOLLOW_memberName_in_namedSpecifiedArgument12805);
             memberName283=memberName();
@@ -13425,7 +13444,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { specifiedArgument = new SpecifiedArgument(null); 
                     specifiedArgument.setIdentifier(memberName283); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1919:7: ( specifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1936:7: ( specifier )?
             int alt166=2;
             int LA166_0 = input.LA(1);
 
@@ -13434,7 +13453,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt166) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1920:9: specifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:1937:9: specifier
                     {
                     pushFollow(FOLLOW_specifier_in_namedSpecifiedArgument12831);
                     specifier284=specifier();
@@ -13474,7 +13493,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "anonymousArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:1928:1: anonymousArgument returns [SpecifiedArgument namedArgument] : functionOrExpression SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1945:1: anonymousArgument returns [SpecifiedArgument namedArgument] : functionOrExpression SEMICOLON ;
     public SpecifiedArgument anonymousArgument() throws RecognitionException {
         SpecifiedArgument namedArgument = null;
 
@@ -13485,8 +13504,8 @@ public class CeylonParser extends Parser {
 
          namedArgument = new SpecifiedArgument(null); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1930:5: ( functionOrExpression SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:1930:7: functionOrExpression SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:1947:5: ( functionOrExpression SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:1947:7: functionOrExpression SEMICOLON
             {
             pushFollow(FOLLOW_functionOrExpression_in_anonymousArgument12905);
             functionOrExpression286=functionOrExpression();
@@ -13522,7 +13541,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "objectArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:1939:1: objectArgument returns [ObjectArgument declaration] : OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1956:1: objectArgument returns [ObjectArgument declaration] : OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON ) ;
     public ObjectArgument objectArgument() throws RecognitionException {
         ObjectArgument declaration = null;
 
@@ -13539,8 +13558,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1940:5: ( OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1940:7: OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:1957:5: ( OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1957:7: OBJECT_DEFINITION memberNameDeclaration ( extendedType )? ( satisfiedTypes )? ( classBody | SEMICOLON )
             {
             OBJECT_DEFINITION288=(Token)match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_objectArgument12960); if (state.failed) return declaration;
 
@@ -13555,7 +13574,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { declaration.setIdentifier(memberNameDeclaration289); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1945:7: ( extendedType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1962:7: ( extendedType )?
             int alt167=2;
             int LA167_0 = input.LA(1);
 
@@ -13564,7 +13583,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt167) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1946:9: extendedType
+                    // /home/david/git/ceylon-spec/Ceylon.g:1963:9: extendedType
                     {
                     pushFollow(FOLLOW_extendedType_in_objectArgument13004);
                     extendedType290=extendedType();
@@ -13580,7 +13599,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1949:7: ( satisfiedTypes )?
+            // /home/david/git/ceylon-spec/Ceylon.g:1966:7: ( satisfiedTypes )?
             int alt168=2;
             int LA168_0 = input.LA(1);
 
@@ -13589,7 +13608,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt168) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1950:9: satisfiedTypes
+                    // /home/david/git/ceylon-spec/Ceylon.g:1967:9: satisfiedTypes
                     {
                     pushFollow(FOLLOW_satisfiedTypes_in_objectArgument13043);
                     satisfiedTypes291=satisfiedTypes();
@@ -13605,7 +13624,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1953:7: ( classBody | SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:1970:7: ( classBody | SEMICOLON )
             int alt169=2;
             int LA169_0 = input.LA(1);
 
@@ -13625,7 +13644,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt169) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1954:9: classBody
+                    // /home/david/git/ceylon-spec/Ceylon.g:1971:9: classBody
                     {
                     pushFollow(FOLLOW_classBody_in_objectArgument13081);
                     classBody292=classBody();
@@ -13638,7 +13657,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1956:9: SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:1973:9: SEMICOLON
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                   new MismatchedTokenException(LBRACE, input)); }
@@ -13671,7 +13690,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "voidOrInferredMethodArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:1963:1: voidOrInferredMethodArgument returns [MethodArgument declaration] : ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( parameters )* ( block | ( functionSpecifier )? SEMICOLON ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:1980:1: voidOrInferredMethodArgument returns [MethodArgument declaration] : ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( parameters )* ( block | ( functionSpecifier )? SEMICOLON ) ;
     public MethodArgument voidOrInferredMethodArgument() throws RecognitionException {
         MethodArgument declaration = null;
 
@@ -13689,12 +13708,12 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1964:5: ( ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( parameters )* ( block | ( functionSpecifier )? SEMICOLON ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1964:7: ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( parameters )* ( block | ( functionSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:1981:5: ( ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( parameters )* ( block | ( functionSpecifier )? SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:1981:7: ( VOID_MODIFIER | FUNCTION_MODIFIER ) memberNameDeclaration ( parameters )* ( block | ( functionSpecifier )? SEMICOLON )
             {
             if ( state.backtracking==0 ) { declaration =new MethodArgument(null); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1965:7: ( VOID_MODIFIER | FUNCTION_MODIFIER )
+            // /home/david/git/ceylon-spec/Ceylon.g:1982:7: ( VOID_MODIFIER | FUNCTION_MODIFIER )
             int alt170=2;
             int LA170_0 = input.LA(1);
 
@@ -13714,7 +13733,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt170) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1966:9: VOID_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1983:9: VOID_MODIFIER
                     {
                     VOID_MODIFIER294=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_voidOrInferredMethodArgument13168); if (state.failed) return declaration;
 
@@ -13723,7 +13742,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1969:9: FUNCTION_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:1986:9: FUNCTION_MODIFIER
                     {
                     FUNCTION_MODIFIER295=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_voidOrInferredMethodArgument13196); if (state.failed) return declaration;
 
@@ -13743,7 +13762,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { declaration.setIdentifier(memberNameDeclaration296); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1974:7: ( parameters )*
+            // /home/david/git/ceylon-spec/Ceylon.g:1991:7: ( parameters )*
             loop171:
             do {
                 int alt171=2;
@@ -13756,7 +13775,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt171) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:1975:9: parameters
+            	    // /home/david/git/ceylon-spec/Ceylon.g:1992:9: parameters
             	    {
             	    pushFollow(FOLLOW_parameters_in_voidOrInferredMethodArgument13250);
             	    parameters297=parameters();
@@ -13775,7 +13794,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1978:7: ( block | ( functionSpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:1995:7: ( block | ( functionSpecifier )? SEMICOLON )
             int alt173=2;
             int LA173_0 = input.LA(1);
 
@@ -13795,7 +13814,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt173) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1979:9: block
+                    // /home/david/git/ceylon-spec/Ceylon.g:1996:9: block
                     {
                     pushFollow(FOLLOW_block_in_voidOrInferredMethodArgument13287);
                     block298=block();
@@ -13808,9 +13827,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:1982:9: ( functionSpecifier )? SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:1999:9: ( functionSpecifier )? SEMICOLON
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:1982:9: ( functionSpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:1999:9: ( functionSpecifier )?
                     int alt172=2;
                     int LA172_0 = input.LA(1);
 
@@ -13819,7 +13838,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt172) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:1983:11: functionSpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:2000:11: functionSpecifier
                             {
                             pushFollow(FOLLOW_functionSpecifier_in_voidOrInferredMethodArgument13328);
                             functionSpecifier299=functionSpecifier();
@@ -13867,7 +13886,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "inferredGetterArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:1993:1: inferredGetterArgument returns [AttributeArgument declaration] : VALUE_MODIFIER memberNameDeclaration ( block | ( specifier | lazySpecifier )? SEMICOLON ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2010:1: inferredGetterArgument returns [AttributeArgument declaration] : VALUE_MODIFIER memberNameDeclaration ( block | ( specifier | lazySpecifier )? SEMICOLON ) ;
     public AttributeArgument inferredGetterArgument() throws RecognitionException {
         AttributeArgument declaration = null;
 
@@ -13884,8 +13903,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:1994:5: ( VALUE_MODIFIER memberNameDeclaration ( block | ( specifier | lazySpecifier )? SEMICOLON ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:1994:7: VALUE_MODIFIER memberNameDeclaration ( block | ( specifier | lazySpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:2011:5: ( VALUE_MODIFIER memberNameDeclaration ( block | ( specifier | lazySpecifier )? SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2011:7: VALUE_MODIFIER memberNameDeclaration ( block | ( specifier | lazySpecifier )? SEMICOLON )
             {
             if ( state.backtracking==0 ) { declaration =new AttributeArgument(null); }
 
@@ -13901,7 +13920,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { declaration.setIdentifier(memberNameDeclaration302); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:1999:7: ( block | ( specifier | lazySpecifier )? SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:2016:7: ( block | ( specifier | lazySpecifier )? SEMICOLON )
             int alt175=2;
             int LA175_0 = input.LA(1);
 
@@ -13921,7 +13940,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt175) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2000:9: block
+                    // /home/david/git/ceylon-spec/Ceylon.g:2017:9: block
                     {
                     pushFollow(FOLLOW_block_in_inferredGetterArgument13472);
                     block303=block();
@@ -13934,9 +13953,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2003:9: ( specifier | lazySpecifier )? SEMICOLON
+                    // /home/david/git/ceylon-spec/Ceylon.g:2020:9: ( specifier | lazySpecifier )? SEMICOLON
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:2003:9: ( specifier | lazySpecifier )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:2020:9: ( specifier | lazySpecifier )?
                     int alt174=3;
                     int LA174_0 = input.LA(1);
 
@@ -13948,7 +13967,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt174) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2004:11: specifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:2021:11: specifier
                             {
                             pushFollow(FOLLOW_specifier_in_inferredGetterArgument13513);
                             specifier304=specifier();
@@ -13961,7 +13980,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2007:11: lazySpecifier
+                            // /home/david/git/ceylon-spec/Ceylon.g:2024:11: lazySpecifier
                             {
                             pushFollow(FOLLOW_lazySpecifier_in_inferredGetterArgument13549);
                             lazySpecifier305=lazySpecifier();
@@ -14009,7 +14028,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typedMethodOrGetterArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:2017:1: typedMethodOrGetterArgument returns [TypedArgument declaration] : ( type | DYNAMIC ) memberNameDeclaration ( ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON ) | (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON ) ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2034:1: typedMethodOrGetterArgument returns [TypedArgument declaration] : ( type | DYNAMIC ) memberNameDeclaration ( ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON ) | (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON ) ) ;
     public TypedArgument typedMethodOrGetterArgument() throws RecognitionException {
         TypedArgument declaration = null;
 
@@ -14038,10 +14057,10 @@ public class CeylonParser extends Parser {
                     AttributeArgument aarg = new AttributeArgument(null); 
                     declaration =aarg; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2021:5: ( ( type | DYNAMIC ) memberNameDeclaration ( ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON ) | (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON ) ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:2021:7: ( type | DYNAMIC ) memberNameDeclaration ( ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON ) | (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2038:5: ( ( type | DYNAMIC ) memberNameDeclaration ( ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON ) | (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON ) ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2038:7: ( type | DYNAMIC ) memberNameDeclaration ( ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON ) | (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON ) )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:2021:7: ( type | DYNAMIC )
+            // /home/david/git/ceylon-spec/Ceylon.g:2038:7: ( type | DYNAMIC )
             int alt176=2;
             int LA176_0 = input.LA(1);
 
@@ -14061,7 +14080,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt176) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2022:9: type
+                    // /home/david/git/ceylon-spec/Ceylon.g:2039:9: type
                     {
                     pushFollow(FOLLOW_type_in_typedMethodOrGetterArgument13661);
                     type307=type();
@@ -14075,7 +14094,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2026:9: DYNAMIC
+                    // /home/david/git/ceylon-spec/Ceylon.g:2043:9: DYNAMIC
                     {
                     DYNAMIC308=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_typedMethodOrGetterArgument13690); if (state.failed) return declaration;
 
@@ -14098,7 +14117,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { marg.setIdentifier(memberNameDeclaration309);
                     aarg.setIdentifier(memberNameDeclaration309); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2034:7: ( ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON ) | (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2051:7: ( ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON ) | (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON ) )
             int alt182=2;
             int LA182_0 = input.LA(1);
 
@@ -14118,11 +14137,11 @@ public class CeylonParser extends Parser {
             }
             switch (alt182) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2035:9: ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2052:9: ( parameters )+ (b1= block | ( functionSpecifier )? s1= SEMICOLON )
                     {
                     if ( state.backtracking==0 ) { declaration = marg; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2036:9: ( parameters )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:2053:9: ( parameters )+
                     int cnt177=0;
                     loop177:
                     do {
@@ -14136,7 +14155,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt177) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:2037:11: parameters
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:2054:11: parameters
                     	    {
                     	    pushFollow(FOLLOW_parameters_in_typedMethodOrGetterArgument13764);
                     	    parameters310=parameters();
@@ -14160,7 +14179,7 @@ public class CeylonParser extends Parser {
                     } while (true);
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2040:9: (b1= block | ( functionSpecifier )? s1= SEMICOLON )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2057:9: (b1= block | ( functionSpecifier )? s1= SEMICOLON )
                     int alt179=2;
                     int LA179_0 = input.LA(1);
 
@@ -14180,7 +14199,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt179) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2041:11: b1= block
+                            // /home/david/git/ceylon-spec/Ceylon.g:2058:11: b1= block
                             {
                             pushFollow(FOLLOW_block_in_typedMethodOrGetterArgument13811);
                             b1=block();
@@ -14193,9 +14212,9 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2044:11: ( functionSpecifier )? s1= SEMICOLON
+                            // /home/david/git/ceylon-spec/Ceylon.g:2061:11: ( functionSpecifier )? s1= SEMICOLON
                             {
-                            // /home/david/git/ceylon-spec/Ceylon.g:2044:11: ( functionSpecifier )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:2061:11: ( functionSpecifier )?
                             int alt178=2;
                             int LA178_0 = input.LA(1);
 
@@ -14204,7 +14223,7 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt178) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:2045:13: functionSpecifier
+                                    // /home/david/git/ceylon-spec/Ceylon.g:2062:13: functionSpecifier
                                     {
                                     pushFollow(FOLLOW_functionSpecifier_in_typedMethodOrGetterArgument13860);
                                     functionSpecifier311=functionSpecifier();
@@ -14237,9 +14256,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2054:9: (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2071:9: (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON )
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:2054:9: (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2071:9: (b2= block | ( specifier | lazySpecifier )? s2= SEMICOLON )
                     int alt181=2;
                     int LA181_0 = input.LA(1);
 
@@ -14259,7 +14278,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt181) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2055:11: b2= block
+                            // /home/david/git/ceylon-spec/Ceylon.g:2072:11: b2= block
                             {
                             pushFollow(FOLLOW_block_in_typedMethodOrGetterArgument13979);
                             b2=block();
@@ -14272,9 +14291,9 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2058:11: ( specifier | lazySpecifier )? s2= SEMICOLON
+                            // /home/david/git/ceylon-spec/Ceylon.g:2075:11: ( specifier | lazySpecifier )? s2= SEMICOLON
                             {
-                            // /home/david/git/ceylon-spec/Ceylon.g:2058:11: ( specifier | lazySpecifier )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:2075:11: ( specifier | lazySpecifier )?
                             int alt180=3;
                             int LA180_0 = input.LA(1);
 
@@ -14286,7 +14305,7 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt180) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:2059:13: specifier
+                                    // /home/david/git/ceylon-spec/Ceylon.g:2076:13: specifier
                                     {
                                     pushFollow(FOLLOW_specifier_in_typedMethodOrGetterArgument14028);
                                     specifier312=specifier();
@@ -14299,7 +14318,7 @@ public class CeylonParser extends Parser {
                                     }
                                     break;
                                 case 2 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:2062:13: lazySpecifier
+                                    // /home/david/git/ceylon-spec/Ceylon.g:2079:13: lazySpecifier
                                     {
                                     pushFollow(FOLLOW_lazySpecifier_in_typedMethodOrGetterArgument14070);
                                     lazySpecifier313=lazySpecifier();
@@ -14353,7 +14372,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "untypedMethodOrGetterArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:2073:1: untypedMethodOrGetterArgument returns [TypedArgument declaration] : memberName ( ( parameters )+ ( functionSpecifier ) | lazySpecifier ) SEMICOLON ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2090:1: untypedMethodOrGetterArgument returns [TypedArgument declaration] : memberName ( ( parameters )+ ( functionSpecifier ) | lazySpecifier ) SEMICOLON ;
     public TypedArgument untypedMethodOrGetterArgument() throws RecognitionException {
         TypedArgument declaration = null;
 
@@ -14374,8 +14393,8 @@ public class CeylonParser extends Parser {
                     aarg.setType(new ValueModifier(null));
                     declaration =aarg; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2079:5: ( memberName ( ( parameters )+ ( functionSpecifier ) | lazySpecifier ) SEMICOLON )
-            // /home/david/git/ceylon-spec/Ceylon.g:2079:7: memberName ( ( parameters )+ ( functionSpecifier ) | lazySpecifier ) SEMICOLON
+            // /home/david/git/ceylon-spec/Ceylon.g:2096:5: ( memberName ( ( parameters )+ ( functionSpecifier ) | lazySpecifier ) SEMICOLON )
+            // /home/david/git/ceylon-spec/Ceylon.g:2096:7: memberName ( ( parameters )+ ( functionSpecifier ) | lazySpecifier ) SEMICOLON
             {
             pushFollow(FOLLOW_memberName_in_untypedMethodOrGetterArgument14196);
             memberName314=memberName();
@@ -14386,7 +14405,7 @@ public class CeylonParser extends Parser {
             if ( state.backtracking==0 ) { marg.setIdentifier(memberName314);
                     aarg.setIdentifier(memberName314); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2082:7: ( ( parameters )+ ( functionSpecifier ) | lazySpecifier )
+            // /home/david/git/ceylon-spec/Ceylon.g:2099:7: ( ( parameters )+ ( functionSpecifier ) | lazySpecifier )
             int alt184=2;
             int LA184_0 = input.LA(1);
 
@@ -14406,11 +14425,11 @@ public class CeylonParser extends Parser {
             }
             switch (alt184) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2083:9: ( parameters )+ ( functionSpecifier )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2100:9: ( parameters )+ ( functionSpecifier )
                     {
                     if ( state.backtracking==0 ) { declaration = marg; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2084:9: ( parameters )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:2101:9: ( parameters )+
                     int cnt183=0;
                     loop183:
                     do {
@@ -14424,7 +14443,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt183) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:2085:11: parameters
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:2102:11: parameters
                     	    {
                     	    pushFollow(FOLLOW_parameters_in_untypedMethodOrGetterArgument14245);
                     	    parameters315=parameters();
@@ -14448,8 +14467,8 @@ public class CeylonParser extends Parser {
                     } while (true);
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2088:9: ( functionSpecifier )
-                    // /home/david/git/ceylon-spec/Ceylon.g:2089:11: functionSpecifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:2105:9: ( functionSpecifier )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2106:11: functionSpecifier
                     {
                     pushFollow(FOLLOW_functionSpecifier_in_untypedMethodOrGetterArgument14290);
                     functionSpecifier316=functionSpecifier();
@@ -14465,7 +14484,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2097:11: lazySpecifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:2114:11: lazySpecifier
                     {
                     pushFollow(FOLLOW_lazySpecifier_in_untypedMethodOrGetterArgument14368);
                     lazySpecifier317=lazySpecifier();
@@ -14507,7 +14526,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "namedArgumentDeclaration"
-    // /home/david/git/ceylon-spec/Ceylon.g:2107:1: namedArgumentDeclaration returns [NamedArgument declaration] : ( objectArgument | typedMethodOrGetterArgument | voidOrInferredMethodArgument | inferredGetterArgument | untypedMethodOrGetterArgument );
+    // /home/david/git/ceylon-spec/Ceylon.g:2124:1: namedArgumentDeclaration returns [NamedArgument declaration] : ( objectArgument | typedMethodOrGetterArgument | voidOrInferredMethodArgument | inferredGetterArgument | untypedMethodOrGetterArgument );
     public NamedArgument namedArgumentDeclaration() throws RecognitionException {
         NamedArgument declaration = null;
 
@@ -14524,7 +14543,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2108:5: ( objectArgument | typedMethodOrGetterArgument | voidOrInferredMethodArgument | inferredGetterArgument | untypedMethodOrGetterArgument )
+            // /home/david/git/ceylon-spec/Ceylon.g:2125:5: ( objectArgument | typedMethodOrGetterArgument | voidOrInferredMethodArgument | inferredGetterArgument | untypedMethodOrGetterArgument )
             int alt185=5;
             switch ( input.LA(1) ) {
             case OBJECT_DEFINITION:
@@ -14568,7 +14587,7 @@ public class CeylonParser extends Parser {
 
             switch (alt185) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2108:7: objectArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:2125:7: objectArgument
                     {
                     pushFollow(FOLLOW_objectArgument_in_namedArgumentDeclaration14451);
                     objectArgument319=objectArgument();
@@ -14581,7 +14600,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2110:7: typedMethodOrGetterArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:2127:7: typedMethodOrGetterArgument
                     {
                     pushFollow(FOLLOW_typedMethodOrGetterArgument_in_namedArgumentDeclaration14467);
                     typedMethodOrGetterArgument320=typedMethodOrGetterArgument();
@@ -14594,7 +14613,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2112:7: voidOrInferredMethodArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:2129:7: voidOrInferredMethodArgument
                     {
                     pushFollow(FOLLOW_voidOrInferredMethodArgument_in_namedArgumentDeclaration14483);
                     voidOrInferredMethodArgument321=voidOrInferredMethodArgument();
@@ -14607,7 +14626,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2114:7: inferredGetterArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:2131:7: inferredGetterArgument
                     {
                     pushFollow(FOLLOW_inferredGetterArgument_in_namedArgumentDeclaration14499);
                     inferredGetterArgument322=inferredGetterArgument();
@@ -14620,7 +14639,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2116:7: untypedMethodOrGetterArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:2133:7: untypedMethodOrGetterArgument
                     {
                     pushFollow(FOLLOW_untypedMethodOrGetterArgument_in_namedArgumentDeclaration14515);
                     untypedMethodOrGetterArgument323=untypedMethodOrGetterArgument();
@@ -14650,11 +14669,11 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "namedArgumentStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:2123:1: namedArgumentStart : compilerAnnotations ( specificationStart | declarationStart ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2140:1: namedArgumentStart : compilerAnnotations ( specificationStart | declarationStart ) ;
     public void namedArgumentStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2124:5: ( compilerAnnotations ( specificationStart | declarationStart ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:2124:7: compilerAnnotations ( specificationStart | declarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:2141:5: ( compilerAnnotations ( specificationStart | declarationStart ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2141:7: compilerAnnotations ( specificationStart | declarationStart )
             {
             pushFollow(FOLLOW_compilerAnnotations_in_namedArgumentStart14543);
             compilerAnnotations();
@@ -14662,7 +14681,7 @@ public class CeylonParser extends Parser {
             state._fsp--;
             if (state.failed) return ;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2125:7: ( specificationStart | declarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:2142:7: ( specificationStart | declarationStart )
             int alt186=2;
             int LA186_0 = input.LA(1);
 
@@ -14682,7 +14701,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt186) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2125:8: specificationStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:2142:8: specificationStart
                     {
                     pushFollow(FOLLOW_specificationStart_in_namedArgumentStart14553);
                     specificationStart();
@@ -14693,7 +14712,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2125:29: declarationStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:2142:29: declarationStart
                     {
                     pushFollow(FOLLOW_declarationStart_in_namedArgumentStart14557);
                     declarationStart();
@@ -14725,15 +14744,15 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "namedAnnotationArgumentsStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:2128:1: namedAnnotationArgumentsStart : LBRACE ( ( namedArgumentStart )=> namedArgumentStart | iterableArgumentStart | RBRACE ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2145:1: namedAnnotationArgumentsStart : LBRACE ( ( namedArgumentStart )=> namedArgumentStart | iterableArgumentStart | RBRACE ) ;
     public void namedAnnotationArgumentsStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2129:5: ( LBRACE ( ( namedArgumentStart )=> namedArgumentStart | iterableArgumentStart | RBRACE ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:2129:7: LBRACE ( ( namedArgumentStart )=> namedArgumentStart | iterableArgumentStart | RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:2146:5: ( LBRACE ( ( namedArgumentStart )=> namedArgumentStart | iterableArgumentStart | RBRACE ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2146:7: LBRACE ( ( namedArgumentStart )=> namedArgumentStart | iterableArgumentStart | RBRACE )
             {
             match(input,LBRACE,FOLLOW_LBRACE_in_namedAnnotationArgumentsStart14575); if (state.failed) return ;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2129:14: ( ( namedArgumentStart )=> namedArgumentStart | iterableArgumentStart | RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:2146:14: ( ( namedArgumentStart )=> namedArgumentStart | iterableArgumentStart | RBRACE )
             int alt187=3;
             int LA187_0 = input.LA(1);
 
@@ -14906,7 +14925,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt187) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2129:15: ( namedArgumentStart )=> namedArgumentStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:2146:15: ( namedArgumentStart )=> namedArgumentStart
                     {
                     pushFollow(FOLLOW_namedArgumentStart_in_namedAnnotationArgumentsStart14582);
                     namedArgumentStart();
@@ -14917,7 +14936,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2129:58: iterableArgumentStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:2146:58: iterableArgumentStart
                     {
                     pushFollow(FOLLOW_iterableArgumentStart_in_namedAnnotationArgumentsStart14586);
                     iterableArgumentStart();
@@ -14928,7 +14947,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2129:82: RBRACE
+                    // /home/david/git/ceylon-spec/Ceylon.g:2146:82: RBRACE
                     {
                     match(input,RBRACE,FOLLOW_RBRACE_in_namedAnnotationArgumentsStart14590); if (state.failed) return ;
 
@@ -14956,11 +14975,11 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "iterableArgumentStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:2132:1: iterableArgumentStart : compilerAnnotations expression ( COMMA | SEMICOLON | RBRACE ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2149:1: iterableArgumentStart : compilerAnnotations expression ( COMMA | SEMICOLON | RBRACE ) ;
     public void iterableArgumentStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2133:5: ( compilerAnnotations expression ( COMMA | SEMICOLON | RBRACE ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:2133:7: compilerAnnotations expression ( COMMA | SEMICOLON | RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:2150:5: ( compilerAnnotations expression ( COMMA | SEMICOLON | RBRACE ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2150:7: compilerAnnotations expression ( COMMA | SEMICOLON | RBRACE )
             {
             pushFollow(FOLLOW_compilerAnnotations_in_iterableArgumentStart14608);
             compilerAnnotations();
@@ -15004,15 +15023,15 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "specificationStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:2137:1: specificationStart : LIDENTIFIER ( parameters )* ( SPECIFY | COMPUTE ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2154:1: specificationStart : LIDENTIFIER ( parameters )* ( SPECIFY | COMPUTE ) ;
     public void specificationStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2138:5: ( LIDENTIFIER ( parameters )* ( SPECIFY | COMPUTE ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:2138:7: LIDENTIFIER ( parameters )* ( SPECIFY | COMPUTE )
+            // /home/david/git/ceylon-spec/Ceylon.g:2155:5: ( LIDENTIFIER ( parameters )* ( SPECIFY | COMPUTE ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2155:7: LIDENTIFIER ( parameters )* ( SPECIFY | COMPUTE )
             {
             match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_specificationStart14636); if (state.failed) return ;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2138:19: ( parameters )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2155:19: ( parameters )*
             loop188:
             do {
                 int alt188=2;
@@ -15025,7 +15044,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt188) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2138:19: parameters
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2155:19: parameters
             	    {
             	    pushFollow(FOLLOW_parameters_in_specificationStart14638);
             	    parameters();
@@ -15072,7 +15091,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "parExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2141:1: parExpression returns [Expression expression] : LPAREN functionOrExpression RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2158:1: parExpression returns [Expression expression] : LPAREN functionOrExpression RPAREN ;
     public Expression parExpression() throws RecognitionException {
         Expression expression = null;
 
@@ -15083,8 +15102,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2142:5: ( LPAREN functionOrExpression RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:2142:7: LPAREN functionOrExpression RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:2159:5: ( LPAREN functionOrExpression RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:2159:7: LPAREN functionOrExpression RPAREN
             {
             LPAREN324=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_parExpression14667); if (state.failed) return expression;
 
@@ -15121,7 +15140,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "positionalArguments"
-    // /home/david/git/ceylon-spec/Ceylon.g:2151:1: positionalArguments returns [PositionalArgumentList positionalArgumentList] : LPAREN (sa= sequencedArgument )? RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2168:1: positionalArguments returns [PositionalArgumentList positionalArgumentList] : LPAREN (sa= sequencedArgument )? RPAREN ;
     public PositionalArgumentList positionalArguments() throws RecognitionException {
         PositionalArgumentList positionalArgumentList = null;
 
@@ -15132,14 +15151,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2152:5: ( LPAREN (sa= sequencedArgument )? RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:2152:7: LPAREN (sa= sequencedArgument )? RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:2169:5: ( LPAREN (sa= sequencedArgument )? RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:2169:7: LPAREN (sa= sequencedArgument )? RPAREN
             {
             LPAREN327=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_positionalArguments14737); if (state.failed) return positionalArgumentList;
 
             if ( state.backtracking==0 ) { positionalArgumentList = new PositionalArgumentList(LPAREN327); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2154:7: (sa= sequencedArgument )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2171:7: (sa= sequencedArgument )?
             int alt189=2;
             int LA189_0 = input.LA(1);
 
@@ -15148,7 +15167,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt189) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2155:9: sa= sequencedArgument
+                    // /home/david/git/ceylon-spec/Ceylon.g:2172:9: sa= sequencedArgument
                     {
                     pushFollow(FOLLOW_sequencedArgument_in_positionalArguments14766);
                     sa=sequencedArgument();
@@ -15191,7 +15210,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "positionalArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:2167:1: positionalArgument returns [ListedArgument positionalArgument] : functionOrExpression ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2184:1: positionalArgument returns [ListedArgument positionalArgument] : functionOrExpression ;
     public ListedArgument positionalArgument() throws RecognitionException {
         ListedArgument positionalArgument = null;
 
@@ -15200,8 +15219,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2168:5: ( functionOrExpression )
-            // /home/david/git/ceylon-spec/Ceylon.g:2168:7: functionOrExpression
+            // /home/david/git/ceylon-spec/Ceylon.g:2185:5: ( functionOrExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:2185:7: functionOrExpression
             {
             if ( state.backtracking==0 ) { positionalArgument = new ListedArgument(null); }
 
@@ -15231,7 +15250,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "spreadArgument"
-    // /home/david/git/ceylon-spec/Ceylon.g:2173:1: spreadArgument returns [SpreadArgument positionalArgument] : PRODUCT_OP unionExpression ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2190:1: spreadArgument returns [SpreadArgument positionalArgument] : PRODUCT_OP unionExpression ;
     public SpreadArgument spreadArgument() throws RecognitionException {
         SpreadArgument positionalArgument = null;
 
@@ -15241,8 +15260,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2174:5: ( PRODUCT_OP unionExpression )
-            // /home/david/git/ceylon-spec/Ceylon.g:2174:7: PRODUCT_OP unionExpression
+            // /home/david/git/ceylon-spec/Ceylon.g:2191:5: ( PRODUCT_OP unionExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:2191:7: PRODUCT_OP unionExpression
             {
             PRODUCT_OP330=(Token)match(input,PRODUCT_OP,FOLLOW_PRODUCT_OP_in_spreadArgument14859); if (state.failed) return positionalArgument;
 
@@ -15276,15 +15295,15 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "anonParametersStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:2182:1: anonParametersStart : LPAREN ( RPAREN | LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) ) | compilerAnnotations annotatedDeclarationStart ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2199:1: anonParametersStart : LPAREN ( RPAREN | LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) ) | compilerAnnotations annotatedDeclarationStart ) ;
     public void anonParametersStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2183:5: ( LPAREN ( RPAREN | LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) ) | compilerAnnotations annotatedDeclarationStart ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:2183:7: LPAREN ( RPAREN | LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) ) | compilerAnnotations annotatedDeclarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:2200:5: ( LPAREN ( RPAREN | LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) ) | compilerAnnotations annotatedDeclarationStart ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2200:7: LPAREN ( RPAREN | LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) ) | compilerAnnotations annotatedDeclarationStart )
             {
             match(input,LPAREN,FOLLOW_LPAREN_in_anonParametersStart14900); if (state.failed) return ;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2184:5: ( RPAREN | LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) ) | compilerAnnotations annotatedDeclarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:2201:5: ( RPAREN | LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) ) | compilerAnnotations annotatedDeclarationStart )
             int alt191=3;
             switch ( input.LA(1) ) {
             case RPAREN:
@@ -15344,18 +15363,18 @@ public class CeylonParser extends Parser {
 
             switch (alt191) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2185:7: RPAREN
+                    // /home/david/git/ceylon-spec/Ceylon.g:2202:7: RPAREN
                     {
                     match(input,RPAREN,FOLLOW_RPAREN_in_anonParametersStart14916); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2186:7: LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2203:7: LIDENTIFIER ( COMMA | RPAREN ( COMPUTE | LBRACE ) )
                     {
                     match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_anonParametersStart14924); if (state.failed) return ;
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2186:19: ( COMMA | RPAREN ( COMPUTE | LBRACE ) )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2203:19: ( COMMA | RPAREN ( COMPUTE | LBRACE ) )
                     int alt190=2;
                     int LA190_0 = input.LA(1);
 
@@ -15375,14 +15394,14 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt190) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2186:20: COMMA
+                            // /home/david/git/ceylon-spec/Ceylon.g:2203:20: COMMA
                             {
                             match(input,COMMA,FOLLOW_COMMA_in_anonParametersStart14927); if (state.failed) return ;
 
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2186:28: RPAREN ( COMPUTE | LBRACE )
+                            // /home/david/git/ceylon-spec/Ceylon.g:2203:28: RPAREN ( COMPUTE | LBRACE )
                             {
                             match(input,RPAREN,FOLLOW_RPAREN_in_anonParametersStart14931); if (state.failed) return ;
 
@@ -15407,7 +15426,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2187:7: compilerAnnotations annotatedDeclarationStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:2204:7: compilerAnnotations annotatedDeclarationStart
                     {
                     pushFollow(FOLLOW_compilerAnnotations_in_anonParametersStart14947);
                     compilerAnnotations();
@@ -15445,11 +15464,11 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "nonemptyParametersStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:2191:1: nonemptyParametersStart : LPAREN compilerAnnotations annotatedDeclarationStart ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2208:1: nonemptyParametersStart : LPAREN compilerAnnotations annotatedDeclarationStart ;
     public void nonemptyParametersStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2192:5: ( LPAREN compilerAnnotations annotatedDeclarationStart )
-            // /home/david/git/ceylon-spec/Ceylon.g:2192:7: LPAREN compilerAnnotations annotatedDeclarationStart
+            // /home/david/git/ceylon-spec/Ceylon.g:2209:5: ( LPAREN compilerAnnotations annotatedDeclarationStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:2209:7: LPAREN compilerAnnotations annotatedDeclarationStart
             {
             match(input,LPAREN,FOLLOW_LPAREN_in_nonemptyParametersStart14973); if (state.failed) return ;
 
@@ -15483,7 +15502,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "functionOrExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2195:1: functionOrExpression returns [Expression expression] : ( ( FUNCTION_MODIFIER | VOID_MODIFIER | anonParametersStart )=> anonymousFunction | conditionalExpression | switchExpression |e= expression );
+    // /home/david/git/ceylon-spec/Ceylon.g:2212:1: functionOrExpression returns [Expression expression] : ( ( FUNCTION_MODIFIER | VOID_MODIFIER | anonParametersStart )=> anonymousFunction | conditionalExpression | switchExpression |e= expression );
     public Expression functionOrExpression() throws RecognitionException {
         Expression expression = null;
 
@@ -15498,7 +15517,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2196:5: ( ( FUNCTION_MODIFIER | VOID_MODIFIER | anonParametersStart )=> anonymousFunction | conditionalExpression | switchExpression |e= expression )
+            // /home/david/git/ceylon-spec/Ceylon.g:2213:5: ( ( FUNCTION_MODIFIER | VOID_MODIFIER | anonParametersStart )=> anonymousFunction | conditionalExpression | switchExpression |e= expression )
             int alt192=4;
             int LA192_0 = input.LA(1);
 
@@ -15545,7 +15564,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt192) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2196:7: ( FUNCTION_MODIFIER | VOID_MODIFIER | anonParametersStart )=> anonymousFunction
+                    // /home/david/git/ceylon-spec/Ceylon.g:2213:7: ( FUNCTION_MODIFIER | VOID_MODIFIER | anonParametersStart )=> anonymousFunction
                     {
                     pushFollow(FOLLOW_anonymousFunction_in_functionOrExpression15014);
                     anonymousFunction332=anonymousFunction();
@@ -15559,7 +15578,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2200:7: conditionalExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2217:7: conditionalExpression
                     {
                     pushFollow(FOLLOW_conditionalExpression_in_functionOrExpression15030);
                     conditionalExpression333=conditionalExpression();
@@ -15573,7 +15592,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2203:7: switchExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2220:7: switchExpression
                     {
                     pushFollow(FOLLOW_switchExpression_in_functionOrExpression15046);
                     switchExpression334=switchExpression();
@@ -15587,7 +15606,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2206:7: e= expression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2223:7: e= expression
                     {
                     pushFollow(FOLLOW_expression_in_functionOrExpression15064);
                     e=expression();
@@ -15617,7 +15636,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "let"
-    // /home/david/git/ceylon-spec/Ceylon.g:2210:1: let returns [LetExpression let] : letClause ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2227:1: let returns [LetExpression let] : letClause ;
     public LetExpression let() throws RecognitionException {
         LetExpression let = null;
 
@@ -15626,8 +15645,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2211:5: ( letClause )
-            // /home/david/git/ceylon-spec/Ceylon.g:2211:7: letClause
+            // /home/david/git/ceylon-spec/Ceylon.g:2228:5: ( letClause )
+            // /home/david/git/ceylon-spec/Ceylon.g:2228:7: letClause
             {
             pushFollow(FOLLOW_letClause_in_let15093);
             letClause335=letClause();
@@ -15656,10 +15675,10 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "patternStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:2216:1: patternStart : ( ( variable ENTRY_OP )=> variable ENTRY_OP | tuplePatternStart );
+    // /home/david/git/ceylon-spec/Ceylon.g:2233:1: patternStart : ( ( variable ENTRY_OP )=> variable ENTRY_OP | tuplePatternStart );
     public void patternStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2217:5: ( ( variable ENTRY_OP )=> variable ENTRY_OP | tuplePatternStart )
+            // /home/david/git/ceylon-spec/Ceylon.g:2234:5: ( ( variable ENTRY_OP )=> variable ENTRY_OP | tuplePatternStart )
             int alt193=2;
             int LA193_0 = input.LA(1);
 
@@ -15715,7 +15734,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt193) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2217:7: ( variable ENTRY_OP )=> variable ENTRY_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2234:7: ( variable ENTRY_OP )=> variable ENTRY_OP
                     {
                     pushFollow(FOLLOW_variable_in_patternStart15126);
                     variable();
@@ -15728,7 +15747,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2218:7: tuplePatternStart
+                    // /home/david/git/ceylon-spec/Ceylon.g:2235:7: tuplePatternStart
                     {
                     pushFollow(FOLLOW_tuplePatternStart_in_patternStart15139);
                     tuplePatternStart();
@@ -15756,7 +15775,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "letVariable"
-    // /home/david/git/ceylon-spec/Ceylon.g:2221:1: letVariable returns [Statement statement] : ( ( patternStart )=> pattern | variable ) ( specifier )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2238:1: letVariable returns [Statement statement] : ( ( patternStart )=> pattern | variable ) ( specifier )? ;
     public Statement letVariable() throws RecognitionException {
         Statement statement = null;
 
@@ -15769,10 +15788,10 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2222:5: ( ( ( patternStart )=> pattern | variable ) ( specifier )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2222:7: ( ( patternStart )=> pattern | variable ) ( specifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2239:5: ( ( ( patternStart )=> pattern | variable ) ( specifier )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2239:7: ( ( patternStart )=> pattern | variable ) ( specifier )?
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:2222:7: ( ( patternStart )=> pattern | variable )
+            // /home/david/git/ceylon-spec/Ceylon.g:2239:7: ( ( patternStart )=> pattern | variable )
             int alt194=2;
             switch ( input.LA(1) ) {
             case LBRACKET:
@@ -15966,7 +15985,7 @@ public class CeylonParser extends Parser {
 
             switch (alt194) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2223:9: ( patternStart )=> pattern
+                    // /home/david/git/ceylon-spec/Ceylon.g:2240:9: ( patternStart )=> pattern
                     {
                     pushFollow(FOLLOW_pattern_in_letVariable15176);
                     pattern336=pattern();
@@ -15981,7 +16000,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2228:9: variable
+                    // /home/david/git/ceylon-spec/Ceylon.g:2245:9: variable
                     {
                     pushFollow(FOLLOW_variable_in_letVariable15204);
                     variable337=variable();
@@ -15997,7 +16016,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2231:7: ( specifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2248:7: ( specifier )?
             int alt195=2;
             int LA195_0 = input.LA(1);
 
@@ -16006,7 +16025,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt195) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2232:9: specifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:2249:9: specifier
                     {
                     pushFollow(FOLLOW_specifier_in_letVariable15240);
                     specifier338=specifier();
@@ -16043,7 +16062,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "letClause"
-    // /home/david/git/ceylon-spec/Ceylon.g:2240:1: letClause returns [LetClause letClause] : LET LPAREN (v1= letVariable ( COMMA v2= letVariable )* )? RPAREN conditionalBranch ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2257:1: letClause returns [LetClause letClause] : LET LPAREN (v1= letVariable ( COMMA v2= letVariable )* )? RPAREN conditionalBranch ;
     public LetClause letClause() throws RecognitionException {
         LetClause letClause = null;
 
@@ -16060,8 +16079,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2241:5: ( LET LPAREN (v1= letVariable ( COMMA v2= letVariable )* )? RPAREN conditionalBranch )
-            // /home/david/git/ceylon-spec/Ceylon.g:2241:7: LET LPAREN (v1= letVariable ( COMMA v2= letVariable )* )? RPAREN conditionalBranch
+            // /home/david/git/ceylon-spec/Ceylon.g:2258:5: ( LET LPAREN (v1= letVariable ( COMMA v2= letVariable )* )? RPAREN conditionalBranch )
+            // /home/david/git/ceylon-spec/Ceylon.g:2258:7: LET LPAREN (v1= letVariable ( COMMA v2= letVariable )* )? RPAREN conditionalBranch
             {
             LET339=(Token)match(input,LET,FOLLOW_LET_in_letClause15280); if (state.failed) return letClause;
 
@@ -16071,7 +16090,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { letClause.setEndToken(LPAREN340); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2245:7: (v1= letVariable ( COMMA v2= letVariable )* )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2262:7: (v1= letVariable ( COMMA v2= letVariable )* )?
             int alt197=2;
             int LA197_0 = input.LA(1);
 
@@ -16080,7 +16099,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt197) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2246:9: v1= letVariable ( COMMA v2= letVariable )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:2263:9: v1= letVariable ( COMMA v2= letVariable )*
                     {
                     pushFollow(FOLLOW_letVariable_in_letClause15324);
                     v1=letVariable();
@@ -16091,7 +16110,7 @@ public class CeylonParser extends Parser {
                     if ( state.backtracking==0 ) { letClause.setEndToken(null);
                               letClause.addVariable(v1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2249:9: ( COMMA v2= letVariable )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:2266:9: ( COMMA v2= letVariable )*
                     loop196:
                     do {
                         int alt196=2;
@@ -16104,7 +16123,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt196) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:2250:11: COMMA v2= letVariable
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:2267:11: COMMA v2= letVariable
                     	    {
                     	    COMMA341=(Token)match(input,COMMA,FOLLOW_COMMA_in_letClause15356); if (state.failed) return letClause;
 
@@ -16165,7 +16184,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "conditionalExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2264:1: conditionalExpression returns [Term term] : ( ifExpression | let );
+    // /home/david/git/ceylon-spec/Ceylon.g:2281:1: conditionalExpression returns [Term term] : ( ifExpression | let );
     public Term conditionalExpression() throws RecognitionException {
         Term term = null;
 
@@ -16176,7 +16195,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2265:5: ( ifExpression | let )
+            // /home/david/git/ceylon-spec/Ceylon.g:2282:5: ( ifExpression | let )
             int alt198=2;
             int LA198_0 = input.LA(1);
 
@@ -16196,7 +16215,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt198) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2265:7: ifExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2282:7: ifExpression
                     {
                     pushFollow(FOLLOW_ifExpression_in_conditionalExpression15467);
                     ifExpression344=ifExpression();
@@ -16209,7 +16228,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2267:7: let
+                    // /home/david/git/ceylon-spec/Ceylon.g:2284:7: let
                     {
                     pushFollow(FOLLOW_let_in_conditionalExpression15483);
                     let345=let();
@@ -16239,7 +16258,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "switchExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2271:1: switchExpression returns [SwitchExpression term] : switchHeader caseExpressions ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2288:1: switchExpression returns [SwitchExpression term] : switchHeader caseExpressions ;
     public SwitchExpression switchExpression() throws RecognitionException {
         SwitchExpression term = null;
 
@@ -16250,8 +16269,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2272:5: ( switchHeader caseExpressions )
-            // /home/david/git/ceylon-spec/Ceylon.g:2272:7: switchHeader caseExpressions
+            // /home/david/git/ceylon-spec/Ceylon.g:2289:5: ( switchHeader caseExpressions )
+            // /home/david/git/ceylon-spec/Ceylon.g:2289:7: switchHeader caseExpressions
             {
             pushFollow(FOLLOW_switchHeader_in_switchExpression15512);
             switchHeader346=switchHeader();
@@ -16337,7 +16356,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "caseExpressions"
-    // /home/david/git/ceylon-spec/Ceylon.g:2328:1: caseExpressions returns [SwitchCaseList switchCaseList] : ( caseExpression )+ ( defaultCaseExpression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2345:1: caseExpressions returns [SwitchCaseList switchCaseList] : ( caseExpression )+ ( defaultCaseExpression )? ;
     public SwitchCaseList caseExpressions() throws RecognitionException {
         SwitchCaseList switchCaseList = null;
 
@@ -16348,12 +16367,12 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2329:5: ( ( caseExpression )+ ( defaultCaseExpression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2329:7: ( caseExpression )+ ( defaultCaseExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2346:5: ( ( caseExpression )+ ( defaultCaseExpression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2346:7: ( caseExpression )+ ( defaultCaseExpression )?
             {
             if ( state.backtracking==0 ) { switchCaseList = new SwitchCaseList(null); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2330:7: ( caseExpression )+
+            // /home/david/git/ceylon-spec/Ceylon.g:2347:7: ( caseExpression )+
             int cnt199=0;
             loop199:
             do {
@@ -16367,7 +16386,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt199) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2331:9: caseExpression
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2348:9: caseExpression
             	    {
             	    pushFollow(FOLLOW_caseExpression_in_caseExpressions15575);
             	    caseExpression348=caseExpression();
@@ -16391,7 +16410,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2334:7: ( defaultCaseExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2351:7: ( defaultCaseExpression )?
             int alt200=2;
             int LA200_0 = input.LA(1);
 
@@ -16400,7 +16419,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt200) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2335:9: defaultCaseExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2352:9: defaultCaseExpression
                     {
                     pushFollow(FOLLOW_defaultCaseExpression_in_caseExpressions15612);
                     defaultCaseExpression349=defaultCaseExpression();
@@ -16434,7 +16453,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "caseExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2340:1: caseExpression returns [CaseClause clause] : CASE_CLAUSE caseItemList conditionalBranch ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2357:1: caseExpression returns [CaseClause clause] : CASE_CLAUSE caseItemList conditionalBranch ;
     public CaseClause caseExpression() throws RecognitionException {
         CaseClause clause = null;
 
@@ -16446,8 +16465,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2341:5: ( CASE_CLAUSE caseItemList conditionalBranch )
-            // /home/david/git/ceylon-spec/Ceylon.g:2341:7: CASE_CLAUSE caseItemList conditionalBranch
+            // /home/david/git/ceylon-spec/Ceylon.g:2358:5: ( CASE_CLAUSE caseItemList conditionalBranch )
+            // /home/david/git/ceylon-spec/Ceylon.g:2358:7: CASE_CLAUSE caseItemList conditionalBranch
             {
             CASE_CLAUSE350=(Token)match(input,CASE_CLAUSE,FOLLOW_CASE_CLAUSE_in_caseExpression15656); if (state.failed) return clause;
 
@@ -16487,7 +16506,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "defaultCaseExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2349:1: defaultCaseExpression returns [ElseClause clause] : ELSE_CLAUSE conditionalBranch ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2366:1: defaultCaseExpression returns [ElseClause clause] : ELSE_CLAUSE conditionalBranch ;
     public ElseClause defaultCaseExpression() throws RecognitionException {
         ElseClause clause = null;
 
@@ -16497,8 +16516,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2350:5: ( ELSE_CLAUSE conditionalBranch )
-            // /home/david/git/ceylon-spec/Ceylon.g:2350:7: ELSE_CLAUSE conditionalBranch
+            // /home/david/git/ceylon-spec/Ceylon.g:2367:5: ( ELSE_CLAUSE conditionalBranch )
+            // /home/david/git/ceylon-spec/Ceylon.g:2367:7: ELSE_CLAUSE conditionalBranch
             {
             ELSE_CLAUSE353=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_defaultCaseExpression15718); if (state.failed) return clause;
 
@@ -16530,18 +16549,18 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "ifExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2356:1: ifExpression returns [IfExpression term] : IF_CLAUSE thenElseClauses ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2373:1: ifExpression returns [IfExpression term] : IF_CLAUSE thenElseClauses ;
     public IfExpression ifExpression() throws RecognitionException {
         IfExpression term = null;
 
 
         Token IF_CLAUSE355=null;
-        CeylonParser.thenElseClauses_return thenElseClauses356 =null;
+        PsiCompatibleCeylonParser.thenElseClauses_return thenElseClauses356 =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2357:5: ( IF_CLAUSE thenElseClauses )
-            // /home/david/git/ceylon-spec/Ceylon.g:2357:7: IF_CLAUSE thenElseClauses
+            // /home/david/git/ceylon-spec/Ceylon.g:2374:5: ( IF_CLAUSE thenElseClauses )
+            // /home/david/git/ceylon-spec/Ceylon.g:2374:7: IF_CLAUSE thenElseClauses
             {
             IF_CLAUSE355=(Token)match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_ifExpression15764); if (state.failed) return term;
 
@@ -16622,7 +16641,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "conditionalBranch"
-    // /home/david/git/ceylon-spec/Ceylon.g:2412:1: conditionalBranch returns [Expression expression] : ( conditionalExpression | disjunctionExpression );
+    // /home/david/git/ceylon-spec/Ceylon.g:2429:1: conditionalBranch returns [Expression expression] : ( conditionalExpression | disjunctionExpression );
     public Expression conditionalBranch() throws RecognitionException {
         Expression expression = null;
 
@@ -16633,7 +16652,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2413:5: ( conditionalExpression | disjunctionExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:2430:5: ( conditionalExpression | disjunctionExpression )
             int alt201=2;
             int LA201_0 = input.LA(1);
 
@@ -16653,7 +16672,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt201) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2413:7: conditionalExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2430:7: conditionalExpression
                     {
                     pushFollow(FOLLOW_conditionalExpression_in_conditionalBranch15809);
                     conditionalExpression357=conditionalExpression();
@@ -16667,7 +16686,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2416:7: disjunctionExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2433:7: disjunctionExpression
                     {
                     pushFollow(FOLLOW_disjunctionExpression_in_conditionalBranch15825);
                     disjunctionExpression358=disjunctionExpression();
@@ -16704,9 +16723,9 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "thenElseClauses"
-    // /home/david/git/ceylon-spec/Ceylon.g:2421:1: thenElseClauses returns [IfClause ifClause, ElseClause elseClause, ConditionList conditionList] : conditions THEN_CLAUSE cb1= conditionalBranch ELSE_CLAUSE cb2= conditionalBranch ;
-    public CeylonParser.thenElseClauses_return thenElseClauses() throws RecognitionException {
-        CeylonParser.thenElseClauses_return retval = new CeylonParser.thenElseClauses_return();
+    // /home/david/git/ceylon-spec/Ceylon.g:2438:1: thenElseClauses returns [IfClause ifClause, ElseClause elseClause, ConditionList conditionList] : conditions THEN_CLAUSE cb1= conditionalBranch ELSE_CLAUSE cb2= conditionalBranch ;
+    public PsiCompatibleCeylonParser.thenElseClauses_return thenElseClauses() throws RecognitionException {
+        PsiCompatibleCeylonParser.thenElseClauses_return retval = new PsiCompatibleCeylonParser.thenElseClauses_return();
         retval.start = input.LT(1);
 
 
@@ -16720,8 +16739,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2422:5: ( conditions THEN_CLAUSE cb1= conditionalBranch ELSE_CLAUSE cb2= conditionalBranch )
-            // /home/david/git/ceylon-spec/Ceylon.g:2422:7: conditions THEN_CLAUSE cb1= conditionalBranch ELSE_CLAUSE cb2= conditionalBranch
+            // /home/david/git/ceylon-spec/Ceylon.g:2439:5: ( conditions THEN_CLAUSE cb1= conditionalBranch ELSE_CLAUSE cb2= conditionalBranch )
+            // /home/david/git/ceylon-spec/Ceylon.g:2439:7: conditions THEN_CLAUSE cb1= conditionalBranch ELSE_CLAUSE cb2= conditionalBranch
             {
             pushFollow(FOLLOW_conditions_in_thenElseClauses15854);
             conditions359=conditions();
@@ -16776,7 +16795,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "anonymousFunction"
-    // /home/david/git/ceylon-spec/Ceylon.g:2434:1: anonymousFunction returns [FunctionArgument function] : ( FUNCTION_MODIFIER | VOID_MODIFIER )? p1= parameters (p2= parameters )* ( COMPUTE fe= functionOrExpression | block ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2451:1: anonymousFunction returns [FunctionArgument function] : ( FUNCTION_MODIFIER | VOID_MODIFIER )? p1= parameters (p2= parameters )* ( COMPUTE fe= functionOrExpression | block ) ;
     public FunctionArgument anonymousFunction() throws RecognitionException {
         FunctionArgument function = null;
 
@@ -16795,10 +16814,10 @@ public class CeylonParser extends Parser {
          function = new FunctionArgument(null);
                     function.setType(new FunctionModifier(null)); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2437:5: ( ( FUNCTION_MODIFIER | VOID_MODIFIER )? p1= parameters (p2= parameters )* ( COMPUTE fe= functionOrExpression | block ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:2437:7: ( FUNCTION_MODIFIER | VOID_MODIFIER )? p1= parameters (p2= parameters )* ( COMPUTE fe= functionOrExpression | block )
+            // /home/david/git/ceylon-spec/Ceylon.g:2454:5: ( ( FUNCTION_MODIFIER | VOID_MODIFIER )? p1= parameters (p2= parameters )* ( COMPUTE fe= functionOrExpression | block ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:2454:7: ( FUNCTION_MODIFIER | VOID_MODIFIER )? p1= parameters (p2= parameters )* ( COMPUTE fe= functionOrExpression | block )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:2437:7: ( FUNCTION_MODIFIER | VOID_MODIFIER )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2454:7: ( FUNCTION_MODIFIER | VOID_MODIFIER )?
             int alt202=3;
             int LA202_0 = input.LA(1);
 
@@ -16810,7 +16829,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt202) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2438:9: FUNCTION_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:2455:9: FUNCTION_MODIFIER
                     {
                     FUNCTION_MODIFIER362=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_anonymousFunction15970); if (state.failed) return function;
 
@@ -16819,7 +16838,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2441:9: VOID_MODIFIER
+                    // /home/david/git/ceylon-spec/Ceylon.g:2458:9: VOID_MODIFIER
                     {
                     VOID_MODIFIER363=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_anonymousFunction15998); if (state.failed) return function;
 
@@ -16839,7 +16858,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { function.addParameterList(p1); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2446:7: (p2= parameters )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2463:7: (p2= parameters )*
             loop203:
             do {
                 int alt203=2;
@@ -16852,7 +16871,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt203) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2447:9: p2= parameters
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2464:9: p2= parameters
             	    {
             	    pushFollow(FOLLOW_parameters_in_anonymousFunction16056);
             	    p2=parameters();
@@ -16871,7 +16890,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2450:7: ( COMPUTE fe= functionOrExpression | block )
+            // /home/david/git/ceylon-spec/Ceylon.g:2467:7: ( COMPUTE fe= functionOrExpression | block )
             int alt204=2;
             int LA204_0 = input.LA(1);
 
@@ -16891,7 +16910,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt204) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2451:9: COMPUTE fe= functionOrExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2468:9: COMPUTE fe= functionOrExpression
                     {
                     match(input,COMPUTE,FOLLOW_COMPUTE_in_anonymousFunction16094); if (state.failed) return function;
 
@@ -16906,7 +16925,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2456:9: block
+                    // /home/david/git/ceylon-spec/Ceylon.g:2473:9: block
                     {
                     pushFollow(FOLLOW_block_in_anonymousFunction16143);
                     block364=block();
@@ -16940,7 +16959,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "comprehension"
-    // /home/david/git/ceylon-spec/Ceylon.g:2461:1: comprehension returns [Comprehension comprehension] : ( forComprehensionClause | ifComprehensionClause );
+    // /home/david/git/ceylon-spec/Ceylon.g:2478:1: comprehension returns [Comprehension comprehension] : ( forComprehensionClause | ifComprehensionClause );
     public Comprehension comprehension() throws RecognitionException {
         Comprehension comprehension = null;
 
@@ -16952,7 +16971,7 @@ public class CeylonParser extends Parser {
 
          comprehension = new Comprehension(null); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2463:5: ( forComprehensionClause | ifComprehensionClause )
+            // /home/david/git/ceylon-spec/Ceylon.g:2480:5: ( forComprehensionClause | ifComprehensionClause )
             int alt205=2;
             int LA205_0 = input.LA(1);
 
@@ -16972,7 +16991,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt205) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2463:7: forComprehensionClause
+                    // /home/david/git/ceylon-spec/Ceylon.g:2480:7: forComprehensionClause
                     {
                     pushFollow(FOLLOW_forComprehensionClause_in_comprehension16191);
                     forComprehensionClause365=forComprehensionClause();
@@ -16985,7 +17004,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2465:7: ifComprehensionClause
+                    // /home/david/git/ceylon-spec/Ceylon.g:2482:7: ifComprehensionClause
                     {
                     pushFollow(FOLLOW_ifComprehensionClause_in_comprehension16207);
                     ifComprehensionClause366=ifComprehensionClause();
@@ -17015,7 +17034,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "comprehensionClause"
-    // /home/david/git/ceylon-spec/Ceylon.g:2469:1: comprehensionClause returns [ComprehensionClause comprehensionClause] : ( forComprehensionClause | ( IF_CLAUSE conditions ~ THEN_CLAUSE )=> ifComprehensionClause | expressionComprehensionClause );
+    // /home/david/git/ceylon-spec/Ceylon.g:2486:1: comprehensionClause returns [ComprehensionClause comprehensionClause] : ( forComprehensionClause | ( IF_CLAUSE conditions ~ THEN_CLAUSE )=> ifComprehensionClause | expressionComprehensionClause );
     public ComprehensionClause comprehensionClause() throws RecognitionException {
         ComprehensionClause comprehensionClause = null;
 
@@ -17028,7 +17047,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2470:5: ( forComprehensionClause | ( IF_CLAUSE conditions ~ THEN_CLAUSE )=> ifComprehensionClause | expressionComprehensionClause )
+            // /home/david/git/ceylon-spec/Ceylon.g:2487:5: ( forComprehensionClause | ( IF_CLAUSE conditions ~ THEN_CLAUSE )=> ifComprehensionClause | expressionComprehensionClause )
             int alt206=3;
             switch ( input.LA(1) ) {
             case FOR_CLAUSE:
@@ -17102,7 +17121,7 @@ public class CeylonParser extends Parser {
 
             switch (alt206) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2470:7: forComprehensionClause
+                    // /home/david/git/ceylon-spec/Ceylon.g:2487:7: forComprehensionClause
                     {
                     pushFollow(FOLLOW_forComprehensionClause_in_comprehensionClause16236);
                     forComprehensionClause367=forComprehensionClause();
@@ -17115,7 +17134,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2472:7: ( IF_CLAUSE conditions ~ THEN_CLAUSE )=> ifComprehensionClause
+                    // /home/david/git/ceylon-spec/Ceylon.g:2489:7: ( IF_CLAUSE conditions ~ THEN_CLAUSE )=> ifComprehensionClause
                     {
                     pushFollow(FOLLOW_ifComprehensionClause_in_comprehensionClause16271);
                     ifComprehensionClause368=ifComprehensionClause();
@@ -17128,7 +17147,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2475:7: expressionComprehensionClause
+                    // /home/david/git/ceylon-spec/Ceylon.g:2492:7: expressionComprehensionClause
                     {
                     pushFollow(FOLLOW_expressionComprehensionClause_in_comprehensionClause16288);
                     expressionComprehensionClause369=expressionComprehensionClause();
@@ -17158,7 +17177,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "expressionComprehensionClause"
-    // /home/david/git/ceylon-spec/Ceylon.g:2479:1: expressionComprehensionClause returns [ExpressionComprehensionClause comprehensionClause] : ( functionOrExpression |);
+    // /home/david/git/ceylon-spec/Ceylon.g:2496:1: expressionComprehensionClause returns [ExpressionComprehensionClause comprehensionClause] : ( functionOrExpression |);
     public ExpressionComprehensionClause expressionComprehensionClause() throws RecognitionException {
         ExpressionComprehensionClause comprehensionClause = null;
 
@@ -17167,7 +17186,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2480:5: ( functionOrExpression |)
+            // /home/david/git/ceylon-spec/Ceylon.g:2497:5: ( functionOrExpression |)
             int alt207=2;
             int LA207_0 = input.LA(1);
 
@@ -17187,7 +17206,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt207) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2480:7: functionOrExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2497:7: functionOrExpression
                     {
                     pushFollow(FOLLOW_functionOrExpression_in_expressionComprehensionClause16318);
                     functionOrExpression370=functionOrExpression();
@@ -17201,7 +17220,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2483:7: 
+                    // /home/david/git/ceylon-spec/Ceylon.g:2500:7: 
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                               new MismatchedTokenException(LIDENTIFIER, input)); }
@@ -17226,7 +17245,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "forComprehensionClause"
-    // /home/david/git/ceylon-spec/Ceylon.g:2487:1: forComprehensionClause returns [ForComprehensionClause comprehensionClause] : FOR_CLAUSE forIterator comprehensionClause ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2504:1: forComprehensionClause returns [ForComprehensionClause comprehensionClause] : FOR_CLAUSE forIterator comprehensionClause ;
     public ForComprehensionClause forComprehensionClause() throws RecognitionException {
         ForComprehensionClause comprehensionClause = null;
 
@@ -17238,8 +17257,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2488:5: ( FOR_CLAUSE forIterator comprehensionClause )
-            // /home/david/git/ceylon-spec/Ceylon.g:2488:7: FOR_CLAUSE forIterator comprehensionClause
+            // /home/david/git/ceylon-spec/Ceylon.g:2505:5: ( FOR_CLAUSE forIterator comprehensionClause )
+            // /home/david/git/ceylon-spec/Ceylon.g:2505:7: FOR_CLAUSE forIterator comprehensionClause
             {
             FOR_CLAUSE371=(Token)match(input,FOR_CLAUSE,FOLLOW_FOR_CLAUSE_in_forComprehensionClause16355); if (state.failed) return comprehensionClause;
 
@@ -17279,7 +17298,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "ifComprehensionClause"
-    // /home/david/git/ceylon-spec/Ceylon.g:2496:1: ifComprehensionClause returns [IfComprehensionClause comprehensionClause] : IF_CLAUSE conditions comprehensionClause ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2513:1: ifComprehensionClause returns [IfComprehensionClause comprehensionClause] : IF_CLAUSE conditions comprehensionClause ;
     public IfComprehensionClause ifComprehensionClause() throws RecognitionException {
         IfComprehensionClause comprehensionClause = null;
 
@@ -17291,8 +17310,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2497:5: ( IF_CLAUSE conditions comprehensionClause )
-            // /home/david/git/ceylon-spec/Ceylon.g:2497:7: IF_CLAUSE conditions comprehensionClause
+            // /home/david/git/ceylon-spec/Ceylon.g:2514:5: ( IF_CLAUSE conditions comprehensionClause )
+            // /home/david/git/ceylon-spec/Ceylon.g:2514:7: IF_CLAUSE conditions comprehensionClause
             {
             IF_CLAUSE374=(Token)match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_ifComprehensionClause16420); if (state.failed) return comprehensionClause;
 
@@ -17332,7 +17351,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "assignmentExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2505:1: assignmentExpression returns [Term term] : ee1= thenElseExpression ( assignmentOperator ee2= functionOrExpression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2522:1: assignmentExpression returns [Term term] : ee1= thenElseExpression ( assignmentOperator ee2= functionOrExpression )? ;
     public Term assignmentExpression() throws RecognitionException {
         Term term = null;
 
@@ -17346,8 +17365,8 @@ public class CeylonParser extends Parser {
 
          QualifiedMemberOrTypeExpression qe=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2507:5: (ee1= thenElseExpression ( assignmentOperator ee2= functionOrExpression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2507:7: ee1= thenElseExpression ( assignmentOperator ee2= functionOrExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2524:5: (ee1= thenElseExpression ( assignmentOperator ee2= functionOrExpression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2524:7: ee1= thenElseExpression ( assignmentOperator ee2= functionOrExpression )?
             {
             pushFollow(FOLLOW_thenElseExpression_in_assignmentExpression16496);
             ee1=thenElseExpression();
@@ -17357,7 +17376,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = ee1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2509:7: ( assignmentOperator ee2= functionOrExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2526:7: ( assignmentOperator ee2= functionOrExpression )?
             int alt208=2;
             int LA208_0 = input.LA(1);
 
@@ -17366,7 +17385,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt208) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2510:9: assignmentOperator ee2= functionOrExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2527:9: assignmentOperator ee2= functionOrExpression
                     {
                     pushFollow(FOLLOW_assignmentOperator_in_assignmentExpression16522);
                     assignmentOperator377=assignmentOperator();
@@ -17410,7 +17429,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "assignmentOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2519:1: assignmentOperator returns [AssignmentOp operator] : ( SPECIFY | ADD_SPECIFY | SUBTRACT_SPECIFY | MULTIPLY_SPECIFY | DIVIDE_SPECIFY | REMAINDER_SPECIFY | INTERSECT_SPECIFY | UNION_SPECIFY | COMPLEMENT_SPECIFY | AND_SPECIFY | OR_SPECIFY );
+    // /home/david/git/ceylon-spec/Ceylon.g:2536:1: assignmentOperator returns [AssignmentOp operator] : ( SPECIFY | ADD_SPECIFY | SUBTRACT_SPECIFY | MULTIPLY_SPECIFY | DIVIDE_SPECIFY | REMAINDER_SPECIFY | INTERSECT_SPECIFY | UNION_SPECIFY | COMPLEMENT_SPECIFY | AND_SPECIFY | OR_SPECIFY );
     public AssignmentOp assignmentOperator() throws RecognitionException {
         AssignmentOp operator = null;
 
@@ -17428,7 +17447,7 @@ public class CeylonParser extends Parser {
         Token OR_SPECIFY388=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2520:5: ( SPECIFY | ADD_SPECIFY | SUBTRACT_SPECIFY | MULTIPLY_SPECIFY | DIVIDE_SPECIFY | REMAINDER_SPECIFY | INTERSECT_SPECIFY | UNION_SPECIFY | COMPLEMENT_SPECIFY | AND_SPECIFY | OR_SPECIFY )
+            // /home/david/git/ceylon-spec/Ceylon.g:2537:5: ( SPECIFY | ADD_SPECIFY | SUBTRACT_SPECIFY | MULTIPLY_SPECIFY | DIVIDE_SPECIFY | REMAINDER_SPECIFY | INTERSECT_SPECIFY | UNION_SPECIFY | COMPLEMENT_SPECIFY | AND_SPECIFY | OR_SPECIFY )
             int alt209=11;
             switch ( input.LA(1) ) {
             case SPECIFY:
@@ -17497,7 +17516,7 @@ public class CeylonParser extends Parser {
 
             switch (alt209) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2520:7: SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2537:7: SPECIFY
                     {
                     SPECIFY378=(Token)match(input,SPECIFY,FOLLOW_SPECIFY_in_assignmentOperator16585); if (state.failed) return operator;
 
@@ -17506,7 +17525,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2521:7: ADD_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2538:7: ADD_SPECIFY
                     {
                     ADD_SPECIFY379=(Token)match(input,ADD_SPECIFY,FOLLOW_ADD_SPECIFY_in_assignmentOperator16595); if (state.failed) return operator;
 
@@ -17515,7 +17534,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2522:7: SUBTRACT_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2539:7: SUBTRACT_SPECIFY
                     {
                     SUBTRACT_SPECIFY380=(Token)match(input,SUBTRACT_SPECIFY,FOLLOW_SUBTRACT_SPECIFY_in_assignmentOperator16605); if (state.failed) return operator;
 
@@ -17524,7 +17543,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2523:7: MULTIPLY_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2540:7: MULTIPLY_SPECIFY
                     {
                     MULTIPLY_SPECIFY381=(Token)match(input,MULTIPLY_SPECIFY,FOLLOW_MULTIPLY_SPECIFY_in_assignmentOperator16615); if (state.failed) return operator;
 
@@ -17533,7 +17552,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2524:7: DIVIDE_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2541:7: DIVIDE_SPECIFY
                     {
                     DIVIDE_SPECIFY382=(Token)match(input,DIVIDE_SPECIFY,FOLLOW_DIVIDE_SPECIFY_in_assignmentOperator16625); if (state.failed) return operator;
 
@@ -17542,7 +17561,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2525:7: REMAINDER_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2542:7: REMAINDER_SPECIFY
                     {
                     REMAINDER_SPECIFY383=(Token)match(input,REMAINDER_SPECIFY,FOLLOW_REMAINDER_SPECIFY_in_assignmentOperator16635); if (state.failed) return operator;
 
@@ -17551,7 +17570,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2526:7: INTERSECT_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2543:7: INTERSECT_SPECIFY
                     {
                     INTERSECT_SPECIFY384=(Token)match(input,INTERSECT_SPECIFY,FOLLOW_INTERSECT_SPECIFY_in_assignmentOperator16645); if (state.failed) return operator;
 
@@ -17560,7 +17579,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 8 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2527:7: UNION_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2544:7: UNION_SPECIFY
                     {
                     UNION_SPECIFY385=(Token)match(input,UNION_SPECIFY,FOLLOW_UNION_SPECIFY_in_assignmentOperator16655); if (state.failed) return operator;
 
@@ -17569,7 +17588,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 9 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2528:7: COMPLEMENT_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2545:7: COMPLEMENT_SPECIFY
                     {
                     COMPLEMENT_SPECIFY386=(Token)match(input,COMPLEMENT_SPECIFY,FOLLOW_COMPLEMENT_SPECIFY_in_assignmentOperator16665); if (state.failed) return operator;
 
@@ -17578,7 +17597,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 10 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2529:7: AND_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2546:7: AND_SPECIFY
                     {
                     AND_SPECIFY387=(Token)match(input,AND_SPECIFY,FOLLOW_AND_SPECIFY_in_assignmentOperator16675); if (state.failed) return operator;
 
@@ -17587,7 +17606,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 11 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2530:7: OR_SPECIFY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2547:7: OR_SPECIFY
                     {
                     OR_SPECIFY388=(Token)match(input,OR_SPECIFY,FOLLOW_OR_SPECIFY_in_assignmentOperator16685); if (state.failed) return operator;
 
@@ -17613,7 +17632,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "thenElseExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2533:1: thenElseExpression returns [Term term] : de1= disjunctionExpression ( thenElseOperator de2= disjunctionExpression )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2550:1: thenElseExpression returns [Term term] : de1= disjunctionExpression ( thenElseOperator de2= disjunctionExpression )* ;
     public Term thenElseExpression() throws RecognitionException {
         Term term = null;
 
@@ -17626,8 +17645,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2534:5: (de1= disjunctionExpression ( thenElseOperator de2= disjunctionExpression )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:2534:7: de1= disjunctionExpression ( thenElseOperator de2= disjunctionExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2551:5: (de1= disjunctionExpression ( thenElseOperator de2= disjunctionExpression )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:2551:7: de1= disjunctionExpression ( thenElseOperator de2= disjunctionExpression )*
             {
             pushFollow(FOLLOW_disjunctionExpression_in_thenElseExpression16710);
             de1=disjunctionExpression();
@@ -17637,7 +17656,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = de1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2536:7: ( thenElseOperator de2= disjunctionExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2553:7: ( thenElseOperator de2= disjunctionExpression )*
             loop210:
             do {
                 int alt210=2;
@@ -17650,7 +17669,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt210) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2537:9: thenElseOperator de2= disjunctionExpression
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2554:9: thenElseOperator de2= disjunctionExpression
             	    {
             	    pushFollow(FOLLOW_thenElseOperator_in_thenElseExpression16736);
             	    thenElseOperator389=thenElseOperator();
@@ -17696,7 +17715,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "thenElseOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2545:1: thenElseOperator returns [BinaryOperatorExpression operator] : ( ELSE_CLAUSE | THEN_CLAUSE );
+    // /home/david/git/ceylon-spec/Ceylon.g:2562:1: thenElseOperator returns [BinaryOperatorExpression operator] : ( ELSE_CLAUSE | THEN_CLAUSE );
     public BinaryOperatorExpression thenElseOperator() throws RecognitionException {
         BinaryOperatorExpression operator = null;
 
@@ -17705,7 +17724,7 @@ public class CeylonParser extends Parser {
         Token THEN_CLAUSE391=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2546:5: ( ELSE_CLAUSE | THEN_CLAUSE )
+            // /home/david/git/ceylon-spec/Ceylon.g:2563:5: ( ELSE_CLAUSE | THEN_CLAUSE )
             int alt211=2;
             int LA211_0 = input.LA(1);
 
@@ -17725,7 +17744,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt211) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2546:7: ELSE_CLAUSE
+                    // /home/david/git/ceylon-spec/Ceylon.g:2563:7: ELSE_CLAUSE
                     {
                     ELSE_CLAUSE390=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_thenElseOperator16798); if (state.failed) return operator;
 
@@ -17734,7 +17753,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2548:7: THEN_CLAUSE
+                    // /home/david/git/ceylon-spec/Ceylon.g:2565:7: THEN_CLAUSE
                     {
                     THEN_CLAUSE391=(Token)match(input,THEN_CLAUSE,FOLLOW_THEN_CLAUSE_in_thenElseOperator16815); if (state.failed) return operator;
 
@@ -17760,7 +17779,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "disjunctionExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2552:1: disjunctionExpression returns [Term term] : me1= conjunctionExpression ( disjunctionOperator me2= conjunctionExpression )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2569:1: disjunctionExpression returns [Term term] : me1= conjunctionExpression ( disjunctionOperator me2= conjunctionExpression )* ;
     public Term disjunctionExpression() throws RecognitionException {
         Term term = null;
 
@@ -17773,8 +17792,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2553:5: (me1= conjunctionExpression ( disjunctionOperator me2= conjunctionExpression )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:2553:7: me1= conjunctionExpression ( disjunctionOperator me2= conjunctionExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2570:5: (me1= conjunctionExpression ( disjunctionOperator me2= conjunctionExpression )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:2570:7: me1= conjunctionExpression ( disjunctionOperator me2= conjunctionExpression )*
             {
             pushFollow(FOLLOW_conjunctionExpression_in_disjunctionExpression16846);
             me1=conjunctionExpression();
@@ -17784,7 +17803,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = me1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2555:7: ( disjunctionOperator me2= conjunctionExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2572:7: ( disjunctionOperator me2= conjunctionExpression )*
             loop212:
             do {
                 int alt212=2;
@@ -17797,7 +17816,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt212) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2556:9: disjunctionOperator me2= conjunctionExpression
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2573:9: disjunctionOperator me2= conjunctionExpression
             	    {
             	    pushFollow(FOLLOW_disjunctionOperator_in_disjunctionExpression16872);
             	    disjunctionOperator392=disjunctionOperator();
@@ -17843,7 +17862,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "disjunctionOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2564:1: disjunctionOperator returns [OrOp operator] : OR_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2581:1: disjunctionOperator returns [OrOp operator] : OR_OP ;
     public OrOp disjunctionOperator() throws RecognitionException {
         OrOp operator = null;
 
@@ -17851,8 +17870,8 @@ public class CeylonParser extends Parser {
         Token OR_OP393=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2565:5: ( OR_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:2565:7: OR_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:2582:5: ( OR_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2582:7: OR_OP
             {
             OR_OP393=(Token)match(input,OR_OP,FOLLOW_OR_OP_in_disjunctionOperator16935); if (state.failed) return operator;
 
@@ -17876,7 +17895,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "conjunctionExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2569:1: conjunctionExpression returns [Term term] : me1= logicalNegationExpression ( conjunctionOperator me2= logicalNegationExpression )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2586:1: conjunctionExpression returns [Term term] : me1= logicalNegationExpression ( conjunctionOperator me2= logicalNegationExpression )* ;
     public Term conjunctionExpression() throws RecognitionException {
         Term term = null;
 
@@ -17889,8 +17908,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2570:5: (me1= logicalNegationExpression ( conjunctionOperator me2= logicalNegationExpression )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:2570:7: me1= logicalNegationExpression ( conjunctionOperator me2= logicalNegationExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2587:5: (me1= logicalNegationExpression ( conjunctionOperator me2= logicalNegationExpression )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:2587:7: me1= logicalNegationExpression ( conjunctionOperator me2= logicalNegationExpression )*
             {
             pushFollow(FOLLOW_logicalNegationExpression_in_conjunctionExpression16967);
             me1=logicalNegationExpression();
@@ -17900,7 +17919,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = me1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2572:7: ( conjunctionOperator me2= logicalNegationExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2589:7: ( conjunctionOperator me2= logicalNegationExpression )*
             loop213:
             do {
                 int alt213=2;
@@ -17913,7 +17932,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt213) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2573:9: conjunctionOperator me2= logicalNegationExpression
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2590:9: conjunctionOperator me2= logicalNegationExpression
             	    {
             	    pushFollow(FOLLOW_conjunctionOperator_in_conjunctionExpression16993);
             	    conjunctionOperator394=conjunctionOperator();
@@ -17959,7 +17978,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "conjunctionOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2581:1: conjunctionOperator returns [AndOp operator] : AND_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2598:1: conjunctionOperator returns [AndOp operator] : AND_OP ;
     public AndOp conjunctionOperator() throws RecognitionException {
         AndOp operator = null;
 
@@ -17967,8 +17986,8 @@ public class CeylonParser extends Parser {
         Token AND_OP395=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2582:5: ( AND_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:2582:7: AND_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:2599:5: ( AND_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2599:7: AND_OP
             {
             AND_OP395=(Token)match(input,AND_OP,FOLLOW_AND_OP_in_conjunctionOperator17056); if (state.failed) return operator;
 
@@ -17992,7 +18011,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "logicalNegationExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2586:1: logicalNegationExpression returns [Term term] : ( notOperator le= logicalNegationExpression | equalityExpression );
+    // /home/david/git/ceylon-spec/Ceylon.g:2603:1: logicalNegationExpression returns [Term term] : ( notOperator le= logicalNegationExpression | equalityExpression );
     public Term logicalNegationExpression() throws RecognitionException {
         Term term = null;
 
@@ -18005,7 +18024,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2587:5: ( notOperator le= logicalNegationExpression | equalityExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:2604:5: ( notOperator le= logicalNegationExpression | equalityExpression )
             int alt214=2;
             int LA214_0 = input.LA(1);
 
@@ -18025,7 +18044,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt214) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2587:7: notOperator le= logicalNegationExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2604:7: notOperator le= logicalNegationExpression
                     {
                     pushFollow(FOLLOW_notOperator_in_logicalNegationExpression17086);
                     notOperator396=notOperator();
@@ -18046,7 +18065,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2591:7: equalityExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2608:7: equalityExpression
                     {
                     pushFollow(FOLLOW_equalityExpression_in_logicalNegationExpression17121);
                     equalityExpression397=equalityExpression();
@@ -18076,7 +18095,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "notOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2595:1: notOperator returns [NotOp operator] : NOT_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2612:1: notOperator returns [NotOp operator] : NOT_OP ;
     public NotOp notOperator() throws RecognitionException {
         NotOp operator = null;
 
@@ -18084,8 +18103,8 @@ public class CeylonParser extends Parser {
         Token NOT_OP398=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2596:5: ( NOT_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:2596:7: NOT_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:2613:5: ( NOT_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2613:7: NOT_OP
             {
             NOT_OP398=(Token)match(input,NOT_OP,FOLLOW_NOT_OP_in_notOperator17150); if (state.failed) return operator;
 
@@ -18109,7 +18128,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "equalityExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2600:1: equalityExpression returns [Term term] : ee1= comparisonExpression ( equalityOperator ee2= comparisonExpression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2617:1: equalityExpression returns [Term term] : ee1= comparisonExpression ( equalityOperator ee2= comparisonExpression )? ;
     public Term equalityExpression() throws RecognitionException {
         Term term = null;
 
@@ -18122,8 +18141,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2601:5: (ee1= comparisonExpression ( equalityOperator ee2= comparisonExpression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2601:7: ee1= comparisonExpression ( equalityOperator ee2= comparisonExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2618:5: (ee1= comparisonExpression ( equalityOperator ee2= comparisonExpression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2618:7: ee1= comparisonExpression ( equalityOperator ee2= comparisonExpression )?
             {
             pushFollow(FOLLOW_comparisonExpression_in_equalityExpression17182);
             ee1=comparisonExpression();
@@ -18133,7 +18152,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = ee1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2603:7: ( equalityOperator ee2= comparisonExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2620:7: ( equalityOperator ee2= comparisonExpression )?
             int alt215=2;
             int LA215_0 = input.LA(1);
 
@@ -18142,7 +18161,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt215) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2604:9: equalityOperator ee2= comparisonExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2621:9: equalityOperator ee2= comparisonExpression
                     {
                     pushFollow(FOLLOW_equalityOperator_in_equalityExpression17208);
                     equalityOperator399=equalityOperator();
@@ -18185,7 +18204,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "equalityOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2612:1: equalityOperator returns [BinaryOperatorExpression operator] : ( EQUAL_OP | NOT_EQUAL_OP | IDENTICAL_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2629:1: equalityOperator returns [BinaryOperatorExpression operator] : ( EQUAL_OP | NOT_EQUAL_OP | IDENTICAL_OP );
     public BinaryOperatorExpression equalityOperator() throws RecognitionException {
         BinaryOperatorExpression operator = null;
 
@@ -18195,7 +18214,7 @@ public class CeylonParser extends Parser {
         Token IDENTICAL_OP402=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2613:5: ( EQUAL_OP | NOT_EQUAL_OP | IDENTICAL_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2630:5: ( EQUAL_OP | NOT_EQUAL_OP | IDENTICAL_OP )
             int alt216=3;
             switch ( input.LA(1) ) {
             case EQUAL_OP:
@@ -18224,7 +18243,7 @@ public class CeylonParser extends Parser {
 
             switch (alt216) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2613:7: EQUAL_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2630:7: EQUAL_OP
                     {
                     EQUAL_OP400=(Token)match(input,EQUAL_OP,FOLLOW_EQUAL_OP_in_equalityOperator17271); if (state.failed) return operator;
 
@@ -18233,7 +18252,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2615:7: NOT_EQUAL_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2632:7: NOT_EQUAL_OP
                     {
                     NOT_EQUAL_OP401=(Token)match(input,NOT_EQUAL_OP,FOLLOW_NOT_EQUAL_OP_in_equalityOperator17288); if (state.failed) return operator;
 
@@ -18242,7 +18261,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2617:7: IDENTICAL_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2634:7: IDENTICAL_OP
                     {
                     IDENTICAL_OP402=(Token)match(input,IDENTICAL_OP,FOLLOW_IDENTICAL_OP_in_equalityOperator17304); if (state.failed) return operator;
 
@@ -18268,7 +18287,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "comparisonExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2621:1: comparisonExpression returns [Term term] : ee1= existenceEmptinessExpression (co1= comparisonOperator ee2= existenceEmptinessExpression |lo1= largerOperator ee3= existenceEmptinessExpression |so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )? |to1= typeOperator t1= type )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2638:1: comparisonExpression returns [Term term] : ee1= existenceEmptinessExpression (co1= comparisonOperator ee2= existenceEmptinessExpression |lo1= largerOperator ee3= existenceEmptinessExpression |so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )? |to1= typeOperator t1= type )? ;
     public Term comparisonExpression() throws RecognitionException {
         Term term = null;
 
@@ -18297,8 +18316,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2622:5: (ee1= existenceEmptinessExpression (co1= comparisonOperator ee2= existenceEmptinessExpression |lo1= largerOperator ee3= existenceEmptinessExpression |so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )? |to1= typeOperator t1= type )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2622:7: ee1= existenceEmptinessExpression (co1= comparisonOperator ee2= existenceEmptinessExpression |lo1= largerOperator ee3= existenceEmptinessExpression |so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )? |to1= typeOperator t1= type )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2639:5: (ee1= existenceEmptinessExpression (co1= comparisonOperator ee2= existenceEmptinessExpression |lo1= largerOperator ee3= existenceEmptinessExpression |so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )? |to1= typeOperator t1= type )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2639:7: ee1= existenceEmptinessExpression (co1= comparisonOperator ee2= existenceEmptinessExpression |lo1= largerOperator ee3= existenceEmptinessExpression |so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )? |to1= typeOperator t1= type )?
             {
             pushFollow(FOLLOW_existenceEmptinessExpression_in_comparisonExpression17335);
             ee1=existenceEmptinessExpression();
@@ -18308,7 +18327,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = ee1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2624:7: (co1= comparisonOperator ee2= existenceEmptinessExpression |lo1= largerOperator ee3= existenceEmptinessExpression |so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )? |to1= typeOperator t1= type )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2641:7: (co1= comparisonOperator ee2= existenceEmptinessExpression |lo1= largerOperator ee3= existenceEmptinessExpression |so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )? |to1= typeOperator t1= type )?
             int alt218=5;
             switch ( input.LA(1) ) {
                 case COMPARE_OP:
@@ -18341,7 +18360,7 @@ public class CeylonParser extends Parser {
 
             switch (alt218) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2625:9: co1= comparisonOperator ee2= existenceEmptinessExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2642:9: co1= comparisonOperator ee2= existenceEmptinessExpression
                     {
                     pushFollow(FOLLOW_comparisonOperator_in_comparisonExpression17363);
                     co1=comparisonOperator();
@@ -18363,7 +18382,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2630:9: lo1= largerOperator ee3= existenceEmptinessExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2647:9: lo1= largerOperator ee3= existenceEmptinessExpression
                     {
                     pushFollow(FOLLOW_largerOperator_in_comparisonExpression17408);
                     lo1=largerOperator();
@@ -18385,7 +18404,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2635:9: so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:2652:9: so1= smallerOperator ee4= existenceEmptinessExpression (so2= smallerOperator ee5= existenceEmptinessExpression )?
                     {
                     pushFollow(FOLLOW_smallerOperator_in_comparisonExpression17453);
                     so1=smallerOperator();
@@ -18404,7 +18423,7 @@ public class CeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { so1.setRightTerm(ee4); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2640:9: (so2= smallerOperator ee5= existenceEmptinessExpression )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:2657:9: (so2= smallerOperator ee5= existenceEmptinessExpression )?
                     int alt217=2;
                     int LA217_0 = input.LA(1);
 
@@ -18413,7 +18432,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt217) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2641:11: so2= smallerOperator ee5= existenceEmptinessExpression
+                            // /home/david/git/ceylon-spec/Ceylon.g:2658:11: so2= smallerOperator ee5= existenceEmptinessExpression
                             {
                             pushFollow(FOLLOW_smallerOperator_in_comparisonExpression17511);
                             so2=smallerOperator();
@@ -18448,7 +18467,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2655:9: to1= typeOperator t1= type
+                    // /home/david/git/ceylon-spec/Ceylon.g:2672:9: to1= typeOperator t1= type
                     {
                     pushFollow(FOLLOW_typeOperator_in_comparisonExpression17560);
                     to1=typeOperator();
@@ -18491,7 +18510,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "smallerOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2669:1: smallerOperator returns [ComparisonOp operator] : ( SMALL_AS_OP | SMALLER_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2686:1: smallerOperator returns [ComparisonOp operator] : ( SMALL_AS_OP | SMALLER_OP );
     public ComparisonOp smallerOperator() throws RecognitionException {
         ComparisonOp operator = null;
 
@@ -18500,7 +18519,7 @@ public class CeylonParser extends Parser {
         Token SMALLER_OP404=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2670:5: ( SMALL_AS_OP | SMALLER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2687:5: ( SMALL_AS_OP | SMALLER_OP )
             int alt219=2;
             int LA219_0 = input.LA(1);
 
@@ -18520,7 +18539,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt219) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2670:7: SMALL_AS_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2687:7: SMALL_AS_OP
                     {
                     SMALL_AS_OP403=(Token)match(input,SMALL_AS_OP,FOLLOW_SMALL_AS_OP_in_smallerOperator17628); if (state.failed) return operator;
 
@@ -18529,7 +18548,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2672:7: SMALLER_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2689:7: SMALLER_OP
                     {
                     SMALLER_OP404=(Token)match(input,SMALLER_OP,FOLLOW_SMALLER_OP_in_smallerOperator17644); if (state.failed) return operator;
 
@@ -18555,7 +18574,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "largerOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2676:1: largerOperator returns [ComparisonOp operator] : ( LARGE_AS_OP | LARGER_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2693:1: largerOperator returns [ComparisonOp operator] : ( LARGE_AS_OP | LARGER_OP );
     public ComparisonOp largerOperator() throws RecognitionException {
         ComparisonOp operator = null;
 
@@ -18564,7 +18583,7 @@ public class CeylonParser extends Parser {
         Token LARGER_OP406=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2677:5: ( LARGE_AS_OP | LARGER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2694:5: ( LARGE_AS_OP | LARGER_OP )
             int alt220=2;
             int LA220_0 = input.LA(1);
 
@@ -18584,7 +18603,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt220) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2677:7: LARGE_AS_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2694:7: LARGE_AS_OP
                     {
                     LARGE_AS_OP405=(Token)match(input,LARGE_AS_OP,FOLLOW_LARGE_AS_OP_in_largerOperator17673); if (state.failed) return operator;
 
@@ -18593,7 +18612,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2679:7: LARGER_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2696:7: LARGER_OP
                     {
                     LARGER_OP406=(Token)match(input,LARGER_OP,FOLLOW_LARGER_OP_in_largerOperator17689); if (state.failed) return operator;
 
@@ -18619,7 +18638,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "comparisonOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2683:1: comparisonOperator returns [BinaryOperatorExpression operator] : ( COMPARE_OP | IN_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2700:1: comparisonOperator returns [BinaryOperatorExpression operator] : ( COMPARE_OP | IN_OP );
     public BinaryOperatorExpression comparisonOperator() throws RecognitionException {
         BinaryOperatorExpression operator = null;
 
@@ -18628,7 +18647,7 @@ public class CeylonParser extends Parser {
         Token IN_OP408=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2684:5: ( COMPARE_OP | IN_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2701:5: ( COMPARE_OP | IN_OP )
             int alt221=2;
             int LA221_0 = input.LA(1);
 
@@ -18648,7 +18667,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt221) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2684:7: COMPARE_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2701:7: COMPARE_OP
                     {
                     COMPARE_OP407=(Token)match(input,COMPARE_OP,FOLLOW_COMPARE_OP_in_comparisonOperator17718); if (state.failed) return operator;
 
@@ -18657,7 +18676,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2686:7: IN_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2703:7: IN_OP
                     {
                     IN_OP408=(Token)match(input,IN_OP,FOLLOW_IN_OP_in_comparisonOperator17735); if (state.failed) return operator;
 
@@ -18683,7 +18702,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2690:1: typeOperator returns [TypeOperatorExpression operator] : ( IS_OP | EXTENDS | SATISFIES | CASE_TYPES );
+    // /home/david/git/ceylon-spec/Ceylon.g:2707:1: typeOperator returns [TypeOperatorExpression operator] : ( IS_OP | EXTENDS | SATISFIES | CASE_TYPES );
     public TypeOperatorExpression typeOperator() throws RecognitionException {
         TypeOperatorExpression operator = null;
 
@@ -18694,7 +18713,7 @@ public class CeylonParser extends Parser {
         Token CASE_TYPES412=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2691:5: ( IS_OP | EXTENDS | SATISFIES | CASE_TYPES )
+            // /home/david/git/ceylon-spec/Ceylon.g:2708:5: ( IS_OP | EXTENDS | SATISFIES | CASE_TYPES )
             int alt222=4;
             switch ( input.LA(1) ) {
             case IS_OP:
@@ -18728,7 +18747,7 @@ public class CeylonParser extends Parser {
 
             switch (alt222) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2691:7: IS_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2708:7: IS_OP
                     {
                     IS_OP409=(Token)match(input,IS_OP,FOLLOW_IS_OP_in_typeOperator17764); if (state.failed) return operator;
 
@@ -18737,7 +18756,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2693:7: EXTENDS
+                    // /home/david/git/ceylon-spec/Ceylon.g:2710:7: EXTENDS
                     {
                     EXTENDS410=(Token)match(input,EXTENDS,FOLLOW_EXTENDS_in_typeOperator17780); if (state.failed) return operator;
 
@@ -18746,7 +18765,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2695:7: SATISFIES
+                    // /home/david/git/ceylon-spec/Ceylon.g:2712:7: SATISFIES
                     {
                     SATISFIES411=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_typeOperator17796); if (state.failed) return operator;
 
@@ -18755,7 +18774,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2697:7: CASE_TYPES
+                    // /home/david/git/ceylon-spec/Ceylon.g:2714:7: CASE_TYPES
                     {
                     CASE_TYPES412=(Token)match(input,CASE_TYPES,FOLLOW_CASE_TYPES_in_typeOperator17812); if (state.failed) return operator;
 
@@ -18781,7 +18800,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "existenceEmptinessExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2701:1: existenceEmptinessExpression returns [Term term] : de1= entryRangeExpression (eno1= existsNonemptyOperator )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2718:1: existenceEmptinessExpression returns [Term term] : de1= entryRangeExpression (eno1= existsNonemptyOperator )? ;
     public Term existenceEmptinessExpression() throws RecognitionException {
         Term term = null;
 
@@ -18792,8 +18811,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2702:5: (de1= entryRangeExpression (eno1= existsNonemptyOperator )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2702:7: de1= entryRangeExpression (eno1= existsNonemptyOperator )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2719:5: (de1= entryRangeExpression (eno1= existsNonemptyOperator )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2719:7: de1= entryRangeExpression (eno1= existsNonemptyOperator )?
             {
             pushFollow(FOLLOW_entryRangeExpression_in_existenceEmptinessExpression17843);
             de1=entryRangeExpression();
@@ -18803,7 +18822,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = de1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2704:7: (eno1= existsNonemptyOperator )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2721:7: (eno1= existsNonemptyOperator )?
             int alt223=2;
             int LA223_0 = input.LA(1);
 
@@ -18812,7 +18831,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt223) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2705:9: eno1= existsNonemptyOperator
+                    // /home/david/git/ceylon-spec/Ceylon.g:2722:9: eno1= existsNonemptyOperator
                     {
                     pushFollow(FOLLOW_existsNonemptyOperator_in_existenceEmptinessExpression17871);
                     eno1=existsNonemptyOperator();
@@ -18847,7 +18866,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "existsNonemptyOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2715:1: existsNonemptyOperator returns [UnaryOperatorExpression operator] : ( EXISTS | NONEMPTY );
+    // /home/david/git/ceylon-spec/Ceylon.g:2732:1: existsNonemptyOperator returns [UnaryOperatorExpression operator] : ( EXISTS | NONEMPTY );
     public UnaryOperatorExpression existsNonemptyOperator() throws RecognitionException {
         UnaryOperatorExpression operator = null;
 
@@ -18856,7 +18875,7 @@ public class CeylonParser extends Parser {
         Token NONEMPTY414=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2716:5: ( EXISTS | NONEMPTY )
+            // /home/david/git/ceylon-spec/Ceylon.g:2733:5: ( EXISTS | NONEMPTY )
             int alt224=2;
             int LA224_0 = input.LA(1);
 
@@ -18876,7 +18895,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt224) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2716:7: EXISTS
+                    // /home/david/git/ceylon-spec/Ceylon.g:2733:7: EXISTS
                     {
                     EXISTS413=(Token)match(input,EXISTS,FOLLOW_EXISTS_in_existsNonemptyOperator17917); if (state.failed) return operator;
 
@@ -18885,7 +18904,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2718:7: NONEMPTY
+                    // /home/david/git/ceylon-spec/Ceylon.g:2735:7: NONEMPTY
                     {
                     NONEMPTY414=(Token)match(input,NONEMPTY,FOLLOW_NONEMPTY_in_existsNonemptyOperator17934); if (state.failed) return operator;
 
@@ -18911,7 +18930,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "entryRangeExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2722:1: entryRangeExpression returns [Term term] : ae1= additiveExpression ( rangeIntervalEntryOperator ae2= additiveExpression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2739:1: entryRangeExpression returns [Term term] : ae1= additiveExpression ( rangeIntervalEntryOperator ae2= additiveExpression )? ;
     public Term entryRangeExpression() throws RecognitionException {
         Term term = null;
 
@@ -18924,8 +18943,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2723:5: (ae1= additiveExpression ( rangeIntervalEntryOperator ae2= additiveExpression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2723:7: ae1= additiveExpression ( rangeIntervalEntryOperator ae2= additiveExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2740:5: (ae1= additiveExpression ( rangeIntervalEntryOperator ae2= additiveExpression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2740:7: ae1= additiveExpression ( rangeIntervalEntryOperator ae2= additiveExpression )?
             {
             pushFollow(FOLLOW_additiveExpression_in_entryRangeExpression17965);
             ae1=additiveExpression();
@@ -18935,7 +18954,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = ae1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2725:7: ( rangeIntervalEntryOperator ae2= additiveExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2742:7: ( rangeIntervalEntryOperator ae2= additiveExpression )?
             int alt225=2;
             int LA225_0 = input.LA(1);
 
@@ -18944,7 +18963,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt225) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2726:9: rangeIntervalEntryOperator ae2= additiveExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2743:9: rangeIntervalEntryOperator ae2= additiveExpression
                     {
                     pushFollow(FOLLOW_rangeIntervalEntryOperator_in_entryRangeExpression17991);
                     rangeIntervalEntryOperator415=rangeIntervalEntryOperator();
@@ -18987,7 +19006,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "rangeIntervalEntryOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2734:1: rangeIntervalEntryOperator returns [BinaryOperatorExpression operator] : ( RANGE_OP | SEGMENT_OP | ENTRY_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2751:1: rangeIntervalEntryOperator returns [BinaryOperatorExpression operator] : ( RANGE_OP | SEGMENT_OP | ENTRY_OP );
     public BinaryOperatorExpression rangeIntervalEntryOperator() throws RecognitionException {
         BinaryOperatorExpression operator = null;
 
@@ -18997,7 +19016,7 @@ public class CeylonParser extends Parser {
         Token ENTRY_OP418=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2735:5: ( RANGE_OP | SEGMENT_OP | ENTRY_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2752:5: ( RANGE_OP | SEGMENT_OP | ENTRY_OP )
             int alt226=3;
             switch ( input.LA(1) ) {
             case RANGE_OP:
@@ -19026,7 +19045,7 @@ public class CeylonParser extends Parser {
 
             switch (alt226) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2735:7: RANGE_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2752:7: RANGE_OP
                     {
                     RANGE_OP416=(Token)match(input,RANGE_OP,FOLLOW_RANGE_OP_in_rangeIntervalEntryOperator18054); if (state.failed) return operator;
 
@@ -19035,7 +19054,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2737:7: SEGMENT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2754:7: SEGMENT_OP
                     {
                     SEGMENT_OP417=(Token)match(input,SEGMENT_OP,FOLLOW_SEGMENT_OP_in_rangeIntervalEntryOperator18071); if (state.failed) return operator;
 
@@ -19044,7 +19063,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2739:7: ENTRY_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2756:7: ENTRY_OP
                     {
                     ENTRY_OP418=(Token)match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_rangeIntervalEntryOperator18087); if (state.failed) return operator;
 
@@ -19070,7 +19089,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "additiveExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2743:1: additiveExpression returns [Term term] : me1= scaleExpression ( additiveOperator me2= scaleExpression )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2760:1: additiveExpression returns [Term term] : me1= scaleExpression ( additiveOperator me2= scaleExpression )* ;
     public Term additiveExpression() throws RecognitionException {
         Term term = null;
 
@@ -19083,8 +19102,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2744:5: (me1= scaleExpression ( additiveOperator me2= scaleExpression )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:2744:7: me1= scaleExpression ( additiveOperator me2= scaleExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2761:5: (me1= scaleExpression ( additiveOperator me2= scaleExpression )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:2761:7: me1= scaleExpression ( additiveOperator me2= scaleExpression )*
             {
             pushFollow(FOLLOW_scaleExpression_in_additiveExpression18118);
             me1=scaleExpression();
@@ -19094,7 +19113,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = me1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2746:7: ( additiveOperator me2= scaleExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2763:7: ( additiveOperator me2= scaleExpression )*
             loop227:
             do {
                 int alt227=2;
@@ -19107,7 +19126,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt227) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2747:9: additiveOperator me2= scaleExpression
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2764:9: additiveOperator me2= scaleExpression
             	    {
             	    pushFollow(FOLLOW_additiveOperator_in_additiveExpression18144);
             	    additiveOperator419=additiveOperator();
@@ -19153,7 +19172,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "additiveOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2755:1: additiveOperator returns [BinaryOperatorExpression operator] : ( SUM_OP | DIFFERENCE_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2772:1: additiveOperator returns [BinaryOperatorExpression operator] : ( SUM_OP | DIFFERENCE_OP );
     public BinaryOperatorExpression additiveOperator() throws RecognitionException {
         BinaryOperatorExpression operator = null;
 
@@ -19162,7 +19181,7 @@ public class CeylonParser extends Parser {
         Token DIFFERENCE_OP421=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2756:5: ( SUM_OP | DIFFERENCE_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2773:5: ( SUM_OP | DIFFERENCE_OP )
             int alt228=2;
             int LA228_0 = input.LA(1);
 
@@ -19182,7 +19201,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt228) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2756:7: SUM_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2773:7: SUM_OP
                     {
                     SUM_OP420=(Token)match(input,SUM_OP,FOLLOW_SUM_OP_in_additiveOperator18207); if (state.failed) return operator;
 
@@ -19191,7 +19210,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2758:7: DIFFERENCE_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2775:7: DIFFERENCE_OP
                     {
                     DIFFERENCE_OP421=(Token)match(input,DIFFERENCE_OP,FOLLOW_DIFFERENCE_OP_in_additiveOperator18224); if (state.failed) return operator;
 
@@ -19217,7 +19236,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "scaleExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2762:1: scaleExpression returns [Term term] : multiplicativeExpression ( scaleOperator se= scaleExpression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2779:1: scaleExpression returns [Term term] : multiplicativeExpression ( scaleOperator se= scaleExpression )? ;
     public Term scaleExpression() throws RecognitionException {
         Term term = null;
 
@@ -19230,8 +19249,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2763:5: ( multiplicativeExpression ( scaleOperator se= scaleExpression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2763:7: multiplicativeExpression ( scaleOperator se= scaleExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2780:5: ( multiplicativeExpression ( scaleOperator se= scaleExpression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2780:7: multiplicativeExpression ( scaleOperator se= scaleExpression )?
             {
             pushFollow(FOLLOW_multiplicativeExpression_in_scaleExpression18253);
             multiplicativeExpression422=multiplicativeExpression();
@@ -19241,7 +19260,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = multiplicativeExpression422; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2765:7: ( scaleOperator se= scaleExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2782:7: ( scaleOperator se= scaleExpression )?
             int alt229=2;
             int LA229_0 = input.LA(1);
 
@@ -19250,7 +19269,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt229) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2766:9: scaleOperator se= scaleExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2783:9: scaleOperator se= scaleExpression
                     {
                     pushFollow(FOLLOW_scaleOperator_in_scaleExpression18279);
                     scaleOperator423=scaleOperator();
@@ -19293,7 +19312,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "multiplicativeExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2774:1: multiplicativeExpression returns [Term term] : ue1= unionExpression ( multiplicativeOperator ue2= unionExpression )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2791:1: multiplicativeExpression returns [Term term] : ue1= unionExpression ( multiplicativeOperator ue2= unionExpression )* ;
     public Term multiplicativeExpression() throws RecognitionException {
         Term term = null;
 
@@ -19306,8 +19325,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2775:5: (ue1= unionExpression ( multiplicativeOperator ue2= unionExpression )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:2775:7: ue1= unionExpression ( multiplicativeOperator ue2= unionExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2792:5: (ue1= unionExpression ( multiplicativeOperator ue2= unionExpression )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:2792:7: ue1= unionExpression ( multiplicativeOperator ue2= unionExpression )*
             {
             pushFollow(FOLLOW_unionExpression_in_multiplicativeExpression18343);
             ue1=unionExpression();
@@ -19317,7 +19336,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = ue1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2777:7: ( multiplicativeOperator ue2= unionExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2794:7: ( multiplicativeOperator ue2= unionExpression )*
             loop230:
             do {
                 int alt230=2;
@@ -19330,7 +19349,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt230) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2778:9: multiplicativeOperator ue2= unionExpression
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2795:9: multiplicativeOperator ue2= unionExpression
             	    {
             	    pushFollow(FOLLOW_multiplicativeOperator_in_multiplicativeExpression18369);
             	    multiplicativeOperator424=multiplicativeOperator();
@@ -19376,7 +19395,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "multiplicativeOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2786:1: multiplicativeOperator returns [BinaryOperatorExpression operator] : ( PRODUCT_OP | QUOTIENT_OP | REMAINDER_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2803:1: multiplicativeOperator returns [BinaryOperatorExpression operator] : ( PRODUCT_OP | QUOTIENT_OP | REMAINDER_OP );
     public BinaryOperatorExpression multiplicativeOperator() throws RecognitionException {
         BinaryOperatorExpression operator = null;
 
@@ -19386,7 +19405,7 @@ public class CeylonParser extends Parser {
         Token REMAINDER_OP427=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2787:5: ( PRODUCT_OP | QUOTIENT_OP | REMAINDER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2804:5: ( PRODUCT_OP | QUOTIENT_OP | REMAINDER_OP )
             int alt231=3;
             switch ( input.LA(1) ) {
             case PRODUCT_OP:
@@ -19415,7 +19434,7 @@ public class CeylonParser extends Parser {
 
             switch (alt231) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2787:7: PRODUCT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2804:7: PRODUCT_OP
                     {
                     PRODUCT_OP425=(Token)match(input,PRODUCT_OP,FOLLOW_PRODUCT_OP_in_multiplicativeOperator18432); if (state.failed) return operator;
 
@@ -19424,7 +19443,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2789:7: QUOTIENT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2806:7: QUOTIENT_OP
                     {
                     QUOTIENT_OP426=(Token)match(input,QUOTIENT_OP,FOLLOW_QUOTIENT_OP_in_multiplicativeOperator18449); if (state.failed) return operator;
 
@@ -19433,7 +19452,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2791:7: REMAINDER_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2808:7: REMAINDER_OP
                     {
                     REMAINDER_OP427=(Token)match(input,REMAINDER_OP,FOLLOW_REMAINDER_OP_in_multiplicativeOperator18465); if (state.failed) return operator;
 
@@ -19459,7 +19478,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "unionExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2795:1: unionExpression returns [Term term] : ie1= intersectionExpression ( unionOperator ie2= intersectionExpression )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2812:1: unionExpression returns [Term term] : ie1= intersectionExpression ( unionOperator ie2= intersectionExpression )* ;
     public Term unionExpression() throws RecognitionException {
         Term term = null;
 
@@ -19472,8 +19491,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2796:5: (ie1= intersectionExpression ( unionOperator ie2= intersectionExpression )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:2796:7: ie1= intersectionExpression ( unionOperator ie2= intersectionExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2813:5: (ie1= intersectionExpression ( unionOperator ie2= intersectionExpression )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:2813:7: ie1= intersectionExpression ( unionOperator ie2= intersectionExpression )*
             {
             pushFollow(FOLLOW_intersectionExpression_in_unionExpression18496);
             ie1=intersectionExpression();
@@ -19483,7 +19502,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = ie1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2798:7: ( unionOperator ie2= intersectionExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2815:7: ( unionOperator ie2= intersectionExpression )*
             loop232:
             do {
                 int alt232=2;
@@ -19496,7 +19515,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt232) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2799:9: unionOperator ie2= intersectionExpression
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2816:9: unionOperator ie2= intersectionExpression
             	    {
             	    pushFollow(FOLLOW_unionOperator_in_unionExpression18522);
             	    unionOperator428=unionOperator();
@@ -19542,7 +19561,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "unionOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2807:1: unionOperator returns [BinaryOperatorExpression operator] : ( UNION_OP | COMPLEMENT_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2824:1: unionOperator returns [BinaryOperatorExpression operator] : ( UNION_OP | COMPLEMENT_OP );
     public BinaryOperatorExpression unionOperator() throws RecognitionException {
         BinaryOperatorExpression operator = null;
 
@@ -19551,7 +19570,7 @@ public class CeylonParser extends Parser {
         Token COMPLEMENT_OP430=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2808:5: ( UNION_OP | COMPLEMENT_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2825:5: ( UNION_OP | COMPLEMENT_OP )
             int alt233=2;
             int LA233_0 = input.LA(1);
 
@@ -19571,7 +19590,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt233) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2808:7: UNION_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2825:7: UNION_OP
                     {
                     UNION_OP429=(Token)match(input,UNION_OP,FOLLOW_UNION_OP_in_unionOperator18589); if (state.failed) return operator;
 
@@ -19580,7 +19599,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2810:7: COMPLEMENT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2827:7: COMPLEMENT_OP
                     {
                     COMPLEMENT_OP430=(Token)match(input,COMPLEMENT_OP,FOLLOW_COMPLEMENT_OP_in_unionOperator18605); if (state.failed) return operator;
 
@@ -19606,7 +19625,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "intersectionExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2814:1: intersectionExpression returns [Term term] : ne1= negationComplementExpression ( intersectionOperator ne2= negationComplementExpression )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2831:1: intersectionExpression returns [Term term] : ne1= negationComplementExpression ( intersectionOperator ne2= negationComplementExpression )* ;
     public Term intersectionExpression() throws RecognitionException {
         Term term = null;
 
@@ -19619,8 +19638,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2815:5: (ne1= negationComplementExpression ( intersectionOperator ne2= negationComplementExpression )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:2815:7: ne1= negationComplementExpression ( intersectionOperator ne2= negationComplementExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2832:5: (ne1= negationComplementExpression ( intersectionOperator ne2= negationComplementExpression )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:2832:7: ne1= negationComplementExpression ( intersectionOperator ne2= negationComplementExpression )*
             {
             pushFollow(FOLLOW_negationComplementExpression_in_intersectionExpression18636);
             ne1=negationComplementExpression();
@@ -19630,7 +19649,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = ne1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2817:7: ( intersectionOperator ne2= negationComplementExpression )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2834:7: ( intersectionOperator ne2= negationComplementExpression )*
             loop234:
             do {
                 int alt234=2;
@@ -19643,7 +19662,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt234) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2818:9: intersectionOperator ne2= negationComplementExpression
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2835:9: intersectionOperator ne2= negationComplementExpression
             	    {
             	    pushFollow(FOLLOW_intersectionOperator_in_intersectionExpression18662);
             	    intersectionOperator431=intersectionOperator();
@@ -19689,7 +19708,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "intersectionOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2826:1: intersectionOperator returns [BinaryOperatorExpression operator] : INTERSECTION_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2843:1: intersectionOperator returns [BinaryOperatorExpression operator] : INTERSECTION_OP ;
     public BinaryOperatorExpression intersectionOperator() throws RecognitionException {
         BinaryOperatorExpression operator = null;
 
@@ -19697,8 +19716,8 @@ public class CeylonParser extends Parser {
         Token INTERSECTION_OP432=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2827:5: ( INTERSECTION_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:2827:7: INTERSECTION_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:2844:5: ( INTERSECTION_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2844:7: INTERSECTION_OP
             {
             INTERSECTION_OP432=(Token)match(input,INTERSECTION_OP,FOLLOW_INTERSECTION_OP_in_intersectionOperator18729); if (state.failed) return operator;
 
@@ -19722,7 +19741,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "negationComplementExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2831:1: negationComplementExpression returns [Term term] : ( unaryMinusOrComplementOperator ne= negationComplementExpression | exponentiationExpression );
+    // /home/david/git/ceylon-spec/Ceylon.g:2848:1: negationComplementExpression returns [Term term] : ( unaryMinusOrComplementOperator ne= negationComplementExpression | exponentiationExpression );
     public Term negationComplementExpression() throws RecognitionException {
         Term term = null;
 
@@ -19735,7 +19754,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2832:5: ( unaryMinusOrComplementOperator ne= negationComplementExpression | exponentiationExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:2849:5: ( unaryMinusOrComplementOperator ne= negationComplementExpression | exponentiationExpression )
             int alt235=2;
             int LA235_0 = input.LA(1);
 
@@ -19755,7 +19774,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt235) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2832:7: unaryMinusOrComplementOperator ne= negationComplementExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2849:7: unaryMinusOrComplementOperator ne= negationComplementExpression
                     {
                     pushFollow(FOLLOW_unaryMinusOrComplementOperator_in_negationComplementExpression18758);
                     unaryMinusOrComplementOperator433=unaryMinusOrComplementOperator();
@@ -19776,7 +19795,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2836:7: exponentiationExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2853:7: exponentiationExpression
                     {
                     pushFollow(FOLLOW_exponentiationExpression_in_negationComplementExpression18793);
                     exponentiationExpression434=exponentiationExpression();
@@ -19806,7 +19825,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "unaryMinusOrComplementOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2840:1: unaryMinusOrComplementOperator returns [UnaryOperatorExpression operator] : ( DIFFERENCE_OP | SUM_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2857:1: unaryMinusOrComplementOperator returns [UnaryOperatorExpression operator] : ( DIFFERENCE_OP | SUM_OP );
     public UnaryOperatorExpression unaryMinusOrComplementOperator() throws RecognitionException {
         UnaryOperatorExpression operator = null;
 
@@ -19815,7 +19834,7 @@ public class CeylonParser extends Parser {
         Token SUM_OP436=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2841:5: ( DIFFERENCE_OP | SUM_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2858:5: ( DIFFERENCE_OP | SUM_OP )
             int alt236=2;
             int LA236_0 = input.LA(1);
 
@@ -19835,7 +19854,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt236) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2841:7: DIFFERENCE_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2858:7: DIFFERENCE_OP
                     {
                     DIFFERENCE_OP435=(Token)match(input,DIFFERENCE_OP,FOLLOW_DIFFERENCE_OP_in_unaryMinusOrComplementOperator18822); if (state.failed) return operator;
 
@@ -19844,7 +19863,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2843:7: SUM_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2860:7: SUM_OP
                     {
                     SUM_OP436=(Token)match(input,SUM_OP,FOLLOW_SUM_OP_in_unaryMinusOrComplementOperator18839); if (state.failed) return operator;
 
@@ -19870,7 +19889,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "exponentiationExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2847:1: exponentiationExpression returns [Term term] : incrementDecrementExpression ( exponentiationOperator ee= exponentiationExpression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2864:1: exponentiationExpression returns [Term term] : incrementDecrementExpression ( exponentiationOperator ee= exponentiationExpression )? ;
     public Term exponentiationExpression() throws RecognitionException {
         Term term = null;
 
@@ -19883,8 +19902,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2848:5: ( incrementDecrementExpression ( exponentiationOperator ee= exponentiationExpression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:2848:7: incrementDecrementExpression ( exponentiationOperator ee= exponentiationExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2865:5: ( incrementDecrementExpression ( exponentiationOperator ee= exponentiationExpression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:2865:7: incrementDecrementExpression ( exponentiationOperator ee= exponentiationExpression )?
             {
             pushFollow(FOLLOW_incrementDecrementExpression_in_exponentiationExpression18868);
             incrementDecrementExpression437=incrementDecrementExpression();
@@ -19894,7 +19913,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = incrementDecrementExpression437; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2850:7: ( exponentiationOperator ee= exponentiationExpression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2867:7: ( exponentiationOperator ee= exponentiationExpression )?
             int alt237=2;
             int LA237_0 = input.LA(1);
 
@@ -19903,7 +19922,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt237) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2851:9: exponentiationOperator ee= exponentiationExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2868:9: exponentiationOperator ee= exponentiationExpression
                     {
                     pushFollow(FOLLOW_exponentiationOperator_in_exponentiationExpression18894);
                     exponentiationOperator438=exponentiationOperator();
@@ -19946,7 +19965,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "exponentiationOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2859:1: exponentiationOperator returns [PowerOp operator] : POWER_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2876:1: exponentiationOperator returns [PowerOp operator] : POWER_OP ;
     public PowerOp exponentiationOperator() throws RecognitionException {
         PowerOp operator = null;
 
@@ -19954,8 +19973,8 @@ public class CeylonParser extends Parser {
         Token POWER_OP439=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2860:5: ( POWER_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:2860:7: POWER_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:2877:5: ( POWER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2877:7: POWER_OP
             {
             POWER_OP439=(Token)match(input,POWER_OP,FOLLOW_POWER_OP_in_exponentiationOperator18956); if (state.failed) return operator;
 
@@ -19979,7 +19998,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "scaleOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2864:1: scaleOperator returns [ScaleOp operator] : SCALE_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2881:1: scaleOperator returns [ScaleOp operator] : SCALE_OP ;
     public ScaleOp scaleOperator() throws RecognitionException {
         ScaleOp operator = null;
 
@@ -19987,8 +20006,8 @@ public class CeylonParser extends Parser {
         Token SCALE_OP440=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2865:5: ( SCALE_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:2865:7: SCALE_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:2882:5: ( SCALE_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2882:7: SCALE_OP
             {
             SCALE_OP440=(Token)match(input,SCALE_OP,FOLLOW_SCALE_OP_in_scaleOperator18986); if (state.failed) return operator;
 
@@ -20012,7 +20031,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "incrementDecrementExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2869:1: incrementDecrementExpression returns [Term term] : ( prefixOperator ie= incrementDecrementExpression | postfixIncrementDecrementExpression );
+    // /home/david/git/ceylon-spec/Ceylon.g:2886:1: incrementDecrementExpression returns [Term term] : ( prefixOperator ie= incrementDecrementExpression | postfixIncrementDecrementExpression );
     public Term incrementDecrementExpression() throws RecognitionException {
         Term term = null;
 
@@ -20025,7 +20044,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2870:5: ( prefixOperator ie= incrementDecrementExpression | postfixIncrementDecrementExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:2887:5: ( prefixOperator ie= incrementDecrementExpression | postfixIncrementDecrementExpression )
             int alt238=2;
             int LA238_0 = input.LA(1);
 
@@ -20045,7 +20064,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt238) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2870:7: prefixOperator ie= incrementDecrementExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2887:7: prefixOperator ie= incrementDecrementExpression
                     {
                     pushFollow(FOLLOW_prefixOperator_in_incrementDecrementExpression19016);
                     prefixOperator441=prefixOperator();
@@ -20066,7 +20085,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2874:7: postfixIncrementDecrementExpression
+                    // /home/david/git/ceylon-spec/Ceylon.g:2891:7: postfixIncrementDecrementExpression
                     {
                     pushFollow(FOLLOW_postfixIncrementDecrementExpression_in_incrementDecrementExpression19050);
                     postfixIncrementDecrementExpression442=postfixIncrementDecrementExpression();
@@ -20096,7 +20115,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "prefixOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2878:1: prefixOperator returns [PrefixOperatorExpression operator] : ( DECREMENT_OP | INCREMENT_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2895:1: prefixOperator returns [PrefixOperatorExpression operator] : ( DECREMENT_OP | INCREMENT_OP );
     public PrefixOperatorExpression prefixOperator() throws RecognitionException {
         PrefixOperatorExpression operator = null;
 
@@ -20105,7 +20124,7 @@ public class CeylonParser extends Parser {
         Token INCREMENT_OP444=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2879:5: ( DECREMENT_OP | INCREMENT_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2896:5: ( DECREMENT_OP | INCREMENT_OP )
             int alt239=2;
             int LA239_0 = input.LA(1);
 
@@ -20125,7 +20144,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt239) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2879:7: DECREMENT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2896:7: DECREMENT_OP
                     {
                     DECREMENT_OP443=(Token)match(input,DECREMENT_OP,FOLLOW_DECREMENT_OP_in_prefixOperator19079); if (state.failed) return operator;
 
@@ -20134,7 +20153,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2881:7: INCREMENT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2898:7: INCREMENT_OP
                     {
                     INCREMENT_OP444=(Token)match(input,INCREMENT_OP,FOLLOW_INCREMENT_OP_in_prefixOperator19096); if (state.failed) return operator;
 
@@ -20160,7 +20179,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "postfixIncrementDecrementExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2885:1: postfixIncrementDecrementExpression returns [Term term] : primary ( postfixOperator )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2902:1: postfixIncrementDecrementExpression returns [Term term] : primary ( postfixOperator )* ;
     public Term postfixIncrementDecrementExpression() throws RecognitionException {
         Term term = null;
 
@@ -20171,8 +20190,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2886:5: ( primary ( postfixOperator )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:2886:7: primary ( postfixOperator )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2903:5: ( primary ( postfixOperator )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:2903:7: primary ( postfixOperator )*
             {
             pushFollow(FOLLOW_primary_in_postfixIncrementDecrementExpression19126);
             primary445=primary();
@@ -20182,7 +20201,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { term = primary445; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2888:7: ( postfixOperator )*
+            // /home/david/git/ceylon-spec/Ceylon.g:2905:7: ( postfixOperator )*
             loop240:
             do {
                 int alt240=2;
@@ -20195,7 +20214,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt240) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:2889:9: postfixOperator
+            	    // /home/david/git/ceylon-spec/Ceylon.g:2906:9: postfixOperator
             	    {
             	    pushFollow(FOLLOW_postfixOperator_in_postfixIncrementDecrementExpression19154);
             	    postfixOperator446=postfixOperator();
@@ -20233,7 +20252,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "postfixOperator"
-    // /home/david/git/ceylon-spec/Ceylon.g:2895:1: postfixOperator returns [PostfixOperatorExpression operator] : ( DECREMENT_OP | INCREMENT_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:2912:1: postfixOperator returns [PostfixOperatorExpression operator] : ( DECREMENT_OP | INCREMENT_OP );
     public PostfixOperatorExpression postfixOperator() throws RecognitionException {
         PostfixOperatorExpression operator = null;
 
@@ -20242,7 +20261,7 @@ public class CeylonParser extends Parser {
         Token INCREMENT_OP448=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2896:5: ( DECREMENT_OP | INCREMENT_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2913:5: ( DECREMENT_OP | INCREMENT_OP )
             int alt241=2;
             int LA241_0 = input.LA(1);
 
@@ -20262,7 +20281,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt241) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2896:7: DECREMENT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2913:7: DECREMENT_OP
                     {
                     DECREMENT_OP447=(Token)match(input,DECREMENT_OP,FOLLOW_DECREMENT_OP_in_postfixOperator19194); if (state.failed) return operator;
 
@@ -20271,7 +20290,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2898:7: INCREMENT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:2915:7: INCREMENT_OP
                     {
                     INCREMENT_OP448=(Token)match(input,INCREMENT_OP,FOLLOW_INCREMENT_OP_in_postfixOperator19211); if (state.failed) return operator;
 
@@ -20297,7 +20316,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "selfReference"
-    // /home/david/git/ceylon-spec/Ceylon.g:2902:1: selfReference returns [Atom atom] : ( THIS | SUPER | OUTER | PACKAGE );
+    // /home/david/git/ceylon-spec/Ceylon.g:2919:1: selfReference returns [Atom atom] : ( THIS | SUPER | OUTER | PACKAGE );
     public Atom selfReference() throws RecognitionException {
         Atom atom = null;
 
@@ -20308,7 +20327,7 @@ public class CeylonParser extends Parser {
         Token PACKAGE452=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2903:5: ( THIS | SUPER | OUTER | PACKAGE )
+            // /home/david/git/ceylon-spec/Ceylon.g:2920:5: ( THIS | SUPER | OUTER | PACKAGE )
             int alt242=4;
             switch ( input.LA(1) ) {
             case THIS:
@@ -20342,7 +20361,7 @@ public class CeylonParser extends Parser {
 
             switch (alt242) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2903:7: THIS
+                    // /home/david/git/ceylon-spec/Ceylon.g:2920:7: THIS
                     {
                     THIS449=(Token)match(input,THIS,FOLLOW_THIS_in_selfReference19241); if (state.failed) return atom;
 
@@ -20351,7 +20370,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2905:7: SUPER
+                    // /home/david/git/ceylon-spec/Ceylon.g:2922:7: SUPER
                     {
                     SUPER450=(Token)match(input,SUPER,FOLLOW_SUPER_in_selfReference19257); if (state.failed) return atom;
 
@@ -20360,7 +20379,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2907:7: OUTER
+                    // /home/david/git/ceylon-spec/Ceylon.g:2924:7: OUTER
                     {
                     OUTER451=(Token)match(input,OUTER,FOLLOW_OUTER_in_selfReference19274); if (state.failed) return atom;
 
@@ -20369,7 +20388,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2909:7: PACKAGE
+                    // /home/david/git/ceylon-spec/Ceylon.g:2926:7: PACKAGE
                     {
                     PACKAGE452=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_selfReference19290); if (state.failed) return atom;
 
@@ -20395,7 +20414,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "nonstringLiteral"
-    // /home/david/git/ceylon-spec/Ceylon.g:2913:1: nonstringLiteral returns [Literal literal] : ( NATURAL_LITERAL | FLOAT_LITERAL | CHAR_LITERAL );
+    // /home/david/git/ceylon-spec/Ceylon.g:2930:1: nonstringLiteral returns [Literal literal] : ( NATURAL_LITERAL | FLOAT_LITERAL | CHAR_LITERAL );
     public Literal nonstringLiteral() throws RecognitionException {
         Literal literal = null;
 
@@ -20405,7 +20424,7 @@ public class CeylonParser extends Parser {
         Token CHAR_LITERAL455=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2914:5: ( NATURAL_LITERAL | FLOAT_LITERAL | CHAR_LITERAL )
+            // /home/david/git/ceylon-spec/Ceylon.g:2931:5: ( NATURAL_LITERAL | FLOAT_LITERAL | CHAR_LITERAL )
             int alt243=3;
             switch ( input.LA(1) ) {
             case NATURAL_LITERAL:
@@ -20434,7 +20453,7 @@ public class CeylonParser extends Parser {
 
             switch (alt243) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2914:7: NATURAL_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:2931:7: NATURAL_LITERAL
                     {
                     NATURAL_LITERAL453=(Token)match(input,NATURAL_LITERAL,FOLLOW_NATURAL_LITERAL_in_nonstringLiteral19323); if (state.failed) return literal;
 
@@ -20443,7 +20462,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2916:7: FLOAT_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:2933:7: FLOAT_LITERAL
                     {
                     FLOAT_LITERAL454=(Token)match(input,FLOAT_LITERAL,FOLLOW_FLOAT_LITERAL_in_nonstringLiteral19340); if (state.failed) return literal;
 
@@ -20452,7 +20471,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2918:7: CHAR_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:2935:7: CHAR_LITERAL
                     {
                     CHAR_LITERAL455=(Token)match(input,CHAR_LITERAL,FOLLOW_CHAR_LITERAL_in_nonstringLiteral19357); if (state.failed) return literal;
 
@@ -20478,7 +20497,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "stringLiteral"
-    // /home/david/git/ceylon-spec/Ceylon.g:2922:1: stringLiteral returns [StringLiteral stringLiteral] : ( STRING_LITERAL | VERBATIM_STRING );
+    // /home/david/git/ceylon-spec/Ceylon.g:2939:1: stringLiteral returns [StringLiteral stringLiteral] : ( STRING_LITERAL | VERBATIM_STRING );
     public StringLiteral stringLiteral() throws RecognitionException {
         StringLiteral stringLiteral = null;
 
@@ -20487,7 +20506,7 @@ public class CeylonParser extends Parser {
         Token VERBATIM_STRING457=null;
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2923:5: ( STRING_LITERAL | VERBATIM_STRING )
+            // /home/david/git/ceylon-spec/Ceylon.g:2940:5: ( STRING_LITERAL | VERBATIM_STRING )
             int alt244=2;
             int LA244_0 = input.LA(1);
 
@@ -20507,7 +20526,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt244) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2923:7: STRING_LITERAL
+                    // /home/david/git/ceylon-spec/Ceylon.g:2940:7: STRING_LITERAL
                     {
                     STRING_LITERAL456=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_stringLiteral19387); if (state.failed) return stringLiteral;
 
@@ -20516,7 +20535,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2925:7: VERBATIM_STRING
+                    // /home/david/git/ceylon-spec/Ceylon.g:2942:7: VERBATIM_STRING
                     {
                     VERBATIM_STRING457=(Token)match(input,VERBATIM_STRING,FOLLOW_VERBATIM_STRING_in_stringLiteral19404); if (state.failed) return stringLiteral;
 
@@ -20542,7 +20561,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "stringExpression"
-    // /home/david/git/ceylon-spec/Ceylon.g:2929:1: stringExpression returns [Atom atom] : (sl1= stringLiteral | STRING_START e1= expression ( STRING_MID e2= expression )* STRING_END );
+    // /home/david/git/ceylon-spec/Ceylon.g:2946:1: stringExpression returns [Atom atom] : (sl1= stringLiteral | STRING_START e1= expression ( STRING_MID e2= expression )* STRING_END );
     public Atom stringExpression() throws RecognitionException {
         Atom atom = null;
 
@@ -20559,7 +20578,7 @@ public class CeylonParser extends Parser {
 
          StringTemplate st=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2931:5: (sl1= stringLiteral | STRING_START e1= expression ( STRING_MID e2= expression )* STRING_END )
+            // /home/david/git/ceylon-spec/Ceylon.g:2948:5: (sl1= stringLiteral | STRING_START e1= expression ( STRING_MID e2= expression )* STRING_END )
             int alt246=2;
             int LA246_0 = input.LA(1);
 
@@ -20579,7 +20598,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt246) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2931:7: sl1= stringLiteral
+                    // /home/david/git/ceylon-spec/Ceylon.g:2948:7: sl1= stringLiteral
                     {
                     pushFollow(FOLLOW_stringLiteral_in_stringExpression19444);
                     sl1=stringLiteral();
@@ -20592,7 +20611,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2933:7: STRING_START e1= expression ( STRING_MID e2= expression )* STRING_END
+                    // /home/david/git/ceylon-spec/Ceylon.g:2950:7: STRING_START e1= expression ( STRING_MID e2= expression )* STRING_END
                     {
                     STRING_START458=(Token)match(input,STRING_START,FOLLOW_STRING_START_in_stringExpression19460); if (state.failed) return atom;
 
@@ -20609,7 +20628,7 @@ public class CeylonParser extends Parser {
                     if ( state.backtracking==0 ) { if (e1!=null) 
                                 st.addExpression(e1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2940:7: ( STRING_MID e2= expression )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:2957:7: ( STRING_MID e2= expression )*
                     loop245:
                     do {
                         int alt245=2;
@@ -20622,7 +20641,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt245) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:2941:9: STRING_MID e2= expression
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:2958:9: STRING_MID e2= expression
                     	    {
                     	    STRING_MID459=(Token)match(input,STRING_MID,FOLLOW_STRING_MID_in_stringExpression19504); if (state.failed) return atom;
 
@@ -20670,7 +20689,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeArguments"
-    // /home/david/git/ceylon-spec/Ceylon.g:2951:1: typeArguments returns [TypeArgumentList typeArgumentList] : SMALLER_OP ( (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )* )? LARGER_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:2968:1: typeArguments returns [TypeArgumentList typeArgumentList] : SMALLER_OP ( (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )* )? LARGER_OP ;
     public TypeArgumentList typeArguments() throws RecognitionException {
         TypeArgumentList typeArgumentList = null;
 
@@ -20693,14 +20712,14 @@ public class CeylonParser extends Parser {
 
          TypeVariance v=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:2953:5: ( SMALLER_OP ( (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )* )? LARGER_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:2953:7: SMALLER_OP ( (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )* )? LARGER_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:2970:5: ( SMALLER_OP ( (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )* )? LARGER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:2970:7: SMALLER_OP ( (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )* )? LARGER_OP
             {
             SMALLER_OP461=(Token)match(input,SMALLER_OP,FOLLOW_SMALLER_OP_in_typeArguments19591); if (state.failed) return typeArgumentList;
 
             if ( state.backtracking==0 ) { typeArgumentList = new TypeArgumentList(SMALLER_OP461); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:2955:7: ( (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )* )?
+            // /home/david/git/ceylon-spec/Ceylon.g:2972:7: ( (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )* )?
             int alt253=2;
             int LA253_0 = input.LA(1);
 
@@ -20709,9 +20728,9 @@ public class CeylonParser extends Parser {
             }
             switch (alt253) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:2956:9: (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:2973:9: (v1= variance (ta1= type )? |ta0= type ) (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )*
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:2956:9: (v1= variance (ta1= type )? |ta0= type )
+                    // /home/david/git/ceylon-spec/Ceylon.g:2973:9: (v1= variance (ta1= type )? |ta0= type )
                     int alt248=2;
                     int LA248_0 = input.LA(1);
 
@@ -20731,7 +20750,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt248) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2957:11: v1= variance (ta1= type )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:2974:11: v1= variance (ta1= type )?
                             {
                             pushFollow(FOLLOW_variance_in_typeArguments19631);
                             v1=variance();
@@ -20741,7 +20760,7 @@ public class CeylonParser extends Parser {
 
                             if ( state.backtracking==0 ) { v = v1; }
 
-                            // /home/david/git/ceylon-spec/Ceylon.g:2959:11: (ta1= type )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:2976:11: (ta1= type )?
                             int alt247=2;
                             int LA247_0 = input.LA(1);
 
@@ -20750,7 +20769,7 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt247) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:2960:13: ta1= type
+                                    // /home/david/git/ceylon-spec/Ceylon.g:2977:13: ta1= type
                                     {
                                     pushFollow(FOLLOW_type_in_typeArguments19671);
                                     ta1=type();
@@ -20772,7 +20791,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:2967:11: ta0= type
+                            // /home/david/git/ceylon-spec/Ceylon.g:2984:11: ta0= type
                             {
                             pushFollow(FOLLOW_type_in_typeArguments19722);
                             ta0=type();
@@ -20789,7 +20808,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:2971:9: (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:2988:9: (c= COMMA (v2= variance (ta2= type |) | (ta3= type |) ) )*
                     loop252:
                     do {
                         int alt252=2;
@@ -20802,13 +20821,13 @@ public class CeylonParser extends Parser {
 
                         switch (alt252) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:2972:11: c= COMMA (v2= variance (ta2= type |) | (ta3= type |) )
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:2989:11: c= COMMA (v2= variance (ta2= type |) | (ta3= type |) )
                     	    {
                     	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_typeArguments19768); if (state.failed) return typeArgumentList;
 
                     	    if ( state.backtracking==0 ) { typeArgumentList.setEndToken(c); }
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:2974:11: (v2= variance (ta2= type |) | (ta3= type |) )
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:2991:11: (v2= variance (ta2= type |) | (ta3= type |) )
                     	    int alt251=2;
                     	    int LA251_0 = input.LA(1);
 
@@ -20828,7 +20847,7 @@ public class CeylonParser extends Parser {
                     	    }
                     	    switch (alt251) {
                     	        case 1 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:2975:13: v2= variance (ta2= type |)
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:2992:13: v2= variance (ta2= type |)
                     	            {
                     	            pushFollow(FOLLOW_variance_in_typeArguments19808);
                     	            v2=variance();
@@ -20838,7 +20857,7 @@ public class CeylonParser extends Parser {
 
                     	            if ( state.backtracking==0 ) { v = v2; }
 
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:2977:13: (ta2= type |)
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:2994:13: (ta2= type |)
                     	            int alt249=2;
                     	            int LA249_0 = input.LA(1);
 
@@ -20858,7 +20877,7 @@ public class CeylonParser extends Parser {
                     	            }
                     	            switch (alt249) {
                     	                case 1 :
-                    	                    // /home/david/git/ceylon-spec/Ceylon.g:2978:15: ta2= type
+                    	                    // /home/david/git/ceylon-spec/Ceylon.g:2995:15: ta2= type
                     	                    {
                     	                    pushFollow(FOLLOW_type_in_typeArguments19854);
                     	                    ta2=type();
@@ -20875,7 +20894,7 @@ public class CeylonParser extends Parser {
                     	                    }
                     	                    break;
                     	                case 2 :
-                    	                    // /home/david/git/ceylon-spec/Ceylon.g:2984:15: 
+                    	                    // /home/david/git/ceylon-spec/Ceylon.g:3001:15: 
                     	                    {
                     	                    if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                     	                                          new MismatchedTokenException(UIDENTIFIER, input)); }
@@ -20889,9 +20908,9 @@ public class CeylonParser extends Parser {
                     	            }
                     	            break;
                     	        case 2 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:2988:13: (ta3= type |)
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:3005:13: (ta3= type |)
                     	            {
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:2988:13: (ta3= type |)
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:3005:13: (ta3= type |)
                     	            int alt250=2;
                     	            int LA250_0 = input.LA(1);
 
@@ -20911,7 +20930,7 @@ public class CeylonParser extends Parser {
                     	            }
                     	            switch (alt250) {
                     	                case 1 :
-                    	                    // /home/david/git/ceylon-spec/Ceylon.g:2989:15: ta3= type
+                    	                    // /home/david/git/ceylon-spec/Ceylon.g:3006:15: ta3= type
                     	                    {
                     	                    pushFollow(FOLLOW_type_in_typeArguments19945);
                     	                    ta3=type();
@@ -20926,7 +20945,7 @@ public class CeylonParser extends Parser {
                     	                    }
                     	                    break;
                     	                case 2 :
-                    	                    // /home/david/git/ceylon-spec/Ceylon.g:2993:15: 
+                    	                    // /home/david/git/ceylon-spec/Ceylon.g:3010:15: 
                     	                    {
                     	                    if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                     	                                      new MismatchedTokenException(UIDENTIFIER, input)); }
@@ -20980,7 +20999,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "variadicType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3003:1: variadicType returns [Type type] : ( ( unionType ( PRODUCT_OP | SUM_OP ) )=>at= unionType ( PRODUCT_OP | SUM_OP )? |t= type );
+    // /home/david/git/ceylon-spec/Ceylon.g:3020:1: variadicType returns [Type type] : ( ( unionType ( PRODUCT_OP | SUM_OP ) )=>at= unionType ( PRODUCT_OP | SUM_OP )? |t= type );
     public Type variadicType() throws RecognitionException {
         Type type = null;
 
@@ -20993,7 +21012,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3004:5: ( ( unionType ( PRODUCT_OP | SUM_OP ) )=>at= unionType ( PRODUCT_OP | SUM_OP )? |t= type )
+            // /home/david/git/ceylon-spec/Ceylon.g:3021:5: ( ( unionType ( PRODUCT_OP | SUM_OP ) )=>at= unionType ( PRODUCT_OP | SUM_OP )? |t= type )
             int alt255=2;
             switch ( input.LA(1) ) {
             case UIDENTIFIER:
@@ -21087,7 +21106,7 @@ public class CeylonParser extends Parser {
 
             switch (alt255) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3004:7: ( unionType ( PRODUCT_OP | SUM_OP ) )=>at= unionType ( PRODUCT_OP | SUM_OP )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3021:7: ( unionType ( PRODUCT_OP | SUM_OP ) )=>at= unionType ( PRODUCT_OP | SUM_OP )?
                     {
                     pushFollow(FOLLOW_unionType_in_variadicType20079);
                     at=unionType();
@@ -21097,7 +21116,7 @@ public class CeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { type = at; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3007:7: ( PRODUCT_OP | SUM_OP )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3024:7: ( PRODUCT_OP | SUM_OP )?
                     int alt254=3;
                     int LA254_0 = input.LA(1);
 
@@ -21109,7 +21128,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt254) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3008:9: PRODUCT_OP
+                            // /home/david/git/ceylon-spec/Ceylon.g:3025:9: PRODUCT_OP
                             {
                             PRODUCT_OP463=(Token)match(input,PRODUCT_OP,FOLLOW_PRODUCT_OP_in_variadicType20105); if (state.failed) return type;
 
@@ -21121,7 +21140,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3014:9: SUM_OP
+                            // /home/david/git/ceylon-spec/Ceylon.g:3031:9: SUM_OP
                             {
                             SUM_OP464=(Token)match(input,SUM_OP,FOLLOW_SUM_OP_in_variadicType20133); if (state.failed) return type;
 
@@ -21140,7 +21159,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3021:7: t= type
+                    // /home/david/git/ceylon-spec/Ceylon.g:3038:7: t= type
                     {
                     pushFollow(FOLLOW_type_in_variadicType20162);
                     t=type();
@@ -21170,7 +21189,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "defaultedType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3025:1: defaultedType returns [Type type] : ( ( type ( SPECIFY ) )=>t= type ( SPECIFY )? | variadicType );
+    // /home/david/git/ceylon-spec/Ceylon.g:3042:1: defaultedType returns [Type type] : ( ( type ( SPECIFY ) )=>t= type ( SPECIFY )? | variadicType );
     public Type defaultedType() throws RecognitionException {
         Type type = null;
 
@@ -21182,7 +21201,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3026:5: ( ( type ( SPECIFY ) )=>t= type ( SPECIFY )? | variadicType )
+            // /home/david/git/ceylon-spec/Ceylon.g:3043:5: ( ( type ( SPECIFY ) )=>t= type ( SPECIFY )? | variadicType )
             int alt257=2;
             switch ( input.LA(1) ) {
             case UIDENTIFIER:
@@ -21276,7 +21295,7 @@ public class CeylonParser extends Parser {
 
             switch (alt257) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3026:7: ( type ( SPECIFY ) )=>t= type ( SPECIFY )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3043:7: ( type ( SPECIFY ) )=>t= type ( SPECIFY )?
                     {
                     pushFollow(FOLLOW_type_in_defaultedType20208);
                     t=type();
@@ -21286,7 +21305,7 @@ public class CeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { type = t; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3029:7: ( SPECIFY )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3046:7: ( SPECIFY )?
                     int alt256=2;
                     int LA256_0 = input.LA(1);
 
@@ -21295,7 +21314,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt256) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3030:9: SPECIFY
+                            // /home/david/git/ceylon-spec/Ceylon.g:3047:9: SPECIFY
                             {
                             SPECIFY465=(Token)match(input,SPECIFY,FOLLOW_SPECIFY_in_defaultedType20234); if (state.failed) return type;
 
@@ -21313,7 +21332,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3036:7: variadicType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3053:7: variadicType
                     {
                     pushFollow(FOLLOW_variadicType_in_defaultedType20261);
                     variadicType466=variadicType();
@@ -21343,7 +21362,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "spreadType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3040:1: spreadType returns [Type type] : PRODUCT_OP (sp= unionType )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3057:1: spreadType returns [Type type] : PRODUCT_OP (sp= unionType )? ;
     public Type spreadType() throws RecognitionException {
         Type type = null;
 
@@ -21354,15 +21373,15 @@ public class CeylonParser extends Parser {
 
          SpreadType spt = null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3042:5: ( PRODUCT_OP (sp= unionType )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3042:7: PRODUCT_OP (sp= unionType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3059:5: ( PRODUCT_OP (sp= unionType )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3059:7: PRODUCT_OP (sp= unionType )?
             {
             PRODUCT_OP467=(Token)match(input,PRODUCT_OP,FOLLOW_PRODUCT_OP_in_spreadType20299); if (state.failed) return type;
 
             if ( state.backtracking==0 ) { spt = new SpreadType(PRODUCT_OP467);
                     type =spt; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3045:7: (sp= unionType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3062:7: (sp= unionType )?
             int alt258=2;
             int LA258_0 = input.LA(1);
 
@@ -21371,7 +21390,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt258) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3046:9: sp= unionType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3063:9: sp= unionType
                     {
                     pushFollow(FOLLOW_unionType_in_spreadType20327);
                     sp=unionType();
@@ -21405,7 +21424,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "tupleType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3051:1: tupleType returns [TupleType type] : LBRACKET (spt= spreadType |t1= defaultedType (c= COMMA t2= defaultedType )* )? RBRACKET ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3068:1: tupleType returns [TupleType type] : LBRACKET (spt= spreadType |t1= defaultedType (c= COMMA t2= defaultedType )* )? RBRACKET ;
     public TupleType tupleType() throws RecognitionException {
         TupleType type = null;
 
@@ -21421,14 +21440,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3052:5: ( LBRACKET (spt= spreadType |t1= defaultedType (c= COMMA t2= defaultedType )* )? RBRACKET )
-            // /home/david/git/ceylon-spec/Ceylon.g:3052:7: LBRACKET (spt= spreadType |t1= defaultedType (c= COMMA t2= defaultedType )* )? RBRACKET
+            // /home/david/git/ceylon-spec/Ceylon.g:3069:5: ( LBRACKET (spt= spreadType |t1= defaultedType (c= COMMA t2= defaultedType )* )? RBRACKET )
+            // /home/david/git/ceylon-spec/Ceylon.g:3069:7: LBRACKET (spt= spreadType |t1= defaultedType (c= COMMA t2= defaultedType )* )? RBRACKET
             {
             LBRACKET468=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_tupleType20367); if (state.failed) return type;
 
             if ( state.backtracking==0 ) { type = new TupleType(LBRACKET468); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3054:7: (spt= spreadType |t1= defaultedType (c= COMMA t2= defaultedType )* )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3071:7: (spt= spreadType |t1= defaultedType (c= COMMA t2= defaultedType )* )?
             int alt260=3;
             int LA260_0 = input.LA(1);
 
@@ -21440,7 +21459,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt260) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3055:9: spt= spreadType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3072:9: spt= spreadType
                     {
                     pushFollow(FOLLOW_spreadType_in_tupleType20395);
                     spt=spreadType();
@@ -21453,7 +21472,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3058:9: t1= defaultedType (c= COMMA t2= defaultedType )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:3075:9: t1= defaultedType (c= COMMA t2= defaultedType )*
                     {
                     pushFollow(FOLLOW_defaultedType_in_tupleType20425);
                     t1=defaultedType();
@@ -21463,7 +21482,7 @@ public class CeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { type.addElementType(t1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3060:9: (c= COMMA t2= defaultedType )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:3077:9: (c= COMMA t2= defaultedType )*
                     loop259:
                     do {
                         int alt259=2;
@@ -21476,7 +21495,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt259) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3061:11: c= COMMA t2= defaultedType
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3078:11: c= COMMA t2= defaultedType
                     	    {
                     	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_tupleType20459); if (state.failed) return type;
 
@@ -21528,7 +21547,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "groupedType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3072:1: groupedType returns [GroupedType type] : SMALLER_OP t= type LARGER_OP ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3089:1: groupedType returns [GroupedType type] : SMALLER_OP t= type LARGER_OP ;
     public GroupedType groupedType() throws RecognitionException {
         GroupedType type = null;
 
@@ -21539,8 +21558,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3073:5: ( SMALLER_OP t= type LARGER_OP )
-            // /home/david/git/ceylon-spec/Ceylon.g:3073:7: SMALLER_OP t= type LARGER_OP
+            // /home/david/git/ceylon-spec/Ceylon.g:3090:5: ( SMALLER_OP t= type LARGER_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:3090:7: SMALLER_OP t= type LARGER_OP
             {
             SMALLER_OP470=(Token)match(input,SMALLER_OP,FOLLOW_SMALLER_OP_in_groupedType20554); if (state.failed) return type;
 
@@ -21576,7 +21595,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "iterableType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3081:1: iterableType returns [IterableType type] : LBRACE (t= variadicType )? RBRACE ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3098:1: iterableType returns [IterableType type] : LBRACE (t= variadicType )? RBRACE ;
     public IterableType iterableType() throws RecognitionException {
         IterableType type = null;
 
@@ -21587,14 +21606,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3082:4: ( LBRACE (t= variadicType )? RBRACE )
-            // /home/david/git/ceylon-spec/Ceylon.g:3082:6: LBRACE (t= variadicType )? RBRACE
+            // /home/david/git/ceylon-spec/Ceylon.g:3099:4: ( LBRACE (t= variadicType )? RBRACE )
+            // /home/david/git/ceylon-spec/Ceylon.g:3099:6: LBRACE (t= variadicType )? RBRACE
             {
             LBRACE472=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_iterableType20616); if (state.failed) return type;
 
             if ( state.backtracking==0 ) { type = new IterableType(LBRACE472); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3084:6: (t= variadicType )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3101:6: (t= variadicType )?
             int alt261=2;
             int LA261_0 = input.LA(1);
 
@@ -21603,7 +21622,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt261) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3085:8: t= variadicType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3102:8: t= variadicType
                     {
                     pushFollow(FOLLOW_variadicType_in_iterableType20641);
                     t=variadicType();
@@ -21641,7 +21660,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "type"
-    // /home/david/git/ceylon-spec/Ceylon.g:3092:1: type returns [StaticType type] : t1= unionType ( ENTRY_OP (t2= unionType ) )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3109:1: type returns [StaticType type] : t1= unionType ( ENTRY_OP (t2= unionType ) )? ;
     public StaticType type() throws RecognitionException {
         StaticType type = null;
 
@@ -21654,8 +21673,8 @@ public class CeylonParser extends Parser {
 
          EntryType bt=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3094:5: (t1= unionType ( ENTRY_OP (t2= unionType ) )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3094:7: t1= unionType ( ENTRY_OP (t2= unionType ) )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3111:5: (t1= unionType ( ENTRY_OP (t2= unionType ) )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3111:7: t1= unionType ( ENTRY_OP (t2= unionType ) )?
             {
             pushFollow(FOLLOW_unionType_in_type20703);
             t1=unionType();
@@ -21665,7 +21684,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { type =t1; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3096:7: ( ENTRY_OP (t2= unionType ) )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3113:7: ( ENTRY_OP (t2= unionType ) )?
             int alt262=2;
             int LA262_0 = input.LA(1);
 
@@ -21674,7 +21693,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt262) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3097:9: ENTRY_OP (t2= unionType )
+                    // /home/david/git/ceylon-spec/Ceylon.g:3114:9: ENTRY_OP (t2= unionType )
                     {
                     ENTRY_OP474=(Token)match(input,ENTRY_OP,FOLLOW_ENTRY_OP_in_type20729); if (state.failed) return type;
 
@@ -21683,8 +21702,8 @@ public class CeylonParser extends Parser {
                               bt.setEndToken(ENTRY_OP474); 
                               type =bt; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3102:9: (t2= unionType )
-                    // /home/david/git/ceylon-spec/Ceylon.g:3103:11: t2= unionType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3119:9: (t2= unionType )
+                    // /home/david/git/ceylon-spec/Ceylon.g:3120:11: t2= unionType
                     {
                     pushFollow(FOLLOW_unionType_in_type20763);
                     t2=unionType();
@@ -21722,7 +21741,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "unionType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3112:1: unionType returns [StaticType type] : it1= intersectionType ( (u= UNION_OP (it2= intersectionType ) )+ )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3129:1: unionType returns [StaticType type] : it1= intersectionType ( (u= UNION_OP (it2= intersectionType ) )+ )? ;
     public StaticType unionType() throws RecognitionException {
         StaticType type = null;
 
@@ -21735,8 +21754,8 @@ public class CeylonParser extends Parser {
 
          UnionType ut=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3114:5: (it1= intersectionType ( (u= UNION_OP (it2= intersectionType ) )+ )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3114:7: it1= intersectionType ( (u= UNION_OP (it2= intersectionType ) )+ )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3131:5: (it1= intersectionType ( (u= UNION_OP (it2= intersectionType ) )+ )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3131:7: it1= intersectionType ( (u= UNION_OP (it2= intersectionType ) )+ )?
             {
             pushFollow(FOLLOW_intersectionType_in_unionType20828);
             it1=intersectionType();
@@ -21748,7 +21767,7 @@ public class CeylonParser extends Parser {
                     ut = new UnionType(null);
                     ut.addStaticType(type); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3118:7: ( (u= UNION_OP (it2= intersectionType ) )+ )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3135:7: ( (u= UNION_OP (it2= intersectionType ) )+ )?
             int alt264=2;
             int LA264_0 = input.LA(1);
 
@@ -21757,9 +21776,9 @@ public class CeylonParser extends Parser {
             }
             switch (alt264) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3119:9: (u= UNION_OP (it2= intersectionType ) )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:3136:9: (u= UNION_OP (it2= intersectionType ) )+
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:3119:9: (u= UNION_OP (it2= intersectionType ) )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:3136:9: (u= UNION_OP (it2= intersectionType ) )+
                     int cnt263=0;
                     loop263:
                     do {
@@ -21773,14 +21792,14 @@ public class CeylonParser extends Parser {
 
                         switch (alt263) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3120:11: u= UNION_OP (it2= intersectionType )
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3137:11: u= UNION_OP (it2= intersectionType )
                     	    {
                     	    u=(Token)match(input,UNION_OP,FOLLOW_UNION_OP_in_unionType20869); if (state.failed) return type;
 
                     	    if ( state.backtracking==0 ) { ut.setEndToken(u); }
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3122:11: (it2= intersectionType )
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3123:13: it2= intersectionType
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3139:11: (it2= intersectionType )
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3140:13: it2= intersectionType
                     	    {
                     	    pushFollow(FOLLOW_intersectionType_in_unionType20909);
                     	    it2=intersectionType();
@@ -21836,7 +21855,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "intersectionType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3136:1: intersectionType returns [StaticType type] : at1= abbreviatedType ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3153:1: intersectionType returns [StaticType type] : at1= abbreviatedType ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )? ;
     public StaticType intersectionType() throws RecognitionException {
         StaticType type = null;
 
@@ -21849,8 +21868,8 @@ public class CeylonParser extends Parser {
 
          IntersectionType it=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3138:5: (at1= abbreviatedType ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3138:7: at1= abbreviatedType ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3155:5: (at1= abbreviatedType ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3155:7: at1= abbreviatedType ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )?
             {
             pushFollow(FOLLOW_abbreviatedType_in_intersectionType20999);
             at1=abbreviatedType();
@@ -21862,7 +21881,7 @@ public class CeylonParser extends Parser {
                     it = new IntersectionType(null);
                     it.addStaticType(type); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3142:7: ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3159:7: ( (i= INTERSECTION_OP (at2= abbreviatedType ) )+ )?
             int alt266=2;
             int LA266_0 = input.LA(1);
 
@@ -21871,9 +21890,9 @@ public class CeylonParser extends Parser {
             }
             switch (alt266) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3143:9: (i= INTERSECTION_OP (at2= abbreviatedType ) )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:3160:9: (i= INTERSECTION_OP (at2= abbreviatedType ) )+
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:3143:9: (i= INTERSECTION_OP (at2= abbreviatedType ) )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:3160:9: (i= INTERSECTION_OP (at2= abbreviatedType ) )+
                     int cnt265=0;
                     loop265:
                     do {
@@ -21887,14 +21906,14 @@ public class CeylonParser extends Parser {
 
                         switch (alt265) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3144:11: i= INTERSECTION_OP (at2= abbreviatedType )
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3161:11: i= INTERSECTION_OP (at2= abbreviatedType )
                     	    {
                     	    i=(Token)match(input,INTERSECTION_OP,FOLLOW_INTERSECTION_OP_in_intersectionType21040); if (state.failed) return type;
 
                     	    if ( state.backtracking==0 ) { it.setEndToken(i); }
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3146:11: (at2= abbreviatedType )
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3147:13: at2= abbreviatedType
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3163:11: (at2= abbreviatedType )
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3164:13: at2= abbreviatedType
                     	    {
                     	    pushFollow(FOLLOW_abbreviatedType_in_intersectionType21080);
                     	    at2=abbreviatedType();
@@ -21950,7 +21969,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "qualifiedOrTupleType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3160:1: qualifiedOrTupleType returns [StaticType type] : ( qualifiedType | tupleType | iterableType );
+    // /home/david/git/ceylon-spec/Ceylon.g:3177:1: qualifiedOrTupleType returns [StaticType type] : ( qualifiedType | tupleType | iterableType );
     public StaticType qualifiedOrTupleType() throws RecognitionException {
         StaticType type = null;
 
@@ -21963,7 +21982,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3161:5: ( qualifiedType | tupleType | iterableType )
+            // /home/david/git/ceylon-spec/Ceylon.g:3178:5: ( qualifiedType | tupleType | iterableType )
             int alt267=3;
             switch ( input.LA(1) ) {
             case SMALLER_OP:
@@ -21993,7 +22012,7 @@ public class CeylonParser extends Parser {
 
             switch (alt267) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3161:7: qualifiedType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3178:7: qualifiedType
                     {
                     pushFollow(FOLLOW_qualifiedType_in_qualifiedOrTupleType21159);
                     qualifiedType475=qualifiedType();
@@ -22006,7 +22025,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3163:7: tupleType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3180:7: tupleType
                     {
                     pushFollow(FOLLOW_tupleType_in_qualifiedOrTupleType21176);
                     tupleType476=tupleType();
@@ -22019,7 +22038,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3165:7: iterableType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3182:7: iterableType
                     {
                     pushFollow(FOLLOW_iterableType_in_qualifiedOrTupleType21193);
                     iterableType477=iterableType();
@@ -22049,7 +22068,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "abbreviatedType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3175:1: abbreviatedType returns [StaticType type] : qualifiedOrTupleType ( OPTIONAL | LBRACKET ( NATURAL_LITERAL )? RBRACKET | LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3192:1: abbreviatedType returns [StaticType type] : qualifiedOrTupleType ( OPTIONAL | LBRACKET ( NATURAL_LITERAL )? RBRACKET | LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN )* ;
     public StaticType abbreviatedType() throws RecognitionException {
         StaticType type = null;
 
@@ -22072,8 +22091,8 @@ public class CeylonParser extends Parser {
 
          FunctionType bt=null; SequenceType st=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3177:5: ( qualifiedOrTupleType ( OPTIONAL | LBRACKET ( NATURAL_LITERAL )? RBRACKET | LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:3177:7: qualifiedOrTupleType ( OPTIONAL | LBRACKET ( NATURAL_LITERAL )? RBRACKET | LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3194:5: ( qualifiedOrTupleType ( OPTIONAL | LBRACKET ( NATURAL_LITERAL )? RBRACKET | LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:3194:7: qualifiedOrTupleType ( OPTIONAL | LBRACKET ( NATURAL_LITERAL )? RBRACKET | LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN )*
             {
             pushFollow(FOLLOW_qualifiedOrTupleType_in_abbreviatedType21234);
             qualifiedOrTupleType478=qualifiedOrTupleType();
@@ -22083,7 +22102,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { type =qualifiedOrTupleType478; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3179:7: ( OPTIONAL | LBRACKET ( NATURAL_LITERAL )? RBRACKET | LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3196:7: ( OPTIONAL | LBRACKET ( NATURAL_LITERAL )? RBRACKET | LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN )*
             loop271:
             do {
                 int alt271=4;
@@ -22108,7 +22127,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt271) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3180:9: OPTIONAL
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3197:9: OPTIONAL
             	    {
             	    OPTIONAL479=(Token)match(input,OPTIONAL,FOLLOW_OPTIONAL_in_abbreviatedType21260); if (state.failed) return type;
 
@@ -22120,7 +22139,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3185:9: LBRACKET ( NATURAL_LITERAL )? RBRACKET
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3202:9: LBRACKET ( NATURAL_LITERAL )? RBRACKET
             	    {
             	    LBRACKET480=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_abbreviatedType21281); if (state.failed) return type;
 
@@ -22128,7 +22147,7 @@ public class CeylonParser extends Parser {
             	              st.setElementType(type);
             	              st.setEndToken(LBRACKET480); }
 
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3189:9: ( NATURAL_LITERAL )?
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3206:9: ( NATURAL_LITERAL )?
             	    int alt268=2;
             	    int LA268_0 = input.LA(1);
 
@@ -22137,7 +22156,7 @@ public class CeylonParser extends Parser {
             	    }
             	    switch (alt268) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:3190:11: NATURAL_LITERAL
+            	            // /home/david/git/ceylon-spec/Ceylon.g:3207:11: NATURAL_LITERAL
             	            {
             	            NATURAL_LITERAL481=(Token)match(input,NATURAL_LITERAL,FOLLOW_NATURAL_LITERAL_in_abbreviatedType21313); if (state.failed) return type;
 
@@ -22158,7 +22177,7 @@ public class CeylonParser extends Parser {
             	    }
             	    break;
             	case 3 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3197:9: LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3214:9: LPAREN (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )? RPAREN
             	    {
             	    LPAREN483=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_abbreviatedType21368); if (state.failed) return type;
 
@@ -22167,7 +22186,7 @@ public class CeylonParser extends Parser {
             	              bt.setReturnType(type);
             	              type =bt; }
 
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3202:11: (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )?
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3219:11: (spt= spreadType |t1= defaultedType ( COMMA t2= defaultedType )* )?
             	    int alt270=3;
             	    int LA270_0 = input.LA(1);
 
@@ -22179,7 +22198,7 @@ public class CeylonParser extends Parser {
             	    }
             	    switch (alt270) {
             	        case 1 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:3203:13: spt= spreadType
+            	            // /home/david/git/ceylon-spec/Ceylon.g:3220:13: spt= spreadType
             	            {
             	            pushFollow(FOLLOW_spreadType_in_abbreviatedType21406);
             	            spt=spreadType();
@@ -22192,7 +22211,7 @@ public class CeylonParser extends Parser {
             	            }
             	            break;
             	        case 2 :
-            	            // /home/david/git/ceylon-spec/Ceylon.g:3206:13: t1= defaultedType ( COMMA t2= defaultedType )*
+            	            // /home/david/git/ceylon-spec/Ceylon.g:3223:13: t1= defaultedType ( COMMA t2= defaultedType )*
             	            {
             	            pushFollow(FOLLOW_defaultedType_in_abbreviatedType21448);
             	            t1=defaultedType();
@@ -22203,7 +22222,7 @@ public class CeylonParser extends Parser {
             	            if ( state.backtracking==0 ) { if (t1!=null)
             	                              bt.addArgumentType(t1); }
 
-            	            // /home/david/git/ceylon-spec/Ceylon.g:3209:13: ( COMMA t2= defaultedType )*
+            	            // /home/david/git/ceylon-spec/Ceylon.g:3226:13: ( COMMA t2= defaultedType )*
             	            loop269:
             	            do {
             	                int alt269=2;
@@ -22216,7 +22235,7 @@ public class CeylonParser extends Parser {
 
             	                switch (alt269) {
             	            	case 1 :
-            	            	    // /home/david/git/ceylon-spec/Ceylon.g:3210:15: COMMA t2= defaultedType
+            	            	    // /home/david/git/ceylon-spec/Ceylon.g:3227:15: COMMA t2= defaultedType
             	            	    {
             	            	    COMMA484=(Token)match(input,COMMA,FOLLOW_COMMA_in_abbreviatedType21492); if (state.failed) return type;
 
@@ -22277,18 +22296,18 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "baseType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3222:1: baseType returns [StaticType type] : (ot= typeNameWithArguments | groupedType );
+    // /home/david/git/ceylon-spec/Ceylon.g:3239:1: baseType returns [StaticType type] : (ot= typeNameWithArguments | groupedType );
     public StaticType baseType() throws RecognitionException {
         StaticType type = null;
 
 
-        CeylonParser.typeNameWithArguments_return ot =null;
+        PsiCompatibleCeylonParser.typeNameWithArguments_return ot =null;
 
         GroupedType groupedType486 =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3223:5: (ot= typeNameWithArguments | groupedType )
+            // /home/david/git/ceylon-spec/Ceylon.g:3240:5: (ot= typeNameWithArguments | groupedType )
             int alt272=2;
             int LA272_0 = input.LA(1);
 
@@ -22308,7 +22327,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt272) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3224:7: ot= typeNameWithArguments
+                    // /home/david/git/ceylon-spec/Ceylon.g:3241:7: ot= typeNameWithArguments
                     {
                     pushFollow(FOLLOW_typeNameWithArguments_in_baseType21629);
                     ot=typeNameWithArguments();
@@ -22325,7 +22344,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3231:7: groupedType
+                    // /home/david/git/ceylon-spec/Ceylon.g:3248:7: groupedType
                     {
                     pushFollow(FOLLOW_groupedType_in_baseType21651);
                     groupedType486=groupedType();
@@ -22355,20 +22374,20 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "qualifiedType"
-    // /home/david/git/ceylon-spec/Ceylon.g:3235:1: qualifiedType returns [StaticType type] : baseType ( MEMBER_OP it= typeNameWithArguments )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3252:1: qualifiedType returns [StaticType type] : baseType ( MEMBER_OP it= typeNameWithArguments )* ;
     public StaticType qualifiedType() throws RecognitionException {
         StaticType type = null;
 
 
         Token MEMBER_OP488=null;
-        CeylonParser.typeNameWithArguments_return it =null;
+        PsiCompatibleCeylonParser.typeNameWithArguments_return it =null;
 
         StaticType baseType487 =null;
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3236:5: ( baseType ( MEMBER_OP it= typeNameWithArguments )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:3236:7: baseType ( MEMBER_OP it= typeNameWithArguments )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3253:5: ( baseType ( MEMBER_OP it= typeNameWithArguments )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:3253:7: baseType ( MEMBER_OP it= typeNameWithArguments )*
             {
             pushFollow(FOLLOW_baseType_in_qualifiedType21680);
             baseType487=baseType();
@@ -22378,7 +22397,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { type =baseType487; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3238:7: ( MEMBER_OP it= typeNameWithArguments )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3255:7: ( MEMBER_OP it= typeNameWithArguments )*
             loop273:
             do {
                 int alt273=2;
@@ -22397,7 +22416,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt273) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3239:9: MEMBER_OP it= typeNameWithArguments
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3256:9: MEMBER_OP it= typeNameWithArguments
             	    {
             	    MEMBER_OP488=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_qualifiedType21706); if (state.failed) return type;
 
@@ -22446,9 +22465,9 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "typeNameWithArguments"
-    // /home/david/git/ceylon-spec/Ceylon.g:3250:1: typeNameWithArguments returns [Identifier identifier, TypeArgumentList typeArgumentList] : typeName ( typeArguments )? ;
-    public CeylonParser.typeNameWithArguments_return typeNameWithArguments() throws RecognitionException {
-        CeylonParser.typeNameWithArguments_return retval = new CeylonParser.typeNameWithArguments_return();
+    // /home/david/git/ceylon-spec/Ceylon.g:3267:1: typeNameWithArguments returns [Identifier identifier, TypeArgumentList typeArgumentList] : typeName ( typeArguments )? ;
+    public PsiCompatibleCeylonParser.typeNameWithArguments_return typeNameWithArguments() throws RecognitionException {
+        PsiCompatibleCeylonParser.typeNameWithArguments_return retval = new PsiCompatibleCeylonParser.typeNameWithArguments_return();
         retval.start = input.LT(1);
 
 
@@ -22458,8 +22477,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3251:5: ( typeName ( typeArguments )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3251:7: typeName ( typeArguments )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3268:5: ( typeName ( typeArguments )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3268:7: typeName ( typeArguments )?
             {
             pushFollow(FOLLOW_typeName_in_typeNameWithArguments21759);
             typeName489=typeName();
@@ -22469,7 +22488,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { retval.identifier = typeName489; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3253:7: ( typeArguments )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3270:7: ( typeArguments )?
             int alt274=2;
             int LA274_0 = input.LA(1);
 
@@ -22482,7 +22501,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt274) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3254:9: typeArguments
+                    // /home/david/git/ceylon-spec/Ceylon.g:3271:9: typeArguments
                     {
                     pushFollow(FOLLOW_typeArguments_in_typeNameWithArguments21786);
                     typeArguments490=typeArguments();
@@ -22519,7 +22538,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "annotations"
-    // /home/david/git/ceylon-spec/Ceylon.g:3259:1: annotations returns [AnnotationList annotationList] : ( stringLiteral )? ( annotation )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3276:1: annotations returns [AnnotationList annotationList] : ( stringLiteral )? ( annotation )* ;
     public AnnotationList annotations() throws RecognitionException {
         AnnotationList annotationList = null;
 
@@ -22530,12 +22549,12 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3260:5: ( ( stringLiteral )? ( annotation )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:3260:7: ( stringLiteral )? ( annotation )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3277:5: ( ( stringLiteral )? ( annotation )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:3277:7: ( stringLiteral )? ( annotation )*
             {
             if ( state.backtracking==0 ) { annotationList = new AnnotationList(null); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3261:7: ( stringLiteral )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3278:7: ( stringLiteral )?
             int alt275=2;
             int LA275_0 = input.LA(1);
 
@@ -22544,7 +22563,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt275) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3262:11: stringLiteral
+                    // /home/david/git/ceylon-spec/Ceylon.g:3279:11: stringLiteral
                     {
                     pushFollow(FOLLOW_stringLiteral_in_annotations21850);
                     stringLiteral491=stringLiteral();
@@ -22566,7 +22585,7 @@ public class CeylonParser extends Parser {
             }
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3271:7: ( annotation )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3288:7: ( annotation )*
             loop276:
             do {
                 int alt276=2;
@@ -22579,7 +22598,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt276) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3272:9: annotation
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3289:9: annotation
             	    {
             	    pushFollow(FOLLOW_annotation_in_annotations21889);
             	    annotation492=annotation();
@@ -22624,7 +22643,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "annotation"
-    // /home/david/git/ceylon-spec/Ceylon.g:3285:1: annotation returns [Annotation annotation] : annotationName ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3302:1: annotation returns [Annotation annotation] : annotationName ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |) ;
     public Annotation annotation() throws RecognitionException {
         Annotation annotation = null;
 
@@ -22637,8 +22656,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3286:5: ( annotationName ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |) )
-            // /home/david/git/ceylon-spec/Ceylon.g:3286:7: annotationName ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |)
+            // /home/david/git/ceylon-spec/Ceylon.g:3303:5: ( annotationName ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |) )
+            // /home/david/git/ceylon-spec/Ceylon.g:3303:7: annotationName ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |)
             {
             pushFollow(FOLLOW_annotationName_in_annotation21930);
             annotationName493=annotationName();
@@ -22652,7 +22671,7 @@ public class CeylonParser extends Parser {
                     bme.setTypeArguments( new InferredTypeArguments(null) );
                     annotation.setPrimary(bme); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3292:5: ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |)
+            // /home/david/git/ceylon-spec/Ceylon.g:3309:5: ( positionalArguments | ( namedAnnotationArgumentsStart )=> namedArguments |)
             int alt277=3;
             switch ( input.LA(1) ) {
             case LPAREN:
@@ -22713,7 +22732,7 @@ public class CeylonParser extends Parser {
 
             switch (alt277) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3293:7: positionalArguments
+                    // /home/david/git/ceylon-spec/Ceylon.g:3310:7: positionalArguments
                     {
                     pushFollow(FOLLOW_positionalArguments_in_annotation21953);
                     positionalArguments494=positionalArguments();
@@ -22726,7 +22745,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3295:7: ( namedAnnotationArgumentsStart )=> namedArguments
+                    // /home/david/git/ceylon-spec/Ceylon.g:3312:7: ( namedAnnotationArgumentsStart )=> namedArguments
                     {
                     pushFollow(FOLLOW_namedArguments_in_annotation21982);
                     namedArguments495=namedArguments();
@@ -22739,7 +22758,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3298:7: 
+                    // /home/david/git/ceylon-spec/Ceylon.g:3315:7: 
                     {
                     if ( state.backtracking==0 ) { annotation.setPositionalArgumentList(new PositionalArgumentList(null)); }
 
@@ -22767,10 +22786,10 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "prefixOperatorStart"
-    // /home/david/git/ceylon-spec/Ceylon.g:3302:1: prefixOperatorStart : ( DIFFERENCE_OP | INCREMENT_OP | DECREMENT_OP | COMPLEMENT_OP );
+    // /home/david/git/ceylon-spec/Ceylon.g:3319:1: prefixOperatorStart : ( DIFFERENCE_OP | INCREMENT_OP | DECREMENT_OP | COMPLEMENT_OP );
     public void prefixOperatorStart() throws RecognitionException {
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3303:5: ( DIFFERENCE_OP | INCREMENT_OP | DECREMENT_OP | COMPLEMENT_OP )
+            // /home/david/git/ceylon-spec/Ceylon.g:3320:5: ( DIFFERENCE_OP | INCREMENT_OP | DECREMENT_OP | COMPLEMENT_OP )
             // /home/david/git/ceylon-spec/Ceylon.g:
             {
             if ( input.LA(1)==COMPLEMENT_OP||(input.LA(1) >= DECREMENT_OP && input.LA(1) <= DIFFERENCE_OP)||input.LA(1)==INCREMENT_OP ) {
@@ -22803,7 +22822,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "compilerAnnotations"
-    // /home/david/git/ceylon-spec/Ceylon.g:3309:1: compilerAnnotations returns [List<CompilerAnnotation> annotations] : ( compilerAnnotation )* ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3326:1: compilerAnnotations returns [List<CompilerAnnotation> annotations] : ( compilerAnnotation )* ;
     public List<CompilerAnnotation> compilerAnnotations() throws RecognitionException {
         List<CompilerAnnotation> annotations = null;
 
@@ -22812,12 +22831,12 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3310:5: ( ( compilerAnnotation )* )
-            // /home/david/git/ceylon-spec/Ceylon.g:3310:7: ( compilerAnnotation )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3327:5: ( ( compilerAnnotation )* )
+            // /home/david/git/ceylon-spec/Ceylon.g:3327:7: ( compilerAnnotation )*
             {
             if ( state.backtracking==0 ) { annotations = new ArrayList<CompilerAnnotation>(); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3311:5: ( compilerAnnotation )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3328:5: ( compilerAnnotation )*
             loop278:
             do {
                 int alt278=2;
@@ -22830,7 +22849,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt278) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3312:7: compilerAnnotation
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3329:7: compilerAnnotation
             	    {
             	    pushFollow(FOLLOW_compilerAnnotation_in_compilerAnnotations22086);
             	    compilerAnnotation496=compilerAnnotation();
@@ -22867,7 +22886,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "compilerAnnotation"
-    // /home/david/git/ceylon-spec/Ceylon.g:3317:1: compilerAnnotation returns [CompilerAnnotation annotation] : COMPILER_ANNOTATION annotationName ( SEGMENT_OP stringLiteral )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3334:1: compilerAnnotation returns [CompilerAnnotation annotation] : COMPILER_ANNOTATION annotationName ( SEGMENT_OP stringLiteral )? ;
     public CompilerAnnotation compilerAnnotation() throws RecognitionException {
         CompilerAnnotation annotation = null;
 
@@ -22879,8 +22898,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3318:5: ( COMPILER_ANNOTATION annotationName ( SEGMENT_OP stringLiteral )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3318:7: COMPILER_ANNOTATION annotationName ( SEGMENT_OP stringLiteral )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3335:5: ( COMPILER_ANNOTATION annotationName ( SEGMENT_OP stringLiteral )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3335:7: COMPILER_ANNOTATION annotationName ( SEGMENT_OP stringLiteral )?
             {
             COMPILER_ANNOTATION497=(Token)match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_compilerAnnotation22126); if (state.failed) return annotation;
 
@@ -22894,7 +22913,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { annotation.setIdentifier(annotationName498); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3322:7: ( SEGMENT_OP stringLiteral )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3339:7: ( SEGMENT_OP stringLiteral )?
             int alt279=2;
             int LA279_0 = input.LA(1);
 
@@ -22903,7 +22922,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt279) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3323:11: SEGMENT_OP stringLiteral
+                    // /home/david/git/ceylon-spec/Ceylon.g:3340:11: SEGMENT_OP stringLiteral
                     {
                     match(input,SEGMENT_OP,FOLLOW_SEGMENT_OP_in_compilerAnnotation22173); if (state.failed) return annotation;
 
@@ -22939,7 +22958,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "conditions"
-    // /home/david/git/ceylon-spec/Ceylon.g:3329:1: conditions returns [ConditionList conditionList] : LPAREN (c1= condition (c= COMMA (c2= condition |) )* )? RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3346:1: conditions returns [ConditionList conditionList] : LPAREN (c1= condition (c= COMMA (c2= condition |) )* )? RPAREN ;
     public ConditionList conditions() throws RecognitionException {
         ConditionList conditionList = null;
 
@@ -22953,14 +22972,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3330:5: ( LPAREN (c1= condition (c= COMMA (c2= condition |) )* )? RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:3330:7: LPAREN (c1= condition (c= COMMA (c2= condition |) )* )? RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:3347:5: ( LPAREN (c1= condition (c= COMMA (c2= condition |) )* )? RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:3347:7: LPAREN (c1= condition (c= COMMA (c2= condition |) )* )? RPAREN
             {
             LPAREN500=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_conditions22227); if (state.failed) return conditionList;
 
             if ( state.backtracking==0 ) { conditionList = new ConditionList(LPAREN500); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3332:7: (c1= condition (c= COMMA (c2= condition |) )* )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3349:7: (c1= condition (c= COMMA (c2= condition |) )* )?
             int alt282=2;
             int LA282_0 = input.LA(1);
 
@@ -22969,7 +22988,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt282) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3333:7: c1= condition (c= COMMA (c2= condition |) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:3350:7: c1= condition (c= COMMA (c2= condition |) )*
                     {
                     pushFollow(FOLLOW_condition_in_conditions22253);
                     c1=condition();
@@ -22980,7 +22999,7 @@ public class CeylonParser extends Parser {
                     if ( state.backtracking==0 ) { if (c1!=null) 
                                 conditionList.addCondition(c1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3336:7: (c= COMMA (c2= condition |) )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:3353:7: (c= COMMA (c2= condition |) )*
                     loop281:
                     do {
                         int alt281=2;
@@ -22993,13 +23012,13 @@ public class CeylonParser extends Parser {
 
                         switch (alt281) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3336:9: c= COMMA (c2= condition |)
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3353:9: c= COMMA (c2= condition |)
                     	    {
                     	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_conditions22273); if (state.failed) return conditionList;
 
                     	    if ( state.backtracking==0 ) { conditionList.setEndToken(c); }
 
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3338:9: (c2= condition |)
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3355:9: (c2= condition |)
                     	    int alt280=2;
                     	    int LA280_0 = input.LA(1);
 
@@ -23019,7 +23038,7 @@ public class CeylonParser extends Parser {
                     	    }
                     	    switch (alt280) {
                     	        case 1 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:3339:11: c2= condition
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:3356:11: c2= condition
                     	            {
                     	            pushFollow(FOLLOW_condition_in_conditions22308);
                     	            c2=condition();
@@ -23034,7 +23053,7 @@ public class CeylonParser extends Parser {
                     	            }
                     	            break;
                     	        case 2 :
-                    	            // /home/david/git/ceylon-spec/Ceylon.g:3343:11: 
+                    	            // /home/david/git/ceylon-spec/Ceylon.g:3360:11: 
                     	            {
                     	            if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                     	                          new MismatchedTokenException(LIDENTIFIER, input)); }
@@ -23082,7 +23101,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "condition"
-    // /home/david/git/ceylon-spec/Ceylon.g:3352:1: condition returns [Condition condition] : ( existsCondition | nonemptyCondition | isCondition | satisfiesCondition | booleanCondition );
+    // /home/david/git/ceylon-spec/Ceylon.g:3369:1: condition returns [Condition condition] : ( existsCondition | nonemptyCondition | isCondition | satisfiesCondition | booleanCondition );
     public Condition condition() throws RecognitionException {
         Condition condition = null;
 
@@ -23099,7 +23118,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3353:5: ( existsCondition | nonemptyCondition | isCondition | satisfiesCondition | booleanCondition )
+            // /home/david/git/ceylon-spec/Ceylon.g:3370:5: ( existsCondition | nonemptyCondition | isCondition | satisfiesCondition | booleanCondition )
             int alt283=5;
             switch ( input.LA(1) ) {
             case NOT_OP:
@@ -23220,7 +23239,7 @@ public class CeylonParser extends Parser {
 
             switch (alt283) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3353:7: existsCondition
+                    // /home/david/git/ceylon-spec/Ceylon.g:3370:7: existsCondition
                     {
                     pushFollow(FOLLOW_existsCondition_in_condition22399);
                     existsCondition502=existsCondition();
@@ -23233,7 +23252,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3355:7: nonemptyCondition
+                    // /home/david/git/ceylon-spec/Ceylon.g:3372:7: nonemptyCondition
                     {
                     pushFollow(FOLLOW_nonemptyCondition_in_condition22415);
                     nonemptyCondition503=nonemptyCondition();
@@ -23246,7 +23265,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3357:7: isCondition
+                    // /home/david/git/ceylon-spec/Ceylon.g:3374:7: isCondition
                     {
                     pushFollow(FOLLOW_isCondition_in_condition22431);
                     isCondition504=isCondition();
@@ -23259,7 +23278,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3359:7: satisfiesCondition
+                    // /home/david/git/ceylon-spec/Ceylon.g:3376:7: satisfiesCondition
                     {
                     pushFollow(FOLLOW_satisfiesCondition_in_condition22448);
                     satisfiesCondition505=satisfiesCondition();
@@ -23272,7 +23291,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3361:7: booleanCondition
+                    // /home/david/git/ceylon-spec/Ceylon.g:3378:7: booleanCondition
                     {
                     pushFollow(FOLLOW_booleanCondition_in_condition22464);
                     booleanCondition506=booleanCondition();
@@ -23302,7 +23321,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "booleanCondition"
-    // /home/david/git/ceylon-spec/Ceylon.g:3365:1: booleanCondition returns [BooleanCondition condition] : functionOrExpression ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3382:1: booleanCondition returns [BooleanCondition condition] : functionOrExpression ;
     public BooleanCondition booleanCondition() throws RecognitionException {
         BooleanCondition condition = null;
 
@@ -23311,8 +23330,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3366:5: ( functionOrExpression )
-            // /home/david/git/ceylon-spec/Ceylon.g:3366:7: functionOrExpression
+            // /home/david/git/ceylon-spec/Ceylon.g:3383:5: ( functionOrExpression )
+            // /home/david/git/ceylon-spec/Ceylon.g:3383:7: functionOrExpression
             {
             if ( state.backtracking==0 ) { condition = new BooleanCondition(null); }
 
@@ -23360,7 +23379,7 @@ public class CeylonParser extends Parser {
             // /home/david/git/ceylon-spec/Ceylon.g:<invalid or missing tree structure>
             // /home/david/git/ceylon-spec/Ceylon.g:<invalid or missing tree structure>
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:3372:7: ( NOT_OP )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3389:7: ( NOT_OP )?
             int alt284=2;
             int LA284_0 = input.LA(1);
 
@@ -23369,7 +23388,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt284) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3373:9: NOT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:3390:9: NOT_OP
                     {
                     NOT_OP508=(Token)match(input,NOT_OP,FOLLOW_NOT_OP_in_existsCondition22548); if (state.failed) return condition;
 
@@ -23507,7 +23526,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3385:9: ( LIDENTIFIER )=> impliedVariable
+                    // /home/david/git/ceylon-spec/Ceylon.g:3402:9: ( LIDENTIFIER )=> impliedVariable
                     {
                     pushFollow(FOLLOW_impliedVariable_in_existsCondition22667);
                     impliedVariable511=impliedVariable();
@@ -23520,7 +23539,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3387:9: expression
+                    // /home/david/git/ceylon-spec/Ceylon.g:3404:9: expression
                     {
                     pushFollow(FOLLOW_expression_in_existsCondition22687);
                     expression512=expression();
@@ -23572,7 +23591,7 @@ public class CeylonParser extends Parser {
             // /home/david/git/ceylon-spec/Ceylon.g:<invalid or missing tree structure>
             // /home/david/git/ceylon-spec/Ceylon.g:<invalid or missing tree structure>
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:3393:7: ( NOT_OP )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3410:7: ( NOT_OP )?
             int alt286=2;
             int LA286_0 = input.LA(1);
 
@@ -23581,7 +23600,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt286) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3394:9: NOT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:3411:9: NOT_OP
                     {
                     NOT_OP513=(Token)match(input,NOT_OP,FOLLOW_NOT_OP_in_nonemptyCondition22740); if (state.failed) return condition;
 
@@ -23719,7 +23738,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3406:9: ( LIDENTIFIER )=> impliedVariable
+                    // /home/david/git/ceylon-spec/Ceylon.g:3423:9: ( LIDENTIFIER )=> impliedVariable
                     {
                     pushFollow(FOLLOW_impliedVariable_in_nonemptyCondition22859);
                     impliedVariable516=impliedVariable();
@@ -23732,7 +23751,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3408:9: expression
+                    // /home/david/git/ceylon-spec/Ceylon.g:3425:9: expression
                     {
                     pushFollow(FOLLOW_expression_in_nonemptyCondition22880);
                     expression517=expression();
@@ -23766,7 +23785,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "isCondition"
-    // /home/david/git/ceylon-spec/Ceylon.g:3413:1: isCondition returns [IsCondition condition] : ( NOT_OP )? IS_OP type ( ( LIDENTIFIER SPECIFY )=>v= isConditionVariable | impliedVariable ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3430:1: isCondition returns [IsCondition condition] : ( NOT_OP )? IS_OP type ( ( LIDENTIFIER SPECIFY )=>v= isConditionVariable | impliedVariable ) ;
     public IsCondition isCondition() throws RecognitionException {
         IsCondition condition = null;
 
@@ -23781,10 +23800,10 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3414:5: ( ( NOT_OP )? IS_OP type ( ( LIDENTIFIER SPECIFY )=>v= isConditionVariable | impliedVariable ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:3414:7: ( NOT_OP )? IS_OP type ( ( LIDENTIFIER SPECIFY )=>v= isConditionVariable | impliedVariable )
+            // /home/david/git/ceylon-spec/Ceylon.g:3431:5: ( ( NOT_OP )? IS_OP type ( ( LIDENTIFIER SPECIFY )=>v= isConditionVariable | impliedVariable ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:3431:7: ( NOT_OP )? IS_OP type ( ( LIDENTIFIER SPECIFY )=>v= isConditionVariable | impliedVariable )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:3414:7: ( NOT_OP )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3431:7: ( NOT_OP )?
             int alt288=2;
             int LA288_0 = input.LA(1);
 
@@ -23793,7 +23812,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt288) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3415:9: NOT_OP
+                    // /home/david/git/ceylon-spec/Ceylon.g:3432:9: NOT_OP
                     {
                     NOT_OP518=(Token)match(input,NOT_OP,FOLLOW_NOT_OP_in_isCondition22929); if (state.failed) return condition;
 
@@ -23819,7 +23838,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { condition.setType(type520); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3424:7: ( ( LIDENTIFIER SPECIFY )=>v= isConditionVariable | impliedVariable )
+            // /home/david/git/ceylon-spec/Ceylon.g:3441:7: ( ( LIDENTIFIER SPECIFY )=>v= isConditionVariable | impliedVariable )
             int alt289=2;
             int LA289_0 = input.LA(1);
 
@@ -23851,7 +23870,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt289) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3425:9: ( LIDENTIFIER SPECIFY )=>v= isConditionVariable
+                    // /home/david/git/ceylon-spec/Ceylon.g:3442:9: ( LIDENTIFIER SPECIFY )=>v= isConditionVariable
                     {
                     pushFollow(FOLLOW_isConditionVariable_in_isCondition23017);
                     v=isConditionVariable();
@@ -23864,7 +23883,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3429:9: impliedVariable
+                    // /home/david/git/ceylon-spec/Ceylon.g:3446:9: impliedVariable
                     {
                     pushFollow(FOLLOW_impliedVariable_in_isCondition23045);
                     impliedVariable521=impliedVariable();
@@ -23898,7 +23917,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "isConditionVariable"
-    // /home/david/git/ceylon-spec/Ceylon.g:3434:1: isConditionVariable returns [Variable variable] : memberName specifier ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3451:1: isConditionVariable returns [Variable variable] : memberName specifier ;
     public Variable isConditionVariable() throws RecognitionException {
         Variable variable = null;
 
@@ -23911,8 +23930,8 @@ public class CeylonParser extends Parser {
          variable = new Variable(null);
                     variable.setType(new ValueModifier(null));  
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3437:5: ( memberName specifier )
-            // /home/david/git/ceylon-spec/Ceylon.g:3437:7: memberName specifier
+            // /home/david/git/ceylon-spec/Ceylon.g:3454:5: ( memberName specifier )
+            // /home/david/git/ceylon-spec/Ceylon.g:3454:7: memberName specifier
             {
             pushFollow(FOLLOW_memberName_in_isConditionVariable23094);
             memberName522=memberName();
@@ -23948,7 +23967,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "satisfiesCondition"
-    // /home/david/git/ceylon-spec/Ceylon.g:3443:1: satisfiesCondition returns [SatisfiesCondition condition] : SATISFIES type typeName ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3460:1: satisfiesCondition returns [SatisfiesCondition condition] : SATISFIES type typeName ;
     public SatisfiesCondition satisfiesCondition() throws RecognitionException {
         SatisfiesCondition condition = null;
 
@@ -23960,8 +23979,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3444:5: ( SATISFIES type typeName )
-            // /home/david/git/ceylon-spec/Ceylon.g:3444:7: SATISFIES type typeName
+            // /home/david/git/ceylon-spec/Ceylon.g:3461:5: ( SATISFIES type typeName )
+            // /home/david/git/ceylon-spec/Ceylon.g:3461:7: SATISFIES type typeName
             {
             SATISFIES524=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiesCondition23139); if (state.failed) return condition;
 
@@ -24001,7 +24020,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "controlStatement"
-    // /home/david/git/ceylon-spec/Ceylon.g:3452:1: controlStatement returns [ControlStatement controlStatement] : ( ifElse | switchCaseElse | whileLoop | forElse | tryCatchFinally | dynamic );
+    // /home/david/git/ceylon-spec/Ceylon.g:3469:1: controlStatement returns [ControlStatement controlStatement] : ( ifElse | switchCaseElse | whileLoop | forElse | tryCatchFinally | dynamic );
     public ControlStatement controlStatement() throws RecognitionException {
         ControlStatement controlStatement = null;
 
@@ -24020,7 +24039,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3453:5: ( ifElse | switchCaseElse | whileLoop | forElse | tryCatchFinally | dynamic )
+            // /home/david/git/ceylon-spec/Ceylon.g:3470:5: ( ifElse | switchCaseElse | whileLoop | forElse | tryCatchFinally | dynamic )
             int alt290=6;
             switch ( input.LA(1) ) {
             case IF_CLAUSE:
@@ -24064,7 +24083,7 @@ public class CeylonParser extends Parser {
 
             switch (alt290) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3453:7: ifElse
+                    // /home/david/git/ceylon-spec/Ceylon.g:3470:7: ifElse
                     {
                     pushFollow(FOLLOW_ifElse_in_controlStatement23202);
                     ifElse527=ifElse();
@@ -24077,7 +24096,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3455:7: switchCaseElse
+                    // /home/david/git/ceylon-spec/Ceylon.g:3472:7: switchCaseElse
                     {
                     pushFollow(FOLLOW_switchCaseElse_in_controlStatement23219);
                     switchCaseElse528=switchCaseElse();
@@ -24090,7 +24109,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3457:7: whileLoop
+                    // /home/david/git/ceylon-spec/Ceylon.g:3474:7: whileLoop
                     {
                     pushFollow(FOLLOW_whileLoop_in_controlStatement23236);
                     whileLoop529=whileLoop();
@@ -24103,7 +24122,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3459:7: forElse
+                    // /home/david/git/ceylon-spec/Ceylon.g:3476:7: forElse
                     {
                     pushFollow(FOLLOW_forElse_in_controlStatement23253);
                     forElse530=forElse();
@@ -24116,7 +24135,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3461:7: tryCatchFinally
+                    // /home/david/git/ceylon-spec/Ceylon.g:3478:7: tryCatchFinally
                     {
                     pushFollow(FOLLOW_tryCatchFinally_in_controlStatement23270);
                     tryCatchFinally531=tryCatchFinally();
@@ -24129,7 +24148,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3463:7: dynamic
+                    // /home/david/git/ceylon-spec/Ceylon.g:3480:7: dynamic
                     {
                     pushFollow(FOLLOW_dynamic_in_controlStatement23286);
                     dynamic532=dynamic();
@@ -24159,7 +24178,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "controlBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3467:1: controlBlock returns [Block block] : ( ( LBRACE )=>b= block |) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3484:1: controlBlock returns [Block block] : ( ( LBRACE )=>b= block |) ;
     public Block controlBlock() throws RecognitionException {
         Block block = null;
 
@@ -24168,10 +24187,10 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3468:5: ( ( ( LBRACE )=>b= block |) )
-            // /home/david/git/ceylon-spec/Ceylon.g:3468:7: ( ( LBRACE )=>b= block |)
+            // /home/david/git/ceylon-spec/Ceylon.g:3485:5: ( ( ( LBRACE )=>b= block |) )
+            // /home/david/git/ceylon-spec/Ceylon.g:3485:7: ( ( LBRACE )=>b= block |)
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:3468:7: ( ( LBRACE )=>b= block |)
+            // /home/david/git/ceylon-spec/Ceylon.g:3485:7: ( ( LBRACE )=>b= block |)
             int alt291=2;
             int LA291_0 = input.LA(1);
 
@@ -24206,7 +24225,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt291) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3468:9: ( LBRACE )=>b= block
+                    // /home/david/git/ceylon-spec/Ceylon.g:3485:9: ( LBRACE )=>b= block
                     {
                     pushFollow(FOLLOW_block_in_controlBlock23324);
                     b=block();
@@ -24219,7 +24238,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3470:9: 
+                    // /home/david/git/ceylon-spec/Ceylon.g:3487:9: 
                     {
                     if ( state.backtracking==0 ) { displayRecognitionError(getTokenNames(), 
                                     new MismatchedTokenException(LBRACE, input)); }
@@ -24248,7 +24267,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "dynamic"
-    // /home/david/git/ceylon-spec/Ceylon.g:3475:1: dynamic returns [DynamicStatement statement] : DYNAMIC block ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3492:1: dynamic returns [DynamicStatement statement] : DYNAMIC block ;
     public DynamicStatement dynamic() throws RecognitionException {
         DynamicStatement statement = null;
 
@@ -24259,8 +24278,8 @@ public class CeylonParser extends Parser {
 
          DynamicClause dc = null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3477:5: ( DYNAMIC block )
-            // /home/david/git/ceylon-spec/Ceylon.g:3477:7: DYNAMIC block
+            // /home/david/git/ceylon-spec/Ceylon.g:3494:5: ( DYNAMIC block )
+            // /home/david/git/ceylon-spec/Ceylon.g:3494:7: DYNAMIC block
             {
             if ( state.backtracking==0 ) { statement =new DynamicStatement(null); }
 
@@ -24295,7 +24314,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "ifElse"
-    // /home/david/git/ceylon-spec/Ceylon.g:3485:1: ifElse returns [IfStatement statement] : ifBlock ( elseBlock )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3502:1: ifElse returns [IfStatement statement] : ifBlock ( elseBlock )? ;
     public IfStatement ifElse() throws RecognitionException {
         IfStatement statement = null;
 
@@ -24306,8 +24325,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3486:5: ( ifBlock ( elseBlock )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3486:7: ifBlock ( elseBlock )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3503:5: ( ifBlock ( elseBlock )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3503:7: ifBlock ( elseBlock )?
             {
             if ( state.backtracking==0 ) { statement =new IfStatement(null); }
 
@@ -24319,7 +24338,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { statement.setIfClause(ifBlock535); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3489:7: ( elseBlock )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3506:7: ( elseBlock )?
             int alt292=2;
             int LA292_0 = input.LA(1);
 
@@ -24328,7 +24347,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt292) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3490:9: elseBlock
+                    // /home/david/git/ceylon-spec/Ceylon.g:3507:9: elseBlock
                     {
                     pushFollow(FOLLOW_elseBlock_in_ifElse23472);
                     elseBlock536=elseBlock();
@@ -24402,7 +24421,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "ifBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3535:1: ifBlock returns [IfClause clause] : IF_CLAUSE conditions controlBlock ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3552:1: ifBlock returns [IfClause clause] : IF_CLAUSE conditions controlBlock ;
     public IfClause ifBlock() throws RecognitionException {
         IfClause clause = null;
 
@@ -24414,8 +24433,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3536:5: ( IF_CLAUSE conditions controlBlock )
-            // /home/david/git/ceylon-spec/Ceylon.g:3536:7: IF_CLAUSE conditions controlBlock
+            // /home/david/git/ceylon-spec/Ceylon.g:3553:5: ( IF_CLAUSE conditions controlBlock )
+            // /home/david/git/ceylon-spec/Ceylon.g:3553:7: IF_CLAUSE conditions controlBlock
             {
             IF_CLAUSE537=(Token)match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_ifBlock23512); if (state.failed) return clause;
 
@@ -24455,7 +24474,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "elseBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3544:1: elseBlock returns [ElseClause clause] : ELSE_CLAUSE ( elseIf | block ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3561:1: elseBlock returns [ElseClause clause] : ELSE_CLAUSE ( elseIf | block ) ;
     public ElseClause elseBlock() throws RecognitionException {
         ElseClause clause = null;
 
@@ -24467,14 +24486,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3545:5: ( ELSE_CLAUSE ( elseIf | block ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:3545:7: ELSE_CLAUSE ( elseIf | block )
+            // /home/david/git/ceylon-spec/Ceylon.g:3562:5: ( ELSE_CLAUSE ( elseIf | block ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:3562:7: ELSE_CLAUSE ( elseIf | block )
             {
             ELSE_CLAUSE540=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_elseBlock23574); if (state.failed) return clause;
 
             if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE540); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3547:7: ( elseIf | block )
+            // /home/david/git/ceylon-spec/Ceylon.g:3564:7: ( elseIf | block )
             int alt293=2;
             int LA293_0 = input.LA(1);
 
@@ -24494,7 +24513,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt293) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3548:9: elseIf
+                    // /home/david/git/ceylon-spec/Ceylon.g:3565:9: elseIf
                     {
                     pushFollow(FOLLOW_elseIf_in_elseBlock23601);
                     elseIf541=elseIf();
@@ -24507,7 +24526,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3551:9: block
+                    // /home/david/git/ceylon-spec/Ceylon.g:3568:9: block
                     {
                     pushFollow(FOLLOW_block_in_elseBlock23631);
                     block542=block();
@@ -24541,7 +24560,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "elseIf"
-    // /home/david/git/ceylon-spec/Ceylon.g:3556:1: elseIf returns [Block block] : ifElse ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3573:1: elseIf returns [Block block] : ifElse ;
     public Block elseIf() throws RecognitionException {
         Block block = null;
 
@@ -24550,8 +24569,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3557:5: ( ifElse )
-            // /home/david/git/ceylon-spec/Ceylon.g:3557:7: ifElse
+            // /home/david/git/ceylon-spec/Ceylon.g:3574:5: ( ifElse )
+            // /home/david/git/ceylon-spec/Ceylon.g:3574:7: ifElse
             {
             pushFollow(FOLLOW_ifElse_in_elseIf23670);
             ifElse543=ifElse();
@@ -24580,7 +24599,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "switchCaseElse"
-    // /home/david/git/ceylon-spec/Ceylon.g:3562:1: switchCaseElse returns [SwitchStatement statement] : switchHeader cases ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3579:1: switchCaseElse returns [SwitchStatement statement] : switchHeader cases ;
     public SwitchStatement switchCaseElse() throws RecognitionException {
         SwitchStatement statement = null;
 
@@ -24591,8 +24610,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3563:5: ( switchHeader cases )
-            // /home/david/git/ceylon-spec/Ceylon.g:3563:7: switchHeader cases
+            // /home/david/git/ceylon-spec/Ceylon.g:3580:5: ( switchHeader cases )
+            // /home/david/git/ceylon-spec/Ceylon.g:3580:7: switchHeader cases
             {
             if ( state.backtracking==0 ) { statement = new SwitchStatement(null); }
 
@@ -24678,7 +24697,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "switchHeader"
-    // /home/david/git/ceylon-spec/Ceylon.g:3618:1: switchHeader returns [SwitchClause clause] : SWITCH_CLAUSE LPAREN ( switched )? RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3635:1: switchHeader returns [SwitchClause clause] : SWITCH_CLAUSE LPAREN ( switched )? RPAREN ;
     public SwitchClause switchHeader() throws RecognitionException {
         SwitchClause clause = null;
 
@@ -24688,8 +24707,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3619:5: ( SWITCH_CLAUSE LPAREN ( switched )? RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:3619:7: SWITCH_CLAUSE LPAREN ( switched )? RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:3636:5: ( SWITCH_CLAUSE LPAREN ( switched )? RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:3636:7: SWITCH_CLAUSE LPAREN ( switched )? RPAREN
             {
             SWITCH_CLAUSE546=(Token)match(input,SWITCH_CLAUSE,FOLLOW_SWITCH_CLAUSE_in_switchHeader23753); if (state.failed) return clause;
 
@@ -24697,7 +24716,7 @@ public class CeylonParser extends Parser {
 
             match(input,LPAREN,FOLLOW_LPAREN_in_switchHeader23770); if (state.failed) return clause;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3622:7: ( switched )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3639:7: ( switched )?
             int alt294=2;
             int LA294_0 = input.LA(1);
 
@@ -24706,7 +24725,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt294) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3623:9: switched
+                    // /home/david/git/ceylon-spec/Ceylon.g:3640:9: switched
                     {
                     pushFollow(FOLLOW_switched_in_switchHeader23789);
                     switched547=switched();
@@ -24742,7 +24761,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "switched"
-    // /home/david/git/ceylon-spec/Ceylon.g:3629:1: switched returns [Switched switched] : ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3646:1: switched returns [Switched switched] : ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) ;
     public Switched switched() throws RecognitionException {
         Switched switched = null;
 
@@ -24754,10 +24773,10 @@ public class CeylonParser extends Parser {
 
          switched = new Switched(null); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3631:5: ( ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:3631:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
+            // /home/david/git/ceylon-spec/Ceylon.g:3648:5: ( ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:3648:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:3631:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
+            // /home/david/git/ceylon-spec/Ceylon.g:3648:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
             int alt295=2;
             int LA295_0 = input.LA(1);
 
@@ -24861,7 +24880,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt295) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3631:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
+                    // /home/david/git/ceylon-spec/Ceylon.g:3648:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
                     {
                     pushFollow(FOLLOW_specifiedVariable_in_switched23868);
                     specifiedVariable548=specifiedVariable();
@@ -24874,7 +24893,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3634:9: expression
+                    // /home/david/git/ceylon-spec/Ceylon.g:3651:9: expression
                     {
                     pushFollow(FOLLOW_expression_in_switched23888);
                     expression549=expression();
@@ -24908,7 +24927,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "cases"
-    // /home/david/git/ceylon-spec/Ceylon.g:3639:1: cases returns [SwitchCaseList switchCaseList] : ( caseBlock )+ ( defaultCaseBlock )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3656:1: cases returns [SwitchCaseList switchCaseList] : ( caseBlock )+ ( defaultCaseBlock )? ;
     public SwitchCaseList cases() throws RecognitionException {
         SwitchCaseList switchCaseList = null;
 
@@ -24919,12 +24938,12 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3640:5: ( ( caseBlock )+ ( defaultCaseBlock )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3640:7: ( caseBlock )+ ( defaultCaseBlock )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3657:5: ( ( caseBlock )+ ( defaultCaseBlock )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3657:7: ( caseBlock )+ ( defaultCaseBlock )?
             {
             if ( state.backtracking==0 ) { switchCaseList = new SwitchCaseList(null); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3641:7: ( caseBlock )+
+            // /home/david/git/ceylon-spec/Ceylon.g:3658:7: ( caseBlock )+
             int cnt296=0;
             loop296:
             do {
@@ -24938,7 +24957,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt296) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3642:9: caseBlock
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3659:9: caseBlock
             	    {
             	    pushFollow(FOLLOW_caseBlock_in_cases23945);
             	    caseBlock550=caseBlock();
@@ -24962,7 +24981,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3645:7: ( defaultCaseBlock )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3662:7: ( defaultCaseBlock )?
             int alt297=2;
             int LA297_0 = input.LA(1);
 
@@ -24971,7 +24990,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt297) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3646:9: defaultCaseBlock
+                    // /home/david/git/ceylon-spec/Ceylon.g:3663:9: defaultCaseBlock
                     {
                     pushFollow(FOLLOW_defaultCaseBlock_in_cases23982);
                     defaultCaseBlock551=defaultCaseBlock();
@@ -25005,7 +25024,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "caseBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3651:1: caseBlock returns [CaseClause clause] : CASE_CLAUSE caseItemList block ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3668:1: caseBlock returns [CaseClause clause] : CASE_CLAUSE caseItemList block ;
     public CaseClause caseBlock() throws RecognitionException {
         CaseClause clause = null;
 
@@ -25017,8 +25036,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3652:5: ( CASE_CLAUSE caseItemList block )
-            // /home/david/git/ceylon-spec/Ceylon.g:3652:7: CASE_CLAUSE caseItemList block
+            // /home/david/git/ceylon-spec/Ceylon.g:3669:5: ( CASE_CLAUSE caseItemList block )
+            // /home/david/git/ceylon-spec/Ceylon.g:3669:7: CASE_CLAUSE caseItemList block
             {
             CASE_CLAUSE552=(Token)match(input,CASE_CLAUSE,FOLLOW_CASE_CLAUSE_in_caseBlock24026); if (state.failed) return clause;
 
@@ -25058,7 +25077,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "defaultCaseBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3660:1: defaultCaseBlock returns [ElseClause clause] : ELSE_CLAUSE block ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3677:1: defaultCaseBlock returns [ElseClause clause] : ELSE_CLAUSE block ;
     public ElseClause defaultCaseBlock() throws RecognitionException {
         ElseClause clause = null;
 
@@ -25068,8 +25087,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3661:5: ( ELSE_CLAUSE block )
-            // /home/david/git/ceylon-spec/Ceylon.g:3661:7: ELSE_CLAUSE block
+            // /home/david/git/ceylon-spec/Ceylon.g:3678:5: ( ELSE_CLAUSE block )
+            // /home/david/git/ceylon-spec/Ceylon.g:3678:7: ELSE_CLAUSE block
             {
             ELSE_CLAUSE555=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock24088); if (state.failed) return clause;
 
@@ -25101,7 +25120,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "caseItemList"
-    // /home/david/git/ceylon-spec/Ceylon.g:3667:1: caseItemList returns [CaseItem item] : LPAREN (ci= caseItem )? RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3684:1: caseItemList returns [CaseItem item] : LPAREN (ci= caseItem )? RPAREN ;
     public CaseItem caseItemList() throws RecognitionException {
         CaseItem item = null;
 
@@ -25111,12 +25130,12 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3668:5: ( LPAREN (ci= caseItem )? RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:3668:7: LPAREN (ci= caseItem )? RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:3685:5: ( LPAREN (ci= caseItem )? RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:3685:7: LPAREN (ci= caseItem )? RPAREN
             {
             match(input,LPAREN,FOLLOW_LPAREN_in_caseItemList24134); if (state.failed) return item;
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3669:7: (ci= caseItem )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3686:7: (ci= caseItem )?
             int alt298=2;
             int LA298_0 = input.LA(1);
 
@@ -25125,7 +25144,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt298) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3670:9: ci= caseItem
+                    // /home/david/git/ceylon-spec/Ceylon.g:3687:9: ci= caseItem
                     {
                     pushFollow(FOLLOW_caseItem_in_caseItemList24155);
                     ci=caseItem();
@@ -25164,7 +25183,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "caseItem"
-    // /home/david/git/ceylon-spec/Ceylon.g:3678:1: caseItem returns [CaseItem item] : ( ( IS_OP )=> isCaseCondition | ( SATISFIES )=> satisfiesCaseCondition | matchCaseCondition );
+    // /home/david/git/ceylon-spec/Ceylon.g:3695:1: caseItem returns [CaseItem item] : ( ( IS_OP )=> isCaseCondition | ( SATISFIES )=> satisfiesCaseCondition | matchCaseCondition );
     public CaseItem caseItem() throws RecognitionException {
         CaseItem item = null;
 
@@ -25177,7 +25196,7 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3679:5: ( ( IS_OP )=> isCaseCondition | ( SATISFIES )=> satisfiesCaseCondition | matchCaseCondition )
+            // /home/david/git/ceylon-spec/Ceylon.g:3696:5: ( ( IS_OP )=> isCaseCondition | ( SATISFIES )=> satisfiesCaseCondition | matchCaseCondition )
             int alt299=3;
             int LA299_0 = input.LA(1);
 
@@ -25200,7 +25219,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt299) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3679:7: ( IS_OP )=> isCaseCondition
+                    // /home/david/git/ceylon-spec/Ceylon.g:3696:7: ( IS_OP )=> isCaseCondition
                     {
                     pushFollow(FOLLOW_isCaseCondition_in_caseItem24216);
                     isCaseCondition558=isCaseCondition();
@@ -25213,7 +25232,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3681:7: ( SATISFIES )=> satisfiesCaseCondition
+                    // /home/david/git/ceylon-spec/Ceylon.g:3698:7: ( SATISFIES )=> satisfiesCaseCondition
                     {
                     pushFollow(FOLLOW_satisfiesCaseCondition_in_caseItem24237);
                     satisfiesCaseCondition559=satisfiesCaseCondition();
@@ -25226,7 +25245,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3683:7: matchCaseCondition
+                    // /home/david/git/ceylon-spec/Ceylon.g:3700:7: matchCaseCondition
                     {
                     pushFollow(FOLLOW_matchCaseCondition_in_caseItem24253);
                     matchCaseCondition560=matchCaseCondition();
@@ -25256,7 +25275,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "matchCaseCondition"
-    // /home/david/git/ceylon-spec/Ceylon.g:3687:1: matchCaseCondition returns [MatchCase item] : valueCaseList ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3704:1: matchCaseCondition returns [MatchCase item] : valueCaseList ;
     public MatchCase matchCaseCondition() throws RecognitionException {
         MatchCase item = null;
 
@@ -25265,8 +25284,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3688:5: ( valueCaseList )
-            // /home/david/git/ceylon-spec/Ceylon.g:3688:7: valueCaseList
+            // /home/david/git/ceylon-spec/Ceylon.g:3705:5: ( valueCaseList )
+            // /home/david/git/ceylon-spec/Ceylon.g:3705:7: valueCaseList
             {
             pushFollow(FOLLOW_valueCaseList_in_matchCaseCondition24282);
             valueCaseList561=valueCaseList();
@@ -25295,7 +25314,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "isCaseCondition"
-    // /home/david/git/ceylon-spec/Ceylon.g:3693:1: isCaseCondition returns [IsCase item] : IS_OP type ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3710:1: isCaseCondition returns [IsCase item] : IS_OP type ;
     public IsCase isCaseCondition() throws RecognitionException {
         IsCase item = null;
 
@@ -25305,8 +25324,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3694:5: ( IS_OP type )
-            // /home/david/git/ceylon-spec/Ceylon.g:3694:7: IS_OP type
+            // /home/david/git/ceylon-spec/Ceylon.g:3711:5: ( IS_OP type )
+            // /home/david/git/ceylon-spec/Ceylon.g:3711:7: IS_OP type
             {
             IS_OP562=(Token)match(input,IS_OP,FOLLOW_IS_OP_in_isCaseCondition24311); if (state.failed) return item;
 
@@ -25338,7 +25357,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "satisfiesCaseCondition"
-    // /home/david/git/ceylon-spec/Ceylon.g:3700:1: satisfiesCaseCondition returns [SatisfiesCase item] : SATISFIES type ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3717:1: satisfiesCaseCondition returns [SatisfiesCase item] : SATISFIES type ;
     public SatisfiesCase satisfiesCaseCondition() throws RecognitionException {
         SatisfiesCase item = null;
 
@@ -25348,8 +25367,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3701:5: ( SATISFIES type )
-            // /home/david/git/ceylon-spec/Ceylon.g:3701:7: SATISFIES type
+            // /home/david/git/ceylon-spec/Ceylon.g:3718:5: ( SATISFIES type )
+            // /home/david/git/ceylon-spec/Ceylon.g:3718:7: SATISFIES type
             {
             SATISFIES564=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiesCaseCondition24357); if (state.failed) return item;
 
@@ -25381,7 +25400,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "forElse"
-    // /home/david/git/ceylon-spec/Ceylon.g:3707:1: forElse returns [ForStatement statement] : forBlock ( failBlock )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3724:1: forElse returns [ForStatement statement] : forBlock ( failBlock )? ;
     public ForStatement forElse() throws RecognitionException {
         ForStatement statement = null;
 
@@ -25392,8 +25411,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3708:5: ( forBlock ( failBlock )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3708:7: forBlock ( failBlock )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3725:5: ( forBlock ( failBlock )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3725:7: forBlock ( failBlock )?
             {
             if ( state.backtracking==0 ) { statement =new ForStatement(null); }
 
@@ -25405,7 +25424,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { statement.setForClause(forBlock566); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3711:7: ( failBlock )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3728:7: ( failBlock )?
             int alt300=2;
             int LA300_0 = input.LA(1);
 
@@ -25414,7 +25433,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt300) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3712:9: failBlock
+                    // /home/david/git/ceylon-spec/Ceylon.g:3729:9: failBlock
                     {
                     pushFollow(FOLLOW_failBlock_in_forElse24438);
                     failBlock567=failBlock();
@@ -25448,7 +25467,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "forBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3717:1: forBlock returns [ForClause clause] : FOR_CLAUSE forIterator controlBlock ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3734:1: forBlock returns [ForClause clause] : FOR_CLAUSE forIterator controlBlock ;
     public ForClause forBlock() throws RecognitionException {
         ForClause clause = null;
 
@@ -25460,8 +25479,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3718:5: ( FOR_CLAUSE forIterator controlBlock )
-            // /home/david/git/ceylon-spec/Ceylon.g:3718:7: FOR_CLAUSE forIterator controlBlock
+            // /home/david/git/ceylon-spec/Ceylon.g:3735:5: ( FOR_CLAUSE forIterator controlBlock )
+            // /home/david/git/ceylon-spec/Ceylon.g:3735:7: FOR_CLAUSE forIterator controlBlock
             {
             FOR_CLAUSE568=(Token)match(input,FOR_CLAUSE,FOLLOW_FOR_CLAUSE_in_forBlock24478); if (state.failed) return clause;
 
@@ -25501,7 +25520,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "failBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3726:1: failBlock returns [ElseClause clause] : ELSE_CLAUSE controlBlock ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3743:1: failBlock returns [ElseClause clause] : ELSE_CLAUSE controlBlock ;
     public ElseClause failBlock() throws RecognitionException {
         ElseClause clause = null;
 
@@ -25511,8 +25530,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3727:5: ( ELSE_CLAUSE controlBlock )
-            // /home/david/git/ceylon-spec/Ceylon.g:3727:7: ELSE_CLAUSE controlBlock
+            // /home/david/git/ceylon-spec/Ceylon.g:3744:5: ( ELSE_CLAUSE controlBlock )
+            // /home/david/git/ceylon-spec/Ceylon.g:3744:7: ELSE_CLAUSE controlBlock
             {
             ELSE_CLAUSE571=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_failBlock24541); if (state.failed) return clause;
 
@@ -25544,7 +25563,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "forIterator"
-    // /home/david/git/ceylon-spec/Ceylon.g:3733:1: forIterator returns [ForIterator iterator] : LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3750:1: forIterator returns [ForIterator iterator] : LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN ;
     public ForIterator forIterator() throws RecognitionException {
         ForIterator iterator = null;
 
@@ -25561,8 +25580,8 @@ public class CeylonParser extends Parser {
          ValueIterator vi = null;
                     PatternIterator pi = null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3736:5: ( LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:3736:7: LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:3753:5: ( LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:3753:7: LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN
             {
             LPAREN573=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_forIterator24596); if (state.failed) return iterator;
 
@@ -25570,7 +25589,7 @@ public class CeylonParser extends Parser {
                   pi = new PatternIterator(LPAREN573); 
                   iterator = vi; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3740:5: ( ( ( patternStart )=> pattern | variable ) ( containment )? )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3757:5: ( ( ( patternStart )=> pattern | variable ) ( containment )? )?
             int alt303=2;
             int LA303_0 = input.LA(1);
 
@@ -25579,9 +25598,9 @@ public class CeylonParser extends Parser {
             }
             switch (alt303) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3741:7: ( ( patternStart )=> pattern | variable ) ( containment )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3758:7: ( ( patternStart )=> pattern | variable ) ( containment )?
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:3741:7: ( ( patternStart )=> pattern | variable )
+                    // /home/david/git/ceylon-spec/Ceylon.g:3758:7: ( ( patternStart )=> pattern | variable )
                     int alt301=2;
                     switch ( input.LA(1) ) {
                     case LBRACKET:
@@ -25775,7 +25794,7 @@ public class CeylonParser extends Parser {
 
                     switch (alt301) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3742:9: ( patternStart )=> pattern
+                            // /home/david/git/ceylon-spec/Ceylon.g:3759:9: ( patternStart )=> pattern
                             {
                             pushFollow(FOLLOW_pattern_in_forIterator24633);
                             pattern574=pattern();
@@ -25789,7 +25808,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3746:9: variable
+                            // /home/david/git/ceylon-spec/Ceylon.g:3763:9: variable
                             {
                             pushFollow(FOLLOW_variable_in_forIterator24661);
                             variable575=variable();
@@ -25805,7 +25824,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3749:7: ( containment )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3766:7: ( containment )?
                     int alt302=2;
                     int LA302_0 = input.LA(1);
 
@@ -25814,7 +25833,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt302) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3750:9: containment
+                            // /home/david/git/ceylon-spec/Ceylon.g:3767:9: containment
                             {
                             pushFollow(FOLLOW_containment_in_forIterator24697);
                             containment576=containment();
@@ -25858,7 +25877,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "containment"
-    // /home/david/git/ceylon-spec/Ceylon.g:3758:1: containment returns [SpecifierExpression specifierExpression] : IN_OP ( expression )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3775:1: containment returns [SpecifierExpression specifierExpression] : IN_OP ( expression )? ;
     public SpecifierExpression containment() throws RecognitionException {
         SpecifierExpression specifierExpression = null;
 
@@ -25868,14 +25887,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3759:5: ( IN_OP ( expression )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3759:7: IN_OP ( expression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3776:5: ( IN_OP ( expression )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3776:7: IN_OP ( expression )?
             {
             IN_OP578=(Token)match(input,IN_OP,FOLLOW_IN_OP_in_containment24760); if (state.failed) return specifierExpression;
 
             if ( state.backtracking==0 ) { specifierExpression = new SpecifierExpression(IN_OP578); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3761:7: ( expression )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3778:7: ( expression )?
             int alt304=2;
             int LA304_0 = input.LA(1);
 
@@ -25884,7 +25903,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt304) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3761:8: expression
+                    // /home/david/git/ceylon-spec/Ceylon.g:3778:8: expression
                     {
                     pushFollow(FOLLOW_expression_in_containment24778);
                     expression579=expression();
@@ -25918,7 +25937,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "whileLoop"
-    // /home/david/git/ceylon-spec/Ceylon.g:3765:1: whileLoop returns [WhileStatement statement] : whileBlock ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3782:1: whileLoop returns [WhileStatement statement] : whileBlock ;
     public WhileStatement whileLoop() throws RecognitionException {
         WhileStatement statement = null;
 
@@ -25927,8 +25946,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3766:5: ( whileBlock )
-            // /home/david/git/ceylon-spec/Ceylon.g:3766:7: whileBlock
+            // /home/david/git/ceylon-spec/Ceylon.g:3783:5: ( whileBlock )
+            // /home/david/git/ceylon-spec/Ceylon.g:3783:7: whileBlock
             {
             if ( state.backtracking==0 ) { statement = new WhileStatement(null); }
 
@@ -25958,7 +25977,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "whileBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3771:1: whileBlock returns [WhileClause clause] : WHILE_CLAUSE conditions controlBlock ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3788:1: whileBlock returns [WhileClause clause] : WHILE_CLAUSE conditions controlBlock ;
     public WhileClause whileBlock() throws RecognitionException {
         WhileClause clause = null;
 
@@ -25970,8 +25989,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3772:5: ( WHILE_CLAUSE conditions controlBlock )
-            // /home/david/git/ceylon-spec/Ceylon.g:3772:7: WHILE_CLAUSE conditions controlBlock
+            // /home/david/git/ceylon-spec/Ceylon.g:3789:5: ( WHILE_CLAUSE conditions controlBlock )
+            // /home/david/git/ceylon-spec/Ceylon.g:3789:7: WHILE_CLAUSE conditions controlBlock
             {
             WHILE_CLAUSE581=(Token)match(input,WHILE_CLAUSE,FOLLOW_WHILE_CLAUSE_in_whileBlock24850); if (state.failed) return clause;
 
@@ -26011,7 +26030,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "tryCatchFinally"
-    // /home/david/git/ceylon-spec/Ceylon.g:3780:1: tryCatchFinally returns [TryCatchStatement statement] : tryBlock ( catchBlock )* ( finallyBlock )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3797:1: tryCatchFinally returns [TryCatchStatement statement] : tryBlock ( catchBlock )* ( finallyBlock )? ;
     public TryCatchStatement tryCatchFinally() throws RecognitionException {
         TryCatchStatement statement = null;
 
@@ -26024,8 +26043,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3781:5: ( tryBlock ( catchBlock )* ( finallyBlock )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3781:7: tryBlock ( catchBlock )* ( finallyBlock )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3798:5: ( tryBlock ( catchBlock )* ( finallyBlock )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3798:7: tryBlock ( catchBlock )* ( finallyBlock )?
             {
             if ( state.backtracking==0 ) { statement = new TryCatchStatement(null); }
 
@@ -26037,7 +26056,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { statement.setTryClause(tryBlock584); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3784:7: ( catchBlock )*
+            // /home/david/git/ceylon-spec/Ceylon.g:3801:7: ( catchBlock )*
             loop305:
             do {
                 int alt305=2;
@@ -26050,7 +26069,7 @@ public class CeylonParser extends Parser {
 
                 switch (alt305) {
             	case 1 :
-            	    // /home/david/git/ceylon-spec/Ceylon.g:3785:9: catchBlock
+            	    // /home/david/git/ceylon-spec/Ceylon.g:3802:9: catchBlock
             	    {
             	    pushFollow(FOLLOW_catchBlock_in_tryCatchFinally24946);
             	    catchBlock585=catchBlock();
@@ -26069,7 +26088,7 @@ public class CeylonParser extends Parser {
             } while (true);
 
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3788:7: ( finallyBlock )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3805:7: ( finallyBlock )?
             int alt306=2;
             int LA306_0 = input.LA(1);
 
@@ -26078,7 +26097,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt306) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3789:9: finallyBlock
+                    // /home/david/git/ceylon-spec/Ceylon.g:3806:9: finallyBlock
                     {
                     pushFollow(FOLLOW_finallyBlock_in_tryCatchFinally24985);
                     finallyBlock586=finallyBlock();
@@ -26112,7 +26131,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "tryBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3794:1: tryBlock returns [TryClause clause] : TRY_CLAUSE ( resources controlBlock | block ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3811:1: tryBlock returns [TryClause clause] : TRY_CLAUSE ( resources controlBlock | block ) ;
     public TryClause tryBlock() throws RecognitionException {
         TryClause clause = null;
 
@@ -26126,14 +26145,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3795:5: ( TRY_CLAUSE ( resources controlBlock | block ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:3795:7: TRY_CLAUSE ( resources controlBlock | block )
+            // /home/david/git/ceylon-spec/Ceylon.g:3812:5: ( TRY_CLAUSE ( resources controlBlock | block ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:3812:7: TRY_CLAUSE ( resources controlBlock | block )
             {
             TRY_CLAUSE587=(Token)match(input,TRY_CLAUSE,FOLLOW_TRY_CLAUSE_in_tryBlock25025); if (state.failed) return clause;
 
             if ( state.backtracking==0 ) { clause = new TryClause(TRY_CLAUSE587); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3797:7: ( resources controlBlock | block )
+            // /home/david/git/ceylon-spec/Ceylon.g:3814:7: ( resources controlBlock | block )
             int alt307=2;
             int LA307_0 = input.LA(1);
 
@@ -26153,7 +26172,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt307) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3798:9: resources controlBlock
+                    // /home/david/git/ceylon-spec/Ceylon.g:3815:9: resources controlBlock
                     {
                     pushFollow(FOLLOW_resources_in_tryBlock25052);
                     resources588=resources();
@@ -26174,7 +26193,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3803:9: block
+                    // /home/david/git/ceylon-spec/Ceylon.g:3820:9: block
                     {
                     pushFollow(FOLLOW_block_in_tryBlock25100);
                     block590=block();
@@ -26208,7 +26227,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "catchBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3808:1: catchBlock returns [CatchClause clause] : CATCH_CLAUSE catchVariable controlBlock ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3825:1: catchBlock returns [CatchClause clause] : CATCH_CLAUSE catchVariable controlBlock ;
     public CatchClause catchBlock() throws RecognitionException {
         CatchClause clause = null;
 
@@ -26220,8 +26239,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3809:5: ( CATCH_CLAUSE catchVariable controlBlock )
-            // /home/david/git/ceylon-spec/Ceylon.g:3809:7: CATCH_CLAUSE catchVariable controlBlock
+            // /home/david/git/ceylon-spec/Ceylon.g:3826:5: ( CATCH_CLAUSE catchVariable controlBlock )
+            // /home/david/git/ceylon-spec/Ceylon.g:3826:7: CATCH_CLAUSE catchVariable controlBlock
             {
             CATCH_CLAUSE591=(Token)match(input,CATCH_CLAUSE,FOLLOW_CATCH_CLAUSE_in_catchBlock25139); if (state.failed) return clause;
 
@@ -26261,7 +26280,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "catchVariable"
-    // /home/david/git/ceylon-spec/Ceylon.g:3817:1: catchVariable returns [CatchVariable catchVariable] : LPAREN ( variable )? RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3834:1: catchVariable returns [CatchVariable catchVariable] : LPAREN ( variable )? RPAREN ;
     public CatchVariable catchVariable() throws RecognitionException {
         CatchVariable catchVariable = null;
 
@@ -26272,14 +26291,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3818:5: ( LPAREN ( variable )? RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:3818:7: LPAREN ( variable )? RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:3835:5: ( LPAREN ( variable )? RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:3835:7: LPAREN ( variable )? RPAREN
             {
             LPAREN594=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_catchVariable25201); if (state.failed) return catchVariable;
 
             if ( state.backtracking==0 ) { catchVariable =new CatchVariable(LPAREN594); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3820:7: ( variable )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3837:7: ( variable )?
             int alt308=2;
             int LA308_0 = input.LA(1);
 
@@ -26288,7 +26307,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt308) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3821:7: variable
+                    // /home/david/git/ceylon-spec/Ceylon.g:3838:7: variable
                     {
                     pushFollow(FOLLOW_variable_in_catchVariable25226);
                     variable595=variable();
@@ -26326,7 +26345,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "finallyBlock"
-    // /home/david/git/ceylon-spec/Ceylon.g:3829:1: finallyBlock returns [FinallyClause clause] : FINALLY_CLAUSE controlBlock ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3846:1: finallyBlock returns [FinallyClause clause] : FINALLY_CLAUSE controlBlock ;
     public FinallyClause finallyBlock() throws RecognitionException {
         FinallyClause clause = null;
 
@@ -26336,8 +26355,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3830:5: ( FINALLY_CLAUSE controlBlock )
-            // /home/david/git/ceylon-spec/Ceylon.g:3830:7: FINALLY_CLAUSE controlBlock
+            // /home/david/git/ceylon-spec/Ceylon.g:3847:5: ( FINALLY_CLAUSE controlBlock )
+            // /home/david/git/ceylon-spec/Ceylon.g:3847:7: FINALLY_CLAUSE controlBlock
             {
             FINALLY_CLAUSE597=(Token)match(input,FINALLY_CLAUSE,FOLLOW_FINALLY_CLAUSE_in_finallyBlock25283); if (state.failed) return clause;
 
@@ -26369,7 +26388,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "resources"
-    // /home/david/git/ceylon-spec/Ceylon.g:3836:1: resources returns [ResourceList resources] : LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3853:1: resources returns [ResourceList resources] : LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN ;
     public ResourceList resources() throws RecognitionException {
         ResourceList resources = null;
 
@@ -26383,14 +26402,14 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3837:5: ( LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN )
-            // /home/david/git/ceylon-spec/Ceylon.g:3837:7: LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN
+            // /home/david/git/ceylon-spec/Ceylon.g:3854:5: ( LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN )
+            // /home/david/git/ceylon-spec/Ceylon.g:3854:7: LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN
             {
             LPAREN599=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_resources25329); if (state.failed) return resources;
 
             if ( state.backtracking==0 ) { resources = new ResourceList(LPAREN599); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3839:5: (r1= resource (c= COMMA r2= resource )* )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3856:5: (r1= resource (c= COMMA r2= resource )* )?
             int alt310=2;
             int LA310_0 = input.LA(1);
 
@@ -26399,7 +26418,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt310) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3840:7: r1= resource (c= COMMA r2= resource )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:3857:7: r1= resource (c= COMMA r2= resource )*
                     {
                     pushFollow(FOLLOW_resource_in_resources25352);
                     r1=resource();
@@ -26409,7 +26428,7 @@ public class CeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { resources.addResource(r1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3842:7: (c= COMMA r2= resource )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:3859:7: (c= COMMA r2= resource )*
                     loop309:
                     do {
                         int alt309=2;
@@ -26422,7 +26441,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt309) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3843:9: c= COMMA r2= resource
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3860:9: c= COMMA r2= resource
                     	    {
                     	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_resources25380); if (state.failed) return resources;
 
@@ -26474,7 +26493,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "resource"
-    // /home/david/git/ceylon-spec/Ceylon.g:3854:1: resource returns [Resource resource] : ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3871:1: resource returns [Resource resource] : ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) ;
     public Resource resource() throws RecognitionException {
         Resource resource = null;
 
@@ -26486,10 +26505,10 @@ public class CeylonParser extends Parser {
 
          resource = new Resource(null); 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3856:5: ( ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:3856:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
+            // /home/david/git/ceylon-spec/Ceylon.g:3873:5: ( ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:3873:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
             {
-            // /home/david/git/ceylon-spec/Ceylon.g:3856:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
+            // /home/david/git/ceylon-spec/Ceylon.g:3873:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
             int alt311=2;
             int LA311_0 = input.LA(1);
 
@@ -26593,7 +26612,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt311) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3856:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
+                    // /home/david/git/ceylon-spec/Ceylon.g:3873:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
                     {
                     pushFollow(FOLLOW_specifiedVariable_in_resource25492);
                     specifiedVariable601=specifiedVariable();
@@ -26606,7 +26625,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3859:9: expression
+                    // /home/david/git/ceylon-spec/Ceylon.g:3876:9: expression
                     {
                     pushFollow(FOLLOW_expression_in_resource25512);
                     expression602=expression();
@@ -26640,7 +26659,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "specifiedVariable"
-    // /home/david/git/ceylon-spec/Ceylon.g:3864:1: specifiedVariable returns [Variable variable] : v= variable ( specifier )? ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3881:1: specifiedVariable returns [Variable variable] : v= variable ( specifier )? ;
     public Variable specifiedVariable() throws RecognitionException {
         Variable variable = null;
 
@@ -26651,8 +26670,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3865:5: (v= variable ( specifier )? )
-            // /home/david/git/ceylon-spec/Ceylon.g:3865:7: v= variable ( specifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3882:5: (v= variable ( specifier )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3882:7: v= variable ( specifier )?
             {
             pushFollow(FOLLOW_variable_in_specifiedVariable25553);
             v=variable();
@@ -26662,7 +26681,7 @@ public class CeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { variable = v; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3867:7: ( specifier )?
+            // /home/david/git/ceylon-spec/Ceylon.g:3884:7: ( specifier )?
             int alt312=2;
             int LA312_0 = input.LA(1);
 
@@ -26671,7 +26690,7 @@ public class CeylonParser extends Parser {
             }
             switch (alt312) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3868:9: specifier
+                    // /home/david/git/ceylon-spec/Ceylon.g:3885:9: specifier
                     {
                     pushFollow(FOLLOW_specifier_in_specifiedVariable25580);
                     specifier603=specifier();
@@ -26705,7 +26724,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "variable"
-    // /home/david/git/ceylon-spec/Ceylon.g:3873:1: variable returns [Variable variable] : compilerAnnotations var ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3890:1: variable returns [Variable variable] : compilerAnnotations var ;
     public Variable variable() throws RecognitionException {
         Variable variable = null;
 
@@ -26716,8 +26735,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3874:5: ( compilerAnnotations var )
-            // /home/david/git/ceylon-spec/Ceylon.g:3874:7: compilerAnnotations var
+            // /home/david/git/ceylon-spec/Ceylon.g:3891:5: ( compilerAnnotations var )
+            // /home/david/git/ceylon-spec/Ceylon.g:3891:7: compilerAnnotations var
             {
             pushFollow(FOLLOW_compilerAnnotations_in_variable25620);
             compilerAnnotations605=compilerAnnotations();
@@ -26752,7 +26771,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "var"
-    // /home/david/git/ceylon-spec/Ceylon.g:3880:1: var returns [Variable variable] : ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName |mn3= memberName (p3= parameters )+ ) ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3897:1: var returns [Variable variable] : ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName |mn3= memberName (p3= parameters )+ ) ;
     public Variable var() throws RecognitionException {
         Variable variable = null;
 
@@ -26774,12 +26793,12 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3881:5: ( ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName |mn3= memberName (p3= parameters )+ ) )
-            // /home/david/git/ceylon-spec/Ceylon.g:3881:7: ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName |mn3= memberName (p3= parameters )+ )
+            // /home/david/git/ceylon-spec/Ceylon.g:3898:5: ( ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName |mn3= memberName (p3= parameters )+ ) )
+            // /home/david/git/ceylon-spec/Ceylon.g:3898:7: ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName |mn3= memberName (p3= parameters )+ )
             {
             if ( state.backtracking==0 ) { variable = new Variable(null); }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3882:5: ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName |mn3= memberName (p3= parameters )+ )
+            // /home/david/git/ceylon-spec/Ceylon.g:3899:5: ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName |mn3= memberName (p3= parameters )+ )
             int alt316=3;
             int LA316_0 = input.LA(1);
 
@@ -26814,9 +26833,9 @@ public class CeylonParser extends Parser {
             }
             switch (alt316) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3883:7: ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:3900:7: ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )*
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:3883:7: ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER )
+                    // /home/david/git/ceylon-spec/Ceylon.g:3900:7: ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER )
                     int alt313=4;
                     switch ( input.LA(1) ) {
                     case LBRACE:
@@ -26853,7 +26872,7 @@ public class CeylonParser extends Parser {
 
                     switch (alt313) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3883:9: type
+                            // /home/david/git/ceylon-spec/Ceylon.g:3900:9: type
                             {
                             pushFollow(FOLLOW_type_in_var25677);
                             type606=type();
@@ -26866,7 +26885,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3885:9: VOID_MODIFIER
+                            // /home/david/git/ceylon-spec/Ceylon.g:3902:9: VOID_MODIFIER
                             {
                             VOID_MODIFIER607=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_var25698); if (state.failed) return variable;
 
@@ -26875,7 +26894,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 3 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3887:9: FUNCTION_MODIFIER
+                            // /home/david/git/ceylon-spec/Ceylon.g:3904:9: FUNCTION_MODIFIER
                             {
                             FUNCTION_MODIFIER608=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_var25718); if (state.failed) return variable;
 
@@ -26884,7 +26903,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 4 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3889:9: VALUE_MODIFIER
+                            // /home/david/git/ceylon-spec/Ceylon.g:3906:9: VALUE_MODIFIER
                             {
                             VALUE_MODIFIER609=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_var25738); if (state.failed) return variable;
 
@@ -26904,7 +26923,7 @@ public class CeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { variable.setIdentifier(mn1); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3894:7: (p1= parameters )*
+                    // /home/david/git/ceylon-spec/Ceylon.g:3911:7: (p1= parameters )*
                     loop314:
                     do {
                         int alt314=2;
@@ -26917,7 +26936,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt314) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3895:9: p1= parameters
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3912:9: p1= parameters
                     	    {
                     	    pushFollow(FOLLOW_parameters_in_var25796);
                     	    p1=parameters();
@@ -26939,7 +26958,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3899:7: mn2= memberName
+                    // /home/david/git/ceylon-spec/Ceylon.g:3916:7: mn2= memberName
                     {
                     if ( state.backtracking==0 ) { variable.setType( new ValueModifier(null) ); }
 
@@ -26954,7 +26973,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3903:7: mn3= memberName (p3= parameters )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:3920:7: mn3= memberName (p3= parameters )+
                     {
                     if ( state.backtracking==0 ) { variable.setType( new FunctionModifier(null) ); }
 
@@ -26966,7 +26985,7 @@ public class CeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { variable.setIdentifier(mn3); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3906:7: (p3= parameters )+
+                    // /home/david/git/ceylon-spec/Ceylon.g:3923:7: (p3= parameters )+
                     int cnt315=0;
                     loop315:
                     do {
@@ -26980,7 +26999,7 @@ public class CeylonParser extends Parser {
 
                         switch (alt315) {
                     	case 1 :
-                    	    // /home/david/git/ceylon-spec/Ceylon.g:3907:9: p3= parameters
+                    	    // /home/david/git/ceylon-spec/Ceylon.g:3924:9: p3= parameters
                     	    {
                     	    pushFollow(FOLLOW_parameters_in_var25902);
                     	    p3=parameters();
@@ -27028,7 +27047,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "impliedVariable"
-    // /home/david/git/ceylon-spec/Ceylon.g:3913:1: impliedVariable returns [Variable variable] : memberName ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3930:1: impliedVariable returns [Variable variable] : memberName ;
     public Variable impliedVariable() throws RecognitionException {
         Variable variable = null;
 
@@ -27037,8 +27056,8 @@ public class CeylonParser extends Parser {
 
 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3914:5: ( memberName )
-            // /home/david/git/ceylon-spec/Ceylon.g:3914:7: memberName
+            // /home/david/git/ceylon-spec/Ceylon.g:3931:5: ( memberName )
+            // /home/david/git/ceylon-spec/Ceylon.g:3931:7: memberName
             {
             pushFollow(FOLLOW_memberName_in_impliedVariable25948);
             memberName610=memberName();
@@ -27077,7 +27096,7 @@ public class CeylonParser extends Parser {
 
 
     // $ANTLR start "metaLiteral"
-    // /home/david/git/ceylon-spec/Ceylon.g:3930:1: metaLiteral returns [MetaLiteral meta] : d1= BACKTICK ( MODULE (p1= packagePath )? | PACKAGE (p2= packagePath )? | CLASS_DEFINITION (ct= type |ot= memberName )? | NEW (nt= type )? | INTERFACE_DEFINITION (it= type )? | ALIAS (at= type )? | TYPE_CONSTRAINT (tt= type )? | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )? | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )? | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? ) d2= BACKTICK ;
+    // /home/david/git/ceylon-spec/Ceylon.g:3947:1: metaLiteral returns [MetaLiteral meta] : d1= BACKTICK ( MODULE (p1= packagePath )? | PACKAGE (p2= packagePath )? | CLASS_DEFINITION (ct= type |ot= memberName )? | NEW (nt= type )? | INTERFACE_DEFINITION (it= type )? | ALIAS (at= type )? | TYPE_CONSTRAINT (tt= type )? | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )? | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )? | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? ) d2= BACKTICK ;
     public MetaLiteral metaLiteral() throws RecognitionException {
         MetaLiteral meta = null;
 
@@ -27163,15 +27182,15 @@ public class CeylonParser extends Parser {
                     ValueLiteral v=null;
                     FunctionLiteral f=null; 
         try {
-            // /home/david/git/ceylon-spec/Ceylon.g:3942:5: (d1= BACKTICK ( MODULE (p1= packagePath )? | PACKAGE (p2= packagePath )? | CLASS_DEFINITION (ct= type |ot= memberName )? | NEW (nt= type )? | INTERFACE_DEFINITION (it= type )? | ALIAS (at= type )? | TYPE_CONSTRAINT (tt= type )? | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )? | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )? | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? ) d2= BACKTICK )
-            // /home/david/git/ceylon-spec/Ceylon.g:3942:7: d1= BACKTICK ( MODULE (p1= packagePath )? | PACKAGE (p2= packagePath )? | CLASS_DEFINITION (ct= type |ot= memberName )? | NEW (nt= type )? | INTERFACE_DEFINITION (it= type )? | ALIAS (at= type )? | TYPE_CONSTRAINT (tt= type )? | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )? | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )? | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? ) d2= BACKTICK
+            // /home/david/git/ceylon-spec/Ceylon.g:3959:5: (d1= BACKTICK ( MODULE (p1= packagePath )? | PACKAGE (p2= packagePath )? | CLASS_DEFINITION (ct= type |ot= memberName )? | NEW (nt= type )? | INTERFACE_DEFINITION (it= type )? | ALIAS (at= type )? | TYPE_CONSTRAINT (tt= type )? | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )? | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )? | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? ) d2= BACKTICK )
+            // /home/david/git/ceylon-spec/Ceylon.g:3959:7: d1= BACKTICK ( MODULE (p1= packagePath )? | PACKAGE (p2= packagePath )? | CLASS_DEFINITION (ct= type |ot= memberName )? | NEW (nt= type )? | INTERFACE_DEFINITION (it= type )? | ALIAS (at= type )? | TYPE_CONSTRAINT (tt= type )? | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )? | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )? | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? ) d2= BACKTICK
             {
             d1=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral25990); if (state.failed) return meta;
 
             if ( state.backtracking==0 ) { tl = new TypeLiteral(d1);
                     meta = tl; }
 
-            // /home/david/git/ceylon-spec/Ceylon.g:3945:5: ( MODULE (p1= packagePath )? | PACKAGE (p2= packagePath )? | CLASS_DEFINITION (ct= type |ot= memberName )? | NEW (nt= type )? | INTERFACE_DEFINITION (it= type )? | ALIAS (at= type )? | TYPE_CONSTRAINT (tt= type )? | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )? | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )? | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? )
+            // /home/david/git/ceylon-spec/Ceylon.g:3962:5: ( MODULE (p1= packagePath )? | PACKAGE (p2= packagePath )? | CLASS_DEFINITION (ct= type |ot= memberName )? | NEW (nt= type )? | INTERFACE_DEFINITION (it= type )? | ALIAS (at= type )? | TYPE_CONSTRAINT (tt= type )? | ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )? | FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )? | ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )? | ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )? | ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )? |t= type |m3= memberName (ta3= typeArguments )? )
             int alt337=14;
             switch ( input.LA(1) ) {
             case MODULE:
@@ -27334,7 +27353,7 @@ public class CeylonParser extends Parser {
 
             switch (alt337) {
                 case 1 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3946:7: MODULE (p1= packagePath )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3963:7: MODULE (p1= packagePath )?
                     {
                     MODULE611=(Token)match(input,MODULE,FOLLOW_MODULE_in_metaLiteral26012); if (state.failed) return meta;
 
@@ -27342,7 +27361,7 @@ public class CeylonParser extends Parser {
                             m.setEndToken(MODULE611); 
                             meta =m; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3950:7: (p1= packagePath )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3967:7: (p1= packagePath )?
                     int alt317=2;
                     int LA317_0 = input.LA(1);
 
@@ -27351,7 +27370,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt317) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3951:9: p1= packagePath
+                            // /home/david/git/ceylon-spec/Ceylon.g:3968:9: p1= packagePath
                             {
                             pushFollow(FOLLOW_packagePath_in_metaLiteral26040);
                             p1=packagePath();
@@ -27371,7 +27390,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3956:7: PACKAGE (p2= packagePath )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3973:7: PACKAGE (p2= packagePath )?
                     {
                     PACKAGE612=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_metaLiteral26073); if (state.failed) return meta;
 
@@ -27379,7 +27398,7 @@ public class CeylonParser extends Parser {
                             p.setEndToken(PACKAGE612); 
                             meta =p; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3960:7: (p2= packagePath )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3977:7: (p2= packagePath )?
                     int alt318=2;
                     int LA318_0 = input.LA(1);
 
@@ -27388,7 +27407,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt318) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3961:9: p2= packagePath
+                            // /home/david/git/ceylon-spec/Ceylon.g:3978:9: p2= packagePath
                             {
                             pushFollow(FOLLOW_packagePath_in_metaLiteral26101);
                             p2=packagePath();
@@ -27408,7 +27427,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3966:7: CLASS_DEFINITION (ct= type |ot= memberName )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3983:7: CLASS_DEFINITION (ct= type |ot= memberName )?
                     {
                     CLASS_DEFINITION613=(Token)match(input,CLASS_DEFINITION,FOLLOW_CLASS_DEFINITION_in_metaLiteral26134); if (state.failed) return meta;
 
@@ -27416,7 +27435,7 @@ public class CeylonParser extends Parser {
                             c.setEndToken(CLASS_DEFINITION613); 
                             meta =c; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3970:7: (ct= type |ot= memberName )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3987:7: (ct= type |ot= memberName )?
                     int alt319=3;
                     int LA319_0 = input.LA(1);
 
@@ -27428,7 +27447,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt319) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3971:9: ct= type
+                            // /home/david/git/ceylon-spec/Ceylon.g:3988:9: ct= type
                             {
                             pushFollow(FOLLOW_type_in_metaLiteral26162);
                             ct=type();
@@ -27442,7 +27461,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3975:9: ot= memberName
+                            // /home/david/git/ceylon-spec/Ceylon.g:3992:9: ot= memberName
                             {
                             pushFollow(FOLLOW_memberName_in_metaLiteral26192);
                             ot=memberName();
@@ -27464,7 +27483,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3982:7: NEW (nt= type )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:3999:7: NEW (nt= type )?
                     {
                     NEW614=(Token)match(input,NEW,FOLLOW_NEW_in_metaLiteral26225); if (state.failed) return meta;
 
@@ -27472,7 +27491,7 @@ public class CeylonParser extends Parser {
                             n.setEndToken(NEW614); 
                             meta =n; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3986:7: (nt= type )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4003:7: (nt= type )?
                     int alt320=2;
                     int LA320_0 = input.LA(1);
 
@@ -27481,7 +27500,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt320) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3987:9: nt= type
+                            // /home/david/git/ceylon-spec/Ceylon.g:4004:9: nt= type
                             {
                             pushFollow(FOLLOW_type_in_metaLiteral26253);
                             nt=type();
@@ -27501,7 +27520,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:3992:7: INTERFACE_DEFINITION (it= type )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4009:7: INTERFACE_DEFINITION (it= type )?
                     {
                     INTERFACE_DEFINITION615=(Token)match(input,INTERFACE_DEFINITION,FOLLOW_INTERFACE_DEFINITION_in_metaLiteral26286); if (state.failed) return meta;
 
@@ -27509,7 +27528,7 @@ public class CeylonParser extends Parser {
                             i.setEndToken(INTERFACE_DEFINITION615); 
                             meta =i; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:3996:7: (it= type )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4013:7: (it= type )?
                     int alt321=2;
                     int LA321_0 = input.LA(1);
 
@@ -27518,7 +27537,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt321) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:3997:9: it= type
+                            // /home/david/git/ceylon-spec/Ceylon.g:4014:9: it= type
                             {
                             pushFollow(FOLLOW_type_in_metaLiteral26314);
                             it=type();
@@ -27538,7 +27557,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4002:7: ALIAS (at= type )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4019:7: ALIAS (at= type )?
                     {
                     ALIAS616=(Token)match(input,ALIAS,FOLLOW_ALIAS_in_metaLiteral26347); if (state.failed) return meta;
 
@@ -27546,7 +27565,7 @@ public class CeylonParser extends Parser {
                             a.setEndToken(ALIAS616); 
                             meta =a; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4006:7: (at= type )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4023:7: (at= type )?
                     int alt322=2;
                     int LA322_0 = input.LA(1);
 
@@ -27555,7 +27574,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt322) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4007:9: at= type
+                            // /home/david/git/ceylon-spec/Ceylon.g:4024:9: at= type
                             {
                             pushFollow(FOLLOW_type_in_metaLiteral26375);
                             at=type();
@@ -27575,7 +27594,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4012:7: TYPE_CONSTRAINT (tt= type )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4029:7: TYPE_CONSTRAINT (tt= type )?
                     {
                     TYPE_CONSTRAINT617=(Token)match(input,TYPE_CONSTRAINT,FOLLOW_TYPE_CONSTRAINT_in_metaLiteral26408); if (state.failed) return meta;
 
@@ -27583,7 +27602,7 @@ public class CeylonParser extends Parser {
                             tp.setEndToken(TYPE_CONSTRAINT617); 
                             meta =tp; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4016:7: (tt= type )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4033:7: (tt= type )?
                     int alt323=2;
                     int LA323_0 = input.LA(1);
 
@@ -27592,7 +27611,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt323) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4017:9: tt= type
+                            // /home/david/git/ceylon-spec/Ceylon.g:4034:9: tt= type
                             {
                             pushFollow(FOLLOW_type_in_metaLiteral26436);
                             tt=type();
@@ -27612,9 +27631,9 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 8 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4022:7: ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4039:7: ( VALUE_MODIFIER | OBJECT_DEFINITION ) ( (vt= type |vom= memberName ) vo= MEMBER_OP )? (vm= memberName (ta6= typeArguments )? )?
                     {
-                    // /home/david/git/ceylon-spec/Ceylon.g:4022:7: ( VALUE_MODIFIER | OBJECT_DEFINITION )
+                    // /home/david/git/ceylon-spec/Ceylon.g:4039:7: ( VALUE_MODIFIER | OBJECT_DEFINITION )
                     int alt324=2;
                     int LA324_0 = input.LA(1);
 
@@ -27634,7 +27653,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt324) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4023:9: VALUE_MODIFIER
+                            // /home/david/git/ceylon-spec/Ceylon.g:4040:9: VALUE_MODIFIER
                             {
                             VALUE_MODIFIER618=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_metaLiteral26479); if (state.failed) return meta;
 
@@ -27645,7 +27664,7 @@ public class CeylonParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4028:9: OBJECT_DEFINITION
+                            // /home/david/git/ceylon-spec/Ceylon.g:4045:9: OBJECT_DEFINITION
                             {
                             OBJECT_DEFINITION619=(Token)match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_metaLiteral26507); if (state.failed) return meta;
 
@@ -27660,7 +27679,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4034:7: ( (vt= type |vom= memberName ) vo= MEMBER_OP )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4051:7: ( (vt= type |vom= memberName ) vo= MEMBER_OP )?
                     int alt326=2;
                     int LA326_0 = input.LA(1);
 
@@ -27676,9 +27695,9 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt326) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4035:9: (vt= type |vom= memberName ) vo= MEMBER_OP
+                            // /home/david/git/ceylon-spec/Ceylon.g:4052:9: (vt= type |vom= memberName ) vo= MEMBER_OP
                             {
-                            // /home/david/git/ceylon-spec/Ceylon.g:4035:9: (vt= type |vom= memberName )
+                            // /home/david/git/ceylon-spec/Ceylon.g:4052:9: (vt= type |vom= memberName )
                             int alt325=2;
                             int LA325_0 = input.LA(1);
 
@@ -27698,7 +27717,7 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt325) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:4036:11: vt= type
+                                    // /home/david/git/ceylon-spec/Ceylon.g:4053:11: vt= type
                                     {
                                     pushFollow(FOLLOW_type_in_metaLiteral26557);
                                     vt=type();
@@ -27712,7 +27731,7 @@ public class CeylonParser extends Parser {
                                     }
                                     break;
                                 case 2 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:4040:11: vom= memberName
+                                    // /home/david/git/ceylon-spec/Ceylon.g:4057:11: vom= memberName
                                     {
                                     pushFollow(FOLLOW_memberName_in_metaLiteral26593);
                                     vom=memberName();
@@ -27742,7 +27761,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4050:7: (vm= memberName (ta6= typeArguments )? )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4067:7: (vm= memberName (ta6= typeArguments )? )?
                     int alt328=2;
                     int LA328_0 = input.LA(1);
 
@@ -27751,7 +27770,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt328) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4051:9: vm= memberName (ta6= typeArguments )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:4068:9: vm= memberName (ta6= typeArguments )?
                             {
                             pushFollow(FOLLOW_memberName_in_metaLiteral26666);
                             vm=memberName();
@@ -27762,7 +27781,7 @@ public class CeylonParser extends Parser {
                             if ( state.backtracking==0 ) { v.setIdentifier(vm); 
                                       v.setEndToken(null); }
 
-                            // /home/david/git/ceylon-spec/Ceylon.g:4054:9: (ta6= typeArguments )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:4071:9: (ta6= typeArguments )?
                             int alt327=2;
                             int LA327_0 = input.LA(1);
 
@@ -27771,7 +27790,7 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt327) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:4056:11: ta6= typeArguments
+                                    // /home/david/git/ceylon-spec/Ceylon.g:4073:11: ta6= typeArguments
                                     {
                                     pushFollow(FOLLOW_typeArguments_in_metaLiteral26711);
                                     ta6=typeArguments();
@@ -27796,7 +27815,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 9 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4061:7: FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4078:7: FUNCTION_MODIFIER ( (ft= type |fom= memberName ) fo= MEMBER_OP )? (fm= memberName (ta5= typeArguments )? )?
                     {
                     FUNCTION_MODIFIER620=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_metaLiteral26757); if (state.failed) return meta;
 
@@ -27804,7 +27823,7 @@ public class CeylonParser extends Parser {
                             f.setEndToken(FUNCTION_MODIFIER620); 
                             meta =f; }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4065:7: ( (ft= type |fom= memberName ) fo= MEMBER_OP )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4082:7: ( (ft= type |fom= memberName ) fo= MEMBER_OP )?
                     int alt330=2;
                     int LA330_0 = input.LA(1);
 
@@ -27820,9 +27839,9 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt330) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4066:9: (ft= type |fom= memberName ) fo= MEMBER_OP
+                            // /home/david/git/ceylon-spec/Ceylon.g:4083:9: (ft= type |fom= memberName ) fo= MEMBER_OP
                             {
-                            // /home/david/git/ceylon-spec/Ceylon.g:4066:9: (ft= type |fom= memberName )
+                            // /home/david/git/ceylon-spec/Ceylon.g:4083:9: (ft= type |fom= memberName )
                             int alt329=2;
                             int LA329_0 = input.LA(1);
 
@@ -27842,7 +27861,7 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt329) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:4067:11: ft= type
+                                    // /home/david/git/ceylon-spec/Ceylon.g:4084:11: ft= type
                                     {
                                     pushFollow(FOLLOW_type_in_metaLiteral26797);
                                     ft=type();
@@ -27856,7 +27875,7 @@ public class CeylonParser extends Parser {
                                     }
                                     break;
                                 case 2 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:4071:11: fom= memberName
+                                    // /home/david/git/ceylon-spec/Ceylon.g:4088:11: fom= memberName
                                     {
                                     pushFollow(FOLLOW_memberName_in_metaLiteral26833);
                                     fom=memberName();
@@ -27886,7 +27905,7 @@ public class CeylonParser extends Parser {
                     }
 
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4081:7: (fm= memberName (ta5= typeArguments )? )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4098:7: (fm= memberName (ta5= typeArguments )? )?
                     int alt332=2;
                     int LA332_0 = input.LA(1);
 
@@ -27895,7 +27914,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt332) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4082:9: fm= memberName (ta5= typeArguments )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:4099:9: fm= memberName (ta5= typeArguments )?
                             {
                             pushFollow(FOLLOW_memberName_in_metaLiteral26906);
                             fm=memberName();
@@ -27906,7 +27925,7 @@ public class CeylonParser extends Parser {
                             if ( state.backtracking==0 ) { f.setIdentifier(fm); 
                                       f.setEndToken(null); }
 
-                            // /home/david/git/ceylon-spec/Ceylon.g:4085:9: (ta5= typeArguments )?
+                            // /home/david/git/ceylon-spec/Ceylon.g:4102:9: (ta5= typeArguments )?
                             int alt331=2;
                             int LA331_0 = input.LA(1);
 
@@ -27915,7 +27934,7 @@ public class CeylonParser extends Parser {
                             }
                             switch (alt331) {
                                 case 1 :
-                                    // /home/david/git/ceylon-spec/Ceylon.g:4087:11: ta5= typeArguments
+                                    // /home/david/git/ceylon-spec/Ceylon.g:4104:11: ta5= typeArguments
                                     {
                                     pushFollow(FOLLOW_typeArguments_in_metaLiteral26951);
                                     ta5=typeArguments();
@@ -27940,7 +27959,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 10 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4092:7: ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4109:7: ( abbreviatedType MEMBER_OP )=>at= abbreviatedType o1= MEMBER_OP m1= memberName (ta1= typeArguments )?
                     {
                     if ( state.backtracking==0 ) { ml = new MemberLiteral(d1);
                             meta = ml; }
@@ -27966,7 +27985,7 @@ public class CeylonParser extends Parser {
                     if ( state.backtracking==0 ) { ml.setIdentifier(m1); 
                             ml.setEndToken(null); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4102:7: (ta1= typeArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4119:7: (ta1= typeArguments )?
                     int alt333=2;
                     int LA333_0 = input.LA(1);
 
@@ -27975,7 +27994,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt333) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4103:9: ta1= typeArguments
+                            // /home/david/git/ceylon-spec/Ceylon.g:4120:9: ta1= typeArguments
                             {
                             pushFollow(FOLLOW_typeArguments_in_metaLiteral27085);
                             ta1=typeArguments();
@@ -27994,7 +28013,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 11 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4107:7: ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4124:7: ( groupedType MEMBER_OP )=>gt= groupedType o2= MEMBER_OP m2= memberName (ta2= typeArguments )?
                     {
                     if ( state.backtracking==0 ) { ml = new MemberLiteral(d1);
                             meta = ml; }
@@ -28020,7 +28039,7 @@ public class CeylonParser extends Parser {
                     if ( state.backtracking==0 ) { ml.setIdentifier(m2); 
                             ml.setEndToken(null); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4117:7: (ta2= typeArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4134:7: (ta2= typeArguments )?
                     int alt334=2;
                     int LA334_0 = input.LA(1);
 
@@ -28029,7 +28048,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt334) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4118:9: ta2= typeArguments
+                            // /home/david/git/ceylon-spec/Ceylon.g:4135:9: ta2= typeArguments
                             {
                             pushFollow(FOLLOW_typeArguments_in_metaLiteral27207);
                             ta2=typeArguments();
@@ -28048,7 +28067,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 12 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4122:7: ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4139:7: ( memberName MEMBER_OP )=>mn= memberName o1= MEMBER_OP m4= memberName (ta1= typeArguments )?
                     {
                     if ( state.backtracking==0 ) { ml = new MemberLiteral(d1);
                             meta = ml; }
@@ -28077,7 +28096,7 @@ public class CeylonParser extends Parser {
                     if ( state.backtracking==0 ) { ml.setIdentifier(m4); 
                             ml.setEndToken(null); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4135:7: (ta1= typeArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4152:7: (ta1= typeArguments )?
                     int alt335=2;
                     int LA335_0 = input.LA(1);
 
@@ -28086,7 +28105,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt335) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4136:9: ta1= typeArguments
+                            // /home/david/git/ceylon-spec/Ceylon.g:4153:9: ta1= typeArguments
                             {
                             pushFollow(FOLLOW_typeArguments_in_metaLiteral27328);
                             ta1=typeArguments();
@@ -28105,7 +28124,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 13 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4140:7: t= type
+                    // /home/david/git/ceylon-spec/Ceylon.g:4157:7: t= type
                     {
                     pushFollow(FOLLOW_type_in_metaLiteral27364);
                     t=type();
@@ -28120,7 +28139,7 @@ public class CeylonParser extends Parser {
                     }
                     break;
                 case 14 :
-                    // /home/david/git/ceylon-spec/Ceylon.g:4145:7: m3= memberName (ta3= typeArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4162:7: m3= memberName (ta3= typeArguments )?
                     {
                     pushFollow(FOLLOW_memberName_in_metaLiteral27389);
                     m3=memberName();
@@ -28132,7 +28151,7 @@ public class CeylonParser extends Parser {
                             meta = ml;
                             ml.setIdentifier(m3); }
 
-                    // /home/david/git/ceylon-spec/Ceylon.g:4149:7: (ta3= typeArguments )?
+                    // /home/david/git/ceylon-spec/Ceylon.g:4166:7: (ta3= typeArguments )?
                     int alt336=2;
                     int LA336_0 = input.LA(1);
 
@@ -28141,7 +28160,7 @@ public class CeylonParser extends Parser {
                     }
                     switch (alt336) {
                         case 1 :
-                            // /home/david/git/ceylon-spec/Ceylon.g:4150:9: ta3= typeArguments
+                            // /home/david/git/ceylon-spec/Ceylon.g:4167:9: ta3= typeArguments
                             {
                             pushFollow(FOLLOW_typeArguments_in_metaLiteral27417);
                             ta3=typeArguments();
@@ -28184,8 +28203,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred1_Ceylon
     public void synpred1_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:76:9: ( annotatedModuleDescriptorStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:76:10: annotatedModuleDescriptorStart
+        // /home/david/git/ceylon-spec/Ceylon.g:93:9: ( annotatedModuleDescriptorStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:93:10: annotatedModuleDescriptorStart
         {
         pushFollow(FOLLOW_annotatedModuleDescriptorStart_in_synpred1_Ceylon164);
         annotatedModuleDescriptorStart();
@@ -28200,8 +28219,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred2_Ceylon
     public void synpred2_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:80:9: ( annotatedPackageDescriptorStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:80:10: annotatedPackageDescriptorStart
+        // /home/david/git/ceylon-spec/Ceylon.g:97:9: ( annotatedPackageDescriptorStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:97:10: annotatedPackageDescriptorStart
         {
         pushFollow(FOLLOW_annotatedPackageDescriptorStart_in_synpred2_Ceylon207);
         annotatedPackageDescriptorStart();
@@ -28216,8 +28235,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred3_Ceylon
     public void synpred3_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:456:9: ( compilerAnnotations declarationStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:456:10: compilerAnnotations declarationStart
+        // /home/david/git/ceylon-spec/Ceylon.g:473:9: ( compilerAnnotations declarationStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:473:10: compilerAnnotations declarationStart
         {
         pushFollow(FOLLOW_compilerAnnotations_in_synpred3_Ceylon2741);
         compilerAnnotations();
@@ -28238,8 +28257,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred4_Ceylon
     public void synpred4_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:465:7: ( tuplePatternStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:465:8: tuplePatternStart
+        // /home/david/git/ceylon-spec/Ceylon.g:482:7: ( tuplePatternStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:482:8: tuplePatternStart
         {
         pushFollow(FOLLOW_tuplePatternStart_in_synpred4_Ceylon2816);
         tuplePatternStart();
@@ -28254,8 +28273,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred5_Ceylon
     public void synpred5_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:474:7: ( variable ENTRY_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:474:8: variable ENTRY_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:491:7: ( variable ENTRY_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:491:8: variable ENTRY_OP
         {
         pushFollow(FOLLOW_variable_in_synpred5_Ceylon2881);
         variable();
@@ -28272,8 +28291,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred6_Ceylon
     public void synpred6_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:478:7: ( tuplePattern ENTRY_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:478:8: tuplePattern ENTRY_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:495:7: ( tuplePattern ENTRY_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:495:8: tuplePattern ENTRY_OP
         {
         pushFollow(FOLLOW_tuplePattern_in_synpred6_Ceylon2919);
         tuplePattern();
@@ -28290,8 +28309,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred7_Ceylon
     public void synpred7_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:482:7: ( tuplePatternStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:482:8: tuplePatternStart
+        // /home/david/git/ceylon-spec/Ceylon.g:499:7: ( tuplePatternStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:499:8: tuplePatternStart
         {
         pushFollow(FOLLOW_tuplePatternStart_in_synpred7_Ceylon2957);
         tuplePatternStart();
@@ -28306,8 +28325,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred8_Ceylon
     public void synpred8_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:492:7: ( variable ENTRY_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:492:8: variable ENTRY_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:509:7: ( variable ENTRY_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:509:8: variable ENTRY_OP
         {
         pushFollow(FOLLOW_variable_in_synpred8_Ceylon3029);
         variable();
@@ -28324,8 +28343,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred9_Ceylon
     public void synpred9_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:496:7: ( tuplePattern ENTRY_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:496:8: tuplePattern ENTRY_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:513:7: ( tuplePattern ENTRY_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:513:8: tuplePattern ENTRY_OP
         {
         pushFollow(FOLLOW_tuplePattern_in_synpred9_Ceylon3067);
         tuplePattern();
@@ -28342,8 +28361,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred10_Ceylon
     public void synpred10_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:532:9: ( compilerAnnotations ( unionType )? PRODUCT_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:532:10: compilerAnnotations ( unionType )? PRODUCT_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:549:9: ( compilerAnnotations ( unionType )? PRODUCT_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:549:10: compilerAnnotations ( unionType )? PRODUCT_OP
         {
         pushFollow(FOLLOW_compilerAnnotations_in_synpred10_Ceylon3358);
         compilerAnnotations();
@@ -28351,7 +28370,7 @@ public class CeylonParser extends Parser {
         state._fsp--;
         if (state.failed) return ;
 
-        // /home/david/git/ceylon-spec/Ceylon.g:532:30: ( unionType )?
+        // /home/david/git/ceylon-spec/Ceylon.g:549:30: ( unionType )?
         int alt338=2;
         int LA338_0 = input.LA(1);
 
@@ -28360,7 +28379,7 @@ public class CeylonParser extends Parser {
         }
         switch (alt338) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:532:30: unionType
+                // /home/david/git/ceylon-spec/Ceylon.g:549:30: unionType
                 {
                 pushFollow(FOLLOW_unionType_in_synpred10_Ceylon3360);
                 unionType();
@@ -28383,8 +28402,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred11_Ceylon
     public void synpred11_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1272:9: ( destructureStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1272:10: destructureStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1289:9: ( destructureStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1289:10: destructureStart
         {
         pushFollow(FOLLOW_destructureStart_in_synpred11_Ceylon8463);
         destructureStart();
@@ -28399,8 +28418,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred12_Ceylon
     public void synpred12_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1274:9: ( annotatedDeclarationStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1274:10: annotatedDeclarationStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1291:9: ( annotatedDeclarationStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1291:10: annotatedDeclarationStart
         {
         pushFollow(FOLLOW_annotatedDeclarationStart_in_synpred12_Ceylon8489);
         annotatedDeclarationStart();
@@ -28415,8 +28434,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred13_Ceylon
     public void synpred13_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1276:9: ( annotatedAssertionStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1276:10: annotatedAssertionStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1293:9: ( annotatedAssertionStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1293:10: annotatedAssertionStart
         {
         pushFollow(FOLLOW_annotatedAssertionStart_in_synpred13_Ceylon8517);
         annotatedAssertionStart();
@@ -28431,8 +28450,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred14_Ceylon
     public void synpred14_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1278:9: ( annotationListStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1278:10: annotationListStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1295:9: ( annotationListStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1295:10: annotationListStart
         {
         pushFollow(FOLLOW_annotationListStart_in_synpred14_Ceylon8543);
         annotationListStart();
@@ -28447,7 +28466,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred15_Ceylon
     public void synpred15_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1295:7: ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )
+        // /home/david/git/ceylon-spec/Ceylon.g:1312:7: ( INTERFACE_DEFINITION | DYNAMIC UIDENTIFIER )
         int alt339=2;
         int LA339_0 = input.LA(1);
 
@@ -28467,14 +28486,14 @@ public class CeylonParser extends Parser {
         }
         switch (alt339) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:1295:8: INTERFACE_DEFINITION
+                // /home/david/git/ceylon-spec/Ceylon.g:1312:8: INTERFACE_DEFINITION
                 {
                 match(input,INTERFACE_DEFINITION,FOLLOW_INTERFACE_DEFINITION_in_synpred15_Ceylon8668); if (state.failed) return ;
 
                 }
                 break;
             case 2 :
-                // /home/david/git/ceylon-spec/Ceylon.g:1295:29: DYNAMIC UIDENTIFIER
+                // /home/david/git/ceylon-spec/Ceylon.g:1312:29: DYNAMIC UIDENTIFIER
                 {
                 match(input,DYNAMIC,FOLLOW_DYNAMIC_in_synpred15_Ceylon8670); if (state.failed) return ;
 
@@ -28489,8 +28508,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred16_Ceylon
     public void synpred16_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1322:8: ( unambiguousType )
-        // /home/david/git/ceylon-spec/Ceylon.g:1322:9: unambiguousType
+        // /home/david/git/ceylon-spec/Ceylon.g:1339:8: ( unambiguousType )
+        // /home/david/git/ceylon-spec/Ceylon.g:1339:9: unambiguousType
         {
         pushFollow(FOLLOW_unambiguousType_in_synpred16_Ceylon8847);
         unambiguousType();
@@ -28505,8 +28524,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred17_Ceylon
     public void synpred17_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1609:9: ( specifierParametersStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1609:10: specifierParametersStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1626:9: ( specifierParametersStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1626:10: specifierParametersStart
         {
         pushFollow(FOLLOW_specifierParametersStart_in_synpred17_Ceylon10664);
         specifierParametersStart();
@@ -28521,7 +28540,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred18_Ceylon
     public void synpred18_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1656:9: (~ ( LIDENTIFIER | UIDENTIFIER ) )
+        // /home/david/git/ceylon-spec/Ceylon.g:1673:9: (~ ( LIDENTIFIER | UIDENTIFIER ) )
         // /home/david/git/ceylon-spec/Ceylon.g:
         {
         if ( (input.LA(1) >= ABSTRACTED_TYPE && input.LA(1) <= LET)||(input.LA(1) >= LINE_COMMENT && input.LA(1) <= TYPE_CONSTRAINT)||(input.LA(1) >= UIdentifierPrefix && input.LA(1) <= WS) ) {
@@ -28543,8 +28562,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred19_Ceylon
     public void synpred19_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1701:9: ( namedArgumentStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1701:10: namedArgumentStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1718:9: ( namedArgumentStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1718:10: namedArgumentStart
         {
         pushFollow(FOLLOW_namedArgumentStart_in_synpred19_Ceylon11206);
         namedArgumentStart();
@@ -28559,8 +28578,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred20_Ceylon
     public void synpred20_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1705:9: ( anonymousArgument )
-        // /home/david/git/ceylon-spec/Ceylon.g:1705:10: anonymousArgument
+        // /home/david/git/ceylon-spec/Ceylon.g:1722:9: ( anonymousArgument )
+        // /home/david/git/ceylon-spec/Ceylon.g:1722:10: anonymousArgument
         {
         pushFollow(FOLLOW_anonymousArgument_in_synpred20_Ceylon11241);
         anonymousArgument();
@@ -28575,8 +28594,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred21_Ceylon
     public void synpred21_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1749:9: ( typeArgumentsStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1749:10: typeArgumentsStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1766:9: ( typeArgumentsStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1766:10: typeArgumentsStart
         {
         pushFollow(FOLLOW_typeArgumentsStart_in_synpred21_Ceylon11569);
         typeArgumentsStart();
@@ -28591,8 +28610,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred22_Ceylon
     public void synpred22_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1760:9: ( typeArgumentsStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1760:10: typeArgumentsStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1777:9: ( typeArgumentsStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1777:10: typeArgumentsStart
         {
         pushFollow(FOLLOW_typeArgumentsStart_in_synpred22_Ceylon11650);
         typeArgumentsStart();
@@ -28607,8 +28626,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred23_Ceylon
     public void synpred23_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1841:9: ( namedArgumentStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:1841:10: namedArgumentStart
+        // /home/david/git/ceylon-spec/Ceylon.g:1858:9: ( namedArgumentStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:1858:10: namedArgumentStart
         {
         pushFollow(FOLLOW_namedArgumentStart_in_synpred23_Ceylon12171);
         namedArgumentStart();
@@ -28623,8 +28642,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred24_Ceylon
     public void synpred24_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1845:9: ( anonymousArgument )
-        // /home/david/git/ceylon-spec/Ceylon.g:1845:10: anonymousArgument
+        // /home/david/git/ceylon-spec/Ceylon.g:1862:9: ( anonymousArgument )
+        // /home/david/git/ceylon-spec/Ceylon.g:1862:10: anonymousArgument
         {
         pushFollow(FOLLOW_anonymousArgument_in_synpred24_Ceylon12206);
         anonymousArgument();
@@ -28639,7 +28658,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred25_Ceylon
     public void synpred25_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1863:11: ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )
+        // /home/david/git/ceylon-spec/Ceylon.g:1880:11: ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )
         int alt340=2;
         int LA340_0 = input.LA(1);
 
@@ -28659,14 +28678,14 @@ public class CeylonParser extends Parser {
         }
         switch (alt340) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:1863:12: FOR_CLAUSE
+                // /home/david/git/ceylon-spec/Ceylon.g:1880:12: FOR_CLAUSE
                 {
                 match(input,FOR_CLAUSE,FOLLOW_FOR_CLAUSE_in_synpred25_Ceylon12344); if (state.failed) return ;
 
                 }
                 break;
             case 2 :
-                // /home/david/git/ceylon-spec/Ceylon.g:1863:25: IF_CLAUSE conditions ~ THEN_CLAUSE
+                // /home/david/git/ceylon-spec/Ceylon.g:1880:25: IF_CLAUSE conditions ~ THEN_CLAUSE
                 {
                 match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_synpred25_Ceylon12348); if (state.failed) return ;
 
@@ -28697,7 +28716,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred26_Ceylon
     public void synpred26_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:1880:13: ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )
+        // /home/david/git/ceylon-spec/Ceylon.g:1897:13: ( FOR_CLAUSE | IF_CLAUSE conditions ~ THEN_CLAUSE )
         int alt341=2;
         int LA341_0 = input.LA(1);
 
@@ -28717,14 +28736,14 @@ public class CeylonParser extends Parser {
         }
         switch (alt341) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:1880:14: FOR_CLAUSE
+                // /home/david/git/ceylon-spec/Ceylon.g:1897:14: FOR_CLAUSE
                 {
                 match(input,FOR_CLAUSE,FOLLOW_FOR_CLAUSE_in_synpred26_Ceylon12527); if (state.failed) return ;
 
                 }
                 break;
             case 2 :
-                // /home/david/git/ceylon-spec/Ceylon.g:1880:27: IF_CLAUSE conditions ~ THEN_CLAUSE
+                // /home/david/git/ceylon-spec/Ceylon.g:1897:27: IF_CLAUSE conditions ~ THEN_CLAUSE
                 {
                 match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_synpred26_Ceylon12531); if (state.failed) return ;
 
@@ -28755,8 +28774,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred27_Ceylon
     public void synpred27_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:2129:15: ( namedArgumentStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:2129:16: namedArgumentStart
+        // /home/david/git/ceylon-spec/Ceylon.g:2146:15: ( namedArgumentStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:2146:16: namedArgumentStart
         {
         pushFollow(FOLLOW_namedArgumentStart_in_synpred27_Ceylon14579);
         namedArgumentStart();
@@ -28771,7 +28790,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred28_Ceylon
     public void synpred28_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:2196:7: ( FUNCTION_MODIFIER | VOID_MODIFIER | anonParametersStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:2213:7: ( FUNCTION_MODIFIER | VOID_MODIFIER | anonParametersStart )
         int alt342=3;
         switch ( input.LA(1) ) {
         case FUNCTION_MODIFIER:
@@ -28800,21 +28819,21 @@ public class CeylonParser extends Parser {
 
         switch (alt342) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:2196:8: FUNCTION_MODIFIER
+                // /home/david/git/ceylon-spec/Ceylon.g:2213:8: FUNCTION_MODIFIER
                 {
                 match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_synpred28_Ceylon14999); if (state.failed) return ;
 
                 }
                 break;
             case 2 :
-                // /home/david/git/ceylon-spec/Ceylon.g:2196:26: VOID_MODIFIER
+                // /home/david/git/ceylon-spec/Ceylon.g:2213:26: VOID_MODIFIER
                 {
                 match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_synpred28_Ceylon15001); if (state.failed) return ;
 
                 }
                 break;
             case 3 :
-                // /home/david/git/ceylon-spec/Ceylon.g:2196:40: anonParametersStart
+                // /home/david/git/ceylon-spec/Ceylon.g:2213:40: anonParametersStart
                 {
                 pushFollow(FOLLOW_anonParametersStart_in_synpred28_Ceylon15003);
                 anonParametersStart();
@@ -28831,8 +28850,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred29_Ceylon
     public void synpred29_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:2217:7: ( variable ENTRY_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:2217:8: variable ENTRY_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:2234:7: ( variable ENTRY_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:2234:8: variable ENTRY_OP
         {
         pushFollow(FOLLOW_variable_in_synpred29_Ceylon15119);
         variable();
@@ -28849,8 +28868,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred30_Ceylon
     public void synpred30_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:2223:9: ( patternStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:2223:10: patternStart
+        // /home/david/git/ceylon-spec/Ceylon.g:2240:9: ( patternStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:2240:10: patternStart
         {
         pushFollow(FOLLOW_patternStart_in_synpred30_Ceylon15171);
         patternStart();
@@ -28865,8 +28884,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred31_Ceylon
     public void synpred31_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:2472:7: ( IF_CLAUSE conditions ~ THEN_CLAUSE )
-        // /home/david/git/ceylon-spec/Ceylon.g:2472:8: IF_CLAUSE conditions ~ THEN_CLAUSE
+        // /home/david/git/ceylon-spec/Ceylon.g:2489:7: ( IF_CLAUSE conditions ~ THEN_CLAUSE )
+        // /home/david/git/ceylon-spec/Ceylon.g:2489:8: IF_CLAUSE conditions ~ THEN_CLAUSE
         {
         match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_synpred31_Ceylon16254); if (state.failed) return ;
 
@@ -28895,8 +28914,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred32_Ceylon
     public void synpred32_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3004:7: ( unionType ( PRODUCT_OP | SUM_OP ) )
-        // /home/david/git/ceylon-spec/Ceylon.g:3004:8: unionType ( PRODUCT_OP | SUM_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:3021:7: ( unionType ( PRODUCT_OP | SUM_OP ) )
+        // /home/david/git/ceylon-spec/Ceylon.g:3021:8: unionType ( PRODUCT_OP | SUM_OP )
         {
         pushFollow(FOLLOW_unionType_in_synpred32_Ceylon20061);
         unionType();
@@ -28923,8 +28942,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred33_Ceylon
     public void synpred33_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3026:7: ( type ( SPECIFY ) )
-        // /home/david/git/ceylon-spec/Ceylon.g:3026:8: type ( SPECIFY )
+        // /home/david/git/ceylon-spec/Ceylon.g:3043:7: ( type ( SPECIFY ) )
+        // /home/david/git/ceylon-spec/Ceylon.g:3043:8: type ( SPECIFY )
         {
         pushFollow(FOLLOW_type_in_synpred33_Ceylon20192);
         type();
@@ -28932,8 +28951,8 @@ public class CeylonParser extends Parser {
         state._fsp--;
         if (state.failed) return ;
 
-        // /home/david/git/ceylon-spec/Ceylon.g:3026:13: ( SPECIFY )
-        // /home/david/git/ceylon-spec/Ceylon.g:3026:14: SPECIFY
+        // /home/david/git/ceylon-spec/Ceylon.g:3043:13: ( SPECIFY )
+        // /home/david/git/ceylon-spec/Ceylon.g:3043:14: SPECIFY
         {
         match(input,SPECIFY,FOLLOW_SPECIFY_in_synpred33_Ceylon20195); if (state.failed) return ;
 
@@ -28947,8 +28966,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred34_Ceylon
     public void synpred34_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3295:7: ( namedAnnotationArgumentsStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:3295:8: namedAnnotationArgumentsStart
+        // /home/david/git/ceylon-spec/Ceylon.g:3312:7: ( namedAnnotationArgumentsStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:3312:8: namedAnnotationArgumentsStart
         {
         pushFollow(FOLLOW_namedAnnotationArgumentsStart_in_synpred34_Ceylon21970);
         namedAnnotationArgumentsStart();
@@ -28963,8 +28982,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred35_Ceylon
     public void synpred35_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3381:10: ( patternStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:3381:11: patternStart
+        // /home/david/git/ceylon-spec/Ceylon.g:3398:10: ( patternStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:3398:11: patternStart
         {
         pushFollow(FOLLOW_patternStart_in_synpred35_Ceylon22605);
         patternStart();
@@ -28979,7 +28998,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred36_Ceylon
     public void synpred36_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3381:9: ( ( patternStart )=> patternStart | compilerAnnotations ( declarationStart | specificationStart ) )
+        // /home/david/git/ceylon-spec/Ceylon.g:3398:9: ( ( patternStart )=> patternStart | compilerAnnotations ( declarationStart | specificationStart ) )
         int alt344=2;
         switch ( input.LA(1) ) {
         case COMPILER_ANNOTATION:
@@ -29184,7 +29203,7 @@ public class CeylonParser extends Parser {
 
         switch (alt344) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3381:10: ( patternStart )=> patternStart
+                // /home/david/git/ceylon-spec/Ceylon.g:3398:10: ( patternStart )=> patternStart
                 {
                 pushFollow(FOLLOW_patternStart_in_synpred36_Ceylon22610);
                 patternStart();
@@ -29195,7 +29214,7 @@ public class CeylonParser extends Parser {
                 }
                 break;
             case 2 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3381:43: compilerAnnotations ( declarationStart | specificationStart )
+                // /home/david/git/ceylon-spec/Ceylon.g:3398:43: compilerAnnotations ( declarationStart | specificationStart )
                 {
                 pushFollow(FOLLOW_compilerAnnotations_in_synpred36_Ceylon22614);
                 compilerAnnotations();
@@ -29203,7 +29222,7 @@ public class CeylonParser extends Parser {
                 state._fsp--;
                 if (state.failed) return ;
 
-                // /home/david/git/ceylon-spec/Ceylon.g:3381:63: ( declarationStart | specificationStart )
+                // /home/david/git/ceylon-spec/Ceylon.g:3398:63: ( declarationStart | specificationStart )
                 int alt343=2;
                 int LA343_0 = input.LA(1);
 
@@ -29223,7 +29242,7 @@ public class CeylonParser extends Parser {
                 }
                 switch (alt343) {
                     case 1 :
-                        // /home/david/git/ceylon-spec/Ceylon.g:3381:64: declarationStart
+                        // /home/david/git/ceylon-spec/Ceylon.g:3398:64: declarationStart
                         {
                         pushFollow(FOLLOW_declarationStart_in_synpred36_Ceylon22617);
                         declarationStart();
@@ -29234,7 +29253,7 @@ public class CeylonParser extends Parser {
                         }
                         break;
                     case 2 :
-                        // /home/david/git/ceylon-spec/Ceylon.g:3381:81: specificationStart
+                        // /home/david/git/ceylon-spec/Ceylon.g:3398:81: specificationStart
                         {
                         pushFollow(FOLLOW_specificationStart_in_synpred36_Ceylon22619);
                         specificationStart();
@@ -29257,8 +29276,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred37_Ceylon
     public void synpred37_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3385:9: ( LIDENTIFIER )
-        // /home/david/git/ceylon-spec/Ceylon.g:3385:10: LIDENTIFIER
+        // /home/david/git/ceylon-spec/Ceylon.g:3402:9: ( LIDENTIFIER )
+        // /home/david/git/ceylon-spec/Ceylon.g:3402:10: LIDENTIFIER
         {
         match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred37_Ceylon22663); if (state.failed) return ;
 
@@ -29269,8 +29288,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred38_Ceylon
     public void synpred38_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3402:10: ( patternStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:3402:11: patternStart
+        // /home/david/git/ceylon-spec/Ceylon.g:3419:10: ( patternStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:3419:11: patternStart
         {
         pushFollow(FOLLOW_patternStart_in_synpred38_Ceylon22797);
         patternStart();
@@ -29285,7 +29304,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred39_Ceylon
     public void synpred39_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3402:9: ( ( patternStart )=> patternStart | compilerAnnotations ( declarationStart | specificationStart ) )
+        // /home/david/git/ceylon-spec/Ceylon.g:3419:9: ( ( patternStart )=> patternStart | compilerAnnotations ( declarationStart | specificationStart ) )
         int alt346=2;
         switch ( input.LA(1) ) {
         case COMPILER_ANNOTATION:
@@ -29490,7 +29509,7 @@ public class CeylonParser extends Parser {
 
         switch (alt346) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3402:10: ( patternStart )=> patternStart
+                // /home/david/git/ceylon-spec/Ceylon.g:3419:10: ( patternStart )=> patternStart
                 {
                 pushFollow(FOLLOW_patternStart_in_synpred39_Ceylon22802);
                 patternStart();
@@ -29501,7 +29520,7 @@ public class CeylonParser extends Parser {
                 }
                 break;
             case 2 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3402:43: compilerAnnotations ( declarationStart | specificationStart )
+                // /home/david/git/ceylon-spec/Ceylon.g:3419:43: compilerAnnotations ( declarationStart | specificationStart )
                 {
                 pushFollow(FOLLOW_compilerAnnotations_in_synpred39_Ceylon22806);
                 compilerAnnotations();
@@ -29509,7 +29528,7 @@ public class CeylonParser extends Parser {
                 state._fsp--;
                 if (state.failed) return ;
 
-                // /home/david/git/ceylon-spec/Ceylon.g:3402:63: ( declarationStart | specificationStart )
+                // /home/david/git/ceylon-spec/Ceylon.g:3419:63: ( declarationStart | specificationStart )
                 int alt345=2;
                 int LA345_0 = input.LA(1);
 
@@ -29529,7 +29548,7 @@ public class CeylonParser extends Parser {
                 }
                 switch (alt345) {
                     case 1 :
-                        // /home/david/git/ceylon-spec/Ceylon.g:3402:64: declarationStart
+                        // /home/david/git/ceylon-spec/Ceylon.g:3419:64: declarationStart
                         {
                         pushFollow(FOLLOW_declarationStart_in_synpred39_Ceylon22809);
                         declarationStart();
@@ -29540,7 +29559,7 @@ public class CeylonParser extends Parser {
                         }
                         break;
                     case 2 :
-                        // /home/david/git/ceylon-spec/Ceylon.g:3402:81: specificationStart
+                        // /home/david/git/ceylon-spec/Ceylon.g:3419:81: specificationStart
                         {
                         pushFollow(FOLLOW_specificationStart_in_synpred39_Ceylon22811);
                         specificationStart();
@@ -29563,8 +29582,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred40_Ceylon
     public void synpred40_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3406:9: ( LIDENTIFIER )
-        // /home/david/git/ceylon-spec/Ceylon.g:3406:10: LIDENTIFIER
+        // /home/david/git/ceylon-spec/Ceylon.g:3423:9: ( LIDENTIFIER )
+        // /home/david/git/ceylon-spec/Ceylon.g:3423:10: LIDENTIFIER
         {
         match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred40_Ceylon22855); if (state.failed) return ;
 
@@ -29575,8 +29594,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred41_Ceylon
     public void synpred41_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3425:9: ( LIDENTIFIER SPECIFY )
-        // /home/david/git/ceylon-spec/Ceylon.g:3425:10: LIDENTIFIER SPECIFY
+        // /home/david/git/ceylon-spec/Ceylon.g:3442:9: ( LIDENTIFIER SPECIFY )
+        // /home/david/git/ceylon-spec/Ceylon.g:3442:10: LIDENTIFIER SPECIFY
         {
         match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred41_Ceylon23000); if (state.failed) return ;
 
@@ -29589,8 +29608,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred42_Ceylon
     public void synpred42_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3468:9: ( LBRACE )
-        // /home/david/git/ceylon-spec/Ceylon.g:3468:10: LBRACE
+        // /home/david/git/ceylon-spec/Ceylon.g:3485:9: ( LBRACE )
+        // /home/david/git/ceylon-spec/Ceylon.g:3485:10: LBRACE
         {
         match(input,LBRACE,FOLLOW_LBRACE_in_synpred42_Ceylon23318); if (state.failed) return ;
 
@@ -29601,7 +29620,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred43_Ceylon
     public void synpred43_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3631:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:3648:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )
         int alt347=3;
         switch ( input.LA(1) ) {
         case COMPILER_ANNOTATION:
@@ -29643,14 +29662,14 @@ public class CeylonParser extends Parser {
 
         switch (alt347) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3631:10: COMPILER_ANNOTATION
+                // /home/david/git/ceylon-spec/Ceylon.g:3648:10: COMPILER_ANNOTATION
                 {
                 match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_synpred43_Ceylon23850); if (state.failed) return ;
 
                 }
                 break;
             case 2 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3631:30: declarationStart
+                // /home/david/git/ceylon-spec/Ceylon.g:3648:30: declarationStart
                 {
                 pushFollow(FOLLOW_declarationStart_in_synpred43_Ceylon23852);
                 declarationStart();
@@ -29661,7 +29680,7 @@ public class CeylonParser extends Parser {
                 }
                 break;
             case 3 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3631:47: specificationStart
+                // /home/david/git/ceylon-spec/Ceylon.g:3648:47: specificationStart
                 {
                 pushFollow(FOLLOW_specificationStart_in_synpred43_Ceylon23854);
                 specificationStart();
@@ -29678,8 +29697,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred44_Ceylon
     public void synpred44_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3679:7: ( IS_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:3679:8: IS_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:3696:7: ( IS_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:3696:8: IS_OP
         {
         match(input,IS_OP,FOLLOW_IS_OP_in_synpred44_Ceylon24213); if (state.failed) return ;
 
@@ -29690,8 +29709,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred45_Ceylon
     public void synpred45_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3681:7: ( SATISFIES )
-        // /home/david/git/ceylon-spec/Ceylon.g:3681:8: SATISFIES
+        // /home/david/git/ceylon-spec/Ceylon.g:3698:7: ( SATISFIES )
+        // /home/david/git/ceylon-spec/Ceylon.g:3698:8: SATISFIES
         {
         match(input,SATISFIES,FOLLOW_SATISFIES_in_synpred45_Ceylon24234); if (state.failed) return ;
 
@@ -29702,8 +29721,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred46_Ceylon
     public void synpred46_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3742:9: ( patternStart )
-        // /home/david/git/ceylon-spec/Ceylon.g:3742:10: patternStart
+        // /home/david/git/ceylon-spec/Ceylon.g:3759:9: ( patternStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:3759:10: patternStart
         {
         pushFollow(FOLLOW_patternStart_in_synpred46_Ceylon24628);
         patternStart();
@@ -29718,7 +29737,7 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred47_Ceylon
     public void synpred47_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:3856:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )
+        // /home/david/git/ceylon-spec/Ceylon.g:3873:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )
         int alt348=3;
         switch ( input.LA(1) ) {
         case COMPILER_ANNOTATION:
@@ -29760,14 +29779,14 @@ public class CeylonParser extends Parser {
 
         switch (alt348) {
             case 1 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3856:10: COMPILER_ANNOTATION
+                // /home/david/git/ceylon-spec/Ceylon.g:3873:10: COMPILER_ANNOTATION
                 {
                 match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_synpred47_Ceylon25474); if (state.failed) return ;
 
                 }
                 break;
             case 2 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3856:30: declarationStart
+                // /home/david/git/ceylon-spec/Ceylon.g:3873:30: declarationStart
                 {
                 pushFollow(FOLLOW_declarationStart_in_synpred47_Ceylon25476);
                 declarationStart();
@@ -29778,7 +29797,7 @@ public class CeylonParser extends Parser {
                 }
                 break;
             case 3 :
-                // /home/david/git/ceylon-spec/Ceylon.g:3856:47: specificationStart
+                // /home/david/git/ceylon-spec/Ceylon.g:3873:47: specificationStart
                 {
                 pushFollow(FOLLOW_specificationStart_in_synpred47_Ceylon25478);
                 specificationStart();
@@ -29795,8 +29814,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred48_Ceylon
     public void synpred48_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:4092:7: ( abbreviatedType MEMBER_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:4092:8: abbreviatedType MEMBER_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:4109:7: ( abbreviatedType MEMBER_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:4109:8: abbreviatedType MEMBER_OP
         {
         pushFollow(FOLLOW_abbreviatedType_in_synpred48_Ceylon26998);
         abbreviatedType();
@@ -29813,8 +29832,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred49_Ceylon
     public void synpred49_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:4107:7: ( groupedType MEMBER_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:4107:8: groupedType MEMBER_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:4124:7: ( groupedType MEMBER_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:4124:8: groupedType MEMBER_OP
         {
         pushFollow(FOLLOW_groupedType_in_synpred49_Ceylon27120);
         groupedType();
@@ -29831,8 +29850,8 @@ public class CeylonParser extends Parser {
 
     // $ANTLR start synpred50_Ceylon
     public void synpred50_Ceylon_fragment() throws RecognitionException {
-        // /home/david/git/ceylon-spec/Ceylon.g:4122:7: ( memberName MEMBER_OP )
-        // /home/david/git/ceylon-spec/Ceylon.g:4122:8: memberName MEMBER_OP
+        // /home/david/git/ceylon-spec/Ceylon.g:4139:7: ( memberName MEMBER_OP )
+        // /home/david/git/ceylon-spec/Ceylon.g:4139:8: memberName MEMBER_OP
         {
         pushFollow(FOLLOW_memberName_in_synpred50_Ceylon27241);
         memberName();
@@ -30621,7 +30640,7 @@ public class CeylonParser extends Parser {
             this.transition = DFA1_transition;
         }
         public String getDescription() {
-            return "66:7: (ca= compilerAnnotations SEMICOLON )?";
+            return "83:7: (ca= compilerAnnotations SEMICOLON )?";
         }
     }
     static final String DFA143_eotS =
@@ -30737,7 +30756,7 @@ public class CeylonParser extends Parser {
             this.transition = DFA143_transition;
         }
         public String getDescription() {
-            return "()* loopback of 1590:5: ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )*";
+            return "()* loopback of 1607:5: ( qualifiedReference | indexOrIndexRange | ( specifierParametersStart )=> parameters | positionalArguments | namedArguments )*";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             TokenStream input = (TokenStream)_input;
@@ -30887,7 +30906,7 @@ public class CeylonParser extends Parser {
             this.transition = DFA146_transition;
         }
         public String getDescription() {
-            return "1648:7: ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>)";
+            return "1665:7: ( memberReference | typeReference | (~ ( LIDENTIFIER | UIDENTIFIER ) )=>)";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             TokenStream input = (TokenStream)_input;
@@ -31154,7 +31173,7 @@ public class CeylonParser extends Parser {
             this.transition = DFA155_transition;
         }
         public String getDescription() {
-            return "1748:7: ( ( typeArgumentsStart )=> typeArguments )?";
+            return "1765:7: ( ( typeArgumentsStart )=> typeArguments )?";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             TokenStream input = (TokenStream)_input;
@@ -31299,7 +31318,7 @@ public class CeylonParser extends Parser {
             this.transition = DFA156_transition;
         }
         public String getDescription() {
-            return "1759:7: ( ( typeArgumentsStart )=> typeArguments )?";
+            return "1776:7: ( ( typeArgumentsStart )=> typeArguments )?";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             TokenStream input = (TokenStream)_input;
