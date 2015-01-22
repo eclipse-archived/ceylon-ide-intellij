@@ -16,9 +16,6 @@
             <element id="module-output" name="CeylonIDEA" />
             <element id="module-output" name="compiler" />
           </element>
-          <element id="directory" name="lib">
-            <element id="library" level="project" name="Ceylon Runtime" />
-          </element>
           <element id="directory" name="META-INF">
             <element id="dir-copy" path="$PROJECT_DIR$/META-INF" />
           </element>
