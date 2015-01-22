@@ -53,12 +53,7 @@ public abstract class PluginCeylonStartup implements ApplicationComponent {
 
     public File getArchiveDirectory(IdeaPluginDescriptor pluginDescriptor) {
         final File pluginDirectory = pluginDescriptor.getPath();
-        File libSubDirectory = new File(pluginDirectory, "lib");
-        if (libSubDirectory.exists()) {
-            return libSubDirectory;
-        } else {
-            return pluginDirectory;
-        }
+        return new File(pluginDirectory, "lib");
     }
 
     private File[] getArchives(IdeaPluginDescriptor pluginDescriptor, FilenameFilter fileNameFilter) {
