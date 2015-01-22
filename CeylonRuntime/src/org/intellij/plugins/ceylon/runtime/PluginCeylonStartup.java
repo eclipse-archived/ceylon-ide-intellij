@@ -109,13 +109,15 @@ public abstract class PluginCeylonStartup implements ApplicationComponent {
         return getModuleArtifacts(pluginDescriptor);
     }
 
-    public ArtifactContext[] getModuleArtifacts(IdeaPluginDescriptor pluginDescriptor) {
+    public ArtifactContext[] getModuleArtifacts(final IdeaPluginDescriptor pluginDescriptor) {
         final Map<String, ArtifactContext> artifacts = new HashMap<>();
         File[] modulesArchives = getArchives(pluginDescriptor, new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 Matcher matcher = moduleArchivePattern.matcher(name);
-                if (!"ceylon-bootstrap.jar".equals(name) && matcher.matches()) {
+                if (!"ceylon-bootstrap.jar".equals(name)
+                        && !name.equals(pluginDescriptor.getPath().getName() + ".jar")
+                        && matcher.matches()) {
                     String moduleName = matcher.group(1);
                     String moduleVersion = matcher.group(2);
                     String moduleType = matcher.group(3).equalsIgnoreCase("C") ?
