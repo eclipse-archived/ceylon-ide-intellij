@@ -124,7 +124,7 @@
             </classpath>
 
             <include name="*.java"/>
-            <include name="org/intellij/plugins/ceylon/psi/CeylonPsi.java"/>
+            <include name="org/intellij/plugins/ceylon/ide/psi/CeylonPsi.java"/>
         </javac>
         <java classname="TokenTypesGenerator" dir="${basedir}" fork="yes">
             <arg path="gen"/>
@@ -160,11 +160,11 @@
             <fileset dir="gen" includes="**/*.java"/>
         </copy>
 
-        <copy todir="../gen/org/intellij/plugins/ceylon/parser" overwrite="true">
+        <copy todir="../gen/org/intellij/plugins/ceylon/ide/parser" overwrite="true">
             <globmapper from="*CeylonParser.java" to="*PsiCompatibleCeylonParser.java"/>
             <fileset dir="../../ceylon-spec/gensrc/com/redhat/ceylon/compiler/typechecker/parser" includes="CeylonParser.java"/>
         </copy>
-        <replace file="../gen/org/intellij/plugins/ceylon/parser/PsiCompatibleCeylonParser.java">
+        <replace file="../gen/org/intellij/plugins/ceylon/ide/parser/PsiCompatibleCeylonParser.java">
             <replacefilter>
                 <replacetoken>import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.*;</replacetoken>
                 <replacevalue>import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.MethodDeclaration;
@@ -182,7 +182,7 @@ import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
             </replacefilter>
             <replacefilter
                     token="package com.redhat.ceylon.compiler.typechecker.parser;"
-                    value="package org.intellij.plugins.ceylon.parser;"/>
+                    value="package org.intellij.plugins.ceylon.ide.parser;"/>
             <replacefilter
                     token="CeylonParser"
                     value="PsiCompatibleCeylonParser"/>

@@ -1,17 +1,13 @@
 package com.redhat.ceylon.compiler.typechecker.treegen;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 
+import java.io.*;
+
 public class GenerateIdeaElements {
 
-    private static final String GENERATED_PACKAGE_DIR = "org/intellij/plugins/ceylon/psi/";
+    private static final String GENERATED_PACKAGE_DIR = "org/intellij/plugins/ceylon/ide/psi/";
 
     public static void main(String[] args) throws Exception {
         File file = new File(args[0]);

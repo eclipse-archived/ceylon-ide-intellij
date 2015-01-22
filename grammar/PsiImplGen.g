@@ -9,11 +9,11 @@ grammar PsiImplGen;
 }
 
 nodeList : { 
-           println("package org.intellij.plugins.ceylon.psi;\n");
+           println("package org.intellij.plugins.ceylon.ide.psi;\n");
            println("import com.intellij.lang.ASTNode;");
            println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
-           println("import org.intellij.plugins.ceylon.codeInsight.resolve.*;");
-           println("import org.intellij.plugins.ceylon.psi.impl.CeylonCompositeElementImpl;");
+           println("import org.intellij.plugins.ceylon.ide.codeInsight.resolve.*;");
+           println("import org.intellij.plugins.ceylon.ide.psi.impl.CeylonCompositeElementImpl;");
            println("/* Generated using Antlr by PsiImplGen.g */");
            println("\npublic class CeylonPsiImpl {\n");
            }

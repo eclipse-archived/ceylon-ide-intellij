@@ -1,4 +1,4 @@
-import org.intellij.plugins.ceylon.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,15 +10,15 @@ import java.io.IOException;
 public class CeylonPsiVisitorGenerator {
 
     public static void main(String[] args) throws IOException {
-        FileOutputStream os = new FileOutputStream(new File(args[0], "org/intellij/plugins/ceylon/psi/CeylonPsiVisitor.java"));
+        FileOutputStream os = new FileOutputStream(new File(args[0], "org/intellij/plugins/ceylon/ide/psi/CeylonPsiVisitor.java"));
 
-        os.write(("package org.intellij.plugins.ceylon.psi;\n" +
+        os.write(("package org.intellij.plugins.ceylon.ide.psi;\n" +
                 "\n" +
                 "import com.intellij.psi.PsiElement;\n" +
                 "import com.intellij.psi.PsiElementVisitor;\n" +
                 "import org.jetbrains.annotations.NotNull;\n" +
                 "\n" +
-                "import static org.intellij.plugins.ceylon.psi.CeylonPsi.*;\n" +
+                "import static org.intellij.plugins.ceylon.ide.psi.CeylonPsi.*;\n" +
                 "\n" +
                 "public class CeylonPsiVisitor extends PsiElementVisitor {\n" +
                 "\n" +
