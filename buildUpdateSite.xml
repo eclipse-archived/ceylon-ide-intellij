@@ -1,0 +1,25 @@
+<!--
+   To build the reference docs for a particular language only, use "ant -Dlang=en", for
+   example, and call either lang.all, lang.docpdf, lang.dochtml, or lang.dochtmlsingle
+   for the target of your choice.
+
+   You can also call lang.section-check to track down missing identifiers in a particular
+   language, or you can call lang.revdiff to get a difference report for a particular
+   language, compared with the English reference.
+-->
+<project name="Build an update site" default="build" basedir=".">
+
+    <property name="updatePluginsFile" location="${artifact.output.path}/updatePlugins.xml"/>
+
+    <target name="build">
+        <delete dir="${updatePluginsFile}"/>
+        <xmlproperty file="CeylonRuntime/src/META-INF/plugin.xml" prefix="CeylonRuntime"/>
+        <xmlproperty file="META-INF/plugin.xml" prefix="CeylonIDEA"/>
+        <echoxml file="${updatePluginsFile}">
+            <plugins>
+                <plugin id="${CeylonRuntime.idea-plugin.id}" url="./CeylonRuntime.zip" version="${CeylonRuntime.idea-plugin.version}"/>
+                <plugin id="${CeylonIDEA.idea-plugin.id}" url="./CeylonIDEA.zip" version="${CeylonIDEA.idea-plugin.version}"/>
+            </plugins>
+        </echoxml>
+    </target>
+</project>

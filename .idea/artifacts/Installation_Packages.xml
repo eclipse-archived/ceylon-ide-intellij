@@ -1,6 +1,12 @@
 <component name="ArtifactManager">
-  <artifact name="CeylonIDEA Plugin Package">
-    <output-path>$PROJECT_DIR$/out/artifacts/CeylonIDEA_Plugin_Package</output-path>
+  <artifact name="Installation Packages">
+    <output-path>$PROJECT_DIR$/out/installation-packages</output-path>
+    <properties id="ant-postprocessing">
+      <options enabled="true">
+        <file>file://$PROJECT_DIR$/buildUpdateSite.xml</file>
+        <target>build</target>
+      </options>
+    </properties>
     <root id="root">
       <element id="archive" name="CeylonIDEA.zip">
         <element id="directory" name="CeylonIDEA">
@@ -15,6 +21,16 @@
           </element>
           <element id="directory" name="META-INF">
             <element id="dir-copy" path="$PROJECT_DIR$/META-INF" />
+          </element>
+        </element>
+      </element>
+      <element id="archive" name="CeylonRuntime.zip">
+        <element id="directory" name="CeylonRuntime">
+          <element id="directory" name="lib">
+            <element id="archive" name="CeylonRuntime.jar">
+              <element id="module-output" name="CeylonRuntime" />
+            </element>
+            <element id="library" level="project" name="Ceylon Runtime" />
           </element>
         </element>
       </element>
