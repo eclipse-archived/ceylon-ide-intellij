@@ -73,20 +73,20 @@ If you want to use the current version, or debug/hack this plugin, you will need
 4. Setup a clone of https://github.com/ceylon/ceylon-ide-intellij (the main plugin project)
 
 5. Make sure that the following GitHub repositories have all been cloned locally into the same parent directory :
-	  - https://github.com/ceylon/ceylon-dist (the Ceylon distribution project)
-	  - https://github.com/ceylon/ceylon-ide-common (shared between the Eclipse plugin and the IntelliJ plugin)
+    - https://github.com/ceylon/ceylon-dist (the Ceylon distribution project)
+    - https://github.com/ceylon/ceylon-ide-common (shared between the Eclipse plugin and the IntelliJ plugin)
 
 6. Setup all the Ceylon distribution sibling projects by running the `ant setup` command in direcrory `../ceylon-dist`. This will create sibling projects such as : `../ceylon-spec`, `../ceylon-compiler`, etc ...
 	
 7. Build a full Ceylon distribution locally (see [here](https://github.com/ceylon/ceylon-dist/blob/master/README.md#building-the-distribution) for more details) :
-  - In the `../ceylon-dist` directory run : `ant clean publish-all ide-quick`
-  - This will create a `dist` sub-directory in `../ceylon-dist`, with the built Ceylon distribution.
+    - In the `../ceylon-dist` directory run : `ant clean publish-all ide-quick`
+    - This will create a `dist` sub-directory in `../ceylon-dist`, with the built Ceylon distribution.
 
 8. Open the project `ceylon-ide-intellij` in IDEA. You might be requested to enter the value of 2 path variables (see next point).
 
 9. In `Settings > Build, Execution, Deployment > Path Variable`, you should add 2 path variables :
-  - `̀CEYLON_DIST_LIB` should point to `../ceylon-dist/dist/lib`
-  - `̀CEYLON_DIST_REPO` should point to `../ceylon-dist/dist/repo`
+    - `̀CEYLON_DIST_LIB` should point to `../ceylon-dist/dist/lib`
+    - `̀CEYLON_DIST_REPO` should point to `../ceylon-dist/dist/repo`
 
 10. In the IDE's `Preferences > File Types`, under `Recognized File Types`, register `*.car` as `Archive files`
 
