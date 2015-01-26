@@ -20,6 +20,7 @@ public class CeylonRuntime extends PluginCeylonStartup {
 
     public void disposeComponent() {
         Metamodel.resetModuleManager();
+        registeredModules.clear();
     }
 
     static void registerModule(ArtifactResult moduleArtifact, PluginClassLoader classLoader) {
