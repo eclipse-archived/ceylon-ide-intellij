@@ -19,6 +19,7 @@
           <element id="directory" name="META-INF">
             <element id="dir-copy" path="$PROJECT_DIR$/META-INF" />
           </element>
+          <element id="directory" name="lib" />
         </element>
       </element>
       <element id="archive" name="CeylonRuntime.zip">
