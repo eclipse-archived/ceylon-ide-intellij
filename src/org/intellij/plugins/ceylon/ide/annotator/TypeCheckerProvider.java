@@ -6,8 +6,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
+import com.redhat.ceylon.compiler.loader.model.LazyModule;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
+import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleManager;
+import com.redhat.ceylon.compiler.typechecker.context.Context;
+import com.redhat.ceylon.compiler.typechecker.model.Module;
+import com.redhat.ceylon.compiler.typechecker.model.ModuleImport;
+import com.redhat.ceylon.compiler.typechecker.util.ModuleManagerFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -70,6 +76,30 @@ public class TypeCheckerProvider implements ProjectComponent {
                 .isJDKIncluded(true)
                 .buildManager();
         builder.setRepositoryManager(manager);
+
+        builder.moduleManagerFactory(new ModuleManagerFactory() {
+            @Override
+            public ModuleManager createModuleManager(final Context context) {
+                // FIXME use a real LazyModuleManager to remove this hack
+                return new ModuleManager(context) {
+                    @Override
+                    public void addImplicitImports() {
+                        Module languageModule = getContext().getModules().getLanguageModule();
+                        for(Module m : getContext().getModules().getListOfModules()){
+                            // Java modules don't depend on ceylon.language
+                            if((!(m instanceof LazyModule) || !m.isJava()) && !m.equals(languageModule)) {
+                                // add ceylon.language if required
+                                ModuleImport moduleImport = findImport(m, languageModule);
+                                if (moduleImport == null) {
+                                    moduleImport = new ModuleImport(languageModule, false, true);
+                                    m.addImport(moduleImport);
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+        });
 
         for (VirtualFile sourceRoot : ProjectRootManager.getInstance(project).getContentSourceRoots()) {
             builder.addSrcDirectory(VFileAdapter.createInstance(sourceRoot));
