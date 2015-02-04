@@ -8,14 +8,14 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CeylonProjectConfig extends AbstractProjectConfig<Project> {
+public class OldCeylonProjectConfig extends AbstractProjectConfig<Project> {
 
     private static final Map<Project, AbstractProjectConfig> PROJECT_CONFIGS = new HashMap<>();
 
     public static AbstractProjectConfig get(Project project) {
         AbstractProjectConfig projectConfig = PROJECT_CONFIGS.get(project);
         if (projectConfig == null) {
-            projectConfig = new CeylonProjectConfig(project);
+            projectConfig = new OldCeylonProjectConfig(project);
             PROJECT_CONFIGS.put(project, projectConfig);
         }
         return projectConfig;
@@ -25,7 +25,7 @@ public class CeylonProjectConfig extends AbstractProjectConfig<Project> {
         PROJECT_CONFIGS.remove(project);
     }
 
-    private CeylonProjectConfig(Project project) {
+    private OldCeylonProjectConfig(Project project) {
         super(project);
     }
 
