@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>IntelliJ Plugin Ceylon Code</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>com.redhat.ceylon.eclipse.ui.ceylonBuilder</name>
+			<arguments>
+				<dictionary>
+					<key>explodeModules</key>
+					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>systemRepo</key>
+					<value></value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.redhat.ceylon.eclipse.ui.ceylonNature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+</projectDescription>
