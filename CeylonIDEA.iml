@@ -39,7 +39,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.ceylon/repo/ceylon/collection/1.1.1/ceylon.collection-1.1.1.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.1.1/ceylon.collection-1.1.1.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -48,7 +48,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.ceylon/repo/ceylon/interop/java/1.1.1/ceylon.interop.java-1.1.1.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.1.1/ceylon.interop.java-1.1.1.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
