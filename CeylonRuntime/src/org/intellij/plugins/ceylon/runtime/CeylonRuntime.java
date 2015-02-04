@@ -1,15 +1,21 @@
 package org.intellij.plugins.ceylon.runtime;
 
 import com.intellij.ide.plugins.cl.PluginClassLoader;
-import com.redhat.ceylon.cmr.api.ArtifactResult;
+import com.intellij.openapi.application.ApplicationInfo;
+import com.redhat.ceylon.cmr.api.*;
 import com.redhat.ceylon.compiler.java.runtime.metamodel.Metamodel;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,12 +24,91 @@ import java.util.Map;
 public class CeylonRuntime extends PluginCeylonStartup {
     static Map<String, String> registeredModules = new HashMap<>();
 
+    public static void registerIntellijApiModules() {
+        ApplicationInfo applicationInfo = ApplicationInfo.getInstance();
+        ClassLoader cl = applicationInfo.getClass().getClassLoader();
+        final String version = applicationInfo.getMajorVersion();
+        Class<? extends ClassLoader> loaderClass = cl.getClass();
+
+        List<URL> urls = Collections.emptyList();
+        try {
+            Method method = loaderClass.getMethod("getUrls");
+            Object result = method.invoke(cl);
+            if (result instanceof List) {
+                urls = (List<URL>) result;
+            }
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        for (final URL url : urls) {
+            final String fileName = url.getFile();
+            if (fileName.endsWith("openapi.jar") ||
+                    fileName.endsWith("util.jar") ||
+                    fileName.endsWith("annotations.jar") ||
+                    fileName.endsWith("extensions.jar")) {
+                ArtifactResult artifactResult = new ArtifactResult() {
+                    @Override
+                    public String name() {
+                        return fileName.replaceAll("\\.jar$", "");
+                    }
+
+                    @Override
+                    public String version() {
+                        return version;
+                    }
+
+                    @Override
+                    public ImportType importType() {
+                        return ImportType.EXPORT;
+                    }
+
+                    @Override
+                    public ArtifactResultType type() {
+                        return ArtifactResultType.CEYLON;
+                    }
+
+                    @Override
+                    public VisibilityType visibilityType() {
+                        return VisibilityType.STRICT;
+                    }
+
+                    @Override
+                    public File artifact() throws RepositoryException {
+                        return new File(url.getPath());
+                    }
+
+                    @Override
+                    public PathFilter filter() {
+                        return null;
+                    }
+
+                    @Override
+                    public List<ArtifactResult> dependencies() throws RepositoryException {
+                        return Collections.emptyList();
+                    }
+
+                    @Override
+                    public String repositoryDisplayString() {
+                        return null;
+                    }
+
+                    @Override
+                    public Repository repository() {
+                        return null;
+                    }
+                };
+                registerModule(artifactResult, cl);
+            }
+        }
+    }
+
     public void disposeComponent() {
         Metamodel.resetModuleManager();
         registeredModules.clear();
     }
 
-    static void registerModule(ArtifactResult moduleArtifact, PluginClassLoader classLoader) {
+    static public void registerModule(ArtifactResult moduleArtifact, ClassLoader classLoader) {
         String artifactFileName = moduleArtifact.artifact().getName();
         String artifactMD5 = "";
         try {
@@ -38,9 +123,13 @@ public class CeylonRuntime extends PluginCeylonStartup {
             registeredModules.put(artifactFileName, artifactMD5);
         } else if (alreadyRegisteredModuleMD5.isEmpty() ||
                     ! alreadyRegisteredModuleMD5.equals(artifactMD5)) {
+            String originMessage = "";
+            if (classLoader instanceof  PluginClassLoader) {
+                originMessage = " of plugin '" + ((PluginClassLoader)classLoader).getPluginId().toString() + "'";
+            }
             throw new RuntimeException("Ceylon Metamodel Registering failed : the module '" +
                     moduleArtifact.name() + "/" + moduleArtifact.version() +
-                    "' of plugin '" + classLoader.getPluginId().toString() + "' cannot be registered since it has already been registered " +
+                    "'" + originMessage + " cannot be registered since it has already been registered " +
                     "by another plugin with a different binary archive");
         } else {
             // then don't need to register again

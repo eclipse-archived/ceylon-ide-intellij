@@ -15,7 +15,7 @@ public abstract class CeylonCodeInsightTestSupport extends LightCodeInsightFixtu
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        TypeCheckerProvider typeCheckerProvider = myFixture.getProject().getComponent(TypeCheckerProvider.class);
+        TypeCheckerProvider typeCheckerProvider = myFixture.getModule().getComponent(TypeCheckerProvider.class);
         typeChecker = typeCheckerProvider.createTypeChecker();
     }
 

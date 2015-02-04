@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -47,7 +48,7 @@ public class CeylonAddModuleAction extends AnAction {
         final VirtualFile eventDir = findEventDir(e);
 
         if (eventDir != null && e.getProject() != null) {
-            TypeCheckerProvider typeCheckerProvider = e.getProject().getComponent(TypeCheckerProvider.class);
+            TypeCheckerProvider typeCheckerProvider = ModuleUtil.findModuleForFile(eventDir, e.getProject()).getComponent(TypeCheckerProvider.class);
             final TypeChecker typeChecker = typeCheckerProvider.getTypeChecker();
 
             final VirtualFile srcRoot = getSourceRoot(e, eventDir);

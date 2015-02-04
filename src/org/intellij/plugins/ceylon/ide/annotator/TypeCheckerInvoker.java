@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleManager;
@@ -28,7 +29,7 @@ public class TypeCheckerInvoker {
      * Mimics com.redhat.ceylon.eclipse.code.parse.CeylonParseController#parse
      */
     public static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile) {
-        TypeCheckerProvider typeCheckerProvider = ceylonFile.getProject().getComponent(TypeCheckerProvider.class);
+        TypeCheckerProvider typeCheckerProvider = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject()).getComponent(TypeCheckerProvider.class);
 
         TypeChecker typeChecker = typeCheckerProvider.getTypeChecker();
 

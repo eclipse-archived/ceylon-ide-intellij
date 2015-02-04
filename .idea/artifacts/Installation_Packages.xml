@@ -19,7 +19,10 @@
           <element id="directory" name="META-INF">
             <element id="dir-copy" path="$PROJECT_DIR$/META-INF" />
           </element>
-          <element id="directory" name="lib" />
+          <element id="directory" name="lib">
+            <element id="file-copy" path="$PROJECT_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.1.1/com.redhat.ceylon.ide.common-1.1.1.car" />
+            <element id="file-copy" path="$PROJECT_DIR$/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.1.1/org.intellij.plugins.ceylon.ide.ceylonCode-1.1.1.car" />
+          </element>
         </element>
       </element>
       <element id="archive" name="CeylonRuntime.zip">

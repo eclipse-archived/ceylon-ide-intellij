@@ -37,7 +37,7 @@ public abstract class PluginCeylonStartup implements ApplicationComponent {
         return null;
     }
 
-    private PluginClassLoader getClassLoader() {
+    protected PluginClassLoader getClassLoader() {
         return getClassLoader(getClass());
     }
 

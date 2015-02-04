@@ -29,9 +29,16 @@
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider</implementation-class>
+            <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonModel</implementation-class>
         </component>
     </project-components>
+
+    <module-components>
+        <!-- Add your module components here -->
+        <component>
+            <implementation-class>org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider</implementation-class>
+        </component>
+    </module-components>
 
     <actions>
         <action id="Ceylon.AddCeylonModule" class="org.intellij.plugins.ceylon.ide.action.CeylonAddModuleAction" text="Ceylon _Module" description="Add a new Ceylon module">
