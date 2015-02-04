@@ -8,8 +8,6 @@
     </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/testdata" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/resources/repo" />
@@ -17,7 +15,44 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ceylon-jps-plugin" />
-    <orderEntry type="module" module-name="ceylon-ide-common" />
     <orderEntry type="module" module-name="CeylonRuntime" scope="PROVIDED" />
+    <orderEntry type="module" module-name="ceylon-ide-common" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.1.1/com.redhat.ceylon.ide.common-1.1.1.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="PluginCeylonCode" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.1.1/org.intellij.plugins.ceylon.ide.ceylonCode-1.1.1.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.ceylon/repo/ceylon/collection/1.1.1/ceylon.collection-1.1.1.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.ceylon/repo/ceylon/interop/java/1.1.1/ceylon.interop.java-1.1.1.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
