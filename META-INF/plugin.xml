@@ -29,7 +29,7 @@
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonModel</implementation-class>
+            <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects</implementation-class>
         </component>
     </project-components>
 

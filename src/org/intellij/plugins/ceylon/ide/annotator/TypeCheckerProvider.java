@@ -16,7 +16,7 @@ import com.redhat.ceylon.compiler.typechecker.util.ModuleManagerFactory;
 import com.redhat.ceylon.ide.common.CeylonProject;
 import com.redhat.ceylon.ide.common.CeylonProjectConfig;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonModel;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -70,7 +70,7 @@ public class TypeCheckerProvider implements ModuleComponent {
     }
 
     public TypeChecker createTypeChecker() {
-        IdeaCeylonModel ceylonModel = module.getProject().getComponent(IdeaCeylonModel.class);
+        IdeaCeylonProjects ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
         CeylonProject<Module> ceylonProject = ceylonModel.getProject(module);
         CeylonProjectConfig<Module> ceylonConfig = ceylonProject.getConfiguration();
 

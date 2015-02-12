@@ -3,25 +3,26 @@ import com.intellij.openapi.components {
 }
 import com.redhat.ceylon.ide.common {
     CeylonProject,
-    CeylonModel
+    CeylonProjects
 }
 import com.intellij.openapi.\imodule {
-    Module
+    IdeaModule = Module
 }
 import com.intellij.openapi.project {
-    Project
+    IdeaProject = Project
 }
 
-shared class IdeaCeylonModel(Project ideProject) 
-        extends CeylonModel<Module>() 
+shared class IdeaCeylonProjects(IdeaProject ideProject) 
+        extends CeylonProjects<IdeaModule>() 
         satisfies ProjectComponent {
-    shared actual CeylonProject<Module> newIdeArtifact(Module ideArtifact)
+    shared actual CeylonProject<IdeaModule> newIdeArtifact(IdeaModule ideArtifact)
             => IdeaCeylonProject(ideArtifact);
 
-    shared actual String componentName => "CeylonProjectModel";
+    shared actual String componentName => "CeylonProjects";
     
     shared actual void disposeComponent() {
         print("disposeComponent");
+        clearProjects();
     }
     
     shared actual void initComponent() {
@@ -30,6 +31,7 @@ shared class IdeaCeylonModel(Project ideProject)
     
     shared actual void projectClosed() {
         print("projectClosed");
+        clearProjects();
     }
     
     shared actual void projectOpened() {
