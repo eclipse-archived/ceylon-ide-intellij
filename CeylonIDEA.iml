@@ -16,7 +16,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ceylon-jps-plugin" />
     <orderEntry type="module" module-name="CeylonRuntime" scope="PROVIDED" />
-    <orderEntry type="module" module-name="ceylon-ide-common" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -26,7 +25,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="PluginCeylonCode" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
