@@ -4,6 +4,9 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -15,7 +18,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.intellij.util.PathUtil;
+import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.lang.ObjectUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -68,9 +71,8 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
                 final String repoDir = CeylonRunConfiguration.class.getClassLoader().getResource("/repo/").getFile();
                 params.getVMParametersList().add("-Dceylon.system.repo=" + repoDir);
 
-                params.setMainClass("com.redhat.ceylon.launcher.Launcher");
-                String pathToPlugin = new File(PathUtil.getJarPathForClass(CeylonRunConfiguration.class)).getParent();
-                params.getClassPath().add(pathToPlugin + "/lib/ceylon-bootstrap.jar");
+                params.setMainClass("com.redhat.ceylon.launcher.Bootstrap");
+                params.getClassPath().add(getBootstrapJarPath());
                 params.getProgramParametersList().add("run");
                 params.getProgramParametersList().add("--run", topLevelNameFull);
                 final Iterable<String> outputPaths = getOutputPaths(CeylonRunConfiguration.this.getProject());
@@ -81,6 +83,18 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
                 params.setWorkingDirectory(getProject().getBasePath()); // todo: make settable
                 return params;
+            }
+
+            @NotNull
+            private String getBootstrapJarPath() {
+                PluginId runtimePluginId = PluginManager.getPluginByClassName("org.intellij.plugins.ceylon.runtime.CeylonRuntime");
+                assert runtimePluginId != null;
+                IdeaPluginDescriptor runtimePlugin = PluginManager.getPlugin(runtimePluginId);
+                assert runtimePlugin != null;
+                String runtimePluginPath = runtimePlugin.getPath().getAbsolutePath();
+                File bootstrapJar = new File(runtimePluginPath, FileUtil.join("lib", "ceylon-bootstrap.jar"));
+                assert bootstrapJar.exists() && !bootstrapJar.isDirectory();
+                return bootstrapJar.getAbsolutePath();
             }
         };
     }
