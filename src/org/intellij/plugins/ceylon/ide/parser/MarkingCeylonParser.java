@@ -328,14 +328,6 @@ public class MarkingCeylonParser extends PsiCompatibleCeylonParser {
     }
 
     @Override
-    public Tree.Term conditionalExpression() throws RecognitionException {
-        final MyTree.MyMarker marker = mark();
-        final Tree.Term node = super.conditionalExpression();
-        end(marker, node);
-        return node;
-    }
-
-    @Override
     public Tree.SwitchExpression switchExpression() throws RecognitionException {
         final MyTree.MyMarker marker = mark();
         final Tree.SwitchExpression node = super.switchExpression();
@@ -1427,22 +1419,6 @@ public class MarkingCeylonParser extends PsiCompatibleCeylonParser {
     public Tree.StaticType intersectionType() throws RecognitionException {
         final MyTree.MyMarker marker = mark();
         final Tree.StaticType node = super.intersectionType();
-        end(marker, node);
-        return node;
-    }
-
-    @Override
-    public Tree.StaticType qualifiedOrTupleType() throws RecognitionException {
-        final MyTree.MyMarker marker = mark();
-        final Tree.StaticType node = super.qualifiedOrTupleType();
-        end(marker, node);
-        return node;
-    }
-
-    @Override
-    public Tree.StaticType abbreviatedType() throws RecognitionException {
-        final MyTree.MyMarker marker = mark();
-        final Tree.StaticType node = super.abbreviatedType();
         end(marker, node);
         return node;
     }

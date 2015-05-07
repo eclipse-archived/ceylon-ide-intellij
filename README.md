@@ -82,6 +82,10 @@ If you want to use the current version, or debug/hack this plugin, you will need
     - In the `../ceylon-dist` directory run : `ant clean publish-all ide-quick`
     - This will create a `dist` sub-directory in `../ceylon-dist`, with the built Ceylon distribution.
 
+7-bis. Some parts of the plugin are written in Ceylon, but cannot yet be built within IntelliJ, so you need to compile them manually:
+    - In the `ceylon-ide-intellij/plugin-ceylon-code` directory, run: `../../ceylon-dist/dist/bin/ceylon compile`
+    - This will generate a `.jar` archive that is required in `ceylon-ide-intellij`'s classpath
+
 8. Open the project `ceylon-ide-intellij` in IDEA. You might be requested to enter the value of 2 path variables (see next point).
 
 9. In `Settings > Build, Execution, Deployment > Path Variable`, you should add 2 path variables :

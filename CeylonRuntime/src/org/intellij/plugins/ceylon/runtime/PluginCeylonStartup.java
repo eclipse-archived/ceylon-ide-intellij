@@ -19,6 +19,7 @@ import com.redhat.ceylon.common.Constants;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -153,7 +154,7 @@ public abstract class PluginCeylonStartup implements ApplicationComponent {
 
         StructureBuilder structureBuilder = new FileContentStore(getArchiveDirectory());
         FlatRepository flatRepository = new FlatRepository(structureBuilder.createRoot());
-        RepositoryManagerBuilder builder = new RepositoryManagerBuilder(getArchiveDirectory(), new CMRJULLogger(), true, (int) Constants.DEFAULT_TIMEOUT);
+        RepositoryManagerBuilder builder = new RepositoryManagerBuilder(getArchiveDirectory(), new CMRJULLogger(), true, (int) Constants.DEFAULT_TIMEOUT, Proxy.NO_PROXY);
         builder.addRepository(flatRepository);
         RepositoryManager repoManager = builder.buildRepository();
 
