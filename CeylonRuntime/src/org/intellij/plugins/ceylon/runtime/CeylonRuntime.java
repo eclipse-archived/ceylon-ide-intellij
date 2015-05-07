@@ -10,6 +10,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -75,7 +76,11 @@ public class CeylonRuntime extends PluginCeylonStartup {
 
                     @Override
                     public File artifact() throws RepositoryException {
-                        return new File(url.getPath());
+                        try {
+                            return new File(url.toURI());
+                        } catch (URISyntaxException e) {
+                            throw new RepositoryException(e);
+                        }
                     }
 
                     @Override
