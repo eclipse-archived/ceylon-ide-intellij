@@ -4,6 +4,7 @@ import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
 import com.redhat.ceylon.compiler.loader.model.LazyModule;
@@ -52,11 +53,17 @@ public class TypeCheckerProvider implements ModuleComponent {
     }
 
     public void projectOpened() {
-        // called when project is opened
-        if (typeChecker == null) {
-            typeChecker = createTypeChecker();
-        }
-        DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
+        // If the project was just created, module files (*.iml) do not yet exist. Since we need them, we defer
+        // the type checker creation after the project has been loaded
+        StartupManager.getInstance(module.getProject()).registerPostStartupActivity(new Runnable() {
+            @Override
+            public void run() {
+                if (typeChecker == null) {
+                    typeChecker = createTypeChecker();
+                }
+                DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
+            }
+        });
     }
 
     public void projectClosed() {
