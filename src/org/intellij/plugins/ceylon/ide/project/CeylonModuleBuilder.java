@@ -1,7 +1,6 @@
 package org.intellij.plugins.ceylon.ide.project;
 
-import com.intellij.ide.util.projectWizard.ModuleBuilder;
-import com.intellij.ide.util.projectWizard.SourcePathsBuilder;
+import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.roots.ContentEntry;
@@ -19,10 +18,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CeylonModuleBuilder extends ModuleBuilder implements SourcePathsBuilder {
+public class CeylonModuleBuilder extends JavaModuleBuilder {
 
     private CeylonConfig config = new CeylonConfig();
-    private List<Pair<String,String>> mySourcePaths;
+    private List<Pair<String, String>> mySourcePaths;
 
     @Override
     public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
@@ -31,7 +30,7 @@ public class CeylonModuleBuilder extends ModuleBuilder implements SourcePathsBui
 
         ContentEntry contentEntry = doAddContentEntry(rootModel);
         if (contentEntry != null) {
-            final List<Pair<String,String>> sourcePaths = getSourcePaths();
+            final List<Pair<String, String>> sourcePaths = getSourcePaths();
 
             if (sourcePaths != null) {
                 for (final Pair<String, String> sourcePath : sourcePaths) {
@@ -77,9 +76,9 @@ public class CeylonModuleBuilder extends ModuleBuilder implements SourcePathsBui
     }
 
     @Override
-    public List<Pair<String, String>> getSourcePaths() throws ConfigurationException {
+    public List<Pair<String, String>> getSourcePaths() {
         if (mySourcePaths == null) {
-            final List<Pair<String, String>> paths = new ArrayList<Pair<String, String>>();
+            final List<Pair<String, String>> paths = new ArrayList<>();
             @NonNls final String path = getContentEntryPath() + File.separator + "source";
             new File(path).mkdirs();
             paths.add(Pair.create(path, ""));
@@ -90,7 +89,7 @@ public class CeylonModuleBuilder extends ModuleBuilder implements SourcePathsBui
 
     @Override
     public void setSourcePaths(List<Pair<String, String>> sourcePaths) {
-        mySourcePaths = sourcePaths != null? new ArrayList<>(sourcePaths) : null;
+        mySourcePaths = sourcePaths != null ? new ArrayList<>(sourcePaths) : null;
     }
 
     @Override
