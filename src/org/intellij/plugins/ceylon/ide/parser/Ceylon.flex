@@ -1,9 +1,9 @@
-package org.intellij.plugins.ceylon.parser;
+package org.intellij.plugins.ceylon.ide.parser;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import CeylonTokens;
+import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
 
 %%
 
@@ -46,7 +46,7 @@ STRING_END = "``" {StringCharacter}* "\""
 //StringTemplate = {StringStart} ({ValueExpression} {StringMid})* {} {StringEnd}
 VERBATIM_STRING =	"\"\"\"" ([^\"] | "\"" [^\"] | """" [^\"])* ("\"" ("\"" ("\"" ("\"" "\""?)?)?)?)?
 CharPart = ( [^\\'] | {EscapeSequence} )*
-EscapeSequence = "\\" ( [^{] | "{" ([^}])* "}"? )?
+EscapeSequence = "\\" ( [^{] | "{" ([^}])* "}"? )
 WS = ( " " | "\r" | "\t" | "\f" | "\n" )+
 LINE_COMMENT = ("//"|"#!") [^\n\r]* ("\r\n" | "\r" | "\n")?
 BACKTICK = "`"
