@@ -3,10 +3,10 @@ package org.intellij.plugins.ceylon.ide.presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.util.PlatformIcons;
-import com.redhat.ceylon.compiler.typechecker.model.ClassOrInterface;
-import com.redhat.ceylon.compiler.typechecker.model.Scope;
-import com.redhat.ceylon.compiler.typechecker.model.TypeDeclaration;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
+import com.redhat.ceylon.model.typechecker.model.Scope;
+import com.redhat.ceylon.model.typechecker.model.TypeDeclaration;
 import org.intellij.plugins.ceylon.ide.psi.CeylonClass;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +15,7 @@ import javax.swing.*;
 public class ClassPresentationProvider implements ItemPresentationProvider<CeylonClass> {
     @Override
     public ItemPresentation getPresentation(final CeylonClass item) {
-        final Tree.ClassOrInterface parentClass = (Tree.ClassOrInterface) item.getCeylonNode();
+        final Tree.ClassOrInterface parentClass = item.getCeylonNode();
 
         return new ItemPresentation() {
             @Nullable

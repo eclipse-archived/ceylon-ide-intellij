@@ -56,4 +56,9 @@ public class VFileAdapter implements com.redhat.ceylon.compiler.typechecker.io.V
         }
         return children;
     }
+
+    @Override
+    public int compareTo(com.redhat.ceylon.compiler.typechecker.io.VirtualFile o) {
+        return 0;
+    }
 }

@@ -4,15 +4,15 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleManager;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
-import com.redhat.ceylon.compiler.typechecker.model.Module;
-import com.redhat.ceylon.compiler.typechecker.model.Modules;
-import com.redhat.ceylon.compiler.typechecker.model.Package;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
+import com.redhat.ceylon.model.typechecker.model.Module;
+import com.redhat.ceylon.model.typechecker.model.Modules;
+import com.redhat.ceylon.model.typechecker.model.Package;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -75,7 +75,7 @@ public class TypeCheckerInvoker {
             pkg = phasedUnit.getPackage();
         }
         phasedUnit = new PhasedUnit(sourceCodeVirtualFile, srcDir, cu, pkg,
-                typeChecker.getPhasedUnits().getModuleManager(), typeChecker.getContext(), tokenStream.getTokens());
+                typeChecker.getPhasedUnits().getModuleManager(), typeChecker.getPhasedUnits().getModuleSourceMapper(), typeChecker.getContext(), tokenStream.getTokens());
 
 //        System.out.printf("Package for %s: %s, %s; module: %s%n", ceylonFile.getName(), ceylonFile.getPackageName(), phasedUnit.getPackage(), phasedUnit.getPackage().getModule());
 

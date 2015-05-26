@@ -2,8 +2,8 @@ package org.intellij.plugins.ceylon.runtime;
 
 import com.intellij.ide.plugins.cl.PluginClassLoader;
 import com.intellij.openapi.application.ApplicationInfo;
-import com.redhat.ceylon.cmr.api.*;
 import com.redhat.ceylon.compiler.java.runtime.metamodel.Metamodel;
+import com.redhat.ceylon.model.cmr.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -19,9 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by david on 19/01/15.
- */
 public class CeylonRuntime extends PluginCeylonStartup {
     static Map<String, String> registeredModules = new HashMap<>();
 
@@ -127,10 +124,10 @@ public class CeylonRuntime extends PluginCeylonStartup {
             Metamodel.loadModule(moduleArtifact.name(), moduleArtifact.version(), moduleArtifact, classLoader);
             registeredModules.put(artifactFileName, artifactMD5);
         } else if (alreadyRegisteredModuleMD5.isEmpty() ||
-                    ! alreadyRegisteredModuleMD5.equals(artifactMD5)) {
+                !alreadyRegisteredModuleMD5.equals(artifactMD5)) {
             String originMessage = "";
-            if (classLoader instanceof  PluginClassLoader) {
-                originMessage = " of plugin '" + ((PluginClassLoader)classLoader).getPluginId().toString() + "'";
+            if (classLoader instanceof PluginClassLoader) {
+                originMessage = " of plugin '" + ((PluginClassLoader) classLoader).getPluginId().toString() + "'";
             }
             throw new RuntimeException("Ceylon Metamodel Registering failed : the module '" +
                     moduleArtifact.name() + "/" + moduleArtifact.version() +
@@ -147,16 +144,16 @@ public class CeylonRuntime extends PluginCeylonStartup {
 
         MessageDigest md = MessageDigest.getInstance("MD5");
 
-        InputStream is= new FileInputStream(file);
+        InputStream is = new FileInputStream(file);
 
-        byte[] buffer=new byte[8192];
-        int read=0;
+        byte[] buffer = new byte[8192];
+        int read = 0;
 
-        while( (read = is.read(buffer)) > 0)
+        while ((read = is.read(buffer)) > 0)
             md.update(buffer, 0, read);
 
         byte[] md5 = md.digest();
-        BigInteger bi=new BigInteger(1, md5);
+        BigInteger bi = new BigInteger(1, md5);
 
         return bi.toString(16);
     }

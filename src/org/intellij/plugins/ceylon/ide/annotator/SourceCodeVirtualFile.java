@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.psi.PsiFile;
+import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -55,5 +56,10 @@ public class SourceCodeVirtualFile implements com.redhat.ceylon.compiler.typeche
         else {
             return super.equals(obj);
         }
+    }
+
+    @Override
+    public int compareTo(VirtualFile o) {
+        return 0;
     }
 }

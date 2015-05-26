@@ -8,15 +8,16 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
-import com.redhat.ceylon.compiler.loader.model.LazyModule;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
-import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleManager;
+import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleSourceMapper;
 import com.redhat.ceylon.compiler.typechecker.context.Context;
-import com.redhat.ceylon.compiler.typechecker.model.ModuleImport;
 import com.redhat.ceylon.compiler.typechecker.util.ModuleManagerFactory;
 import com.redhat.ceylon.ide.common.CeylonProject;
 import com.redhat.ceylon.ide.common.CeylonProjectConfig;
+import com.redhat.ceylon.model.loader.model.LazyModule;
+import com.redhat.ceylon.model.typechecker.model.ModuleImport;
+import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
@@ -117,11 +118,11 @@ public class TypeCheckerProvider implements ModuleComponent {
             @Override
             public ModuleManager createModuleManager(final Context context) {
                 // FIXME use a real LazyModuleManager to remove this hack
-                return new ModuleManager(context) {
+                return new ModuleManager() {
                     @Override
                     public void addImplicitImports() {
-                        com.redhat.ceylon.compiler.typechecker.model.Module languageModule = getContext().getModules().getLanguageModule();
-                        for (com.redhat.ceylon.compiler.typechecker.model.Module m : getContext().getModules().getListOfModules()) {
+                        com.redhat.ceylon.model.typechecker.model.Module languageModule = getModules().getLanguageModule();
+                        for (com.redhat.ceylon.model.typechecker.model.Module m : getModules().getListOfModules()) {
                             // Java modules don't depend on ceylon.language
                             if ((!(m instanceof LazyModule) || !m.isJava()) && !m.equals(languageModule)) {
                                 // add ceylon.language if required
@@ -134,6 +135,11 @@ public class TypeCheckerProvider implements ModuleComponent {
                         }
                     }
                 };
+            }
+
+            @Override
+            public ModuleSourceMapper createModuleManagerUtil(Context context, ModuleManager moduleManager) {
+                return new ModuleSourceMapper(context, moduleManager);
             }
         });
 

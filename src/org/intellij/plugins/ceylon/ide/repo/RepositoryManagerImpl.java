@@ -3,8 +3,8 @@ package org.intellij.plugins.ceylon.ide.repo;
 import com.intellij.openapi.module.Module;
 import com.redhat.ceylon.cmr.api.ModuleQuery;
 import com.redhat.ceylon.cmr.api.ModuleSearchResult;
-import com.redhat.ceylon.cmr.api.Repository;
 import com.redhat.ceylon.cmr.api.RepositoryManagerBuilder;
+import com.redhat.ceylon.model.cmr.Repository;
 
 import java.io.File;
 import java.util.Collection;
@@ -23,7 +23,7 @@ public class RepositoryManagerImpl implements RepositoryManager {
 
         ModuleQuery query = new ModuleQuery(moduleName, ModuleQuery.Type.JVM);
         ModuleSearchResult result = new ModuleSearchResult();
-        repository.searchModules(query, result);
+//        repository.searchModules(query, result);
 
         return result.getResults();
     }

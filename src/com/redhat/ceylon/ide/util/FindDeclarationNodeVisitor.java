@@ -1,9 +1,9 @@
 package com.redhat.ceylon.ide.util;
 
-import com.redhat.ceylon.compiler.typechecker.model.Declaration;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
 
 public class FindDeclarationNodeVisitor extends Visitor {
 
@@ -19,7 +19,7 @@ public class FindDeclarationNodeVisitor extends Visitor {
     }
 
     private boolean isDeclaration(Declaration dec) {
-        return dec!=null && dec.equals(declaration);
+        return dec != null && dec.equals(declaration);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class FindDeclarationNodeVisitor extends Visitor {
     }
 
     public void visitAny(Node node) {
-        if (declarationNode==null) {
+        if (declarationNode == null) {
             super.visitAny(node);
         }
     }

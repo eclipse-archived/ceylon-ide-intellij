@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide.presentation;
 import com.intellij.ide.IconProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.PlatformIcons;
-import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleManager;
+import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

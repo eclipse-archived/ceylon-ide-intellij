@@ -4,9 +4,8 @@ import com.github.rjeschke.txtmark.BlockEmitter;
 import com.github.rjeschke.txtmark.Configuration;
 import com.github.rjeschke.txtmark.Processor;
 import com.github.rjeschke.txtmark.SpanEmitter;
-import com.redhat.ceylon.compiler.typechecker.model.*;
-import com.redhat.ceylon.compiler.typechecker.model.Package;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.model.typechecker.model.*;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
 public class DocBuilder {
 
     public static String getPackageFor(Declaration declaration) {
-        Package pkg = declaration.getUnit().getPackage();
+        com.redhat.ceylon.model.typechecker.model.Package pkg = declaration.getUnit().getPackage();
 
         return pkg.getNameAsString();
     }

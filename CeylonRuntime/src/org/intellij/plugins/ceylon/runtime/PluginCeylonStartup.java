@@ -7,7 +7,6 @@ import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.util.text.StringUtil;
 import com.redhat.ceylon.cmr.api.ArtifactContext;
-import com.redhat.ceylon.cmr.api.ArtifactResult;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
 import com.redhat.ceylon.cmr.api.RepositoryManagerBuilder;
 import com.redhat.ceylon.cmr.impl.CMRJULLogger;
@@ -15,6 +14,7 @@ import com.redhat.ceylon.cmr.impl.FileContentStore;
 import com.redhat.ceylon.cmr.impl.FlatRepository;
 import com.redhat.ceylon.cmr.spi.StructureBuilder;
 import com.redhat.ceylon.common.Constants;
+import com.redhat.ceylon.model.cmr.ArtifactResult;
 
 import java.io.File;
 import java.io.FilenameFilter;

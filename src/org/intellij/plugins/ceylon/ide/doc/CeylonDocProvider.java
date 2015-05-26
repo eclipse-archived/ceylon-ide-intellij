@@ -6,8 +6,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.redhat.ceylon.compiler.typechecker.model.Declaration;
-import com.redhat.ceylon.compiler.typechecker.model.Interface;
+import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +43,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 }
 
                 String declKind = "";
-                if (decl instanceof com.redhat.ceylon.compiler.typechecker.model.Class) {
+                if (decl instanceof com.redhat.ceylon.model.typechecker.model.Class) {
                     declKind = "class ";
                 } else if (decl instanceof Interface) {
                     declKind = "interface ";

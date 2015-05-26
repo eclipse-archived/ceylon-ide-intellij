@@ -24,7 +24,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.io.impl.FileSystemVirtualFile;
-import com.redhat.ceylon.compiler.typechecker.model.Module;
+import com.redhat.ceylon.model.typechecker.model.Module;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

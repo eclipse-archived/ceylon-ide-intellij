@@ -24,6 +24,7 @@
       <root url="jar://$CEYLON_DIST_REPO$/ceylon/runtime/1.1.1/ceylon.runtime-1.1.1.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/ceylon/language/1.1.1/ceylon.language-1.1.1.car!/" />
       <root url="jar://$CEYLON_DIST_LIB$/ceylon-bootstrap.jar!/" />
+      <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/model/1.1.1/com.redhat.ceylon.model-1.1.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
