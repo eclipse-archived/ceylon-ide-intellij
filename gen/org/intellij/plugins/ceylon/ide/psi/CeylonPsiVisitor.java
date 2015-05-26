@@ -681,6 +681,9 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         else if (element instanceof SuperTypePsi) {
             visitSuperTypePsi((SuperTypePsi) element);
         }
+        else if (element instanceof TypeConstructorPsi) {
+            visitTypeConstructorPsi((TypeConstructorPsi) element);
+        }
         else if (element instanceof EntryTypePsi) {
             visitEntryTypePsi((EntryTypePsi) element);
         }
@@ -1124,6 +1127,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitTypeLiteralPsi(@NotNull TypeLiteralPsi element) {}
     public void visitMetaLiteralPsi(@NotNull MetaLiteralPsi element) {}
     public void visitSuperTypePsi(@NotNull SuperTypePsi element) {}
+    public void visitTypeConstructorPsi(@NotNull TypeConstructorPsi element) {}
     public void visitEntryTypePsi(@NotNull EntryTypePsi element) {}
     public void visitFunctionTypePsi(@NotNull FunctionTypePsi element) {}
     public void visitTupleTypePsi(@NotNull TupleTypePsi element) {}

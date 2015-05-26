@@ -88,6 +88,7 @@ public class NodeToIElementTypeMap {
         map.put(CustomTree.TupleType.class, CeylonTypes.TUPLE_TYPE);
         map.put(CustomTree.FunctionType.class, CeylonTypes.FUNCTION_TYPE);
         map.put(CustomTree.EntryType.class, CeylonTypes.ENTRY_TYPE);
+        map.put(CustomTree.TypeConstructor.class, CeylonTypes.TYPE_CONSTRUCTOR);
         map.put(CustomTree.SuperType.class, CeylonTypes.SUPER_TYPE);
         map.put(CustomTree.MetaLiteral.class, CeylonTypes.META_LITERAL);
         map.put(CustomTree.TypeLiteral.class, CeylonTypes.TYPE_LITERAL);

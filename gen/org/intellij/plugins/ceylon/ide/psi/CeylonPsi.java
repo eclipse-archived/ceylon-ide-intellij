@@ -297,6 +297,10 @@ public class CeylonPsi {
         @Override Tree.EntryType getCeylonNode();
     }
 
+    public static interface TypeConstructorPsi extends StaticTypePsi {
+        @Override Tree.TypeConstructor getCeylonNode();
+    }
+
     public static interface SuperTypePsi extends StaticTypePsi {
         @Override Tree.SuperType getCeylonNode();
     }

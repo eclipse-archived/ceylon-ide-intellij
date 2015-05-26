@@ -446,6 +446,12 @@ public class CeylonPsiImpl {
         @Override public Tree.EntryType getCeylonNode() { return (Tree.EntryType) super.getCeylonNode(); }
     }
 
+    public static class TypeConstructorPsiImpl extends StaticTypePsiImpl
+            implements CeylonPsi.TypeConstructorPsi {
+        public TypeConstructorPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.TypeConstructor getCeylonNode() { return (Tree.TypeConstructor) super.getCeylonNode(); }
+    }
+
     public static class SuperTypePsiImpl extends StaticTypePsiImpl
             implements CeylonPsi.SuperTypePsi {
         public SuperTypePsiImpl(ASTNode astNode) { super(astNode); }

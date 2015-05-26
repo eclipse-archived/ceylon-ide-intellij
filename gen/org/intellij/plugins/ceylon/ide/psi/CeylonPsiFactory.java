@@ -139,6 +139,8 @@ public class CeylonPsiFactory {
             return new FunctionTypePsiImpl(node);
         } else if (type == ENTRY_TYPE) {
             return new EntryTypePsiImpl(node);
+        } else if (type == TYPE_CONSTRUCTOR) {
+            return new TypeConstructorPsiImpl(node);
         } else if (type == SUPER_TYPE) {
             return new SuperTypePsiImpl(node);
         } else if (type == TYPE_LITERAL) {

@@ -85,6 +85,7 @@ public interface CeylonTypes {
     IElementType TUPLE_TYPE = new CeylonElementType("TUPLE_TYPE");
     IElementType FUNCTION_TYPE = new CeylonElementType("FUNCTION_TYPE");
     IElementType ENTRY_TYPE = new CeylonElementType("ENTRY_TYPE");
+    IElementType TYPE_CONSTRUCTOR = new CeylonElementType("TYPE_CONSTRUCTOR");
     IElementType SUPER_TYPE = new CeylonElementType("SUPER_TYPE");
     IElementType META_LITERAL = new CeylonElementType("META_LITERAL");
     IElementType TYPE_LITERAL = new CeylonElementType("TYPE_LITERAL");
