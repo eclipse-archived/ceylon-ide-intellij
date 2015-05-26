@@ -28,13 +28,16 @@ import javax.swing.*;
  */
 public class CeylonFacetConfiguration implements FacetConfiguration, PersistentStateComponent<CeylonConfig> {
 
+    public static final String COMPILATION_TAB = "Compilation";
+    public static final String PATHS_TAB = "Paths";
+
     private CeylonConfig config;
 
     @Override
     public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
         return new FacetEditorTab[]{
-                new CeylonFacetTab("Compilation", new PageOne()),
-                new CeylonFacetTab("Paths", new PageTwo())
+                new CeylonFacetTab(COMPILATION_TAB, new PageOne()),
+                new CeylonFacetTab(PATHS_TAB, new PageTwo())
         };
     }
 

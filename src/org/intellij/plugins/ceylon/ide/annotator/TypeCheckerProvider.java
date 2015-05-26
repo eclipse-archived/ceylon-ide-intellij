@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -18,6 +19,7 @@ import com.redhat.ceylon.ide.common.CeylonProject;
 import com.redhat.ceylon.ide.common.CeylonProjectConfig;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -53,17 +55,25 @@ public class TypeCheckerProvider implements ModuleComponent {
     }
 
     public void projectOpened() {
+        if (FacetManager.getInstance(module).getFacetByType(CeylonFacet.ID) == null) {
+            return;
+        }
+
         // If the project was just created, module files (*.iml) do not yet exist. Since we need them, we defer
         // the type checker creation after the project has been loaded
         StartupManager.getInstance(module.getProject()).registerPostStartupActivity(new Runnable() {
             @Override
             public void run() {
-                if (typeChecker == null) {
-                    typeChecker = createTypeChecker();
-                }
-                DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
+                typecheck();
             }
         });
+    }
+
+    public void typecheck() {
+        if (typeChecker == null) {
+            typeChecker = createTypeChecker();
+        }
+        DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
     }
 
     public void projectClosed() {
@@ -111,9 +121,9 @@ public class TypeCheckerProvider implements ModuleComponent {
                     @Override
                     public void addImplicitImports() {
                         com.redhat.ceylon.compiler.typechecker.model.Module languageModule = getContext().getModules().getLanguageModule();
-                        for(com.redhat.ceylon.compiler.typechecker.model.Module m : getContext().getModules().getListOfModules()){
+                        for (com.redhat.ceylon.compiler.typechecker.model.Module m : getContext().getModules().getListOfModules()) {
                             // Java modules don't depend on ceylon.language
-                            if((!(m instanceof LazyModule) || !m.isJava()) && !m.equals(languageModule)) {
+                            if ((!(m instanceof LazyModule) || !m.isJava()) && !m.equals(languageModule)) {
                                 // add ceylon.language if required
                                 ModuleImport moduleImport = findImport(m, languageModule);
                                 if (moduleImport == null) {

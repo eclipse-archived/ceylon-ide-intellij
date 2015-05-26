@@ -6,6 +6,7 @@ import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.util.IconLoader;
+import org.intellij.plugins.ceylon.ide.project.CeylonModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,8 @@ public class CeylonFacetType extends FacetType<CeylonFacet, CeylonFacetConfigura
 
     @Override
     public boolean isSuitableModuleType(ModuleType moduleType) {
-        return moduleType instanceof JavaModuleType;
+        // TODO perhaps we should test if the module uses a JDK instead? (cause right now we are forgetting things like PluginModuleType
+        return moduleType instanceof JavaModuleType || moduleType instanceof CeylonModuleType;
     }
 
     @Nullable

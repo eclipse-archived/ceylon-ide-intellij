@@ -78,6 +78,7 @@
         <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>
 
         <facetType implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetType"/>
+        <framework.detector implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetDetector"/>
 
         <lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonFindUsagesProvider"/>
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->

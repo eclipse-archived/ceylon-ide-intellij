@@ -10,6 +10,10 @@ public class CeylonFacet extends Facet<CeylonFacetConfiguration> {
     public static final FacetTypeId<CeylonFacet> ID = new FacetTypeId<>("ceylon");
 
     public CeylonFacet(Module module, String name, CeylonFacetConfiguration configuration) {
-        super(FacetTypeRegistry.getInstance().findFacetType(ID), module, name, configuration, null);
+        super(getFacetType(), module, name, configuration, null);
+    }
+
+    public static CeylonFacetType getFacetType() {
+        return (CeylonFacetType) FacetTypeRegistry.getInstance().findFacetType(ID);
     }
 }
