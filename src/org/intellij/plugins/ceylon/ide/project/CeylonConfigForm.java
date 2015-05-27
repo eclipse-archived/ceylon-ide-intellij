@@ -1,6 +1,8 @@
 package org.intellij.plugins.ceylon.ide.project;
 
-import com.redhat.ceylon.common.config.CeylonConfig;
+import com.intellij.openapi.module.Module;
+import com.redhat.ceylon.ide.common.CeylonProject;
+import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 
 import javax.swing.*;
 
@@ -13,20 +15,17 @@ public interface CeylonConfigForm {
 
     /**
      * Applies the user settings to the module's config.
-     * @param config the configuration to update
      */
-    void updateCeylonConfig(CeylonConfig config);
+    void apply(CeylonProject<Module> project, CeylonFacetState state);
 
     /**
      * Checks if the settings were modified by the user.
-     * @param config the original config to compare to
      * @return true if the settings were modified
      */
-    boolean isModified(CeylonConfig config);
+    boolean isModified(CeylonProject<Module> project, CeylonFacetState state);
 
     /**
      * Loads the setting from a .ceylon/config file.
-     * @param config the settings to load
      */
-    void loadCeylonConfig(CeylonConfig config);
+    void load(CeylonProject<Module> project, CeylonFacetState state);
 }

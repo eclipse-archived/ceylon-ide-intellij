@@ -9,9 +9,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.redhat.ceylon.common.config.CeylonConfig;
 import com.redhat.ceylon.ide.common.CeylonProject;
-import com.redhat.ceylon.ide.common.CeylonProjectConfig;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.project.CeylonConfigForm;
 import org.intellij.plugins.ceylon.ide.project.PageOne;
@@ -26,18 +24,19 @@ import javax.swing.*;
 /**
  * Settings for the Ceylon facet. Uses the same component than the "new module" wizard.
  */
-public class CeylonFacetConfiguration implements FacetConfiguration, PersistentStateComponent<CeylonConfig> {
+public class CeylonFacetConfiguration implements FacetConfiguration, PersistentStateComponent<CeylonFacetState> {
 
     public static final String COMPILATION_TAB = "Compilation";
-    public static final String PATHS_TAB = "Paths";
+    public static final String REPOS_TAB = "Repositories";
 
-    private CeylonConfig config;
+    private CeylonProject<Module> ceylonProject;
+    private CeylonFacetState state;
 
     @Override
     public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
         return new FacetEditorTab[]{
                 new CeylonFacetTab(COMPILATION_TAB, new PageOne()),
-                new CeylonFacetTab(PATHS_TAB, new PageTwo())
+                new CeylonFacetTab(REPOS_TAB, new PageTwo())
         };
     }
 
@@ -53,25 +52,25 @@ public class CeylonFacetConfiguration implements FacetConfiguration, PersistentS
 
     @Nullable
     @Override
-    public CeylonConfig getState() {
-        // We don't need IntelliJ to persist anything, we'll do it by ourselves
-        // FIXME
-
-        return new CeylonConfig();
+    public CeylonFacetState getState() {
+        ceylonProject.getConfiguration().save();
+        return state;
     }
 
     @Override
-    public void loadState(CeylonConfig state) {
+    public void loadState(CeylonFacetState state) {
         System.out.println("loadState()"); // When is it called anyway?
+        this.state = state;
     }
 
     public void setModule(Module module) {
         IdeaCeylonProjects ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
-        CeylonProject<Module> ceylonProject = ceylonModel.getProject(module);
-        CeylonProjectConfig<Module> ceylonConfig = ceylonProject.getConfiguration();
+        ceylonProject = ceylonModel.getProject(module);
 
-        // TODO Use CeylonConfig or CeylonProjectConfig?
-        config = ceylonConfig.getProjectConfig();
+        if (state == null) {
+            state = new CeylonFacetState();
+            System.out.println("!!!! Instantiating CeylonFacetState !!!!");
+        }
     }
 
     private class CeylonFacetTab extends FacetEditorTab {
@@ -92,17 +91,17 @@ public class CeylonFacetConfiguration implements FacetConfiguration, PersistentS
 
         @Override
         public boolean isModified() {
-            return form.isModified(CeylonFacetConfiguration.this.config);
+            return form.isModified(ceylonProject, state);
         }
 
         @Override
         public void reset() {
-            form.loadCeylonConfig(config);
+            form.load(ceylonProject, state);
         }
 
         @Override
         public void apply() throws ConfigurationException {
-            form.updateCeylonConfig(CeylonFacetConfiguration.this.config);
+            form.apply(ceylonProject, state);
         }
 
         @Override

@@ -20,6 +20,6 @@ public class PageOneWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateDataModel() {
-        step.updateCeylonConfig(moduleBuilder.getConfig());
+        moduleBuilder.setPageOne(step);
     }
 }

@@ -1,18 +1,28 @@
 package org.intellij.plugins.ceylon.ide.project;
 
+import ceylon.language.Boolean;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.redhat.ceylon.common.config.CeylonConfig;
+import com.redhat.ceylon.ide.common.CeylonProject;
 import org.apache.commons.lang.StringUtils;
+import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 
 import javax.swing.*;
-
-import static com.redhat.ceylon.ide.project.config.AbstractProjectConfig.PROJECT_OUTPUT_DIRECTORY;
-import static com.redhat.ceylon.ide.project.config.AbstractProjectConfig.PROJECT_SYSTEM_REPO;
 
 public class PageTwo implements CeylonConfigForm {
     private JPanel panel;
     private TextFieldWithBrowseButton systemRepository;
     private TextFieldWithBrowseButton outputDirectory;
+    private JCheckBox flatClasspath;
+    private JCheckBox exportMavenDeps;
+    private JList list1;
+    private JButton addExternalRepo;
+    private JButton addMavenRepo;
+    private JButton removeRepo;
+    private JButton upButton;
+    private JButton downButton;
+    private JButton addRepo;
+    private JButton addRemoteRepo;
 
     @Override
     public JPanel getPanel() {
@@ -20,20 +30,32 @@ public class PageTwo implements CeylonConfigForm {
     }
 
     @Override
-    public void updateCeylonConfig(CeylonConfig config) {
-        config.setOption(PROJECT_SYSTEM_REPO, systemRepository.getText());
-        config.setOption(PROJECT_OUTPUT_DIRECTORY, outputDirectory.getText());
+    public void apply(CeylonProject<Module> config, CeylonFacetState state) {
+        state.setSystemRepository(systemRepository.getText());
+        config.getConfiguration().setOutputRepo(outputDirectory.getText());
+        config.getConfiguration().setProjectFlatClasspath(Boolean.instance(flatClasspath.isSelected()));
+        config.getConfiguration().setProjectAutoExportMavenDependencies(Boolean.instance(exportMavenDeps.isSelected()));
     }
 
     @Override
-    public boolean isModified(CeylonConfig config) {
-        return !StringUtils.equals(config.getOption(PROJECT_SYSTEM_REPO), systemRepository.getText())
-                || !StringUtils.equals(config.getOption(PROJECT_OUTPUT_DIRECTORY), outputDirectory.getText());
+    public boolean isModified(CeylonProject<Module> config, CeylonFacetState state) {
+        return !StringUtils.equals(state.getSystemRepository(), systemRepository.getText())
+                || !StringUtils.equals(config.getConfiguration().getOutputRepo(), outputDirectory.getText())
+                || !Boolean.equals(flatClasspath.isSelected(), config.getConfiguration().getProjectFlatClasspath())
+                || !Boolean.equals(exportMavenDeps.isSelected(), config.getConfiguration().getProjectAutoExportMavenDependencies())
+                ;
     }
 
     @Override
-    public void loadCeylonConfig(CeylonConfig config) {
-        systemRepository.setText(config.getOption(PROJECT_SYSTEM_REPO));
-        outputDirectory.setText(config.getOption(PROJECT_OUTPUT_DIRECTORY));
+    public void load(CeylonProject<Module> config, CeylonFacetState state) {
+        systemRepository.setText(state.getSystemRepository());
+        outputDirectory.setText(config.getConfiguration().getOutputRepo());
+        flatClasspath.setSelected(boolValue(config.getConfiguration().getProjectFlatClasspath()));
+        exportMavenDeps.setSelected(boolValue(config.getConfiguration().getProjectAutoExportMavenDependencies()));
+    }
+
+    private boolean boolValue(Boolean bool) {
+        //noinspection SimplifiableConditionalExpression
+        return bool == null ? false : bool.booleanValue();
     }
 }

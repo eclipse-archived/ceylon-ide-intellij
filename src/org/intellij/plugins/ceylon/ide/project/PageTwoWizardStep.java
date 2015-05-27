@@ -20,6 +20,6 @@ public class PageTwoWizardStep extends ModuleWizardStep {
 
     @Override
     public void updateDataModel() {
-        step.updateCeylonConfig(moduleBuilder.getConfig());
+        moduleBuilder.setPageTwo(step);
     }
 }

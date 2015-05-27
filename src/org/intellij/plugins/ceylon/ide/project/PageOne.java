@@ -1,17 +1,17 @@
 package org.intellij.plugins.ceylon.ide.project;
 
-import com.redhat.ceylon.common.config.CeylonConfig;
+import com.intellij.openapi.module.Module;
+import com.redhat.ceylon.ide.common.CeylonProject;
+import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 
 import javax.swing.*;
-
-import static com.redhat.ceylon.ide.project.config.AbstractProjectConfig.*;
 
 public class PageOne implements CeylonConfigForm {
     private JCheckBox compileForJvm;
     private JCheckBox compileToJs;
     private JCheckBox enableJavaCalling;
-    private JCheckBox showCompilerWarnings;
     private JPanel panel;
+    private JCheckBox workOffline;
 
     @Override
     public JPanel getPanel() {
@@ -19,26 +19,31 @@ public class PageOne implements CeylonConfigForm {
     }
 
     @Override
-    public void updateCeylonConfig(CeylonConfig config) {
-        config.setBoolOption(PROJECT_COMPILE_TO_JVM, compileForJvm.isSelected());
-        config.setBoolOption(PROJECT_COMPILE_TO_JS, compileToJs.isSelected());
-        config.setBoolOption(PROJECT_SHOW_COMPILER_WARNINGS, showCompilerWarnings.isSelected());
-        config.setBoolOption(PROJECT_ENABLE_JAVA_CALLING_CEYLON, enableJavaCalling.isSelected());
+    public void apply(CeylonProject<Module> project, CeylonFacetState state) {
+        state.setCompileForJvm(compileForJvm.isSelected());
+        state.setCompileToJs(compileToJs.isSelected());
+        state.setEnableJavaCalling(enableJavaCalling.isSelected());
+        project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(workOffline.isSelected()));
     }
 
     @Override
-    public boolean isModified(CeylonConfig config) {
-        return config.getBoolOption(PROJECT_COMPILE_TO_JVM, false) != compileForJvm.isSelected()
-                || config.getBoolOption(PROJECT_COMPILE_TO_JS, false) != compileToJs.isSelected()
-                || config.getBoolOption(PROJECT_SHOW_COMPILER_WARNINGS, false) != showCompilerWarnings.isSelected()
-                || config.getBoolOption(PROJECT_ENABLE_JAVA_CALLING_CEYLON, false) != enableJavaCalling.isSelected();
+    public boolean isModified(CeylonProject<Module> project, CeylonFacetState state) {
+        return state.isCompileForJvm() != compileForJvm.isSelected()
+                || state.isCompileToJs() != compileToJs.isSelected()
+                || state.isEnableJavaCalling() != enableJavaCalling.isSelected()
+                || !ceylon.language.Boolean.equals(workOffline.isSelected(), project.getConfiguration().getProjectOffline());
     }
 
     @Override
-    public void loadCeylonConfig(CeylonConfig config) {
-        compileForJvm.setSelected(config.getBoolOption(PROJECT_COMPILE_TO_JVM, false));
-        compileToJs.setSelected(config.getBoolOption(PROJECT_COMPILE_TO_JS, false));
-        showCompilerWarnings.setSelected(config.getBoolOption(PROJECT_SHOW_COMPILER_WARNINGS, false));
-        enableJavaCalling.setSelected(config.getBoolOption(PROJECT_ENABLE_JAVA_CALLING_CEYLON, false));
+    public void load(CeylonProject<Module> project, CeylonFacetState state) {
+        compileForJvm.setSelected(state.isCompileForJvm());
+        compileToJs.setSelected(state.isCompileToJs());
+        enableJavaCalling.setSelected(state.isEnableJavaCalling());
+
+        if (project.getConfiguration().getProjectOffline() != null) {
+            workOffline.setSelected(project.getConfiguration().getProjectOffline().booleanValue());
+        } else {
+            workOffline.setSelected(false);
+        }
     }
 }
