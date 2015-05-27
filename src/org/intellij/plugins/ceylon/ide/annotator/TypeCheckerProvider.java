@@ -99,7 +99,8 @@ public class TypeCheckerProvider implements ModuleComponent {
 
         String systemRepo = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
         if (systemRepo == null) {
-            systemRepo = ceylonConfig.getProjectRepositories().getSystemRepoDir().getAbsolutePath();
+            // FIXME retrieve CeylonFacetState.systemRepository and interpolate variables
+//            systemRepo = ceylonConfig.getProjectRepositories().getSystemRepoDir().getAbsolutePath();
         }
         boolean offline = ceylonConfig.getOffline();
         File cwd = ceylonConfig.getProject().getRootDirectory();
