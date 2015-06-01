@@ -9,7 +9,6 @@ import javax.swing.*;
 public class PageOne implements CeylonConfigForm {
     private JCheckBox compileForJvm;
     private JCheckBox compileToJs;
-    private JCheckBox enableJavaCalling;
     private JPanel panel;
     private JCheckBox workOffline;
 
@@ -22,7 +21,6 @@ public class PageOne implements CeylonConfigForm {
     public void apply(CeylonProject<Module> project, CeylonFacetState state) {
         state.setCompileForJvm(compileForJvm.isSelected());
         state.setCompileToJs(compileToJs.isSelected());
-        state.setEnableJavaCalling(enableJavaCalling.isSelected());
         project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(workOffline.isSelected()));
     }
 
@@ -30,7 +28,6 @@ public class PageOne implements CeylonConfigForm {
     public boolean isModified(CeylonProject<Module> project, CeylonFacetState state) {
         return state.isCompileForJvm() != compileForJvm.isSelected()
                 || state.isCompileToJs() != compileToJs.isSelected()
-                || state.isEnableJavaCalling() != enableJavaCalling.isSelected()
                 || !ceylon.language.Boolean.equals(workOffline.isSelected(), project.getConfiguration().getProjectOffline());
     }
 
@@ -38,7 +35,6 @@ public class PageOne implements CeylonConfigForm {
     public void load(CeylonProject<Module> project, CeylonFacetState state) {
         compileForJvm.setSelected(state.isCompileForJvm());
         compileToJs.setSelected(state.isCompileToJs());
-        enableJavaCalling.setSelected(state.isEnableJavaCalling());
 
         if (project.getConfiguration().getProjectOffline() != null) {
             workOffline.setSelected(project.getConfiguration().getProjectOffline().booleanValue());

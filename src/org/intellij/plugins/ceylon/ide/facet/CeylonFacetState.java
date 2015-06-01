@@ -4,7 +4,6 @@ public class CeylonFacetState {
 
     private boolean compileForJvm;
     private boolean compileToJs;
-    private boolean enableJavaCalling;
     private String systemRepository;
 
     public boolean isCompileForJvm() {
@@ -21,14 +20,6 @@ public class CeylonFacetState {
 
     public void setCompileToJs(boolean compileToJs) {
         this.compileToJs = compileToJs;
-    }
-
-    public boolean isEnableJavaCalling() {
-        return enableJavaCalling;
-    }
-
-    public void setEnableJavaCalling(boolean enableJavaCalling) {
-        this.enableJavaCalling = enableJavaCalling;
     }
 
     public String getSystemRepository() {
