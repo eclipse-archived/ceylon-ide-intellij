@@ -6,6 +6,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.intellij.plugins.ceylon.ide.CeylonBundle;
 
 import javax.swing.*;
 
@@ -21,7 +22,7 @@ public class AetherRepositoryForm {
                         return virtualFile.getName().equals("settings.xml");
                     }
                 });
-        repoField.addBrowseFolderListener("Select path to settings.xml", null, null, descriptor);
+        repoField.addBrowseFolderListener(CeylonBundle.message("project.wizard.repo.maven.selectpath"), null, null, descriptor);
     }
 
     public TextFieldWithBrowseButton getRepoField() {

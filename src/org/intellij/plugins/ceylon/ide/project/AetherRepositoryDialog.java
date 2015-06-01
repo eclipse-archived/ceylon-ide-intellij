@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
+import org.intellij.plugins.ceylon.ide.CeylonBundle;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -16,7 +17,7 @@ public class AetherRepositoryDialog extends DialogWrapper {
     protected AetherRepositoryDialog(Component parent) {
         super(parent, false);
         init();
-        setTitle("Add Maven Repository");
+        setTitle(CeylonBundle.message("project.wizard.repo.maven.title"));
 
     }
 
@@ -41,7 +42,7 @@ public class AetherRepositoryDialog extends DialogWrapper {
     protected ValidationInfo doValidate() {
         if (StringUtil.isNotEmpty(getRepository())) {
             if (!new File(getRepository()).exists()) {
-                return new ValidationInfo("Invalid path to settings.xml", form.getRepoField());
+                return new ValidationInfo(CeylonBundle.message("project.wizard.repo.maven.invalidpath"), form.getRepoField());
             }
         }
         return null;

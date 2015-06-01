@@ -13,6 +13,7 @@ import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
 import com.redhat.ceylon.ide.common.CeylonProject;
 import org.apache.commons.lang.StringUtils;
+import org.intellij.plugins.ceylon.ide.CeylonBundle;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 
 import javax.swing.*;
@@ -223,7 +224,7 @@ public class PageTwo implements CeylonConfigForm {
     private class AddRemoteRepoListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String uri = JOptionPane.showInputDialog(PageTwo.this.panel, "Enter URI of remote module repository", "Add remote repository", JOptionPane.QUESTION_MESSAGE);
+            String uri = JOptionPane.showInputDialog(PageTwo.this.panel, CeylonBundle.message("project.wizard.repo.uri.description"), CeylonBundle.message("project.wizard.repo.uri.title"), JOptionPane.QUESTION_MESSAGE);
 
             if (StringUtils.isNotBlank(uri)) {
                 int index = projectLocalRepos.size() +

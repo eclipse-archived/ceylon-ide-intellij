@@ -7,6 +7,7 @@ import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.ArrayUtil;
+import org.intellij.plugins.ceylon.ide.CeylonBundle;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +48,7 @@ public class CeylonModuleType extends ModuleType<CeylonModuleBuilder> {
     @NotNull
     @Override
     public String getDescription() {
-        return "Creates a new module containing Ceylon files";
+        return CeylonBundle.message("project.wizard.module.description");
     }
 
     @Override
