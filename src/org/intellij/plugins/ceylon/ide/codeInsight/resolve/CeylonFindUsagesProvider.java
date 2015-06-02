@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
-import com.redhat.ceylon.model.typechecker.model.Method;
+import com.redhat.ceylon.model.typechecker.model.Function;
 import org.intellij.plugins.ceylon.ide.psi.CeylonClass;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
@@ -76,7 +76,7 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             Declaration model = ceylonNode.getDeclarationModel();
             return model == null ? ceylonNode.getIdentifier().getText() : model.getQualifiedNameString();
         } else if (element instanceof CeylonPsi.MethodDefinitionPsi) {
-            Method model = ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getDeclarationModel();
+            Function model = ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getDeclarationModel();
             return model == null ? ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getIdentifier().getText() : model.getQualifiedNameString();
         } else if (element instanceof CeylonPsi.ParameterDeclarationPsi) {
             return ((CeylonPsi.ParameterDeclarationPsi) element).getCeylonNode().getTypedDeclaration().getIdentifier().getText();
