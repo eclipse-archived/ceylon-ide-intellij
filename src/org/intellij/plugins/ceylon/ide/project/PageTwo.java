@@ -12,6 +12,7 @@ import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
 import com.redhat.ceylon.ide.common.CeylonProject;
+import com.redhat.ceylon.ide.common.configuration.CeylonRepositoryConfigurator;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
@@ -22,11 +23,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-public class PageTwo implements CeylonConfigForm {
+public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfigForm {
     private CollectionListModel<String> listModel = new CollectionListModel<>();
     private JPanel panel;
     private TextFieldWithBrowseButton systemRepository;
@@ -42,11 +40,6 @@ public class PageTwo implements CeylonConfigForm {
     private JButton addRemoteRepo;
     private JList<String> repoList;
 
-    private List<String> projectLocalRepos = new ArrayList<>();
-    private List<String> globalLookupRepos = new ArrayList<>();
-    private List<String> projectRemoteRepos = new ArrayList<>();
-    private List<String> otherRemoteRepos = new ArrayList<>();
-
     public PageTwo() {
         Repositories repositories = Repositories.withConfig(CeylonConfigFinder.loadDefaultConfig(null));
 
@@ -57,11 +50,11 @@ public class PageTwo implements CeylonConfigForm {
         );
 
         // TODO if we knew the module's location at this time, we could get this from the CeylonConfig
-        globalLookupRepos.add(repositories.getRepository("USER").getUrl());
-        otherRemoteRepos.add(repositories.getRepository("REMOTE").getUrl());
+        addGlobalLookupRepo(repositories.getRepository("USER").getUrl());
+        addOtherRemoteRepo(repositories.getRepository("REMOTE").getUrl());
 
-        listModel.add(globalLookupRepos);
-        listModel.add(otherRemoteRepos);
+        listModel.add(repositories.getRepository("USER").getUrl());
+        listModel.add(repositories.getRepository("REMOTE").getUrl());
 
         repoList.setModel(listModel);
         repoList.setCellRenderer(new DefaultListCellRenderer() {
@@ -69,8 +62,7 @@ public class PageTwo implements CeylonConfigForm {
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                if (value instanceof Repositories.Repository) {
-                    setText(((Repositories.Repository) value).getUrl());
+                if (isFixedRepoIndex(index)) {
                     setIcon(PlatformIcons.LIBRARY_ICON);
 
                     if (isFixedRepoIndex(index)) {
@@ -102,6 +94,7 @@ public class PageTwo implements CeylonConfigForm {
         config.getConfiguration().setOutputRepo(outputDirectory.getText());
         config.getConfiguration().setProjectFlatClasspath(Boolean.instance(flatClasspath.isSelected()));
         config.getConfiguration().setProjectAutoExportMavenDependencies(Boolean.instance(exportMavenDeps.isSelected()));
+        applyToConfiguration(config.getConfiguration());
     }
 
     @Override
@@ -110,6 +103,7 @@ public class PageTwo implements CeylonConfigForm {
                 || !StringUtils.equals(config.getConfiguration().getOutputRepo(), outputDirectory.getText())
                 || !Boolean.equals(flatClasspath.isSelected(), config.getConfiguration().getProjectFlatClasspath())
                 || !Boolean.equals(exportMavenDeps.isSelected(), config.getConfiguration().getProjectAutoExportMavenDependencies())
+                || isRepoConfigurationModified(config.getConfiguration())
                 ;
     }
 
@@ -119,6 +113,9 @@ public class PageTwo implements CeylonConfigForm {
         outputDirectory.setText(config.getConfiguration().getOutputRepo());
         flatClasspath.setSelected(boolValue(config.getConfiguration().getProjectFlatClasspath()));
         exportMavenDeps.setSelected(boolValue(config.getConfiguration().getProjectAutoExportMavenDependencies()));
+
+        listModel.removeAll();
+        loadFromConfiguration(config.getConfiguration());
     }
 
     private boolean boolValue(Boolean bool) {
@@ -126,89 +123,49 @@ public class PageTwo implements CeylonConfigForm {
         return bool == null ? false : bool.booleanValue();
     }
 
-    private boolean isFixedRepoIndex(int index) {
-        if (!globalLookupRepos.isEmpty()
-                && index >= projectLocalRepos.size()
-                && index < projectLocalRepos.size() +
-                globalLookupRepos.size()) {
-            return true;
-        }
-        if (!otherRemoteRepos.isEmpty()
-                && index >= projectLocalRepos.size() +
-                globalLookupRepos.size() +
-                projectRemoteRepos.size()
-                && index < projectLocalRepos.size() +
-                globalLookupRepos.size() +
-                projectRemoteRepos.size() +
-                otherRemoteRepos.size()) {
-            return true;
-        }
-        return false;
+    @Override
+    public int[] $getSelection() {
+        return repoList.getSelectedIndices();
     }
 
-    private void updateButtonState() {
-        updateRemoveRepoButtonState();
-        updateUpDownButtonState();
+    @Override
+    public Object $setRemoveButtonEnabled(boolean enabled) {
+        removeRepo.setEnabled(enabled);
+        return null;
     }
 
-    private void updateRemoveRepoButtonState() {
-        int[] selectionIndices = repoList.getSelectedIndices();
-        for (int index : selectionIndices) {
-            if (!isFixedRepoIndex(index)) {
-                removeRepo.setEnabled(true);
-                return;
-            }
-        }
-        removeRepo.setEnabled(false);
+    @Override
+    public Object $setUpButtonEnabled(boolean enabled) {
+        upButton.setEnabled(enabled);
+        return null;
     }
 
-    private void updateUpDownButtonState() {
-        boolean isUpEnabled = false;
-        boolean isDownEnabled = false;
-
-        int[] selectionIndices = repoList.getSelectedIndices();
-        if (selectionIndices.length == 1) {
-            int index = selectionIndices[0];
-            if (index > 0 &&
-                    !isFixedRepoIndex(index)) {
-                isUpEnabled = true;
-            }
-            int maxIndex =
-                    projectLocalRepos.size() +
-                            globalLookupRepos.size() +
-                            projectRemoteRepos.size() - 1;
-            if (index < maxIndex &&
-                    !isFixedRepoIndex(index)) {
-                isDownEnabled = true;
-            }
-        }
-
-        upButton.setEnabled(isUpEnabled);
-        downButton.setEnabled(isDownEnabled);
+    @Override
+    public Object $setDownButtonEnabled(boolean enabled) {
+        downButton.setEnabled(enabled);
+        return null;
     }
 
-    private void addProjectRepo(String repo, int index, boolean isLocalRepo) {
-        if (isLocalRepo && projectLocalRepos.contains(repo)) {
-            return;
-        }
-        if (!isLocalRepo && projectRemoteRepos.contains(repo)) {
-            return;
-        }
+    @Override
+    public String removeRepositoryFromList(long index) {
+        String repo = listModel.getElementAt((int) index);
+        listModel.remove((int) index);
+        return repo;
+    }
 
-        if (isLocalRepo) {
-            projectLocalRepos.add(index, repo);
-        } else {
-            int remoteIndex = index -
-                    projectLocalRepos.size() -
-                    globalLookupRepos.size();
-            projectRemoteRepos.add(remoteIndex, repo);
+    @Override
+    public Object addRepositoryToList(long index, String repo) {
+        listModel.add((int) index, repo);
+        repoList.setSelectedIndex((int) index);
+        return null;
+    }
+
+    @Override
+    public Object addAllRepositoriesToList(String[] repos) {
+        for (String repo : repos) {
+            listModel.add(repo);
         }
-
-        listModel.add(index, repo);
-        repoList.setSelectedIndex(index);
-
-//        validate();
-        updateButtonState();
+        return null;
     }
 
     private class AddExternalRepoListener implements ActionListener {
@@ -216,7 +173,7 @@ public class PageTwo implements CeylonConfigForm {
         public void actionPerformed(ActionEvent e) {
             VirtualFile file = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFolderDescriptor(), null, null);
             if (file != null) {
-                addProjectRepo(file.getPresentableUrl(), 0, true);
+                addExternalRepo(file.getPresentableUrl());
             }
         }
     }
@@ -227,10 +184,7 @@ public class PageTwo implements CeylonConfigForm {
             String uri = JOptionPane.showInputDialog(PageTwo.this.panel, CeylonBundle.message("project.wizard.repo.uri.description"), CeylonBundle.message("project.wizard.repo.uri.title"), JOptionPane.QUESTION_MESSAGE);
 
             if (StringUtils.isNotBlank(uri)) {
-                int index = projectLocalRepos.size() +
-                                globalLookupRepos.size() +
-                                projectRemoteRepos.size();
-                addProjectRepo(uri, index, false);
+                addRemoteRepo(uri);
             }
         }
     }
@@ -245,16 +199,7 @@ public class PageTwo implements CeylonConfigForm {
                 String repo = dialog.getRepository();
 
                 if (repo != null) {
-                    int index =
-                            projectLocalRepos.size() +
-                                    globalLookupRepos.size() +
-                                    projectRemoteRepos.size();
-
-                    if (repo.equals("")) {
-                        addProjectRepo("aether", index, false);
-                    } else {
-                        addProjectRepo("aether:" + repo, index, false);
-                    }
+                    addAetherRepo(repo);
                 }
             }
         }
@@ -270,19 +215,8 @@ public class PageTwo implements CeylonConfigForm {
     private class RemoveRepoListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            int[] selection = repoList.getSelectedIndices();
-            Arrays.sort(selection);
-            for (int i = selection.length - 1; i >= 0; i--) {
-                int index = selection[i];
-                if (!isFixedRepoIndex(index)) {
-                    String repo = listModel.getElementAt(index);
-                    listModel.remove(index);
-                    projectLocalRepos.remove(repo);
-                    projectRemoteRepos.remove(repo);
-                }
-            }
+            removeSelectedRepo();
             repoList.clearSelection();
-            updateButtonState();
         }
     }
 
@@ -290,22 +224,7 @@ public class PageTwo implements CeylonConfigForm {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!repoList.isSelectionEmpty()) {
-                int index = repoList.getSelectedIndex();
-                String repo = listModel.getElementAt(index);
-                listModel.remove(index);
-
-                if (index > 0 && index <= projectLocalRepos.size()) {
-                    projectLocalRepos.remove(index);
-                    addProjectRepo(repo, index - 1, true);
-                }
-                if (index == projectLocalRepos.size() + globalLookupRepos.size()) {
-                    projectRemoteRepos.remove(repo);
-                    addProjectRepo(repo, projectLocalRepos.size(), true);
-                }
-                if (index > projectLocalRepos.size() + globalLookupRepos.size()) {
-                    projectRemoteRepos.remove(repo);
-                    addProjectRepo(repo, index - 1, false);
-                }
+                moveSelectedReposUp();
             }
         }
     }
@@ -314,23 +233,7 @@ public class PageTwo implements CeylonConfigForm {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!repoList.isSelectionEmpty()) {
-                int index = repoList.getSelectedIndex();
-                String repo = listModel.getElementAt(index);
-                listModel.remove(index);
-
-                if (index < projectLocalRepos.size() - 1 && !projectLocalRepos.isEmpty()) {
-                    projectLocalRepos.remove(repo);
-                    addProjectRepo(repo, index + 1, true);
-                }
-                if( index == projectLocalRepos.size() - 1 && !projectLocalRepos.isEmpty()) {
-                    projectLocalRepos.remove(repo);
-                    addProjectRepo(repo, projectLocalRepos.size() + globalLookupRepos.size(), false);
-                }
-                if( index >= projectLocalRepos.size() + globalLookupRepos.size()
-                        && index < projectLocalRepos.size() + globalLookupRepos.size() + projectRemoteRepos.size() - 1 ) {
-                    projectRemoteRepos.remove(repo);
-                    addProjectRepo(repo, index + 1, false);
-                }
+                moveSelectedReposDown();
             }
         }
     }
