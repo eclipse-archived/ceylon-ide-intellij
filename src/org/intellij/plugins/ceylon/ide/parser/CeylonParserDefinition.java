@@ -65,9 +65,9 @@ public class CeylonParserDefinition implements ParserDefinition {
     @Override
     public PsiElement createElement(ASTNode node) {
         final IElementType type = node.getElementType();
-        return type == CeylonTypes.CLASS_DEFINITION || type == CeylonTypes.INTERFACE_DEFINITION
+        return /*type == CeylonTypes.CLASS_DEFINITION || type == CeylonTypes.INTERFACE_DEFINITION
                 ? new StubbedClassDefinitionPsiImpl(node)
-                : CeylonPsiFactory.createElement(node);
+                :*/ CeylonPsiFactory.createElement(node);
     }
 
     @Override
