@@ -5,6 +5,7 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
+import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
@@ -39,5 +40,13 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
 
         Annotation anno = annotationHolder.createInfoAnnotation(element, null);
         anno.setTextAttributes(CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES);
+    }
+
+    @Override
+    public void visitMetaLiteralPsi(@NotNull CeylonPsi.MetaLiteralPsi element) {
+        super.visitMetaLiteralPsi(element);
+
+        Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+        anno.setTextAttributes(EditorColors.INJECTED_LANGUAGE_FRAGMENT);
     }
 }

@@ -1,8 +1,11 @@
+import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 /**
  * Generates CeylonPsiVisitor.java
@@ -25,28 +28,49 @@ public class CeylonPsiVisitorGenerator {
                 "    @Override\n" +
                 "    public void visitElement(PsiElement element) {\n" +
                 "        super.visitElement(element);\n" +
+                "        if (false) {\n" +
                 "\n").getBytes());
 
         Class<?>[] interfaces = CeylonPsi.class.getClasses();
 
-        for (int i = 0; i < interfaces.length; i++) {
-            Class iface = interfaces[i];
 
-            os.write("        ".getBytes());
-            if (i > 0) {
-                os.write("else ".getBytes());
+        for (Field field : CeylonTypes.class.getDeclaredFields()) {
+            if (field.getName().equals("CEYLON_FILE")) {
+                continue;
             }
 
-            os.write(("if (element instanceof " + iface.getSimpleName() + ") {\n").getBytes());
-            os.write(("            visit" + iface.getSimpleName() + "((" + iface.getSimpleName() + ") element);\n").getBytes());
-            os.write(                "        }\n".getBytes());
+            String psiClass = toCamelCase(field.getName()) + "Psi";
+
+            os.write(("        } else if (element.getNode().getElementType() == CeylonTypes." + field.getName() + ") {\n").getBytes());
+            os.write(("            visit" + psiClass + "((" + psiClass + ") element);\n").getBytes());
         }
 
+        os.write("        }\n".getBytes());
         os.write("    }\n".getBytes());
 
         for (Class<?> anInterface : interfaces) {
-            os.write(("    public void visit" + anInterface.getSimpleName() + "(@NotNull " + anInterface.getSimpleName() + " element) {}\n").getBytes());
+            Class<?>[] parentInterfaces = anInterface.getInterfaces();
+            String parentCall = shouldCallParent(parentInterfaces) ? String.format(" visit%s(element); ", parentInterfaces[0].getSimpleName()) : "";
+            os.write(("    public void visit" + anInterface.getSimpleName() + "(@NotNull " + anInterface.getSimpleName() + " element) {" + parentCall + "}\n").getBytes());
         }
         os.write("}\n".getBytes());
+    }
+
+    private static boolean shouldCallParent(Class<?>[] parentInterfaces) {
+        return parentInterfaces.length == 1 && parentInterfaces[0] != CeylonCompositeElement.class;
+    }
+
+    static String toCamelCase(String s) {
+        String[] parts = s.split("_");
+        String camelCaseString = "";
+        for (String part : parts) {
+            camelCaseString = camelCaseString + toPwoperCase(part);
+        }
+        return camelCaseString;
+    }
+
+    static String toPwoperCase(String s) {
+        return s.substring(0, 1).toUpperCase() +
+                s.substring(1).toLowerCase();
     }
 }

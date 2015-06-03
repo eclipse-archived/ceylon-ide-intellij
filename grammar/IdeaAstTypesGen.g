@@ -11,12 +11,9 @@ grammar IdeaAstTypesGen;
 nodeList : { 
             println("package org.intellij.plugins.ceylon.ide.psi;\n");
             println("import com.intellij.psi.tree.IElementType;");
-            println("import com.intellij.psi.PsiElement;");
-            println("import com.intellij.lang.ASTNode;");
             println("import com.intellij.psi.tree.IFileElementType;");
             println("import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;");
-            println("import org.intellij.plugins.ceylon.ide.psi.stub.impl.ClassElementType;");
-            println("import org.intellij.plugins.ceylon.ide.psi.impl.*;\n");
+
             println("/* Generated using Antlr by IdeaAstTypesGen.g */");
             println("public interface CeylonTypes {");
             println("    IFileElementType CEYLON_FILE = CeylonStubTypes.CEYLON_FILE;\n");

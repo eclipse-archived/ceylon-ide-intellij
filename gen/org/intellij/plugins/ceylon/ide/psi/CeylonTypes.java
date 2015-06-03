@@ -1,13 +1,8 @@
 package org.intellij.plugins.ceylon.ide.psi;
 
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.PsiElement;
-import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.IFileElementType;
 import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
-import org.intellij.plugins.ceylon.ide.psi.stub.impl.ClassElementType;
-import org.intellij.plugins.ceylon.ide.psi.impl.*;
-
 /* Generated using Antlr by IdeaAstTypesGen.g */
 public interface CeylonTypes {
     IFileElementType CEYLON_FILE = CeylonStubTypes.CEYLON_FILE;

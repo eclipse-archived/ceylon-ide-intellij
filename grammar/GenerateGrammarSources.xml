@@ -27,6 +27,9 @@
     <property name="ceylon.typechecker.dir" value="com/redhat/ceylon/typechecker/${module.com.redhat.ceylon.typechecker.version}"/>
     <property name="ceylon.typechecker.jar" value="${ceylon.typechecker.dir}/com.redhat.ceylon.typechecker-${module.com.redhat.ceylon.typechecker.version}.jar"/>
     <property name="ceylon.typechecker.lib" value="${build.dist.repo}/${ceylon.typechecker.jar}"/>
+    <property name="ceylon.model.dir" value="com/redhat/ceylon/model/${module.com.redhat.ceylon.model.version}"/>
+    <property name="ceylon.model.jar" value="${ceylon.model.dir}/com.redhat.ceylon.model-${module.com.redhat.ceylon.model.version}.jar"/>
+    <property name="ceylon.model.lib" value="${build.dist.repo}/${ceylon.model.jar}"/>
 
     <!-- ANTLR -->
     <property name="antlr.src" location="Ceylon.g"/>
@@ -83,6 +86,7 @@
             <classpath>
                 <pathelement location="${antlr.lib}"/>
                 <pathelement location="${ceylon.typechecker.lib}"/>
+                <pathelement location="${ceylon.model.lib}"/>
             </classpath>
 
             <include name="com/redhat/ceylon/compiler/typechecker/treegen/*.java"/>
@@ -110,6 +114,7 @@
             <classpath>
                 <pathelement location="${antlr.lib}"/>
                 <pathelement location="${ceylon.typechecker.lib}"/>
+                <pathelement location="${ceylon.model.lib}"/>
                 <pathelement location="${build.classes}"/>
             </classpath>
         </java>
@@ -121,6 +126,7 @@
             <classpath>
                 <pathelement location="${antlr.lib}"/>
                 <pathelement location="${ceylon.typechecker.lib}"/>
+                <pathelement location="${ceylon.model.lib}"/>
             </classpath>
 
             <include name="*.java"/>
@@ -131,6 +137,7 @@
             <classpath>
                 <pathelement location="${antlr.lib}"/>
                 <pathelement location="${ceylon.typechecker.lib}"/>
+                <pathelement location="${ceylon.model.lib}"/>
                 <pathelement location="${build.classes}"/>
             </classpath>
         </java>
@@ -139,6 +146,7 @@
             <classpath>
                 <pathelement location="${antlr.lib}"/>
                 <pathelement location="${ceylon.typechecker.lib}"/>
+                <pathelement location="${ceylon.model.lib}"/>
                 <pathelement location="${build.classes}"/>
                 <pathelement location="${idea.home}/lib/openapi.jar"/>
                 <pathelement location="${idea.home}/lib/util.jar"/>
