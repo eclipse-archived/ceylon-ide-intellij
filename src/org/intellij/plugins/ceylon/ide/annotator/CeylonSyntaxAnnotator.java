@@ -49,4 +49,16 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
         Annotation anno = annotationHolder.createInfoAnnotation(element, null);
         anno.setTextAttributes(EditorColors.INJECTED_LANGUAGE_FRAGMENT);
     }
+
+    @Override
+    public void visitStringTemplatePsi(@NotNull CeylonPsi.StringTemplatePsi element) {
+        super.visitStringTemplatePsi(element);
+
+        for (PsiElement child : element.getChildren()) {
+            if (child instanceof CeylonPsi.ExpressionPsi) {
+                Annotation anno = annotationHolder.createInfoAnnotation(child, null);
+                anno.setTextAttributes(EditorColors.INJECTED_LANGUAGE_FRAGMENT);
+            }
+        }
+    }
 }
