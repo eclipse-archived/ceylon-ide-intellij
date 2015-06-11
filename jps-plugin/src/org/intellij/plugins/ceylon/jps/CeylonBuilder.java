@@ -64,6 +64,7 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             "com.redhat.ceylon.compiler.java",
             "com.redhat.ceylon.module-resolver",
             "com.redhat.ceylon.typechecker",
+            "com.redhat.ceylon.model",
             "com.redhat.ceylon.common",
             "ceylon.language"
     };
