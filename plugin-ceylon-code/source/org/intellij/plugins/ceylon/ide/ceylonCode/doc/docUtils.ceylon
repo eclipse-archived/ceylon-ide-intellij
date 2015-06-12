@@ -28,7 +28,12 @@ import com.redhat.ceylon.model.typechecker.model {
     UnknownType,
     Function,
     Functional,
-    Parameter
+    Parameter,
+    Unit,
+    Scope,
+    Reference,
+    Type,
+    ClassOrInterface
 }
 import java.lang {
     JString=String
@@ -36,6 +41,11 @@ import java.lang {
 import ceylon.collection {
     ArrayList
 }
+import com.redhat.ceylon.model.typechecker.util {
+    TypePrinter
+}
+
+String psiProtocol = "psi_element://";
 
 shared JString? getDocumentation(Tree.CompilationUnit rootNode, Integer offset) {
     value node = getHoverNode(rootNode, offset);
@@ -43,7 +53,7 @@ shared JString? getDocumentation(Tree.CompilationUnit rootNode, Integer offset) 
     
     if (exists node) {
         if (is Tree.LocalModifier node) {
-            // TODO
+            doc = getInferredTypeText(node);
         } else if (is Tree.Literal node) {
             // TODO
         } else {
@@ -62,6 +72,29 @@ shared JString? getDocumentation(Tree.CompilationUnit rootNode, Integer offset) 
     return null;
 }
 
+object printer extends TypePrinter(true, true, false, true, false) {
+    
+    shared actual String getSimpleDeclarationName(Declaration? declaration, Unit unit) {
+        if (exists declaration) {
+            return buildLink(declaration, super.getSimpleDeclarationName(declaration, unit));
+        }
+        
+        return "<unknown>";
+    }
+    
+    shared actual String amp() => "&amp;";
+    shared actual String lt() => "&lt;";
+    shared actual String gt() => "&gt";
+}
+
+String? getInferredTypeText(Tree.LocalModifier node) {
+    if (exists model = node.typeModel) {
+        return "Inferred type: <code>``printer.print(model, node.unit)``</code>";
+    }
+    
+    return null;
+}
+
 void addPackage(Declaration decl, StringBuilder builder) {
     Package? pkg = (decl of Referenceable).unit.\ipackage;
     if (exists pkg, !pkg.qualifiedNameString.empty) {
@@ -69,7 +102,7 @@ void addPackage(Declaration decl, StringBuilder builder) {
     }
 }
 
-void addSignature(Declaration decl, StringBuilder builder) {
+void addSignature(Declaration decl, StringBuilder builder, Node node) {
     if (decl.shared) { builder.append("shared "); }
     if (decl.actual) { builder.append("actual "); }
     if (decl.default) { builder.append("default "); }
@@ -103,7 +136,7 @@ void addSignature(Declaration decl, StringBuilder builder) {
     builder.append("<b>`` decl.name else "" ``</b>");
     
     addTypeParameters(decl, builder);
-    addParameters(decl, builder);
+    addParameters(decl, builder, node);
     addInheritance(decl, builder);
 }
 
@@ -126,8 +159,10 @@ String markdown(String text) {
 void addInheritance(Declaration decl, StringBuilder builder) {
     if (is TypedDeclaration decl) {
     } else if (is TypeDeclaration decl) {
+        value unit = (decl of Referenceable).unit;
+
         if (exists cases = decl.type.caseTypes) {
-            builder.append("\nof ").append(" | ".join(CeylonIterable(cases).map((c) => c.declaration.name)));
+            builder.append("\nof ").append(" | ".join(CeylonIterable(cases).map((c) => printer.print(c, unit))));
             
             // FIXME compilation error
             //if (exists it = decl.selfType) {
@@ -137,12 +172,12 @@ void addInheritance(Declaration decl, StringBuilder builder) {
         
         if (is Class decl) {
             if (exists sup = decl.extendedType) {
-                builder.append("\nextends ").append(sup.asString());
+                builder.append("\nextends ").append(printer.print(sup, unit));
             }
         }
         
         if (!decl.satisfiedTypes.empty) {
-            builder.append("\nsatisfies ").append(" &amp; ".join(CeylonIterable(decl.satisfiedTypes).map((s) => s.asString())));
+            builder.append("\nsatisfies ").append(" &amp; ".join(CeylonIterable(decl.satisfiedTypes).map((s) => printer.print(s, unit))));
         }
     }
 }
@@ -184,20 +219,42 @@ Boolean isSequenced(TypedDeclaration decl) {
 void addTypeParameters(Declaration decl, StringBuilder builder) {
 }
 
-void addParameters(Declaration decl, StringBuilder builder) {
+void addParameters(Declaration decl, StringBuilder builder, Node node) {
     if (is Functional decl, exists plists = decl.parameterLists) {
+        Reference ref = appliedReference(decl, node);
+        
         CeylonIterable(plists).each(void(element) {
-                value params = { for (param in CeylonIterable(element.parameters)) addParameter(param, builder) };
+                value params = { for (param in CeylonIterable(element.parameters)) addParameter(param, builder, ref) };
                 builder.append("(").append(", ".join(params)).append(")");
             });
     }
 }
 
-String addParameter(Parameter param, StringBuilder builder) {
+String addParameter(Parameter param, StringBuilder builder, Reference ref) {
     if (exists model = param.model) {
-        return model.type.declaration.name + " " + param.name;
+        value type = ref.getTypedParameter(param).type;
+        
+        return printer.print(type, (model of Referenceable).unit) + " " + param.name;
     } else {
         return param.name;
+    }
+}
+
+Reference appliedReference(Declaration decl, Node node) {
+    if (is TypeDeclaration decl) {
+        return decl.type;
+    } else if (is Tree.MemberOrTypeExpression node) {
+        return node.target;
+    } else if (is Tree.Type node) {
+        return node.typeModel;
+    } else {
+        variable Type? qt = null;
+        
+        if (decl.classOrInterfaceMember, is ClassOrInterface ci = decl.container) {
+             qt = ci.type;
+        }
+        
+        return decl.appliedReference(qt, null);
     }
 }
 
@@ -247,7 +304,7 @@ String getDeclarationDoc(Declaration model, Node node) {
     
     addPackage(decl, builder);
     builder.append("<pre>");
-    addSignature(decl, builder);
+    addSignature(decl, builder, node);
     builder.append("</pre>\n");
     addDoc(decl, builder);
     addParametersDoc(decl, builder);
@@ -255,7 +312,29 @@ String getDeclarationDoc(Declaration model, Node node) {
     return builder.string;
 }
 
-String? getDocumentationText(Referenceable model, Node node) {
+String buildUrl(Referenceable model) {
+    if (is Package model) {
+        return buildUrl(model.\imodule) + ":" + model.nameAsString;
+    }
+    if (is Module model) {
+        return model.nameAsString + "/" + model.version;
+    }
+    else if (is Declaration model) {
+        String result = ":" + model.name;
+        Scope? container = model.container;
+        if (is Referenceable container) {
+            return buildUrl(container) + result;
+        }
+        else {
+            return result;
+        }
+    }
+    else {
+        return "";
+    }
+}
+
+shared String? getDocumentationText(Referenceable model, Node node) {
     if (is Declaration model) {
         return getDeclarationDoc(model, node);
     } else if (is Package model) {
@@ -265,6 +344,10 @@ String? getDocumentationText(Referenceable model, Node node) {
     }
     
     return null;
+}
+
+String buildLink(Referenceable model, String text) {
+    return "<a href=\"``psiProtocol``doc:``buildUrl(model)``\">``text``</a>";
 }
 
 shared Node? getHoverNode(Tree.CompilationUnit rootNode, Integer offset) {
