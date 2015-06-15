@@ -15,7 +15,7 @@ import ceylon.file {
     lines
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc {
-    getDocumentation
+    docGenerator
 }
 import com.redhat.ceylon.compiler.typechecker {
     TypeCheckerBuilder,
@@ -42,13 +42,13 @@ void testDoc(String baseName, Integer cursorOffset, String testName = "") {
     if (is File sourceFile = parsePath("test-resources/" + sourceFileName).resource) {
         Tree.CompilationUnit cu = tc.getPhasedUnitFromRelativePath(sourceFileName).compilationUnit;
         
-        value doc = getDocumentation(cu, cursorOffset)?.string else "<no doc>";
+        value doc = docGenerator.getDocumentation(cu, cursorOffset)?.string else "<no doc>";
         
         value expectedResource = parsePath("test-resources/" + expectedFileName).resource;
         if (is File expectedFile = expectedResource) {
             value expectedContent = "\n".join(lines(expectedFile));
             
-            assertEquals(doc, expectedContent);
+            assertEquals(doc, expectedContent.replace("{VERSION}", language.version));
         } else if (is Nil expectedResource) {
             print("WARNING: expected file ``expectedFileName`` does not exist, creating it");
             value file = expectedResource.createFile();
@@ -68,4 +68,16 @@ test shared void toplevelFunction() {
 test shared void classes() {
     testDoc("classes", 46, "Foo");
     testDoc("classes", 197, "Woot");
+}
+
+test shared void inferred() {
+    testDoc("inferred", 20);
+}
+
+test shared void literals() {
+    testDoc("literals", 45, "String");
+    testDoc("literals", 114, "Character");
+    testDoc("literals", 155, "BinInt");
+    testDoc("literals", 195, "HexInt");
+    testDoc("literals", 230, "Float");
 }

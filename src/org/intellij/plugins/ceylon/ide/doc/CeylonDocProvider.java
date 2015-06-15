@@ -15,12 +15,10 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.ceylonCode.doc.getDocumentationText_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.doc.docGenerator_;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static org.intellij.plugins.ceylon.ide.ceylonCode.doc.getDocumentation_.getDocumentation;
 
 /**
  * @author Matija Mazi <br/>
@@ -39,9 +37,9 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         try {
             if (element instanceof DummyPsiElement) {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;
-                return getDocumentationText_.getDocumentationText(referenceable, null).value;
+                return docGenerator_.get_().getDocumentationText(referenceable, null).value;
             }
-            return getDocumentation(((CeylonFile) element.getContainingFile()).getCompilationUnit(), element.getTextOffset());
+            return docGenerator_.get_().getDocumentation(((CeylonFile) element.getContainingFile()).getCompilationUnit(), element.getTextOffset());
         } catch (ceylon.language.AssertionError | Exception e) {
             e.printStackTrace();
             throw e;
