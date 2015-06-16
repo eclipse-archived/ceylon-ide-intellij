@@ -88,6 +88,10 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         return panel;
     }
 
+    public String getOutputDirectory() {
+        return outputDirectory.getText();
+    }
+
     @Override
     public void apply(CeylonProject<Module> config, CeylonFacetState state) {
         state.setSystemRepository(systemRepository.getText());

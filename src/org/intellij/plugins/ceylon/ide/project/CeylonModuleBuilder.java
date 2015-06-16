@@ -6,6 +6,7 @@ import com.intellij.ide.util.projectWizard.ModuleBuilderListener;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.Pair;
@@ -17,6 +18,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
     public CeylonModuleBuilder() {
         addListener(new ModuleBuilderListener() {
             @Override
-            public void moduleCreated(Module module) {
+            public void moduleCreated(@NotNull Module module) {
                 persistConfiguration(module);
             }
         });
@@ -51,13 +53,30 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
                 for (final Pair<String, String> sourcePath : sourcePaths) {
                     String first = sourcePath.first;
                     new File(first).mkdirs();
-                    final VirtualFile sourceRoot = LocalFileSystem.getInstance()
-                            .refreshAndFindFileByPath(FileUtil.toSystemIndependentName(first));
+                    VirtualFile sourceRoot = LocalFileSystem.getInstance().refreshAndFindFileByPath(FileUtil.toSystemIndependentName(first));
                     if (sourceRoot != null) {
                         contentEntry.addSourceFolder(sourceRoot, false, sourcePath.second);
                     }
                 }
             }
+
+            String outPath = getContentEntryPath() + File.separator + pageTwo.getOutputDirectory();
+            File outDirectory = new File(FileUtil.toSystemIndependentName(outPath));
+            if (!outDirectory.exists()) {
+                outDirectory.mkdir();
+            }
+
+            VirtualFile virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(outDirectory);
+            if (virtualFile != null) {
+                contentEntry.addExcludeFolder(virtualFile);
+            }
+
+            String outUrl = pageTwo.getOutputDirectory().startsWith("./") ? "file://$MODULE_DIR$/" + pageTwo.getOutputDirectory().substring(2) : outPath;
+            CompilerModuleExtension compiler = rootModel.getModuleExtension(CompilerModuleExtension.class);
+            compiler.setCompilerOutputPath(outUrl);
+            compiler.setCompilerOutputPathForTests(outUrl);
+            compiler.inheritCompilerOutputPath(false);
+            compiler.commit();
         }
 
     }
