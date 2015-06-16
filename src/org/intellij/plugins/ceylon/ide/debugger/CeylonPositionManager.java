@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.Location;
 import com.sun.jdi.ReferenceType;
@@ -104,6 +103,9 @@ public class CeylonPositionManager implements PositionManager {
     @Nullable
     @Override
     public ClassPrepareRequest createPrepareRequest(@NotNull ClassPrepareRequestor requestor, @NotNull SourcePosition position) throws NoDataException {
+        if (!(position.getFile() instanceof CeylonFile)) {
+            throw NoDataException.INSTANCE;
+        }
         String cls = findClassBySourcePosition(position);
 
         return cls == null ? null : process.getRequestsManager().createClassPrepareRequest(requestor, cls);
