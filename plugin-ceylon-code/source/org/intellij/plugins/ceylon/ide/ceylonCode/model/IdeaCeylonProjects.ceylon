@@ -11,6 +11,9 @@ import com.intellij.openapi.\imodule {
 import com.intellij.openapi.project {
     IdeaProject = Project
 }
+import com.intellij.compiler {
+    CompilerConfiguration
+}
 
 shared class IdeaCeylonProjects(IdeaProject ideProject) 
         extends CeylonProjects<IdeaModule>() 
@@ -36,5 +39,11 @@ shared class IdeaCeylonProjects(IdeaProject ideProject)
     
     shared actual void projectOpened() {
         print("projectOpened");
+
+        // Do not treat .ceylon files as resources, otherwise they are copied in the output directory during compilation
+        value compilerConfiguration = CompilerConfiguration.getInstance(ideProject);
+        if (compilerConfiguration.isResourceFile("lol.ceylon")) {
+            compilerConfiguration.addResourceFilePattern("!?*.ceylon");
+        }
     }
 }
