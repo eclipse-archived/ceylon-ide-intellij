@@ -7,7 +7,8 @@ import java.io {
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
-    VfsUtil
+    VfsUtil,
+    VirtualFileManager
 }
 import com.intellij.openapi.application {
     WriteAction,
@@ -31,8 +32,23 @@ shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
     
     shared Module ideaModule => ideArtifact;
     
+    VirtualFile getDefaultRoot() {
+        if (exists file = ideaModule.moduleFile) {
+            return file.parent;
+        }
+        
+        value path = ideaModule.moduleFilePath;
+        Integer? lastSlash = path.lastOccurrence('/');
+        if (exists lastSlash) {
+            String parentPath = path.span(0, lastSlash);
+            return VirtualFileManager.instance.findFileByUrl("file://``parentPath``");
+        }
+        
+        throw Exception("Couldn't get module root for ``path``");
+    }
+    
     VirtualFile moduleRoot 
-            => let (defaultRoot = ideaModule.moduleFile.parent)
+            => let (defaultRoot = getDefaultRoot())
                     if (exists contentsRoot = ModuleRootManager.getInstance(ideaModule)?.contentRoots)
                         then ( contentsRoot.array.first else defaultRoot)
                         else defaultRoot;

@@ -2,7 +2,7 @@ package org.intellij.plugins.ceylon.ide.facet;
 
 public class CeylonFacetState {
 
-    private boolean compileForJvm;
+    private boolean compileForJvm = true;
     private boolean compileToJs;
     private String systemRepository;
 

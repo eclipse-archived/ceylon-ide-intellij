@@ -77,6 +77,7 @@
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.psi.CeylonElementDescriptionProvider"/>
         <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>
 
+        <projectStructureDetector implementation="org.intellij.plugins.ceylon.ide.project.CeylonProjectStructureDetector"/>
         <facetType implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetType"/>
         <framework.detector implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetDetector"/>
 
