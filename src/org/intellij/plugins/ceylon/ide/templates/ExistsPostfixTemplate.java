@@ -121,15 +121,7 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
             model = ((Tree.Term) node).getTypeModel();
         }
 
-        if (model != null && model.isUnion()) {
-            for (Type type : model.getCaseTypes()) {
-                if (type.isNull()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return node.getUnit().isOptionalType(model);
     }
 
     public ExistsPostfixTemplate() {
