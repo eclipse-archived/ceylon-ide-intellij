@@ -81,6 +81,7 @@ public class CeylonPositionManager implements PositionManager {
     @NotNull
     @Override
     public List<ReferenceType> getAllClasses(@NotNull SourcePosition classPosition) throws NoDataException {
+        checkCeylonFile(classPosition);
         String cls = findClassBySourcePosition(classPosition);
         return cls == null ? Collections.<ReferenceType>emptyList() : process.getVirtualMachineProxy().classesByName(cls);
     }
@@ -88,6 +89,7 @@ public class CeylonPositionManager implements PositionManager {
     @NotNull
     @Override
     public List<Location> locationsOfLine(@NotNull ReferenceType type, @NotNull SourcePosition position) throws NoDataException {
+        checkCeylonFile(position);
         try {
             int line = position.getLine() + 1;
             List<Location> locations = type.locationsOfLine(DebugProcess.JAVA_STRATUM, null, line);
@@ -103,12 +105,16 @@ public class CeylonPositionManager implements PositionManager {
     @Nullable
     @Override
     public ClassPrepareRequest createPrepareRequest(@NotNull ClassPrepareRequestor requestor, @NotNull SourcePosition position) throws NoDataException {
-        if (!(position.getFile() instanceof CeylonFile)) {
-            throw NoDataException.INSTANCE;
-        }
+        checkCeylonFile(position);
         String cls = findClassBySourcePosition(position);
 
         return cls == null ? null : process.getRequestsManager().createClassPrepareRequest(requestor, cls);
+    }
+
+    private void checkCeylonFile(@NotNull SourcePosition position) throws NoDataException {
+        if (!(position.getFile() instanceof CeylonFile)) {
+            throw NoDataException.INSTANCE;
+        }
     }
 
     @Nullable
