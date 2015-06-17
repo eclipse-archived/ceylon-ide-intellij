@@ -66,6 +66,10 @@
         <lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.formatting.CeylonFormattingModelBuilder"/>
         <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.structureView.CeylonStructureViewFactory"/>
 
+        <defaultLiveTemplatesProvider implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplatesProvider"/>
+        <liveTemplateContext implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplateContext"/>
+        <codeInsight.template.postfixTemplateProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.templates.CeylonPostfixTemplateProvider"/>
+
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.ide.psi.CeylonTypes"/>
         <stubIndex implementation="org.intellij.plugins.ceylon.ide.psi.stub.ClassIndex"/>
         <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>-->

@@ -1,0 +1,3 @@
+void myPrint(Object? val) {
+    <spot>val</spot>.ex
+}

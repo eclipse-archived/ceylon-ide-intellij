@@ -1,0 +1,5 @@
+void myPrint(Object? val) {
+    if (exists val) {
+
+    }
+}

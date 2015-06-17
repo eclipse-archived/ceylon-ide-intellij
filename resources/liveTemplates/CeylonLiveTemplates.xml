@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templateSet group="Ceylon">
+
+    <template name="svr" value="shared void $NAME$() {$END$}" description="Shared toplevel function" toReformat="true" toShortenFQNames="true">
+        <variable name="NAME" expression="" defaultValue="&quot;run&quot;" alwaysStopAt="true"/>
+
+        <context>
+            <option name="CEYLON" value="true"/>
+        </context>
+    </template>
+</templateSet>
