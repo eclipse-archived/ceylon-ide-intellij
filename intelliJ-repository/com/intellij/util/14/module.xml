@@ -3,5 +3,6 @@
         <resource-root path="com.intellij.util-14.jar"/>
     </resources>
     <dependencies>
+        <module name="gnu.trove" slot="idea" export="false"/>
     </dependencies>
 </module>

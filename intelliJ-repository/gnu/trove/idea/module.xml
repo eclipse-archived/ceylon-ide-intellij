@@ -1,0 +1,7 @@
+<module xmlns="urn:jboss:module:1.1" name="gnu.trove" slot="idea">
+    <resources>
+        <resource-root path="gnu.trove-idea.jar"/>
+    </resources>
+    <dependencies>
+    </dependencies>
+</module>
