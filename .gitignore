@@ -11,3 +11,4 @@ grammar/gen
 grammar/gensrc
 grammar/build
 plugin-ceylon-code/test-resources/modules
+out

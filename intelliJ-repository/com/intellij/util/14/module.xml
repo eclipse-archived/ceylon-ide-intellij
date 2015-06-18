@@ -1,8 +1,0 @@
-<module xmlns="urn:jboss:module:1.1" name="com.intellij.util" slot="14">
-    <resources>
-        <resource-root path="com.intellij.util-14.jar"/>
-    </resources>
-    <dependencies>
-        <module name="gnu.trove" slot="idea" export="false"/>
-    </dependencies>
-</module>

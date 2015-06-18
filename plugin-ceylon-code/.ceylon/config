@@ -1,5 +1,8 @@
 [defaults]
 encoding=UTF-8
+overrides=overrides.xml
+flatclasspath=false
+autoexportmavendependencies=false
 
 [repositories]
-lookup=../intelliJ-repository
+lookup=flat:./intellij-repository

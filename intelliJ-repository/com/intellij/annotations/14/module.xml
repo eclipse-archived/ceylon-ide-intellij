@@ -1,7 +1,0 @@
-<module xmlns="urn:jboss:module:1.1" name="com.intellij.annotations" slot="14">
-    <resources>
-        <resource-root path="com.intellij.annotations-14.jar"/>
-    </resources>
-    <dependencies>
-    </dependencies>
-</module>

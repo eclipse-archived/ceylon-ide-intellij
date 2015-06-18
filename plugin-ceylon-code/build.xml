@@ -1,0 +1,38 @@
+<project name="Gather Intellij Dependencies" basedir="." default="copy-intellij-dependencies">
+
+    <property file="build.properties" />
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="${dist.root.dir}/lib/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+
+	<condition property="ideaRootDefined">
+		<isset property="ideaRoot"/>
+	</condition>
+	
+    <!-- Local repository -->
+    <property name="intellij.repo.dir" location="${basedir}/intellij-repository" />
+    
+	<loadproperties srcfile="IdeaModuleToImport.properties" prefix="moduleToImport."/>
+	<propertyselector property="modulesToImport"
+	                         delimiter=","
+	                         match="moduleToImport\.(.*)"
+	                         select="\1"
+	                         casesensitive="true" />
+	
+	<target name="importModule">
+		<propertycopy name="moduleName" from="moduleToImport.${moduleToImport}" />
+		<echo>${moduleName}</echo>
+		<copy file="${ideaRoot}/lib/${moduleToImport}" tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+	</target>
+	
+	<target name="copy-intellij-dependencies">
+        <delete dir="${intellij.repo.dir}" failonerror="false"/>
+		<mkdir dir="${intellij.repo.dir}"/>
+        <fail unless="ideaRootDefined"
+        	message="Please set the 'ideaRoot' property to the root of the IntelliJ IDEA installation (which must contain a 'lib' sub-folder)"/>
+		<foreach list="${modulesToImport}" param="moduleToImport" target="importModule">
+		</foreach>
+	</target>
+</project>
