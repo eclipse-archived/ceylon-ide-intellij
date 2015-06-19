@@ -1,4 +1,4 @@
-import com.redhat.ceylon.ide.common {
+import com.redhat.ceylon.ide.common.model {
     CeylonProject
 }
 import java.io {
@@ -29,37 +29,37 @@ import com.intellij.openapi.roots {
 
 shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
     shared actual Module ideArtifact;
-    
+
     shared Module ideaModule => ideArtifact;
-    
+
     VirtualFile getDefaultRoot() {
         if (exists file = ideaModule.moduleFile) {
             return file.parent;
         }
-        
+
         value path = ideaModule.moduleFilePath;
         Integer? lastSlash = path.lastOccurrence('/');
         if (exists lastSlash) {
             String parentPath = path.span(0, lastSlash);
             return VirtualFileManager.instance.findFileByUrl("file://``parentPath``");
         }
-        
+
         throw Exception("Couldn't get module root for ``path``");
     }
-    
-    VirtualFile moduleRoot 
+
+    VirtualFile moduleRoot
             => let (defaultRoot = getDefaultRoot())
                     if (exists contentsRoot = ModuleRootManager.getInstance(ideaModule)?.contentRoots)
                         then ( contentsRoot.array.first else defaultRoot)
                         else defaultRoot;
-    
+
     shared actual File rootDirectory
             => VfsUtil.virtualToIoFile(moduleRoot);
 
-    VirtualFile? findModuleFile(String moduleRelativePath) 
+    VirtualFile? findModuleFile(String moduleRelativePath)
             => moduleRoot.findFileByRelativePath(moduleRelativePath);
-    
-    VirtualFile? findModuleFileWithRefresh(String moduleRelativePath) 
+
+    VirtualFile? findModuleFileWithRefresh(String moduleRelativePath)
             => VfsUtil.findFileByIoFile(File(rootDirectory, moduleRelativePath), true);
 
     shared actual void createNewOutputFolder(String folderModuleRelativePath) {
@@ -69,7 +69,7 @@ shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
                         VfsUtil.createDirectoryIfMissing(moduleRoot, folderModuleRelativePath);
                     }
                 }.execute().throwException();
-        
+
         if (exists outputFolder = findModuleFileWithRefresh(folderModuleRelativePath)) {
             outputFolder.refresh(false, false);
             if (! outputFolder.\iexists()) {
@@ -79,11 +79,11 @@ shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
             createDirectory();
         }
     }
-    
+
     shared actual void deleteOldOutputFolder(String folderProjectRelativePath) {
         VirtualFile? oldOutputRepoFolder = findModuleFile(folderProjectRelativePath);
         if(exists oldOutputRepoFolder) {
-            if (Messages.showYesNoDialog(ideaModule.project, 
+            if (Messages.showYesNoDialog(ideaModule.project,
                     "The Ceylon output repository has changed.
                      Do you want to remove the old output repository folder '`` oldOutputRepoFolder.path ``' and all its contents ?",
                     "Changing Ceylon output repository",
@@ -99,13 +99,13 @@ shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
                 }
             } else {
                 // TODO : if we keep the old output folder, remove the "Derived flag"
-                
+
             }
         }
     }
-    
+
     shared actual Boolean hasConfigFile => findModuleFile(ceylonConfigFileProjectRelativePath) exists;
-    
+
     shared actual void refreshConfigFile() {
         value configFile = findModuleFile(ceylonConfigFileProjectRelativePath);
         if (exists configFile) {
@@ -114,7 +114,7 @@ shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
             moduleRoot.refresh(false, false);
         }
     }
-    
+
 }
 
 
