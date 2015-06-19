@@ -54,15 +54,19 @@ import com.redhat.ceylon.model.typechecker.util {
 }
 import com.intellij.openapi.editor.colors {
     TextAttributesKey,
-    EditorColorsManager
+    EditorColorsManager,
+    CodeInsightColors
 }
 import com.intellij.openapi.editor {
     DefaultLanguageHighlighterColors
 }
-
-String psiProtocol = "psi_element://";
+import com.redhat.ceylon.model.cmr {
+    JDKUtils
+}
 
 shared object docGenerator {
+
+    String psiProtocol = "psi_element://";
 
     String escape(String content) => content.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 
@@ -122,7 +126,7 @@ shared object docGenerator {
                 return buildLink(declaration, super.getSimpleDeclarationName(declaration, unit));
             }
             
-            return "<unknown>";
+            return "&lt;unknown&gt;";
         }
         
         shared actual String amp() => "&amp;";
@@ -130,6 +134,7 @@ shared object docGenerator {
         shared actual String gt() => "&gt";
     }
 
+    //see getTermTypeHoverText(Node node, String selectedText, IDocument doc, IProject project)
     String? getTermTypeText(Tree.Term term) {
         if (exists model = term.typeModel) {
             value builder = StringBuilder(if (is Tree.Literal term) then "Literal of type" else "Expression of type");
@@ -138,6 +143,8 @@ shared object docGenerator {
             if (is Tree.StringLiteral term) {
                 value text = if (term.text.size < 250) then escape(term.text) else escape(term.text.spanTo(250)) + "...";
                 builder.append(color("\"``text``\"", DefaultLanguageHighlighterColors.\iSTRING));
+                
+                // TODO display info for selected char? 
             } else if (is Tree.CharLiteral term, term.text.size > 2) {
                 appendCharacterInfo(builder, term.text.span(1, 1));
             } else if (is Tree.NaturalLiteral term) {
@@ -160,6 +167,7 @@ shared object docGenerator {
         return null;
     }
     
+    // see getInferredTypeHoverText(Node node, IProject project)
     String? getInferredTypeText(Tree.LocalModifier node) {
         if (exists model = node.typeModel) {
             return "Inferred type: <code>``printer.print(model, node.unit)``</code>";
@@ -176,32 +184,35 @@ shared object docGenerator {
     }
     
     void addSignature(Declaration decl, StringBuilder builder, Node node) {
-        if (decl.shared) { builder.append("shared "); }
-        if (decl.actual) { builder.append("actual "); }
-        if (decl.default) { builder.append("default "); }
-        if (decl.formal) { builder.append("formal "); }
-        if (is Value decl, decl.late) { builder.append("late "); }
-        if (is TypedDeclaration decl, decl.variable) { builder.append("variable "); }
-        // FIXME does not compile if (exists nat = decl.native) { builder.append("native "); }
+        value annotations = StringBuilder();
+        if (decl.shared) { annotations.append("shared "); }
+        if (decl.actual) { annotations.append("actual "); }
+        if (decl.default) { annotations.append("default "); }
+        if (decl.formal) { annotations.append("formal "); }
+        if (is Value decl, decl.late) { annotations.append("late "); }
+        if (is TypedDeclaration decl, decl.variable) { annotations.append("variable "); }
+        // FIXME does not compile if (exists nat = decl.native) { annotations.append("native "); }
         if (is TypeDeclaration decl) {
-            if (decl.sealed) { builder.append("sealed "); }
-            if (decl.final) { builder.append("final "); }
-            if (is Class decl, decl.abstract) { builder.append("abstract "); }
+            if (decl.sealed) { annotations.append("sealed "); }
+            if (decl.final) { annotations.append("final "); }
+            if (is Class decl, decl.abstract) { annotations.append("abstract "); }
         }
-        if (decl.annotation) { builder.append("annotation "); }
-        
+        if (decl.annotation) { annotations.append("annotation "); }
+       
+        builder.append(color(annotations.string, CodeInsightColors.\iANNOTATION_NAME_ATTRIBUTES));
+       
         if (is Class decl) {
             if (decl.anonymous) {
-                builder.append("object ");
+                builder.append(color("object ", DefaultLanguageHighlighterColors.\iKEYWORD));
             } else {
-                builder.append("class ");
+                builder.append(color("class ", DefaultLanguageHighlighterColors.\iKEYWORD));
             }
         } else if (is Interface decl) {
-            builder.append("interface ");
+            builder.append(color("interface ", DefaultLanguageHighlighterColors.\iKEYWORD));
         } else if (is TypeAlias decl) {
-            builder.append("alias ");
+            builder.append(color("alias ", DefaultLanguageHighlighterColors.\iKEYWORD));
         } else if (is Constructor decl) {
-            builder.append("new ");
+            builder.append(color("new ", DefaultLanguageHighlighterColors.\iKEYWORD));
         } else if (is TypedDeclaration decl) {
             addTypedDeclarationSignature(decl, builder);
         }
@@ -235,7 +246,9 @@ shared object docGenerator {
             value unit = (decl of Referenceable).unit;
             
             if (exists cases = decl.type.caseTypes) {
-                builder.append("\nof ").append(" | ".join(CeylonIterable(cases).map((c) => printer.print(c, unit))));
+                builder.append("\n")
+                        .append(color("of ", DefaultLanguageHighlighterColors.\iKEYWORD))
+                        .append(" | ".join(CeylonIterable(cases).map((c) => printer.print(c, unit))));
                 
                 // FIXME compilation error
                 //if (exists it = decl.selfType) {
@@ -245,12 +258,16 @@ shared object docGenerator {
             
             if (is Class decl) {
                 if (exists sup = decl.extendedType) {
-                    builder.append("\nextends ").append(printer.print(sup, unit));
+                    builder.append("\n")
+                            .append(color("extends ", DefaultLanguageHighlighterColors.\iKEYWORD))
+                            .append(printer.print(sup, unit));
                 }
             }
             
             if (!decl.satisfiedTypes.empty) {
-                builder.append("\nsatisfies ").append(" &amp; ".join(CeylonIterable(decl.satisfiedTypes).map((s) => printer.print(s, unit))));
+                builder.append("\n")
+                        .append(color("satisfies ", DefaultLanguageHighlighterColors.\iKEYWORD))
+                        .append(" &amp; ".join(CeylonIterable(decl.satisfiedTypes).map((s) => printer.print(s, unit))));
             }
         }
     }
@@ -258,27 +275,42 @@ shared object docGenerator {
     void addTypedDeclarationSignature(TypedDeclaration decl, StringBuilder builder) {
         value sequenced = isSequenced(decl);
         
-        value type = if (sequenced, exists t = decl.type, !t.typeArgumentList.empty) then decl.type else UnknownType((decl of Referenceable).unit).type;
-        
+        value unit = (decl of Referenceable).unit;
+        value type = getType(decl, sequenced, unit);
+       
         if (decl.dynamicallyTyped) {
-            builder.append("dynamic ");
+            builder.append(color("dynamic", DefaultLanguageHighlighterColors.\iKEYWORD));
         } else if (is Value decl, type.declaration.anonymous, !type.typeConstructor) {
-            builder.append("object ");
+            builder.append(color("object", DefaultLanguageHighlighterColors.\iKEYWORD));
         } else if (is Function decl) {
             if (decl.declaredVoid) {
-                builder.append("void ");
+                builder.append(color("void", DefaultLanguageHighlighterColors.\iKEYWORD));
             } else {
-                builder.append(type.asString());
+                builder.append(printer.print(type, unit));
             }
+        } else {
+            builder.append(printer.print(type, unit));
         }
         
         if (sequenced) {
             if (is FunctionOrValue decl, decl.initializerParameter.atLeastOne) {
-                builder.append("+ ");
+                builder.append("+");
             } else {
-                builder.append("* ");
+                builder.append("*");
             }
         }
+        
+        builder.append(" ");
+    }
+    
+    Type getType(TypedDeclaration decl, Boolean sequenced, Unit unit) {
+        variable Type? type = decl.type;
+
+        if (sequenced, exists t = decl.type, !t.typeArgumentList.empty) {
+            type = t.typeArgumentList.get(0);
+        }
+
+        return type else UnknownType(unit).type;
     }
     
     Boolean isSequenced(TypedDeclaration decl) {
@@ -363,6 +395,7 @@ shared object docGenerator {
         return "";
     }
     
+    // see getDocumentationFor(CeylonParseController controller, Declaration dec, Node node, Reference pr)
     String getDeclarationDoc(Declaration model, Node node) {
         variable value decl = model;
         if (is Value model) {
@@ -381,26 +414,85 @@ shared object docGenerator {
         builder.append("</pre>\n");
         addDoc(decl, builder);
         addParametersDoc(decl, builder);
+        // TODO addClassMembers
+        // TODO addNothingTypeInfo
+        // TODO addUnitInfo
         
         return builder.string;
     }
-        
+                
     shared String? getDocumentationText(Referenceable model, Node node) {
         if (is Declaration model) {
             return getDeclarationDoc(model, node);
         } else if (is Package model) {
-            // TODO
+            return getPackageDoc(model, node);
         } else if (is Module model) {
-            // TODO
+            return getModuleDoc(model, node);
         }
         
         return null;
     }
     
+    shared String getPackageDoc(Package pack, Node node) {
+        value builder = StringBuilder();
+        
+        if (pack.shared) {
+            builder.append(color("shared ", CodeInsightColors.\iANNOTATION_NAME_ATTRIBUTES));
+        }
+        
+        builder.append(color("package ", DefaultLanguageHighlighterColors.\iKEYWORD)).append(pack.nameAsString).append("<br/>\n");
+        
+        // TODO documentation
+        
+        value mod = pack.\imodule;
+        if (mod.java) {
+            builder.append("<p>This package is implemented in Java.</p>\n");
+        }
+        if (JDKUtils.isJDKModule(mod.nameAsString)) {
+            builder.append("<p>This package forms part of the Java SDK.</p>\n");             
+        }
+        
+        // TODO? members
+        
+        if (mod.nameAsString.empty || mod.nameAsString.equals("default")) {
+            builder.append("in default module\n");             
+        } else {
+            builder.append("in module ``mod.nameAsString`` \"``mod.version``\"");
+            // TODO link to module
+        }
+        
+        return builder.string;
+    }
+
+    shared String? getModuleDoc(Module mod, Node node) {
+        value builder = StringBuilder();
+
+        builder.append(color("module ", DefaultLanguageHighlighterColors.\iKEYWORD))
+                .append(mod.nameAsString)
+                .append(color(" \"``mod.version``\"", DefaultLanguageHighlighterColors.\iSTRING))
+                .append("\n");
+        
+        if (mod.java) {
+            builder.append("<p>This module is implemented in Java.</p>");
+        }
+        if (mod.default) {
+            builder.append("<p>The default module for packages which do not belong to explicit module.</p>");
+        }
+        if (JDKUtils.isJDKModule(mod.nameAsString)) {
+            builder.append("<p>This module forms part of the Java SDK.</p>");            
+        }
+
+        // TODO module doc
+        // TODO? members
+        
+        return builder.string;
+    }
+
     shared Node? getHoverNode(Tree.CompilationUnit rootNode, Integer offset) {
         return nodes.findNode(rootNode, offset);
     }    
     
+    // see getHoverText(CeylonEditor editor, IRegion hoverRegion)
     shared JString? getDocumentation(Tree.CompilationUnit rootNode, Integer offset) {
         value node = getHoverNode(rootNode, offset);
         variable String? doc = null;
