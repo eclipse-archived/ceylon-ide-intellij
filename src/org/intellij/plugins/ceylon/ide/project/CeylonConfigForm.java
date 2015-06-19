@@ -1,7 +1,7 @@
 package org.intellij.plugins.ceylon.ide.project;
 
 import com.intellij.openapi.module.Module;
-import com.redhat.ceylon.ide.common.CeylonProject;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 
 import javax.swing.*;

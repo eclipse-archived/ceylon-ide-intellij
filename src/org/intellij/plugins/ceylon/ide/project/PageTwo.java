@@ -11,8 +11,8 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
-import com.redhat.ceylon.ide.common.CeylonProject;
 import com.redhat.ceylon.ide.common.configuration.CeylonRepositoryConfigurator;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
@@ -128,24 +128,24 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     }
 
     @Override
-    public int[] $getSelection() {
+    public int[] getSelection() {
         return repoList.getSelectedIndices();
     }
 
     @Override
-    public Object $setRemoveButtonEnabled(boolean enabled) {
+    public Object enableRemoveButton(boolean enabled) {
         removeRepo.setEnabled(enabled);
         return null;
     }
 
     @Override
-    public Object $setUpButtonEnabled(boolean enabled) {
+    public Object enableUpButton(boolean enabled) {
         upButton.setEnabled(enabled);
         return null;
     }
 
     @Override
-    public Object $setDownButtonEnabled(boolean enabled) {
+    public Object enableDownButton(boolean enabled) {
         downButton.setEnabled(enabled);
         return null;
     }
