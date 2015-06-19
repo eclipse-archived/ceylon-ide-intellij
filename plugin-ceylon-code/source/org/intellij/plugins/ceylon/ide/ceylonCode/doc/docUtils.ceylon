@@ -3,7 +3,8 @@ import ceylon.interop.java {
     CeylonIterable
 }
 import com.github.rjeschke.txtmark {
-    Processor
+    Processor,
+    Configuration
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Node,
@@ -64,6 +65,8 @@ import com.redhat.ceylon.model.cmr {
     JDKUtils
 }
 
+String psiProtocol = "psi_element://";
+
 shared object docGenerator {
 
     String psiProtocol = "psi_element://";
@@ -93,7 +96,7 @@ shared object docGenerator {
         builder.append("Block: <code>").append(UnicodeBlock.\iof(codepoint).string).append("</code>");
     }
     
-    String buildUrl(Referenceable model) {
+    shared String buildUrl(Referenceable model) {
         if (is Package model) {
             return buildUrl(model.\imodule) + ":" + model.nameAsString;
         }
@@ -228,16 +231,29 @@ shared object docGenerator {
         value doc = CeylonIterable(decl.annotations).find((ann) => ann.name.equals("doc") || ann.name.empty);
         
         if (exists doc, !doc.positionalArguments.empty) {
-            value string = markdown(doc.positionalArguments.get(0).string);
+            value string = markdown(doc.positionalArguments.get(0).string, resolveScope(decl), (decl of Referenceable).unit);
             builder.append("<div>\n").append(string).append("</div>");
         }
     }
     
-    String markdown(String text) {
-        //Builder builder = Configuration.builder().forceExtentedProfile();
-        //builder.setSpecialLinkEmitter(UnlinkedSpanEmitter());
+    Scope resolveScope(Declaration decl) {
+        if (is Scope decl) {
+            return decl;
+        } else {
+            return decl.container;
+        }
+    }
+    
+    String markdown(String text, Scope? linkScope = null, Unit? unit = null) {
+        value builder = Configuration.builder().forceExtentedProfile();
+        builder.setCodeBlockEmitter(ceylonBlockEmitter);
+        if (exists linkScope, exists unit) {
+            builder.setSpecialLinkEmitter(CeylonSpanEmitter(linkScope, unit));
+        } else {
+            builder.setSpecialLinkEmitter(unlinkedSpanEmitter);
+        }
         
-        return Processor.process(text);
+        return Processor.process(text, builder.build());
     }
     
     void addInheritance(Declaration decl, StringBuilder builder) {
