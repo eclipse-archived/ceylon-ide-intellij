@@ -13,7 +13,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.redhat.ceylon.ide.common.CeylonProject;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;

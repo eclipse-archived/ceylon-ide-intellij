@@ -9,7 +9,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.redhat.ceylon.ide.common.CeylonProject;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.project.CeylonConfigForm;
 import org.intellij.plugins.ceylon.ide.project.PageOne;
