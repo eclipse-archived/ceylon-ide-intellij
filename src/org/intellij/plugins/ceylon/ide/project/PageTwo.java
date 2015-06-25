@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
@@ -81,6 +82,11 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         downButton.addActionListener(new MoveDownListener());
         addExternalRepo.addActionListener(new AddExternalRepoListener());
         addMavenRepo.addActionListener(new AddMavenRepoListener());
+
+        JTextField textField = systemRepository.getTextField();
+        if (textField instanceof JBTextField) {
+            ((JBTextField) textField).getEmptyText().setText("Use IDE system modules");
+        }
     }
 
     @Override

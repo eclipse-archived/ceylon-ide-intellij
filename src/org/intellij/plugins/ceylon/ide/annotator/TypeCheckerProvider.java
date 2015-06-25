@@ -18,18 +18,17 @@ import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
 import com.redhat.ceylon.model.loader.model.LazyModule;
 import com.redhat.ceylon.model.typechecker.model.ModuleImport;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
+import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
+import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
 import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
 
-/**
- *
- */
 public class TypeCheckerProvider implements ModuleComponent {
 
     private final Module module;
@@ -97,10 +96,9 @@ public class TypeCheckerProvider implements ModuleComponent {
                 .usageWarnings(true);
 
 
-        String systemRepo = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
+        String systemRepo = getFacetSystemRepo();
         if (systemRepo == null) {
-            // FIXME retrieve CeylonFacetState.systemRepository and interpolate variables
-//            systemRepo = ceylonConfig.getProjectRepositories().getSystemRepoDir().getAbsolutePath();
+            systemRepo = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
         }
         boolean offline = ceylonConfig.getOffline();
         File cwd = ceylonConfig.getProject().getRootDirectory();
@@ -158,6 +156,27 @@ public class TypeCheckerProvider implements ModuleComponent {
         System.out.println("Type checker process()ed in " + (System.currentTimeMillis() - startTime) + "ms");
 
         return checker;
+    }
+
+    private String getFacetSystemRepo() {
+        String repo = null;
+        CeylonFacet facet = CeylonFacet.forModule(module);
+
+        if (facet != null) {
+            CeylonFacetState state = facet.getConfiguration().getState();
+
+            if (state != null) {
+                repo = state.getSystemRepository();
+            }
+        }
+
+        return StringUtils.isBlank(repo) ? null : interpolateVariablesInRepositoryPath(repo);
+    }
+
+    private String interpolateVariablesInRepositoryPath(String repoPath) {
+        String userHomePath = System.getProperty("user.home");
+        String pluginRepoPath = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
+        return repoPath.replace("${user.home}", userHomePath).replace("${ceylon.repo}", pluginRepoPath);
     }
 
 }

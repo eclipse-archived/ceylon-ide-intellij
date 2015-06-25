@@ -1,5 +1,7 @@
 package org.intellij.plugins.ceylon.ide;
 
+import com.intellij.diagnostic.PluginException;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.util.PathUtil;
 import org.intellij.plugins.ceylon.runtime.CeylonRuntime;
 import org.intellij.plugins.ceylon.runtime.PluginCeylonStartup;
@@ -7,9 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-/**
- * Created by david on 20/01/15.
- */
 public class IdePluginCeylonStartup extends PluginCeylonStartup {
     public IdePluginCeylonStartup(CeylonRuntime ceylonRuntime) {
     }
@@ -26,6 +25,7 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup {
         return "IdePluginCeylonStartup";
     }
 
+    @NotNull
     public static File getEmbeddedCeylonRepository() {
         File pluginClassesDir = new File(PathUtil.getJarPathForClass(IdePluginCeylonStartup.class));
 
@@ -35,6 +35,7 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup {
                 return ceylonRepoDir;
             }
         }
-        return null;
+
+        throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
     }
 }
