@@ -4,7 +4,10 @@ import ceylon.language.Boolean;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.JBColor;
@@ -17,6 +20,8 @@ import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -40,6 +45,7 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     private JButton addRepo;
     private JButton addRemoteRepo;
     private JList<String> repoList;
+    private Module module;
 
     public PageTwo() {
         Repositories repositories = Repositories.withConfig(CeylonConfigFinder.loadDefaultConfig(null));
@@ -75,6 +81,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
             }
         });
 
+        systemRepository.addBrowseFolderListener(CeylonBundle.message("ceylon.facet.settings.selectsystemrepo"), null, null, FileChooserDescriptorFactory.createSingleFolderDescriptor());
+        outputDirectory.addBrowseFolderListener(new BrowseOutputDirectoryListener());
         repoList.addListSelectionListener(new RepoListSelectionListener());
         addRemoteRepo.addActionListener(new AddRemoteRepoListener());
         removeRepo.addActionListener(new RemoveRepoListener());
@@ -119,6 +127,7 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
 
     @Override
     public void load(CeylonProject<Module> config, CeylonFacetState state) {
+        module = config.getIdeArtifact();
         systemRepository.setText(state.getSystemRepository());
         outputDirectory.setText(config.getConfiguration().getOutputRepo());
         flatClasspath.setSelected(boolValue(config.getConfiguration().getProjectFlatClasspath()));
@@ -176,6 +185,41 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
             listModel.add(repo);
         }
         return null;
+    }
+
+    private class BrowseOutputDirectoryListener extends TextBrowseFolderListener {
+
+        public BrowseOutputDirectoryListener() {
+            super(FileChooserDescriptorFactory.createSingleFolderDescriptor());
+        }
+
+        @Nullable
+        @Override
+        protected Project getProject() {
+            return module == null ? null : module.getProject();
+        }
+
+        @Nullable
+        @Override
+        protected VirtualFile getInitialFile() {
+            Project project = getProject();
+            if (project != null) {
+                return project.getBaseDir();
+            }
+            return super.getInitialFile();
+        }
+
+        @NotNull
+        @Override
+        protected String chosenFileToResultingText(@NotNull VirtualFile file) {
+            Project project = getProject();
+
+            if (project != null && VfsUtil.isAncestor(project.getBaseDir(), file, true)) {
+                return "./" + VfsUtil.getRelativePath(file, project.getBaseDir());
+            }
+
+            return super.chosenFileToResultingText(file);
+        }
     }
 
     private class AddExternalRepoListener implements ActionListener {
