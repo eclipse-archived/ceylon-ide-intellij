@@ -7,8 +7,12 @@ import com.intellij.ide.util.importProject.ModulesDetectionStep;
 import com.intellij.ide.util.importProject.ProjectDescriptor;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.ProjectWizardStepFactory;
-import com.intellij.ide.util.projectWizard.importSources.JavaSourceRootDetector;
+import com.intellij.ide.util.projectWizard.importSources.DetectedProjectRoot;
+import com.intellij.ide.util.projectWizard.importSources.JavaModuleSourceRoot;
 import com.intellij.ide.util.projectWizard.importSources.ProjectFromSourcesBuilder;
+import com.intellij.ide.util.projectWizard.importSources.ProjectStructureDetector;
+import com.intellij.ide.util.projectWizard.importSources.util.CommonSourceRootDetectionUtil;
+import com.intellij.openapi.util.Pair;
 import com.intellij.util.NullableFunction;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
@@ -16,27 +20,15 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.intellij.plugins.ceylon.ide.CeylonFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CeylonProjectStructureDetector extends JavaSourceRootDetector {
-
-    @NotNull
-    @Override
-    protected String getLanguageName() {
-        return "Ceylon";
-    }
-
-    @NotNull
-    @Override
-    protected String getFileExtension() {
-        return CeylonFileType.DEFAULT_EXTENSION;
-    }
+public class CeylonProjectStructureDetector extends ProjectStructureDetector {
 
     @Override
     public String getDetectorId() {
@@ -57,6 +49,25 @@ public class CeylonProjectStructureDetector extends JavaSourceRootDetector {
 
     @NotNull
     @Override
+    public DirectoryProcessingResult detectRoots(@NotNull File dir, @NotNull File[] children, @NotNull File base, @NotNull List<DetectedProjectRoot> result) {
+        for (File child : children) {
+            // FIXME does not work for default module, which has no module.ceylon :(
+            if (child.isFile() && child.getName().equals("module.ceylon")) {
+                Pair<File, String> root = CommonSourceRootDetectionUtil.IO_FILE.suggestRootForFileWithPackageStatement(child, base,
+                        getPackageNameFetcher(),
+                        true);
+                if (root != null) {
+                    result.add(new JavaModuleSourceRoot(root.getFirst(), root.getSecond(), "Ceylon"));
+                    return DirectoryProcessingResult.skipChildrenAndParentsUpTo(root.getFirst());
+                } else {
+                    return DirectoryProcessingResult.SKIP_CHILDREN;
+                }
+            }
+        }
+        return DirectoryProcessingResult.PROCESS_CHILDREN;
+    }
+
+    @NotNull
     protected NullableFunction<CharSequence, String> getPackageNameFetcher() {
         return new NullableFunction<CharSequence, String>() {
             @Nullable
