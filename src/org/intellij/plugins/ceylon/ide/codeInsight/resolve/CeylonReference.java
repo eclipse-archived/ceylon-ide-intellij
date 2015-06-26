@@ -1,13 +1,18 @@
 package org.intellij.plugins.ceylon.ide.codeInsight.resolve;
 
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.util.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
+import com.redhat.ceylon.model.typechecker.model.Unit;
 import org.intellij.plugins.ceylon.ide.psi.*;
 import org.intellij.plugins.ceylon.ide.psi.stub.ClassIndex;
 import org.jetbrains.annotations.NotNull;
@@ -43,14 +48,29 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         if (declaration == null) {
             return null;
         }
+
+        Unit unit = declaration.getUnit();
+        PsiFile containingFile = myElement.getContainingFile();
+
+        if (unit != compilationUnit.getUnit()) {
+            String protocol = unit.getFullPath().contains("!/") ? "jar://" : "file://";
+            VirtualFile vfile = VirtualFileManager.getInstance().findFileByUrl(protocol + unit.getFullPath());
+            if (vfile != null) {
+                containingFile = PsiManager.getInstance(myElement.getProject()).findFile(vfile);
+                if (containingFile instanceof CeylonFile) {
+                    compilationUnit = ((CeylonFile) containingFile).getCompilationUnit();
+                }
+            }
+        }
+
         FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
         compilationUnit.visit(visitor);
         Tree.Declaration declarationNode = visitor.getDeclarationNode();
 
         if (declarationNode != null) {
-            return CeylonTreeUtil.findPsiElement(declarationNode, myElement.getContainingFile());
+            return CeylonTreeUtil.findPsiElement(declarationNode, containingFile);
         }
-        return null;
+        return containingFile;
     }
 
     @NotNull

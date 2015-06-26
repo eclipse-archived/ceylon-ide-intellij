@@ -7,6 +7,7 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.IncorrectOperationException;
+import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.psi.impl.CeylonCompositeElementImpl;
 import org.jetbrains.annotations.NonNls;
@@ -25,6 +26,15 @@ public class CeylonResolvable extends CeylonCompositeElementImpl implements PsiN
         final boolean isType = getNode().getChildren(UIDENT).length > 0;
         TextRange range = TextRange.from(0, getTextLength());
         return isType ? new CeylonTypeReference<>(this, range, true) : new CeylonReference<>(this, range, true);
+    }
+
+    @Override
+    public String getName() {
+        if (this instanceof CeylonPsi.IdentifierPsi) {
+            return getText();
+        }
+
+        return super.getName();
     }
 
     @Override

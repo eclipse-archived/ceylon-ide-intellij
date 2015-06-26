@@ -33,6 +33,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return true;
         } else if (psiElement instanceof CeylonPsi.TypeParameterDeclarationPsi) {
             return true;
+        } else if (psiElement instanceof CeylonPsi.ObjectDefinitionPsi) {
+            return true;
         }
 //        System.out.println("Can't find usages for " + psiElement);
         return false;
@@ -57,6 +59,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return "Function parameter";
         } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {
             return "Type parameter";
+        } else if (element instanceof CeylonPsi.ObjectDefinitionPsi) {
+            return "Object";
         }
 
         throw new UnsupportedOperationException(element.toString());
@@ -84,6 +88,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return ((CeylonPsi.TypeParameterDeclarationPsi) element).getCeylonNode().getIdentifier().getText();
         } else if (element instanceof CeylonFile) {
             return ((CeylonFile) element).getName();
+        } else if (element instanceof CeylonPsi.ObjectDefinitionPsi) {
+            return ((CeylonPsi.ObjectDefinitionPsi) element).getCeylonNode().getIdentifier().getText();
         }
 
         throw new UnsupportedOperationException("Descriptive name not implemented for " + element.getClass());
