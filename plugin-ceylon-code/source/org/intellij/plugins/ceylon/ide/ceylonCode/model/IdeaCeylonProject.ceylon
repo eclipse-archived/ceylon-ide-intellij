@@ -115,6 +115,6 @@ shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
         }
     }
 
+    shared actual Boolean synchronizedWithConfiguration => true; // TODO : needs to be implemented
 }
-
 
