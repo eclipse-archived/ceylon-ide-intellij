@@ -75,6 +75,7 @@
         <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>-->
 
         <gotoClassContributor implementation="org.intellij.plugins.ceylon.ide.codeInsight.navigation.CeylonGotoClassContributor"/>
+        <completion.contributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonCompletionContributor"/>
 
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.psi.CeylonClass" implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
