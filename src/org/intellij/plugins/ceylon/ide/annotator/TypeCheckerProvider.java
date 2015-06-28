@@ -33,6 +33,7 @@ public class TypeCheckerProvider implements ModuleComponent {
 
     private final Module module;
     private TypeChecker typeChecker;
+    IdeaCeylonProjects ceylonModel;
 
     public TypeCheckerProvider(Module module) {
         this.module = module;
@@ -55,6 +56,11 @@ public class TypeCheckerProvider implements ModuleComponent {
     }
 
     public void projectOpened() {
+        if (ceylonModel == null) {
+            ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
+        }
+        ceylonModel.addProject(module);
+
         if (FacetManager.getInstance(module).getFacetByType(CeylonFacet.ID) == null) {
             return;
         }
@@ -77,8 +83,8 @@ public class TypeCheckerProvider implements ModuleComponent {
     }
 
     public void projectClosed() {
-        // called when project is being closed
         typeChecker = null;
+        ceylonModel.removeProject(module);
     }
 
     @Override
@@ -87,7 +93,6 @@ public class TypeCheckerProvider implements ModuleComponent {
     }
 
     public TypeChecker createTypeChecker() {
-        IdeaCeylonProjects ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
         CeylonProject<Module> ceylonProject = ceylonModel.getProject(module);
         CeylonProjectConfig<Module> ceylonConfig = ceylonProject.getConfiguration();
 

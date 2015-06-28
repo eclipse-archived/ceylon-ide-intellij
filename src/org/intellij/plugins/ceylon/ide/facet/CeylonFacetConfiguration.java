@@ -67,6 +67,10 @@ public class CeylonFacetConfiguration implements FacetConfiguration, PersistentS
         IdeaCeylonProjects ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
         ceylonProject = ceylonModel.getProject(module);
 
+        if (ceylonProject == null && ceylonModel.addProject(module)) {
+            ceylonProject = ceylonModel.getProject(module);
+        }
+
         if (state == null) {
             state = new CeylonFacetState();
             System.out.println("!!!! Instantiating CeylonFacetState !!!!");
