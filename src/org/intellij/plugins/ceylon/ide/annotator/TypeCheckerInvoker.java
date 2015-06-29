@@ -29,7 +29,11 @@ public class TypeCheckerInvoker {
      * Mimics com.redhat.ceylon.eclipse.code.parse.CeylonParseController#parse
      */
     public static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile) {
-        TypeCheckerProvider typeCheckerProvider = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject()).getComponent(TypeCheckerProvider.class);
+        com.intellij.openapi.module.Module module = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject());
+        if (module == null) {
+            return null; // TODO .ceylon files loaded from .src archives don't belong to any module, what should we do?
+        }
+        TypeCheckerProvider typeCheckerProvider = module.getComponent(TypeCheckerProvider.class);
 
         TypeChecker typeChecker = typeCheckerProvider.getTypeChecker();
 

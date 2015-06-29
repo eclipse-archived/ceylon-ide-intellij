@@ -7,11 +7,7 @@
     <description>Provides support for the Ceylon programming language</description>
 
     <change-notes>
-        Version 1.0.0:
-        * Basic parser
-        * Syntax highlighting
-        * Go to class/interface
-        * Compile project
+        See https://github.com/ceylon/ceylon-ide-intellij/wiki/Features
     </change-notes>
 
     <idea-version since-build="131"/>
@@ -45,6 +41,15 @@
             <add-to-group group-id="NewGroup1" anchor="before" relative-to-action="NewModuleInGroup"/>
         </action>
     </actions>
+
+    <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
+    <extensionPoints>
+        <extensionPoint name="importHandler" interface="org.intellij.plugins.ceylon.ide.ceylonCode.completion.ImportHandler"/>
+    </extensionPoints>
+
+    <extensions defaultExtensionNs="org.intellij.plugins.ceylon.ide">
+        <importHandler implementation="org.intellij.plugins.ceylon.ide.completion.CeylonImportHandler"/>
+    </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
         <lang.documentationProvider implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonDocProvider" language="Ceylon"/>

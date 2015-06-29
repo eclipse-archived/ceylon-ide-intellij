@@ -6,3 +6,7 @@ autoexportmavendependencies=false
 
 [repositories]
 lookup=flat:./intellij-repository
+
+[compiler]
+source=source
+resource=resource
