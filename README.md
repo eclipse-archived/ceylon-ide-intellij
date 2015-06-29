@@ -12,24 +12,9 @@ We embed most of the raw Ceylon installation in the plugin, so you won't necessa
 
 # Features
 
-While we are working very hard at making this a great plugin, only a few features are working at the moment:
+While we are working very hard at making this a great plugin, only a few features are working at the moment. Please note that the plugin is not currently ready for daily usage.
 
-- `.ceylon` files recognition
-- parsing and syntax highlighting
-- project make / file compilation
-- running a top-level method/class
-- nifty lang features (code commenting, braces/quotes matching, code folding, structure viewing)
-- documentation pop-ups
-- basic Add Ceylon module/file functionality
-- goto class/interface (Ctrl-N)
-- identifiers work as references, which enables Ctrl-click navigation, rename refactoring, and usages search
-
-This makes of it a useful tool for browsing existing Ceylon projects, and experimenting with writing and running
-simple Ceylon programs. To be used for more serious development, many more features are needed, notably:
-
-- Code Completion (issue #26)
-- More dynamic typechecking (eg. include newly added file in typechecking correctly, use external libraries etc.)
-
+See the [Features](https://github.com/ceylon/ceylon-ide-intellij/wiki/Features) page for a detailed list of things that are working and that will be implemented in the future.
 
 # Testing & Hacking
 
