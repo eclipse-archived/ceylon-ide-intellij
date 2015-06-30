@@ -20,7 +20,7 @@ public class CeylonCompletionContributor extends CompletionContributor {
             PsiElement element = parameters.getOriginalPosition();
 
             if (element != null) {
-                ideaCompletionManager_.get_().addCompletions(parameters, context, result, ((CeylonFile) element.getContainingFile()).getCompilationUnit());
+                ideaCompletionManager_.get_().addCompletions(parameters, context, result, ((CeylonFile) element.getContainingFile()).getLastCompilationUnit());
             }
         }
     }

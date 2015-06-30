@@ -131,7 +131,7 @@ public class CeylonPositionManager implements PositionManager {
             useUnderscoreSuffix = true;
         }
 
-        if (declaration != null) {
+        if (declaration != null && declaration.getCeylonNode().getDeclarationModel() != null) {
             String cls = declaration.getCeylonNode().getDeclarationModel().getQualifiedNameString().replace("::", ".") + (useUnderscoreSuffix ? "_" : "");
 
             System.out.println(String.format("Source position %s:%d => %s", position.getFile().getName(), position.getLine(), cls));

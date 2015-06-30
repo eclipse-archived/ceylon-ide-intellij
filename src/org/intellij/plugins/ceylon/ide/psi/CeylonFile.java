@@ -19,6 +19,8 @@ import java.util.List;
 
 public class CeylonFile extends PsiFileBase {
 
+    private Tree.CompilationUnit lastCompilationUnit;
+
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
     }
@@ -30,6 +32,14 @@ public class CeylonFile extends PsiFileBase {
     public Tree.CompilationUnit getCompilationUnit() {
         final CeylonPsi.CompilationUnitPsi cuPsi = getCompilationUnitPsi();
         return cuPsi == null ? null : cuPsi.getCeylonNode();
+    }
+
+    public Tree.CompilationUnit getLastCompilationUnit() {
+        return lastCompilationUnit;
+    }
+
+    public void setLastCompilationUnit(Tree.CompilationUnit lastUnit) {
+        this.lastCompilationUnit = lastUnit;
     }
 
     @NotNull

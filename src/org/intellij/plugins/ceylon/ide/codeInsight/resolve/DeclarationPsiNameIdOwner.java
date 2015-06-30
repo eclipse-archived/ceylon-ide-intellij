@@ -6,6 +6,7 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl;
 import org.intellij.plugins.ceylon.ide.psi.CeylonTreeUtil;
 import org.jetbrains.annotations.NonNls;
@@ -29,7 +30,8 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        return CeylonTreeUtil.findPsiElement(getCeylonNode().getIdentifier(), getContainingFile());
+        Tree.Declaration node = getCeylonNode();
+        return node == null ? null : CeylonTreeUtil.findPsiElement(node.getIdentifier(), getContainingFile());
     }
 
     @NotNull

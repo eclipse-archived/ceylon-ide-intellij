@@ -1,5 +1,5 @@
 import ceylon.interop.java {
-    Iter = CeylonIterable
+    Iter=CeylonIterable
 }
 
 import com.intellij.codeInsight.completion {
@@ -10,6 +10,9 @@ import com.intellij.codeInsight.completion {
 import com.intellij.codeInsight.lookup {
     LookupElementBuilder,
     LookupElement
+}
+import com.intellij.openapi.util {
+    IconLoader
 }
 import com.intellij.util {
     ProcessingContext,
@@ -36,9 +39,6 @@ import com.redhat.ceylon.model.typechecker.model {
 
 import javax.swing {
     Icon
-}
-import com.intellij.openapi.util {
-    IconLoader
 }
 
 shared object ideaCompletionManager extends IdeCompletionManager() {
@@ -74,12 +74,14 @@ class MyLookupElementBuilder(Declaration decl, Unit unit) {
             icon = PlatformIcons.\iMETHOD_ICON;
             typeText = if (fun.declaredVoid) then "void" else fun.typeDeclaration.name;
         }
+
+        handler = functionInsertHandler;
     }
     
     void visitValue(Value val) {
         if (is Class t = val.type.declaration, t.name.first?.lowercase else false) {
             icon = IconLoader.getIcon("/icons/object.png");
-            handler = classInsertHandler;
+            handler = declarationInsertHandler;
         } else {
             icon = PlatformIcons.\iPROPERTY_ICON;
             typeText = val.typeDeclaration.name;
@@ -90,14 +92,14 @@ class MyLookupElementBuilder(Declaration decl, Unit unit) {
         icon = PlatformIcons.\iCLASS_ICON;
         tailText = " (``klass.container.qualifiedNameString``)";
         grayTailText = true;
-        handler = classInsertHandler;
+        handler = declarationInsertHandler;
     }
     
     void visitInterface(Interface int) {
         icon = PlatformIcons.\iINTERFACE_ICON;
         tailText = " (``int.container.qualifiedNameString``)";
         grayTailText = true;
-        handler = classInsertHandler;
+        handler = declarationInsertHandler;
     }
     
     void visitAlias(TypeAlias typeAlias) {
