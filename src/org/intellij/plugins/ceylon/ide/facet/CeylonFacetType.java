@@ -31,8 +31,7 @@ public class CeylonFacetType extends FacetType<CeylonFacet, CeylonFacetConfigura
 
     @Override
     public boolean isSuitableModuleType(ModuleType moduleType) {
-        // TODO perhaps we should test if the module uses a JDK instead? (cause right now we are forgetting things like PluginModuleType
-        return moduleType instanceof JavaModuleType || moduleType instanceof CeylonModuleType;
+        return moduleType instanceof JavaModuleType || moduleType instanceof CeylonModuleType || "PLUGIN_MODULE".equals(moduleType.getId());
     }
 
     @Nullable

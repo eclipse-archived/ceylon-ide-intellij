@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PLUGIN_MODULE" version="4">
   <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" manifest="file://$MODULE_DIR$/META-INF/plugin.xml" />
+  <component name="FacetManager">
+    <facet type="ceylon" name="Ceylon">
+      <configuration>
+        <option name="compileForJvm" value="false" />
+        <option name="systemRepository" value="" />
+      </configuration>
+    </facet>
+  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$CEYLON_DIST_REPO$">
@@ -11,6 +19,8 @@
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/testdata" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/source" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/resources/repo" />
     </content>
     <orderEntry type="inheritedJdk" />
