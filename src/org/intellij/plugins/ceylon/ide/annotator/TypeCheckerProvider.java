@@ -2,10 +2,13 @@ package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.facet.FacetManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
@@ -56,40 +59,47 @@ public class TypeCheckerProvider implements ModuleComponent {
     }
 
     public void projectOpened() {
+    }
+
+    public void typecheck() {
+        if (typeChecker == null) {
+            ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Preparing typechecker for module " + module.getName()) {
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    typeChecker = createTypeChecker();
+
+                    ApplicationManager.getApplication().invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
+                        }
+                    });
+                }
+            });
+        } else {
+            DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
+        }
+    }
+
+    public void projectClosed() {
+        typeChecker = null;
+        if (ceylonModel != null) {
+            ceylonModel.removeProject(module);
+        }
+    }
+
+    @Override
+    public void moduleAdded() {
+        if (FacetManager.getInstance(module).getFacetByType(CeylonFacet.ID) == null) {
+            return;
+        }
+
         if (ceylonModel == null) {
             ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
         }
         ceylonModel.addProject(module);
 
-        if (FacetManager.getInstance(module).getFacetByType(CeylonFacet.ID) == null) {
-            return;
-        }
-
-        // If the project was just created, module files (*.iml) do not yet exist. Since we need them, we defer
-        // the type checker creation after the project has been loaded
-        StartupManager.getInstance(module.getProject()).registerPostStartupActivity(new Runnable() {
-            @Override
-            public void run() {
-                typecheck();
-            }
-        });
-    }
-
-    public void typecheck() {
-        if (typeChecker == null) {
-            typeChecker = createTypeChecker();
-        }
-        DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
-    }
-
-    public void projectClosed() {
-        typeChecker = null;
-        ceylonModel.removeProject(module);
-    }
-
-    @Override
-    public void moduleAdded() {
-        System.out.println("TypeCheckerprovider.moduleAdded()");
+        typecheck();
     }
 
     public TypeChecker createTypeChecker() {
