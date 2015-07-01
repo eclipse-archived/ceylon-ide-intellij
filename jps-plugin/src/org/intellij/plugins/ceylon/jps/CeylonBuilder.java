@@ -10,6 +10,7 @@ import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
+import org.jetbrains.jps.model.module.JpsModule;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,13 +35,24 @@ public class CeylonBuilder extends ModuleLevelBuilder {
     @Override
     public ExitCode build(final CompileContext context, ModuleChunk chunk, DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder, OutputConsumer outputConsumer) throws ProjectBuildException, IOException {
 
+        final Map<JpsModule, Boolean> compileForJvm = new HashMap<>();
+        for (JpsModule module : chunk.getModules()) {
+            JpsCeylonModuleExtension facet = module.getContainer().getChild(JpsCeylonModuleExtension.KIND);
+
+            if (facet != null) {
+                compileForJvm.put(module, facet.getProperties().isCompileForJvm());
+            } else {
+                compileForJvm.put(module, false);
+            }
+        }
+
         try {
             final List<String> filesToBuild = new ArrayList<>();
 
             dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
                 @Override
                 public boolean apply(ModuleBuildTarget target, File file, JavaSourceRootDescriptor root) throws IOException {
-                    if (file.getName().endsWith(".ceylon")) {
+                    if (Boolean.TRUE.equals(compileForJvm.get(target.getModule())) && file.getName().endsWith(".ceylon")) {
                         String path = file.getAbsolutePath();
                         filesToBuild.add(path);
                     }
