@@ -69,6 +69,8 @@ public class CeylonPsiFactory {
             return new AnyClassPsiImpl(node);
         } else if (type == CLASS_DEFINITION) {
             return new ClassDefinitionPsiImpl(node);
+        } else if (type == ENUMERATED) {
+            return new EnumeratedPsiImpl(node);
         } else if (type == CONSTRUCTOR) {
             return new ConstructorPsiImpl(node);
         } else if (type == DELEGATED_CONSTRUCTOR) {

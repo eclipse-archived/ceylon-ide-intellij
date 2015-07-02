@@ -45,6 +45,7 @@ public class NodeToIElementTypeMap {
         map.put(CustomTree.ClassSpecifier.class, CeylonTypes.CLASS_SPECIFIER);
         map.put(CustomTree.AnyClass.class, CeylonTypes.ANY_CLASS);
         map.put(CustomTree.ClassDefinition.class, CeylonTypes.CLASS_DEFINITION);
+        map.put(CustomTree.Enumerated.class, CeylonTypes.ENUMERATED);
         map.put(CustomTree.Constructor.class, CeylonTypes.CONSTRUCTOR);
         map.put(CustomTree.DelegatedConstructor.class, CeylonTypes.DELEGATED_CONSTRUCTOR);
         map.put(CustomTree.ClassDeclaration.class, CeylonTypes.CLASS_DECLARATION);

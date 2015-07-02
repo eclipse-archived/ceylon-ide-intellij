@@ -125,6 +125,10 @@ public class CeylonPsi {
         @Override Tree.ClassDefinition getCeylonNode();
     }
 
+    public static interface EnumeratedPsi extends DeclarationPsi {
+        @Override Tree.Enumerated getCeylonNode();
+    }
+
     public static interface ConstructorPsi extends DeclarationPsi {
         @Override Tree.Constructor getCeylonNode();
     }

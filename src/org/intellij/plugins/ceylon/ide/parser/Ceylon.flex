@@ -73,9 +73,9 @@ IMPORT = "import"
 INTERFACE_DEFINITION = "interface"
 VALUE_MODIFIER = "value"
 FUNCTION_MODIFIER = "function"
-//LET = "let"
+LET = "let"
 MODULE = "module"
-//NEW = "new"
+NEW = "new"
 PACKAGE = "package"
 NONEMPTY = "nonempty"
 RETURN = "return"
@@ -224,7 +224,7 @@ BinaryDigit = [01]
 {LARGE_AS_OP} { return CeylonTokens.LARGE_AS_OP; }
 {LBRACE} { return CeylonTokens.LBRACE; }
 {LBRACKET} { return CeylonTokens.LBRACKET; }
-//{LET} { return CeylonTokens.LET; }
+{LET} { return CeylonTokens.LET; }
 //{LIDENTIFIER} { return CeylonTokens.LIDENTIFIER; }
 {LINE_COMMENT} { return CeylonTokens.LINE_COMMENT; }
 //{LIdentifierPrefix} { return CeylonTokens.LIdentifierPrefix; }
@@ -235,7 +235,7 @@ BinaryDigit = [01]
 {MULTIPLY_SPECIFY} { return CeylonTokens.MULTIPLY_SPECIFY; }
 //{Magnitude} { return CeylonTokens.Magnitude; }
 {NATURAL_LITERAL} { return CeylonTokens.NATURAL_LITERAL; }
-//{NEW} { return CeylonTokens.NEW; }
+{NEW} { return CeylonTokens.NEW; }
 {NONEMPTY} { return CeylonTokens.NONEMPTY; }
 {NOT_EQUAL_OP} { return CeylonTokens.NOT_EQUAL_OP; }
 {NOT_OP} { return CeylonTokens.NOT_OP; }

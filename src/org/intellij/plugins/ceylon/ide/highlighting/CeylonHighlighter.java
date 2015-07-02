@@ -62,7 +62,9 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
             TokenTypes.SUPER.getTokenType(),
             TokenTypes.IS_OP.getTokenType(),
             TokenTypes.EXISTS.getTokenType(),
-            TokenTypes.NONEMPTY.getTokenType()
+            TokenTypes.NONEMPTY.getTokenType(),
+            TokenTypes.LET.getTokenType(),
+            TokenTypes.NEW.getTokenType()
         );
 
         fillMap(keys, keywords, KEYWORD_KEY);

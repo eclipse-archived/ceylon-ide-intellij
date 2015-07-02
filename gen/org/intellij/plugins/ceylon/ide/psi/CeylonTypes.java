@@ -37,6 +37,7 @@ public interface CeylonTypes {
     IElementType CLASS_SPECIFIER = new CeylonElementType("CLASS_SPECIFIER");
     IElementType ANY_CLASS = new CeylonElementType("ANY_CLASS");
     IElementType CLASS_DEFINITION = new CeylonElementType("CLASS_DEFINITION");
+    IElementType ENUMERATED = new CeylonElementType("ENUMERATED");
     IElementType CONSTRUCTOR = new CeylonElementType("CONSTRUCTOR");
     IElementType DELEGATED_CONSTRUCTOR = new CeylonElementType("DELEGATED_CONSTRUCTOR");
     IElementType CLASS_DECLARATION = new CeylonElementType("CLASS_DECLARATION");

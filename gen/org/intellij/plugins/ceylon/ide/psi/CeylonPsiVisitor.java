@@ -73,6 +73,8 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
             visitAnyClassPsi((AnyClassPsi) element);
         } else if (element.getNode().getElementType() == CeylonTypes.CLASS_DEFINITION) {
             visitClassDefinitionPsi((ClassDefinitionPsi) element);
+        } else if (element.getNode().getElementType() == CeylonTypes.ENUMERATED) {
+            visitEnumeratedPsi((EnumeratedPsi) element);
         } else if (element.getNode().getElementType() == CeylonTypes.CONSTRUCTOR) {
             visitConstructorPsi((ConstructorPsi) element);
         } else if (element.getNode().getElementType() == CeylonTypes.DELEGATED_CONSTRUCTOR) {
@@ -876,6 +878,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitClassDeclarationPsi(@NotNull ClassDeclarationPsi element) { visitAnyClassPsi(element); }
     public void visitDelegatedConstructorPsi(@NotNull DelegatedConstructorPsi element) {}
     public void visitConstructorPsi(@NotNull ConstructorPsi element) { visitDeclarationPsi(element); }
+    public void visitEnumeratedPsi(@NotNull EnumeratedPsi element) { visitDeclarationPsi(element); }
     public void visitClassDefinitionPsi(@NotNull ClassDefinitionPsi element) { visitAnyClassPsi(element); }
     public void visitAnyClassPsi(@NotNull AnyClassPsi element) { visitClassOrInterfacePsi(element); }
     public void visitClassSpecifierPsi(@NotNull ClassSpecifierPsi element) {}

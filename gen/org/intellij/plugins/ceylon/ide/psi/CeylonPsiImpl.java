@@ -188,6 +188,12 @@ public class CeylonPsiImpl {
         @Override public Tree.ClassDefinition getCeylonNode() { return (Tree.ClassDefinition) super.getCeylonNode(); }
     }
 
+    public static class EnumeratedPsiImpl extends DeclarationPsiNameIdOwner
+            implements CeylonPsi.EnumeratedPsi {
+        public EnumeratedPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.Enumerated getCeylonNode() { return (Tree.Enumerated) super.getCeylonNode(); }
+    }
+
     public static class ConstructorPsiImpl extends DeclarationPsiNameIdOwner
             implements CeylonPsi.ConstructorPsi {
         public ConstructorPsiImpl(ASTNode astNode) { super(astNode); }
