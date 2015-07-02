@@ -36,31 +36,35 @@ import com.redhat.ceylon.model.typechecker.model {
     Class,
     Interface,
     TypeAlias,
-    Unit
+    Unit,
+    DeclarationWithProximity,
+    ModelUtil {
+        isConstructor
+    },
+    Scope,
+    FunctionOrValue
 }
 
 import javax.swing {
     Icon
 }
-import com.intellij.psi {
-    PsiWhiteSpace
-}
 
 shared object ideaCompletionManager extends IdeCompletionManager() {
     shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result, Tree.CompilationUnit cu) {
+        value isSecondLevel = parameters.invocationCount >= 2;
         value element = parameters.originalPosition;
         variable Integer startOffset = element.textOffset;
         variable Integer stopOffset = element.textOffset + element.textLength;
         variable Boolean isDot = false;
 
-        if (is PsiWhiteSpace element, element.textOffset > 1) {
+        if (element.textOffset > 1) {
             value doc = parameters.editor.document;
             value range = TextRange(element.textOffset - 1, element.textOffset);
-
+            
             if (doc.getText(range).equals(".")) {
                 isDot = true;
                 startOffset = element.textOffset - 2;
-                stopOffset = element.textOffset - 1;
+                stopOffset = element.textOffset;
             }
         }
 
@@ -70,17 +74,57 @@ shared object ideaCompletionManager extends IdeCompletionManager() {
         if (exists node = visitor.node) {
             value scopeVisitor = FindScopeVisitor(node);
             scopeVisitor.visit(cu);
+            value scope = scopeVisitor.scope else cu.scope;
 
-            for (decl in Iter(getProposals(node, scopeVisitor.scope else cu.scope, "", isDot, cu).values())) {
-                result.addElement(MyLookupElementBuilder(decl.declaration, cu.unit).lookupElement);
+            for (decl in Iter(getProposals(node, scope, "", isDot, cu).values())) {
+                if (isSecondLevel) {
+                    addSecondLevelCompletions(decl, cu.unit, scope, result);
+                } else {
+                    if (!isQualifiedType(node) || isConstructor(decl.declaration) || decl.declaration.staticallyImportable) {
+                        result.addElement(MyLookupElementBuilder(decl.declaration, cu.unit, true).lookupElement);
+                    }
+                    result.addElement(MyLookupElementBuilder(decl.declaration, cu.unit, false).lookupElement);
+                }
+            }
+            
+            if (!isDot) {
+                for (decl in Iter(getFunctionProposals(node, scope, "", isDot).values())) {
+                    result.addElement(MyLookupElementBuilder(decl.declaration, cu.unit, true).lookupElement);
+                }
+            }
+            
+            if (!isSecondLevel) {
+                result.addLookupAdvertisement("Call again to toggle second-level completions");
+            }
+        }
+    }
+    
+    void addSecondLevelCompletions(DeclarationWithProximity dwp, Unit unit, Scope scope, CompletionResultSet result) {
+        value decl = dwp.declaration;
+        
+        if (is Value decl) {
+            value matchingMembers = decl.type.declaration.getMatchingMemberDeclarations(unit, scope, "", 0);
+            
+            for (dwp2 in Iter(matchingMembers.values())) {
+                if (is FunctionOrValue|Class member = dwp2.declaration, !isConstructor(member)) {
+                    result.addElement(MyLookupElementBuilder(member, unit, true, dwp.declaration).lookupElement);
+                }
+            }
+        } else if (is Class decl) {
+            value matchingMembers = decl.type.declaration.getMatchingMemberDeclarations(unit, scope, "", 0);
+            
+            for (dwp2 in Iter(matchingMembers.values())) {
+                if (isConstructor(dwp2.declaration)) {
+                    result.addElement(MyLookupElementBuilder(dwp2.declaration, unit, true, dwp.declaration).lookupElement);
+                }
             }
         }
     }
 }
 
-class MyLookupElementBuilder(Declaration decl, Unit unit) {
+class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocation, Declaration? parentDecl = null) {
 
-    String text = decl.nameAsString;
+    String text = if (exists name = parentDecl?.nameAsString) then "``name``.``decl.nameAsString``" else decl.nameAsString;
     variable String tailText = "";
     variable Boolean grayTailText = false;
     variable Icon? icon = null;
@@ -91,22 +135,24 @@ class MyLookupElementBuilder(Declaration decl, Unit unit) {
         if (fun.annotation) {
             icon = PlatformIcons.\iANNOTATION_TYPE_ICON;
         } else {
-            value params = Iter(fun.firstParameterList.parameters).map((p) => p.type.declaration.name + " " + p.name);
-            tailText = "(``", ".join(params)``)";
             icon = PlatformIcons.\iMETHOD_ICON;
-            typeText = if (fun.declaredVoid) then "void" else fun.typeDeclaration.name;
+            
+            if (allowInvocation) {
+                value params = Iter(fun.firstParameterList.parameters).map((p) => p.type.declaration.name + " " + p.name);
+                tailText = "(``", ".join(params)``)";
+                typeText = if (fun.declaredVoid) then "void" else fun.typeDeclaration.name;
+                handler = functionInsertHandler;
+            }
         }
-
-        handler = functionInsertHandler;
     }
 
     void visitValue(Value val) {
-        if (is Class t = val.type.declaration, t.name.first?.lowercase else false) {
+        if (is Class t = val.type?.declaration, t.name.first?.lowercase else false) {
             icon = IconLoader.getIcon("/icons/object.png");
             handler = declarationInsertHandler;
         } else {
             icon = PlatformIcons.\iPROPERTY_ICON;
-            typeText = val.typeDeclaration.name;
+            typeText = val.typeDeclaration?.name;
         }
     }
 
