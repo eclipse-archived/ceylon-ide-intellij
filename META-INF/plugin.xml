@@ -61,6 +61,8 @@
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonSyntaxAnnotator"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonFileHighlightFilter"/>
+        <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonColorSettingsPage"/>
+        <additionalTextAttributes scheme="Default" file="colorSchemes/CeylonDefault.xml"/>
 
         <moduleType id="CEYLON_MODULE" implementationClass="org.intellij.plugins.ceylon.ide.project.CeylonModuleType"/>
             

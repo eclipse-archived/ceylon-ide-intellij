@@ -145,11 +145,10 @@ REMAINDER_SPECIFY = "%="
 AND_SPECIFY = "&&="
 OR_SPECIFY = "||="
 COMPILER_ANNOTATION = "@"
-//EMPTY// LIDENTIFIER =
 //EMPTY// PIDENTIFIER =
 //EMPTY// AIDENTIFIER =
-UIDENTIFIER = {IdentifierStart} {IdentifierPart}* | {UIdentifierPrefix} {IdentifierPart}+ | {LIdentifierPrefix} {IdentifierPart}+
-IdentifierStart = "_" | {Letter}
+LIDENTIFIER = "_"? [a-z] {IdentifierPart}* | {LIdentifierPrefix} {IdentifierPart}+
+UIDENTIFIER = "_"? [A-Z] {IdentifierPart}* | {UIdentifierPrefix} {IdentifierPart}+
 LIdentifierPrefix = "\\i"
 UIdentifierPrefix = "\\I"
 IdentifierPart = "_" | {Digit} | {Letter}
@@ -225,7 +224,6 @@ BinaryDigit = [01]
 {LBRACE} { return CeylonTokens.LBRACE; }
 {LBRACKET} { return CeylonTokens.LBRACKET; }
 {LET} { return CeylonTokens.LET; }
-//{LIDENTIFIER} { return CeylonTokens.LIDENTIFIER; }
 {LINE_COMMENT} { return CeylonTokens.LINE_COMMENT; }
 //{LIdentifierPrefix} { return CeylonTokens.LIdentifierPrefix; }
 {LPAREN} { return CeylonTokens.LPAREN; }
@@ -289,6 +287,7 @@ BinaryDigit = [01]
 {WHILE_CLAUSE} { return CeylonTokens.WHILE_CLAUSE; }
 {WS} { return CeylonTokens.WS; }
 
+{LIDENTIFIER} { return CeylonTokens.LIDENTIFIER; }
 {UIDENTIFIER} { return CeylonTokens.UIDENTIFIER; }
 
 // Nested multiline comments.

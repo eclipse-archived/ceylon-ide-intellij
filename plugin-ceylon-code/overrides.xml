@@ -3,5 +3,6 @@
         <add module="com.intellij.extensions" version="current" shared="true"/>
         <add module="com.intellij.annotations" version="current"/>
         <add module="com.intellij.util" version="current" shared="true"/>
+        <add module="org.jdom" version="current"/>
     </module>
 </overrides>
