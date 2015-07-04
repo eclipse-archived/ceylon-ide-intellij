@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.annotator;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -34,6 +35,7 @@ import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
 
 public class TypeCheckerProvider implements ModuleComponent {
 
+    public static final Logger LOGGER = Logger.getInstance(TypeCheckerProvider.class);
     private final Module module;
     private TypeChecker typeChecker;
     IdeaCeylonProjects ceylonModel;
@@ -118,6 +120,8 @@ public class TypeCheckerProvider implements ModuleComponent {
         boolean offline = ceylonConfig.getOffline();
         File cwd = ceylonConfig.getProject().getRootDirectory();
 
+        LOGGER.info("Using Ceylon system repository in " + systemRepo);
+
         RepositoryManager repositoryManager = repoManager()
                 .offline(offline)
                 .cwd(cwd)
@@ -162,13 +166,12 @@ public class TypeCheckerProvider implements ModuleComponent {
         }
 
         long startTime = System.currentTimeMillis();
-        System.out.println("Getting type checker");
         TypeChecker checker = builder.getTypeChecker();
-        System.out.println("Got type checker in " + (System.currentTimeMillis() - startTime) + "ms");
+        LOGGER.info("Got type checker in " + (System.currentTimeMillis() - startTime) + "ms");
 
         startTime = System.currentTimeMillis();
         checker.process();
-        System.out.println("Type checker process()ed in " + (System.currentTimeMillis() - startTime) + "ms");
+        LOGGER.info("Type checker process()ed in " + (System.currentTimeMillis() - startTime) + "ms");
 
         return checker;
     }

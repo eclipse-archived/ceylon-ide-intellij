@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.compiler;
 
 import com.intellij.openapi.application.PathManager;
+import com.intellij.util.PathUtil;
 import com.redhat.ceylon.common.Versions;
 import com.redhat.ceylon.compiler.java.launcher.Main;
 import com.redhat.ceylon.compiler.java.tools.CeylonLog;
@@ -126,10 +127,8 @@ public class CeylonCompiler {
             throw new IllegalArgumentException("Can't detect compiler output path");
         }
 
-//        String pathToRepo = "/usr/local/Cellar/ceylon/1.0.0/libexec/repo/";
-//
-//        options.add("-sysrep");
-//        options.add(pathToRepo);
+        options.add("-sysrep"); // FIXME should take the repo configured in the facet, if present
+        options.add(getSystemRepoPath());
 
         String pathToCeylonc = PathManager.getJarPathForClass(CeyloncTool.class);
         File pathToJars = new File(pathToCeylonc).getParentFile();
@@ -140,4 +139,16 @@ public class CeylonCompiler {
         return options;
     }
 
+    private String getSystemRepoPath() {
+        File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonCompiler.class));
+
+        if (pluginClassesDir.isDirectory()) {
+            File ceylonRepoDir = new File(pluginClassesDir, "repo");
+            if (ceylonRepoDir.exists()) {
+                return ceylonRepoDir.getAbsolutePath();
+            }
+        }
+
+        throw new RuntimeException("Embedded Ceylon system repo not found");
+    }
 }
