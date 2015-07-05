@@ -20,8 +20,6 @@ public class CeylonTypeCheckerAnnotator implements Annotator {
 
         if (phasedUnit == null) return;
 
-        ceylonFile.setLastCompilationUnit(phasedUnit.getCompilationUnit());
-
         if (phasedUnit.getCompilationUnit() != null) {
             phasedUnit.getCompilationUnit().visit(new CeylonTypeCheckerVisitor(holder));
         }
