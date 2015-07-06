@@ -21,6 +21,12 @@ import java.util {
 import ceylon.interop.java {
     CeylonIterable
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+    highlight
+}
+import com.intellij.openapi.project {
+    Project
+}
 
 
 object unlinkedSpanEmitter satisfies SpanEmitter {
@@ -135,21 +141,21 @@ class CeylonSpanEmitter(Scope scope, Unit unit) satisfies SpanEmitter {
     }
 }
 
-object ceylonBlockEmitter satisfies BlockEmitter {
+class CeylonBlockEmitter(Project project) satisfies BlockEmitter {
     
     shared actual void emitBlock(StringBuilder builder, List<JString> lines, String? meta) {
         if (!lines.empty) {
-            builder.append("<pre>");
+            builder.append("<div style='margin-left: 5px'><pre>");
             
             value code = "\n".join(CeylonIterable(lines)) + "\n";
             
             if (exists meta, (meta.empty || "ceylon".equals(meta))) {
-                builder.append(code.string); // TODO highlight
+                builder.append(highlight(code.string, project));
             } else {
                 builder.append(code.string);
             }
             
-            builder.append("</pre>\n");
+            builder.append("</pre></div>\n");
         }
     }
 }

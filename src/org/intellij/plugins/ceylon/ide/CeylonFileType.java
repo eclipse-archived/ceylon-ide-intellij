@@ -37,6 +37,6 @@ public class CeylonFileType extends LanguageFileType {
     @Nullable
     @Override
     public Icon getIcon() {
-        return IconLoader.getIcon("/icons/ceylon.png");
+        return IconLoader.getIcon("/icons/ceylonFile.png");
     }
 }

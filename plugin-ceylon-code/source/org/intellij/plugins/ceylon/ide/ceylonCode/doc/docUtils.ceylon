@@ -1,10 +1,27 @@
+import ceylon.collection {
+    ArrayList
+}
 import ceylon.interop.java {
     javaString,
     CeylonIterable
 }
+
 import com.github.rjeschke.txtmark {
     Processor,
     Configuration
+}
+import com.intellij.icons {
+    AllIcons
+}
+import com.intellij.openapi.editor.colors {
+    TextAttributesKey,
+    EditorColorsManager
+}
+import com.intellij.openapi.project {
+    Project
+}
+import com.intellij.util {
+    PlatformIcons
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Node,
@@ -12,6 +29,9 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
+}
+import com.redhat.ceylon.model.cmr {
+    JDKUtils
 }
 import com.redhat.ceylon.model.typechecker.model {
     Referenceable,
@@ -36,33 +56,31 @@ import com.redhat.ceylon.model.typechecker.model {
     Type,
     ClassOrInterface
 }
+import com.redhat.ceylon.model.typechecker.util {
+    TypePrinter
+}
+
+import java.awt {
+    Font
+}
 import java.lang {
     JString=String,
     StringBuilder,
     JCharacter=Character {
         UnicodeScript,
         UnicodeBlock
-    }    
+    }
 }
-import java.awt {
-    Font
+
+import javax.swing {
+    Icon
 }
-import ceylon.collection {
-    ArrayList
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+    ceylonHighlightingColors
 }
-import com.redhat.ceylon.model.typechecker.util {
-    TypePrinter
-}
-import com.intellij.openapi.editor.colors {
-    TextAttributesKey,
-    EditorColorsManager,
-    CodeInsightColors
-}
-import com.intellij.openapi.editor {
-    DefaultLanguageHighlighterColors
-}
-import com.redhat.ceylon.model.cmr {
-    JDKUtils
+import com.intellij.openapi.util {
+    IconLoader
 }
 
 String psiProtocol = "psi_element://";
@@ -87,7 +105,7 @@ shared object docGenerator {
     }
     
     void appendCharacterInfo(StringBuilder builder, String string) {
-        builder.append(color(escape("'``string``'"), DefaultLanguageHighlighterColors.\iSTRING)).append("<br/>\n");
+        builder.append(color(escape("'``string``'"), ceylonHighlightingColors.strings)).append("<br/>\n");
         value codepoint = JCharacter.codePointAt(javaString(string), 0);
         builder.append("Unicode name: ").append(JCharacter.getName(codepoint)).append("<br/>\n");
         builder.append("Codepoint: <code>U+").append(formatInteger(codepoint, 16).uppercased.padLeading(4, '0')).append("</code><br/>\n");
@@ -104,7 +122,7 @@ shared object docGenerator {
             return model.nameAsString + "/" + model.version;
         }
         else if (is Declaration model) {
-            String result = ":" + model.name;
+            String result = ":" + (model.name else "new");
             Scope? container = model.container;
             if (is Referenceable container) {
                 return buildUrl(container) + result;
@@ -126,7 +144,14 @@ shared object docGenerator {
         
         shared actual String getSimpleDeclarationName(Declaration? declaration, Unit unit) {
             if (exists declaration) {
-                return buildLink(declaration, super.getSimpleDeclarationName(declaration, unit));
+                variable String? name = super.getSimpleDeclarationName(declaration, unit);
+                if (!exists n = name, is Constructor declaration) {
+                    name = "new";
+                }
+                if (exists n = name) {
+                    value col = if (n.first?.lowercase else false) then ceylonHighlightingColors.identifier else ceylonHighlightingColors.type;
+                    return buildLink(declaration, color(name, col));
+                }
             }
             
             return "&lt;unknown&gt;";
@@ -145,7 +170,7 @@ shared object docGenerator {
             
             if (is Tree.StringLiteral term) {
                 value text = if (term.text.size < 250) then escape(term.text) else escape(term.text.spanTo(250)) + "...";
-                builder.append(color("\"``text``\"", DefaultLanguageHighlighterColors.\iSTRING));
+                builder.append(color("\"``text``\"", ceylonHighlightingColors.strings));
                 
                 // TODO display info for selected char? 
             } else if (is Tree.CharLiteral term, term.text.size > 2) {
@@ -154,14 +179,14 @@ shared object docGenerator {
                 value text = term.text.replace("_", "");
                 
                 if (exists first = text.first, first == '#') {
-                    builder.append(color(parseInteger(text.spanFrom(1), 16), DefaultLanguageHighlighterColors.\iNUMBER));
+                    builder.append(color(parseInteger(text.spanFrom(1), 16), ceylonHighlightingColors.number));
                 } else if (exists first = text.first, first == '$') {
-                    builder.append(color(parseInteger(text.spanFrom(1), 2), DefaultLanguageHighlighterColors.\iNUMBER));
+                    builder.append(color(parseInteger(text.spanFrom(1), 2), ceylonHighlightingColors.number));
                 } else {
-                    builder.append(color(parseInteger(text), DefaultLanguageHighlighterColors.\iNUMBER));
+                    builder.append(color(parseInteger(text), ceylonHighlightingColors.number));
                 }
             } else if (is Tree.FloatLiteral term) {
-                builder.append(color(parseFloat(term.text.replace("_", "")), DefaultLanguageHighlighterColors.\iNUMBER));
+                builder.append(color(parseFloat(term.text.replace("_", "")), ceylonHighlightingColors.number));
             }
             
             return builder.string;
@@ -171,7 +196,7 @@ shared object docGenerator {
     }
     
     // see getInferredTypeHoverText(Node node, IProject project)
-    String? getInferredTypeText(Tree.LocalModifier node) {
+    String? getInferredTypeText(Tree.LocalModifier node, Project project) {
         if (exists model = node.typeModel) {
             return "Inferred type: <code>``printer.print(model, node.unit)``</code>";
         }
@@ -182,11 +207,12 @@ shared object docGenerator {
     void addPackage(Declaration decl, StringBuilder builder) {
         Package? pkg = (decl of Referenceable).unit.\ipackage;
         if (exists pkg, !pkg.qualifiedNameString.empty) {
-            builder.append("<p><b>``pkg.qualifiedNameString``</b></p>\n");
+            addIcon(builder, IconLoader.getIcon("/icons/package.png"));
+            builder.append("Member of package ``pkg.qualifiedNameString``<br/>\n<br/>\n"); // TODO link
         }
     }
     
-    void addSignature(Declaration decl, StringBuilder builder, Node node) {
+    void addSignature(Declaration decl, StringBuilder builder, Node node, Project project) {
         value annotations = StringBuilder();
         if (decl.shared) { annotations.append("shared "); }
         if (decl.actual) { annotations.append("actual "); }
@@ -202,20 +228,27 @@ shared object docGenerator {
         }
         if (decl.annotation) { annotations.append("annotation "); }
        
-        builder.append(color(annotations.string, CodeInsightColors.\iANNOTATION_NAME_ATTRIBUTES));
+        if (annotations.length() > 0) {
+            addIcon(builder, AllIcons.Gutter.\iExtAnnotation);
+            builder.append(color(annotations.string, ceylonHighlightingColors.annotation));
+            builder.append("\n");
+        }
        
         if (is Class decl) {
             if (decl.anonymous) {
-                builder.append(color("object ", DefaultLanguageHighlighterColors.\iKEYWORD));
+                addIcon(builder, PlatformIcons.\iANONYMOUS_CLASS_ICON);
+                builder.append(color("object ", ceylonHighlightingColors.keyword));
             } else {
-                builder.append(color("class ", DefaultLanguageHighlighterColors.\iKEYWORD));
+                addIcon(builder, PlatformIcons.\iCLASS_ICON);
+                builder.append(color("class ", ceylonHighlightingColors.keyword));
             }
         } else if (is Interface decl) {
-            builder.append(color("interface ", DefaultLanguageHighlighterColors.\iKEYWORD));
+            addIcon(builder, PlatformIcons.\iINTERFACE_ICON);
+            builder.append(color("interface ", ceylonHighlightingColors.keyword));
         } else if (is TypeAlias decl) {
-            builder.append(color("alias ", DefaultLanguageHighlighterColors.\iKEYWORD));
+            builder.append(color("alias ", ceylonHighlightingColors.keyword));
         } else if (is Constructor decl) {
-            builder.append(color("new ", DefaultLanguageHighlighterColors.\iKEYWORD));
+            builder.append(color("new ", ceylonHighlightingColors.keyword));
         } else if (is TypedDeclaration decl) {
             addTypedDeclarationSignature(decl, builder);
         }
@@ -227,11 +260,18 @@ shared object docGenerator {
         addInheritance(decl, builder);
     }
     
-    void addDoc(Declaration decl, StringBuilder builder) {
+    void addIcon(StringBuilder builder, Icon icon, Integer leftPadding = 0) {
+        if (leftPadding > 0) {
+            builder.append("&nbsp".repeat(leftPadding));
+        }
+        builder.append("<img src='").append(icon.string).append("'/> ");
+    }
+
+    void addDoc(Declaration decl, StringBuilder builder, Project project) {
         value doc = CeylonIterable(decl.annotations).find((ann) => ann.name.equals("doc") || ann.name.empty);
         
         if (exists doc, !doc.positionalArguments.empty) {
-            value string = markdown(doc.positionalArguments.get(0).string, resolveScope(decl), (decl of Referenceable).unit);
+            value string = markdown(doc.positionalArguments.get(0).string, project, resolveScope(decl), (decl of Referenceable).unit);
             builder.append("<div>\n").append(string).append("</div>");
         }
     }
@@ -244,9 +284,9 @@ shared object docGenerator {
         }
     }
     
-    String markdown(String text, Scope? linkScope = null, Unit? unit = null) {
+    String markdown(String text, Project project, Scope? linkScope = null, Unit? unit = null) {
         value builder = Configuration.builder().forceExtentedProfile();
-        builder.setCodeBlockEmitter(ceylonBlockEmitter);
+        builder.setCodeBlockEmitter(CeylonBlockEmitter(project));
         if (exists linkScope, exists unit) {
             builder.setSpecialLinkEmitter(CeylonSpanEmitter(linkScope, unit));
         } else {
@@ -257,33 +297,36 @@ shared object docGenerator {
     }
     
     void addInheritance(Declaration decl, StringBuilder builder) {
-        if (is TypedDeclaration decl) {
-        } else if (is TypeDeclaration decl) {
+        value typeDecl = if (is TypedDeclaration decl, exists td = decl.typeDeclaration, td.anonymous) then td else decl;
+        
+        if (is TypeDeclaration typeDecl) {
             value unit = (decl of Referenceable).unit;
             
-            if (exists cases = decl.type.caseTypes) {
-                builder.append("\n")
-                        .append(color("of ", DefaultLanguageHighlighterColors.\iKEYWORD))
+            if (exists cases = typeDecl.type.caseTypes) {
+                builder.append("\n");
+                addIcon(builder, AllIcons.General.\iOverridenMethod, 2);
+                builder.append(color("of ", ceylonHighlightingColors.keyword))
                         .append(" | ".join(CeylonIterable(cases).map((c) => printer.print(c, unit))));
                 
-                // FIXME compilation error
-                //if (exists it = decl.selfType) {
-                //    builder.append(" (self type)");
-                //}
+                if (exists it = typeDecl.selfType) {
+                    builder.append(" (self type)");
+                }
             }
             
-            if (is Class decl) {
-                if (exists sup = decl.extendedType) {
-                    builder.append("\n")
-                            .append(color("extends ", DefaultLanguageHighlighterColors.\iKEYWORD))
+            if (is Class typeDecl) {
+                if (exists sup = typeDecl.extendedType) {
+                    builder.append("\n");
+                    addIcon(builder, AllIcons.General.\iOverridingMethod, 2);
+                    builder.append(color("extends ", ceylonHighlightingColors.keyword))
                             .append(printer.print(sup, unit));
                 }
             }
             
-            if (!decl.satisfiedTypes.empty) {
-                builder.append("\n")
-                        .append(color("satisfies ", DefaultLanguageHighlighterColors.\iKEYWORD))
-                        .append(" &amp; ".join(CeylonIterable(decl.satisfiedTypes).map((s) => printer.print(s, unit))));
+            if (!typeDecl.satisfiedTypes.empty) {
+                builder.append("\n");
+                addIcon(builder, AllIcons.General.\iImplementingMethod, 2);
+                builder.append(color("satisfies ", ceylonHighlightingColors.keyword))
+                        .append(" &amp; ".join(CeylonIterable(typeDecl.satisfiedTypes).map((s) => printer.print(s, unit))));
             }
         }
     }
@@ -295,12 +338,12 @@ shared object docGenerator {
         value type = getType(decl, sequenced, unit);
        
         if (decl.dynamicallyTyped) {
-            builder.append(color("dynamic", DefaultLanguageHighlighterColors.\iKEYWORD));
+            builder.append(color("dynamic", ceylonHighlightingColors.keyword));
         } else if (is Value decl, type.declaration.anonymous, !type.typeConstructor) {
-            builder.append(color("object", DefaultLanguageHighlighterColors.\iKEYWORD));
+            builder.append(color("object", ceylonHighlightingColors.keyword));
         } else if (is Function decl) {
             if (decl.declaredVoid) {
-                builder.append(color("void", DefaultLanguageHighlighterColors.\iKEYWORD));
+                builder.append(color("void", ceylonHighlightingColors.keyword));
             } else {
                 builder.append(printer.print(type, unit));
             }
@@ -412,7 +455,7 @@ shared object docGenerator {
     }
     
     // see getDocumentationFor(CeylonParseController controller, Declaration dec, Node node, Reference pr)
-    String getDeclarationDoc(Declaration model, Node node) {
+    String getDeclarationDoc(Declaration model, Node node, Project project) {
         variable value decl = model;
         if (is Value model) {
             TypeDeclaration? typeDecl = model.typeDeclaration;
@@ -424,22 +467,39 @@ shared object docGenerator {
         
         value builder = StringBuilder();
         
-        addPackage(decl, builder);
         builder.append("<pre>");
-        addSignature(decl, builder, node);
+        addSignature(decl, builder, node, project);
         builder.append("</pre>\n");
-        addDoc(decl, builder);
+        addPackage(decl, builder);
+        addDoc(decl, builder, project);
         addParametersDoc(decl, builder);
         // TODO addClassMembers
         // TODO addNothingTypeInfo
-        // TODO addUnitInfo
+        addUnit(decl, builder);
         
         return builder.string;
     }
+    
+    void addUnit(Declaration decl, StringBuilder builder) {
+        builder.append("<br/>\n");
+        addIcon(builder, IconLoader.getIcon("/icons/ceylonFile.png"));
+        builder.append("&nbsp;Declared in ").append(decl.unit.filename);
+
+        builder.append("<br/>\n");
+        value mod = decl.unit.\ipackage.\imodule;
+        addIcon(builder, AllIcons.Nodes.\iArtifact);
+        if (mod.nameAsString.empty || mod.nameAsString.equals("default")) {
+            builder.append("&nbsp;Belongs to default module.");
+        } else {
+            // TODO link to module
+            builder.append("&nbsp;Belongs to ").append(mod.nameAsString)
+                    .append(color(" \"``mod.version``\"", ceylonHighlightingColors.strings));
+        }
+    }
                 
-    shared String? getDocumentationText(Referenceable model, Node node) {
+    shared String? getDocumentationText(Referenceable model, Node node, Project project) {
         if (is Declaration model) {
-            return getDeclarationDoc(model, node);
+            return getDeclarationDoc(model, node, project);
         } else if (is Package model) {
             return getPackageDoc(model, node);
         } else if (is Module model) {
@@ -453,10 +513,10 @@ shared object docGenerator {
         value builder = StringBuilder();
         
         if (pack.shared) {
-            builder.append(color("shared ", CodeInsightColors.\iANNOTATION_NAME_ATTRIBUTES));
+            builder.append(color("shared ", ceylonHighlightingColors.annotation));
         }
         
-        builder.append(color("package ", DefaultLanguageHighlighterColors.\iKEYWORD)).append(pack.nameAsString).append("<br/>\n");
+        builder.append(color("package ", ceylonHighlightingColors.keyword)).append(pack.nameAsString).append("<br/>\n");
         
         // TODO documentation
         
@@ -483,9 +543,9 @@ shared object docGenerator {
     shared String? getModuleDoc(Module mod, Node node) {
         value builder = StringBuilder();
 
-        builder.append(color("module ", DefaultLanguageHighlighterColors.\iKEYWORD))
+        builder.append(color("module ", ceylonHighlightingColors.keyword))
                 .append(mod.nameAsString)
-                .append(color(" \"``mod.version``\"", DefaultLanguageHighlighterColors.\iSTRING))
+                .append(color(" \"``mod.version``\"", ceylonHighlightingColors.strings))
                 .append("\n");
         
         if (mod.java) {
@@ -509,20 +569,20 @@ shared object docGenerator {
     }    
     
     // see getHoverText(CeylonEditor editor, IRegion hoverRegion)
-    shared JString? getDocumentation(Tree.CompilationUnit rootNode, Integer offset) {
+    shared JString? getDocumentation(Tree.CompilationUnit rootNode, Integer offset, Project project) {
         value node = getHoverNode(rootNode, offset);
         variable String? doc = null;
         
         if (exists node) {
             if (is Tree.LocalModifier node) {
-                doc = getInferredTypeText(node);
+                doc = getInferredTypeText(node, project);
             } else if (is Tree.Literal node) {
                 doc = getTermTypeText(node);
             } else {
                 Referenceable? model = nodes.getReferencedDeclaration(node, rootNode);
                 
                 if (exists model) {
-                    doc = getDocumentationText(model, node);
+                    doc = getDocumentationText(model, node, project);
                 }
             }
         }

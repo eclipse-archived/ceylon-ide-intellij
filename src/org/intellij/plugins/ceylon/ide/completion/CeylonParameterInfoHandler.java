@@ -2,27 +2,23 @@ package org.intellij.plugins.ceylon.ide.completion;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.lang.parameterInfo.*;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
-import com.intellij.ui.ColorUtil;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.util.FindNodeVisitor;
 import com.redhat.ceylon.model.typechecker.model.*;
 import com.redhat.ceylon.model.typechecker.util.TypePrinter;
-import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPsi.ArgumentListPsi, Functional> {
+import static org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlight_.highlight;
 
-    private static ceylonHighlightingColors_ ceylonHighlightingColors = ceylonHighlightingColors_.get_();
+public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPsi.ArgumentListPsi, Functional> {
 
     public static final com.intellij.util.Function<String, String> HTMLIZE = new com.intellij.util.Function<String, String>() {
         @Override
@@ -126,7 +122,7 @@ public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPs
         if (fun.getFirstParameterList().getParameters().size() > 0) {
             for (Parameter param : fun.getFirstParameterList().getParameters()) {
                 String paramLabel = getParameterLabel(param, ((Declaration) fun).getUnit());
-
+                paramLabel = highlight(paramLabel, context.getParameterOwner().getProject()).replace('<', '≤').replace('>', '≥');
                 if (i == context.getCurrentParameterIndex()) {
                     highlightOffsetStart = builder.length();
                     highlightOffsetEnd = builder.length() + paramLabel.length();
@@ -148,9 +144,7 @@ public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPs
     }
 
     private String getParameterLabel(Parameter param, Unit unit) {
-        TextAttributes attributes = EditorColorsManager.getInstance().getGlobalScheme().getAttributes(ceylonHighlightingColors.getType());
-        String color = ColorUtil.toHex(attributes.getForegroundColor());
-        StringBuilder builder = new StringBuilder("≤font color='#").append(color).append("'≥").append(printer.print(param.getType(), unit)).append("≤/font≥ ").append(param.getName());
+        StringBuilder builder = new StringBuilder(printer.print(param.getType(), unit)).append(" ").append(param.getName());
 
         if (param.getModel() instanceof Function) {
             Function model = (Function) param.getModel();

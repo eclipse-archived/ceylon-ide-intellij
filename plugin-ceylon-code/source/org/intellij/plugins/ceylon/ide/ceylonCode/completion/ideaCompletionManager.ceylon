@@ -148,7 +148,7 @@ class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocatio
 
     void visitValue(Value val) {
         if (is Class t = val.type?.declaration, t.name.first?.lowercase else false) {
-            icon = IconLoader.getIcon("/icons/object.png");
+            icon = PlatformIcons.\iANONYMOUS_CLASS_ICON;
             handler = declarationInsertHandler;
         } else {
             icon = PlatformIcons.\iPROPERTY_ICON;
