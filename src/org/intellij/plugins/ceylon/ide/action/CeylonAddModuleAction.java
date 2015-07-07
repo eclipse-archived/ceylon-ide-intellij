@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.ide.action;
 
 import com.google.common.base.Preconditions;
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.ide.util.DirectoryUtil;
@@ -41,7 +42,7 @@ import static java.util.Arrays.asList;
 public class CeylonAddModuleAction extends AnAction {
 
     public CeylonAddModuleAction() {
-        super(PlatformIcons.PACKAGE_ICON);
+        super(AllIcons.Nodes.Artifact);
     }
 
     public void actionPerformed(final AnActionEvent e) {

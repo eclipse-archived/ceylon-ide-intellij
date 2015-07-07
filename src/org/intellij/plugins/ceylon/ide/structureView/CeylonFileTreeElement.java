@@ -5,7 +5,6 @@ import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.psi.CeylonClass;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +39,12 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
 
         List<StructureViewTreeElement> elements = new ArrayList<>();
 
+        if (!compilationUnit.getImportList().getImports().isEmpty()) {
+            CeylonPsi.ImportPsi[] imports = PsiTreeUtil.getChildrenOfType(myElement.getFirstChild(), CeylonPsi.ImportPsi.class);
+
+            elements.add(new CeylonImportListTreeElement(imports));
+        }
+
         for (Tree.Declaration declaration : declarations) {
             StructureViewTreeElement node = getTreeElementForDeclaration(myElement, declaration);
             if (node != null) {
@@ -56,7 +61,7 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
         }
 
         if (declaration instanceof CustomTree.ClassOrInterface) {
-            CeylonClass psiClass = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonClass.class);
+            CeylonPsi.ClassOrInterfacePsi psiClass = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.ClassOrInterfacePsi.class);
             return new CeylonClassTreeElement(psiClass);
         } else if (declaration instanceof Tree.AnyMethod) {
             CeylonPsi.AnyMethodPsi psiMethod = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.AnyMethodPsi.class);

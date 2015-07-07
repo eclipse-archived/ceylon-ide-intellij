@@ -7,8 +7,8 @@ import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.psi.CeylonClass;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,10 +24,10 @@ import static org.intellij.plugins.ceylon.ide.structureView.CeylonFileTreeElemen
 /**
  * A structure node which represents a CeylonClass (class or interface definition/declaration).
  */
-public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonClass> {
-    private CeylonClass myClass;
+public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonPsi.ClassOrInterfacePsi> {
+    private CeylonPsi.ClassOrInterfacePsi myClass;
 
-    public CeylonClassTreeElement(CeylonClass element) {
+    public CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi element) {
         super(element);
         this.myClass = element;
     }
@@ -75,6 +75,6 @@ public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonClass> {
 
     @Override
     public Icon getIcon(boolean open) {
-        return myClass.isInterface() ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
+        return myClass instanceof CeylonPsi.AnyInterfacePsi ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
     }
 }

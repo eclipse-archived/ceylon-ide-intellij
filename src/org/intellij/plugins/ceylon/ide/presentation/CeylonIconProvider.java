@@ -1,6 +1,8 @@
 package org.intellij.plugins.ceylon.ide.presentation;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.IconProvider;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
@@ -18,9 +20,9 @@ public class CeylonIconProvider extends IconProvider {
             String fileName = ((CeylonFile) element).getName();
 
             if (fileName.equals(ModuleManager.PACKAGE_FILE)) {
-                return PlatformIcons.PACKAGE_ICON;
+                return IconLoader.getIcon("/icons/package.png");
             } else if (fileName.equals(ModuleManager.MODULE_FILE)) {
-                return PlatformIcons.CLOSED_MODULE_GROUP_ICON;
+                return AllIcons.Nodes.Artifact;
             }
         }
 
