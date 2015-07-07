@@ -38,6 +38,14 @@ public class FindDeclarationNodeVisitor extends Visitor {
         super.visit(that);
     }
 
+    @Override
+    public void visit(Tree.AttributeDeclaration that) {
+        if (isDeclaration(that.getDeclarationModel())) {
+            declarationNode = that;
+        }
+        super.visit(that);
+    }
+
     public void visitAny(Node node) {
         if (declarationNode == null) {
             super.visitAny(node);

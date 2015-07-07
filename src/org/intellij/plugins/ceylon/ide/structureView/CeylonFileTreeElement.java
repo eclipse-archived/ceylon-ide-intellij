@@ -46,7 +46,7 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
         }
 
         for (Tree.Declaration declaration : declarations) {
-            StructureViewTreeElement node = getTreeElementForDeclaration(myElement, declaration);
+            StructureViewTreeElement node = getTreeElementForDeclaration(myElement, declaration, false);
             if (node != null) {
                 elements.add(node);
             }
@@ -55,20 +55,24 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
         return elements;
     }
 
-    static StructureViewTreeElement getTreeElementForDeclaration(CeylonFile myFile, Tree.Declaration declaration) {
+    static StructureViewTreeElement getTreeElementForDeclaration(CeylonFile myFile, Tree.Declaration declaration, boolean isInherited) {
         if (declaration == null) {
             return null;
         }
 
         if (declaration instanceof CustomTree.ClassOrInterface) {
             CeylonPsi.ClassOrInterfacePsi psiClass = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.ClassOrInterfacePsi.class);
-            return new CeylonClassTreeElement(psiClass);
+            return new CeylonClassTreeElement(psiClass, isInherited);
         } else if (declaration instanceof Tree.AnyMethod) {
             CeylonPsi.AnyMethodPsi psiMethod = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.AnyMethodPsi.class);
-            return new CeylonMethodTreeElement(psiMethod);
+            return new CeylonFunctionTreeElement(psiMethod, isInherited);
+        } else if (declaration instanceof Tree.ObjectDefinition) {
+            CeylonPsi.ObjectDefinitionPsi psiObject = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.ObjectDefinitionPsi.class);
+            return new CeylonObjectTreeElement(psiObject, isInherited);
+        } else if (declaration instanceof Tree.AttributeDeclaration) {
+            CeylonPsi.AttributeDeclarationPsi psiDecl = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.AttributeDeclarationPsi.class);
+            return new CeylonAttributeTreeElement(psiDecl, isInherited);
         }
-
-        // TODO support attributes?
 
         return null;
     }

@@ -45,12 +45,6 @@ public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement> 
     public Icon getIcon(boolean open) {
         return IconLoader.getIcon("/icons/ceylonImports.gif");
     }
-
-    @NotNull
-    @Override
-    public ItemPresentation getPresentation() {
-        return super.getPresentation();
-    }
 }
 
 class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi> {

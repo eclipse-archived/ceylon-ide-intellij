@@ -308,9 +308,10 @@ shared object docGenerator {
                 builder.append(color("of ", ceylonHighlightingColors.keyword))
                         .append(" | ".join(CeylonIterable(cases).map((c) => printer.print(c, unit))));
                 
-                if (exists it = typeDecl.selfType) {
-                    builder.append(" (self type)");
-                }
+                // FIXME compilation error
+                //if (exists it = decl.selfType) {
+                //    builder.append(" (self type)");
+                //}
             }
             
             if (is Class typeDecl) {

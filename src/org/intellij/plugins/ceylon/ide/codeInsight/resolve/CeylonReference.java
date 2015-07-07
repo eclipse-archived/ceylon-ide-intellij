@@ -53,13 +53,9 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         PsiFile containingFile = myElement.getContainingFile();
 
         if (unit != compilationUnit.getUnit()) {
-            String protocol = unit.getFullPath().contains("!/") ? "jar://" : "file://";
-            VirtualFile vfile = VirtualFileManager.getInstance().findFileByUrl(protocol + unit.getFullPath());
-            if (vfile != null) {
-                containingFile = PsiManager.getInstance(myElement.getProject()).findFile(vfile);
-                if (containingFile instanceof CeylonFile) {
-                    compilationUnit = ((CeylonFile) containingFile).getCompilationUnit();
-                }
+            containingFile = CeylonTreeUtil.getDeclaringFile(unit, containingFile.getProject());
+            if (containingFile instanceof CeylonFile) {
+                compilationUnit = ((CeylonFile) containingFile).getCompilationUnit();
             }
         }
 

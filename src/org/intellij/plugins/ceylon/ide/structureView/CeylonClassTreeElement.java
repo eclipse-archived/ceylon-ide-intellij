@@ -3,10 +3,12 @@ package org.intellij.plugins.ceylon.ide.structureView;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.lang.ASTNode;
+import com.intellij.ui.LayeredIcon;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
@@ -24,11 +26,11 @@ import static org.intellij.plugins.ceylon.ide.structureView.CeylonFileTreeElemen
 /**
  * A structure node which represents a CeylonClass (class or interface definition/declaration).
  */
-public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonPsi.ClassOrInterfacePsi> {
+public class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ClassOrInterfacePsi> {
     private CeylonPsi.ClassOrInterfacePsi myClass;
 
-    public CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi element) {
-        super(element);
+    public CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi element, boolean isInherited) {
+        super(element, isInherited);
         this.myClass = element;
     }
 
@@ -50,7 +52,7 @@ public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonPsi.ClassOr
 
         for (Node node : bodyChildren) {
             if (node instanceof Tree.Declaration) {
-                StructureViewTreeElement child = getTreeElementForDeclaration((CeylonFile) myClass.getContainingFile(), (Tree.Declaration) node);
+                StructureViewTreeElement child = getTreeElementForDeclaration((CeylonFile) myClass.getContainingFile(), (Tree.Declaration) node, false);
                 if (child != null) {
                     elements.add(child);
                 }
@@ -63,18 +65,24 @@ public class CeylonClassTreeElement extends PsiTreeElementBase<CeylonPsi.ClassOr
     @Nullable
     @Override
     public String getPresentableText() {
-        Tree.Declaration ceylonNode = myClass.getCeylonNode();
+        String kind = myClass instanceof CeylonPsi.AnyInterfacePsi ? "interface " : "class ";
 
-        if (ceylonNode != null) {
-            return ceylonNode.getIdentifier().getText();
-        }
-
-        ASTNode identifier = myClass.getNode().findChildByType(CeylonTypes.IDENTIFIER);
-        return (identifier == null) ? null : identifier.getText();
+        return kind + getName();
     }
 
     @Override
     public Icon getIcon(boolean open) {
-        return myClass instanceof CeylonPsi.AnyInterfacePsi ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
+        Declaration model = getElement().getCeylonNode().getDeclarationModel();
+        Icon icon = myClass instanceof CeylonPsi.AnyInterfacePsi ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
+
+        if (model != null) {
+            if (model.isShared()) {
+                return LayeredIcon.createHorizontalIcon(icon, PlatformIcons.PUBLIC_ICON);
+            } else {
+                return LayeredIcon.createHorizontalIcon(icon, PlatformIcons.PRIVATE_ICON);
+            }
+        }
+
+        return icon;
     }
 }

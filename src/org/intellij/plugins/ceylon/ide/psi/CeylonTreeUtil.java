@@ -1,10 +1,16 @@
 package org.intellij.plugins.ceylon.ide.psi;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiUtilCore;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.model.typechecker.model.Unit;
+import org.jetbrains.annotations.Nullable;
 
 public class CeylonTreeUtil {
 
@@ -37,5 +43,16 @@ public class CeylonTreeUtil {
 
         throw new IllegalArgumentException(String.format("No PSI node found for ceylon node of type %s at (%d-%d).%n",
                 ceylonNode.getNodeType(), ceylonNode.getStartIndex(), ceylonNode.getStopIndex()));
+    }
+
+    @Nullable
+    public static PsiFile getDeclaringFile(Unit unit, Project project) {
+        String protocol = unit.getFullPath().contains("!/") ? "jar://" : "file://";
+        VirtualFile vfile = VirtualFileManager.getInstance().findFileByUrl(protocol + unit.getFullPath());
+        if (vfile != null) {
+            return PsiManager.getInstance(project).findFile(vfile);
+        }
+
+        return null;
     }
 }
