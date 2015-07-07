@@ -115,14 +115,8 @@ public class CeylonCompiler {
 
         File outputDir = chunk.representativeTarget().getOutputDir();
         if (outputDir != null) {
-            String outputPath = outputDir.getAbsolutePath();
-            // TODO temp fix until we have a real "Ceylon" project kind, with configurable paths
-            String suffixToStrip = File.separator + "production" + File.separator + chunk.getModules().iterator().next().getProject().getName();
-            if (outputPath.endsWith(suffixToStrip)) {
-                outputPath = outputPath.substring(0, outputPath.length() - suffixToStrip.length());
-            }
             options.add("-out");
-            options.add(outputPath);
+            options.add(outputDir.getAbsolutePath());
         } else {
             throw new IllegalArgumentException("Can't detect compiler output path");
         }
