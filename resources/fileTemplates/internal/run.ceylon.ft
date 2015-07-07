@@ -1,5 +1,5 @@
 "Run the module `${MODULE_NAME}`."
 
-void run() {
+shared void run() {
 
 }
