@@ -34,7 +34,7 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
 
         Tree.CompilationUnit cu = tc.getPhasedUnitFromRelativePath(sourceFileName).getCompilationUnit();
 
-        String doc = docGenerator_.get_().getDocumentation(cu, cursorOffset);
+        String doc = docGenerator_.get_().getDocumentation(cu, cursorOffset, getProject());
 
         File expectedFile = new File("plugin-ceylon-code/test-resources/" + expectedFileName);
         if (expectedFile.exists()) {
