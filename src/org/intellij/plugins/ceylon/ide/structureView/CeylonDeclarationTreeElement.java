@@ -7,7 +7,7 @@ import com.intellij.navigation.LocationPresentation;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.util.ui.UIUtil;
-import com.redhat.ceylon.model.typechecker.model.Declaration;
+import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +34,52 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
     @Override
     public String getPresentableText() {
         return null;
+    }
+
+    @Nullable
+    protected String getPresentableParameters() {
+        Declaration model = getElement().getCeylonNode().getDeclarationModel();
+
+        if (model instanceof Functional) {
+            StringBuilder builder = new StringBuilder("(");
+
+            for (Parameter parameter : ((Functional) model).getFirstParameterList().getParameters()) {
+                builder.append(parameter.getType().asString(model.getUnit())).append(", ");
+            }
+
+            if (builder.length() > 1) {
+                builder.setLength(builder.length() - 2);
+            }
+
+            builder.append(")");
+
+            return builder.toString();
+        }
+
+        return "";
+    }
+
+    @Nullable
+    protected String getPresentableTypeParameters() {
+        Declaration model = getElement().getCeylonNode().getDeclarationModel();
+
+        if (model instanceof Generic && ((Generic) model).getTypeParameters().size() > 0) {
+            StringBuilder builder = new StringBuilder("<");
+
+            for (TypeParameter parameter : ((Generic) model).getTypeParameters()) {
+                builder.append(parameter.getType().asString(model.getUnit())).append(", ");
+            }
+
+            if (builder.length() > 1) {
+                builder.setLength(builder.length() - 2);
+            }
+
+            builder.append(">");
+
+            return builder.toString();
+        }
+
+        return "";
     }
 
     @Override

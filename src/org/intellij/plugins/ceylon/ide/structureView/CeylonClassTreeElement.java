@@ -1,8 +1,6 @@
 package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
-import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.lang.ASTNode;
 import com.intellij.ui.LayeredIcon;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
@@ -11,7 +9,6 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,7 +64,7 @@ public class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonP
     public String getPresentableText() {
         String kind = myClass instanceof CeylonPsi.AnyInterfacePsi ? "interface " : "class ";
 
-        return kind + getName();
+        return kind + getName() + getPresentableTypeParameters() + getPresentableParameters();
     }
 
     @Override

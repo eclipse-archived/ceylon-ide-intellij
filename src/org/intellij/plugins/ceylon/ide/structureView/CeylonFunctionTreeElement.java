@@ -17,7 +17,7 @@ public class CeylonFunctionTreeElement extends CeylonDeclarationTreeElement<Ceyl
     @Nullable
     @Override
     public String getPresentableText() {
-        return "function " + getName();
+        return "function " + getName() + getPresentableTypeParameters() + getPresentableParameters();
     }
 
     @Override
