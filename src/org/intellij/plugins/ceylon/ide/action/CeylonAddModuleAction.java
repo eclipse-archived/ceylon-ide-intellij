@@ -5,28 +5,20 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.ide.util.DirectoryUtil;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiManager;
-import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.io.impl.FileSystemVirtualFile;
 import com.redhat.ceylon.model.typechecker.model.Module;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,63 +30,44 @@ import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterables.all;
 import static com.redhat.ceylon.ide.validate.NameValidator.packageNameIsLegal;
 import static java.util.Arrays.asList;
+import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 
-public class CeylonAddModuleAction extends AnAction {
+public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
     public CeylonAddModuleAction() {
         super(AllIcons.Nodes.Artifact);
     }
 
-    public void actionPerformed(final AnActionEvent e) {
-        final VirtualFile eventDir = findEventDir(e);
+    @Override
+    protected void createFiles(final AnActionEvent e, final TypeChecker typeChecker, final VirtualFile srcRoot, final String eventPackage, final PsiDirectory srcRootDir) {
+        // todo: choose module version in the same dialog
+        final String moduleName = Messages.showInputDialog(e.getProject(), message("ceylon.module.wizard.message"), message("ceylon.module.wizard.title"), null, null, new AddModuleInputValidator(typeChecker));
 
-        if (eventDir != null && e.getProject() != null) {
-            TypeCheckerProvider typeCheckerProvider = ModuleUtil.findModuleForFile(eventDir, e.getProject()).getComponent(TypeCheckerProvider.class);
-            final TypeChecker typeChecker = typeCheckerProvider.getTypeChecker();
+        if (moduleName != null) {
+            ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                @Override
+                public void run() {
+                    FileTemplateManager templateManager = FileTemplateManager.getInstance(e.getProject());
+                    PsiDirectory subdirectory = DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
 
-            final VirtualFile srcRoot = getSourceRoot(e, eventDir);
-            if (srcRoot != null) {
-                String eventPath = eventDir.getPath();
-                final String srcRootPath = srcRoot.getPath();
-                assert eventPath.startsWith(srcRootPath) : eventPath + " not in " + srcRootPath;
+                    Properties variables = new Properties();
+                    variables.put("MODULE_NAME", moduleName);
+                    variables.put("MODULE_VERSION", "1.0.0");
 
-                // Make eventPath relative
-                eventPath = eventPath.length() <= srcRootPath.length() ? "" : eventPath.substring(srcRootPath.length() + 1);
+                    try {
+                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("module.ceylon"), "module.ceylon", variables, subdirectory);
+                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("package.ceylon"), "package.ceylon", variables, subdirectory);
+                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), "run.ceylon", variables, subdirectory);
+                    } catch (Exception e1) {
+                        Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
+                    }
 
-                final String eventPackage = eventPath.replace('/', '.');
-                final PsiDirectory eventPsiDir = PsiManager.getInstance(e.getProject()).findDirectory(eventDir);
-
-                // todo: choose module version in the same dialog
-                final String moduleName = Messages.showInputDialog(e.getProject(), "Enter module name", "Add Ceylon Module", null, null, new AddModuleInputValidator(typeChecker));
-
-                if (moduleName != null) {
-                    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            FileTemplateManager templateManager = FileTemplateManager.getInstance();
-                            PsiDirectory subdirectory = DirectoryUtil.createSubdirectories(moduleName, eventPsiDir, ".");
-
-                            Properties variables = new Properties();
-                            String fullModuleName = (eventPackage.isEmpty() ? "" : eventPackage + ".") + moduleName;
-                            variables.put("MODULE_NAME", fullModuleName);
-                            variables.put("MODULE_VERSION", "1.0.0");
-
-                            try {
-                                FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("module.ceylon"), "module.ceylon", variables, subdirectory);
-                                FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("package.ceylon"), "package.ceylon", variables, subdirectory);
-                                FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), "run.ceylon", variables, subdirectory);
-                            } catch (Exception e1) {
-                                Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
-                            }
-
-                            // FIXME com.redhat.ceylon.compiler.typechecker.context.PhasedUnits expects to parse modules from the root folder
-                            // so the only way to not parse everything here seems to be by modifying PhaseUnits or injecting a different ModuleManager into it
-                            FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(new File(srcRoot.getCanonicalPath()));
-                            parseUnit(virtualFile, typeChecker, e.getProject());
-                        }
-                    });
+                    // FIXME com.redhat.ceylon.compiler.typechecker.context.PhasedUnits expects to parse modules from the root folder
+                    // so the only way to not parse everything here seems to be by modifying PhaseUnits or injecting a different ModuleManager into it
+                    FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(new File(srcRoot.getCanonicalPath()));
+                    parseUnit(virtualFile, typeChecker, e.getProject());
                 }
-            }
+            });
         }
     }
 
@@ -105,26 +78,6 @@ public class CeylonAddModuleAction extends AnAction {
                 typeChecker.getPhasedUnits().parseUnit(virtualFile);
             }
         });
-    }
-
-    private static VirtualFile getSourceRoot(AnActionEvent e, VirtualFile eventDir) {
-        return ProjectRootManager.getInstance(e.getProject()).getFileIndex().getSourceRootForFile(eventDir);
-    }
-
-    private static VirtualFile findEventDir(AnActionEvent e) {
-        VirtualFile eventSourceFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
-
-        while (eventSourceFile != null && !(eventSourceFile instanceof VirtualDirectoryImpl)) {
-            eventSourceFile = eventSourceFile.getParent();
-        }
-
-        return eventSourceFile;
-    }
-
-    @Override
-    public void update(AnActionEvent e) {
-        final VirtualFile eventDir = findEventDir(e);
-        e.getPresentation().setVisible(eventDir != null && getSourceRoot(e, eventDir) != null);
     }
 
     private static class AddModuleInputValidator implements InputValidatorEx {
@@ -149,13 +102,13 @@ public class CeylonAddModuleAction extends AnAction {
         @Override
         public String getErrorText(String name) {
             if (name.trim().isEmpty()) {
-                return "Please enter a name for your module";
+                return message("ceylon.module.wizard.error.blank");
             }
             if (!packageNameIsLegal(name)) {
-                return String.format("\"%s\" is not a valid name for a module.", name);
+                return message("ceylon.module.wizard.error.illegal", name);
             }
             if (moduleExists(name)) {
-                return String.format("Module %s already exists.", name);
+                return message("ceylon.module.wizard.error.duplicate", name);
             }
             return null;
         }
