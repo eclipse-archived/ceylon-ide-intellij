@@ -39,11 +39,14 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;
                 return docGenerator_.get_().getDocumentationText(referenceable, null, element.getProject()).value;
             }
-            return docGenerator_.get_().getDocumentation(((CeylonFile) element.getContainingFile()).getCompilationUnit(), element.getTextOffset(), element.getProject());
+            if (element.getContainingFile() != null) {
+                return docGenerator_.get_().getDocumentation(((CeylonFile) element.getContainingFile()).getCompilationUnit(), element.getTextOffset(), element.getProject());
+            }
         } catch (ceylon.language.AssertionError | Exception e) {
             e.printStackTrace();
             throw e;
         }
+        return null;
     }
 
     @Nullable

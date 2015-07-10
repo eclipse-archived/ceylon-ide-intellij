@@ -1,11 +1,10 @@
 package org.intellij.plugins.ceylon.ide.codeInsight.resolve;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
@@ -41,6 +40,9 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
         Node parentNode = ((CeylonCompositeElement) myElement.getParent()).getCeylonNode();
 
+        if (parentNode instanceof Tree.ImportPath) {
+            return resolveDirectory(myElement, (Tree.ImportPath) parentNode);
+        }
         if (parentNode instanceof Tree.InvocationExpression) {
             parentNode = ((Tree.InvocationExpression) parentNode).getPrimary();
         }
@@ -70,6 +72,31 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             return CeylonTreeUtil.findPsiElement(declarationNode, containingFile);
         }
         return containingFile;
+    }
+
+    @Nullable
+    private PsiElement resolveDirectory(PsiElement path, Tree.ImportPath descriptor) {
+        for (int i = 0; i < descriptor.getIdentifiers().size(); i++) {
+            Tree.Identifier identifier = descriptor.getIdentifiers().get(i);
+
+            if (identifier.getStartIndex().equals(path.getTextOffset())) {
+                int nbUpLevels = descriptor.getIdentifiers().size() - i - 1;
+                PsiDirectory directory = path.getContainingFile().getParent();
+
+                for (int j = 0; j < nbUpLevels; j++) {
+                    if (directory != null) {
+                        directory = directory.getParentDirectory();
+                    }
+                }
+
+                if (directory != null && directory.getName().equals(path.getText())) {
+                    return directory;
+                } else {
+                    Logger.getInstance(CeylonReference.class).warn("Could not find directory " + path.getText() + " from package " + descriptor.getText());
+                }
+            }
+        }
+        return null;
     }
 
     @NotNull

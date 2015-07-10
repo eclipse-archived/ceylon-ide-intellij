@@ -13,6 +13,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,13 +51,29 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
     @Nullable
     @Override
     public Object getData(Collection<AbstractTreeNode> selected, String dataName) {
+        if (selected.size() != 1) {
+            return null;
+        }
+        AbstractTreeNode node = selected.iterator().next();
+        if (node instanceof ModuleTreeNode) {
+            ModuleTreeNode module = (ModuleTreeNode) node;
+
+            if (module.directory == null) {
+                return null; // default module is not a real folder
+            }
+            if (dataName.equals("context.Project")) {
+                return module.directory.getProject();
+            } else if (dataName.equals("psi.Element")) {
+                return module.directory;
+            }
+        }
         return null;
     }
 
     @NotNull
     private Collection<AbstractTreeNode> buildModuleList(@NotNull AbstractTreeNode parent, @NotNull Collection<AbstractTreeNode> children, @NotNull VirtualFile sourceRoot) {
         List<AbstractTreeNode> modules = new ArrayList<>();
-        ModuleTreeNode defaultModule = new ModuleTreeNode(parent, "(default module)");
+        ModuleTreeNode defaultModule = new ModuleTreeNode(parent.getProject(), null, "(default module)");
         modules.add(defaultModule);
 
         Map<String, ModuleTreeNode> modulesByName = new HashMap<>();
@@ -77,7 +94,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
             } else {
                 for (PsiDirectoryNode submodule : submodules) {
                     String moduleName = computeModuleName(sourceRoot, submodule.getVirtualFile());
-                    ModuleTreeNode subModule = new ModuleTreeNode(parent, moduleName);
+                    ModuleTreeNode subModule = new ModuleTreeNode(parent.getProject(), submodule.getValue(), moduleName);
                     subModule.addChild(submodule);
                     modules.add(subModule);
                     modulesByName.put(moduleName, subModule);
@@ -127,9 +144,14 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
     private static class ModuleTreeNode extends AbstractTreeNode<String> {
 
         List<AbstractTreeNode> children = new ArrayList<>();
+        @Nullable
+        protected final PsiDirectory directory;
+        private final String moduleName;
 
-        public ModuleTreeNode(AbstractTreeNode parent, String moduleName) {
-            super(parent.getProject(), moduleName);
+        public ModuleTreeNode(Project parent, @Nullable PsiDirectory directory, String moduleName) {
+            super(parent, moduleName);
+            this.directory = directory;
+            this.moduleName = moduleName;
         }
 
         public void addChild(AbstractTreeNode child) {
@@ -138,13 +160,13 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
 
         @NotNull
         @Override
-        public Collection<? extends AbstractTreeNode> getChildren() {
+        public Collection<AbstractTreeNode> getChildren() {
             return children;
         }
 
         @Override
-        protected void update(PresentationData presentation) {
-            presentation.setPresentableText(getValue());
+        public void update(PresentationData presentation) {
+            presentation.setPresentableText(moduleName);
             presentation.setIcon(AllIcons.Nodes.Artifact);
         }
     }
