@@ -78,6 +78,7 @@
         <lang.foldingBuilder language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonFoldingBuilder"/>
         <lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.formatting.CeylonFormattingModelBuilder"/>
         <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.structureView.CeylonStructureViewFactory"/>
+        <treeStructureProvider implementation="org.intellij.plugins.ceylon.ide.projectView.ModuleTreeStructureProvider" order="last"/>
 
         <defaultLiveTemplatesProvider implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplatesProvider"/>
         <liveTemplateContext implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplateContext"/>
