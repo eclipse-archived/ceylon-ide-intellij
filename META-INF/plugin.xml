@@ -43,6 +43,9 @@
         <action id="Ceylon.AddCeylonPackage" class="org.intellij.plugins.ceylon.ide.action.CeylonAddPackageAction" text="Ceylon _Package" description="Add a new Ceylon package">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="Ceylon.AddCeylonModule"/>
         </action>
+        <action id="Ceylon.AddCeylonFile" class="org.intellij.plugins.ceylon.ide.action.CeylonAddFileAction" text="Ceylon _File" description="Add a new Ceylon file">
+            <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="Ceylon.AddCeylonPackage"/>
+        </action>
         <action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction" id="Ceylon.PasteAsCeylon" text="Paste Java as Ceylon">
             <add-to-group group-id="CutCopyPasteGroup" anchor="last"/>
         </action>
