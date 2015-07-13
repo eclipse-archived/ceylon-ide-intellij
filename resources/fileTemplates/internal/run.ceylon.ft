@@ -1,5 +1,5 @@
 "Run the module `${MODULE_NAME}`."
 
-shared void run() {
+shared void ${FUN_NAME}() {
 
 }

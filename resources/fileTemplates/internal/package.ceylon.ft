@@ -1,3 +1,3 @@
 "Default documentation for package `${MODULE_NAME}`."
 
-shared package ${MODULE_NAME};
+#if (${IS_SHARED} == "true")shared #end package ${MODULE_NAME};

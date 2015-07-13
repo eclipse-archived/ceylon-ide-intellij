@@ -40,6 +40,7 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
 
                     Properties variables = new Properties();
                     variables.put("MODULE_NAME", packageName);
+                    variables.put("IS_SHARED", "true");
 
                     try {
                         FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("package.ceylon"), "package.ceylon", variables, subdirectory);

@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.ide.action;
 
-import com.google.common.base.Preconditions;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
@@ -12,25 +11,17 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.InputValidatorEx;
-import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.io.impl.FileSystemVirtualFile;
-import com.redhat.ceylon.model.typechecker.model.Module;
+import org.intellij.plugins.ceylon.ide.wizard.CreateCeylonModuleWizard;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Properties;
-import java.util.Set;
-
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Iterables.all;
-import static com.redhat.ceylon.ide.validate.NameValidator.packageNameIsLegal;
-import static java.util.Arrays.asList;
-import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 
 public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
@@ -40,24 +31,31 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
     @Override
     protected void createFiles(final AnActionEvent e, final TypeChecker typeChecker, final VirtualFile srcRoot, final String eventPackage, final PsiDirectory srcRootDir) {
-        // todo: choose module version in the same dialog
-        final String moduleName = Messages.showInputDialog(e.getProject(), message("ceylon.module.wizard.message"), message("ceylon.module.wizard.title"), null, null, new AddModuleInputValidator(typeChecker));
+        final CreateCeylonModuleWizard wizard = new CreateCeylonModuleWizard(e.getProject(), typeChecker);
 
-        if (moduleName != null) {
+        wizard.show();
+
+        if (wizard.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+            final String moduleName = wizard.getModuleName();
+            final String unitFileName = wizard.getCompilationUnitName().endsWith(".ceylon") ? wizard.getCompilationUnitName() : wizard.getCompilationUnitName() + ".ceylon";
+            final String unitName = wizard.getCompilationUnitName().endsWith(".ceylon") ? wizard.getCompilationUnitName().substring(0, ".ceylon".length()) : wizard.getCompilationUnitName();
+
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 @Override
                 public void run() {
                     FileTemplateManager templateManager = FileTemplateManager.getInstance(e.getProject());
-                    PsiDirectory subdirectory = DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
+                    PsiDirectory subdirectory = findOrCreateModuleDirectory();
 
                     Properties variables = new Properties();
                     variables.put("MODULE_NAME", moduleName);
-                    variables.put("MODULE_VERSION", "1.0.0");
+                    variables.put("MODULE_VERSION", wizard.getModuleVersion());
+                    variables.put("IS_SHARED", Boolean.toString(wizard.isSharedPackage()));
+                    variables.put("FUN_NAME", unitName);
 
                     try {
                         FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("module.ceylon"), "module.ceylon", variables, subdirectory);
                         FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("package.ceylon"), "package.ceylon", variables, subdirectory);
-                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), "run.ceylon", variables, subdirectory);
+                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), unitFileName, variables, subdirectory);
                     } catch (Exception e1) {
                         Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
                     }
@@ -66,6 +64,12 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                     // so the only way to not parse everything here seems to be by modifying PhaseUnits or injecting a different ModuleManager into it
                     FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(new File(srcRoot.getCanonicalPath()));
                     parseUnit(virtualFile, typeChecker, e.getProject());
+                }
+
+                @NotNull
+                private PsiDirectory findOrCreateModuleDirectory() {
+                    VirtualFile targetDir = srcRoot.findChild(moduleName.replace('.', '/'));
+                    return targetDir != null ? PsiManager.getInstance(e.getProject()).findDirectory(targetDir) : DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
                 }
             });
         }
@@ -79,55 +83,4 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
             }
         });
     }
-
-    private static class AddModuleInputValidator implements InputValidatorEx {
-        private final TypeChecker typeChecker;
-
-        public AddModuleInputValidator(TypeChecker typeChecker) {
-            Preconditions.checkNotNull(typeChecker);
-            this.typeChecker = typeChecker;
-        }
-
-        @Override
-        public boolean checkInput(String name) {
-            return !name.trim().isEmpty() && packageNameIsLegal(name) && !moduleExists(name);
-        }
-
-        @Override
-        public boolean canClose(String inputString) {
-            return checkInput(inputString);
-        }
-
-        @Nullable
-        @Override
-        public String getErrorText(String name) {
-            if (name.trim().isEmpty()) {
-                return message("ceylon.module.wizard.error.blank");
-            }
-            if (!packageNameIsLegal(name)) {
-                return message("ceylon.module.wizard.error.illegal", name);
-            }
-            if (moduleExists(name)) {
-                return message("ceylon.module.wizard.error.duplicate", name);
-            }
-            return null;
-        }
-
-        private boolean moduleExists(String moduleName) {
-            Set<Module> modules;
-            if (all(asList(typeChecker, typeChecker.getContext(), typeChecker.getContext().getModules(),
-                            modules = typeChecker.getContext().getModules().getListOfModules()),
-                    notNull())) {
-                for (Module module : modules) {
-                    if (module.getNameAsString().equals(moduleName)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            // cannot tell whether the module exists, so let's be safe! Should never happen.
-            return true;
-        }
-    }
-
 }
