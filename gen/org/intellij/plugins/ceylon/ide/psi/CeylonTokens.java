@@ -134,5 +134,7 @@ public interface CeylonTokens {
     IElementType VERBATIM_STRING = new CeylonTokenType("VERBATIM_STRING");
     IElementType VOID_MODIFIER = new CeylonTokenType("VOID_MODIFIER");
     IElementType WHILE_CLAUSE = new CeylonTokenType("WHILE_CLAUSE");
+    IElementType STRING_TEMPLATE = new CeylonTokenType("STRING_TEMPLATE");
+    IElementType STRING_INTERP = new CeylonTokenType("STRING_INTERP");
     IElementType WS = TokenType.WHITE_SPACE;
 }

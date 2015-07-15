@@ -16,7 +16,7 @@ import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
 %eof}
 //%debug
 
-%xstate MCOMMENT
+%xstate MCOMMENT, IN_STRING
 
 %{
     int multiCommentLevel = 0;
@@ -36,15 +36,8 @@ FractionalMagnitude = "m" | "u" | "n" | "p" | "f"
 NATURAL_LITERAL = {Digits} ( /* ("." ("0".."9")) => */ "." {Digits} ({Exponent}|{Magnitude}|{FractionalMagnitude})? | {FractionalMagnitude} | {Magnitude}? ) | "#" {HexDigits} | "$" {BinaryDigits}
 //EMPTY// ASTRING_LITERAL =
 //EMPTY// AVERBATIM_STRING =
-CHAR_LITERAL = "'" {CharPart} "'"
-/////// The STRING_* macros are taken from the spec, not from Ceylon.g as the others.
-STRING_LITERAL = "\"" {StringCharacter}* "`"? "\""
-StringCharacter = [^\\\"`] | "`" [^`\"] | {EscapeSequence}
-STRING_START = "\"" {StringCharacter}* "``"
-STRING_MID = "``" {StringCharacter}* "``"
-STRING_END = "``" {StringCharacter}* "\""
-//StringTemplate = {StringStart} ({ValueExpression} {StringMid})* {} {StringEnd}
-VERBATIM_STRING =	"\"\"\"" ([^\"] | "\"" [^\"] | """" [^\"])* ("\"" ("\"" ("\"" ("\"" "\""?)?)?)?)?
+CHAR_LITERAL = "'" {CharPart} "'"?
+VERBATIM_STRING =	"\"\"\"" ([^\"] | "\"" [^\"] | "\"\"" [^\"])* ("\"" ("\"" ("\"" ("\"" "\""?)?)?)?)?
 CharPart = ( [^\\'] | {EscapeSequence} )*
 EscapeSequence = "\\" ( [^{] | "{" ([^}])* "}"? )
 WS = ( " " | "\r" | "\t" | "\f" | "\n" )+
@@ -170,7 +163,9 @@ BinaryDigit = [01]
 {ASSIGN} { return CeylonTokens.ASSIGN; }
 //{ASTRING_LITERAL} { return CeylonTokens.ASTRING_LITERAL; }
 //{AVERBATIM_STRING} { return CeylonTokens.AVERBATIM_STRING; }
-{BACKTICK} { return CeylonTokens.BACKTICK; }
+<YYINITIAL> {
+    {BACKTICK} { return CeylonTokens.BACKTICK; }
+}
 {BREAK} { return CeylonTokens.BREAK; }
 //{BinaryDigit} { return CeylonTokens.BinaryDigit; }
 //{BinaryDigits} { return CeylonTokens.BinaryDigits; }
@@ -264,10 +259,6 @@ BinaryDigit = [01]
 {SMALL_AS_OP} { return CeylonTokens.SMALL_AS_OP; }
 {SPECIFY} { return CeylonTokens.SPECIFY; }
 {SPREAD_OP} { return CeylonTokens.SPREAD_OP; }
-{STRING_END} { return CeylonTokens.STRING_END; }
-{STRING_LITERAL} { return CeylonTokens.STRING_LITERAL; }
-{STRING_MID} { return CeylonTokens.STRING_MID; }
-{STRING_START} { return CeylonTokens.STRING_START; }
 {SUBTRACT_SPECIFY} { return CeylonTokens.SUBTRACT_SPECIFY; }
 {SUM_OP} { return CeylonTokens.SUM_OP; }
 {SUPER} { return CeylonTokens.SUPER; }
@@ -289,6 +280,15 @@ BinaryDigit = [01]
 
 {LIDENTIFIER} { return CeylonTokens.LIDENTIFIER; }
 {UIDENTIFIER} { return CeylonTokens.UIDENTIFIER; }
+
+"\"" { yybegin(IN_STRING); return CeylonTokens.STRING_LITERAL; }
+
+<IN_STRING> {
+    "``" [^`\"]* "``"? { return CeylonTokens.STRING_TEMPLATE; }
+    "`" [^`\"]* "`"? { return CeylonTokens.STRING_INTERP; }
+    "\"" { yybegin(YYINITIAL); return CeylonTokens.STRING_LITERAL; }
+    [^`\"]* { return CeylonTokens.STRING_LITERAL; }
+}
 
 // Nested multiline comments.
 // This creates multiple tokens per comment, which shouldn't be a problem

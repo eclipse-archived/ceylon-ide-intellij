@@ -8,6 +8,7 @@ import com.intellij.psi.tree.TokenSet;
 import gnu.trove.THashMap;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
 import org.intellij.plugins.ceylon.ide.parser.CeylonFlexLexerAdapter;
+import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -76,12 +77,12 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
 
         keys.put(TokenTypes.NATURAL_LITERAL.getTokenType(), ceylonHighlightingColors.getNumber());
         keys.put(TokenTypes.FLOAT_LITERAL.getTokenType(), ceylonHighlightingColors.getNumber());
+
         keys.put(TokenTypes.CHAR_LITERAL.getTokenType(), ceylonHighlightingColors.getChar());
-        keys.put(TokenTypes.STRING_LITERAL.getTokenType(), ceylonHighlightingColors.getStrings());
-        keys.put(TokenTypes.STRING_START.getTokenType(), ceylonHighlightingColors.getStrings());
-        keys.put(TokenTypes.STRING_MID.getTokenType(), ceylonHighlightingColors.getStrings());
-        keys.put(TokenTypes.STRING_END.getTokenType(), ceylonHighlightingColors.getStrings());
-        keys.put(TokenTypes.VERBATIM_STRING.getTokenType(), ceylonHighlightingColors.getStrings());
+
+        keys.put(CeylonTokens.STRING_LITERAL, ceylonHighlightingColors.getStrings());
+        keys.put(CeylonTokens.STRING_INTERP, ceylonHighlightingColors.getStrings());
+        keys.put(CeylonTokens.VERBATIM_STRING, ceylonHighlightingColors.getStrings());
 
         keys.put(TokenTypes.LPAREN.getTokenType(), ceylonHighlightingColors.getBrace());
         keys.put(TokenTypes.RPAREN.getTokenType(), ceylonHighlightingColors.getBrace());
