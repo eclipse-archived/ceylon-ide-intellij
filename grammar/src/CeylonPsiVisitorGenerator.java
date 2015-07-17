@@ -25,6 +25,12 @@ public class CeylonPsiVisitorGenerator {
                 "\n" +
                 "public class CeylonPsiVisitor extends PsiElementVisitor {\n" +
                 "\n" +
+                "    private boolean recursive;\n" +
+                "\n" +
+                "    public CeylonPsiVisitor(boolean recursive) {\n" +
+                "        this.recursive = recursive;\n" +
+                "    }\n" +
+                "\n" +
                 "    @Override\n" +
                 "    public void visitElement(PsiElement element) {\n" +
                 "        super.visitElement(element);\n" +
@@ -45,6 +51,9 @@ public class CeylonPsiVisitorGenerator {
             os.write(("            visit" + psiClass + "((" + psiClass + ") element);\n").getBytes());
         }
 
+        os.write("        }\n\n".getBytes());
+        os.write("        if (recursive) {\n".getBytes());
+        os.write("            element.acceptChildren(this);\n".getBytes());
         os.write("        }\n".getBytes());
         os.write("    }\n".getBytes());
 

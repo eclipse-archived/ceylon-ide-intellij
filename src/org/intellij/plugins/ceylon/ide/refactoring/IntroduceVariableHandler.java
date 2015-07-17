@@ -15,17 +15,18 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.refactoring.IntroduceTargetChooser;
 import com.intellij.refactoring.RefactoringActionHandler;
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler;
 import com.intellij.util.Function;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.refactoring.ExtractValueResult;
+import com.redhat.ceylon.ide.common.refactoring.FindContainingExpressionsVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import org.intellij.plugins.ceylon.ide.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.IdeaExtractValueRefactoring;
+import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonTreeUtil;
@@ -70,13 +71,25 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
         CeylonPsi.StatementPsi parentStatement = PsiTreeUtil.getParentOfType(value, CeylonPsi.StatementPsi.class);
 
         if (parentStatement == null) {
-            System.out.println("nope");
             return;
         }
 
-        CeylonPsi.DeclarationPsi inserted = (CeylonPsi.DeclarationPsi) parentStatement.getParent().addBefore(declaration, parentStatement);
-        PsiElement identifier = PsiTreeUtil.getChildOfType(inserted, CeylonPsi.IdentifierPsi.class);
-        value.replace(identifier);
+        boolean isAssigningWholeStatement = parentStatement.getChildren().length == 1
+                && parentStatement.getChildren()[0].getTextLength() == value.getTextLength();
+
+        CeylonPsi.DeclarationPsi inserted;
+        PsiElement identifier;
+
+        if (isAssigningWholeStatement) {
+            inserted = (CeylonPsi.DeclarationPsi) parentStatement.replace(declaration);
+        } else {
+            inserted = (CeylonPsi.DeclarationPsi) parentStatement.getParent().addBefore(declaration, parentStatement);
+        }
+
+        if (!isAssigningWholeStatement) {
+            identifier = PsiTreeUtil.getChildOfType(inserted, CeylonPsi.IdentifierPsi.class);
+            value.replace(identifier);
+        }
 
         PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
 
@@ -110,21 +123,9 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
     }
 
     private PsiElement selectValueToExtract(final Project project, final Editor editor, final PsiFile file) {
-        PsiElement elementAtCaret = PsiUtilBase.getElementAtCaret(editor);
-
-        List<PsiElement> allParentExpressions = new ArrayList<>();
-        PsiElement parentExpression = elementAtCaret;
-        int lastOffset = elementAtCaret == null ? -1 : elementAtCaret.getTextOffset() + 1;
-
-        while (parentExpression != null) {
-            if (parentExpression != elementAtCaret && parentExpression.getTextOffset() < lastOffset) {
-                allParentExpressions.add(parentExpression);
-                lastOffset = parentExpression.getTextOffset();
-            }
-
-            //noinspection unchecked
-            parentExpression = PsiTreeUtil.getParentOfType(parentExpression, CeylonPsi.PrimaryPsi.class);
-        }
+        FindContainingExpressionsVisitor visitor = new FindContainingExpressionsVisitor(editor.getCaretModel().getOffset());
+        visitor.visitAny(PsiTreeUtil.findChildOfType(file, CeylonPsi.CompilationUnitPsi.class).getCeylonNode());
+        List<CeylonPsi.TermPsi> allParentExpressions = toPsi(file, visitor.getElements());
 
         if (allParentExpressions.isEmpty()) {
             return null;
@@ -132,20 +133,38 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
             return allParentExpressions.get(0);
         } else {
             IntroduceTargetChooser.showChooser(editor, allParentExpressions,
-                    new Pass<PsiElement>() {
-                        public void pass(final PsiElement selectedValue) {
+                    new Pass<CeylonPsi.TermPsi>() {
+                        public void pass(final CeylonPsi.TermPsi selectedValue) {
                             createAndIntroduceValue(project, editor, file, selectedValue);
                         }
                     },
-                    new Function<PsiElement, String>() {
+                    new Function<CeylonPsi.TermPsi, String>() {
                         @Override
-                        public String fun(PsiElement element) {
+                        public String fun(CeylonPsi.TermPsi element) {
                             return element.getText();
                         }
                     }, "Expressions"
             );
         }
         return null;
+    }
+
+    private List<CeylonPsi.TermPsi> toPsi(PsiFile file, Tree.Term[] elements) {
+        List<CeylonPsi.TermPsi> psi = new ArrayList<>();
+
+        for (Tree.Term term : elements) {
+            FindMatchingPsiNodeVisitor visitor = new FindMatchingPsiNodeVisitor(term, CeylonPsi.TermPsi.class);
+            visitor.visitFile(file);
+            CeylonCompositeElement element = visitor.getPsi();
+
+            if (element != null) {
+                psi.add((CeylonPsi.TermPsi) element);
+            } else {
+                System.err.println("Couldn't find PSI node for Node " + term);
+            }
+        }
+
+        return psi;
     }
 
     @Override

@@ -16,6 +16,10 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
     private AnnotationHolder annotationHolder;
     private ceylonHighlightingColors_ ceylonHighlightingColors = ceylonHighlightingColors_.get_();
 
+    public CeylonSyntaxAnnotator() {
+        super(false);
+    }
+
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         this.annotationHolder = holder;

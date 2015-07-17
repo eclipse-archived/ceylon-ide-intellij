@@ -8,6 +8,12 @@ import static org.intellij.plugins.ceylon.ide.psi.CeylonPsi.*;
 
 public class CeylonPsiVisitor extends PsiElementVisitor {
 
+    private boolean recursive;
+
+    public CeylonPsiVisitor(boolean recursive) {
+        this.recursive = recursive;
+    }
+
     @Override
     public void visitElement(PsiElement element) {
         super.visitElement(element);
@@ -609,6 +615,10 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
             visitForComprehensionClausePsi((ForComprehensionClausePsi) element);
         } else if (element.getNode().getElementType() == CeylonTypes.IF_COMPREHENSION_CLAUSE) {
             visitIfComprehensionClausePsi((IfComprehensionClausePsi) element);
+        }
+
+        if (recursive) {
+            element.acceptChildren(this);
         }
     }
     public void visitIfComprehensionClausePsi(@NotNull IfComprehensionClausePsi element) { visitInitialComprehensionClausePsi(element); }
