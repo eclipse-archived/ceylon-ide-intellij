@@ -3,7 +3,9 @@ package org.intellij.plugins.ceylon.ide.refactoring;
 import com.intellij.lang.refactoring.RefactoringSupportProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.intellij.refactoring.RefactoringActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class CeylonRefactoringSupportProvider extends RefactoringSupportProvider {
     @Override
@@ -16,4 +18,9 @@ public class CeylonRefactoringSupportProvider extends RefactoringSupportProvider
         return true;
     }
 
+    @Nullable
+    @Override
+    public RefactoringActionHandler getIntroduceVariableHandler() {
+        return new IntroduceVariableHandler();
+    }
 }

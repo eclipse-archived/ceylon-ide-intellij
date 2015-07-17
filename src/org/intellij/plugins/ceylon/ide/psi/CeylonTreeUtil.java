@@ -5,14 +5,22 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Unit;
+import org.intellij.plugins.ceylon.ide.CeylonLanguage;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonTreeUtil {
+
+    public static CeylonPsi.DeclarationPsi createDeclarationFromText(Project project, String code) {
+        PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(CeylonLanguage.INSTANCE, code);
+        return PsiTreeUtil.getParentOfType(file.findElementAt(0), CeylonPsi.DeclarationPsi.class);
+    }
 
     /**
      * Finds a PSI element corresponding to the original Node in a given file.
