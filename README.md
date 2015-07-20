@@ -25,6 +25,9 @@ You can either install the CeylonIDEA from there, or build it from sources.
 ## Common pre-requisites
 
 - a _Community_ or _Ultimate_ version of **[IntelliJ 14](http://www.jetbrains.com/idea/download/)**
+- **OSX users**: this plugin needs a JRE 7+, but IntelliJ 14 requires a JDK 6 by default. To run Ceylon IDEA, you can either:
+  - download IntelliJ with a [custom JDK bundled](https://confluence.jetbrains.com/display/IntelliJIDEA/Previous+IntelliJ+IDEA+Releases)
+  - download the standard version, install it, then modify `Info.plist` to [force a recent version of Java](https://intellij-support.jetbrains.com/hc/en-us/articles/206827547-Selecting-the-JDK-version-the-IDE-will-run-under)
 
 ## Install from the Development plugin repository
 
