@@ -1,10 +1,10 @@
 package org.intellij.plugins.ceylon.ide.psi.stub;
 
 import com.intellij.psi.tree.IFileElementType;
-import com.intellij.psi.tree.IStubFileElementType;
 import org.intellij.plugins.ceylon.ide.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.psi.CeylonStubFileElementType;
 
 public interface CeylonStubTypes {
 
-    IFileElementType CEYLON_FILE = new IStubFileElementType(CeylonLanguage.INSTANCE);
+    IFileElementType CEYLON_FILE = new CeylonStubFileElementType(CeylonLanguage.INSTANCE);
 }

@@ -4,11 +4,12 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
-import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsiVisitor;
+import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,17 +27,6 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
         element.accept(this);
         this.annotationHolder = null;
     }
-
-    @Override
-    public void visitAnnotationPsi(@NotNull CeylonPsi.AnnotationPsi element) {
-        super.visitAnnotationPsi(element);
-
-        final ASTNode ident = element.getNode().findChildByType(CeylonTypes.IDENTIFIER);
-        final TextRange range = ident == null ? element.getTextRange() : ident.getTextRange();
-        Annotation anno = annotationHolder.createInfoAnnotation(range, null);
-        anno.setTextAttributes(ceylonHighlightingColors.getAnnotation());
-    }
-
 
     @Override
     public void visitCompilerAnnotationPsi(@NotNull CeylonPsi.CompilerAnnotationPsi element) {
@@ -73,9 +63,14 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
         String name = element.getName();
         PsiElement prevSibling = element.getPrevSibling();
 
-        if (name != null && name.charAt(0) < 'z' && prevSibling != null && prevSibling.getNode().getElementType() == CeylonTypes.MEMBER_OP) {
+        if (StringUtil.isNotEmpty(name) && name.charAt(0) < 'z' && prevSibling != null && prevSibling.getNode().getElementType() == CeylonTypes.MEMBER_OP) {
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.setTextAttributes(ceylonHighlightingColors.getMember());
+        }
+        ASTNode firstChildNode = element.getNode().getFirstChildNode();
+        if (firstChildNode != null && firstChildNode.getElementType() == CeylonTokens.AIDENTIFIER) {
+            Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+            anno.setTextAttributes(ceylonHighlightingColors.getAnnotation());
         }
     }
 }
