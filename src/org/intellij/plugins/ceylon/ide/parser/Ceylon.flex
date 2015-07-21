@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide.parser;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
+import CeylonTokens;
 
 %%
 

@@ -1,6 +1,6 @@
-import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,15 +13,15 @@ import java.lang.reflect.Field;
 public class CeylonPsiVisitorGenerator {
 
     public static void main(String[] args) throws IOException {
-        FileOutputStream os = new FileOutputStream(new File(args[0], "org/intellij/plugins/ceylon/ide/psi/CeylonPsiVisitor.java"));
+        FileOutputStream os = new FileOutputStream(new File(args[0], "org/intellij/plugins/ceylon/ide/ceylonCode/psi/CeylonPsiVisitor.java"));
 
-        os.write(("package org.intellij.plugins.ceylon.ide.psi;\n" +
+        os.write(("package org.intellij.plugins.ceylon.ide.ceylonCode.psi;\n" +
                 "\n" +
                 "import com.intellij.psi.PsiElement;\n" +
                 "import com.intellij.psi.PsiElementVisitor;\n" +
                 "import org.jetbrains.annotations.NotNull;\n" +
                 "\n" +
-                "import static org.intellij.plugins.ceylon.ide.psi.CeylonPsi.*;\n" +
+                "import static org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi.*;\n" +
                 "\n" +
                 "public class CeylonPsiVisitor extends PsiElementVisitor {\n" +
                 "\n" +

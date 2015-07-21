@@ -119,7 +119,7 @@
             </classpath>
         </java>
         <javac
-                srcdir="${src}:${gen}:../src"
+                srcdir="${src}:${gen}:../plugin-ceylon-code/src"
                 destdir="${build.classes}"
                 debug="true"
                 encoding="UTF-8">
@@ -130,7 +130,7 @@
             </classpath>
 
             <include name="*.java"/>
-            <include name="org/intellij/plugins/ceylon/ide/psi/CeylonPsi.java"/>
+            <include name="org/intellij/plugins/ceylon/ide/ceylonCode/psi/CeylonPsi.java"/>
         </javac>
         <java classname="TokenTypesGenerator" dir="${basedir}" fork="yes">
             <arg path="gen"/>
@@ -163,16 +163,16 @@
     </fail>
 
     <target name="generateSources" depends="clean, tree" >
-        <mkdir dir="../gen"/>
-        <copy todir="../gen" overwrite="true" >
+        <mkdir dir="../plugin-ceylon-code/gen"/>
+        <copy todir="../plugin-ceylon-code/gen" overwrite="true" >
             <fileset dir="gen" includes="**/*.java"/>
         </copy>
 
-        <copy todir="../gen/org/intellij/plugins/ceylon/ide/parser" overwrite="true">
+        <copy todir="../plugin-ceylon-code/gen/org/intellij/plugins/ceylon/ide/ceylonCode/parser" overwrite="true">
             <globmapper from="*CeylonParser.java" to="*PsiCompatibleCeylonParser.java"/>
             <fileset dir="../../ceylon-spec/gensrc/com/redhat/ceylon/compiler/typechecker/parser" includes="CeylonParser.java"/>
         </copy>
-        <replace file="../gen/org/intellij/plugins/ceylon/ide/parser/PsiCompatibleCeylonParser.java">
+        <replace file="../plugin-ceylon-code/gen/org/intellij/plugins/ceylon/ide/ceylonCode/parser/PsiCompatibleCeylonParser.java">
             <replacefilter>
                 <replacetoken>import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.*;</replacetoken>
                 <replacevalue>import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.MethodDeclaration;
@@ -190,7 +190,7 @@ import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
             </replacefilter>
             <replacefilter
                     token="package com.redhat.ceylon.compiler.typechecker.parser;"
-                    value="package org.intellij.plugins.ceylon.ide.parser;"/>
+                    value="package org.intellij.plugins.ceylon.ide.ceylonCode.parser;"/>
             <replacefilter
                     token="CeylonParser"
                     value="PsiCompatibleCeylonParser"/>

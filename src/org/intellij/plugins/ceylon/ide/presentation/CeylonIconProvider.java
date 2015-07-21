@@ -4,9 +4,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.IconProvider;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

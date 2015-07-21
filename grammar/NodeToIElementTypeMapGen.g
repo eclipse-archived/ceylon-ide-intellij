@@ -10,7 +10,7 @@ grammar NodeToIElementTypeMapGen;
 
 nodeList : { 
 
-            println("package org.intellij.plugins.ceylon.ide.psi;");
+            println("package org.intellij.plugins.ceylon.ide.ceylonCode.psi;");
             println("");
             println("import com.intellij.psi.tree.IElementType;");
             println("import com.redhat.ceylon.compiler.typechecker.tree.Node;");

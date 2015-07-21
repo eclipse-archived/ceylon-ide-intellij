@@ -12,6 +12,14 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Ceylon Runtime" level="project" />
-    <orderEntry type="module" module-name="CeylonIDEA" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.1.1/org.intellij.plugins.ceylon.ide.ceylonCode-1.1.1.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

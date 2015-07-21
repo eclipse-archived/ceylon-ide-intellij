@@ -5,8 +5,8 @@ import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.intellij.plugins.ceylon.ide.psi.CeylonClass;
-import org.intellij.plugins.ceylon.ide.psi.stub.ClassIndex;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

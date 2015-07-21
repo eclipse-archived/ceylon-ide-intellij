@@ -4,7 +4,7 @@ import com.intellij.lang.CodeDocumentationAwareCommenterEx;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import org.intellij.plugins.ceylon.ide.psi.TokenTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonCommenter implements CodeDocumentationAwareCommenterEx {

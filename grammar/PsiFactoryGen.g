@@ -9,13 +9,13 @@ grammar PsiFactoryGen;
 }
 
 nodeList : { 
-            println("package org.intellij.plugins.ceylon.ide.psi;\n");
+            println("package org.intellij.plugins.ceylon.ide.ceylonCode.psi;\n");
             println("import com.intellij.psi.tree.IElementType;");
             println("import com.intellij.psi.PsiElement;");
             println("import com.intellij.lang.ASTNode;");
-            println("import org.intellij.plugins.ceylon.ide.psi.impl.*;\n");
-            println("import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl.*;\n");
-            println("import static org.intellij.plugins.ceylon.ide.psi.CeylonTypes.*;\n");
+            println("import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.*;\n");
+            println("import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl.*;\n");
+            println("import static org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes.*;\n");
             println("/* Generated using Antlr by PsiFactoryGen.g */");
             println("public class CeylonPsiFactory {");
             println("");

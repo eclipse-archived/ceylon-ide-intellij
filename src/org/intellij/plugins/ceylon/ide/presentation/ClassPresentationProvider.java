@@ -7,7 +7,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Scope;
 import com.redhat.ceylon.model.typechecker.model.TypeDeclaration;
-import org.intellij.plugins.ceylon.ide.psi.CeylonClass;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;

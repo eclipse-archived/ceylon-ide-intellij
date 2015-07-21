@@ -6,7 +6,7 @@ import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Lexer;
 import org.antlr.runtime.RecognizerSharedState;
-import org.intellij.plugins.ceylon.ide.psi.TokenTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**

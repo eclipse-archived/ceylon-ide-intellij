@@ -9,7 +9,7 @@ grammar IdeaAstTypesGen;
 }
 
 nodeList : { 
-            println("package org.intellij.plugins.ceylon.ide.psi;\n");
+            println("package org.intellij.plugins.ceylon.ide.ceylonCode.psi;\n");
             println("import com.intellij.psi.tree.IElementType;\n");
 
             println("/* Generated using Antlr by IdeaAstTypesGen.g */");

@@ -7,7 +7,8 @@ import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.antlr.runtime.RecognitionException;
-import org.intellij.plugins.ceylon.ide.psi.NodeToIElementTypeMap;
+import org.intellij.plugins.ceylon.ide.ceylonCode.parser.PsiCompatibleCeylonParser;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.NodeToIElementTypeMap;
 
 
 public class MarkingCeylonParser extends PsiCompatibleCeylonParser {

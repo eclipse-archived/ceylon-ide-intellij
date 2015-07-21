@@ -13,10 +13,10 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.PsiElementBase;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.model.typechecker.model.*;
-import org.intellij.plugins.ceylon.ide.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.docGenerator_;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

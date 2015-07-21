@@ -2,8 +2,8 @@ package org.intellij.plugins.ceylon.ide.refactoring;
 
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
-import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsiVisitor;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiVisitor;
 import org.jetbrains.annotations.Nullable;
 
 public class FindMatchingPsiNodeVisitor extends CeylonPsiVisitor {

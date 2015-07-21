@@ -8,7 +8,7 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
-import org.intellij.plugins.ceylon.ide.CeylonFileType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.jetbrains.annotations.NotNull;
 

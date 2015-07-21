@@ -1,7 +1,6 @@
 package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.ide.util.FileStructureFilter;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentation;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentationData;
 import com.intellij.ide.util.treeView.smartTree.Filter;
@@ -13,7 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 
 /**

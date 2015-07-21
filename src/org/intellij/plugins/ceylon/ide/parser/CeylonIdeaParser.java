@@ -10,10 +10,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import org.antlr.runtime.RecognitionException;
-import org.intellij.plugins.ceylon.ide.psi.CeylonElementType;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
-import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CeylonIdeaParser implements PsiParser {
 
-    public static final Key<Node> CEYLON_NODE_KEY = new Key<>("CEYLON-SPEC_NODE");
     public static final TokenSet COMPOSITE_ELEMENTS = TokenSet.create(IElementType.enumerate(new IElementType.Predicate() {
         @Override
         public boolean matches(IElementType type) {

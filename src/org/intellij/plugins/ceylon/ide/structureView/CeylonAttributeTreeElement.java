@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide.structureView;
 import com.intellij.ui.LayeredIcon;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.model.typechecker.model.Value;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;

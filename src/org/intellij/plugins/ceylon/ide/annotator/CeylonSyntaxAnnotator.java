@@ -7,10 +7,10 @@ import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsiVisitor;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiVisitor;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator {

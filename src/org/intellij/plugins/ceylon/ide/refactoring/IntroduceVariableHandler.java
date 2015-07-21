@@ -23,13 +23,13 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.refactoring.ExtractValueResult;
 import com.redhat.ceylon.ide.common.refactoring.FindContainingExpressionsVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
-import org.intellij.plugins.ceylon.ide.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.IdeaExtractValueRefactoring;
-import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTreeUtil;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

@@ -6,7 +6,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +122,7 @@ public class MyTree {
          */
         void bindNode(ASTNode ideaNode) {
             assert Objects.equals(getType(), ideaNode.getElementType()) : getType() + " != " + ideaNode.getElementType();
-            ideaNode.putUserData(CeylonIdeaParser.CEYLON_NODE_KEY, node);
+            ideaNode.putUserData(CeylonStubFileElementType.CEYLON_NODE_KEY, node);
         }
     }
 

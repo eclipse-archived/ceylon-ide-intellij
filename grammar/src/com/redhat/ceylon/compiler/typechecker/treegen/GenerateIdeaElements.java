@@ -7,7 +7,7 @@ import java.io.*;
 
 public class GenerateIdeaElements {
 
-    private static final String GENERATED_PACKAGE_DIR = "org/intellij/plugins/ceylon/ide/psi/";
+    private static final String GENERATED_PACKAGE_DIR = "org/intellij/plugins/ceylon/ide/ceylonCode/psi/";
 
     public static void main(String[] args) throws Exception {
         File file = new File(args[0]);

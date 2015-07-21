@@ -2,7 +2,7 @@ package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 
 public class CeylonSyntaxAnnotatorTest extends LightCodeInsightFixtureTestCase {
 

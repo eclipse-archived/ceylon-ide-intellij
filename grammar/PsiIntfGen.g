@@ -9,7 +9,7 @@ grammar PsiIntfGen;
 }
 
 nodeList : { 
-           println("package org.intellij.plugins.ceylon.ide.psi;\n");
+           println("package org.intellij.plugins.ceylon.ide.ceylonCode.psi;\n");
            println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
            println("/* Generated using Antlr by PsiIntfGen.g */");
            println("\npublic class CeylonPsi {\n");

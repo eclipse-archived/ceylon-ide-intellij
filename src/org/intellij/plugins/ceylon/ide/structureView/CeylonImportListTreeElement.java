@@ -2,10 +2,9 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiElement;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

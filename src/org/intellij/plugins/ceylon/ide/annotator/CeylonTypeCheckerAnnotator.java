@@ -4,7 +4,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 
 public class CeylonTypeCheckerAnnotator implements Annotator {

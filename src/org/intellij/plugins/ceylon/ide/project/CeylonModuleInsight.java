@@ -7,7 +7,7 @@ import com.intellij.ide.util.projectWizard.importSources.DetectedSourceRoot;
 import com.intellij.ide.util.projectWizard.importSources.JavaModuleSourceRoot;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.Consumer;
-import org.intellij.plugins.ceylon.ide.CeylonFileType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 
 import java.io.File;
 import java.io.IOException;

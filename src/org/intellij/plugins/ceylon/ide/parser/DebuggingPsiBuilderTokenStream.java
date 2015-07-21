@@ -4,7 +4,7 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
-import org.intellij.plugins.ceylon.ide.psi.TokenTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 
 import java.util.Objects;
 

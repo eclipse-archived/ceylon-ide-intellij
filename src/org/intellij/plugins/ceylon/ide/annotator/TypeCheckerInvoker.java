@@ -16,7 +16,7 @@ import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 
 import java.io.IOException;
 import java.util.Arrays;

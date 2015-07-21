@@ -4,7 +4,7 @@ import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 
 import java.util.concurrent.TimeoutException;
 

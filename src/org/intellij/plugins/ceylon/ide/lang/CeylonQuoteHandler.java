@@ -5,7 +5,7 @@ import com.intellij.codeInsight.editorActions.SimpleTokenSetQuoteHandler;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.util.TextRange;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonQuoteHandler extends SimpleTokenSetQuoteHandler implements MultiCharQuoteHandler {

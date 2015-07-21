@@ -9,4 +9,6 @@ lookup=flat:./intellij-repository
 
 [compiler]
 source=source
+source=src
+source=gen
 resource=resource

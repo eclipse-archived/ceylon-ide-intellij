@@ -3,8 +3,8 @@ package org.intellij.plugins.ceylon.ide.refactoring;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
-import org.intellij.plugins.ceylon.ide.CeylonLanguage;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 
 public class IdentifierElementManipulator extends AbstractElementManipulator<CeylonPsi.IdentifierPsi> {

@@ -2,7 +2,7 @@ package org.intellij.plugins.ceylon.ide.highlighting;
 
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.intellij.plugins.ceylon.ide.CeylonFileType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 
 /**
  * Underlines a Ceylon file name when it contains errors.
