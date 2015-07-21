@@ -14,6 +14,7 @@ import java.util.Objects;
 /**
  * This is useful for debugging the lexer/parser during development, not to be used otherwise.
  */
+@Deprecated
 public class DebuggingPsiBuilderTokenStream extends PsiBuilderTokenStream {
 //    private CommonToken currentToken = null;
 

@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Matija Mazi <br/>
  */
+@Deprecated
 public class CeylonIdeaParser implements PsiParser {
 
     public static final TokenSet COMPOSITE_ELEMENTS = TokenSet.create(IElementType.enumerate(new IElementType.Predicate() {

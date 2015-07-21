@@ -22,6 +22,7 @@ import java.util.Map;
  * Basically this uses PsiBuilder markers only for rewinds (roll-backs) since this is the only mechanism in PsiBuilder
  * that enables this.
  */
+@Deprecated
 public class PsiBuilderTokenStream implements TokenStream {
     private PsiBuilder psiBuilder;
     private List<PsiBuilder.Marker> markers = new ArrayList<>();

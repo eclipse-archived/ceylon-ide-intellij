@@ -29,6 +29,7 @@ public class CeylonParserDefinition implements ParserDefinition {
 
     @Override
     public PsiParser createParser(Project project) {
+        // TODO remove this instantiation once we're sure that the AST transformer works correctly
         return new CeylonIdeaParser();
     }
 

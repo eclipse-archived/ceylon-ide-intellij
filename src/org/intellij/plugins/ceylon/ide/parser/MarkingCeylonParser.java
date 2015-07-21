@@ -10,7 +10,7 @@ import org.antlr.runtime.RecognitionException;
 import org.intellij.plugins.ceylon.ide.ceylonCode.parser.PsiCompatibleCeylonParser;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.NodeToIElementTypeMap;
 
-
+@Deprecated
 public class MarkingCeylonParser extends PsiCompatibleCeylonParser {
     private PsiBuilder psiBuilder;
     private MyTree myTree = new MyTree();
