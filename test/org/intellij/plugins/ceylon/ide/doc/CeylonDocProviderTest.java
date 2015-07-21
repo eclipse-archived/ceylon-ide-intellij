@@ -1,4 +1,4 @@
-package doc;
+package org.intellij.plugins.ceylon.ide.doc;
 
 import ceylon.language.language_;
 import com.intellij.openapi.util.io.FileUtil;

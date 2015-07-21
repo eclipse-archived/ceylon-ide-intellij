@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Properties;
 
-import static com.redhat.ceylon.ide.validate.NameValidator.packageNameIsLegal;
+import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageNameIsLegal;
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 
 public class CeylonAddPackageAction extends CeylonAddingFilesAction {

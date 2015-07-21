@@ -1,8 +1,8 @@
-package com.redhat.ceylon.ide.validate;
+package org.intellij.plugins.ceylon.ide.validate;
 
 import org.junit.Test;
 
-import static com.redhat.ceylon.ide.validate.NameValidator.packageNameIsLegal;
+import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageNameIsLegal;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 

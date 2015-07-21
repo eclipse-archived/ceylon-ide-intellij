@@ -14,8 +14,8 @@ import java.util.Set;
 
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterables.all;
-import static com.redhat.ceylon.ide.validate.NameValidator.packageNameIsLegal;
-import static com.redhat.ceylon.ide.validate.NameValidator.unitNameIsLegal;
+import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageNameIsLegal;
+import static org.intellij.plugins.ceylon.ide.validate.NameValidator.unitNameIsLegal;
 import static java.util.Arrays.asList;
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 

@@ -1,6 +1,6 @@
-package com.redhat.ceylon.ide.validate;
+package org.intellij.plugins.ceylon.ide.validate;
 
-import com.redhat.ceylon.ide.util.Escaping;
+import com.redhat.ceylon.ide.common.util.escaping_;
 
 import java.util.regex.Pattern;
 
@@ -13,7 +13,7 @@ public class NameValidator {
 
     static {
         StringBuilder sb = new StringBuilder();
-        for (String kw : Escaping.KEYWORDS) {
+        for (String kw : escaping_.get_().getKeywords()) {
             sb.append(kw).append('|');
         }
         sb.setLength(sb.length() - 1);
