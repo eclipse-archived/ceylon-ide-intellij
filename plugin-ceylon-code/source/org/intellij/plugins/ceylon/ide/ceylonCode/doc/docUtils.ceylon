@@ -580,7 +580,7 @@ shared object docGenerator {
             } else if (is Tree.Literal node) {
                 doc = getTermTypeText(node);
             } else {
-                Referenceable? model = nodes.getReferencedDeclaration(node, rootNode);
+                Referenceable? model = nodes.getReferencedDeclaration(node);
                 
                 if (exists model) {
                     doc = getDocumentationText(model, node, project);

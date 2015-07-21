@@ -5,6 +5,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,9 +35,9 @@ public class CeylonTypeReference<T extends PsiElement> extends CeylonReference<T
             return resolved;
         }
 
-        if (declaration != null) {
+        if (declaration instanceof Declaration) {
             // Try implicit ceylon.language.*
-            String fqn = declaration.getContainer().getQualifiedNameString() + "." + nodeText;
+            String fqn = ((Declaration) declaration).getContainer().getQualifiedNameString() + "." + nodeText;
             resolved = JavaPsiFacade.getInstance(myElement.getProject()).findClass(fqn, GlobalSearchScope.allScope(myElement.getProject()));
             if (resolved != null) {
                 return resolved;

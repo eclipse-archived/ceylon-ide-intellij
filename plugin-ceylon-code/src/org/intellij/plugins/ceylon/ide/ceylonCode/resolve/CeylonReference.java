@@ -9,7 +9,9 @@ import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.model.typechecker.model.Declaration;
+import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
+import com.redhat.ceylon.ide.common.util.nodes_;
+import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import com.redhat.ceylon.model.typechecker.model.Unit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex;
@@ -18,10 +20,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.Nodes.getReferencedExplicitDeclaration;
-
 public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
-    protected Declaration declaration;
+    protected Referenceable declaration;
 
     public CeylonReference(T element, TextRange range, boolean soft) {
         super(element, range, soft);
@@ -48,7 +48,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         if (parentNode instanceof Tree.ExtendedType) {
             parentNode = ((Tree.ExtendedType) parentNode).getType();
         }
-        declaration = getReferencedExplicitDeclaration(parentNode, compilationUnit);
+        declaration = nodes_.get_().getReferencedExplicitDeclaration(parentNode, compilationUnit);
         if (declaration == null) {
             return null;
         }
@@ -65,7 +65,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
         FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
         compilationUnit.visit(visitor);
-        Tree.Declaration declarationNode = visitor.getDeclarationNode();
+        Tree.StatementOrArgument declarationNode = visitor.getDeclarationNode();
 
         if (declarationNode != null) {
             return CeylonTreeUtil.findPsiElement(declarationNode, containingFile);

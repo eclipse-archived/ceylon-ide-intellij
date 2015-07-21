@@ -42,7 +42,9 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
         if (!compilationUnit.getImportList().getImports().isEmpty()) {
             CeylonPsi.ImportPsi[] imports = PsiTreeUtil.getChildrenOfType(myElement.getFirstChild(), CeylonPsi.ImportPsi.class);
 
-            elements.add(new CeylonImportListTreeElement(imports));
+            if (imports != null && imports.length > 0) {
+                elements.add(new CeylonImportListTreeElement(imports));
+            }
         }
 
         for (Tree.Declaration declaration : declarations) {

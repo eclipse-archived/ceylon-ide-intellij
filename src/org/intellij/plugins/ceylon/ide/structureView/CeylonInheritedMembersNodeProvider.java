@@ -7,7 +7,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.FindDeclarationNodeVisitor;
+import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.DeclarationWithProximity;
 import com.redhat.ceylon.model.typechecker.model.TypeDeclaration;
@@ -64,13 +64,12 @@ public class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProv
 
         FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
         myFile.getCompilationUnit().visit(visitor);
-        Tree.Declaration node = visitor.getDeclarationNode();
+        Tree.StatementOrArgument node = visitor.getDeclarationNode();
 
-        if (node != null) {
-            return CeylonFileTreeElement.getTreeElementForDeclaration(myFile, node, true);
+        if (node instanceof Tree.Declaration) {
+            return CeylonFileTreeElement.getTreeElementForDeclaration(myFile, (Tree.Declaration) node, true);
         }
 
         return null;
-//        return new CeylonFileTreeElement(myFile);
     }
 }
