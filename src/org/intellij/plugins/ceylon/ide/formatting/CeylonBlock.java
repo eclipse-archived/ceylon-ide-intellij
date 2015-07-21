@@ -9,7 +9,7 @@ import com.intellij.psi.tree.IElementType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
-import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.CeylonStubTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

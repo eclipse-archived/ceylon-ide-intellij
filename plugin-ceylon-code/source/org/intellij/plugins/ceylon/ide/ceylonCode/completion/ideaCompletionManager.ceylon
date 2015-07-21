@@ -12,7 +12,6 @@ import com.intellij.codeInsight.lookup {
     LookupElement
 }
 import com.intellij.openapi.util {
-    IconLoader,
     TextRange
 }
 import com.intellij.util {

@@ -6,7 +6,8 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonStubFileElementType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.CeylonStubTypes;
 
 import java.util.ArrayList;
 import java.util.List;

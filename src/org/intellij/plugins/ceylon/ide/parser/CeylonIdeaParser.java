@@ -3,14 +3,15 @@ package org.intellij.plugins.ceylon.ide.parser;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
-import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.resolve.FileContextUtil;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import org.antlr.runtime.RecognitionException;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.CeylonStubTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -45,8 +46,8 @@ public class CeylonIdeaParser implements PsiParser {
         }
 
         if (!builder.eof()) {
-            final MyTree.MyMarker tail =  parser.mark();
-            while(!builder.eof()) {
+            final MyTree.MyMarker tail = parser.mark();
+            while (!builder.eof()) {
                 builder.advanceLexer();
             }
             tail.error("Uparseable code found at end of file.");
