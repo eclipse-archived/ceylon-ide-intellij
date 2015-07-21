@@ -1,12 +1,9 @@
 package org.intellij.plugins.ceylon.ide.psi;
 
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.IFileElementType;
-import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
+
 /* Generated using Antlr by IdeaAstTypesGen.g */
 public interface CeylonTypes {
-    IFileElementType CEYLON_FILE = CeylonStubTypes.CEYLON_FILE;
-
     IElementType COMPILATION_UNIT = new CeylonElementType("COMPILATION_UNIT");
     IElementType MODULE_DESCRIPTOR = new CeylonElementType("MODULE_DESCRIPTOR");
     IElementType PACKAGE_DESCRIPTOR = new CeylonElementType("PACKAGE_DESCRIPTOR");

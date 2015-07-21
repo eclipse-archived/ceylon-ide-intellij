@@ -13,9 +13,8 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsiFactory;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.ide.psi.TokenTypes;
-import org.intellij.plugins.ceylon.ide.psi.stub.impl.StubbedClassDefinitionPsiImpl;
+import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class CeylonParserDefinition implements ParserDefinition {
@@ -35,7 +34,7 @@ public class CeylonParserDefinition implements ParserDefinition {
 
     @Override
     public IFileElementType getFileNodeType() {
-        return CeylonTypes.CEYLON_FILE;
+        return CeylonStubTypes.CEYLON_FILE;
     }
 
     @NotNull

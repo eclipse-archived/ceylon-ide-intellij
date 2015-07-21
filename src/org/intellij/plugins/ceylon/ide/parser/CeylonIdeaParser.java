@@ -10,7 +10,10 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import org.antlr.runtime.RecognitionException;
-import org.intellij.plugins.ceylon.ide.psi.*;
+import org.intellij.plugins.ceylon.ide.psi.CeylonElementType;
+import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -29,7 +32,7 @@ public class CeylonIdeaParser implements PsiParser {
     @NotNull
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
-        assert root == CeylonTypes.CEYLON_FILE : root;
+        assert root == CeylonStubTypes.CEYLON_FILE : root;
 
         final PsiFile file = builder.getUserDataUnprotected(FileContextUtil.CONTAINING_FILE_KEY);
         assert file instanceof CeylonFile : "Not a ceylon file or not found.";

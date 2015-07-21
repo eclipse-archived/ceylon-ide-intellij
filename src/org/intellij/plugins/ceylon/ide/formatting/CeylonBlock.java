@@ -9,6 +9,7 @@ import com.intellij.psi.tree.IElementType;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +41,7 @@ public class CeylonBlock implements Block {
             CeylonTypes.NAMED_ARGUMENT_LIST, CeylonTypes.SEQUENCED_ARGUMENT, CeylonTypes.IMPORT_MEMBER_OR_TYPE_LIST
     );
     private static final List<IElementType> INDENT_CHILDREN_NONE = Arrays.asList(
-            CeylonTypes.CEYLON_FILE, CeylonTypes.COMPILATION_UNIT,
+            CeylonStubTypes.CEYLON_FILE, CeylonTypes.COMPILATION_UNIT,
             CeylonTypes.SWITCH_STATEMENT, CeylonTypes.SWITCH_CASE_LIST, CeylonTypes.SWITCH_CLAUSE, CeylonTypes.CASE_CLAUSE,
             CeylonTypes.SEQUENCE_ENUMERATION, CeylonTypes.ANNOTATION_LIST, CeylonTypes.TYPE_CONSTRAINT_LIST,
             CeylonTypes.IF_STATEMENT, CeylonTypes.ELSE_CLAUSE
@@ -67,7 +68,7 @@ public class CeylonBlock implements Block {
             CeylonTokens.ENTRY_OP, CeylonTypes.ENTRY_OP,
             CeylonTypes.POSITIVE_OP, CeylonTypes.NEGATIVE_OP
     );
-    private static final  Collection<IElementType> TYPES_REQUIRING_EMPTY_LINE = Arrays.asList(
+    private static final Collection<IElementType> TYPES_REQUIRING_EMPTY_LINE = Arrays.asList(
             CeylonTypes.IMPORT_LIST, CeylonTypes.CLASS_DEFINITION, CeylonTypes.METHOD_DEFINITION
     );
     private static final Collection<IElementType> COMMENTS = Arrays.asList(CeylonTokens.LINE_COMMENT, CeylonTokens.MULTI_COMMENT);
@@ -91,8 +92,8 @@ public class CeylonBlock implements Block {
 
         final IElementType nodeType = node.getElementType();
         final Indent normalChildIndent = INDENT_CHILDREN_NORMAL.contains(nodeType) ? Indent.getNormalIndent()
-                        : INDENT_CHILDREN_NONE.contains(nodeType) ? Indent.getNoneIndent()
-                        : null;
+                : INDENT_CHILDREN_NONE.contains(nodeType) ? Indent.getNoneIndent()
+                : null;
 //        System.out.printf("normalChildIndent for %s: %s%n", nodeType, indent);
         IElementType prevChildType = null;
         for (ASTNode child = node.getFirstChildNode(); child != null; child = child.getTreeNext()) {

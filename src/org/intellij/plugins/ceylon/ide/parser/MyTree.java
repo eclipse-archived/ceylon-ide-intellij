@@ -6,7 +6,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.psi.stub.CeylonStubTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class MyTree {
         @Override
         public void done(IElementType type, Node node) {
             // flatten the tree somewhat by collapsing single-child chains into a single node
-            if (children.size() == 1 && children.get(0).node == node && children.get(0).type == type && type != CeylonTypes.CEYLON_FILE) {
+            if (children.size() == 1 && children.get(0).node == node && children.get(0).type == type && type != CeylonStubTypes.CEYLON_FILE) {
                 psiMarker.drop();
                 final MyNode myOnlyChild = children.get(0);
                 myOnlyChild.parent = this.parent;
@@ -128,7 +128,9 @@ public class MyTree {
 
     public static interface MyMarker {
         void done(IElementType type, Node node);
+
         void drop();
+
         void error(String message);
     }
 }
