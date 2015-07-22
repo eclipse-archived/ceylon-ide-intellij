@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.doc;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -20,16 +21,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Matija Mazi <br/>
- */
-public class CeylonDocProvider extends AbstractDocumentationProvider {
+import javax.swing.*;
 
-    @Nullable
-    @Override
-    public String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
-        return generateDoc(element, originalElement);
-    }
+public class CeylonDocProvider extends AbstractDocumentationProvider {
 
     @Nullable
     @Override
@@ -74,32 +68,34 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             }
         }
 
-        if (theModule != null) {
-            Referenceable target = theModule.getPackage(bits[2]);
+        if (theModule == null || bits.length == 2) {
+            return new DummyPsiElement(theModule, context.getContainingFile());
+        }
 
-            for (int i = 3; i < bits.length; i++) {
-                Scope scope;
-                if (target instanceof Scope) {
-                    scope = (Scope) target;
-                } else if (target instanceof TypedDeclaration) {
-                    TypedDeclaration td = (TypedDeclaration) target;
-                    scope = td.getType().getDeclaration();
-                } else {
-                    return null;
-                }
-                if (scope instanceof Value) {
-                    Value v = (Value) scope;
-                    TypeDeclaration val = v.getTypeDeclaration();
-                    if (val.isAnonymous()) {
-                        scope = val;
-                    }
-                }
-                target = scope.getDirectMember(bits[i], null, false);
-            }
+        Referenceable target = theModule.getPackage(bits[2]);
 
-            if (target != null) {
-                return new DummyPsiElement(target, context.getContainingFile());
+        for (int i = 3; i < bits.length; i++) {
+            Scope scope;
+            if (target instanceof Scope) {
+                scope = (Scope) target;
+            } else if (target instanceof TypedDeclaration) {
+                TypedDeclaration td = (TypedDeclaration) target;
+                scope = td.getType().getDeclaration();
+            } else {
+                return null;
             }
+            if (scope instanceof Value) {
+                Value v = (Value) scope;
+                TypeDeclaration val = v.getTypeDeclaration();
+                if (val.isAnonymous()) {
+                    scope = val;
+                }
+            }
+            target = scope.getDirectMember(bits[i], null, false);
+        }
+
+        if (target != null) {
+            return new DummyPsiElement(target, context.getContainingFile());
         }
 
         return null;
@@ -117,6 +113,29 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         public DummyPsiElement(Referenceable referenceable, PsiFile containingFile) {
             this.referenceable = referenceable;
             this.containingFile = containingFile;
+        }
+
+        @Override
+        public ItemPresentation getPresentation() {
+            return new ItemPresentation() {
+                @Nullable
+                @Override
+                public String getPresentableText() {
+                    return referenceable.getNameAsString();
+                }
+
+                @Nullable
+                @Override
+                public String getLocationString() {
+                    return null;
+                }
+
+                @Nullable
+                @Override
+                public Icon getIcon(boolean unused) {
+                    return null;
+                }
+            };
         }
 
         @Override

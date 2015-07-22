@@ -54,7 +54,8 @@ import com.redhat.ceylon.model.typechecker.model {
     Scope,
     Reference,
     Type,
-    ClassOrInterface
+    ClassOrInterface,
+    Annotated
 }
 import com.redhat.ceylon.model.typechecker.util {
     TypePrinter
@@ -86,8 +87,6 @@ import com.intellij.openapi.util {
 String psiProtocol = "psi_element://";
 
 shared object docGenerator {
-
-    String psiProtocol = "psi_element://";
 
     String escape(String content) => content.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 
@@ -208,7 +207,7 @@ shared object docGenerator {
         Package? pkg = (decl of Referenceable).unit.\ipackage;
         if (exists pkg, !pkg.qualifiedNameString.empty) {
             addIcon(builder, IconLoader.getIcon("/icons/package.png"));
-            builder.append("Member of package ``pkg.qualifiedNameString``<br/>\n<br/>\n"); // TODO link
+            builder.append("Member of package ``buildLink(pkg, pkg.qualifiedNameString)``<br/>\n<br/>\n");
         }
     }
     
@@ -220,6 +219,7 @@ shared object docGenerator {
         if (decl.formal) { annotations.append("formal "); }
         if (is Value decl, decl.late) { annotations.append("late "); }
         if (is TypedDeclaration decl, decl.variable) { annotations.append("variable "); }
+        // see https://github.com/ceylon/ceylon-compiler/issues/2222
         // FIXME does not compile if (exists nat = decl.native) { annotations.append("native "); }
         if (is TypeDeclaration decl) {
             if (decl.sealed) { annotations.append("sealed "); }
@@ -267,12 +267,12 @@ shared object docGenerator {
         builder.append("<img src='").append(icon.string).append("'/> ");
     }
 
-    void addDoc(Declaration decl, StringBuilder builder, Project project) {
+    void addDoc(Annotated&Referenceable decl, StringBuilder builder, Scope? scope, Project project) {
         value doc = CeylonIterable(decl.annotations).find((ann) => ann.name.equals("doc") || ann.name.empty);
         
         if (exists doc, !doc.positionalArguments.empty) {
-            value string = markdown(doc.positionalArguments.get(0).string, project, resolveScope(decl), (decl of Referenceable).unit);
-            builder.append("<div>\n").append(string).append("</div>");
+            value string = markdown(doc.positionalArguments.get(0).string, project, scope, decl.unit);
+            builder.append("<p>\n").append(string).append("</p>");
         }
     }
     
@@ -309,6 +309,7 @@ shared object docGenerator {
                         .append(" | ".join(CeylonIterable(cases).map((c) => printer.print(c, unit))));
                 
                 // FIXME compilation error
+                // see https://github.com/ceylon/ceylon-compiler/issues/2222
                 //if (exists it = decl.selfType) {
                 //    builder.append(" (self type)");
                 //}
@@ -472,7 +473,7 @@ shared object docGenerator {
         addSignature(decl, builder, node, project);
         builder.append("</pre>\n");
         addPackage(decl, builder);
-        addDoc(decl, builder, project);
+        addDoc(decl, builder, resolveScope(model), project);
         addParametersDoc(decl, builder);
         // TODO addClassMembers
         // TODO addNothingTypeInfo
@@ -492,8 +493,7 @@ shared object docGenerator {
         if (mod.nameAsString.empty || mod.nameAsString.equals("default")) {
             builder.append("&nbsp;Belongs to default module.");
         } else {
-            // TODO link to module
-            builder.append("&nbsp;Belongs to ").append(mod.nameAsString)
+            builder.append("&nbsp;Belongs to ").append(buildLink(mod, mod.nameAsString))
                     .append(color(" \"``mod.version``\"", ceylonHighlightingColors.strings));
         }
     }
@@ -502,15 +502,15 @@ shared object docGenerator {
         if (is Declaration model) {
             return getDeclarationDoc(model, node, project);
         } else if (is Package model) {
-            return getPackageDoc(model, node);
+            return getPackageDoc(model, node, project);
         } else if (is Module model) {
-            return getModuleDoc(model, node);
+            return getModuleDoc(model, node, project);
         }
         
         return null;
     }
     
-    shared String getPackageDoc(Package pack, Node node) {
+    shared String getPackageDoc(Package pack, Node node, Project project) {
         value builder = StringBuilder();
         
         if (pack.shared) {
@@ -519,8 +519,8 @@ shared object docGenerator {
         
         builder.append(color("package ", ceylonHighlightingColors.keyword)).append(pack.nameAsString).append("<br/>\n");
         
-        // TODO documentation
-        
+        addDoc(pack, builder, pack, project);
+
         value mod = pack.\imodule;
         if (mod.java) {
             builder.append("<p>This package is implemented in Java.</p>\n");
@@ -531,17 +531,20 @@ shared object docGenerator {
         
         // TODO? members
         
+        builder.append("<br/>\n");
+        addIcon(builder, AllIcons.Nodes.\iArtifact);
+
         if (mod.nameAsString.empty || mod.nameAsString.equals("default")) {
             builder.append("in default module\n");             
         } else {
-            builder.append("in module ``mod.nameAsString`` \"``mod.version``\"");
-            // TODO link to module
+            value version = "\"``mod.version``\"";
+            builder.append("in module ").append(buildLink(mod, mod.nameAsString)).append(" ").append(color(version, ceylonHighlightingColors.strings));
         }
         
         return builder.string;
     }
 
-    shared String? getModuleDoc(Module mod, Node node) {
+    shared String? getModuleDoc(Module mod, Node node, Project project) {
         value builder = StringBuilder();
 
         builder.append(color("module ", ceylonHighlightingColors.keyword))
@@ -559,7 +562,7 @@ shared object docGenerator {
             builder.append("<p>This module forms part of the Java SDK.</p>");            
         }
 
-        // TODO module doc
+        addDoc(mod, builder, mod.getPackage(mod.nameAsString), project);
         // TODO? members
         
         return builder.string;
