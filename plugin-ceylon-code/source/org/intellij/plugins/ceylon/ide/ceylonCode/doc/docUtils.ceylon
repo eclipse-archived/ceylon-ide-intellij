@@ -219,8 +219,7 @@ shared object docGenerator {
         if (decl.formal) { annotations.append("formal "); }
         if (is Value decl, decl.late) { annotations.append("late "); }
         if (is TypedDeclaration decl, decl.variable) { annotations.append("variable "); }
-        // see https://github.com/ceylon/ceylon-compiler/issues/2222
-        // FIXME does not compile if (exists nat = decl.native) { annotations.append("native "); }
+        if (decl.native) { annotations.append("native "); }
         if (is TypeDeclaration decl) {
             if (decl.sealed) { annotations.append("sealed "); }
             if (decl.final) { annotations.append("final "); }
