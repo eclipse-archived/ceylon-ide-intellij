@@ -53,7 +53,7 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
         IdeaExtractValueRefactoring refacto = new IdeaExtractValueRefactoring(ceylonFile.getCompilationUnit(), editor.getDocument());
 
         Tree.Term node = ((CeylonPsi.TermPsi) value).getCeylonNode();
-        String name = nodes_.get_().nameProposals(node).getFirst().toString();
+        String name = nodes_.get_().nameProposals(node)[0];
         ExtractValueResult result = refacto.extractValue(node, ((CeylonFile) file).getCompilationUnit(), name, false, false);
 
         final CeylonPsi.DeclarationPsi declaration = CeylonTreeUtil.createDeclarationFromText(project, result.getDeclaration());
