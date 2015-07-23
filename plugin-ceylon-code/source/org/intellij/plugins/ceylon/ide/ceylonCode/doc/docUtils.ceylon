@@ -206,8 +206,10 @@ shared object docGenerator {
     void addPackage(Declaration decl, StringBuilder builder) {
         Package? pkg = (decl of Referenceable).unit.\ipackage;
         if (exists pkg, !pkg.qualifiedNameString.empty) {
+            builder.append("<p>");
             addIcon(builder, IconLoader.getIcon("/icons/package.png"));
-            builder.append("Member of package ``buildLink(pkg, pkg.qualifiedNameString)``<br/>\n<br/>\n");
+            builder.append("Member of package ``buildLink(pkg, pkg.qualifiedNameString)``\n");
+            builder.append("</p>");
         }
     }
     
@@ -219,7 +221,12 @@ shared object docGenerator {
         if (decl.formal) { annotations.append("formal "); }
         if (is Value decl, decl.late) { annotations.append("late "); }
         if (is TypedDeclaration decl, decl.variable) { annotations.append("variable "); }
-        if (decl.native) { annotations.append("native "); }
+        if (decl.native) { annotations.append("native"); }
+        print(decl.nativeBackend);
+        if (exists backend = decl.nativeBackend, !backend.empty) {
+            annotations.append("(").append(color("\"" + backend + "\"", ceylonHighlightingColors.annotationString)).append(")");
+        }
+        if (decl.native) { annotations.append(" "); }
         if (is TypeDeclaration decl) {
             if (decl.sealed) { annotations.append("sealed "); }
             if (decl.final) { annotations.append("final "); }
@@ -271,7 +278,7 @@ shared object docGenerator {
         
         if (exists doc, !doc.positionalArguments.empty) {
             value string = markdown(doc.positionalArguments.get(0).string, project, scope, decl.unit);
-            builder.append("<p>\n").append(string).append("</p>");
+            builder.append(string);
         }
     }
     
@@ -482,7 +489,7 @@ shared object docGenerator {
     }
     
     void addUnit(Declaration decl, StringBuilder builder) {
-        builder.append("<br/>\n");
+        builder.append("<p>");
         addIcon(builder, IconLoader.getIcon("/icons/ceylonFile.png"));
         builder.append("&nbsp;Declared in ").append(decl.unit.filename);
 
@@ -495,6 +502,7 @@ shared object docGenerator {
             builder.append("&nbsp;Belongs to ").append(buildLink(mod, mod.nameAsString))
                     .append(color(" \"``mod.version``\"", ceylonHighlightingColors.strings));
         }
+        builder.append("</p>");
     }
                 
     shared String? getDocumentationText(Referenceable model, Node node, Project project) {

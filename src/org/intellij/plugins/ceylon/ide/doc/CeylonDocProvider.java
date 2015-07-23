@@ -12,18 +12,30 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.PsiElementBase;
+import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.docGenerator_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class CeylonDocProvider extends AbstractDocumentationProvider {
+
+    // A few common element types we know will never trigger a doc popup
+    private static final List<IElementType> TYPES_TO_IGNORE = Arrays.asList(
+            CeylonTokens.WS, CeylonTokens.LINE_COMMENT, CeylonTokens.COMMA, CeylonTokens.SEMICOLON,
+            CeylonTokens.LBRACE, CeylonTokens.RBRACE,
+            CeylonTokens.LBRACKET, CeylonTokens.RBRACKET,
+            CeylonTokens.LPAREN, CeylonTokens.RPAREN
+    );
 
     @Nullable
     @Override
@@ -34,7 +46,8 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 return docGenerator_.get_().getDocumentationText(referenceable, null, element.getProject()).value;
             }
             if (element.getContainingFile() != null) {
-                return docGenerator_.get_().getDocumentation(((CeylonFile) element.getContainingFile()).getCompilationUnit(), element.getTextOffset(), element.getProject());
+                String doc = docGenerator_.get_().getDocumentation(((CeylonFile) element.getContainingFile()).getCompilationUnit(), element.getTextOffset(), element.getProject());
+                return doc == null ? null : "<html><head><style>p {margin: 3px 0;}</style></head><body>" + doc + "</body></html>";
             }
         } catch (ceylon.language.AssertionError | Exception e) {
             e.printStackTrace();
@@ -46,7 +59,11 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     @Nullable
     @Override
     public PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {
-        return contextElement;
+        if (!TYPES_TO_IGNORE.contains(contextElement.getNode().getElementType())) {
+            return contextElement;
+        }
+
+        return null;
     }
 
     // FIXME refactor with com.redhat.ceylon.eclipse.code.hover.DocumentationHover.getLinkedModel(String, TypeChecker)
