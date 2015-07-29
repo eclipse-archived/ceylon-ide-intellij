@@ -1,10 +1,13 @@
+import ceylon.interop.java {
+    CeylonIterable
+}
+
 import com.github.rjeschke.txtmark {
     SpanEmitter,
     BlockEmitter
 }
-import java.lang {
-    StringBuilder,
-    JString = String
+import com.intellij.openapi.project {
+    Project
 }
 import com.redhat.ceylon.model.typechecker.model {
     Unit,
@@ -15,17 +18,17 @@ import com.redhat.ceylon.model.typechecker.model {
     Package,
     Declaration
 }
+
+import java.lang {
+    StringBuilder,
+    JString=String
+}
 import java.util {
     List
 }
-import ceylon.interop.java {
-    CeylonIterable
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlight
-}
-import com.intellij.openapi.project {
-    Project
 }
 
 
@@ -44,7 +47,7 @@ object unlinkedSpanEmitter satisfies SpanEmitter {
     }
 }
 
-class CeylonSpanEmitter(Scope scope, Unit unit) satisfies SpanEmitter {
+class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable model)) satisfies SpanEmitter {
     
     shared actual void emitSpan(StringBuilder builder, String content) {
         value pipe = content.firstOccurrence('|');
@@ -65,7 +68,7 @@ class CeylonSpanEmitter(Scope scope, Unit unit) satisfies SpanEmitter {
         }
         
         value decl = resolveLink(linkTarget, scope, unit);
-        value href = if (exists decl) then "href='``psiProtocol``doc:``docGenerator.buildUrl(decl)``'" else null;
+        value href = if (exists decl) then "href='``psiProtocol``doc:``buildUrl(decl)``'" else null;
         
         if (exists href) {
             builder.append("<a ").append(href).append(">");

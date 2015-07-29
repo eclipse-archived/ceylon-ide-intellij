@@ -139,7 +139,9 @@ class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocatio
             if (allowInvocation) {
                 value params = Iter(fun.firstParameterList.parameters).map((p) => p.type.declaration.name + " " + p.name);
                 tailText = "(``", ".join(params)``)";
-                typeText = if (fun.declaredVoid) then "void" else fun.typeDeclaration.name;
+                // see https://github.com/ceylon/ceylon-compiler/issues/2255
+                value foo = if (fun.declaredVoid) then "void" else fun.typeDeclaration.name;
+                typeText = foo;
                 handler = functionInsertHandler;
             }
         }

@@ -14,9 +14,6 @@ import ceylon.file {
     Nil,
     lines
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.doc {
-    docGenerator
-}
 import com.redhat.ceylon.compiler.typechecker {
     TypeCheckerBuilder,
     TypeChecker

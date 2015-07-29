@@ -50,7 +50,7 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getType(@NotNull PsiElement element) {
-        if (element.getParent() instanceof CeylonPsi.ClassOrInterfacePsi) {
+        if (element instanceof CeylonPsi.ClassOrInterfacePsi) {
             return element.getNode().getElementType() == CeylonTypes.INTERFACE_DEFINITION ? "Interface" : "Class";
         } else if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
             return "Attribute";

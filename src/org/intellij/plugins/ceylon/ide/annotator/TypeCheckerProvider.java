@@ -6,11 +6,13 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
@@ -25,9 +27,11 @@ import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
@@ -42,6 +46,22 @@ public class TypeCheckerProvider implements ModuleComponent {
 
     public TypeCheckerProvider(Module module) {
         this.module = module;
+    }
+
+    @Nullable
+    public static TypeChecker getFor(PsiElement element) {
+        if (element.getContainingFile() instanceof CeylonFile) {
+            CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
+
+            // TODO .ceylon files loaded from .src archives don't belong to any module, what should we do?
+            Module module = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject());
+
+            if (module != null) {
+                return module.getComponent(TypeCheckerProvider.class).getTypeChecker();
+            }
+        }
+
+        return null;
     }
 
     public void initComponent() {

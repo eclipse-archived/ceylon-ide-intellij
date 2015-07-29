@@ -6,7 +6,7 @@ import com.intellij.testFramework.LightCodeInsightTestCase;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.ceylonCode.doc.docGenerator_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
 
         Tree.CompilationUnit cu = tc.getPhasedUnitFromRelativePath(sourceFileName).getCompilationUnit();
 
-        String doc = docGenerator_.get_().getDocumentation(cu, cursorOffset, getProject());
+        String doc = new IdeaDocGenerator(tc).getDocumentation(cu, cursorOffset, getProject()).toString();
 
         File expectedFile = new File("plugin-ceylon-code/test-resources/" + expectedFileName);
         if (expectedFile.exists()) {

@@ -1,20 +1,25 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.resolve;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import com.redhat.ceylon.model.typechecker.model.Unit;
+import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex;
+import org.intellij.plugins.ceylon.ide.refactoring.FindMatchingPsiNodeVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,10 +62,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         PsiFile containingFile = myElement.getContainingFile();
 
         if (unit != compilationUnit.getUnit()) {
-            containingFile = CeylonTreeUtil.getDeclaringFile(unit, containingFile.getProject());
-            if (containingFile instanceof CeylonFile) {
-                compilationUnit = ((CeylonFile) containingFile).getCompilationUnit();
-            }
+            return resolveDeclaration(declaration, TypeCheckerProvider.getFor(myElement), myElement.getProject());
         }
 
         FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
@@ -71,6 +73,24 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             return CeylonTreeUtil.findPsiElement(declarationNode, containingFile);
         }
         return containingFile;
+    }
+
+    @Nullable
+    public static CeylonCompositeElement resolveDeclaration(Referenceable declaration, TypeChecker tc, Project project) {
+        PhasedUnit pu = tc.getPhasedUnitFromRelativePath(declaration.getUnit().getRelativePath());
+        Tree.CompilationUnit compilationUnit = pu.getCompilationUnit();
+
+        FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
+        compilationUnit.visit(visitor);
+        Tree.StatementOrArgument declarationNode = visitor.getDeclarationNode();
+
+        if (declarationNode != null) {
+            FindMatchingPsiNodeVisitor psiVisitor = new FindMatchingPsiNodeVisitor(declarationNode, CeylonPsi.StatementOrArgumentPsi.class);
+            psiVisitor.visitFile(CeylonTreeUtil.getDeclaringFile(declaration.getUnit(), project));
+            return psiVisitor.getPsi();
+        }
+
+        return null;
     }
 
     @Nullable

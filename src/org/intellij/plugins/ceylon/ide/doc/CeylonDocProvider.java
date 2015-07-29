@@ -5,7 +5,6 @@ import com.intellij.lang.Language;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -14,18 +13,22 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.PsiElementBase;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.*;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.ceylonCode.doc.docGenerator_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class CeylonDocProvider extends AbstractDocumentationProvider {
 
@@ -41,13 +44,15 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     @Override
     public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         try {
+            IdeaDocGenerator generator = new IdeaDocGenerator(TypeCheckerProvider.getFor(element));
             if (element instanceof DummyPsiElement) {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;
-                return docGenerator_.get_().getDocumentationText(referenceable, null, element.getProject()).value;
+                Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
+                return generator.getDocumentationText(referenceable, null, cu, element.getProject()).value;
             }
             if (element.getContainingFile() != null) {
-                String doc = docGenerator_.get_().getDocumentation(((CeylonFile) element.getContainingFile()).getCompilationUnit(), element.getTextOffset(), element.getProject());
-                return doc == null ? null : "<html><head><style>p {margin: 3px 0;}</style></head><body>" + doc + "</body></html>";
+                Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
+                return Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), element.getProject()), null);
             }
         } catch (ceylon.language.AssertionError | Exception e) {
             e.printStackTrace();
@@ -75,7 +80,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         String moduleName = moduleNameAndVersion.substring(0, loc);
         String moduleVersion = moduleNameAndVersion.substring(loc + 1);
 
-        TypeChecker tc = ModuleUtil.findModuleForFile(context.getContainingFile().getVirtualFile(), context.getProject()).getComponent(TypeCheckerProvider.class).getTypeChecker();
+        TypeChecker tc = TypeCheckerProvider.getFor(context);
 
         Module theModule = null;
 
@@ -112,7 +117,15 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         }
 
         if (target != null) {
-            return new DummyPsiElement(target, context.getContainingFile());
+            if (Objects.equals(bits[0], "doc")) {
+                return new DummyPsiElement(target, context.getContainingFile());
+            } else if (Objects.equals(bits[0], "dec")) {
+                CeylonCompositeElement psiDecl = CeylonReference.resolveDeclaration(target, tc, context.getProject());
+
+                if (psiDecl != null) {
+                    psiDecl.navigate(true);
+                }
+            }
         }
 
         return null;
