@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.refactoring;
+package org.intellij.plugins.ceylon.ide.ceylonCode.resolve;
 
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;

@@ -8,6 +8,8 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
+import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +43,6 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
     @Override
     public void setupFacet(@NotNull CeylonFacet facet, ModifiableRootModel model) {
         ModulesConfigurator.showFacetSettingsDialog(facet, CeylonFacetConfiguration.COMPILATION_TAB);
-        facet.getModule().getComponent(TypeCheckerProvider.class).typecheck();
+        ((TypeCheckerProvider) facet.getModule().getComponent(ITypeCheckerProvider.class)).typecheck();
     }
 }

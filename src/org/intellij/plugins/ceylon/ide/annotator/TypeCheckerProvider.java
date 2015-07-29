@@ -26,6 +26,7 @@ import com.redhat.ceylon.model.typechecker.model.ModuleImport;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
@@ -37,7 +38,7 @@ import java.io.File;
 
 import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
 
-public class TypeCheckerProvider implements ModuleComponent {
+public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvider {
 
     public static final Logger LOGGER = Logger.getInstance(TypeCheckerProvider.class);
     private final Module module;
@@ -57,7 +58,7 @@ public class TypeCheckerProvider implements ModuleComponent {
             Module module = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject());
 
             if (module != null) {
-                return module.getComponent(TypeCheckerProvider.class).getTypeChecker();
+                return module.getComponent(ITypeCheckerProvider.class).getTypeChecker();
             }
         }
 
@@ -67,6 +68,7 @@ public class TypeCheckerProvider implements ModuleComponent {
     public void initComponent() {
     }
 
+    @Override
     public TypeChecker getTypeChecker() {
         return typeChecker;
     }

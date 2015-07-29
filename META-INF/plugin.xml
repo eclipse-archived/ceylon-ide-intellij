@@ -32,6 +32,7 @@
     <module-components>
         <!-- Add your module components here -->
         <component>
+            <interface-class>org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider</interface-class>
             <implementation-class>org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider</implementation-class>
         </component>
     </module-components>

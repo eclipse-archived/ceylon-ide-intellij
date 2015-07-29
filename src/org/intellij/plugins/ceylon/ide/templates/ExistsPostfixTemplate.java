@@ -19,6 +19,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
+import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -98,10 +99,10 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
     private static boolean isOptional(CeylonPsi.ExpressionPsi expr) {
         CeylonFile ceylonFile = (CeylonFile) expr.getContainingFile();
         final VirtualFile virtualFile = Objects.firstNonNull(ceylonFile.getVirtualFile(), ceylonFile.getUserData(CeylonPostfixTemplateProvider.ORIG_VFILE));
-        TypeCheckerProvider typeCheckerProvider = ModuleUtil.findModuleForFile(virtualFile, ceylonFile.getProject()).getComponent(TypeCheckerProvider.class);
+        TypeChecker typeChecker = TypeCheckerProvider.getFor(ceylonFile);
 
         // FIXME I'd prefer having an up-to-date CompilationUnit in CeylonFile instead of having to retrieve another one
-        PhasedUnit phasedUnit = typeCheckerProvider.getTypeChecker().getPhasedUnit(new SourceCodeVirtualFile(ceylonFile) {
+        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(new SourceCodeVirtualFile(ceylonFile) {
             @Override
             public String getPath() {
                 return virtualFile.getPath();

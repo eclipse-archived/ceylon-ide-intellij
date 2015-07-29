@@ -20,7 +20,7 @@ import com.intellij.refactoring.RefactoringActionHandler;
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler;
 import com.intellij.util.Function;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.refactoring.ExtractValueResult;
+import com.redhat.ceylon.ide.common.refactoring.ExtractValueRefactoring$Result;
 import com.redhat.ceylon.ide.common.refactoring.FindContainingExpressionsVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
@@ -30,6 +30,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.FindMatchingPsiNodeVisitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
 
         Tree.Term node = ((CeylonPsi.TermPsi) value).getCeylonNode();
         String name = nodes_.get_().nameProposals(node)[0];
-        ExtractValueResult result = refacto.extractValue(node, ((CeylonFile) file).getCompilationUnit(), name, false, false);
+        ExtractValueRefactoring$Result result = refacto.extractValue();
 
         final CeylonPsi.DeclarationPsi declaration = CeylonTreeUtil.createDeclarationFromText(project, result.getDeclaration());
 

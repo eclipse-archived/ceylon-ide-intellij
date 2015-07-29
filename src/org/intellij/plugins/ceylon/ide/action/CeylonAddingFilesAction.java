@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 
 import javax.swing.*;
 
@@ -38,7 +38,7 @@ public abstract class CeylonAddingFilesAction extends AnAction {
         final VirtualFile srcRootDir = findEventDir(e);
 
         if (srcRootDir != null && e.getProject() != null) {
-            TypeCheckerProvider typeCheckerProvider = ModuleUtil.findModuleForFile(srcRootDir, e.getProject()).getComponent(TypeCheckerProvider.class);
+            ITypeCheckerProvider typeCheckerProvider = ModuleUtil.findModuleForFile(srcRootDir, e.getProject()).getComponent(ITypeCheckerProvider.class);
             final TypeChecker typeChecker = typeCheckerProvider.getTypeChecker();
 
             final VirtualFile srcRoot = getSourceRoot(e, srcRootDir);

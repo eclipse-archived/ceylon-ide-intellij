@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
@@ -37,7 +38,7 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
             @Override
             public void moduleCreated(@NotNull Module module) {
                 persistConfiguration(module);
-                module.getComponent(TypeCheckerProvider.class).moduleAdded();
+                ((TypeCheckerProvider) module.getComponent(ITypeCheckerProvider.class)).moduleAdded();
             }
         });
     }

@@ -1,6 +1,8 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.resolve;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDirectory;
@@ -16,10 +18,10 @@ import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import com.redhat.ceylon.model.typechecker.model.Unit;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex;
-import org.intellij.plugins.ceylon.ide.refactoring.FindMatchingPsiNodeVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,7 +64,13 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         PsiFile containingFile = myElement.getContainingFile();
 
         if (unit != compilationUnit.getUnit()) {
-            return resolveDeclaration(declaration, TypeCheckerProvider.getFor(myElement), myElement.getProject());
+            CeylonFile ceylonFile = (CeylonFile) containingFile;
+            Module module = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject());
+
+            if (module != null) {
+                TypeChecker tc = module.getComponent(ITypeCheckerProvider.class).getTypeChecker();
+                return resolveDeclaration(declaration, tc, myElement.getProject());
+            }
         }
 
         FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);

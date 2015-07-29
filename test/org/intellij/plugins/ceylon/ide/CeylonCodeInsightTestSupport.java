@@ -4,6 +4,7 @@ import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 
 import java.util.concurrent.TimeoutException;
@@ -15,7 +16,7 @@ public abstract class CeylonCodeInsightTestSupport extends LightCodeInsightFixtu
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        TypeCheckerProvider typeCheckerProvider = myFixture.getModule().getComponent(TypeCheckerProvider.class);
+        TypeCheckerProvider typeCheckerProvider = (TypeCheckerProvider) myFixture.getModule().getComponent(ITypeCheckerProvider.class);
         typeChecker = typeCheckerProvider.createTypeChecker();
     }
 
