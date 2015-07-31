@@ -8,7 +8,6 @@ import com.intellij.codeInsight.template.postfix.templates.SurroundPostfixTempla
 import com.intellij.codeInsight.template.postfix.util.JavaPostfixTemplatesUtils;
 import com.intellij.lang.surroundWith.Surrounder;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -25,11 +24,11 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.util.FindNodeVisitor;
 import com.redhat.ceylon.model.typechecker.model.Type;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
-import org.intellij.plugins.ceylon.ide.annotator.SourceCodeVirtualFile;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.PsiFileVirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,7 +101,7 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
         TypeChecker typeChecker = TypeCheckerProvider.getFor(ceylonFile);
 
         // FIXME I'd prefer having an up-to-date CompilationUnit in CeylonFile instead of having to retrieve another one
-        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(new SourceCodeVirtualFile(ceylonFile) {
+        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(new PsiFileVirtualFile(ceylonFile) {
             @Override
             public String getPath() {
                 return virtualFile.getPath();

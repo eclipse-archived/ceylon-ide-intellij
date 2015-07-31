@@ -31,6 +31,11 @@ import java.util.*;
 public class CeylonStubFileElementType extends IStubFileElementType {
 
     private static final List<Integer> NODES_ALLOWED_AT_EOF = Arrays.asList(CeylonLexer.EOF, CeylonLexer.WS);
+
+    // Leaves which will be wrapped in a CeylonCompositeElement, for example to allow refactoring them
+    private static final List<IElementType> LEAVES_TO_WRAP = Arrays.asList(CeylonTypes.IDENTIFIER,
+            CeylonTypes.NATURAL_LITERAL, CeylonTypes.FUNCTION_LITERAL);
+
     public static final Key<Node> CEYLON_NODE_KEY = new Key<>("CEYLON-SPEC_NODE");
 
     public CeylonStubFileElementType(Language language) {
@@ -176,7 +181,7 @@ public class CeylonStubFileElementType extends IStubFileElementType {
 
         @NotNull
         private TreeElement buildLeaf(Node ceylonNode, IElementType type, Token token) {
-            if (type == CeylonTypes.IDENTIFIER) {
+            if (LEAVES_TO_WRAP.contains(type)) {
                 CompositeElement comp = new CompositeElement(type);
                 LeafPsiElement leaf = new LeafPsiElement(TokenTypes.fromInt(token.getType()), token.getText());
                 comp.rawAddChildrenWithoutNotifications(leaf);
