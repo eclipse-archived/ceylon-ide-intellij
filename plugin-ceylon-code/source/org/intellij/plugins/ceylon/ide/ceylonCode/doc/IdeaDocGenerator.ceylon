@@ -63,6 +63,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     ceylonHighlightingColors,
     highlight
 }
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
 
 String psiProtocol = "psi_element://";
 
@@ -131,14 +134,14 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
     
     shared actual void addIconAndText(StringBuilder builder, Icons|Referenceable icon, String text) {
         value iconUrl = getIconUrl(icon);
-        builder.append("<div>");
         
         if (exists iconUrl) {
-            builder.append("<img src='").append(iconUrl.string).append("' valign='bottom'/>");
+            builder.append("<div style='background: url(" + iconUrl.string + ") left 10px no-repeat; padding-left: 16px'>");
+        } else {
+            builder.append("<div>");
         }
         
-        builder.append(text)
-            .append("</div>");
+        builder.append(text).append("</div>");
     }
     
     shared actual String getDefaultValueDescription(Parameter p, Project cmp) => "";
@@ -174,6 +177,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
     shared actual String markdown(String text, Project project, Scope? linkScope, Unit? unit) {
         value builder = Configuration.builder().forceExtentedProfile();
         builder.setCodeBlockEmitter(CeylonBlockEmitter(project));
+        
         if (exists linkScope, exists unit) {
             builder.setSpecialLinkEmitter(CeylonSpanEmitter(linkScope, unit, buildUrl));
         } else {
@@ -195,6 +199,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
                 if (!exists n = name, is Constructor declaration) {
                     name = "new";
                 }
+    
                 if (exists n = name) {
                     value col = if (n.first?.lowercase else false) then Colors.identifiers else Colors.types;
                     return buildLink(declaration, color(name, col));
@@ -210,9 +215,11 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
     }
 
     shared actual Boolean showMembers => false;
+    
     shared actual void appendPageProlog(StringBuilder builder) {
-        builder.append("<html><head><style>body {padding: 5px; } p {margin: 3px 0;}</style></head><body>");
+        builder.append("<html><head><style>body {padding: 5px; } p {margin: 4px 0;} div {margin: 0} .paragraph {margin-top: 10px;} </style></head><body>");
     }
+    
     shared actual void appendPageEpilog(StringBuilder builder) {
         builder.append("</body></html>");
     }
@@ -232,5 +239,12 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
         
         return null;
     }
+    
+    shared actual PhasedUnit? getPhasedUnit(Unit u) {
+        if (exists tc) { 
+            return tc.getPhasedUnitFromRelativePath(u.relativePath);
+        }
+        
+        return null;
+    }
 }
-

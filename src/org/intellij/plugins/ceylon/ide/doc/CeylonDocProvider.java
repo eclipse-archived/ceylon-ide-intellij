@@ -13,6 +13,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.PsiElementBase;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
@@ -44,15 +45,21 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     @Override
     public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         try {
-            IdeaDocGenerator generator = new IdeaDocGenerator(TypeCheckerProvider.getFor(element));
+            TypeChecker tc = TypeCheckerProvider.getFor(element);
+            IdeaDocGenerator generator = new IdeaDocGenerator(tc);
             if (element instanceof DummyPsiElement) {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;
-                Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
-                return generator.getDocumentationText(referenceable, null, cu, element.getProject()).value;
+                PhasedUnit pu = tc.getPhasedUnitFromRelativePath(referenceable.getUnit().getRelativePath());
+                Tree.CompilationUnit cu = pu.getCompilationUnit();
+                String value = generator.getDocumentationText(referenceable, null, cu, element.getProject()).value;
+                System.out.println(value);
+                return value;
             }
             if (element.getContainingFile() != null) {
                 Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
-                return Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), element.getProject()), null);
+                String s = Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), element.getProject()), null);
+                System.out.println(s);
+                return s;
             }
         } catch (ceylon.language.AssertionError | Exception e) {
             e.printStackTrace();
@@ -64,7 +71,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     @Nullable
     @Override
     public PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {
-        if (!TYPES_TO_IGNORE.contains(contextElement.getNode().getElementType())) {
+        if (contextElement != null && !TYPES_TO_IGNORE.contains(contextElement.getNode().getElementType())) {
             return contextElement;
         }
 

@@ -18,6 +18,8 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleSourceMapper;
 import com.redhat.ceylon.compiler.typechecker.context.Context;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
 import com.redhat.ceylon.compiler.typechecker.util.ModuleManagerFactory;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
@@ -35,6 +37,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
 
@@ -194,6 +198,26 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         startTime = System.currentTimeMillis();
         checker.process();
         LOGGER.info("Type checker process()ed in " + (System.currentTimeMillis() - startTime) + "ms");
+
+        List<PhasedUnit> phasedUnitsOfDependencies = new ArrayList<>();
+
+        for (PhasedUnits phasedUnits : checker.getPhasedUnitsOfDependencies()) {
+            for (PhasedUnit pu : phasedUnits.getPhasedUnits()) {
+                phasedUnitsOfDependencies.add(pu);
+            }
+        }
+
+        for (PhasedUnit pu : phasedUnitsOfDependencies) {
+            pu.scanDeclarations();
+        }
+
+        for (PhasedUnit pu : phasedUnitsOfDependencies) {
+            pu.scanTypeDeclarations();
+        }
+
+        for (PhasedUnit pu : phasedUnitsOfDependencies) {
+            pu.analyseTypes();
+        }
 
         return checker;
     }

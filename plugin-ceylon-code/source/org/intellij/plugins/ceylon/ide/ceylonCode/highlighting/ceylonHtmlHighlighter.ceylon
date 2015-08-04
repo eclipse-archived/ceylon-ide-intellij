@@ -24,6 +24,9 @@ import java.awt {
 import ceylon.interop.java {
     javaString
 }
+import com.redhat.ceylon.ide.common.doc {
+    convertToHTML
+}
 
 shared String highlight(String rawText, Project project) {
     EditorHighlighter highlighter = HighlighterFactory.createHighlighter(project, FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
@@ -61,8 +64,13 @@ String style(String text, Integer start, Integer end, TextAttributes attr) {
         builder.append("<i>");
     }
 
-    builder.append(text.span(start, end - 1));
-
+    builder.append(convertToHTML(text.span(start, end - 1)));
+    
+    value endsWithNewLine = if ((builder.last else ' ') == '\n') then true else false;
+    if (endsWithNewLine) {
+        builder.deleteTerminal(1);
+    }
+    
     if (isItalic) {
         builder.append("</i>");
     }
@@ -73,6 +81,10 @@ String style(String text, Integer start, Integer end, TextAttributes attr) {
         builder.append("</font>");
     }
 
+    if (endsWithNewLine) {
+        builder.append("\n");
+    }
+    
     return builder.string;
 }
 
