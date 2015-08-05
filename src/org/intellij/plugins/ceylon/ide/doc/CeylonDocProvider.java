@@ -51,15 +51,11 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;
                 PhasedUnit pu = tc.getPhasedUnitFromRelativePath(referenceable.getUnit().getRelativePath());
                 Tree.CompilationUnit cu = pu.getCompilationUnit();
-                String value = generator.getDocumentationText(referenceable, null, cu, element.getProject()).value;
-                System.out.println(value);
-                return value;
+                return generator.getDocumentationText(referenceable, null, cu, element.getProject()).value;
             }
             if (element.getContainingFile() != null) {
                 Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
-                String s = Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), element.getProject()), null);
-                System.out.println(s);
-                return s;
+                return Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), element.getProject()), null);
             }
         } catch (ceylon.language.AssertionError | Exception e) {
             e.printStackTrace();

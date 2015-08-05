@@ -1,0 +1,15 @@
+body {
+    padding: 5px;
+}
+
+p {
+    margin: 4px 0;
+}
+
+div {
+    margin: 0;
+}
+
+.paragraph {
+    margin-top: 10px;
+}

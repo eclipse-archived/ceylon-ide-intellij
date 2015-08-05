@@ -217,7 +217,9 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
     shared actual Boolean showMembers => false;
     
     shared actual void appendPageProlog(StringBuilder builder) {
-        builder.append("<html><head><style>body {padding: 5px; } p {margin: 4px 0;} div {margin: 0} .paragraph {margin-top: 10px;} </style></head><body>");
+        value css = `module`.resourceByPath("ceylondoc.css");
+        value style = if (exists css) then css.textContent() else "";
+        builder.append("<html><head><style>``style``</style></head><body>");
     }
     
     shared actual void appendPageEpilog(StringBuilder builder) {
