@@ -11,7 +11,6 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
-import com.redhat.ceylon.compiler.typechecker.tree.NaturalVisitor;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
@@ -91,7 +90,7 @@ public class CeylonStubFileElementType extends IStubFileElementType {
         }
     }
 
-    private class AstVisitor extends Visitor implements NaturalVisitor {
+    private class AstVisitor extends Visitor {
         private CompositeElement parent;
         private Queue<Token> tokens;
         private boolean verbose;
@@ -224,7 +223,7 @@ public class CeylonStubFileElementType extends IStubFileElementType {
         }
     }
 
-    private class OrderedChildrenVisitor extends Visitor implements NaturalVisitor {
+    private class OrderedChildrenVisitor extends Visitor {
         List<Node> children = new ArrayList<>();
 
         @Override

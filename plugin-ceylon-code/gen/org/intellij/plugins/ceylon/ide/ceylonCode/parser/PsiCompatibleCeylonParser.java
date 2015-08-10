@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g 2015-07-20 23:09:31
+// $ANTLR 3.4 /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g 2015-08-09 17:39:27
  package org.intellij.plugins.ceylon.ide.ceylonCode.parser;
                   import com.redhat.ceylon.compiler.typechecker.tree.MissingToken;
                   import com.redhat.ceylon.compiler.typechecker.tree.Node;
@@ -175,7 +175,7 @@ public class PsiCompatibleCeylonParser extends Parser {
     }
     public PsiCompatibleCeylonParser(TokenStream input, RecognizerSharedState state) {
         super(input, state);
-        this.state.ruleMemo = new HashMap[325+1];
+        this.state.ruleMemo = new HashMap[326+1];
          
 
     }
@@ -6475,7 +6475,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                                         if ((t1!=null?t1.typeArgumentList:null)!=null)
                                             bt.setTypeArgumentList((t1!=null?t1.typeArgumentList:null));
                                         retval.expression = new ExtendedTypeExpression(null);
-                                        retval.expression.setExtendedType(retval.type); }
+                                        retval.expression.setType(retval.type); }
 
                             // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:1039:11: (m2= MEMBER_OP t2= memberNameWithArguments )?
                             int alt95=2;
@@ -6508,7 +6508,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                                                   if ((t2!=null?t2.typeArgumentList:null)!=null)
                                                     qt.setTypeArgumentList((t2!=null?t2.typeArgumentList:null));
                                                   retval.expression = new ExtendedTypeExpression(null);
-                                                  retval.expression.setExtendedType(retval.type); }
+                                                  retval.expression.setType(retval.type); }
 
                                     }
                                     break;
@@ -6605,7 +6605,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                                 bt.setTypeArgumentList((t0!=null?t0.typeArgumentList:null));
                             retval.type =bt; 
                             retval.expression = new ExtendedTypeExpression(null);
-                            retval.expression.setExtendedType(retval.type); }
+                            retval.expression.setType(retval.type); }
 
                     // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:1070:7: (m3= MEMBER_OP (t3= memberNameWithArguments )? )?
                     int alt99=2;
@@ -6649,7 +6649,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                                                 if ((t3!=null?t3.typeArgumentList:null)!=null)
                                                     qt.setTypeArgumentList((t3!=null?t3.typeArgumentList:null));
                                                 retval.expression = new ExtendedTypeExpression(null);
-                                                retval.expression.setExtendedType(retval.type); }
+                                                retval.expression.setType(retval.type); }
 
                                     }
                                     break;
@@ -6680,7 +6680,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                                 bt.setTypeArgumentList((t4!=null?t4.typeArgumentList:null));
                             retval.type =bt; 
                             retval.expression = new ExtendedTypeExpression(null);
-                            retval.expression.setExtendedType(retval.type); }
+                            retval.expression.setType(retval.type); }
 
                     }
                     break;
@@ -6766,7 +6766,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                               if ((t4!=null?t4.typeArgumentList:null)!=null)
                                 qt.setTypeArgumentList((t4!=null?t4.typeArgumentList:null));
                               retval.expression = new ExtendedTypeExpression(null);
-                              retval.expression.setExtendedType(retval.type); }
+                              retval.expression.setType(retval.type); }
 
                     }
                     break;
@@ -6786,7 +6786,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                               if ((t5!=null?t5.typeArgumentList:null)!=null)
                                 qt.setTypeArgumentList((t5!=null?t5.typeArgumentList:null));
                               retval.expression = new ExtendedTypeExpression(null);
-                              retval.expression.setExtendedType(retval.type); }
+                              retval.expression.setType(retval.type); }
 
                     }
                     break;
@@ -26721,34 +26721,26 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "dynamic"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3757:1: dynamic returns [DynamicStatement statement] : DYNAMIC block ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3757:1: dynamic returns [DynamicStatement statement] : dynamicClause ;
     public DynamicStatement dynamic() throws RecognitionException {
         DynamicStatement statement = null;
 
 
-        Token DYNAMIC563=null;
-        Block block564 =null;
+        DynamicClause dynamicClause563 =null;
 
 
-         DynamicClause dc = null; 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3759:5: ( DYNAMIC block )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3759:7: DYNAMIC block
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3758:5: ( dynamicClause )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3758:7: dynamicClause
             {
-            if ( state.backtracking==0 ) { statement =new DynamicStatement(null); }
-
-            DYNAMIC563=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_dynamic25382); if (state.failed) return statement;
-
-            if ( state.backtracking==0 ) { dc = new DynamicClause(DYNAMIC563);
-                    statement.setDynamicClause(dc); }
-
-            pushFollow(FOLLOW_block_in_dynamic25399);
-            block564=block();
+            pushFollow(FOLLOW_dynamicClause_in_dynamic25365);
+            dynamicClause563=dynamicClause();
 
             state._fsp--;
             if (state.failed) return statement;
 
-            if ( state.backtracking==0 ) { dc.setBlock(block564); }
+            if ( state.backtracking==0 ) { statement = new DynamicStatement(null); 
+                    statement.setDynamicClause(dynamicClause563); }
 
             }
 
@@ -26767,32 +26759,75 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
 
+    // $ANTLR start "dynamicClause"
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3763:1: dynamicClause returns [DynamicClause dynamic] : DYNAMIC block ;
+    public DynamicClause dynamicClause() throws RecognitionException {
+        DynamicClause dynamic = null;
+
+
+        Token DYNAMIC564=null;
+        Block block565 =null;
+
+
+        try {
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3764:5: ( DYNAMIC block )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3764:7: DYNAMIC block
+            {
+            DYNAMIC564=(Token)match(input,DYNAMIC,FOLLOW_DYNAMIC_in_dynamicClause25398); if (state.failed) return dynamic;
+
+            if ( state.backtracking==0 ) { dynamic = new DynamicClause(DYNAMIC564); }
+
+            pushFollow(FOLLOW_block_in_dynamicClause25415);
+            block565=block();
+
+            state._fsp--;
+            if (state.failed) return dynamic;
+
+            if ( state.backtracking==0 ) { dynamic.setBlock(block565); }
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+
+        finally {
+        	// do for sure before leaving
+        }
+        return dynamic;
+    }
+    // $ANTLR end "dynamicClause"
+
+
+
     // $ANTLR start "ifElse"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3767:1: ifElse returns [IfStatement statement] : ifBlock ( elseBlock )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3770:1: ifElse returns [IfStatement statement] : ifBlock ( elseBlock )? ;
     public IfStatement ifElse() throws RecognitionException {
         IfStatement statement = null;
 
 
-        IfClause ifBlock565 =null;
+        IfClause ifBlock566 =null;
 
-        ElseClause elseBlock566 =null;
+        ElseClause elseBlock567 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3768:5: ( ifBlock ( elseBlock )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3768:7: ifBlock ( elseBlock )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3771:5: ( ifBlock ( elseBlock )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3771:7: ifBlock ( elseBlock )?
             {
-            if ( state.backtracking==0 ) { statement =new IfStatement(null); }
+            if ( state.backtracking==0 ) { statement = new IfStatement(null); }
 
-            pushFollow(FOLLOW_ifBlock_in_ifElse25436);
-            ifBlock565=ifBlock();
+            pushFollow(FOLLOW_ifBlock_in_ifElse25452);
+            ifBlock566=ifBlock();
 
             state._fsp--;
             if (state.failed) return statement;
 
-            if ( state.backtracking==0 ) { statement.setIfClause(ifBlock565); }
+            if ( state.backtracking==0 ) { statement.setIfClause(ifBlock566); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3771:7: ( elseBlock )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3774:7: ( elseBlock )?
             int alt335=2;
             int LA335_0 = input.LA(1);
 
@@ -26801,17 +26836,17 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt335) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3772:9: elseBlock
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3775:9: elseBlock
                     {
-                    pushFollow(FOLLOW_elseBlock_in_ifElse25464);
-                    elseBlock566=elseBlock();
+                    pushFollow(FOLLOW_elseBlock_in_ifElse25480);
+                    elseBlock567=elseBlock();
 
                     state._fsp--;
                     if (state.failed) return statement;
 
-                    if ( state.backtracking==0 ) { ElseClause ec = elseBlock566;
+                    if ( state.backtracking==0 ) { ElseClause ec = elseBlock567;
                               statement.setElseClause(ec);
-                              ConditionList cl = ifBlock565.getConditionList();
+                              ConditionList cl = ifBlock566.getConditionList();
                               if (cl!=null) {
                                 List<Condition> conditions = cl.getConditions();
                                 if (conditions.size()==1) {
@@ -26875,40 +26910,40 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "ifBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3817:1: ifBlock returns [IfClause clause] : IF_CLAUSE conditions controlBlock ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3820:1: ifBlock returns [IfClause clause] : IF_CLAUSE conditions controlBlock ;
     public IfClause ifBlock() throws RecognitionException {
         IfClause clause = null;
 
 
-        Token IF_CLAUSE567=null;
-        ConditionList conditions568 =null;
+        Token IF_CLAUSE568=null;
+        ConditionList conditions569 =null;
 
-        Block controlBlock569 =null;
+        Block controlBlock570 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3818:5: ( IF_CLAUSE conditions controlBlock )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3818:7: IF_CLAUSE conditions controlBlock
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3821:5: ( IF_CLAUSE conditions controlBlock )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3821:7: IF_CLAUSE conditions controlBlock
             {
-            IF_CLAUSE567=(Token)match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_ifBlock25504); if (state.failed) return clause;
+            IF_CLAUSE568=(Token)match(input,IF_CLAUSE,FOLLOW_IF_CLAUSE_in_ifBlock25520); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new IfClause(IF_CLAUSE567); }
+            if ( state.backtracking==0 ) { clause = new IfClause(IF_CLAUSE568); }
 
-            pushFollow(FOLLOW_conditions_in_ifBlock25521);
-            conditions568=conditions();
-
-            state._fsp--;
-            if (state.failed) return clause;
-
-            if ( state.backtracking==0 ) { clause.setConditionList(conditions568); }
-
-            pushFollow(FOLLOW_controlBlock_in_ifBlock25537);
-            controlBlock569=controlBlock();
+            pushFollow(FOLLOW_conditions_in_ifBlock25537);
+            conditions569=conditions();
 
             state._fsp--;
             if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setBlock(controlBlock569); }
+            if ( state.backtracking==0 ) { clause.setConditionList(conditions569); }
+
+            pushFollow(FOLLOW_controlBlock_in_ifBlock25553);
+            controlBlock570=controlBlock();
+
+            state._fsp--;
+            if (state.failed) return clause;
+
+            if ( state.backtracking==0 ) { clause.setBlock(controlBlock570); }
 
             }
 
@@ -26928,26 +26963,26 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "elseBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3826:1: elseBlock returns [ElseClause clause] : ELSE_CLAUSE ( elseIf | block ) ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3829:1: elseBlock returns [ElseClause clause] : ELSE_CLAUSE ( elseIf | block ) ;
     public ElseClause elseBlock() throws RecognitionException {
         ElseClause clause = null;
 
 
-        Token ELSE_CLAUSE570=null;
-        Block elseIf571 =null;
+        Token ELSE_CLAUSE571=null;
+        Block elseIf572 =null;
 
-        Block block572 =null;
+        Block block573 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3827:5: ( ELSE_CLAUSE ( elseIf | block ) )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3827:7: ELSE_CLAUSE ( elseIf | block )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3830:5: ( ELSE_CLAUSE ( elseIf | block ) )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3830:7: ELSE_CLAUSE ( elseIf | block )
             {
-            ELSE_CLAUSE570=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_elseBlock25566); if (state.failed) return clause;
+            ELSE_CLAUSE571=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_elseBlock25582); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE570); }
+            if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE571); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3829:7: ( elseIf | block )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3832:7: ( elseIf | block )
             int alt336=2;
             int LA336_0 = input.LA(1);
 
@@ -26967,28 +27002,28 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt336) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3830:9: elseIf
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3833:9: elseIf
                     {
-                    pushFollow(FOLLOW_elseIf_in_elseBlock25593);
-                    elseIf571=elseIf();
+                    pushFollow(FOLLOW_elseIf_in_elseBlock25609);
+                    elseIf572=elseIf();
 
                     state._fsp--;
                     if (state.failed) return clause;
 
-                    if ( state.backtracking==0 ) { clause.setBlock(elseIf571); }
+                    if ( state.backtracking==0 ) { clause.setBlock(elseIf572); }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3833:9: block
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3836:9: block
                     {
-                    pushFollow(FOLLOW_block_in_elseBlock25623);
-                    block572=block();
+                    pushFollow(FOLLOW_block_in_elseBlock25639);
+                    block573=block();
 
                     state._fsp--;
                     if (state.failed) return clause;
 
-                    if ( state.backtracking==0 ) { clause.setBlock(block572); }
+                    if ( state.backtracking==0 ) { clause.setBlock(block573); }
 
                     }
                     break;
@@ -27014,26 +27049,26 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "elseIf"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3838:1: elseIf returns [Block block] : ifElse ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3841:1: elseIf returns [Block block] : ifElse ;
     public Block elseIf() throws RecognitionException {
         Block block = null;
 
 
-        IfStatement ifElse573 =null;
+        IfStatement ifElse574 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3839:5: ( ifElse )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3839:7: ifElse
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3842:5: ( ifElse )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3842:7: ifElse
             {
-            pushFollow(FOLLOW_ifElse_in_elseIf25662);
-            ifElse573=ifElse();
+            pushFollow(FOLLOW_ifElse_in_elseIf25678);
+            ifElse574=ifElse();
 
             state._fsp--;
             if (state.failed) return block;
 
             if ( state.backtracking==0 ) { block = new Block(null);
-                    block.addStatement(ifElse573); }
+                    block.addStatement(ifElse574); }
 
             }
 
@@ -27053,39 +27088,39 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "switchCaseElse"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3844:1: switchCaseElse returns [SwitchStatement statement] : switchHeader cases ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3847:1: switchCaseElse returns [SwitchStatement statement] : switchHeader cases ;
     public SwitchStatement switchCaseElse() throws RecognitionException {
         SwitchStatement statement = null;
 
 
-        SwitchClause switchHeader574 =null;
+        SwitchClause switchHeader575 =null;
 
-        SwitchCaseList cases575 =null;
+        SwitchCaseList cases576 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3845:5: ( switchHeader cases )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3845:7: switchHeader cases
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3848:5: ( switchHeader cases )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3848:7: switchHeader cases
             {
             if ( state.backtracking==0 ) { statement = new SwitchStatement(null); }
 
-            pushFollow(FOLLOW_switchHeader_in_switchCaseElse25699);
-            switchHeader574=switchHeader();
+            pushFollow(FOLLOW_switchHeader_in_switchCaseElse25715);
+            switchHeader575=switchHeader();
 
             state._fsp--;
             if (state.failed) return statement;
 
-            if ( state.backtracking==0 ) { statement.setSwitchClause(switchHeader574); }
+            if ( state.backtracking==0 ) { statement.setSwitchClause(switchHeader575); }
 
-            pushFollow(FOLLOW_cases_in_switchCaseElse25716);
-            cases575=cases();
+            pushFollow(FOLLOW_cases_in_switchCaseElse25732);
+            cases576=cases();
 
             state._fsp--;
             if (state.failed) return statement;
 
-            if ( state.backtracking==0 ) { statement.setSwitchCaseList(cases575);
+            if ( state.backtracking==0 ) { statement.setSwitchCaseList(cases576);
                     Identifier id = null;
-                    Switched sw = switchHeader574.getSwitched();
+                    Switched sw = switchHeader575.getSwitched();
                     if (sw!=null) {
                       Expression ex = sw.getExpression();
                       if (ex!=null && ex.getTerm() instanceof BaseMemberExpression) {
@@ -27097,7 +27132,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                       }
                     }
                     if (id!=null) {
-                      for (CaseClause cc: cases575.getCaseClauses()) {
+                      for (CaseClause cc: cases576.getCaseClauses()) {
                         CaseItem item = cc.getCaseItem();
                         if (item instanceof IsCase) {
                           IsCase ic = (IsCase) item;
@@ -27115,7 +27150,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                           v.setIdentifier(id);
                         }
                       }
-                      ElseClause ec = cases575.getElseClause();
+                      ElseClause ec = cases576.getElseClause();
                       if (ec!=null) {
                         Variable ev = new Variable(null);
                         ev.setType(new SyntheticVariable(null));
@@ -27151,30 +27186,30 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "switchHeader"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3900:1: switchHeader returns [SwitchClause clause] : SWITCH_CLAUSE LPAREN ( switched )? RPAREN ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3903:1: switchHeader returns [SwitchClause clause] : SWITCH_CLAUSE LPAREN ( switched )? RPAREN ;
     public SwitchClause switchHeader() throws RecognitionException {
         SwitchClause clause = null;
 
 
-        Token SWITCH_CLAUSE576=null;
-        Token LPAREN577=null;
-        Token RPAREN579=null;
-        Switched switched578 =null;
+        Token SWITCH_CLAUSE577=null;
+        Token LPAREN578=null;
+        Token RPAREN580=null;
+        Switched switched579 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3901:5: ( SWITCH_CLAUSE LPAREN ( switched )? RPAREN )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3901:7: SWITCH_CLAUSE LPAREN ( switched )? RPAREN
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3904:5: ( SWITCH_CLAUSE LPAREN ( switched )? RPAREN )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3904:7: SWITCH_CLAUSE LPAREN ( switched )? RPAREN
             {
-            SWITCH_CLAUSE576=(Token)match(input,SWITCH_CLAUSE,FOLLOW_SWITCH_CLAUSE_in_switchHeader25745); if (state.failed) return clause;
+            SWITCH_CLAUSE577=(Token)match(input,SWITCH_CLAUSE,FOLLOW_SWITCH_CLAUSE_in_switchHeader25761); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new SwitchClause(SWITCH_CLAUSE576); }
+            if ( state.backtracking==0 ) { clause = new SwitchClause(SWITCH_CLAUSE577); }
 
-            LPAREN577=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_switchHeader25762); if (state.failed) return clause;
+            LPAREN578=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_switchHeader25778); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setEndToken(LPAREN577); }
+            if ( state.backtracking==0 ) { clause.setEndToken(LPAREN578); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3905:7: ( switched )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3908:7: ( switched )?
             int alt337=2;
             int LA337_0 = input.LA(1);
 
@@ -27183,15 +27218,15 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt337) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3906:9: switched
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3909:9: switched
                     {
-                    pushFollow(FOLLOW_switched_in_switchHeader25788);
-                    switched578=switched();
+                    pushFollow(FOLLOW_switched_in_switchHeader25804);
+                    switched579=switched();
 
                     state._fsp--;
                     if (state.failed) return clause;
 
-                    if ( state.backtracking==0 ) { clause.setSwitched(switched578); 
+                    if ( state.backtracking==0 ) { clause.setSwitched(switched579); 
                               clause.setEndToken(null); }
 
                     }
@@ -27200,9 +27235,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
 
 
-            RPAREN579=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_switchHeader25816); if (state.failed) return clause;
+            RPAREN580=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_switchHeader25832); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setEndToken(RPAREN579); }
+            if ( state.backtracking==0 ) { clause.setEndToken(RPAREN580); }
 
             }
 
@@ -27222,22 +27257,22 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "switched"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3914:1: switched returns [Switched switched] : ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3917:1: switched returns [Switched switched] : ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) ;
     public Switched switched() throws RecognitionException {
         Switched switched = null;
 
 
-        Variable specifiedVariable580 =null;
+        Variable specifiedVariable581 =null;
 
-        Expression expression581 =null;
+        Expression expression582 =null;
 
 
          switched = new Switched(null); 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3916:5: ( ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3916:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:5: ( ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression ) )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
             {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3916:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:7: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
             int alt338=2;
             int LA338_0 = input.LA(1);
 
@@ -27359,28 +27394,28 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt338) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3916:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
                     {
-                    pushFollow(FOLLOW_specifiedVariable_in_switched25875);
-                    specifiedVariable580=specifiedVariable();
+                    pushFollow(FOLLOW_specifiedVariable_in_switched25891);
+                    specifiedVariable581=specifiedVariable();
 
                     state._fsp--;
                     if (state.failed) return switched;
 
-                    if ( state.backtracking==0 ) { switched.setVariable(specifiedVariable580); }
+                    if ( state.backtracking==0 ) { switched.setVariable(specifiedVariable581); }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:9: expression
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3922:9: expression
                     {
-                    pushFollow(FOLLOW_expression_in_switched25895);
-                    expression581=expression();
+                    pushFollow(FOLLOW_expression_in_switched25911);
+                    expression582=expression();
 
                     state._fsp--;
                     if (state.failed) return switched;
 
-                    if ( state.backtracking==0 ) { switched.setExpression(expression581); }
+                    if ( state.backtracking==0 ) { switched.setExpression(expression582); }
 
                     }
                     break;
@@ -27406,23 +27441,23 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "cases"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3924:1: cases returns [SwitchCaseList switchCaseList] : ( caseBlock )+ ( defaultCaseBlock )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3927:1: cases returns [SwitchCaseList switchCaseList] : ( caseBlock )+ ( defaultCaseBlock )? ;
     public SwitchCaseList cases() throws RecognitionException {
         SwitchCaseList switchCaseList = null;
 
 
-        CaseClause caseBlock582 =null;
+        CaseClause caseBlock583 =null;
 
-        ElseClause defaultCaseBlock583 =null;
+        ElseClause defaultCaseBlock584 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3925:5: ( ( caseBlock )+ ( defaultCaseBlock )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3925:7: ( caseBlock )+ ( defaultCaseBlock )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3928:5: ( ( caseBlock )+ ( defaultCaseBlock )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3928:7: ( caseBlock )+ ( defaultCaseBlock )?
             {
             if ( state.backtracking==0 ) { switchCaseList = new SwitchCaseList(null); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3926:7: ( caseBlock )+
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3929:7: ( caseBlock )+
             int cnt339=0;
             loop339:
             do {
@@ -27436,15 +27471,15 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                 switch (alt339) {
             	case 1 :
-            	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3927:9: caseBlock
+            	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3930:9: caseBlock
             	    {
-            	    pushFollow(FOLLOW_caseBlock_in_cases25952);
-            	    caseBlock582=caseBlock();
+            	    pushFollow(FOLLOW_caseBlock_in_cases25968);
+            	    caseBlock583=caseBlock();
 
             	    state._fsp--;
             	    if (state.failed) return switchCaseList;
 
-            	    if ( state.backtracking==0 ) { switchCaseList.addCaseClause(caseBlock582); }
+            	    if ( state.backtracking==0 ) { switchCaseList.addCaseClause(caseBlock583); }
 
             	    }
             	    break;
@@ -27460,7 +27495,7 @@ public class PsiCompatibleCeylonParser extends Parser {
             } while (true);
 
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3930:7: ( defaultCaseBlock )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3933:7: ( defaultCaseBlock )?
             int alt340=2;
             int LA340_0 = input.LA(1);
 
@@ -27469,15 +27504,15 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt340) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3931:9: defaultCaseBlock
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3934:9: defaultCaseBlock
                     {
-                    pushFollow(FOLLOW_defaultCaseBlock_in_cases25989);
-                    defaultCaseBlock583=defaultCaseBlock();
+                    pushFollow(FOLLOW_defaultCaseBlock_in_cases26005);
+                    defaultCaseBlock584=defaultCaseBlock();
 
                     state._fsp--;
                     if (state.failed) return switchCaseList;
 
-                    if ( state.backtracking==0 ) { switchCaseList.setElseClause(defaultCaseBlock583); }
+                    if ( state.backtracking==0 ) { switchCaseList.setElseClause(defaultCaseBlock584); }
 
                     }
                     break;
@@ -27503,40 +27538,40 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "caseBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3936:1: caseBlock returns [CaseClause clause] : CASE_CLAUSE caseItemList block ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3939:1: caseBlock returns [CaseClause clause] : CASE_CLAUSE caseItemList block ;
     public CaseClause caseBlock() throws RecognitionException {
         CaseClause clause = null;
 
 
-        Token CASE_CLAUSE584=null;
-        CaseItem caseItemList585 =null;
+        Token CASE_CLAUSE585=null;
+        CaseItem caseItemList586 =null;
 
-        Block block586 =null;
+        Block block587 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3937:5: ( CASE_CLAUSE caseItemList block )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3937:7: CASE_CLAUSE caseItemList block
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3940:5: ( CASE_CLAUSE caseItemList block )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3940:7: CASE_CLAUSE caseItemList block
             {
-            CASE_CLAUSE584=(Token)match(input,CASE_CLAUSE,FOLLOW_CASE_CLAUSE_in_caseBlock26033); if (state.failed) return clause;
+            CASE_CLAUSE585=(Token)match(input,CASE_CLAUSE,FOLLOW_CASE_CLAUSE_in_caseBlock26049); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new CaseClause(CASE_CLAUSE584); }
+            if ( state.backtracking==0 ) { clause = new CaseClause(CASE_CLAUSE585); }
 
-            pushFollow(FOLLOW_caseItemList_in_caseBlock26050);
-            caseItemList585=caseItemList();
-
-            state._fsp--;
-            if (state.failed) return clause;
-
-            if ( state.backtracking==0 ) { clause.setCaseItem(caseItemList585); }
-
-            pushFollow(FOLLOW_block_in_caseBlock26066);
-            block586=block();
+            pushFollow(FOLLOW_caseItemList_in_caseBlock26066);
+            caseItemList586=caseItemList();
 
             state._fsp--;
             if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setBlock(block586); }
+            if ( state.backtracking==0 ) { clause.setCaseItem(caseItemList586); }
+
+            pushFollow(FOLLOW_block_in_caseBlock26082);
+            block587=block();
+
+            state._fsp--;
+            if (state.failed) return clause;
+
+            if ( state.backtracking==0 ) { clause.setBlock(block587); }
 
             }
 
@@ -27556,30 +27591,30 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "defaultCaseBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3945:1: defaultCaseBlock returns [ElseClause clause] : ELSE_CLAUSE block ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3948:1: defaultCaseBlock returns [ElseClause clause] : ELSE_CLAUSE block ;
     public ElseClause defaultCaseBlock() throws RecognitionException {
         ElseClause clause = null;
 
 
-        Token ELSE_CLAUSE587=null;
-        Block block588 =null;
+        Token ELSE_CLAUSE588=null;
+        Block block589 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3946:5: ( ELSE_CLAUSE block )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3946:7: ELSE_CLAUSE block
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3949:5: ( ELSE_CLAUSE block )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3949:7: ELSE_CLAUSE block
             {
-            ELSE_CLAUSE587=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock26095); if (state.failed) return clause;
+            ELSE_CLAUSE588=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock26111); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE587); }
+            if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE588); }
 
-            pushFollow(FOLLOW_block_in_defaultCaseBlock26112);
-            block588=block();
+            pushFollow(FOLLOW_block_in_defaultCaseBlock26128);
+            block589=block();
 
             state._fsp--;
             if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setBlock(block588); }
+            if ( state.backtracking==0 ) { clause.setBlock(block589); }
 
             }
 
@@ -27599,22 +27634,22 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "caseItemList"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3952:1: caseItemList returns [CaseItem item] : LPAREN (ci= caseItem )? RPAREN ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3955:1: caseItemList returns [CaseItem item] : LPAREN (ci= caseItem )? RPAREN ;
     public CaseItem caseItemList() throws RecognitionException {
         CaseItem item = null;
 
 
-        Token RPAREN589=null;
+        Token RPAREN590=null;
         CaseItem ci =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3953:5: ( LPAREN (ci= caseItem )? RPAREN )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3953:7: LPAREN (ci= caseItem )? RPAREN
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3956:5: ( LPAREN (ci= caseItem )? RPAREN )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3956:7: LPAREN (ci= caseItem )? RPAREN
             {
-            match(input,LPAREN,FOLLOW_LPAREN_in_caseItemList26141); if (state.failed) return item;
+            match(input,LPAREN,FOLLOW_LPAREN_in_caseItemList26157); if (state.failed) return item;
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3954:7: (ci= caseItem )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3957:7: (ci= caseItem )?
             int alt341=2;
             int LA341_0 = input.LA(1);
 
@@ -27623,9 +27658,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt341) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3955:9: ci= caseItem
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3958:9: ci= caseItem
                     {
-                    pushFollow(FOLLOW_caseItem_in_caseItemList26162);
+                    pushFollow(FOLLOW_caseItem_in_caseItemList26178);
                     ci=caseItem();
 
                     state._fsp--;
@@ -27639,10 +27674,10 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
 
 
-            RPAREN589=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_caseItemList26189); if (state.failed) return item;
+            RPAREN590=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_caseItemList26205); if (state.failed) return item;
 
             if ( state.backtracking==0 ) { if (item!=null) 
-                        item.setEndToken(RPAREN589); }
+                        item.setEndToken(RPAREN590); }
 
             }
 
@@ -27662,20 +27697,20 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "caseItem"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3963:1: caseItem returns [CaseItem item] : ( ( IS_OP )=> isCaseCondition | ( SATISFIES )=> satisfiesCaseCondition | matchCaseCondition );
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3966:1: caseItem returns [CaseItem item] : ( ( IS_OP )=> isCaseCondition | ( SATISFIES )=> satisfiesCaseCondition | matchCaseCondition );
     public CaseItem caseItem() throws RecognitionException {
         CaseItem item = null;
 
 
-        IsCase isCaseCondition590 =null;
+        IsCase isCaseCondition591 =null;
 
-        SatisfiesCase satisfiesCaseCondition591 =null;
+        SatisfiesCase satisfiesCaseCondition592 =null;
 
-        MatchCase matchCaseCondition592 =null;
+        MatchCase matchCaseCondition593 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3964:5: ( ( IS_OP )=> isCaseCondition | ( SATISFIES )=> satisfiesCaseCondition | matchCaseCondition )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3967:5: ( ( IS_OP )=> isCaseCondition | ( SATISFIES )=> satisfiesCaseCondition | matchCaseCondition )
             int alt342=3;
             int LA342_0 = input.LA(1);
 
@@ -27698,41 +27733,41 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt342) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3964:7: ( IS_OP )=> isCaseCondition
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3967:7: ( IS_OP )=> isCaseCondition
                     {
-                    pushFollow(FOLLOW_isCaseCondition_in_caseItem26223);
-                    isCaseCondition590=isCaseCondition();
+                    pushFollow(FOLLOW_isCaseCondition_in_caseItem26239);
+                    isCaseCondition591=isCaseCondition();
 
                     state._fsp--;
                     if (state.failed) return item;
 
-                    if ( state.backtracking==0 ) { item =isCaseCondition590; }
+                    if ( state.backtracking==0 ) { item =isCaseCondition591; }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3966:7: ( SATISFIES )=> satisfiesCaseCondition
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3969:7: ( SATISFIES )=> satisfiesCaseCondition
                     {
-                    pushFollow(FOLLOW_satisfiesCaseCondition_in_caseItem26244);
-                    satisfiesCaseCondition591=satisfiesCaseCondition();
+                    pushFollow(FOLLOW_satisfiesCaseCondition_in_caseItem26260);
+                    satisfiesCaseCondition592=satisfiesCaseCondition();
 
                     state._fsp--;
                     if (state.failed) return item;
 
-                    if ( state.backtracking==0 ) { item =satisfiesCaseCondition591; }
+                    if ( state.backtracking==0 ) { item =satisfiesCaseCondition592; }
 
                     }
                     break;
                 case 3 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3968:7: matchCaseCondition
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3971:7: matchCaseCondition
                     {
-                    pushFollow(FOLLOW_matchCaseCondition_in_caseItem26260);
-                    matchCaseCondition592=matchCaseCondition();
+                    pushFollow(FOLLOW_matchCaseCondition_in_caseItem26276);
+                    matchCaseCondition593=matchCaseCondition();
 
                     state._fsp--;
                     if (state.failed) return item;
 
-                    if ( state.backtracking==0 ) { item =matchCaseCondition592; }
+                    if ( state.backtracking==0 ) { item =matchCaseCondition593; }
 
                     }
                     break;
@@ -27754,26 +27789,26 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "matchCaseCondition"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3972:1: matchCaseCondition returns [MatchCase item] : valueCaseList ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3975:1: matchCaseCondition returns [MatchCase item] : valueCaseList ;
     public MatchCase matchCaseCondition() throws RecognitionException {
         MatchCase item = null;
 
 
-        ExpressionList valueCaseList593 =null;
+        ExpressionList valueCaseList594 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3973:5: ( valueCaseList )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3973:7: valueCaseList
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3976:5: ( valueCaseList )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3976:7: valueCaseList
             {
-            pushFollow(FOLLOW_valueCaseList_in_matchCaseCondition26289);
-            valueCaseList593=valueCaseList();
+            pushFollow(FOLLOW_valueCaseList_in_matchCaseCondition26305);
+            valueCaseList594=valueCaseList();
 
             state._fsp--;
             if (state.failed) return item;
 
             if ( state.backtracking==0 ) { item = new MatchCase(null);
-                    item.setExpressionList(valueCaseList593); }
+                    item.setExpressionList(valueCaseList594); }
 
             }
 
@@ -27793,30 +27828,30 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "isCaseCondition"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3978:1: isCaseCondition returns [IsCase item] : IS_OP type ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3981:1: isCaseCondition returns [IsCase item] : IS_OP type ;
     public IsCase isCaseCondition() throws RecognitionException {
         IsCase item = null;
 
 
-        Token IS_OP594=null;
-        StaticType type595 =null;
+        Token IS_OP595=null;
+        StaticType type596 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3979:5: ( IS_OP type )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3979:7: IS_OP type
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3982:5: ( IS_OP type )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3982:7: IS_OP type
             {
-            IS_OP594=(Token)match(input,IS_OP,FOLLOW_IS_OP_in_isCaseCondition26318); if (state.failed) return item;
+            IS_OP595=(Token)match(input,IS_OP,FOLLOW_IS_OP_in_isCaseCondition26334); if (state.failed) return item;
 
-            if ( state.backtracking==0 ) { item = new IsCase(IS_OP594); }
+            if ( state.backtracking==0 ) { item = new IsCase(IS_OP595); }
 
-            pushFollow(FOLLOW_type_in_isCaseCondition26335);
-            type595=type();
+            pushFollow(FOLLOW_type_in_isCaseCondition26351);
+            type596=type();
 
             state._fsp--;
             if (state.failed) return item;
 
-            if ( state.backtracking==0 ) { item.setType(type595); }
+            if ( state.backtracking==0 ) { item.setType(type596); }
 
             }
 
@@ -27836,30 +27871,30 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "satisfiesCaseCondition"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3985:1: satisfiesCaseCondition returns [SatisfiesCase item] : SATISFIES type ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3988:1: satisfiesCaseCondition returns [SatisfiesCase item] : SATISFIES type ;
     public SatisfiesCase satisfiesCaseCondition() throws RecognitionException {
         SatisfiesCase item = null;
 
 
-        Token SATISFIES596=null;
-        StaticType type597 =null;
+        Token SATISFIES597=null;
+        StaticType type598 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3986:5: ( SATISFIES type )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3986:7: SATISFIES type
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3989:5: ( SATISFIES type )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3989:7: SATISFIES type
             {
-            SATISFIES596=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiesCaseCondition26364); if (state.failed) return item;
+            SATISFIES597=(Token)match(input,SATISFIES,FOLLOW_SATISFIES_in_satisfiesCaseCondition26380); if (state.failed) return item;
 
-            if ( state.backtracking==0 ) { item = new SatisfiesCase(SATISFIES596); }
+            if ( state.backtracking==0 ) { item = new SatisfiesCase(SATISFIES597); }
 
-            pushFollow(FOLLOW_type_in_satisfiesCaseCondition26381);
-            type597=type();
+            pushFollow(FOLLOW_type_in_satisfiesCaseCondition26397);
+            type598=type();
 
             state._fsp--;
             if (state.failed) return item;
 
-            if ( state.backtracking==0 ) { item.setType(type597); }
+            if ( state.backtracking==0 ) { item.setType(type598); }
 
             }
 
@@ -27879,31 +27914,31 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "forElse"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3992:1: forElse returns [ForStatement statement] : forBlock ( failBlock )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3995:1: forElse returns [ForStatement statement] : forBlock ( failBlock )? ;
     public ForStatement forElse() throws RecognitionException {
         ForStatement statement = null;
 
 
-        ForClause forBlock598 =null;
+        ForClause forBlock599 =null;
 
-        ElseClause failBlock599 =null;
+        ElseClause failBlock600 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3993:5: ( forBlock ( failBlock )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3993:7: forBlock ( failBlock )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3996:5: ( forBlock ( failBlock )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3996:7: forBlock ( failBlock )?
             {
             if ( state.backtracking==0 ) { statement =new ForStatement(null); }
 
-            pushFollow(FOLLOW_forBlock_in_forElse26418);
-            forBlock598=forBlock();
+            pushFollow(FOLLOW_forBlock_in_forElse26434);
+            forBlock599=forBlock();
 
             state._fsp--;
             if (state.failed) return statement;
 
-            if ( state.backtracking==0 ) { statement.setForClause(forBlock598); }
+            if ( state.backtracking==0 ) { statement.setForClause(forBlock599); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3996:7: ( failBlock )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3999:7: ( failBlock )?
             int alt343=2;
             int LA343_0 = input.LA(1);
 
@@ -27912,15 +27947,15 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt343) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3997:9: failBlock
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4000:9: failBlock
                     {
-                    pushFollow(FOLLOW_failBlock_in_forElse26445);
-                    failBlock599=failBlock();
+                    pushFollow(FOLLOW_failBlock_in_forElse26461);
+                    failBlock600=failBlock();
 
                     state._fsp--;
                     if (state.failed) return statement;
 
-                    if ( state.backtracking==0 ) { statement.setElseClause(failBlock599); }
+                    if ( state.backtracking==0 ) { statement.setElseClause(failBlock600); }
 
                     }
                     break;
@@ -27946,40 +27981,40 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "forBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4002:1: forBlock returns [ForClause clause] : FOR_CLAUSE forIterator controlBlock ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4005:1: forBlock returns [ForClause clause] : FOR_CLAUSE forIterator controlBlock ;
     public ForClause forBlock() throws RecognitionException {
         ForClause clause = null;
 
 
-        Token FOR_CLAUSE600=null;
-        ForIterator forIterator601 =null;
+        Token FOR_CLAUSE601=null;
+        ForIterator forIterator602 =null;
 
-        Block controlBlock602 =null;
+        Block controlBlock603 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4003:5: ( FOR_CLAUSE forIterator controlBlock )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4003:7: FOR_CLAUSE forIterator controlBlock
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4006:5: ( FOR_CLAUSE forIterator controlBlock )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4006:7: FOR_CLAUSE forIterator controlBlock
             {
-            FOR_CLAUSE600=(Token)match(input,FOR_CLAUSE,FOLLOW_FOR_CLAUSE_in_forBlock26485); if (state.failed) return clause;
+            FOR_CLAUSE601=(Token)match(input,FOR_CLAUSE,FOLLOW_FOR_CLAUSE_in_forBlock26501); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new ForClause(FOR_CLAUSE600); }
+            if ( state.backtracking==0 ) { clause = new ForClause(FOR_CLAUSE601); }
 
-            pushFollow(FOLLOW_forIterator_in_forBlock26502);
-            forIterator601=forIterator();
-
-            state._fsp--;
-            if (state.failed) return clause;
-
-            if ( state.backtracking==0 ) { clause.setForIterator(forIterator601); }
-
-            pushFollow(FOLLOW_controlBlock_in_forBlock26519);
-            controlBlock602=controlBlock();
+            pushFollow(FOLLOW_forIterator_in_forBlock26518);
+            forIterator602=forIterator();
 
             state._fsp--;
             if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setBlock(controlBlock602); }
+            if ( state.backtracking==0 ) { clause.setForIterator(forIterator602); }
+
+            pushFollow(FOLLOW_controlBlock_in_forBlock26535);
+            controlBlock603=controlBlock();
+
+            state._fsp--;
+            if (state.failed) return clause;
+
+            if ( state.backtracking==0 ) { clause.setBlock(controlBlock603); }
 
             }
 
@@ -27999,30 +28034,30 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "failBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4011:1: failBlock returns [ElseClause clause] : ELSE_CLAUSE controlBlock ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4014:1: failBlock returns [ElseClause clause] : ELSE_CLAUSE controlBlock ;
     public ElseClause failBlock() throws RecognitionException {
         ElseClause clause = null;
 
 
-        Token ELSE_CLAUSE603=null;
-        Block controlBlock604 =null;
+        Token ELSE_CLAUSE604=null;
+        Block controlBlock605 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4012:5: ( ELSE_CLAUSE controlBlock )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4012:7: ELSE_CLAUSE controlBlock
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4015:5: ( ELSE_CLAUSE controlBlock )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4015:7: ELSE_CLAUSE controlBlock
             {
-            ELSE_CLAUSE603=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_failBlock26548); if (state.failed) return clause;
+            ELSE_CLAUSE604=(Token)match(input,ELSE_CLAUSE,FOLLOW_ELSE_CLAUSE_in_failBlock26564); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE603); }
+            if ( state.backtracking==0 ) { clause = new ElseClause(ELSE_CLAUSE604); }
 
-            pushFollow(FOLLOW_controlBlock_in_failBlock26565);
-            controlBlock604=controlBlock();
+            pushFollow(FOLLOW_controlBlock_in_failBlock26581);
+            controlBlock605=controlBlock();
 
             state._fsp--;
             if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setBlock(controlBlock604); }
+            if ( state.backtracking==0 ) { clause.setBlock(controlBlock605); }
 
             }
 
@@ -28042,33 +28077,33 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "forIterator"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4018:1: forIterator returns [ForIterator iterator] : LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4021:1: forIterator returns [ForIterator iterator] : LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN ;
     public ForIterator forIterator() throws RecognitionException {
         ForIterator iterator = null;
 
 
-        Token LPAREN605=null;
-        Token RPAREN609=null;
-        Pattern pattern606 =null;
+        Token LPAREN606=null;
+        Token RPAREN610=null;
+        Pattern pattern607 =null;
 
-        Variable variable607 =null;
+        Variable variable608 =null;
 
-        SpecifierExpression containment608 =null;
+        SpecifierExpression containment609 =null;
 
 
          ValueIterator vi = null;
                     PatternIterator pi = null; 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4021:5: ( LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4021:7: LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4024:5: ( LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4024:7: LPAREN ( ( ( patternStart )=> pattern | variable ) ( containment )? )? RPAREN
             {
-            LPAREN605=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_forIterator26603); if (state.failed) return iterator;
+            LPAREN606=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_forIterator26619); if (state.failed) return iterator;
 
-            if ( state.backtracking==0 ) { vi = new ValueIterator(LPAREN605); 
-            	      pi = new PatternIterator(LPAREN605); 
+            if ( state.backtracking==0 ) { vi = new ValueIterator(LPAREN606); 
+            	      pi = new PatternIterator(LPAREN606); 
             	      iterator = vi; }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4025:6: ( ( ( patternStart )=> pattern | variable ) ( containment )? )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4028:6: ( ( ( patternStart )=> pattern | variable ) ( containment )? )?
             int alt346=2;
             int LA346_0 = input.LA(1);
 
@@ -28077,9 +28112,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt346) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4026:8: ( ( patternStart )=> pattern | variable ) ( containment )?
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4029:8: ( ( patternStart )=> pattern | variable ) ( containment )?
                     {
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4026:8: ( ( patternStart )=> pattern | variable )
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4029:8: ( ( patternStart )=> pattern | variable )
                     int alt344=2;
                     switch ( input.LA(1) ) {
                     case LBRACKET:
@@ -28293,29 +28328,29 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                     switch (alt344) {
                         case 1 :
-                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4027:10: ( patternStart )=> pattern
+                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4030:10: ( patternStart )=> pattern
                             {
-                            pushFollow(FOLLOW_pattern_in_forIterator26644);
-                            pattern606=pattern();
+                            pushFollow(FOLLOW_pattern_in_forIterator26660);
+                            pattern607=pattern();
 
                             state._fsp--;
                             if (state.failed) return iterator;
 
-                            if ( state.backtracking==0 ) { pi.setPattern(pattern606);
+                            if ( state.backtracking==0 ) { pi.setPattern(pattern607);
                             	          iterator = pi; }
 
                             }
                             break;
                         case 2 :
-                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4031:10: variable
+                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4034:10: variable
                             {
-                            pushFollow(FOLLOW_variable_in_forIterator26675);
-                            variable607=variable();
+                            pushFollow(FOLLOW_variable_in_forIterator26691);
+                            variable608=variable();
 
                             state._fsp--;
                             if (state.failed) return iterator;
 
-                            if ( state.backtracking==0 ) { vi.setVariable(variable607); }
+                            if ( state.backtracking==0 ) { vi.setVariable(variable608); }
 
                             }
                             break;
@@ -28323,7 +28358,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                     }
 
 
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4034:8: ( containment )?
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4037:8: ( containment )?
                     int alt345=2;
                     int LA345_0 = input.LA(1);
 
@@ -28332,15 +28367,15 @@ public class PsiCompatibleCeylonParser extends Parser {
                     }
                     switch (alt345) {
                         case 1 :
-                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4035:10: containment
+                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4038:10: containment
                             {
-                            pushFollow(FOLLOW_containment_in_forIterator26715);
-                            containment608=containment();
+                            pushFollow(FOLLOW_containment_in_forIterator26731);
+                            containment609=containment();
 
                             state._fsp--;
                             if (state.failed) return iterator;
 
-                            if ( state.backtracking==0 ) { iterator.setSpecifierExpression(containment608); }
+                            if ( state.backtracking==0 ) { iterator.setSpecifierExpression(containment609); }
 
                             }
                             break;
@@ -28354,9 +28389,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
 
 
-            RPAREN609=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_forIterator26751); if (state.failed) return iterator;
+            RPAREN610=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_forIterator26767); if (state.failed) return iterator;
 
-            if ( state.backtracking==0 ) { iterator.setEndToken(RPAREN609); }
+            if ( state.backtracking==0 ) { iterator.setEndToken(RPAREN610); }
 
             }
 
@@ -28376,24 +28411,24 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "containment"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4043:1: containment returns [SpecifierExpression specifierExpression] : IN_OP ( expression )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4046:1: containment returns [SpecifierExpression specifierExpression] : IN_OP ( expression )? ;
     public SpecifierExpression containment() throws RecognitionException {
         SpecifierExpression specifierExpression = null;
 
 
-        Token IN_OP610=null;
-        Expression expression611 =null;
+        Token IN_OP611=null;
+        Expression expression612 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4044:5: ( IN_OP ( expression )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4044:7: IN_OP ( expression )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4047:5: ( IN_OP ( expression )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4047:7: IN_OP ( expression )?
             {
-            IN_OP610=(Token)match(input,IN_OP,FOLLOW_IN_OP_in_containment26783); if (state.failed) return specifierExpression;
+            IN_OP611=(Token)match(input,IN_OP,FOLLOW_IN_OP_in_containment26799); if (state.failed) return specifierExpression;
 
-            if ( state.backtracking==0 ) { specifierExpression = new SpecifierExpression(IN_OP610); }
+            if ( state.backtracking==0 ) { specifierExpression = new SpecifierExpression(IN_OP611); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4046:7: ( expression )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4049:7: ( expression )?
             int alt347=2;
             int LA347_0 = input.LA(1);
 
@@ -28402,15 +28437,15 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt347) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4046:8: expression
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4049:8: expression
                     {
-                    pushFollow(FOLLOW_expression_in_containment26801);
-                    expression611=expression();
+                    pushFollow(FOLLOW_expression_in_containment26817);
+                    expression612=expression();
 
                     state._fsp--;
                     if (state.failed) return specifierExpression;
 
-                    if ( state.backtracking==0 ) { specifierExpression.setExpression(expression611); }
+                    if ( state.backtracking==0 ) { specifierExpression.setExpression(expression612); }
 
                     }
                     break;
@@ -28436,27 +28471,27 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "whileLoop"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4050:1: whileLoop returns [WhileStatement statement] : whileBlock ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4053:1: whileLoop returns [WhileStatement statement] : whileBlock ;
     public WhileStatement whileLoop() throws RecognitionException {
         WhileStatement statement = null;
 
 
-        WhileClause whileBlock612 =null;
+        WhileClause whileBlock613 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4051:5: ( whileBlock )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4051:7: whileBlock
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4054:5: ( whileBlock )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4054:7: whileBlock
             {
             if ( state.backtracking==0 ) { statement = new WhileStatement(null); }
 
-            pushFollow(FOLLOW_whileBlock_in_whileLoop26844);
-            whileBlock612=whileBlock();
+            pushFollow(FOLLOW_whileBlock_in_whileLoop26860);
+            whileBlock613=whileBlock();
 
             state._fsp--;
             if (state.failed) return statement;
 
-            if ( state.backtracking==0 ) { statement.setWhileClause(whileBlock612); }
+            if ( state.backtracking==0 ) { statement.setWhileClause(whileBlock613); }
 
             }
 
@@ -28476,40 +28511,40 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "whileBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4056:1: whileBlock returns [WhileClause clause] : WHILE_CLAUSE conditions controlBlock ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4059:1: whileBlock returns [WhileClause clause] : WHILE_CLAUSE conditions controlBlock ;
     public WhileClause whileBlock() throws RecognitionException {
         WhileClause clause = null;
 
 
-        Token WHILE_CLAUSE613=null;
-        ConditionList conditions614 =null;
+        Token WHILE_CLAUSE614=null;
+        ConditionList conditions615 =null;
 
-        Block controlBlock615 =null;
+        Block controlBlock616 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4057:5: ( WHILE_CLAUSE conditions controlBlock )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4057:7: WHILE_CLAUSE conditions controlBlock
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4060:5: ( WHILE_CLAUSE conditions controlBlock )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4060:7: WHILE_CLAUSE conditions controlBlock
             {
-            WHILE_CLAUSE613=(Token)match(input,WHILE_CLAUSE,FOLLOW_WHILE_CLAUSE_in_whileBlock26873); if (state.failed) return clause;
+            WHILE_CLAUSE614=(Token)match(input,WHILE_CLAUSE,FOLLOW_WHILE_CLAUSE_in_whileBlock26889); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new WhileClause(WHILE_CLAUSE613); }
+            if ( state.backtracking==0 ) { clause = new WhileClause(WHILE_CLAUSE614); }
 
-            pushFollow(FOLLOW_conditions_in_whileBlock26889);
-            conditions614=conditions();
-
-            state._fsp--;
-            if (state.failed) return clause;
-
-            if ( state.backtracking==0 ) { clause.setConditionList(conditions614); }
-
-            pushFollow(FOLLOW_controlBlock_in_whileBlock26905);
-            controlBlock615=controlBlock();
+            pushFollow(FOLLOW_conditions_in_whileBlock26905);
+            conditions615=conditions();
 
             state._fsp--;
             if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setBlock(controlBlock615); }
+            if ( state.backtracking==0 ) { clause.setConditionList(conditions615); }
+
+            pushFollow(FOLLOW_controlBlock_in_whileBlock26921);
+            controlBlock616=controlBlock();
+
+            state._fsp--;
+            if (state.failed) return clause;
+
+            if ( state.backtracking==0 ) { clause.setBlock(controlBlock616); }
 
             }
 
@@ -28529,33 +28564,33 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "tryCatchFinally"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4065:1: tryCatchFinally returns [TryCatchStatement statement] : tryBlock ( catchBlock )* ( finallyBlock )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4068:1: tryCatchFinally returns [TryCatchStatement statement] : tryBlock ( catchBlock )* ( finallyBlock )? ;
     public TryCatchStatement tryCatchFinally() throws RecognitionException {
         TryCatchStatement statement = null;
 
 
-        TryClause tryBlock616 =null;
+        TryClause tryBlock617 =null;
 
-        CatchClause catchBlock617 =null;
+        CatchClause catchBlock618 =null;
 
-        FinallyClause finallyBlock618 =null;
+        FinallyClause finallyBlock619 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4066:5: ( tryBlock ( catchBlock )* ( finallyBlock )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4066:7: tryBlock ( catchBlock )* ( finallyBlock )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4069:5: ( tryBlock ( catchBlock )* ( finallyBlock )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4069:7: tryBlock ( catchBlock )* ( finallyBlock )?
             {
             if ( state.backtracking==0 ) { statement = new TryCatchStatement(null); }
 
-            pushFollow(FOLLOW_tryBlock_in_tryCatchFinally26942);
-            tryBlock616=tryBlock();
+            pushFollow(FOLLOW_tryBlock_in_tryCatchFinally26958);
+            tryBlock617=tryBlock();
 
             state._fsp--;
             if (state.failed) return statement;
 
-            if ( state.backtracking==0 ) { statement.setTryClause(tryBlock616); }
+            if ( state.backtracking==0 ) { statement.setTryClause(tryBlock617); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4069:7: ( catchBlock )*
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4072:7: ( catchBlock )*
             loop348:
             do {
                 int alt348=2;
@@ -28568,15 +28603,15 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                 switch (alt348) {
             	case 1 :
-            	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4070:9: catchBlock
+            	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4073:9: catchBlock
             	    {
-            	    pushFollow(FOLLOW_catchBlock_in_tryCatchFinally26969);
-            	    catchBlock617=catchBlock();
+            	    pushFollow(FOLLOW_catchBlock_in_tryCatchFinally26985);
+            	    catchBlock618=catchBlock();
 
             	    state._fsp--;
             	    if (state.failed) return statement;
 
-            	    if ( state.backtracking==0 ) { statement.addCatchClause(catchBlock617); }
+            	    if ( state.backtracking==0 ) { statement.addCatchClause(catchBlock618); }
 
             	    }
             	    break;
@@ -28587,7 +28622,7 @@ public class PsiCompatibleCeylonParser extends Parser {
             } while (true);
 
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4073:7: ( finallyBlock )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4076:7: ( finallyBlock )?
             int alt349=2;
             int LA349_0 = input.LA(1);
 
@@ -28596,15 +28631,15 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt349) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4074:9: finallyBlock
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4077:9: finallyBlock
                     {
-                    pushFollow(FOLLOW_finallyBlock_in_tryCatchFinally27008);
-                    finallyBlock618=finallyBlock();
+                    pushFollow(FOLLOW_finallyBlock_in_tryCatchFinally27024);
+                    finallyBlock619=finallyBlock();
 
                     state._fsp--;
                     if (state.failed) return statement;
 
-                    if ( state.backtracking==0 ) { statement.setFinallyClause(finallyBlock618); }
+                    if ( state.backtracking==0 ) { statement.setFinallyClause(finallyBlock619); }
 
                     }
                     break;
@@ -28630,28 +28665,28 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "tryBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4079:1: tryBlock returns [TryClause clause] : TRY_CLAUSE ( resources controlBlock | block ) ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4082:1: tryBlock returns [TryClause clause] : TRY_CLAUSE ( resources controlBlock | block ) ;
     public TryClause tryBlock() throws RecognitionException {
         TryClause clause = null;
 
 
-        Token TRY_CLAUSE619=null;
-        ResourceList resources620 =null;
+        Token TRY_CLAUSE620=null;
+        ResourceList resources621 =null;
 
-        Block controlBlock621 =null;
+        Block controlBlock622 =null;
 
-        Block block622 =null;
+        Block block623 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4080:5: ( TRY_CLAUSE ( resources controlBlock | block ) )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4080:7: TRY_CLAUSE ( resources controlBlock | block )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4083:5: ( TRY_CLAUSE ( resources controlBlock | block ) )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4083:7: TRY_CLAUSE ( resources controlBlock | block )
             {
-            TRY_CLAUSE619=(Token)match(input,TRY_CLAUSE,FOLLOW_TRY_CLAUSE_in_tryBlock27048); if (state.failed) return clause;
+            TRY_CLAUSE620=(Token)match(input,TRY_CLAUSE,FOLLOW_TRY_CLAUSE_in_tryBlock27064); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new TryClause(TRY_CLAUSE619); }
+            if ( state.backtracking==0 ) { clause = new TryClause(TRY_CLAUSE620); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4082:7: ( resources controlBlock | block )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4085:7: ( resources controlBlock | block )
             int alt350=2;
             int LA350_0 = input.LA(1);
 
@@ -28671,36 +28706,36 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt350) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4083:9: resources controlBlock
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4086:9: resources controlBlock
                     {
-                    pushFollow(FOLLOW_resources_in_tryBlock27075);
-                    resources620=resources();
+                    pushFollow(FOLLOW_resources_in_tryBlock27091);
+                    resources621=resources();
 
                     state._fsp--;
                     if (state.failed) return clause;
 
-                    if ( state.backtracking==0 ) { clause.setResourceList(resources620); }
+                    if ( state.backtracking==0 ) { clause.setResourceList(resources621); }
 
-                    pushFollow(FOLLOW_controlBlock_in_tryBlock27095);
-                    controlBlock621=controlBlock();
+                    pushFollow(FOLLOW_controlBlock_in_tryBlock27111);
+                    controlBlock622=controlBlock();
 
                     state._fsp--;
                     if (state.failed) return clause;
 
-                    if ( state.backtracking==0 ) { clause.setBlock(controlBlock621); }
+                    if ( state.backtracking==0 ) { clause.setBlock(controlBlock622); }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4088:9: block
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4091:9: block
                     {
-                    pushFollow(FOLLOW_block_in_tryBlock27123);
-                    block622=block();
+                    pushFollow(FOLLOW_block_in_tryBlock27139);
+                    block623=block();
 
                     state._fsp--;
                     if (state.failed) return clause;
 
-                    if ( state.backtracking==0 ) { clause.setBlock(block622); }
+                    if ( state.backtracking==0 ) { clause.setBlock(block623); }
 
                     }
                     break;
@@ -28726,40 +28761,40 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "catchBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4093:1: catchBlock returns [CatchClause clause] : CATCH_CLAUSE catchVariable controlBlock ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4096:1: catchBlock returns [CatchClause clause] : CATCH_CLAUSE catchVariable controlBlock ;
     public CatchClause catchBlock() throws RecognitionException {
         CatchClause clause = null;
 
 
-        Token CATCH_CLAUSE623=null;
-        CatchVariable catchVariable624 =null;
+        Token CATCH_CLAUSE624=null;
+        CatchVariable catchVariable625 =null;
 
-        Block controlBlock625 =null;
+        Block controlBlock626 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4094:5: ( CATCH_CLAUSE catchVariable controlBlock )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4094:7: CATCH_CLAUSE catchVariable controlBlock
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4097:5: ( CATCH_CLAUSE catchVariable controlBlock )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4097:7: CATCH_CLAUSE catchVariable controlBlock
             {
-            CATCH_CLAUSE623=(Token)match(input,CATCH_CLAUSE,FOLLOW_CATCH_CLAUSE_in_catchBlock27162); if (state.failed) return clause;
+            CATCH_CLAUSE624=(Token)match(input,CATCH_CLAUSE,FOLLOW_CATCH_CLAUSE_in_catchBlock27178); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new CatchClause(CATCH_CLAUSE623); }
+            if ( state.backtracking==0 ) { clause = new CatchClause(CATCH_CLAUSE624); }
 
-            pushFollow(FOLLOW_catchVariable_in_catchBlock27179);
-            catchVariable624=catchVariable();
-
-            state._fsp--;
-            if (state.failed) return clause;
-
-            if ( state.backtracking==0 ) { clause.setCatchVariable(catchVariable624); }
-
-            pushFollow(FOLLOW_controlBlock_in_catchBlock27195);
-            controlBlock625=controlBlock();
+            pushFollow(FOLLOW_catchVariable_in_catchBlock27195);
+            catchVariable625=catchVariable();
 
             state._fsp--;
             if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setBlock(controlBlock625); }
+            if ( state.backtracking==0 ) { clause.setCatchVariable(catchVariable625); }
+
+            pushFollow(FOLLOW_controlBlock_in_catchBlock27211);
+            controlBlock626=controlBlock();
+
+            state._fsp--;
+            if (state.failed) return clause;
+
+            if ( state.backtracking==0 ) { clause.setBlock(controlBlock626); }
 
             }
 
@@ -28779,25 +28814,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "catchVariable"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4102:1: catchVariable returns [CatchVariable catchVariable] : LPAREN ( variable )? RPAREN ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4105:1: catchVariable returns [CatchVariable catchVariable] : LPAREN ( variable )? RPAREN ;
     public CatchVariable catchVariable() throws RecognitionException {
         CatchVariable catchVariable = null;
 
 
-        Token LPAREN626=null;
-        Token RPAREN628=null;
-        Variable variable627 =null;
+        Token LPAREN627=null;
+        Token RPAREN629=null;
+        Variable variable628 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4103:5: ( LPAREN ( variable )? RPAREN )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4103:7: LPAREN ( variable )? RPAREN
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4106:5: ( LPAREN ( variable )? RPAREN )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4106:7: LPAREN ( variable )? RPAREN
             {
-            LPAREN626=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_catchVariable27224); if (state.failed) return catchVariable;
+            LPAREN627=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_catchVariable27240); if (state.failed) return catchVariable;
 
-            if ( state.backtracking==0 ) { catchVariable =new CatchVariable(LPAREN626); }
+            if ( state.backtracking==0 ) { catchVariable =new CatchVariable(LPAREN627); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4105:7: ( variable )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4108:7: ( variable )?
             int alt351=2;
             int LA351_0 = input.LA(1);
 
@@ -28806,15 +28841,15 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt351) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4106:7: variable
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4109:7: variable
                     {
-                    pushFollow(FOLLOW_variable_in_catchVariable27249);
-                    variable627=variable();
+                    pushFollow(FOLLOW_variable_in_catchVariable27265);
+                    variable628=variable();
 
                     state._fsp--;
                     if (state.failed) return catchVariable;
 
-                    if ( state.backtracking==0 ) { catchVariable.setVariable(variable627); }
+                    if ( state.backtracking==0 ) { catchVariable.setVariable(variable628); }
 
                     }
                     break;
@@ -28822,9 +28857,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
 
 
-            RPAREN628=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_catchVariable27275); if (state.failed) return catchVariable;
+            RPAREN629=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_catchVariable27291); if (state.failed) return catchVariable;
 
-            if ( state.backtracking==0 ) { catchVariable.setEndToken(RPAREN628); }
+            if ( state.backtracking==0 ) { catchVariable.setEndToken(RPAREN629); }
 
             }
 
@@ -28844,30 +28879,30 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "finallyBlock"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4114:1: finallyBlock returns [FinallyClause clause] : FINALLY_CLAUSE controlBlock ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4117:1: finallyBlock returns [FinallyClause clause] : FINALLY_CLAUSE controlBlock ;
     public FinallyClause finallyBlock() throws RecognitionException {
         FinallyClause clause = null;
 
 
-        Token FINALLY_CLAUSE629=null;
-        Block controlBlock630 =null;
+        Token FINALLY_CLAUSE630=null;
+        Block controlBlock631 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4115:5: ( FINALLY_CLAUSE controlBlock )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4115:7: FINALLY_CLAUSE controlBlock
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4118:5: ( FINALLY_CLAUSE controlBlock )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4118:7: FINALLY_CLAUSE controlBlock
             {
-            FINALLY_CLAUSE629=(Token)match(input,FINALLY_CLAUSE,FOLLOW_FINALLY_CLAUSE_in_finallyBlock27306); if (state.failed) return clause;
+            FINALLY_CLAUSE630=(Token)match(input,FINALLY_CLAUSE,FOLLOW_FINALLY_CLAUSE_in_finallyBlock27322); if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause = new FinallyClause(FINALLY_CLAUSE629); }
+            if ( state.backtracking==0 ) { clause = new FinallyClause(FINALLY_CLAUSE630); }
 
-            pushFollow(FOLLOW_controlBlock_in_finallyBlock27323);
-            controlBlock630=controlBlock();
+            pushFollow(FOLLOW_controlBlock_in_finallyBlock27339);
+            controlBlock631=controlBlock();
 
             state._fsp--;
             if (state.failed) return clause;
 
-            if ( state.backtracking==0 ) { clause.setBlock(controlBlock630); }
+            if ( state.backtracking==0 ) { clause.setBlock(controlBlock631); }
 
             }
 
@@ -28887,28 +28922,28 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "resources"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4121:1: resources returns [ResourceList resources] : LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4124:1: resources returns [ResourceList resources] : LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN ;
     public ResourceList resources() throws RecognitionException {
         ResourceList resources = null;
 
 
         Token c=null;
-        Token LPAREN631=null;
-        Token RPAREN632=null;
+        Token LPAREN632=null;
+        Token RPAREN633=null;
         Resource r1 =null;
 
         Resource r2 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4122:5: ( LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4122:7: LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4125:5: ( LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4125:7: LPAREN (r1= resource (c= COMMA r2= resource )* )? RPAREN
             {
-            LPAREN631=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_resources27352); if (state.failed) return resources;
+            LPAREN632=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_resources27368); if (state.failed) return resources;
 
-            if ( state.backtracking==0 ) { resources = new ResourceList(LPAREN631); }
+            if ( state.backtracking==0 ) { resources = new ResourceList(LPAREN632); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4124:6: (r1= resource (c= COMMA r2= resource )* )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4127:6: (r1= resource (c= COMMA r2= resource )* )?
             int alt353=2;
             int LA353_0 = input.LA(1);
 
@@ -28917,9 +28952,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt353) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4125:8: r1= resource (c= COMMA r2= resource )*
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4128:8: r1= resource (c= COMMA r2= resource )*
                     {
-                    pushFollow(FOLLOW_resource_in_resources27378);
+                    pushFollow(FOLLOW_resource_in_resources27394);
                     r1=resource();
 
                     state._fsp--;
@@ -28927,7 +28962,7 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { resources.addResource(r1); }
 
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4127:8: (c= COMMA r2= resource )*
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4130:8: (c= COMMA r2= resource )*
                     loop352:
                     do {
                         int alt352=2;
@@ -28940,13 +28975,13 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                         switch (alt352) {
                     	case 1 :
-                    	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4128:10: c= COMMA r2= resource
+                    	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4131:10: c= COMMA r2= resource
                     	    {
-                    	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_resources27409); if (state.failed) return resources;
+                    	    c=(Token)match(input,COMMA,FOLLOW_COMMA_in_resources27425); if (state.failed) return resources;
 
                     	    if ( state.backtracking==0 ) { resources.setEndToken(c); }
 
-                    	    pushFollow(FOLLOW_resource_in_resources27434);
+                    	    pushFollow(FOLLOW_resource_in_resources27450);
                     	    r2=resource();
 
                     	    state._fsp--;
@@ -28970,9 +29005,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
 
 
-            RPAREN632=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_resources27470); if (state.failed) return resources;
+            RPAREN633=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_resources27486); if (state.failed) return resources;
 
-            if ( state.backtracking==0 ) { resources.setEndToken(RPAREN632); }
+            if ( state.backtracking==0 ) { resources.setEndToken(RPAREN633); }
 
             }
 
@@ -28992,19 +29027,19 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "resource"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4139:1: resource returns [Resource resource] : ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression );
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4142:1: resource returns [Resource resource] : ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression );
     public Resource resource() throws RecognitionException {
         Resource resource = null;
 
 
-        Variable specifiedVariable633 =null;
+        Variable specifiedVariable634 =null;
 
-        Expression expression634 =null;
+        Expression expression635 =null;
 
 
          resource = new Resource(null); 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4141:5: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4144:5: ( ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable | expression )
             int alt354=2;
             int LA354_0 = input.LA(1);
 
@@ -29126,28 +29161,28 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt354) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4142:7: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4145:7: ( COMPILER_ANNOTATION | declarationStart | specificationStart )=> specifiedVariable
                     {
-                    pushFollow(FOLLOW_specifiedVariable_in_resource27531);
-                    specifiedVariable633=specifiedVariable();
+                    pushFollow(FOLLOW_specifiedVariable_in_resource27547);
+                    specifiedVariable634=specifiedVariable();
 
                     state._fsp--;
                     if (state.failed) return resource;
 
-                    if ( state.backtracking==0 ) { resource.setVariable(specifiedVariable633); }
+                    if ( state.backtracking==0 ) { resource.setVariable(specifiedVariable634); }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4146:7: expression
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4149:7: expression
                     {
-                    pushFollow(FOLLOW_expression_in_resource27554);
-                    expression634=expression();
+                    pushFollow(FOLLOW_expression_in_resource27570);
+                    expression635=expression();
 
                     state._fsp--;
                     if (state.failed) return resource;
 
-                    if ( state.backtracking==0 ) { resource.setExpression(expression634); }
+                    if ( state.backtracking==0 ) { resource.setExpression(expression635); }
 
                     }
                     break;
@@ -29169,21 +29204,21 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "specifiedVariable"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4150:1: specifiedVariable returns [Variable variable] : v= variable ( specifier )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4153:1: specifiedVariable returns [Variable variable] : v= variable ( specifier )? ;
     public Variable specifiedVariable() throws RecognitionException {
         Variable variable = null;
 
 
         Variable v =null;
 
-        SpecifierExpression specifier635 =null;
+        SpecifierExpression specifier636 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4151:5: (v= variable ( specifier )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4151:7: v= variable ( specifier )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4154:5: (v= variable ( specifier )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4154:7: v= variable ( specifier )?
             {
-            pushFollow(FOLLOW_variable_in_specifiedVariable27585);
+            pushFollow(FOLLOW_variable_in_specifiedVariable27601);
             v=variable();
 
             state._fsp--;
@@ -29191,7 +29226,7 @@ public class PsiCompatibleCeylonParser extends Parser {
 
             if ( state.backtracking==0 ) { variable = v; }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4153:7: ( specifier )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4156:7: ( specifier )?
             int alt355=2;
             int LA355_0 = input.LA(1);
 
@@ -29200,15 +29235,15 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt355) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4154:9: specifier
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4157:9: specifier
                     {
-                    pushFollow(FOLLOW_specifier_in_specifiedVariable27612);
-                    specifier635=specifier();
+                    pushFollow(FOLLOW_specifier_in_specifiedVariable27628);
+                    specifier636=specifier();
 
                     state._fsp--;
                     if (state.failed) return variable;
 
-                    if ( state.backtracking==0 ) { variable.setSpecifierExpression(specifier635); }
+                    if ( state.backtracking==0 ) { variable.setSpecifierExpression(specifier636); }
 
                     }
                     break;
@@ -29234,34 +29269,34 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "variable"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4159:1: variable returns [Variable variable] : compilerAnnotations var ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4162:1: variable returns [Variable variable] : compilerAnnotations var ;
     public Variable variable() throws RecognitionException {
         Variable variable = null;
 
 
-        Variable var636 =null;
+        Variable var637 =null;
 
-        List<CompilerAnnotation> compilerAnnotations637 =null;
+        List<CompilerAnnotation> compilerAnnotations638 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4160:5: ( compilerAnnotations var )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4160:7: compilerAnnotations var
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4163:5: ( compilerAnnotations var )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4163:7: compilerAnnotations var
             {
-            pushFollow(FOLLOW_compilerAnnotations_in_variable27652);
-            compilerAnnotations637=compilerAnnotations();
+            pushFollow(FOLLOW_compilerAnnotations_in_variable27668);
+            compilerAnnotations638=compilerAnnotations();
 
             state._fsp--;
             if (state.failed) return variable;
 
-            pushFollow(FOLLOW_var_in_variable27660);
-            var636=var();
+            pushFollow(FOLLOW_var_in_variable27676);
+            var637=var();
 
             state._fsp--;
             if (state.failed) return variable;
 
-            if ( state.backtracking==0 ) { variable =var636;
-                    variable.getCompilerAnnotations().addAll(compilerAnnotations637); }
+            if ( state.backtracking==0 ) { variable =var637;
+                    variable.getCompilerAnnotations().addAll(compilerAnnotations638); }
 
             }
 
@@ -29281,14 +29316,14 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "var"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4166:1: var returns [Variable variable] : ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName (p2= parameters )* );
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4169:1: var returns [Variable variable] : ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName (p2= parameters )* );
     public Variable var() throws RecognitionException {
         Variable variable = null;
 
 
-        Token VOID_MODIFIER639=null;
-        Token FUNCTION_MODIFIER640=null;
-        Token VALUE_MODIFIER641=null;
+        Token VOID_MODIFIER640=null;
+        Token FUNCTION_MODIFIER641=null;
+        Token VALUE_MODIFIER642=null;
         Identifier mn1 =null;
 
         ParameterList p1 =null;
@@ -29297,12 +29332,12 @@ public class PsiCompatibleCeylonParser extends Parser {
 
         ParameterList p2 =null;
 
-        StaticType type638 =null;
+        StaticType type639 =null;
 
 
          variable = new Variable(null); 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4168:5: ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName (p2= parameters )* )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4171:5: ( ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )* |mn2= memberName (p2= parameters )* )
             int alt359=2;
             int LA359_0 = input.LA(1);
 
@@ -29322,9 +29357,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt359) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4169:7: ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )*
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4172:7: ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER ) mn1= memberName (p1= parameters )*
                     {
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4169:7: ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER )
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4172:7: ( type | VOID_MODIFIER | FUNCTION_MODIFIER | VALUE_MODIFIER )
                     int alt356=4;
                     switch ( input.LA(1) ) {
                     case LBRACE:
@@ -29362,42 +29397,42 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                     switch (alt356) {
                         case 1 :
-                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4170:9: type
+                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4173:9: type
                             {
-                            pushFollow(FOLLOW_type_in_var27720);
-                            type638=type();
+                            pushFollow(FOLLOW_type_in_var27736);
+                            type639=type();
 
                             state._fsp--;
                             if (state.failed) return variable;
 
-                            if ( state.backtracking==0 ) { variable.setType(type638); }
+                            if ( state.backtracking==0 ) { variable.setType(type639); }
 
                             }
                             break;
                         case 2 :
-                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4173:9: VOID_MODIFIER
+                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4176:9: VOID_MODIFIER
                             {
-                            VOID_MODIFIER639=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_var27750); if (state.failed) return variable;
+                            VOID_MODIFIER640=(Token)match(input,VOID_MODIFIER,FOLLOW_VOID_MODIFIER_in_var27766); if (state.failed) return variable;
 
-                            if ( state.backtracking==0 ) { variable.setType(new VoidModifier(VOID_MODIFIER639)); }
+                            if ( state.backtracking==0 ) { variable.setType(new VoidModifier(VOID_MODIFIER640)); }
 
                             }
                             break;
                         case 3 :
-                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4176:9: FUNCTION_MODIFIER
+                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4179:9: FUNCTION_MODIFIER
                             {
-                            FUNCTION_MODIFIER640=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_var27779); if (state.failed) return variable;
+                            FUNCTION_MODIFIER641=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_var27795); if (state.failed) return variable;
 
-                            if ( state.backtracking==0 ) { variable.setType(new FunctionModifier(FUNCTION_MODIFIER640)); }
+                            if ( state.backtracking==0 ) { variable.setType(new FunctionModifier(FUNCTION_MODIFIER641)); }
 
                             }
                             break;
                         case 4 :
-                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4179:9: VALUE_MODIFIER
+                            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4182:9: VALUE_MODIFIER
                             {
-                            VALUE_MODIFIER641=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_var27808); if (state.failed) return variable;
+                            VALUE_MODIFIER642=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_var27824); if (state.failed) return variable;
 
-                            if ( state.backtracking==0 ) { variable.setType(new ValueModifier(VALUE_MODIFIER641)); }
+                            if ( state.backtracking==0 ) { variable.setType(new ValueModifier(VALUE_MODIFIER642)); }
 
                             }
                             break;
@@ -29405,7 +29440,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                     }
 
 
-                    pushFollow(FOLLOW_memberName_in_var27836);
+                    pushFollow(FOLLOW_memberName_in_var27852);
                     mn1=memberName();
 
                     state._fsp--;
@@ -29413,7 +29448,7 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { variable.setIdentifier(mn1); }
 
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4184:7: (p1= parameters )*
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4187:7: (p1= parameters )*
                     loop357:
                     do {
                         int alt357=2;
@@ -29426,9 +29461,9 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                         switch (alt357) {
                     	case 1 :
-                    	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4185:9: p1= parameters
+                    	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4188:9: p1= parameters
                     	    {
-                    	    pushFollow(FOLLOW_parameters_in_var27866);
+                    	    pushFollow(FOLLOW_parameters_in_var27882);
                     	    p1=parameters();
 
                     	    state._fsp--;
@@ -29448,11 +29483,11 @@ public class PsiCompatibleCeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4189:7: mn2= memberName (p2= parameters )*
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4192:7: mn2= memberName (p2= parameters )*
                     {
                     if ( state.backtracking==0 ) { variable.setType( new ValueModifier(null) ); }
 
-                    pushFollow(FOLLOW_memberName_in_var27910);
+                    pushFollow(FOLLOW_memberName_in_var27926);
                     mn2=memberName();
 
                     state._fsp--;
@@ -29460,7 +29495,7 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { variable.setIdentifier(mn2); }
 
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4192:7: (p2= parameters )*
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4195:7: (p2= parameters )*
                     loop358:
                     do {
                         int alt358=2;
@@ -29473,9 +29508,9 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                         switch (alt358) {
                     	case 1 :
-                    	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4193:9: p2= parameters
+                    	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4196:9: p2= parameters
                     	    {
-                    	    pushFollow(FOLLOW_parameters_in_var27938);
+                    	    pushFollow(FOLLOW_parameters_in_var27954);
                     	    p2=parameters();
 
                     	    state._fsp--;
@@ -29513,31 +29548,31 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "impliedVariable"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4199:1: impliedVariable returns [Variable variable] : memberName ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4202:1: impliedVariable returns [Variable variable] : memberName ;
     public Variable impliedVariable() throws RecognitionException {
         Variable variable = null;
 
 
-        Identifier memberName642 =null;
+        Identifier memberName643 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4200:5: ( memberName )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4200:7: memberName
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4203:5: ( memberName )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4203:7: memberName
             {
-            pushFollow(FOLLOW_memberName_in_impliedVariable27978);
-            memberName642=memberName();
+            pushFollow(FOLLOW_memberName_in_impliedVariable27994);
+            memberName643=memberName();
 
             state._fsp--;
             if (state.failed) return variable;
 
             if ( state.backtracking==0 ) { Variable v = new Variable(null);
                     v.setType(new SyntheticVariable(null));
-                    v.setIdentifier(memberName642);
+                    v.setIdentifier(memberName643);
                     SpecifierExpression se = new SpecifierExpression(null);
                     Expression e = new Expression(null);
                     BaseMemberExpression bme = new BaseMemberExpression(null);
-                    bme.setIdentifier(memberName642);
+                    bme.setIdentifier(memberName643);
                     bme.setTypeArguments( new InferredTypeArguments(null) );
                     e.setTerm(bme);
                     se.setExpression(e);
@@ -29562,18 +29597,18 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "referencePathElement"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4215:1: referencePathElement returns [Identifier identifier] : ( typeName | memberName );
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4218:1: referencePathElement returns [Identifier identifier] : ( typeName | memberName );
     public Identifier referencePathElement() throws RecognitionException {
         Identifier identifier = null;
 
 
-        Identifier typeName643 =null;
+        Identifier typeName644 =null;
 
-        Identifier memberName644 =null;
+        Identifier memberName645 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4216:5: ( typeName | memberName )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4219:5: ( typeName | memberName )
             int alt360=2;
             int LA360_0 = input.LA(1);
 
@@ -29593,28 +29628,28 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt360) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4216:7: typeName
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4219:7: typeName
                     {
-                    pushFollow(FOLLOW_typeName_in_referencePathElement28008);
-                    typeName643=typeName();
+                    pushFollow(FOLLOW_typeName_in_referencePathElement28024);
+                    typeName644=typeName();
 
                     state._fsp--;
                     if (state.failed) return identifier;
 
-                    if ( state.backtracking==0 ) { identifier =typeName643; }
+                    if ( state.backtracking==0 ) { identifier =typeName644; }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4218:7: memberName
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4221:7: memberName
                     {
-                    pushFollow(FOLLOW_memberName_in_referencePathElement28025);
-                    memberName644=memberName();
+                    pushFollow(FOLLOW_memberName_in_referencePathElement28041);
+                    memberName645=memberName();
 
                     state._fsp--;
                     if (state.failed) return identifier;
 
-                    if ( state.backtracking==0 ) { identifier =memberName644; }
+                    if ( state.backtracking==0 ) { identifier =memberName645; }
 
                     }
                     break;
@@ -29636,14 +29671,14 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "referencePath"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4222:1: referencePath returns [SimpleType type] : (e1= referencePathElement | PACKAGE o1= MEMBER_OP e2= referencePathElement ) (o2= MEMBER_OP e3= referencePathElement )* ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4225:1: referencePath returns [SimpleType type] : (e1= referencePathElement | PACKAGE o1= MEMBER_OP e2= referencePathElement ) (o2= MEMBER_OP e3= referencePathElement )* ;
     public SimpleType referencePath() throws RecognitionException {
         SimpleType type = null;
 
 
         Token o1=null;
         Token o2=null;
-        Token PACKAGE645=null;
+        Token PACKAGE646=null;
         Identifier e1 =null;
 
         Identifier e2 =null;
@@ -29652,10 +29687,10 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4223:5: ( (e1= referencePathElement | PACKAGE o1= MEMBER_OP e2= referencePathElement ) (o2= MEMBER_OP e3= referencePathElement )* )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4223:7: (e1= referencePathElement | PACKAGE o1= MEMBER_OP e2= referencePathElement ) (o2= MEMBER_OP e3= referencePathElement )*
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4226:5: ( (e1= referencePathElement | PACKAGE o1= MEMBER_OP e2= referencePathElement ) (o2= MEMBER_OP e3= referencePathElement )* )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4226:7: (e1= referencePathElement | PACKAGE o1= MEMBER_OP e2= referencePathElement ) (o2= MEMBER_OP e3= referencePathElement )*
             {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4223:7: (e1= referencePathElement | PACKAGE o1= MEMBER_OP e2= referencePathElement )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4226:7: (e1= referencePathElement | PACKAGE o1= MEMBER_OP e2= referencePathElement )
             int alt361=2;
             int LA361_0 = input.LA(1);
 
@@ -29675,9 +29710,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt361) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4224:9: e1= referencePathElement
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4227:9: e1= referencePathElement
                     {
-                    pushFollow(FOLLOW_referencePathElement_in_referencePath28070);
+                    pushFollow(FOLLOW_referencePathElement_in_referencePath28086);
                     e1=referencePathElement();
 
                     state._fsp--;
@@ -29690,19 +29725,19 @@ public class PsiCompatibleCeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4229:9: PACKAGE o1= MEMBER_OP e2= referencePathElement
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4232:9: PACKAGE o1= MEMBER_OP e2= referencePathElement
                     {
-                    PACKAGE645=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_referencePath28100); if (state.failed) return type;
+                    PACKAGE646=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_referencePath28116); if (state.failed) return type;
 
-                    if ( state.backtracking==0 ) { BaseType pbt = new BaseType(PACKAGE645);
+                    if ( state.backtracking==0 ) { BaseType pbt = new BaseType(PACKAGE646);
                     	        pbt.setPackageQualified(true);
                     	        type = pbt; }
 
-                    o1=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_referencePath28120); if (state.failed) return type;
+                    o1=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_referencePath28136); if (state.failed) return type;
 
                     if ( state.backtracking==0 ) { type.setEndToken(o1); }
 
-                    pushFollow(FOLLOW_referencePathElement_in_referencePath28140);
+                    pushFollow(FOLLOW_referencePathElement_in_referencePath28156);
                     e2=referencePathElement();
 
                     state._fsp--;
@@ -29717,7 +29752,7 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
 
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4239:7: (o2= MEMBER_OP e3= referencePathElement )*
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4242:7: (o2= MEMBER_OP e3= referencePathElement )*
             loop362:
             do {
                 int alt362=2;
@@ -29730,11 +29765,11 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                 switch (alt362) {
             	case 1 :
-            	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4240:9: o2= MEMBER_OP e3= referencePathElement
+            	    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4243:9: o2= MEMBER_OP e3= referencePathElement
             	    {
-            	    o2=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_referencePath28177); if (state.failed) return type;
+            	    o2=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_referencePath28193); if (state.failed) return type;
 
-            	    pushFollow(FOLLOW_referencePathElement_in_referencePath28189);
+            	    pushFollow(FOLLOW_referencePathElement_in_referencePath28205);
             	    e3=referencePathElement();
 
             	    state._fsp--;
@@ -29772,25 +29807,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "moduleLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4249:1: moduleLiteral returns [ModuleLiteral literal] : MODULE (p1= packagePath )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4252:1: moduleLiteral returns [ModuleLiteral literal] : MODULE (p1= packagePath )? ;
     public ModuleLiteral moduleLiteral() throws RecognitionException {
         ModuleLiteral literal = null;
 
 
-        Token MODULE646=null;
+        Token MODULE647=null;
         ImportPath p1 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4250:2: ( MODULE (p1= packagePath )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4250:4: MODULE (p1= packagePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4253:2: ( MODULE (p1= packagePath )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4253:4: MODULE (p1= packagePath )?
             {
-            MODULE646=(Token)match(input,MODULE,FOLLOW_MODULE_in_moduleLiteral28227); if (state.failed) return literal;
+            MODULE647=(Token)match(input,MODULE,FOLLOW_MODULE_in_moduleLiteral28243); if (state.failed) return literal;
 
             if ( state.backtracking==0 ) { literal = new ModuleLiteral(null);
-                 literal.setEndToken(MODULE646); }
+                 literal.setEndToken(MODULE647); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4253:4: (p1= packagePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4256:4: (p1= packagePath )?
             int alt363=2;
             int LA363_0 = input.LA(1);
 
@@ -29799,9 +29834,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt363) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4254:6: p1= packagePath
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4257:6: p1= packagePath
                     {
-                    pushFollow(FOLLOW_packagePath_in_moduleLiteral28246);
+                    pushFollow(FOLLOW_packagePath_in_moduleLiteral28262);
                     p1=packagePath();
 
                     state._fsp--;
@@ -29834,25 +29869,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "packageLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4260:1: packageLiteral returns [PackageLiteral literal] : PACKAGE (p2= packagePath )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4263:1: packageLiteral returns [PackageLiteral literal] : PACKAGE (p2= packagePath )? ;
     public PackageLiteral packageLiteral() throws RecognitionException {
         PackageLiteral literal = null;
 
 
-        Token PACKAGE647=null;
+        Token PACKAGE648=null;
         ImportPath p2 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4261:2: ( PACKAGE (p2= packagePath )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4261:4: PACKAGE (p2= packagePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4264:2: ( PACKAGE (p2= packagePath )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4264:4: PACKAGE (p2= packagePath )?
             {
-            PACKAGE647=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_packageLiteral28274); if (state.failed) return literal;
+            PACKAGE648=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_packageLiteral28290); if (state.failed) return literal;
 
             if ( state.backtracking==0 ) { literal = new PackageLiteral(null);
-                 literal.setEndToken(PACKAGE647); }
+                 literal.setEndToken(PACKAGE648); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4264:4: (p2= packagePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4267:4: (p2= packagePath )?
             int alt364=2;
             int LA364_0 = input.LA(1);
 
@@ -29861,9 +29896,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt364) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4265:6: p2= packagePath
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4268:6: p2= packagePath
                     {
-                    pushFollow(FOLLOW_packagePath_in_packageLiteral28293);
+                    pushFollow(FOLLOW_packagePath_in_packageLiteral28309);
                     p2=packagePath();
 
                     state._fsp--;
@@ -29896,25 +29931,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "classLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4271:1: classLiteral returns [ClassLiteral literal] : CLASS_DEFINITION (ct= referencePath )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4274:1: classLiteral returns [ClassLiteral literal] : CLASS_DEFINITION (ct= referencePath )? ;
     public ClassLiteral classLiteral() throws RecognitionException {
         ClassLiteral literal = null;
 
 
-        Token CLASS_DEFINITION648=null;
+        Token CLASS_DEFINITION649=null;
         SimpleType ct =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4272:2: ( CLASS_DEFINITION (ct= referencePath )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4272:4: CLASS_DEFINITION (ct= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4275:2: ( CLASS_DEFINITION (ct= referencePath )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4275:4: CLASS_DEFINITION (ct= referencePath )?
             {
-            CLASS_DEFINITION648=(Token)match(input,CLASS_DEFINITION,FOLLOW_CLASS_DEFINITION_in_classLiteral28321); if (state.failed) return literal;
+            CLASS_DEFINITION649=(Token)match(input,CLASS_DEFINITION,FOLLOW_CLASS_DEFINITION_in_classLiteral28337); if (state.failed) return literal;
 
             if ( state.backtracking==0 ) { literal = new ClassLiteral(null);
-                 literal.setEndToken(CLASS_DEFINITION648); }
+                 literal.setEndToken(CLASS_DEFINITION649); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4275:4: (ct= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4278:4: (ct= referencePath )?
             int alt365=2;
             int LA365_0 = input.LA(1);
 
@@ -29923,9 +29958,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt365) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4276:6: ct= referencePath
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4279:6: ct= referencePath
                     {
-                    pushFollow(FOLLOW_referencePath_in_classLiteral28340);
+                    pushFollow(FOLLOW_referencePath_in_classLiteral28356);
                     ct=referencePath();
 
                     state._fsp--;
@@ -29958,25 +29993,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "interfaceLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4282:1: interfaceLiteral returns [InterfaceLiteral literal] : INTERFACE_DEFINITION (it= referencePath )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4285:1: interfaceLiteral returns [InterfaceLiteral literal] : INTERFACE_DEFINITION (it= referencePath )? ;
     public InterfaceLiteral interfaceLiteral() throws RecognitionException {
         InterfaceLiteral literal = null;
 
 
-        Token INTERFACE_DEFINITION649=null;
+        Token INTERFACE_DEFINITION650=null;
         SimpleType it =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4283:2: ( INTERFACE_DEFINITION (it= referencePath )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4283:4: INTERFACE_DEFINITION (it= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4286:2: ( INTERFACE_DEFINITION (it= referencePath )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4286:4: INTERFACE_DEFINITION (it= referencePath )?
             {
-            INTERFACE_DEFINITION649=(Token)match(input,INTERFACE_DEFINITION,FOLLOW_INTERFACE_DEFINITION_in_interfaceLiteral28368); if (state.failed) return literal;
+            INTERFACE_DEFINITION650=(Token)match(input,INTERFACE_DEFINITION,FOLLOW_INTERFACE_DEFINITION_in_interfaceLiteral28384); if (state.failed) return literal;
 
             if ( state.backtracking==0 ) { literal = new InterfaceLiteral(null);
-                 literal.setEndToken(INTERFACE_DEFINITION649); }
+                 literal.setEndToken(INTERFACE_DEFINITION650); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4286:4: (it= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4289:4: (it= referencePath )?
             int alt366=2;
             int LA366_0 = input.LA(1);
 
@@ -29985,9 +30020,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt366) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4287:6: it= referencePath
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4290:6: it= referencePath
                     {
-                    pushFollow(FOLLOW_referencePath_in_interfaceLiteral28387);
+                    pushFollow(FOLLOW_referencePath_in_interfaceLiteral28403);
                     it=referencePath();
 
                     state._fsp--;
@@ -30020,25 +30055,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "newLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4293:1: newLiteral returns [NewLiteral literal] : NEW (nt= referencePath )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4296:1: newLiteral returns [NewLiteral literal] : NEW (nt= referencePath )? ;
     public NewLiteral newLiteral() throws RecognitionException {
         NewLiteral literal = null;
 
 
-        Token NEW650=null;
+        Token NEW651=null;
         SimpleType nt =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4294:2: ( NEW (nt= referencePath )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4294:4: NEW (nt= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4297:2: ( NEW (nt= referencePath )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4297:4: NEW (nt= referencePath )?
             {
-            NEW650=(Token)match(input,NEW,FOLLOW_NEW_in_newLiteral28415); if (state.failed) return literal;
+            NEW651=(Token)match(input,NEW,FOLLOW_NEW_in_newLiteral28431); if (state.failed) return literal;
 
             if ( state.backtracking==0 ) { literal = new NewLiteral(null);
-                 literal.setEndToken(NEW650); }
+                 literal.setEndToken(NEW651); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4297:4: (nt= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4300:4: (nt= referencePath )?
             int alt367=2;
             int LA367_0 = input.LA(1);
 
@@ -30047,9 +30082,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt367) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4298:6: nt= referencePath
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4301:6: nt= referencePath
                     {
-                    pushFollow(FOLLOW_referencePath_in_newLiteral28434);
+                    pushFollow(FOLLOW_referencePath_in_newLiteral28450);
                     nt=referencePath();
 
                     state._fsp--;
@@ -30082,25 +30117,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "aliasLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4304:1: aliasLiteral returns [AliasLiteral literal] : ALIAS (at= referencePath )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4307:1: aliasLiteral returns [AliasLiteral literal] : ALIAS (at= referencePath )? ;
     public AliasLiteral aliasLiteral() throws RecognitionException {
         AliasLiteral literal = null;
 
 
-        Token ALIAS651=null;
+        Token ALIAS652=null;
         SimpleType at =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4305:2: ( ALIAS (at= referencePath )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4305:4: ALIAS (at= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4308:2: ( ALIAS (at= referencePath )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4308:4: ALIAS (at= referencePath )?
             {
-            ALIAS651=(Token)match(input,ALIAS,FOLLOW_ALIAS_in_aliasLiteral28462); if (state.failed) return literal;
+            ALIAS652=(Token)match(input,ALIAS,FOLLOW_ALIAS_in_aliasLiteral28478); if (state.failed) return literal;
 
             if ( state.backtracking==0 ) { literal = new AliasLiteral(null);
-                 literal.setEndToken(ALIAS651); }
+                 literal.setEndToken(ALIAS652); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4308:4: (at= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4311:4: (at= referencePath )?
             int alt368=2;
             int LA368_0 = input.LA(1);
 
@@ -30109,9 +30144,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt368) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4309:6: at= referencePath
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4312:6: at= referencePath
                     {
-                    pushFollow(FOLLOW_referencePath_in_aliasLiteral28481);
+                    pushFollow(FOLLOW_referencePath_in_aliasLiteral28497);
                     at=referencePath();
 
                     state._fsp--;
@@ -30144,25 +30179,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "typeParameterLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4315:1: typeParameterLiteral returns [TypeParameterLiteral literal] : TYPE_CONSTRAINT (tt= referencePath )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4318:1: typeParameterLiteral returns [TypeParameterLiteral literal] : TYPE_CONSTRAINT (tt= referencePath )? ;
     public TypeParameterLiteral typeParameterLiteral() throws RecognitionException {
         TypeParameterLiteral literal = null;
 
 
-        Token TYPE_CONSTRAINT652=null;
+        Token TYPE_CONSTRAINT653=null;
         SimpleType tt =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4316:2: ( TYPE_CONSTRAINT (tt= referencePath )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4316:4: TYPE_CONSTRAINT (tt= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4319:2: ( TYPE_CONSTRAINT (tt= referencePath )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4319:4: TYPE_CONSTRAINT (tt= referencePath )?
             {
-            TYPE_CONSTRAINT652=(Token)match(input,TYPE_CONSTRAINT,FOLLOW_TYPE_CONSTRAINT_in_typeParameterLiteral28509); if (state.failed) return literal;
+            TYPE_CONSTRAINT653=(Token)match(input,TYPE_CONSTRAINT,FOLLOW_TYPE_CONSTRAINT_in_typeParameterLiteral28525); if (state.failed) return literal;
 
             if ( state.backtracking==0 ) { literal = new TypeParameterLiteral(null);
-                 literal.setEndToken(TYPE_CONSTRAINT652); }
+                 literal.setEndToken(TYPE_CONSTRAINT653); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4319:4: (tt= referencePath )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4322:4: (tt= referencePath )?
             int alt369=2;
             int LA369_0 = input.LA(1);
 
@@ -30171,9 +30206,9 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt369) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4320:6: tt= referencePath
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4323:6: tt= referencePath
                     {
-                    pushFollow(FOLLOW_referencePath_in_typeParameterLiteral28528);
+                    pushFollow(FOLLOW_referencePath_in_typeParameterLiteral28544);
                     tt=referencePath();
 
                     state._fsp--;
@@ -30206,21 +30241,21 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "valueLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4326:1: valueLiteral returns [ValueLiteral literal] : ( VALUE_MODIFIER | OBJECT_DEFINITION ) vt= referencePath ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4329:1: valueLiteral returns [ValueLiteral literal] : ( VALUE_MODIFIER | OBJECT_DEFINITION ) vt= referencePath ;
     public ValueLiteral valueLiteral() throws RecognitionException {
         ValueLiteral literal = null;
 
 
-        Token VALUE_MODIFIER653=null;
-        Token OBJECT_DEFINITION654=null;
+        Token VALUE_MODIFIER654=null;
+        Token OBJECT_DEFINITION655=null;
         SimpleType vt =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4327:3: ( ( VALUE_MODIFIER | OBJECT_DEFINITION ) vt= referencePath )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4327:5: ( VALUE_MODIFIER | OBJECT_DEFINITION ) vt= referencePath
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4330:3: ( ( VALUE_MODIFIER | OBJECT_DEFINITION ) vt= referencePath )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4330:5: ( VALUE_MODIFIER | OBJECT_DEFINITION ) vt= referencePath
             {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4327:5: ( VALUE_MODIFIER | OBJECT_DEFINITION )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4330:5: ( VALUE_MODIFIER | OBJECT_DEFINITION )
             int alt370=2;
             int LA370_0 = input.LA(1);
 
@@ -30240,22 +30275,22 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt370) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4328:7: VALUE_MODIFIER
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4331:7: VALUE_MODIFIER
                     {
-                    VALUE_MODIFIER653=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_valueLiteral28565); if (state.failed) return literal;
+                    VALUE_MODIFIER654=(Token)match(input,VALUE_MODIFIER,FOLLOW_VALUE_MODIFIER_in_valueLiteral28581); if (state.failed) return literal;
 
                     if ( state.backtracking==0 ) { literal = new ValueLiteral(null);
-                            literal.setEndToken(VALUE_MODIFIER653); }
+                            literal.setEndToken(VALUE_MODIFIER654); }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4332:7: OBJECT_DEFINITION
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4335:7: OBJECT_DEFINITION
                     {
-                    OBJECT_DEFINITION654=(Token)match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_valueLiteral28587); if (state.failed) return literal;
+                    OBJECT_DEFINITION655=(Token)match(input,OBJECT_DEFINITION,FOLLOW_OBJECT_DEFINITION_in_valueLiteral28603); if (state.failed) return literal;
 
                     if ( state.backtracking==0 ) { literal = new ValueLiteral(null);
-                            literal.setEndToken(OBJECT_DEFINITION654);
+                            literal.setEndToken(OBJECT_DEFINITION655);
                             literal.setBroken(true); }
 
                     }
@@ -30264,7 +30299,7 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
 
 
-            pushFollow(FOLLOW_referencePath_in_valueLiteral28609);
+            pushFollow(FOLLOW_referencePath_in_valueLiteral28625);
             vt=referencePath();
 
             state._fsp--;
@@ -30302,25 +30337,25 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "functionLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4353:1: functionLiteral returns [FunctionLiteral literal] : FUNCTION_MODIFIER ft= referencePath ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4356:1: functionLiteral returns [FunctionLiteral literal] : FUNCTION_MODIFIER ft= referencePath ;
     public FunctionLiteral functionLiteral() throws RecognitionException {
         FunctionLiteral literal = null;
 
 
-        Token FUNCTION_MODIFIER655=null;
+        Token FUNCTION_MODIFIER656=null;
         SimpleType ft =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4354:3: ( FUNCTION_MODIFIER ft= referencePath )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4354:5: FUNCTION_MODIFIER ft= referencePath
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4357:3: ( FUNCTION_MODIFIER ft= referencePath )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4357:5: FUNCTION_MODIFIER ft= referencePath
             {
-            FUNCTION_MODIFIER655=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_functionLiteral28632); if (state.failed) return literal;
+            FUNCTION_MODIFIER656=(Token)match(input,FUNCTION_MODIFIER,FOLLOW_FUNCTION_MODIFIER_in_functionLiteral28648); if (state.failed) return literal;
 
             if ( state.backtracking==0 ) { literal = new FunctionLiteral(null);
-                  literal.setEndToken(FUNCTION_MODIFIER655); }
+                  literal.setEndToken(FUNCTION_MODIFIER656); }
 
-            pushFollow(FOLLOW_referencePath_in_functionLiteral28646);
+            pushFollow(FOLLOW_referencePath_in_functionLiteral28662);
             ft=referencePath();
 
             state._fsp--;
@@ -30363,30 +30398,30 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "memberPathElement"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4373:1: memberPathElement returns [Identifier identifier, \n TypeArgumentList typeArgumentList] : memberName ( typeArguments )? ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4376:1: memberPathElement returns [Identifier identifier, \n TypeArgumentList typeArgumentList] : memberName ( typeArguments )? ;
     public PsiCompatibleCeylonParser.memberPathElement_return memberPathElement() throws RecognitionException {
         PsiCompatibleCeylonParser.memberPathElement_return retval = new PsiCompatibleCeylonParser.memberPathElement_return();
         retval.start = input.LT(1);
 
 
-        Identifier memberName656 =null;
+        Identifier memberName657 =null;
 
-        TypeArgumentList typeArguments657 =null;
+        TypeArgumentList typeArguments658 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4375:5: ( memberName ( typeArguments )? )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4375:7: memberName ( typeArguments )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4378:5: ( memberName ( typeArguments )? )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4378:7: memberName ( typeArguments )?
             {
-            pushFollow(FOLLOW_memberName_in_memberPathElement28671);
-            memberName656=memberName();
+            pushFollow(FOLLOW_memberName_in_memberPathElement28687);
+            memberName657=memberName();
 
             state._fsp--;
             if (state.failed) return retval;
 
-            if ( state.backtracking==0 ) { retval.identifier =memberName656; }
+            if ( state.backtracking==0 ) { retval.identifier =memberName657; }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4377:7: ( typeArguments )?
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4380:7: ( typeArguments )?
             int alt371=2;
             int LA371_0 = input.LA(1);
 
@@ -30395,15 +30430,15 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt371) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4378:9: typeArguments
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4381:9: typeArguments
                     {
-                    pushFollow(FOLLOW_typeArguments_in_memberPathElement28697);
-                    typeArguments657=typeArguments();
+                    pushFollow(FOLLOW_typeArguments_in_memberPathElement28713);
+                    typeArguments658=typeArguments();
 
                     state._fsp--;
                     if (state.failed) return retval;
 
-                    if ( state.backtracking==0 ) { retval.typeArgumentList =typeArguments657; }
+                    if ( state.backtracking==0 ) { retval.typeArgumentList =typeArguments658; }
 
                     }
                     break;
@@ -30432,14 +30467,14 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "memberModelExpression"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4384:1: memberModelExpression returns [MemberLiteral literal] : (e1= memberPathElement | PACKAGE o2= MEMBER_OP e2= memberPathElement |at= primaryType o3= MEMBER_OP e3= memberPathElement );
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4387:1: memberModelExpression returns [MemberLiteral literal] : (e1= memberPathElement | PACKAGE o2= MEMBER_OP e2= memberPathElement |at= primaryType o3= MEMBER_OP e3= memberPathElement );
     public MemberLiteral memberModelExpression() throws RecognitionException {
         MemberLiteral literal = null;
 
 
         Token o2=null;
         Token o3=null;
-        Token PACKAGE658=null;
+        Token PACKAGE659=null;
         PsiCompatibleCeylonParser.memberPathElement_return e1 =null;
 
         PsiCompatibleCeylonParser.memberPathElement_return e2 =null;
@@ -30451,7 +30486,7 @@ public class PsiCompatibleCeylonParser extends Parser {
 
          literal = new MemberLiteral(null); 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4386:5: (e1= memberPathElement | PACKAGE o2= MEMBER_OP e2= memberPathElement |at= primaryType o3= MEMBER_OP e3= memberPathElement )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4389:5: (e1= memberPathElement | PACKAGE o2= MEMBER_OP e2= memberPathElement |at= primaryType o3= MEMBER_OP e3= memberPathElement )
             int alt372=3;
             switch ( input.LA(1) ) {
             case LIDENTIFIER:
@@ -30510,9 +30545,9 @@ public class PsiCompatibleCeylonParser extends Parser {
 
             switch (alt372) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4387:7: e1= memberPathElement
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4390:7: e1= memberPathElement
                     {
-                    pushFollow(FOLLOW_memberPathElement_in_memberModelExpression28760);
+                    pushFollow(FOLLOW_memberPathElement_in_memberModelExpression28776);
                     e1=memberPathElement();
 
                     state._fsp--;
@@ -30524,18 +30559,18 @@ public class PsiCompatibleCeylonParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4391:7: PACKAGE o2= MEMBER_OP e2= memberPathElement
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4394:7: PACKAGE o2= MEMBER_OP e2= memberPathElement
                     {
-                    PACKAGE658=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_memberModelExpression28783); if (state.failed) return literal;
+                    PACKAGE659=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_memberModelExpression28799); if (state.failed) return literal;
 
-                    if ( state.backtracking==0 ) { literal.setToken(PACKAGE658);
+                    if ( state.backtracking==0 ) { literal.setToken(PACKAGE659);
                             literal.setPackageQualified(true);  }
 
-                    o2=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_memberModelExpression28801); if (state.failed) return literal;
+                    o2=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_memberModelExpression28817); if (state.failed) return literal;
 
                     if ( state.backtracking==0 ) { literal.setEndToken(o2); }
 
-                    pushFollow(FOLLOW_memberPathElement_in_memberModelExpression28819);
+                    pushFollow(FOLLOW_memberPathElement_in_memberModelExpression28835);
                     e2=memberPathElement();
 
                     state._fsp--;
@@ -30548,9 +30583,9 @@ public class PsiCompatibleCeylonParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4401:7: at= primaryType o3= MEMBER_OP e3= memberPathElement
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4404:7: at= primaryType o3= MEMBER_OP e3= memberPathElement
                     {
-                    pushFollow(FOLLOW_primaryType_in_memberModelExpression28844);
+                    pushFollow(FOLLOW_primaryType_in_memberModelExpression28860);
                     at=primaryType();
 
                     state._fsp--;
@@ -30558,11 +30593,11 @@ public class PsiCompatibleCeylonParser extends Parser {
 
                     if ( state.backtracking==0 ) { literal.setType(at); }
 
-                    o3=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_memberModelExpression28862); if (state.failed) return literal;
+                    o3=(Token)match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_memberModelExpression28878); if (state.failed) return literal;
 
                     if ( state.backtracking==0 ) { literal.setEndToken(o3); }
 
-                    pushFollow(FOLLOW_memberPathElement_in_memberModelExpression28880);
+                    pushFollow(FOLLOW_memberPathElement_in_memberModelExpression28896);
                     e3=memberPathElement();
 
                     state._fsp--;
@@ -30592,26 +30627,26 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "typeModelExpression"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4411:1: typeModelExpression returns [TypeLiteral literal] : type ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4414:1: typeModelExpression returns [TypeLiteral literal] : type ;
     public TypeLiteral typeModelExpression() throws RecognitionException {
         TypeLiteral literal = null;
 
 
-        StaticType type659 =null;
+        StaticType type660 =null;
 
 
          literal = new TypeLiteral(null); 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4413:5: ( type )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4413:7: type
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4416:5: ( type )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4416:7: type
             {
-            pushFollow(FOLLOW_type_in_typeModelExpression28919);
-            type659=type();
+            pushFollow(FOLLOW_type_in_typeModelExpression28935);
+            type660=type();
 
             state._fsp--;
             if (state.failed) return literal;
 
-            if ( state.backtracking==0 ) { literal.setType(type659); }
+            if ( state.backtracking==0 ) { literal.setType(type660); }
 
             }
 
@@ -30631,18 +30666,18 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "modelExpression"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4417:1: modelExpression returns [MetaLiteral meta] : ( ( ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER )=> memberModelExpression | typeModelExpression );
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4420:1: modelExpression returns [MetaLiteral meta] : ( ( ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER )=> memberModelExpression | typeModelExpression );
     public MetaLiteral modelExpression() throws RecognitionException {
         MetaLiteral meta = null;
 
 
-        MemberLiteral memberModelExpression660 =null;
+        MemberLiteral memberModelExpression661 =null;
 
-        TypeLiteral typeModelExpression661 =null;
+        TypeLiteral typeModelExpression662 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4418:3: ( ( ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER )=> memberModelExpression | typeModelExpression )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4421:3: ( ( ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER )=> memberModelExpression | typeModelExpression )
             int alt373=2;
             int LA373_0 = input.LA(1);
 
@@ -30749,28 +30784,28 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
             switch (alt373) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4419:5: ( ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER )=> memberModelExpression
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4422:5: ( ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER )=> memberModelExpression
                     {
-                    pushFollow(FOLLOW_memberModelExpression_in_modelExpression28971);
-                    memberModelExpression660=memberModelExpression();
+                    pushFollow(FOLLOW_memberModelExpression_in_modelExpression28987);
+                    memberModelExpression661=memberModelExpression();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =memberModelExpression660; }
+                    if ( state.backtracking==0 ) { meta =memberModelExpression661; }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4423:5: typeModelExpression
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4426:5: typeModelExpression
                     {
-                    pushFollow(FOLLOW_typeModelExpression_in_modelExpression28988);
-                    typeModelExpression661=typeModelExpression();
+                    pushFollow(FOLLOW_typeModelExpression_in_modelExpression29004);
+                    typeModelExpression662=typeModelExpression();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta = typeModelExpression661; }
+                    if ( state.backtracking==0 ) { meta = typeModelExpression662; }
 
                     }
                     break;
@@ -30792,43 +30827,43 @@ public class PsiCompatibleCeylonParser extends Parser {
 
 
     // $ANTLR start "metaLiteral"
-    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4427:1: metaLiteral returns [MetaLiteral meta] : d1= BACKTICK ( moduleLiteral | ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral | classLiteral | newLiteral | interfaceLiteral | aliasLiteral | typeParameterLiteral | valueLiteral | functionLiteral | modelExpression ) d2= BACKTICK ;
+    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4430:1: metaLiteral returns [MetaLiteral meta] : d1= BACKTICK ( moduleLiteral | ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral | classLiteral | newLiteral | interfaceLiteral | aliasLiteral | typeParameterLiteral | valueLiteral | functionLiteral | modelExpression ) d2= BACKTICK ;
     public MetaLiteral metaLiteral() throws RecognitionException {
         MetaLiteral meta = null;
 
 
         Token d1=null;
         Token d2=null;
-        ModuleLiteral moduleLiteral662 =null;
+        ModuleLiteral moduleLiteral663 =null;
 
-        PackageLiteral packageLiteral663 =null;
+        PackageLiteral packageLiteral664 =null;
 
-        ClassLiteral classLiteral664 =null;
+        ClassLiteral classLiteral665 =null;
 
-        NewLiteral newLiteral665 =null;
+        NewLiteral newLiteral666 =null;
 
-        InterfaceLiteral interfaceLiteral666 =null;
+        InterfaceLiteral interfaceLiteral667 =null;
 
-        AliasLiteral aliasLiteral667 =null;
+        AliasLiteral aliasLiteral668 =null;
 
-        TypeParameterLiteral typeParameterLiteral668 =null;
+        TypeParameterLiteral typeParameterLiteral669 =null;
 
-        ValueLiteral valueLiteral669 =null;
+        ValueLiteral valueLiteral670 =null;
 
-        FunctionLiteral functionLiteral670 =null;
+        FunctionLiteral functionLiteral671 =null;
 
-        MetaLiteral modelExpression671 =null;
+        MetaLiteral modelExpression672 =null;
 
 
         try {
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4428:5: (d1= BACKTICK ( moduleLiteral | ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral | classLiteral | newLiteral | interfaceLiteral | aliasLiteral | typeParameterLiteral | valueLiteral | functionLiteral | modelExpression ) d2= BACKTICK )
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4428:7: d1= BACKTICK ( moduleLiteral | ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral | classLiteral | newLiteral | interfaceLiteral | aliasLiteral | typeParameterLiteral | valueLiteral | functionLiteral | modelExpression ) d2= BACKTICK
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4431:5: (d1= BACKTICK ( moduleLiteral | ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral | classLiteral | newLiteral | interfaceLiteral | aliasLiteral | typeParameterLiteral | valueLiteral | functionLiteral | modelExpression ) d2= BACKTICK )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4431:7: d1= BACKTICK ( moduleLiteral | ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral | classLiteral | newLiteral | interfaceLiteral | aliasLiteral | typeParameterLiteral | valueLiteral | functionLiteral | modelExpression ) d2= BACKTICK
             {
-            d1=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral29015); if (state.failed) return meta;
+            d1=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral29031); if (state.failed) return meta;
 
             if ( state.backtracking==0 ) { meta = new TypeLiteral(d1); }
 
-            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4430:6: ( moduleLiteral | ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral | classLiteral | newLiteral | interfaceLiteral | aliasLiteral | typeParameterLiteral | valueLiteral | functionLiteral | modelExpression )
+            // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4433:6: ( moduleLiteral | ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral | classLiteral | newLiteral | interfaceLiteral | aliasLiteral | typeParameterLiteral | valueLiteral | functionLiteral | modelExpression )
             int alt374=10;
             switch ( input.LA(1) ) {
             case MODULE:
@@ -30918,141 +30953,141 @@ public class PsiCompatibleCeylonParser extends Parser {
 
             switch (alt374) {
                 case 1 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4430:8: moduleLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4433:8: moduleLiteral
                     {
-                    pushFollow(FOLLOW_moduleLiteral_in_metaLiteral29032);
-                    moduleLiteral662=moduleLiteral();
+                    pushFollow(FOLLOW_moduleLiteral_in_metaLiteral29048);
+                    moduleLiteral663=moduleLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =moduleLiteral662; 
+                    if ( state.backtracking==0 ) { meta =moduleLiteral663; 
                     	        meta.setToken(d1); }
 
                     }
                     break;
                 case 2 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4433:8: ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4436:8: ( PACKAGE ( LIDENTIFIER | BACKTICK ) )=> packageLiteral
                     {
-                    pushFollow(FOLLOW_packageLiteral_in_metaLiteral29069);
-                    packageLiteral663=packageLiteral();
+                    pushFollow(FOLLOW_packageLiteral_in_metaLiteral29085);
+                    packageLiteral664=packageLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =packageLiteral663; 
+                    if ( state.backtracking==0 ) { meta =packageLiteral664; 
                     	        meta.setToken(d1); }
 
                     }
                     break;
                 case 3 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4437:8: classLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4440:8: classLiteral
                     {
-                    pushFollow(FOLLOW_classLiteral_in_metaLiteral29087);
-                    classLiteral664=classLiteral();
+                    pushFollow(FOLLOW_classLiteral_in_metaLiteral29103);
+                    classLiteral665=classLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =classLiteral664; 
+                    if ( state.backtracking==0 ) { meta =classLiteral665; 
                               meta.setToken(d1); }
 
                     }
                     break;
                 case 4 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4440:8: newLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4443:8: newLiteral
                     {
-                    pushFollow(FOLLOW_newLiteral_in_metaLiteral29105);
-                    newLiteral665=newLiteral();
+                    pushFollow(FOLLOW_newLiteral_in_metaLiteral29121);
+                    newLiteral666=newLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =newLiteral665; 
+                    if ( state.backtracking==0 ) { meta =newLiteral666; 
                               meta.setToken(d1); }
 
                     }
                     break;
                 case 5 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4443:8: interfaceLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4446:8: interfaceLiteral
                     {
-                    pushFollow(FOLLOW_interfaceLiteral_in_metaLiteral29123);
-                    interfaceLiteral666=interfaceLiteral();
+                    pushFollow(FOLLOW_interfaceLiteral_in_metaLiteral29139);
+                    interfaceLiteral667=interfaceLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =interfaceLiteral666; 
+                    if ( state.backtracking==0 ) { meta =interfaceLiteral667; 
                               meta.setToken(d1); }
 
                     }
                     break;
                 case 6 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4446:8: aliasLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4449:8: aliasLiteral
                     {
-                    pushFollow(FOLLOW_aliasLiteral_in_metaLiteral29141);
-                    aliasLiteral667=aliasLiteral();
+                    pushFollow(FOLLOW_aliasLiteral_in_metaLiteral29157);
+                    aliasLiteral668=aliasLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =aliasLiteral667; 
+                    if ( state.backtracking==0 ) { meta =aliasLiteral668; 
                               meta.setToken(d1); }
 
                     }
                     break;
                 case 7 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4449:8: typeParameterLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4452:8: typeParameterLiteral
                     {
-                    pushFollow(FOLLOW_typeParameterLiteral_in_metaLiteral29159);
-                    typeParameterLiteral668=typeParameterLiteral();
+                    pushFollow(FOLLOW_typeParameterLiteral_in_metaLiteral29175);
+                    typeParameterLiteral669=typeParameterLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =typeParameterLiteral668; 
+                    if ( state.backtracking==0 ) { meta =typeParameterLiteral669; 
                               meta.setToken(d1); }
 
                     }
                     break;
                 case 8 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4452:8: valueLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4455:8: valueLiteral
                     {
-                    pushFollow(FOLLOW_valueLiteral_in_metaLiteral29177);
-                    valueLiteral669=valueLiteral();
+                    pushFollow(FOLLOW_valueLiteral_in_metaLiteral29193);
+                    valueLiteral670=valueLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =valueLiteral669; 
+                    if ( state.backtracking==0 ) { meta =valueLiteral670; 
                               meta.setToken(d1); }
 
                     }
                     break;
                 case 9 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4455:8: functionLiteral
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4458:8: functionLiteral
                     {
-                    pushFollow(FOLLOW_functionLiteral_in_metaLiteral29195);
-                    functionLiteral670=functionLiteral();
+                    pushFollow(FOLLOW_functionLiteral_in_metaLiteral29211);
+                    functionLiteral671=functionLiteral();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =functionLiteral670; 
+                    if ( state.backtracking==0 ) { meta =functionLiteral671; 
                               meta.setToken(d1); }
 
                     }
                     break;
                 case 10 :
-                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4458:8: modelExpression
+                    // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4461:8: modelExpression
                     {
-                    pushFollow(FOLLOW_modelExpression_in_metaLiteral29213);
-                    modelExpression671=modelExpression();
+                    pushFollow(FOLLOW_modelExpression_in_metaLiteral29229);
+                    modelExpression672=modelExpression();
 
                     state._fsp--;
                     if (state.failed) return meta;
 
-                    if ( state.backtracking==0 ) { meta =modelExpression671; 
+                    if ( state.backtracking==0 ) { meta =modelExpression672; 
                     	        meta.setToken(d1); }
 
                     }
@@ -31061,7 +31096,7 @@ public class PsiCompatibleCeylonParser extends Parser {
             }
 
 
-            d2=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral29244); if (state.failed) return meta;
+            d2=(Token)match(input,BACKTICK,FOLLOW_BACKTICK_in_metaLiteral29260); if (state.failed) return meta;
 
             if ( state.backtracking==0 ) { meta.setEndToken(d2); }
 
@@ -32739,7 +32774,7 @@ public class PsiCompatibleCeylonParser extends Parser {
 
     // $ANTLR start synpred49_Ceylon
     public void synpred49_Ceylon_fragment() throws RecognitionException {
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3916:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:9: ( COMPILER_ANNOTATION | declarationStart | specificationStart )
         int alt387=3;
         switch ( input.LA(1) ) {
         case COMPILER_ANNOTATION:
@@ -32782,16 +32817,16 @@ public class PsiCompatibleCeylonParser extends Parser {
 
         switch (alt387) {
             case 1 :
-                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3916:10: COMPILER_ANNOTATION
+                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:10: COMPILER_ANNOTATION
                 {
-                match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_synpred49_Ceylon25857); if (state.failed) return ;
+                match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_synpred49_Ceylon25873); if (state.failed) return ;
 
                 }
                 break;
             case 2 :
-                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3916:30: declarationStart
+                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:30: declarationStart
                 {
-                pushFollow(FOLLOW_declarationStart_in_synpred49_Ceylon25859);
+                pushFollow(FOLLOW_declarationStart_in_synpred49_Ceylon25875);
                 declarationStart();
 
                 state._fsp--;
@@ -32800,9 +32835,9 @@ public class PsiCompatibleCeylonParser extends Parser {
                 }
                 break;
             case 3 :
-                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3916:47: specificationStart
+                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3919:47: specificationStart
                 {
-                pushFollow(FOLLOW_specificationStart_in_synpred49_Ceylon25861);
+                pushFollow(FOLLOW_specificationStart_in_synpred49_Ceylon25877);
                 specificationStart();
 
                 state._fsp--;
@@ -32817,10 +32852,10 @@ public class PsiCompatibleCeylonParser extends Parser {
 
     // $ANTLR start synpred50_Ceylon
     public void synpred50_Ceylon_fragment() throws RecognitionException {
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3964:7: ( IS_OP )
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3964:8: IS_OP
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3967:7: ( IS_OP )
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3967:8: IS_OP
         {
-        match(input,IS_OP,FOLLOW_IS_OP_in_synpred50_Ceylon26220); if (state.failed) return ;
+        match(input,IS_OP,FOLLOW_IS_OP_in_synpred50_Ceylon26236); if (state.failed) return ;
 
         }
 
@@ -32829,10 +32864,10 @@ public class PsiCompatibleCeylonParser extends Parser {
 
     // $ANTLR start synpred51_Ceylon
     public void synpred51_Ceylon_fragment() throws RecognitionException {
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3966:7: ( SATISFIES )
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3966:8: SATISFIES
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3969:7: ( SATISFIES )
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:3969:8: SATISFIES
         {
-        match(input,SATISFIES,FOLLOW_SATISFIES_in_synpred51_Ceylon26241); if (state.failed) return ;
+        match(input,SATISFIES,FOLLOW_SATISFIES_in_synpred51_Ceylon26257); if (state.failed) return ;
 
         }
 
@@ -32841,10 +32876,10 @@ public class PsiCompatibleCeylonParser extends Parser {
 
     // $ANTLR start synpred52_Ceylon
     public void synpred52_Ceylon_fragment() throws RecognitionException {
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4027:10: ( patternStart )
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4027:11: patternStart
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4030:10: ( patternStart )
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4030:11: patternStart
         {
-        pushFollow(FOLLOW_patternStart_in_synpred52_Ceylon26639);
+        pushFollow(FOLLOW_patternStart_in_synpred52_Ceylon26655);
         patternStart();
 
         state._fsp--;
@@ -32857,7 +32892,7 @@ public class PsiCompatibleCeylonParser extends Parser {
 
     // $ANTLR start synpred53_Ceylon
     public void synpred53_Ceylon_fragment() throws RecognitionException {
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4142:7: ( COMPILER_ANNOTATION | declarationStart | specificationStart )
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4145:7: ( COMPILER_ANNOTATION | declarationStart | specificationStart )
         int alt388=3;
         switch ( input.LA(1) ) {
         case COMPILER_ANNOTATION:
@@ -32900,16 +32935,16 @@ public class PsiCompatibleCeylonParser extends Parser {
 
         switch (alt388) {
             case 1 :
-                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4142:8: COMPILER_ANNOTATION
+                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4145:8: COMPILER_ANNOTATION
                 {
-                match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_synpred53_Ceylon27515); if (state.failed) return ;
+                match(input,COMPILER_ANNOTATION,FOLLOW_COMPILER_ANNOTATION_in_synpred53_Ceylon27531); if (state.failed) return ;
 
                 }
                 break;
             case 2 :
-                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4142:28: declarationStart
+                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4145:28: declarationStart
                 {
-                pushFollow(FOLLOW_declarationStart_in_synpred53_Ceylon27517);
+                pushFollow(FOLLOW_declarationStart_in_synpred53_Ceylon27533);
                 declarationStart();
 
                 state._fsp--;
@@ -32918,9 +32953,9 @@ public class PsiCompatibleCeylonParser extends Parser {
                 }
                 break;
             case 3 :
-                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4142:45: specificationStart
+                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4145:45: specificationStart
                 {
-                pushFollow(FOLLOW_specificationStart_in_synpred53_Ceylon27519);
+                pushFollow(FOLLOW_specificationStart_in_synpred53_Ceylon27535);
                 specificationStart();
 
                 state._fsp--;
@@ -32935,10 +32970,10 @@ public class PsiCompatibleCeylonParser extends Parser {
 
     // $ANTLR start synpred54_Ceylon
     public void synpred54_Ceylon_fragment() throws RecognitionException {
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4419:5: ( ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER )
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4419:6: ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4422:5: ( ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER )
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4422:6: ( ( PACKAGE | primaryType ) MEMBER_OP )? LIDENTIFIER
         {
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4419:6: ( ( PACKAGE | primaryType ) MEMBER_OP )?
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4422:6: ( ( PACKAGE | primaryType ) MEMBER_OP )?
         int alt390=2;
         int LA390_0 = input.LA(1);
 
@@ -32947,9 +32982,9 @@ public class PsiCompatibleCeylonParser extends Parser {
         }
         switch (alt390) {
             case 1 :
-                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4419:7: ( PACKAGE | primaryType ) MEMBER_OP
+                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4422:7: ( PACKAGE | primaryType ) MEMBER_OP
                 {
-                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4419:7: ( PACKAGE | primaryType )
+                // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4422:7: ( PACKAGE | primaryType )
                 int alt389=2;
                 int LA389_0 = input.LA(1);
 
@@ -32996,16 +33031,16 @@ public class PsiCompatibleCeylonParser extends Parser {
                 }
                 switch (alt389) {
                     case 1 :
-                        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4419:8: PACKAGE
+                        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4422:8: PACKAGE
                         {
-                        match(input,PACKAGE,FOLLOW_PACKAGE_in_synpred54_Ceylon28953); if (state.failed) return ;
+                        match(input,PACKAGE,FOLLOW_PACKAGE_in_synpred54_Ceylon28969); if (state.failed) return ;
 
                         }
                         break;
                     case 2 :
-                        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4419:16: primaryType
+                        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4422:16: primaryType
                         {
-                        pushFollow(FOLLOW_primaryType_in_synpred54_Ceylon28955);
+                        pushFollow(FOLLOW_primaryType_in_synpred54_Ceylon28971);
                         primaryType();
 
                         state._fsp--;
@@ -33017,7 +33052,7 @@ public class PsiCompatibleCeylonParser extends Parser {
                 }
 
 
-                match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_synpred54_Ceylon28958); if (state.failed) return ;
+                match(input,MEMBER_OP,FOLLOW_MEMBER_OP_in_synpred54_Ceylon28974); if (state.failed) return ;
 
                 }
                 break;
@@ -33025,7 +33060,7 @@ public class PsiCompatibleCeylonParser extends Parser {
         }
 
 
-        match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred54_Ceylon28962); if (state.failed) return ;
+        match(input,LIDENTIFIER,FOLLOW_LIDENTIFIER_in_synpred54_Ceylon28978); if (state.failed) return ;
 
         }
 
@@ -33034,10 +33069,10 @@ public class PsiCompatibleCeylonParser extends Parser {
 
     // $ANTLR start synpred55_Ceylon
     public void synpred55_Ceylon_fragment() throws RecognitionException {
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4433:8: ( PACKAGE ( LIDENTIFIER | BACKTICK ) )
-        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4433:9: PACKAGE ( LIDENTIFIER | BACKTICK )
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4436:8: ( PACKAGE ( LIDENTIFIER | BACKTICK ) )
+        // /Users/bastien/Dev/ceylon/ceylon-spec/Ceylon.g:4436:9: PACKAGE ( LIDENTIFIER | BACKTICK )
         {
-        match(input,PACKAGE,FOLLOW_PACKAGE_in_synpred55_Ceylon29051); if (state.failed) return ;
+        match(input,PACKAGE,FOLLOW_PACKAGE_in_synpred55_Ceylon29067); if (state.failed) return ;
 
         if ( input.LA(1)==BACKTICK||input.LA(1)==LIDENTIFIER ) {
             input.consume();
@@ -33058,557 +33093,11 @@ public class PsiCompatibleCeylonParser extends Parser {
 
     // Delegated rules
 
-    public boolean synpred46_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred46_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred37_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred37_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred13_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred13_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred25_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred25_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred9_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred9_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred7_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred7_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred49_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred49_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred16_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred16_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred12_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred12_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred20_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred20_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred8_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred8_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred42_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred42_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred28_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred28_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred30_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred30_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred48_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred48_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred32_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred32_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred44_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred44_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred27_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred27_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred22_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred22_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred3_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred3_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred26_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred26_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred43_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred43_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred35_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred35_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred45_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred45_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
     public boolean synpred24_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
             synpred24_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred41_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred41_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred34_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred34_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred15_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred15_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred10_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred10_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred1_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred1_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred51_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred51_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred38_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred38_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred53_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred53_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred2_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred2_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred55_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred55_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred36_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred36_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred6_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred6_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred23_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred23_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred11_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred11_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred14_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred14_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33632,11 +33121,11 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
-    public boolean synpred18_Ceylon() {
+    public boolean synpred42_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred18_Ceylon_fragment(); // can never throw exception
+            synpred42_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33646,11 +33135,11 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
-    public boolean synpred54_Ceylon() {
+    public boolean synpred41_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred54_Ceylon_fragment(); // can never throw exception
+            synpred41_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33660,11 +33149,81 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
-    public boolean synpred31_Ceylon() {
+    public boolean synpred20_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred31_Ceylon_fragment(); // can never throw exception
+            synpred20_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred27_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred27_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred28_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred28_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred22_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred22_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred25_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred25_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred26_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred26_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33688,39 +33247,39 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
-    public boolean synpred52_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred52_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
-    public boolean synpred4_Ceylon() {
-        state.backtracking++;
-        int start = input.mark();
-        try {
-            synpred4_Ceylon_fragment(); // can never throw exception
-        } catch (RecognitionException re) {
-            System.err.println("impossible: "+re);
-        }
-        boolean success = !state.failed;
-        input.rewind(start);
-        state.backtracking--;
-        state.failed=false;
-        return success;
-    }
     public boolean synpred21_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
             synpred21_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred23_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred23_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred48_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred48_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33744,11 +33303,11 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
-    public boolean synpred50_Ceylon() {
+    public boolean synpred49_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred50_Ceylon_fragment(); // can never throw exception
+            synpred49_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33758,11 +33317,11 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
-    public boolean synpred17_Ceylon() {
+    public boolean synpred45_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred17_Ceylon_fragment(); // can never throw exception
+            synpred45_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33772,11 +33331,11 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
-    public boolean synpred33_Ceylon() {
+    public boolean synpred43_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred33_Ceylon_fragment(); // can never throw exception
+            synpred43_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33786,11 +33345,193 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
-    public boolean synpred39_Ceylon() {
+    public boolean synpred44_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred39_Ceylon_fragment(); // can never throw exception
+            synpred44_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred46_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred46_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred2_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred2_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred10_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred10_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred32_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred32_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred7_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred7_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred8_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred8_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred16_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred16_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred14_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred14_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred15_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred15_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred6_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred6_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred34_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred34_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred9_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred9_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred30_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred30_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -33814,11 +33555,305 @@ public class PsiCompatibleCeylonParser extends Parser {
         state.failed=false;
         return success;
     }
+    public boolean synpred31_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred31_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred33_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred33_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred35_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred35_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred4_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred4_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
     public boolean synpred19_Ceylon() {
         state.backtracking++;
         int start = input.mark();
         try {
             synpred19_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred36_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred36_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred18_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred18_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred11_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred11_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred12_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred12_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred13_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred13_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred17_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred17_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred37_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred37_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred38_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred38_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred39_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred39_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred52_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred52_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred53_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred53_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred51_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred51_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred54_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred54_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred55_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred55_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred50_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred50_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred3_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred3_Ceylon_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
+        }
+        boolean success = !state.failed;
+        input.rewind(start);
+        state.backtracking--;
+        state.failed=false;
+        return success;
+    }
+    public boolean synpred1_Ceylon() {
+        state.backtracking++;
+        int start = input.mark();
+        try {
+            synpred1_Ceylon_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -35827,147 +35862,148 @@ public class PsiCompatibleCeylonParser extends Parser {
     public static final BitSet FOLLOW_tryCatchFinally_in_controlStatement25262 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_dynamic_in_controlStatement25278 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_block_in_controlBlock25316 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DYNAMIC_in_dynamic25382 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_dynamic25399 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ifBlock_in_ifElse25436 = new BitSet(new long[]{0x0000008000000002L});
-    public static final BitSet FOLLOW_elseBlock_in_ifElse25464 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IF_CLAUSE_in_ifBlock25504 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_conditions_in_ifBlock25521 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_ifBlock25537 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ELSE_CLAUSE_in_elseBlock25566 = new BitSet(new long[]{0x0040000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_elseIf_in_elseBlock25593 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_elseBlock25623 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ifElse_in_elseIf25662 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_switchHeader_in_switchCaseElse25699 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_cases_in_switchCaseElse25716 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SWITCH_CLAUSE_in_switchHeader25745 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_LPAREN_in_switchHeader25762 = new BitSet(new long[]{0x0102800B04408000L,0x223508200618812CL,0x000000000000000EL});
-    public static final BitSet FOLLOW_switched_in_switchHeader25788 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_switchHeader25816 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_specifiedVariable_in_switched25875 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_switched25895 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_caseBlock_in_cases25952 = new BitSet(new long[]{0x0000008000080002L});
-    public static final BitSet FOLLOW_defaultCaseBlock_in_cases25989 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CASE_CLAUSE_in_caseBlock26033 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_caseItemList_in_caseBlock26050 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_caseBlock26066 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock26095 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_block_in_defaultCaseBlock26112 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_caseItemList26141 = new BitSet(new long[]{0x2100800B00408000L,0x223500A00610812CL,0x0000000000000004L});
-    public static final BitSet FOLLOW_caseItem_in_caseItemList26162 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_caseItemList26189 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_isCaseCondition_in_caseItem26223 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_satisfiesCaseCondition_in_caseItem26244 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_matchCaseCondition_in_caseItem26260 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_valueCaseList_in_matchCaseCondition26289 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IS_OP_in_isCaseCondition26318 = new BitSet(new long[]{0x0000000000000000L,0x200008000400000CL});
-    public static final BitSet FOLLOW_type_in_isCaseCondition26335 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SATISFIES_in_satisfiesCaseCondition26364 = new BitSet(new long[]{0x0000000000000000L,0x200008000400000CL});
-    public static final BitSet FOLLOW_type_in_satisfiesCaseCondition26381 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_forBlock_in_forElse26418 = new BitSet(new long[]{0x0000008000000002L});
-    public static final BitSet FOLLOW_failBlock_in_forElse26445 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FOR_CLAUSE_in_forBlock26485 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_forIterator_in_forBlock26502 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_forBlock26519 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ELSE_CLAUSE_in_failBlock26548 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_failBlock26565 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_forIterator26603 = new BitSet(new long[]{0x0002000004000000L,0x200008200400002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_pattern_in_forIterator26644 = new BitSet(new long[]{0x1000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_variable_in_forIterator26675 = new BitSet(new long[]{0x1000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_containment_in_forIterator26715 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_forIterator26751 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IN_OP_in_containment26783 = new BitSet(new long[]{0x0100800B00408002L,0x223500000618812CL,0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_containment26801 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_whileBlock_in_whileLoop26844 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_WHILE_CLAUSE_in_whileBlock26873 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_conditions_in_whileBlock26889 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_whileBlock26905 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tryBlock_in_tryCatchFinally26942 = new BitSet(new long[]{0x0000400000200002L});
-    public static final BitSet FOLLOW_catchBlock_in_tryCatchFinally26969 = new BitSet(new long[]{0x0000400000200002L});
-    public static final BitSet FOLLOW_finallyBlock_in_tryCatchFinally27008 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TRY_CLAUSE_in_tryBlock27048 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000104L});
-    public static final BitSet FOLLOW_resources_in_tryBlock27075 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_tryBlock27095 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_block_in_tryBlock27123 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CATCH_CLAUSE_in_catchBlock27162 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_catchVariable_in_catchBlock27179 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_catchBlock27195 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_catchVariable27224 = new BitSet(new long[]{0x0002000004000000L,0x200008200400002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_variable_in_catchVariable27249 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_catchVariable27275 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FINALLY_CLAUSE_in_finallyBlock27306 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
-    public static final BitSet FOLLOW_controlBlock_in_finallyBlock27323 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_resources27352 = new BitSet(new long[]{0x0102800B04408000L,0x223508200618812CL,0x000000000000000EL});
-    public static final BitSet FOLLOW_resource_in_resources27378 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_COMMA_in_resources27409 = new BitSet(new long[]{0x0102800B04408000L,0x223508000618812CL,0x000000000000000EL});
-    public static final BitSet FOLLOW_resource_in_resources27434 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_resources27470 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_specifiedVariable_in_resource27531 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_resource27554 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_variable_in_specifiedVariable27585 = new BitSet(new long[]{0x0000000000000002L,0x0000200000000000L});
-    public static final BitSet FOLLOW_specifier_in_specifiedVariable27612 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_compilerAnnotations_in_variable27652 = new BitSet(new long[]{0x0002000000000000L,0x200008000400002CL,0x000000000000000AL});
-    public static final BitSet FOLLOW_var_in_variable27660 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_type_in_var27720 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_VOID_MODIFIER_in_var27750 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_var27779 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_VALUE_MODIFIER_in_var27808 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberName_in_var27836 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
-    public static final BitSet FOLLOW_parameters_in_var27866 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
-    public static final BitSet FOLLOW_memberName_in_var27910 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
-    public static final BitSet FOLLOW_parameters_in_var27938 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
-    public static final BitSet FOLLOW_memberName_in_impliedVariable27978 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeName_in_referencePathElement28008 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_memberName_in_referencePathElement28025 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_referencePathElement_in_referencePath28070 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
-    public static final BitSet FOLLOW_PACKAGE_in_referencePath28100 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_referencePath28120 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000020L});
-    public static final BitSet FOLLOW_referencePathElement_in_referencePath28140 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_referencePath28177 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000020L});
-    public static final BitSet FOLLOW_referencePathElement_in_referencePath28189 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MODULE_in_moduleLiteral28227 = new BitSet(new long[]{0x0000000000000002L,0x2000000000000020L});
-    public static final BitSet FOLLOW_packagePath_in_moduleLiteral28246 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PACKAGE_in_packageLiteral28274 = new BitSet(new long[]{0x0000000000000002L,0x2000000000000020L});
-    public static final BitSet FOLLOW_packagePath_in_packageLiteral28293 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CLASS_DEFINITION_in_classLiteral28321 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
-    public static final BitSet FOLLOW_referencePath_in_classLiteral28340 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INTERFACE_DEFINITION_in_interfaceLiteral28368 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
-    public static final BitSet FOLLOW_referencePath_in_interfaceLiteral28387 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NEW_in_newLiteral28415 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
-    public static final BitSet FOLLOW_referencePath_in_newLiteral28434 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ALIAS_in_aliasLiteral28462 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
-    public static final BitSet FOLLOW_referencePath_in_aliasLiteral28481 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TYPE_CONSTRAINT_in_typeParameterLiteral28509 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
-    public static final BitSet FOLLOW_referencePath_in_typeParameterLiteral28528 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_VALUE_MODIFIER_in_valueLiteral28565 = new BitSet(new long[]{0x0000000000000000L,0x2000000004000020L});
-    public static final BitSet FOLLOW_OBJECT_DEFINITION_in_valueLiteral28587 = new BitSet(new long[]{0x0000000000000000L,0x2000000004000020L});
-    public static final BitSet FOLLOW_referencePath_in_valueLiteral28609 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_functionLiteral28632 = new BitSet(new long[]{0x0000000000000000L,0x2000000004000020L});
-    public static final BitSet FOLLOW_referencePath_in_functionLiteral28646 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_memberName_in_memberPathElement28671 = new BitSet(new long[]{0x0000000000000002L,0x0000080000000000L});
-    public static final BitSet FOLLOW_typeArguments_in_memberPathElement28697 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_memberPathElement_in_memberModelExpression28760 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PACKAGE_in_memberModelExpression28783 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_memberModelExpression28801 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberPathElement_in_memberModelExpression28819 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_primaryType_in_memberModelExpression28844 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_memberModelExpression28862 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_memberPathElement_in_memberModelExpression28880 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_type_in_typeModelExpression28919 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_memberModelExpression_in_modelExpression28971 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeModelExpression_in_modelExpression28988 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BACKTICK_in_metaLiteral29015 = new BitSet(new long[]{0x0202000000800080L,0x300008000411082CL,0x0000000000000002L});
-    public static final BitSet FOLLOW_moduleLiteral_in_metaLiteral29032 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_packageLiteral_in_metaLiteral29069 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_classLiteral_in_metaLiteral29087 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_newLiteral_in_metaLiteral29105 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_interfaceLiteral_in_metaLiteral29123 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_aliasLiteral_in_metaLiteral29141 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_typeParameterLiteral_in_metaLiteral29159 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_valueLiteral_in_metaLiteral29177 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_functionLiteral_in_metaLiteral29195 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_modelExpression_in_metaLiteral29213 = new BitSet(new long[]{0x0000000000008000L});
-    public static final BitSet FOLLOW_BACKTICK_in_metaLiteral29244 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_dynamicClause_in_dynamic25365 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DYNAMIC_in_dynamicClause25398 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_dynamicClause25415 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ifBlock_in_ifElse25452 = new BitSet(new long[]{0x0000008000000002L});
+    public static final BitSet FOLLOW_elseBlock_in_ifElse25480 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IF_CLAUSE_in_ifBlock25520 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_conditions_in_ifBlock25537 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_ifBlock25553 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ELSE_CLAUSE_in_elseBlock25582 = new BitSet(new long[]{0x0040000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_elseIf_in_elseBlock25609 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_elseBlock25639 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ifElse_in_elseIf25678 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_switchHeader_in_switchCaseElse25715 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_cases_in_switchCaseElse25732 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SWITCH_CLAUSE_in_switchHeader25761 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_LPAREN_in_switchHeader25778 = new BitSet(new long[]{0x0102800B04408000L,0x223508200618812CL,0x000000000000000EL});
+    public static final BitSet FOLLOW_switched_in_switchHeader25804 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_switchHeader25832 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_specifiedVariable_in_switched25891 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_switched25911 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_caseBlock_in_cases25968 = new BitSet(new long[]{0x0000008000080002L});
+    public static final BitSet FOLLOW_defaultCaseBlock_in_cases26005 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CASE_CLAUSE_in_caseBlock26049 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_caseItemList_in_caseBlock26066 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_caseBlock26082 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ELSE_CLAUSE_in_defaultCaseBlock26111 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_block_in_defaultCaseBlock26128 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_caseItemList26157 = new BitSet(new long[]{0x2100800B00408000L,0x223500A00610812CL,0x0000000000000004L});
+    public static final BitSet FOLLOW_caseItem_in_caseItemList26178 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_caseItemList26205 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_isCaseCondition_in_caseItem26239 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_satisfiesCaseCondition_in_caseItem26260 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_matchCaseCondition_in_caseItem26276 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_valueCaseList_in_matchCaseCondition26305 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IS_OP_in_isCaseCondition26334 = new BitSet(new long[]{0x0000000000000000L,0x200008000400000CL});
+    public static final BitSet FOLLOW_type_in_isCaseCondition26351 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SATISFIES_in_satisfiesCaseCondition26380 = new BitSet(new long[]{0x0000000000000000L,0x200008000400000CL});
+    public static final BitSet FOLLOW_type_in_satisfiesCaseCondition26397 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_forBlock_in_forElse26434 = new BitSet(new long[]{0x0000008000000002L});
+    public static final BitSet FOLLOW_failBlock_in_forElse26461 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FOR_CLAUSE_in_forBlock26501 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_forIterator_in_forBlock26518 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_forBlock26535 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ELSE_CLAUSE_in_failBlock26564 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_failBlock26581 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_forIterator26619 = new BitSet(new long[]{0x0002000004000000L,0x200008200400002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_pattern_in_forIterator26660 = new BitSet(new long[]{0x1000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_variable_in_forIterator26691 = new BitSet(new long[]{0x1000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_containment_in_forIterator26731 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_forIterator26767 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IN_OP_in_containment26799 = new BitSet(new long[]{0x0100800B00408002L,0x223500000618812CL,0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_containment26817 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_whileBlock_in_whileLoop26860 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_WHILE_CLAUSE_in_whileBlock26889 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_conditions_in_whileBlock26905 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_whileBlock26921 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_tryBlock_in_tryCatchFinally26958 = new BitSet(new long[]{0x0000400000200002L});
+    public static final BitSet FOLLOW_catchBlock_in_tryCatchFinally26985 = new BitSet(new long[]{0x0000400000200002L});
+    public static final BitSet FOLLOW_finallyBlock_in_tryCatchFinally27024 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TRY_CLAUSE_in_tryBlock27064 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000104L});
+    public static final BitSet FOLLOW_resources_in_tryBlock27091 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_tryBlock27111 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_block_in_tryBlock27139 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CATCH_CLAUSE_in_catchBlock27178 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_catchVariable_in_catchBlock27195 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_catchBlock27211 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_catchVariable27240 = new BitSet(new long[]{0x0002000004000000L,0x200008200400002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_variable_in_catchVariable27265 = new BitSet(new long[]{0x0000000000000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_catchVariable27291 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FINALLY_CLAUSE_in_finallyBlock27322 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_controlBlock_in_finallyBlock27339 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_resources27368 = new BitSet(new long[]{0x0102800B04408000L,0x223508200618812CL,0x000000000000000EL});
+    public static final BitSet FOLLOW_resource_in_resources27394 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_COMMA_in_resources27425 = new BitSet(new long[]{0x0102800B04408000L,0x223508000618812CL,0x000000000000000EL});
+    public static final BitSet FOLLOW_resource_in_resources27450 = new BitSet(new long[]{0x0000000001000000L,0x0000002000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_resources27486 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_specifiedVariable_in_resource27547 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_resource27570 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_variable_in_specifiedVariable27601 = new BitSet(new long[]{0x0000000000000002L,0x0000200000000000L});
+    public static final BitSet FOLLOW_specifier_in_specifiedVariable27628 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_compilerAnnotations_in_variable27668 = new BitSet(new long[]{0x0002000000000000L,0x200008000400002CL,0x000000000000000AL});
+    public static final BitSet FOLLOW_var_in_variable27676 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_var27736 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_VOID_MODIFIER_in_var27766 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_var27795 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_VALUE_MODIFIER_in_var27824 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberName_in_var27852 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
+    public static final BitSet FOLLOW_parameters_in_var27882 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
+    public static final BitSet FOLLOW_memberName_in_var27926 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
+    public static final BitSet FOLLOW_parameters_in_var27954 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000100L});
+    public static final BitSet FOLLOW_memberName_in_impliedVariable27994 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeName_in_referencePathElement28024 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_memberName_in_referencePathElement28041 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_referencePathElement_in_referencePath28086 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
+    public static final BitSet FOLLOW_PACKAGE_in_referencePath28116 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_referencePath28136 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000020L});
+    public static final BitSet FOLLOW_referencePathElement_in_referencePath28156 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_referencePath28193 = new BitSet(new long[]{0x0000000000000000L,0x2000000000000020L});
+    public static final BitSet FOLLOW_referencePathElement_in_referencePath28205 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MODULE_in_moduleLiteral28243 = new BitSet(new long[]{0x0000000000000002L,0x2000000000000020L});
+    public static final BitSet FOLLOW_packagePath_in_moduleLiteral28262 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PACKAGE_in_packageLiteral28290 = new BitSet(new long[]{0x0000000000000002L,0x2000000000000020L});
+    public static final BitSet FOLLOW_packagePath_in_packageLiteral28309 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CLASS_DEFINITION_in_classLiteral28337 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
+    public static final BitSet FOLLOW_referencePath_in_classLiteral28356 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INTERFACE_DEFINITION_in_interfaceLiteral28384 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
+    public static final BitSet FOLLOW_referencePath_in_interfaceLiteral28403 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NEW_in_newLiteral28431 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
+    public static final BitSet FOLLOW_referencePath_in_newLiteral28450 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ALIAS_in_aliasLiteral28478 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
+    public static final BitSet FOLLOW_referencePath_in_aliasLiteral28497 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TYPE_CONSTRAINT_in_typeParameterLiteral28525 = new BitSet(new long[]{0x0000000000000002L,0x2000000004000020L});
+    public static final BitSet FOLLOW_referencePath_in_typeParameterLiteral28544 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_VALUE_MODIFIER_in_valueLiteral28581 = new BitSet(new long[]{0x0000000000000000L,0x2000000004000020L});
+    public static final BitSet FOLLOW_OBJECT_DEFINITION_in_valueLiteral28603 = new BitSet(new long[]{0x0000000000000000L,0x2000000004000020L});
+    public static final BitSet FOLLOW_referencePath_in_valueLiteral28625 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FUNCTION_MODIFIER_in_functionLiteral28648 = new BitSet(new long[]{0x0000000000000000L,0x2000000004000020L});
+    public static final BitSet FOLLOW_referencePath_in_functionLiteral28662 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_memberName_in_memberPathElement28687 = new BitSet(new long[]{0x0000000000000002L,0x0000080000000000L});
+    public static final BitSet FOLLOW_typeArguments_in_memberPathElement28713 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_memberPathElement_in_memberModelExpression28776 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PACKAGE_in_memberModelExpression28799 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_memberModelExpression28817 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberPathElement_in_memberModelExpression28835 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_primaryType_in_memberModelExpression28860 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_memberModelExpression28878 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_memberPathElement_in_memberModelExpression28896 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_type_in_typeModelExpression28935 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_memberModelExpression_in_modelExpression28987 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeModelExpression_in_modelExpression29004 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BACKTICK_in_metaLiteral29031 = new BitSet(new long[]{0x0202000000800080L,0x300008000411082CL,0x0000000000000002L});
+    public static final BitSet FOLLOW_moduleLiteral_in_metaLiteral29048 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_packageLiteral_in_metaLiteral29085 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_classLiteral_in_metaLiteral29103 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_newLiteral_in_metaLiteral29121 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_interfaceLiteral_in_metaLiteral29139 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_aliasLiteral_in_metaLiteral29157 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_typeParameterLiteral_in_metaLiteral29175 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_valueLiteral_in_metaLiteral29193 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_functionLiteral_in_metaLiteral29211 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_modelExpression_in_metaLiteral29229 = new BitSet(new long[]{0x0000000000008000L});
+    public static final BitSet FOLLOW_BACKTICK_in_metaLiteral29260 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_annotatedModuleDescriptorStart_in_synpred1_Ceylon164 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_annotatedPackageDescriptorStart_in_synpred2_Ceylon207 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_compilerAnnotations_in_synpred3_Ceylon3037 = new BitSet(new long[]{0x0202000800801080L,0x200008000411000CL,0x000000000000000AL});
@@ -36052,20 +36088,20 @@ public class PsiCompatibleCeylonParser extends Parser {
     public static final BitSet FOLLOW_LIDENTIFIER_in_synpred47_Ceylon24992 = new BitSet(new long[]{0x0000000000000000L,0x0000200000000000L});
     public static final BitSet FOLLOW_SPECIFY_in_synpred47_Ceylon24994 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_LBRACE_in_synpred48_Ceylon25310 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COMPILER_ANNOTATION_in_synpred49_Ceylon25857 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_declarationStart_in_synpred49_Ceylon25859 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_specificationStart_in_synpred49_Ceylon25861 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IS_OP_in_synpred50_Ceylon26220 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SATISFIES_in_synpred51_Ceylon26241 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_patternStart_in_synpred52_Ceylon26639 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COMPILER_ANNOTATION_in_synpred53_Ceylon27515 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_declarationStart_in_synpred53_Ceylon27517 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_specificationStart_in_synpred53_Ceylon27519 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PACKAGE_in_synpred54_Ceylon28953 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_primaryType_in_synpred54_Ceylon28955 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
-    public static final BitSet FOLLOW_MEMBER_OP_in_synpred54_Ceylon28958 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_LIDENTIFIER_in_synpred54_Ceylon28962 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PACKAGE_in_synpred55_Ceylon29051 = new BitSet(new long[]{0x0000000000008000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_set_in_synpred55_Ceylon29053 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COMPILER_ANNOTATION_in_synpred49_Ceylon25873 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_declarationStart_in_synpred49_Ceylon25875 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_specificationStart_in_synpred49_Ceylon25877 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IS_OP_in_synpred50_Ceylon26236 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SATISFIES_in_synpred51_Ceylon26257 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_patternStart_in_synpred52_Ceylon26655 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COMPILER_ANNOTATION_in_synpred53_Ceylon27531 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_declarationStart_in_synpred53_Ceylon27533 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_specificationStart_in_synpred53_Ceylon27535 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PACKAGE_in_synpred54_Ceylon28969 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_primaryType_in_synpred54_Ceylon28971 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000400L});
+    public static final BitSet FOLLOW_MEMBER_OP_in_synpred54_Ceylon28974 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_LIDENTIFIER_in_synpred54_Ceylon28978 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PACKAGE_in_synpred55_Ceylon29067 = new BitSet(new long[]{0x0000000000008000L,0x0000000000000020L});
+    public static final BitSet FOLLOW_set_in_synpred55_Ceylon29069 = new BitSet(new long[]{0x0000000000000002L});
 
 }
