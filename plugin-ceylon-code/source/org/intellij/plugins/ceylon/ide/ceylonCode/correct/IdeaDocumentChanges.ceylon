@@ -3,7 +3,7 @@ import com.redhat.ceylon.ide.common.correct {
 }
 import com.intellij.openapi.editor {
     Document,
-    IdeaTextChange = TextChange
+    AliasedAsTextEdit=TextChange
 }
 import java.lang {
     CharSequence,
@@ -21,31 +21,33 @@ import java.util {
     ArrayList
 }
 
-shared class InsertEdit(Integer position, shared String str) satisfies IdeaTextChange {
+shared alias TextEdit => AliasedAsTextEdit;
+
+shared class InsertEdit(Integer position, shared String str) satisfies AliasedAsTextEdit {
     shared actual Integer start => position;
     shared actual Integer end => position;
     shared actual CharSequence text => javaString(str);
     shared actual CharArray chars => javaString(str).toCharArray();
 }
 
-shared class DeleteEdit(shared actual Integer start, shared actual Integer end) satisfies IdeaTextChange {
+shared class DeleteEdit(shared actual Integer start, shared actual Integer end) satisfies AliasedAsTextEdit {
     shared actual CharSequence text => javaString("");
     shared actual CharArray chars => javaString("").toCharArray();
 }
 
-shared class ReplaceEdit(shared actual Integer start, Integer length, String str) satisfies IdeaTextChange {
+shared class ReplaceEdit(shared actual Integer start, Integer length, String str) satisfies AliasedAsTextEdit {
     shared actual Integer end => start + length;
     shared actual CharSequence text => javaString(str);
     shared actual CharArray chars => javaString(str).toCharArray();
 }
 
 shared class TextChange(shared Document document) {
-    variable JList<IdeaTextChange> changes = ArrayList<IdeaTextChange>();
-    
-    shared void addEdit(IdeaTextChange edit) {
+    variable JList<TextEdit> changes = ArrayList<TextEdit>();
+
+    shared void addEdit(TextEdit edit) {
         changes.add(edit);
     }
-    
+
     shared void apply() {
         value chars = javaString(document.text).toCharArray();
         value newText = BulkChangesMerger.\iINSTANCE.mergeToCharArray(chars, document.textLength, changes);
@@ -53,25 +55,25 @@ shared class TextChange(shared Document document) {
     }
 }
 
-shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertEdit, IdeaTextChange, TextChange> {
+shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertEdit, TextEdit, TextChange> {
     shared actual void initMultiEditChange(TextChange importChange) {
     }
-    
+
     shared actual Document getDocumentForChange(TextChange change)
             => change.document;
-    
-    shared actual IdeaTextChange newDeleteEdit(Integer start, Integer stop)
+
+    shared actual TextEdit newDeleteEdit(Integer start, Integer stop)
             => DeleteEdit(start, stop);
-    
-    shared actual IdeaTextChange newReplaceEdit(Integer start, Integer stop, String text)
+
+    shared actual TextEdit newReplaceEdit(Integer start, Integer stop, String text)
             => ReplaceEdit(start, stop, text);
-    
+
     shared actual InsertEdit newInsertEdit(Integer position, String text)
             => InsertEdit(position, text);
-    
-    shared actual void addEditToChange(TextChange change, IdeaTextChange edit)
+
+    shared actual void addEditToChange(TextChange change, TextEdit edit)
             => change.addEdit(edit);
-    
+
     shared actual String getInsertedText(InsertEdit edit)
             => edit.str;
 }
