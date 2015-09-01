@@ -6,14 +6,16 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
 import com.redhat.ceylon.ide.common.refactoring {
-    ExtractValueRefactoring
+    ExtractValueRefactoring,
+    DefaultRegion
 }
 import java.util {
     List,
     ArrayList
 }
 import com.intellij.openapi.editor {
-    Document
+    Document,
+    IdeaTextChange = TextChange
 }
 import com.intellij.openapi.util {
     TextRange
@@ -33,8 +35,40 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     PsiFileVirtualFile
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
+    IdeaDocumentChanges,
+    InsertEdit,
+    TextChange,
+    IdeaImportProposals,
+    ideaImportProposals
+}
+import com.intellij.codeInsight.lookup {
+    LookupElement
+}
+import java.lang {
+    ObjectArray,
+    JString = String,
+    Void
+}
+import ceylon.interop.java {
+    javaString
+}
+import com.intellij.openapi.command {
+    WriteCommandAction
+}
+import com.intellij.openapi.project {
+    Project
+}
+import com.intellij.psi {
+    PsiFile
+}
+import com.intellij.openapi.application {
+    Result
+}
 
-shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node) satisfies ExtractValueRefactoring {
+shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node)
+        satisfies ExtractValueRefactoring<CeylonFile, LookupElement, Document, InsertEdit, IdeaTextChange, TextChange>
+                & IdeaDocumentChanges {
     
     shared actual List<PhasedUnit> getAllUnits() => ArrayList<PhasedUnit>();
     shared actual Boolean searchInFile(PhasedUnit pu) => false;
@@ -56,4 +90,23 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
     
     shared variable actual String? internalNewName = "";
     shared actual variable Boolean explicitType = false;
+    
+    shared actual variable DefaultRegion? typeRegion = null;
+    shared actual variable DefaultRegion? decRegion = null;
+    shared actual variable DefaultRegion? refRegion = null;
+    
+    shared actual DefaultRegion newRegion(Integer start, Integer length) => DefaultRegion(start, length);
+    
+    shared actual IdeaImportProposals importProposals => ideaImportProposals;
+
+    shared void extractInFile(Project myProject, PsiFile file) {
+        TextChange tfc = TextChange(document);
+        build(tfc);
+        
+        object extends WriteCommandAction<Void>(myProject, file) {
+            shared actual void run(Result<Void> result) {
+                tfc.apply();
+            }
+        }.execute();
+    }
 }

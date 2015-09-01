@@ -20,7 +20,6 @@ import com.intellij.refactoring.RefactoringActionHandler;
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler;
 import com.intellij.util.Function;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.refactoring.ExtractValueRefactoring$Result;
 import com.redhat.ceylon.ide.common.refactoring.FindContainingExpressionsVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
@@ -57,17 +56,18 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
 
         String name = nodes_.get_().nameProposals(node)[0];
         refacto.setNewName(name);
-        ExtractValueRefactoring$Result result = refacto.extractValue();
-
-        final CeylonPsi.DeclarationPsi declaration = CeylonTreeUtil.createDeclarationFromText(project, result.getDeclaration());
-
-        new WriteCommandAction(project, file) {
-
-            @Override
-            protected void run(@NotNull Result result) throws Throwable {
-                introduceValue(declaration, value, project, file, editor);
-            }
-        }.execute();
+        refacto.extractInFile(project, file);
+//        ExtractValueRefactoring$Result result = refacto.extractValue();
+//
+//        final CeylonPsi.DeclarationPsi declaration = CeylonTreeUtil.createDeclarationFromText(project, result.getDeclaration());
+//
+//        new WriteCommandAction(project, file) {
+//
+//            @Override
+//            protected void run(@NotNull Result result) throws Throwable {
+//                introduceValue(declaration, value, project, file, editor);
+//            }
+//        }.execute();
     }
 
     private void introduceValue(CeylonPsi.DeclarationPsi declaration, PsiElement value, Project project, PsiFile file, Editor editor) {
