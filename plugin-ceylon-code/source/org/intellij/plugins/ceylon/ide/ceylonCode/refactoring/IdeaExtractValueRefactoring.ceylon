@@ -1,5 +1,30 @@
+import com.intellij.codeInsight.lookup {
+    LookupElement
+}
+import com.intellij.openapi.application {
+    Result
+}
+import com.intellij.openapi.command {
+    WriteCommandAction
+}
+import com.intellij.openapi.editor {
+    Document,
+    IdeaTextChange=TextChange
+}
+import com.intellij.openapi.project {
+    Project
+}
+import com.intellij.openapi.util {
+    TextRange
+}
+import com.intellij.psi {
+    PsiFile
+}
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
+}
+import com.redhat.ceylon.compiler.typechecker.io {
+    VirtualFile
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree,
@@ -9,31 +34,20 @@ import com.redhat.ceylon.ide.common.refactoring {
     ExtractValueRefactoring,
     DefaultRegion
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Type
+}
+
+import java.lang {
+    Void
+}
 import java.util {
     List,
     ArrayList
 }
-import com.intellij.openapi.editor {
-    Document,
-    IdeaTextChange = TextChange
-}
-import com.intellij.openapi.util {
-    TextRange
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Type
-}
+
 import org.antlr.runtime {
     CommonToken
-}
-import com.redhat.ceylon.compiler.typechecker.io {
-    VirtualFile
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    PsiFileVirtualFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     IdeaDocumentChanges,
@@ -42,28 +56,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     IdeaImportProposals,
     ideaImportProposals
 }
-import com.intellij.codeInsight.lookup {
-    LookupElement
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
 }
-import java.lang {
-    ObjectArray,
-    JString = String,
-    Void
-}
-import ceylon.interop.java {
-    javaString
-}
-import com.intellij.openapi.command {
-    WriteCommandAction
-}
-import com.intellij.openapi.project {
-    Project
-}
-import com.intellij.psi {
-    PsiFile
-}
-import com.intellij.openapi.application {
-    Result
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
+    PsiFileVirtualFile
 }
 
 shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node)
@@ -99,14 +96,16 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
     
     shared actual IdeaImportProposals importProposals => ideaImportProposals;
 
-    shared void extractInFile(Project myProject, PsiFile file) {
+    shared DefaultRegion? extractInFile(Project myProject, PsiFile file) {
         TextChange tfc = TextChange(document);
         build(tfc);
         
-        object extends WriteCommandAction<Void>(myProject, file) {
-            shared actual void run(Result<Void> result) {
+        return object extends WriteCommandAction<DefaultRegion?>(myProject, file) {
+            shared actual void run(Result<DefaultRegion?> result) {
                 tfc.apply();
+                
+                result.setResult(decRegion);
             }
-        }.execute();
+        }.execute().resultObject;
     }
 }

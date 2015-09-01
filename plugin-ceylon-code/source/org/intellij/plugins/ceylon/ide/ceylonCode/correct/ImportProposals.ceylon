@@ -1,24 +1,22 @@
-import com.redhat.ceylon.ide.common.correct {
-    ImportProposals
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
-}
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
 import com.intellij.openapi.editor {
     Document,
-    IdeaTextChange = TextChange
+    IdeaTextChange=TextChange
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIndents
+import com.redhat.ceylon.ide.common.correct {
+    ImportProposals
 }
 import com.redhat.ceylon.ide.common.util {
     Indents
 }
-import com.intellij.psi {
-    PsiFile
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIndents
 }
 
 shared alias IdeaImportProposals => ImportProposals<CeylonFile, LookupElement, Document, InsertEdit, IdeaTextChange, TextChange>;

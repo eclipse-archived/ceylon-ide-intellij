@@ -33,7 +33,8 @@ shared class DeleteEdit(shared actual Integer start, shared actual Integer end) 
     shared actual CharArray chars => javaString("").toCharArray();
 }
 
-shared class ReplaceEdit(shared actual Integer start, shared actual Integer end, String str) satisfies IdeaTextChange {
+shared class ReplaceEdit(shared actual Integer start, Integer length, String str) satisfies IdeaTextChange {
+    shared actual Integer end => start + length;
     shared actual CharSequence text => javaString(str);
     shared actual CharArray chars => javaString(str).toCharArray();
 }
@@ -54,7 +55,6 @@ shared class TextChange(shared Document document) {
 
 shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertEdit, IdeaTextChange, TextChange> {
     shared actual void initMultiEditChange(TextChange importChange) {
-        // TODO importChange.edit = MultiTextEdit();
     }
     
     shared actual Document getDocumentForChange(TextChange change)

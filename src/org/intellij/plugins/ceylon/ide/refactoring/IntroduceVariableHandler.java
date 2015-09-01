@@ -20,15 +20,15 @@ import com.intellij.refactoring.RefactoringActionHandler;
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler;
 import com.intellij.util.Function;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.refactoring.FindContainingExpressionsVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
-import org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.IdeaExtractValueRefactoring;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
+import org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.IdeaExtractValueRefactoring;
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.FindMatchingPsiNodeVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,63 +56,41 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
 
         String name = nodes_.get_().nameProposals(node)[0];
         refacto.setNewName(name);
-        refacto.extractInFile(project, file);
-//        ExtractValueRefactoring$Result result = refacto.extractValue();
-//
-//        final CeylonPsi.DeclarationPsi declaration = CeylonTreeUtil.createDeclarationFromText(project, result.getDeclaration());
-//
-//        new WriteCommandAction(project, file) {
-//
-//            @Override
-//            protected void run(@NotNull Result result) throws Throwable {
-//                introduceValue(declaration, value, project, file, editor);
-//            }
-//        }.execute();
-    }
+        final DefaultRegion newIdentifier = refacto.extractInFile(project, file);
 
-    private void introduceValue(CeylonPsi.DeclarationPsi declaration, PsiElement value, Project project, PsiFile file, Editor editor) {
-        CeylonPsi.StatementPsi parentStatement = PsiTreeUtil.getParentOfType(value, CeylonPsi.StatementPsi.class);
+        if (newIdentifier != null) {
+            new WriteCommandAction(project, file) {
+                @Override
+                protected void run(@NotNull Result result) throws Throwable {
+                    // This sucks: the file was not reparsed, so getCeylonNode() returns null for elements we just inserted. This means
+                    // that CeylonReference (find usages) will not work, and when we rename the declaration, its usages won't be renamed.
+                    // Workaround: replace the whole document with the same content to force a reparse, then typecheck. Ugh.
+                    reparseFile(file, editor, project);
 
-        if (parentStatement == null) {
-            return;
-        }
+                    PsiElement identifierElement = file.findElementAt((int) newIdentifier.getStart());
 
-        boolean isAssigningWholeStatement = parentStatement.getChildren().length == 1
-                && parentStatement.getChildren()[0].getTextLength() == value.getTextLength();
+                    if (identifierElement == null) {
+                        return;
+                    }
+                    CeylonPsi.DeclarationPsi inserted = (CeylonPsi.DeclarationPsi) identifierElement.getParent().getParent();
+                    PsiElement identifier = PsiTreeUtil.getChildOfType(inserted, CeylonPsi.IdentifierPsi.class);
 
-        CeylonPsi.DeclarationPsi inserted;
-        PsiElement identifier;
+                    if (identifier == null) {
+                        return;
+                    }
+                    editor.getCaretModel().moveToOffset(identifier.getTextOffset());
 
-        if (isAssigningWholeStatement) {
-            inserted = (CeylonPsi.DeclarationPsi) parentStatement.replace(declaration);
-        } else {
-            inserted = (CeylonPsi.DeclarationPsi) parentStatement.getParent().addBefore(declaration, parentStatement);
-        }
+                    Map<String, Object> myDataContext = new HashMap<>();
+                    myDataContext.put(CommonDataKeys.EDITOR.getName(), editor);
+                    myDataContext.put(CommonDataKeys.PSI_FILE.getName(), file);
+                    myDataContext.put(LangDataKeys.PSI_ELEMENT_ARRAY.getName(), new PsiElement[]{inserted});
 
-        if (!isAssigningWholeStatement) {
-            identifier = PsiTreeUtil.getChildOfType(inserted, CeylonPsi.IdentifierPsi.class);
-            value.replace(identifier);
-        }
-
-        PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
-
-        // This sucks: the file was not reparsed, so getCeylonNode() returns null for elements we just inserted. This means
-        // that CeylonReference (find usages) will not work, and when we rename the declaration, its usages won't be renamed.
-        // Workaround: replace the whole document with the same content to force a reparse, then typecheck. Ugh.
-        reparseFile(file, editor, project);
-        inserted = (CeylonPsi.DeclarationPsi) file.findElementAt(inserted.getTextOffset()).getParent();
-        identifier = PsiTreeUtil.getChildOfType(inserted, CeylonPsi.IdentifierPsi.class);
-
-        editor.getCaretModel().moveToOffset(identifier.getTextOffset());
-
-        Map<String, Object> myDataContext = new HashMap<>();
-        myDataContext.put(CommonDataKeys.EDITOR.getName(), editor);
-        myDataContext.put(CommonDataKeys.PSI_FILE.getName(), file);
-        myDataContext.put(LangDataKeys.PSI_ELEMENT_ARRAY.getName(), new PsiElement[]{inserted});
-
-        RefactoringSupportProvider supportProvider = LanguageRefactoringSupport.INSTANCE.forLanguage(CeylonLanguage.INSTANCE);
-        if (supportProvider.isInplaceRenameAvailable(inserted, identifier)) {
-            new VariableInplaceRenameHandler().invoke(project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
+                    RefactoringSupportProvider supportProvider = LanguageRefactoringSupport.INSTANCE.forLanguage(CeylonLanguage.INSTANCE);
+                    if (supportProvider.isInplaceRenameAvailable(inserted, identifier)) {
+                        new VariableInplaceRenameHandler().invoke(project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
+                    }
+                }
+            }.execute();
         }
     }
 

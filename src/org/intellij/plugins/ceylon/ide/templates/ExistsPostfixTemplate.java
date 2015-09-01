@@ -113,7 +113,7 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
         });
         Tree.CompilationUnit compilationUnit = phasedUnit.getCompilationUnit();
 
-        FindNodeVisitor visitor = new FindNodeVisitor(expr.getTextOffset() + 1, expr.getTextOffset() + 2);
+        FindNodeVisitor visitor = new FindNodeVisitor(null, expr.getTextOffset() + 1, expr.getTextOffset() + 2);
         compilationUnit.visit(visitor);
 
         Node node = visitor.getNode();
