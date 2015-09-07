@@ -21,16 +21,20 @@ import com.intellij.util {
     ProcessingContext,
     PlatformIcons
 }
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree,
     Node
 }
 import com.redhat.ceylon.ide.common.completion {
-    IdeCompletionManager,
-    FindScopeVisitor
+    IdeCompletionManager
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    LocalAnalysisResult
 }
 import com.redhat.ceylon.ide.common.util {
-    FindNodeVisitor,
     OccurrenceLocation
 }
 import com.redhat.ceylon.model.typechecker.model {
@@ -53,89 +57,47 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.util {
-    JList=List,
-    Collections
+    JList=List
+}
+import java.util.regex {
+    Pattern
 }
 
 import javax.swing {
     Icon
 }
+
 import org.antlr.runtime {
     CommonToken
 }
-import com.intellij.psi {
-    PsiWhiteSpace
-}
-import com.intellij.psi.impl.source.tree {
-    ElementType
-}
 
-shared object ideaCompletionManager extends IdeCompletionManager<Tree.CompilationUnit, LookupElement, Document>() {
+
+shared object ideaCompletionManager extends IdeCompletionManager<PhasedUnit, LookupElement, Document>() {
     
-    shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result, Tree.CompilationUnit cu) {
+    shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result, PhasedUnit pu) {
         value isSecondLevel = parameters.invocationCount >= 2;
         value element = parameters.originalPosition;
-        variable Integer startOffset = element.textOffset;
-        variable Integer stopOffset = element.textOffset + element.textLength;
-        variable Boolean isDot = false;
-
-        if (element.textOffset > 1) {
-            value doc = parameters.editor.document;
-            value range = TextRange(element.textOffset - 1, element.textOffset);
-            
-            if (doc.getText(range).equals(".")) {
-                isDot = true;
-                startOffset = element.textOffset - 2;
-                stopOffset = element.textOffset;
-            }
+        value doc = parameters.editor.document;
+        value params = object satisfies LocalAnalysisResult<Document> {
+            shared actual Tree.CompilationUnit rootNode => pu.compilationUnit;
+            shared actual PhasedUnit phasedUnit => pu;
+            shared actual Document document => doc;
+            shared actual JList<CommonToken>? tokens => pu.tokens;
+        };
+        value line = doc.getLineNumber(element.textOffset);
+        print(line);
+        value completions = getContentProposals(params, element.textOffset + 1, line, isSecondLevel, pu);
+        
+        for (completion in completions) {
+            result.addElement(completion);
         }
-
-        if (element.node.elementType == ElementType.\iWHITE_SPACE) {
-            stopOffset = startOffset;
-        }
-
-        value visitor = FindNodeVisitor(null, startOffset, stopOffset);
-        cu.visit(visitor);
-
-        if (exists node = visitor.node) {
-            value scopeVisitor = FindScopeVisitor(node);
-            scopeVisitor.visit(cu);
-            value scope = scopeVisitor.scope else cu.scope;
-            value proposals = getProposals(node, scope, "", isDot, cu);
-            value doc = parameters.editor.document;
-            value token = CommonToken(0); // TODO
-            value prefix = if (element.node.elementType == ElementType.\iWHITE_SPACE)
-                           then ""
-                           else doc.getText(TextRange.from(startOffset, stopOffset - startOffset + 1));
-            value completions = constructCompletions(startOffset, prefix, proposals.values(), Collections.emptySet<DeclarationWithProximity>(),
-                cu, scope, node, token, isDot, doc, isSecondLevel, false, null, 0, 0);
-            
-            for (completion in completions.iterable) {
-                result.addElement(completion);
-            }
-            
-            //for (decl in Iter(getProposals(node, scope, "", isDot, cu).values())) {
-            //    if (isSecondLevel) {
-            //        addSecondLevelCompletions(decl, cu.unit, scope, result);
-            //    } else {
-            //        if (!isQualifiedType(node) || isConstructor(decl.declaration) || decl.declaration.staticallyImportable) {
-            //            result.addElement(MyLookupElementBuilder(decl.declaration, cu.unit, true).lookupElement);
-            //        }
-            //        result.addElement(MyLookupElementBuilder(decl.declaration, cu.unit, false).lookupElement);
-            //    }
-            //}
-            
-            if (!isDot) {
-                for (decl in Iter(getFunctionProposals(node, scope, "", isDot).values())) {
-                    result.addElement(MyLookupElementBuilder(decl.declaration, cu.unit, true).lookupElement);
-                }
-            }
-            
-            if (!isSecondLevel) {
-                result.addLookupAdvertisement("Call again to toggle second-level completions");
-            }
+        
+        if (!isSecondLevel) {
+            result.addLookupAdvertisement("Call again to toggle second-level completions");
         }
     }
+    
+    shared actual List<Pattern> proposalFilters => empty; 
     
     void addSecondLevelCompletions(DeclarationWithProximity dwp, Unit unit, Scope scope, CompletionResultSet result) {
         value decl = dwp.declaration;
@@ -160,26 +122,26 @@ shared object ideaCompletionManager extends IdeCompletionManager<Tree.Compilatio
     }
     
     shared actual LookupElement newParametersCompletionProposal(Integer offset, 
-            Type type, JList<Type> argTypes, Node node, Tree.CompilationUnit cu) {
+            Type type, JList<Type> argTypes, Node node, PhasedUnit pu) {
         return MyLookupElementBuilder(type.declaration, node.unit, true).lookupElement;
     }
     
     shared actual Boolean showParameterTypes => true;
-    shared actual Tree.CompilationUnit getCompilationUnit(Tree.CompilationUnit u) => u;
+    shared actual Tree.CompilationUnit getCompilationUnit(PhasedUnit pu) => pu.compilationUnit;
     shared actual String inexactMatches => "positional";
 
     shared actual String getDocumentSubstring(Document doc, Integer start, Integer length)
         => doc.getText(TextRange.from(start, length));
     
     shared actual LookupElement newPositionalInvocationCompletion(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, Tree.CompilationUnit cmp, Boolean isMember,
+        Declaration dec, Reference? pr, Scope scope, PhasedUnit pu, Boolean isMember,
         OccurrenceLocation? ol, String? typeArgs, Boolean includeDefaulted) {
 
         return MyLookupElementBuilder(dec, dec.unit, true).lookupElement;
     }
 
     shared actual LookupElement newNamedInvocationCompletion(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, Tree.CompilationUnit cmp, Boolean isMember,
+        Declaration dec, Reference? pr, Scope scope, PhasedUnit pu, Boolean isMember,
         OccurrenceLocation? ol, String? typeArgs, Boolean includeDefaulted) {
         
         print("newNamedInvocationCompletion");
@@ -187,14 +149,14 @@ shared object ideaCompletionManager extends IdeCompletionManager<Tree.Compilatio
     }
     
     shared actual LookupElement newReferenceCompletion(Integer offset, String prefix,
-        Declaration dec, Unit u, Reference? pr, Scope scope, Tree.CompilationUnit cmp,
+        Declaration dec, Unit u, Reference? pr, Scope scope, PhasedUnit pu,
         Boolean isMember, Boolean includeTypeArgs) {
         
         return MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
     }
 
     shared actual LookupElement newRefinementCompletionProposal(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, Tree.CompilationUnit cmp, Boolean isInterface,
+        Declaration dec, Reference? pr, Scope scope, PhasedUnit pu, Boolean isInterface,
         ClassOrInterface ci, Node node, Unit unit, Document doc, Boolean preamble) {
         
         print("newRefinementCompletionProposal");
@@ -217,32 +179,30 @@ shared object ideaCompletionManager extends IdeCompletionManager<Tree.Compilatio
         return nothing; // TODO
     }
 
-    shared actual JList<CommonToken> getTokens(Tree.CompilationUnit cu) {
-        return nothing;  // TODO
+    shared actual JList<CommonToken> getTokens(PhasedUnit pu) {
+        return pu.tokens;
     }
     
     shared actual LookupElement newNamedArgumentProposal(Integer offset, String prefix, 
-        Tree.CompilationUnit cmp, Tree.CompilationUnit unit, Declaration dec, Scope scope) {
+        PhasedUnit pu, Tree.CompilationUnit unit, Declaration dec, Scope scope) {
         print("newNamedArgumentProposal");
         return nothing; // TODO
     }
 
     shared actual LookupElement newInlineFunctionProposal(Integer offset, FunctionOrValue dec,
-        Scope scope, Node node, String prefix, Tree.CompilationUnit cu, Document doc) {
+        Scope scope, Node node, String prefix, PhasedUnit pu, Document doc) {
         print("newInlineFunctionProposal");
         return nothing;
     }
     
     shared actual LookupElement newProgramElementReferenceCompletion(Integer offset, String prefix,
-        Declaration dec, Unit? u, Reference? pr, Scope scope, Tree.CompilationUnit cmp, Boolean isMember) {
+        Declaration dec, Unit? u, Reference? pr, Scope scope, PhasedUnit pu, Boolean isMember) {
         print("newProgramElementReferenceCompletion");
         return nothing;
     }
 
-    shared actual CommonToken? getNextToken(Tree.CompilationUnit cmp, CommonToken token) => null;
-
     shared actual LookupElement newBasicCompletionProposal(Integer offset, String prefix, 
-        String text, String escapedText, Declaration decl, Tree.CompilationUnit cmp) {
+        String text, String escapedText, Declaration decl, PhasedUnit pu) {
         print("newBasicCompletionProposal");
         return nothing;
     }

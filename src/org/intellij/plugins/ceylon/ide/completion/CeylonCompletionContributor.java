@@ -25,7 +25,7 @@ public class CeylonCompletionContributor extends CompletionContributor {
                 CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
                 PhasedUnit phasedUnit = TypeCheckerInvoker.invokeTypeChecker(ceylonFile);
                 if (phasedUnit != null) {
-                    ideaCompletionManager_.get_().addCompletions(parameters, context, result, phasedUnit.getCompilationUnit());
+                    ideaCompletionManager_.get_().addCompletions(parameters, context, result, phasedUnit);
                 }
             }
         }
