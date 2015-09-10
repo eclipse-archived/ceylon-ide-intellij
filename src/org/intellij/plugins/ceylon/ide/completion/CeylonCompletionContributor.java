@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
+import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion.ideaCompletionManager_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,7 @@ public class CeylonCompletionContributor extends CompletionContributor {
                 CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
                 PhasedUnit phasedUnit = TypeCheckerInvoker.invokeTypeChecker(ceylonFile);
                 if (phasedUnit != null) {
-                    ideaCompletionManager_.get_().addCompletions(parameters, context, result, phasedUnit);
+                    ideaCompletionManager_.get_().addCompletions(parameters, context, result, phasedUnit, TypeCheckerProvider.getFor(element));
                 }
             }
         }

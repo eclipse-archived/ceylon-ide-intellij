@@ -11,7 +11,8 @@ import com.intellij.openapi.editor.colors {
         createTextAttributesKey
     },
     EditorColors,
-    CodeInsightColors
+    CodeInsightColors,
+    EditorColorsManager
 }
 import com.intellij.openapi.options.colors {
     ColorSettingsPage,
@@ -33,6 +34,9 @@ import java.util {
 
 import javax.swing {
     Icon
+}
+import com.intellij.openapi.editor.markup {
+    TextAttributes
 }
 
 
@@ -110,4 +114,8 @@ shared object ceylonHighlightingColors {
     shared TextAttributesKey brace = createTextAttributesKey("CEYLON_BRACE", DefaultLanguageHighlighterColors.\iBRACES);
     shared TextAttributesKey packages = createTextAttributesKey("CEYLON_PACKAGE", DefaultLanguageHighlighterColors.\iIDENTIFIER);
     shared TextAttributesKey member = createTextAttributesKey("CEYLON_MEMBER", CodeInsightColors.\iINSTANCE_FIELD_ATTRIBUTES);
+}
+
+shared TextAttributes textAttributes(TextAttributesKey key) {
+    return EditorColorsManager.instance.globalScheme.getAttributes(key);
 }

@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.ceylonCode.util;
+package org.intellij.plugins.ceylon.ide.ceylonCode.util;

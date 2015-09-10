@@ -5,9 +5,11 @@ import com.github.rjeschke.txtmark {
 import com.intellij.icons {
     AllIcons
 }
+import com.intellij.openapi.editor {
+    Document
+}
 import com.intellij.openapi.editor.colors {
-    TextAttributesKey,
-    EditorColorsManager
+    TextAttributesKey
 }
 import com.intellij.openapi.project {
     Project
@@ -21,13 +23,23 @@ import com.intellij.util {
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
 }
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Node
+    Node,
+    Tree
 }
 import com.redhat.ceylon.ide.common.doc {
     DocGenerator,
     Colors,
     Icons
+}
+import com.redhat.ceylon.ide.common.model {
+    CeylonProject
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    LocalAnalysisResult
 }
 import com.redhat.ceylon.ide.common.util {
     FindReferencedNodeVisitor
@@ -40,7 +52,6 @@ import com.redhat.ceylon.model.typechecker.model {
     Class,
     Interface,
     Constructor,
-    Parameter,
     Unit,
     Scope,
     Value,
@@ -54,25 +65,39 @@ import com.redhat.ceylon.model.typechecker.util {
 import java.awt {
     Font
 }
+import java.util {
+    JList=List
+}
 
 import javax.swing {
     Icon
 }
 
+import org.antlr.runtime {
+    CommonToken
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     ceylonHighlightingColors,
-    highlight
-}
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
+    highlight,
+    textAttributes
 }
 
 String psiProtocol = "psi_element://";
 
 String(String, Project) outerHighlight = highlight;
 
-shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
+shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Nothing>() {
 
+    shared class DocParams(PhasedUnit pu, Project p) satisfies LocalAnalysisResult<Document,Nothing> {
+        shared actual Tree.CompilationUnit rootNode => pu.compilationUnit;
+        shared actual PhasedUnit phasedUnit => pu;
+        shared actual Document document => nothing;
+        shared actual JList<CommonToken>? tokens => pu.tokens;
+        shared actual TypeChecker typeChecker => nothing;
+        shared actual CeylonProject<Nothing>? ceylonProject => nothing;
+        shared Project ideaProject => p;
+    }
+    
     String hexColor(Integer red, Integer green, Integer blue) {
         return "#" + formatInteger(red, 16).padLeading(2, '0') + formatInteger(green, 16).padLeading(2, '0') + formatInteger(blue, 16).padLeading(2, '0');
     }
@@ -88,7 +113,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
     }
 
     shared actual String color(Object? what, Colors how) {
-        value attributes = EditorColorsManager.instance.globalScheme.getAttributes(getAttributes(how));
+        value attributes = textAttributes(getAttributes(how));
         value color = "color:``hexColor(attributes.foregroundColor.red, attributes.foregroundColor.green, attributes.foregroundColor.blue)``";
         value bold = if (attributes.fontType.and(Font.\iBOLD) != 0) then "font-weight: bold" else "";
         value italic = if (attributes.fontType.and(Font.\iITALIC) != 0) then "font-size: italic" else "";
@@ -144,13 +169,14 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
         builder.append(text).append("</div>");
     }
     
-    shared actual String getDefaultValueDescription(Parameter p, Project cmp) => "";
-    
-    shared actual String getInitialValueDescription(Declaration d, Project cmp) => "";
+    shared actual String getInitialValueDescription(Declaration d, LocalAnalysisResult<Document,Nothing> cmp) => "";
 
     shared actual void appendJavadoc(Declaration model, StringBuilder buffer) {}
         
-    shared actual String highlight(String text, Project cmp) => outerHighlight(text, cmp);
+    shared actual String highlight(String text, LocalAnalysisResult<Document,Nothing> cmp) {
+        assert (is DocParams cmp);
+        return outerHighlight(text, cmp.ideaProject);
+    }
 
     shared String buildUrl(Referenceable model) {
         if (is Package model) {
@@ -174,7 +200,9 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Project>() {
         }
     }
     
-    shared actual String markdown(String text, Project project, Scope? linkScope, Unit? unit) {
+    shared actual String markdown(String text, LocalAnalysisResult<Document,Nothing> cmp, Scope? linkScope, Unit? unit) {
+        assert (is DocParams cmp);
+        value project = cmp.ideaProject;
         value builder = Configuration.builder().forceExtentedProfile();
         builder.setCodeBlockEmitter(CeylonBlockEmitter(project));
         

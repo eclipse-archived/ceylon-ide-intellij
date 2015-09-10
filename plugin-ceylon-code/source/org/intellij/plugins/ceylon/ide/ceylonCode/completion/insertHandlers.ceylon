@@ -1,6 +1,13 @@
+import ceylon.interop.java {
+    javaString
+}
+
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
+}
+import com.intellij.codeInsight.completion.util {
+    ParenthesesInsertHandler
 }
 import com.intellij.codeInsight.lookup {
     LookupElement
@@ -12,9 +19,6 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     Unit,
     Function
-}
-import com.intellij.codeInsight.completion.util {
-    ParenthesesInsertHandler
 }
 
 object declarationInsertHandler satisfies InsertHandler<LookupElement> {
@@ -48,5 +52,22 @@ object functionInsertHandler extends ParenthesesInsertHandler<LookupElement>() {
 
     shared actual Boolean placeCaretInsideParentheses(InsertionContext ctx, LookupElement elem) {
         return if (is [Function, Unit] seq = elem.\iobject, seq.first.firstParameterList.parameters.size() > 0) then true else false;
+    }
+}
+
+class ReplaceTextHandler(Integer startOffset, Integer stopOffset, String newText)
+        satisfies InsertHandler<LookupElement> {
+    
+    shared actual void handleInsert(InsertionContext ctx, LookupElement elem) {
+        ctx.document.replaceString(startOffset, ctx.editor.caretModel.offset, javaString(newText));
+    }
+
+}
+
+object putCaretInBracesInsertHandler satisfies InsertHandler<LookupElement> {
+    shared actual void handleInsert(InsertionContext ctx, LookupElement elem) {
+        if (elem.lookupString.endsWith("{}")) {
+            ctx.editor.caretModel.moveCaretRelatively(-1, 0, false, false, true);
+        }
     }
 }

@@ -14,12 +14,22 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 import com.intellij.openapi.util {
     TextRange
 }
 import com.intellij.util {
     ProcessingContext,
     PlatformIcons
+}
+import com.redhat.ceylon.cmr.api {
+    ModuleVersionDetails,
+    ModuleSearchResult
+}
+import com.redhat.ceylon.compiler.typechecker {
+    TypeChecker
 }
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
@@ -29,13 +39,22 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
 import com.redhat.ceylon.ide.common.completion {
-    IdeCompletionManager
+    IdeCompletionManager,
+    appendTypeParameters,
+    getRefinementTextFor,
+    getNamedInvocationTextFor,
+    getTextFor,
+    getInlineFunctionTextFor
+}
+import com.redhat.ceylon.ide.common.model {
+    CeylonProject
 }
 import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
 import com.redhat.ceylon.ide.common.util {
-    OccurrenceLocation
+    OccurrenceLocation,
+    ProgressMonitor
 }
 import com.redhat.ceylon.model.typechecker.model {
     Function,
@@ -45,17 +64,17 @@ import com.redhat.ceylon.model.typechecker.model {
     Interface,
     TypeAlias,
     Unit,
-    DeclarationWithProximity,
-    ModelUtil {
-        isConstructor
-    },
     Scope,
     FunctionOrValue,
     Type,
     Reference,
-    ClassOrInterface
+    ClassOrInterface,
+    Package
 }
 
+import java.awt {
+    Font
+}
 import java.util {
     JList=List
 }
@@ -70,23 +89,44 @@ import javax.swing {
 import org.antlr.runtime {
     CommonToken
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+    ceylonHighlightingColors,
+    textAttributes
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
+}
 
+shared class CompletionData(PhasedUnit pu, Document doc, TypeChecker tc) satisfies LocalAnalysisResult<Document,Module> {
+    shared actual Tree.CompilationUnit rootNode => pu.compilationUnit;
+    shared actual PhasedUnit phasedUnit => pu;
+    shared actual Document document => doc;
+    shared actual JList<CommonToken>? tokens => pu.tokens;
+    shared actual TypeChecker typeChecker => tc;
+    shared actual CeylonProject<Module>? ceylonProject => null; // TODO
+}
 
-shared object ideaCompletionManager extends IdeCompletionManager<PhasedUnit, LookupElement, Document>() {
+shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,Module,LookupElement,Document>() {
     
-    shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result, PhasedUnit pu) {
+    shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result,
+            PhasedUnit pu, TypeChecker tc) {
         value isSecondLevel = parameters.invocationCount >= 2;
         value element = parameters.originalPosition;
         value doc = parameters.editor.document;
-        value params = object satisfies LocalAnalysisResult<Document> {
-            shared actual Tree.CompilationUnit rootNode => pu.compilationUnit;
-            shared actual PhasedUnit phasedUnit => pu;
-            shared actual Document document => doc;
-            shared actual JList<CommonToken>? tokens => pu.tokens;
-        };
+        value params = CompletionData(pu, doc, tc);
         value line = doc.getLineNumber(element.textOffset);
-        print(line);
-        value completions = getContentProposals(params, element.textOffset + 1, line, isSecondLevel, pu);
+        
+        value monitor = object satisfies ProgressMonitor {
+            shared actual variable Integer workRemaining = 100;
+            shared actual void worked(Integer amount) {
+                workRemaining -= amount;
+            }
+            shared actual void subTask(String? desc) {}
+        };
+        value returnedParamInfo = true; // The parameters tooltip has nothing to do with code completion, so we bypass it
+        value completions = getContentProposals(params, parameters.editor.caretModel.offset, line, isSecondLevel, monitor, returnedParamInfo);
+        
+        //MySimpleColoredComponent.patch(CompletionService.completionService.currentCompletion);
         
         for (completion in completions) {
             result.addElement(completion);
@@ -97,127 +137,217 @@ shared object ideaCompletionManager extends IdeCompletionManager<PhasedUnit, Loo
         }
     }
     
-    shared actual List<Pattern> proposalFilters => empty; 
-    
-    void addSecondLevelCompletions(DeclarationWithProximity dwp, Unit unit, Scope scope, CompletionResultSet result) {
-        value decl = dwp.declaration;
+    shared actual List<Pattern> proposalFilters => empty;
+    shared actual Boolean showParameterTypes => true;
+    shared actual String inexactMatches => "positional";
+    shared actual Boolean supportsLinkedModeInArguments => false;
+
+    shared actual LookupElement newParametersCompletionProposal(Integer offset,
+        Type type, JList<Type> argTypes, Node node, CompletionData data) {
         
-        if (is Value decl) {
-            value matchingMembers = decl.type.declaration.getMatchingMemberDeclarations(unit, scope, "", 0);
-            
-            for (dwp2 in Iter(matchingMembers.values())) {
-                if (is FunctionOrValue|Class member = dwp2.declaration, !isConstructor(member)) {
-                    result.addElement(MyLookupElementBuilder(member, unit, true, dwp.declaration).lookupElement);
-                }
-            }
-        } else if (is Class decl) {
-            value matchingMembers = decl.type.declaration.getMatchingMemberDeclarations(unit, scope, "", 0);
-            
-            for (dwp2 in Iter(matchingMembers.values())) {
-                if (isConstructor(dwp2.declaration)) {
-                    result.addElement(MyLookupElementBuilder(dwp2.declaration, unit, true, dwp.declaration).lookupElement);
-                }
-            }
-        }
-    }
-    
-    shared actual LookupElement newParametersCompletionProposal(Integer offset, 
-            Type type, JList<Type> argTypes, Node node, PhasedUnit pu) {
+        print("newParametersCompletionProposal");
         return MyLookupElementBuilder(type.declaration, node.unit, true).lookupElement;
     }
     
-    shared actual Boolean showParameterTypes => true;
-    shared actual Tree.CompilationUnit getCompilationUnit(PhasedUnit pu) => pu.compilationUnit;
-    shared actual String inexactMatches => "positional";
-
     shared actual String getDocumentSubstring(Document doc, Integer start, Integer length)
-        => doc.getText(TextRange.from(start, length));
+            => doc.getText(TextRange.from(start, length));
     
     shared actual LookupElement newPositionalInvocationCompletion(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, PhasedUnit pu, Boolean isMember,
-        OccurrenceLocation? ol, String? typeArgs, Boolean includeDefaulted) {
-
-        return MyLookupElementBuilder(dec, dec.unit, true).lookupElement;
+        Declaration dec, Reference? pr, Scope scope, CompletionData data, Boolean isMember,
+        OccurrenceLocation? ol, String? typeArgs, Boolean includeDefaulted, Declaration? qualifyingDec) {
+        
+        //print("newPositionalInvocationCompletion ``dec`` - ``typeArgs else "null"``");
+        return MyLookupElementBuilder(dec, dec.unit, true, typeArgs, qualifyingDec).lookupElement;
     }
-
+    
     shared actual LookupElement newNamedInvocationCompletion(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, PhasedUnit pu, Boolean isMember,
+        Declaration dec, Reference? pr, Scope scope, CompletionData data, Boolean isMember,
         OccurrenceLocation? ol, String? typeArgs, Boolean includeDefaulted) {
         
-        print("newNamedInvocationCompletion");
-        return nothing; // TODO
+        //print("newNamedInvocationCompletion");
+        assert(exists pr);
+        String text = getNamedInvocationTextFor(dec, pr, data.rootNode.unit, includeDefaulted, typeArgs);
+        
+        // TODO linked mode in parameters (see InvocationCompletionProposal.activeLinkedMode)
+        return LookupElementBuilder.create(text)
+            .withIcon(PlatformIcons.\iMETHOD_ICON);
     }
     
     shared actual LookupElement newReferenceCompletion(Integer offset, String prefix,
-        Declaration dec, Unit u, Reference? pr, Scope scope, PhasedUnit pu,
+        Declaration dec, Unit u, Reference? pr, Scope scope, CompletionData data,
         Boolean isMember, Boolean includeTypeArgs) {
         
-        return MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
+        //print("newReferenceCompletion ``includeTypeArgs``");
+        String args;
+        if (includeTypeArgs) {
+            value sb = StringBuilder();
+            appendTypeParameters(dec, pr, u, sb, false);
+            args = sb.string.replace("&lt;", "<").replace("&gt;", ">");
+        } else {
+            args = "";
+        }
+        return MyLookupElementBuilder(dec, dec.unit, false, args).lookupElement;
     }
-
+    
     shared actual LookupElement newRefinementCompletionProposal(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, PhasedUnit pu, Boolean isInterface,
+        Declaration dec, Reference? pr, Scope scope, CompletionData data, Boolean isInterface,
         ClassOrInterface ci, Node node, Unit unit, Document doc, Boolean preamble) {
         
-        print("newRefinementCompletionProposal");
-        return nothing; // TODO
+        value ref = getRefinedProducedReference(scope, dec);
+        value text = getRefinementTextFor(dec, ref, unit, isInterface, ci, "", false, preamble);
+        
+        //print("newRefinementCompletionProposal");
+        return LookupElementBuilder.create("", text)
+            .withPresentableText("")
+            .withIcon(ideaIcons.refinement)
+            .withInsertHandler(putCaretInBracesInsertHandler)
+            .withRenderer(ColoredTailElementRenderer.\iINSTANCE);
     }
     
     shared actual LookupElement newMemberNameCompletionProposal(Integer offset, String prefix, String name, String unquotedName) {
-        return LookupElementBuilder.create(unquotedName, name);
+        //print("newMemberNameCompletionProposal");
+        
+        return LookupElementBuilder.create(unquotedName, name)
+            .withIcon(ideaIcons.local);
     }
     
     shared actual LookupElement newKeywordCompletionProposal(Integer offset, String prefix, String keyword) {
-        print("keyword ``keyword``");
-        return LookupElementBuilder.create(keyword);
-    }
-
-    shared actual LookupElement newAnonFunctionProposal(Integer offset, Type? requiredType,
-            Unit unit, String text, String header, Boolean isVoid) {
+        value attr = textAttributes(ceylonHighlightingColors.keyword);
         
-        print("newAnonFunctionProposal");
-        return nothing; // TODO
-    }
-
-    shared actual JList<CommonToken> getTokens(PhasedUnit pu) {
-        return pu.tokens;
+        return LookupElementBuilder.create(keyword)
+            .withItemTextForeground(attr.foregroundColor)
+            .withBoldness(attr.fontType.and(Font.\iBOLD) != 0);
     }
     
-    shared actual LookupElement newNamedArgumentProposal(Integer offset, String prefix, 
-        PhasedUnit pu, Tree.CompilationUnit unit, Declaration dec, Scope scope) {
-        print("newNamedArgumentProposal");
-        return nothing; // TODO
+    shared actual LookupElement newAnonFunctionProposal(Integer offset, Type? requiredType,
+        Unit unit, String text, String header, Boolean isVoid) {
+        
+        //print("newAnonFunctionProposal");
+        
+        // TODO should appear at the top of the list
+        // TODO select "nothing" or place caret inside braces
+        return LookupElementBuilder.create(text)
+            .withIcon(ideaIcons.anonymousFunction);
     }
-
+    
+    shared actual LookupElement newNamedArgumentProposal(Integer offset, String prefix,
+        CompletionData data, Tree.CompilationUnit cu, Declaration dec, Scope scope) {
+        
+        //print("newNamedArgumentProposal");
+        // TODO select "nothing"
+        // TODO should appear at the top of the completion list
+        value text = getTextFor(dec, cu.unit) + " = nothing";
+        return LookupElementBuilder.create(text)
+            .withIcon(ideaIcons.param);
+    }
+    
     shared actual LookupElement newInlineFunctionProposal(Integer offset, FunctionOrValue dec,
-        Scope scope, Node node, String prefix, PhasedUnit pu, Document doc) {
-        print("newInlineFunctionProposal");
-        return nothing;
+        Scope scope, Node node, String prefix, CompletionData data, Document doc) {
+
+        //print("newInlineFunctionProposal");
+        value p = dec.initializerParameter;
+        value unit = node.unit;
+        value text = getInlineFunctionTextFor(p, null, unit, "");
+        
+        // TODO select "nothing"
+        // TODO should appear at the top of the completion list
+        return LookupElementBuilder.create(text)
+            .withIcon(ideaIcons.param);
     }
     
     shared actual LookupElement newProgramElementReferenceCompletion(Integer offset, String prefix,
-        Declaration dec, Unit? u, Reference? pr, Scope scope, PhasedUnit pu, Boolean isMember) {
-        print("newProgramElementReferenceCompletion");
-        return nothing;
+        Declaration dec, Unit? u, Reference? pr, Scope scope, CompletionData data, Boolean isMember) {
+        
+        //print("newProgramElementReferenceCompletion");
+        return MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
+    }
+    
+    shared actual LookupElement newBasicCompletionProposal(Integer offset, String prefix,
+        String text, String escapedText, Declaration decl, CompletionData data) {
+
+        //print("newBasicCompletionProposal");
+        return LookupElementBuilder.create(escapedText)
+            .withPresentableText(text);
+    }
+    
+    shared actual LookupElement newPackageDescriptorProposal(Integer offset, String prefix, String packageName) {
+        return LookupElementBuilder.create(packageName);
+    }
+    
+    shared actual LookupElement newCurrentPackageProposal(Integer offset, String prefix, String packageName, CompletionData data) {
+        return LookupElementBuilder.create(packageName); // TODO icon (module or package)
     }
 
-    shared actual LookupElement newBasicCompletionProposal(Integer offset, String prefix, 
-        String text, String escapedText, Declaration decl, PhasedUnit pu) {
-        print("newBasicCompletionProposal");
-        return nothing;
+    shared actual LookupElement newImportedModulePackageProposal(Integer offset, String prefix,
+        String memberPackageSubname, Boolean withBody,
+        String fullPackageName, CompletionData data,
+        Package candidate) {
+        
+        value text = if (withBody) then "``memberPackageSubname`` { ... }" else memberPackageSubname;
+        
+        return LookupElementBuilder.create(text).withIcon(ideaIcons.packages);
+    }
+    
+    shared actual LookupElement newQueriedModulePackageProposal(Integer offset, String prefix,
+        String memberPackageSubname, Boolean withBody,
+        String fullPackageName, CompletionData data,
+        ModuleVersionDetails version, Unit unit, ModuleSearchResult.ModuleDetails md) {
+     
+        print("newQueriedModulePackageProposal");
+        return LookupElementBuilder.create(memberPackageSubname);
+    }       
+    
+    shared actual LookupElement newModuleProposal(Integer offset, String prefix, Integer len, 
+        String versioned, ModuleSearchResult.ModuleDetails mod,
+        Boolean withBody, ModuleVersionDetails version, String name, Node node) {
+        
+        //print("newModuleProposal");
+        // TODO linked mode in version
+        return LookupElementBuilder.create(versioned)
+                .withIcon(ideaIcons.modules);
+    }
+    
+    shared actual LookupElement newModuleDescriptorProposal(Integer offset, String prefix, String name) {
+        return LookupElementBuilder.create(name)
+                .withIcon(ideaIcons.modules);
+    }
+
+    shared actual LookupElement newJDKModuleProposal(Integer offset, String prefix, Integer len, 
+        String versioned, String name) {
+
+        //print("newJDKModuleProposal");
+        return LookupElementBuilder.create(versioned)
+                .withIcon(ideaIcons.modules);
+    }
+
+    // Not supported in IntelliJ (see CeylonParameterInfoHandler instead)
+    shared actual LookupElement newParameterInfo(Integer offset, Declaration dec, 
+        Reference producedReference, Scope scope, CompletionData data, Boolean namedInvocation) => nothing;
+
+    shared actual LookupElement newFunctionCompletionProposal(Integer offset, String prefix,
+        String text, Declaration dec, Unit unit, CompletionData data) {
+        
+        return LookupElementBuilder.create("``dec.getName(unit)``(...)")
+            .withIcon(ideaIcons.surround)
+            .withInsertHandler(ReplaceTextHandler(offset - prefix.size, offset, text));
     }
 
 }
 
-class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocation, Declaration? parentDecl = null) {
-
-    String text = if (exists name = parentDecl?.nameAsString) then "``name``.``decl.nameAsString``" else decl.nameAsString;
+class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocation, 
+        String? typeArgs = null, Declaration? parentDecl = null) {
+    
+    String text = (if (exists name = parentDecl?.nameAsString) 
+                  then "``name``.``decl.nameAsString``"
+                  else decl.nameAsString)
+                + (typeArgs else "");
+    
     variable String tailText = "";
     variable Boolean grayTailText = false;
     variable Icon? icon = null;
     variable String? typeText = null;
     variable InsertHandler<LookupElement>? handler = null;
-
+    
     void visitFunction(Function fun) {
         if (fun.annotation) {
             icon = PlatformIcons.\iANNOTATION_TYPE_ICON;
@@ -229,10 +359,12 @@ class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocatio
                 tailText = "(``", ".join(params)``)";
                 typeText = if (fun.declaredVoid) then "void" else fun.typeDeclaration.name;
                 handler = functionInsertHandler;
+            } else {
+                handler = declarationInsertHandler;
             }
         }
     }
-
+    
     void visitValue(Value val) {
         if (is Class t = val.type?.declaration, t.name.first?.lowercase else false) {
             icon = PlatformIcons.\iANONYMOUS_CLASS_ICON;
@@ -242,25 +374,26 @@ class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocatio
             typeText = val.typeDeclaration?.name;
         }
     }
-
+    
     void visitClass(Class klass) {
         icon = PlatformIcons.\iCLASS_ICON;
         tailText = " (``klass.container.qualifiedNameString``)";
         grayTailText = true;
         handler = declarationInsertHandler;
     }
-
+    
     void visitInterface(Interface int) {
         icon = PlatformIcons.\iINTERFACE_ICON;
         tailText = " (``int.container.qualifiedNameString``)";
         grayTailText = true;
         handler = declarationInsertHandler;
     }
-
+    
     void visitAlias(TypeAlias typeAlias) {
+        print("alias");
         // TODO create an icon for aliases
     }
-
+    
     void visit(Declaration decl) {
         if (is Function decl) {
             visitFunction(decl);
@@ -274,12 +407,12 @@ class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocatio
             visitAlias(decl);
         }
     }
-
+    
     visit(decl);
-
+    
     shared LookupElement lookupElement = LookupElementBuilder.create([decl, unit], text)
-            .withTailText(tailText, grayTailText)
-            .withTypeText(typeText)
-            .withIcon(icon)
-            .withInsertHandler(handler);
+        .withTailText(tailText, grayTailText)
+        .withTypeText(typeText)
+        .withIcon(icon)
+        .withInsertHandler(handler);
 }
