@@ -40,11 +40,7 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.completion {
     IdeCompletionManager,
-    appendTypeParameters,
-    getRefinementTextFor,
-    getNamedInvocationTextFor,
-    getTextFor,
-    getInlineFunctionTextFor
+    appendTypeParameters
 }
 import com.redhat.ceylon.ide.common.model {
     CeylonProject
@@ -53,8 +49,8 @@ import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
 import com.redhat.ceylon.ide.common.util {
-    OccurrenceLocation,
-    ProgressMonitor
+    ProgressMonitor,
+    Indents
 }
 import com.redhat.ceylon.model.typechecker.model {
     Function,
@@ -65,10 +61,8 @@ import com.redhat.ceylon.model.typechecker.model {
     TypeAlias,
     Unit,
     Scope,
-    FunctionOrValue,
     Type,
     Reference,
-    ClassOrInterface,
     Package
 }
 
@@ -94,7 +88,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     textAttributes
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    ideaIcons,
+    ideaIndents
 }
 
 shared class CompletionData(PhasedUnit pu, Document doc, TypeChecker tc) satisfies LocalAnalysisResult<Document,Module> {
@@ -141,7 +136,9 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     shared actual Boolean showParameterTypes => true;
     shared actual String inexactMatches => "positional";
     shared actual Boolean supportsLinkedModeInArguments => false;
-
+    shared actual Boolean addParameterTypesInCompletions => true;
+    shared actual Indents<Document> indents => ideaIndents;
+    
     shared actual LookupElement newParametersCompletionProposal(Integer offset,
         Type type, JList<Type> argTypes, Node node, CompletionData data) {
         
@@ -153,29 +150,29 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
             => doc.getText(TextRange.from(start, length));
     
     shared actual LookupElement newPositionalInvocationCompletion(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, CompletionData data, Boolean isMember,
-        OccurrenceLocation? ol, String? typeArgs, Boolean includeDefaulted, Declaration? qualifyingDec) {
+        String desc, String text, Declaration dec, Reference? pr, Scope scope, CompletionData data,
+        Boolean isMember, String? typeArgs, Boolean includeDefaulted, Declaration? qualifyingDec) {
         
         //print("newPositionalInvocationCompletion ``dec`` - ``typeArgs else "null"``");
         return MyLookupElementBuilder(dec, dec.unit, true, typeArgs, qualifyingDec).lookupElement;
     }
     
     shared actual LookupElement newNamedInvocationCompletion(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, CompletionData data, Boolean isMember,
-        OccurrenceLocation? ol, String? typeArgs, Boolean includeDefaulted) {
+        String desc, String text, Declaration dec, Reference? pr, Scope scope, CompletionData data,
+        Boolean isMember, String? typeArgs, Boolean includeDefaulted) {
         
         //print("newNamedInvocationCompletion");
         assert(exists pr);
-        String text = getNamedInvocationTextFor(dec, pr, data.rootNode.unit, includeDefaulted, typeArgs);
         
         // TODO linked mode in parameters (see InvocationCompletionProposal.activeLinkedMode)
         return LookupElementBuilder.create(text)
+            .withPresentableText(desc)
             .withIcon(PlatformIcons.\iMETHOD_ICON);
     }
     
     shared actual LookupElement newReferenceCompletion(Integer offset, String prefix,
-        Declaration dec, Unit u, Reference? pr, Scope scope, CompletionData data,
-        Boolean isMember, Boolean includeTypeArgs) {
+        String desc, String text, Declaration dec, Unit u, Reference? pr, Scope scope,
+        CompletionData data, Boolean isMember, Boolean includeTypeArgs) {
         
         //print("newReferenceCompletion ``includeTypeArgs``");
         String args;
@@ -190,11 +187,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
     
     shared actual LookupElement newRefinementCompletionProposal(Integer offset, String prefix,
-        Declaration dec, Reference? pr, Scope scope, CompletionData data, Boolean isInterface,
-        ClassOrInterface ci, Node node, Unit unit, Document doc, Boolean preamble) {
-        
-        value ref = getRefinedProducedReference(scope, dec);
-        value text = getRefinementTextFor(dec, ref, unit, isInterface, ci, "", false, preamble);
+        Reference? pr, String desc, String text, CompletionData data, Declaration dec, Scope scope) {
         
         //print("newRefinementCompletionProposal");
         return LookupElementBuilder.create("", text)
@@ -231,27 +224,24 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
     
     shared actual LookupElement newNamedArgumentProposal(Integer offset, String prefix,
-        CompletionData data, Tree.CompilationUnit cu, Declaration dec, Scope scope) {
+        Reference? pr, String desc, String text, CompletionData data, Declaration dec, Scope scope) {
         
         //print("newNamedArgumentProposal");
         // TODO select "nothing"
         // TODO should appear at the top of the completion list
-        value text = getTextFor(dec, cu.unit) + " = nothing";
         return LookupElementBuilder.create(text)
+            .withPresentableText(desc)
             .withIcon(ideaIcons.param);
     }
     
-    shared actual LookupElement newInlineFunctionProposal(Integer offset, FunctionOrValue dec,
-        Scope scope, Node node, String prefix, CompletionData data, Document doc) {
+    shared actual LookupElement newInlineFunctionProposal(Integer offset, String prefix, Reference? pr,
+        String desc, String text, CompletionData data, Declaration dec, Scope scope) {
 
         //print("newInlineFunctionProposal");
-        value p = dec.initializerParameter;
-        value unit = node.unit;
-        value text = getInlineFunctionTextFor(p, null, unit, "");
-        
         // TODO select "nothing"
         // TODO should appear at the top of the completion list
         return LookupElementBuilder.create(text)
+            .withPresentableText(desc)
             .withIcon(ideaIcons.param);
     }
     
@@ -321,17 +311,25 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
 
     // Not supported in IntelliJ (see CeylonParameterInfoHandler instead)
+    suppressWarnings("expressionTypeNothing")
     shared actual LookupElement newParameterInfo(Integer offset, Declaration dec, 
         Reference producedReference, Scope scope, CompletionData data, Boolean namedInvocation) => nothing;
 
     shared actual LookupElement newFunctionCompletionProposal(Integer offset, String prefix,
-        String text, Declaration dec, Unit unit, CompletionData data) {
+        String desc, String text, Declaration dec, Unit unit, CompletionData data) {
         
-        return LookupElementBuilder.create("``dec.getName(unit)``(...)")
+        return LookupElementBuilder.create(text)
+            .withPresentableText(desc)
             .withIcon(ideaIcons.surround)
             .withInsertHandler(ReplaceTextHandler(offset - prefix.size, offset, text));
     }
 
+    shared actual LookupElement newControlStructureCompletionProposal(Integer offset, String prefix,
+        String desc, String text, Declaration dec, CompletionData data) {
+        
+        return LookupElementBuilder.create(text)
+            .withPresentableText(desc);
+    }
 }
 
 class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocation, 
