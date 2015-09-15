@@ -13,8 +13,13 @@
         </echo>
     </target>
 
+    <target name="build"
+            description="Builds the IDE plugin">
+        <echo>To be implemented!</echo>
+    </target>
+
     <target name="clean"
-            description="Cleans the distribution package">
+            description="Cleans the build environment">
         <echo>To be implemented!</echo>
     </target>
 </project>
