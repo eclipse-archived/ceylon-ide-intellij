@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ceylon-ide-intellij" default="help" basedir="." xmlns:if="ant:if">
+
+    <tstamp>
+        <format property="NOW" pattern="yyyyMMddHHmm" />
+    </tstamp>
+
+    <property file="build.properties"/>
+
+    <target name="help">
+        <echo>Options for building the Ceylon IDE plugins:
+    ant clean              - Cleans the build environment
+        </echo>
+    </target>
+
+    <target name="clean"
+            description="Cleans the distribution package">
+        <echo>To be implemented!</echo>
+    </target>
+</project>
