@@ -55,7 +55,7 @@ public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPs
         CeylonPsi.ArgumentListPsi args = PsiTreeUtil.getParentOfType(elementAtOffset, CeylonPsi.ArgumentListPsi.class);
 
         if (invocation != null && args != null) {
-            FindNodeVisitor visitor = new FindNodeVisitor(invocation.getTextOffset(), invocation.getTextOffset() + invocation.getTextLength());
+            FindNodeVisitor visitor = new FindNodeVisitor(null, invocation.getTextOffset(), invocation.getTextOffset() + invocation.getTextLength());
             ((CeylonFile) context.getFile()).getCompilationUnit().visit(visitor);
             Node node = visitor.getNode();
 

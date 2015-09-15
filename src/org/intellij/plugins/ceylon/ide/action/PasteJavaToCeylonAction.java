@@ -1,5 +1,8 @@
 package org.intellij.plugins.ceylon.ide.action;
 
+import ceylon.tool.converter.java2ceylon.Java8Lexer;
+import ceylon.tool.converter.java2ceylon.Java8Parser;
+import ceylon.tool.converter.java2ceylon.JavaToCeylonConverter;
 import com.intellij.ide.PasteProvider;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.Result;
@@ -8,21 +11,20 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.rohit.converter.Java8Lexer;
-import com.rohit.converter.Java8Parser;
-import com.rohit.converter.JavaToCeylonConverter;
+import com.redhat.ceylon.ide.common.model.CeylonIdeConfig;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.datatransfer.DataFlavor;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -48,7 +50,14 @@ public class PasteJavaToCeylonAction extends AnAction {
 
         try {
             String javaCode = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor);
-            ceylonCode = transformJavaToCeylon(javaCode);
+            final DataContext dataContext = e.getDataContext();
+            final Editor editor = (Editor) dataContext.getData("editor");
+            PsiFile psiFile = PsiDocumentManager.getInstance(e.getProject()).getPsiFile(editor.getDocument());
+            IdeaCeylonProjects projects = e.getProject().getComponent(IdeaCeylonProjects.class);
+            Module module = ModuleUtil.findModuleForFile(psiFile.getVirtualFile(), psiFile.getProject());
+            CeylonIdeConfig<Module> ideConfig = projects.getProject(module).getIdeConfiguration();
+
+            ceylonCode = transformJavaToCeylon(javaCode, ideConfig);
         } catch (IOException exc) {
             Logger.getInstance(PasteJavaToCeylonAction.class).error("Couldn't transform Java code to Ceylon", exc);
         }
@@ -56,7 +65,7 @@ public class PasteJavaToCeylonAction extends AnAction {
         insertTextInEditor(ceylonCode, e);
     }
 
-    private String transformJavaToCeylon(String javaCode) throws IOException {
+    private String transformJavaToCeylon(String javaCode, CeylonIdeConfig<Module> ideConfig) throws IOException {
         ANTLRInputStream input = new ANTLRInputStream(javaCode);
         Java8Lexer lexer = new Java8Lexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -64,11 +73,14 @@ public class PasteJavaToCeylonAction extends AnAction {
         ParserRuleContext tree = parser.compilationUnit();
 
         StringWriter out = new StringWriter();
-        BufferedWriter bw = new BufferedWriter(out);
-        JavaToCeylonConverter converter = new JavaToCeylonConverter(bw);
 
-        ParseTreeWalker.DEFAULT.walk(converter, tree);
-        converter.close();
+        JavaToCeylonConverter converter = new JavaToCeylonConverter(out,
+                ideConfig.getConverterConfig().getTransformGetters(),
+                ideConfig.getConverterConfig().getUseVariableInParameters(),
+                ideConfig.getConverterConfig().getUseVariableInLocals(),
+                ideConfig.getConverterConfig().getUseValues());
+
+        tree.accept(converter);
 
         return out.toString();
     }
