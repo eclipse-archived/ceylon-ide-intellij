@@ -36,6 +36,7 @@ public class CeylonStubFileElementType extends IStubFileElementType {
             CeylonTypes.NATURAL_LITERAL, CeylonTypes.FUNCTION_LITERAL);
 
     public static final Key<Node> CEYLON_NODE_KEY = new Key<>("CEYLON-SPEC_NODE");
+    public static final Key<Tree.CompilationUnit> FORCED_CU_KEY = new Key<>("CEYLON-FORCED_CU");
 
     public CeylonStubFileElementType(Language language) {
         super(language);
@@ -69,7 +70,14 @@ public class CeylonStubFileElementType extends IStubFileElementType {
 
         try {
             AstVisitor visitor = new AstVisitor(tokens, verbose);
-            visitor.visit(parser.compilationUnit());
+
+            Tree.CompilationUnit cu = parser.compilationUnit();
+            Tree.CompilationUnit forcedCu = file.getUserData(FORCED_CU_KEY);
+            if (forcedCu != null) {
+                cu = forcedCu;
+            }
+
+            visitor.visit(cu);
 
             ASTNode root = visitor.parent;
             if (verbose) {

@@ -18,7 +18,6 @@ import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import com.redhat.ceylon.model.typechecker.model.Unit;
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex;
@@ -94,7 +93,11 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
         if (declarationNode != null) {
             FindMatchingPsiNodeVisitor psiVisitor = new FindMatchingPsiNodeVisitor(declarationNode, CeylonPsi.StatementOrArgumentPsi.class);
-            psiVisitor.visitFile(CeylonTreeUtil.getDeclaringFile(declaration.getUnit(), project));
+            PsiFile declaringFile = CeylonTreeUtil.getDeclaringFile(declaration.getUnit(), project);
+            if (declaringFile instanceof CeylonFile) {
+                declaringFile.putUserData(CeylonStubFileElementType.FORCED_CU_KEY, compilationUnit);
+            }
+            psiVisitor.visitFile(declaringFile);
             return psiVisitor.getPsi();
         }
 

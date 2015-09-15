@@ -97,6 +97,7 @@
         <codeInsight.parameterInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonParameterInfoHandler"/>
 
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass" implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner" implementationClass="org.intellij.plugins.ceylon.ide.presentation.DeclarationPresentationProvider"/>
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementDescriptionProvider"/>
         <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>
