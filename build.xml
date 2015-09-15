@@ -6,20 +6,30 @@
     </tstamp>
 
     <property file="build.properties"/>
+    <property name="projects.base.dir" value="${basedir}/.." />
 
     <target name="help">
         <echo>Options for building the Ceylon IDE plugins:
     ant clean              - Cleans the build environment
+    ant build              - Builds Ceylon IDE for IntelliJ
         </echo>
     </target>
 
     <target name="build"
             description="Builds the IDE plugin">
-        <echo>To be implemented!</echo>
+        <ant antfile="${basedir}/plugin-ceylon-code/build.xml"
+             target="build"
+             dir="${basedir}/plugin-ceylon-code"
+             inheritall="false">
+        </ant>
     </target>
 
     <target name="clean"
             description="Cleans the build environment">
-        <echo>To be implemented!</echo>
+        <ant antfile="${basedir}/plugin-ceylon-code/build.xml"
+             target="clean"
+             dir="${basedir}/plugin-ceylon-code"
+             inheritall="false">
+        </ant>
     </target>
 </project>

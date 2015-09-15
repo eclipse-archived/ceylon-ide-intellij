@@ -1,13 +1,23 @@
 <project name="Gather Intellij Dependencies" basedir="." default="copy-intellij-dependencies">
 
     <property file="build.properties" />
+    <property name="ceylon.verbosity" value="false" />
+    <property name="ceylon.executable" value="${dist.bin.dir}/ceylon" />
+    <property name="out.repo" location="modules" />
+
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
         <classpath>
             <pathelement location="${dist.root.dir}/lib/ant-contrib-1.0b3.jar"/>
         </classpath>
     </taskdef>
 
-	<condition property="ideaRootDefined">
+    <path id="ant-tasks">
+        <pathelement location="${ceylon.ant.lib}" />
+    </path>
+
+    <typedef resource="com/redhat/ceylon/ant/antlib.xml" classpathref="ant-tasks" />
+
+    <condition property="ideaRootDefined">
 		<isset property="ideaRoot"/>
 	</condition>
 	
@@ -20,8 +30,26 @@
 	                         match="moduleToImport\.(.*)"
 	                         select="\1"
 	                         casesensitive="true" />
-	
-	<target name="importModule">
+
+
+    <moduleset id="modules.source">
+        <module name="org.intellij.plugins.ceylon.ide.ceylonCode" />
+    </moduleset>
+
+    <reposet id="reposet.compile">
+        <repo url="${out.repo}" />
+        <repo url="flat:${intellij.repo.dir}"/>
+    </reposet>
+
+    <target name="help">
+        <echo>Options for building the Ceylon IDE plugins:
+    ant copy-intellij-dependencies   - Copies dependencies from the IntelliJ installation to a local repository
+    ant clean                        - Cleans the build environment
+    ant build                        - Builds the Ceylon part of the IDE
+        </echo>
+    </target>
+
+    <target name="importModule">
 		<propertycopy name="moduleName" from="moduleToImport.${moduleToImport}" />
 		<echo>${moduleName}</echo>
 		<copy file="${ideaRoot}/lib/${moduleToImport}" tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
@@ -35,4 +63,23 @@
 		<foreach list="${modulesToImport}" param="moduleToImport" target="importModule">
 		</foreach>
 	</target>
+
+    <target name="build" depends="copy-intellij-dependencies">
+        <ceylon-compile executable="${ceylon.executable}"
+                        verbose="${ceylon.verbosity}"
+                        encoding="UTF-8"
+                        pack200="true"
+                        mavenoverrides="${basedir}/overrides.xml"
+                        out="${out.repo}">
+            <source value="${basedir}/source"/>
+            <source value="${basedir}/src"/>
+            <source value="${basedir}/gen"/>
+            <reposet refid="reposet.compile"/>
+            <moduleset refid="modules.source"/>
+        </ceylon-compile>
+    </target>
+
+    <target name="clean" description="Deletes the test-modules and modules directories">
+        <delete dir="${out.repo}" />
+    </target>
 </project>
