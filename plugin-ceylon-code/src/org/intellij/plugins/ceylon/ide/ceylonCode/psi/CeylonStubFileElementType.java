@@ -14,10 +14,7 @@ import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
+import org.antlr.runtime.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -143,13 +140,13 @@ public class CeylonStubFileElementType extends IStubFileElementType {
 
             if (that.getToken() != null && visitor.children.isEmpty()) {
                 Token peek = tokens.peek();
-                if (peek.getText().length() == that.getStopIndex() - that.getStartIndex() + 1) {
+                if (getTokenLength(peek) == that.getEndIndex() - that.getStartIndex()) {
                     Token toRemove = tokens.remove();
                     parent.rawAddChildrenWithoutNotifications(buildLeaf(that, type, toRemove));
                     if (verbose) {
                         System.out.println("t \"" + toRemove.getText() + "\"");
                     }
-                    index += toRemove.getText().length();
+                    index += getTokenLength(toRemove);
                 } else {
                     CompositeElement comp = new CompositeElement(type);
 
@@ -159,7 +156,7 @@ public class CeylonStubFileElementType extends IStubFileElementType {
                         if (verbose) {
                             System.out.println("t \"" + toRemove.getText() + "\"");
                         }
-                        index += toRemove.getText().length();
+                        index += getTokenLength(toRemove);
                     }
 
                     parent.rawAddChildrenWithoutNotifications(comp);
@@ -167,7 +164,7 @@ public class CeylonStubFileElementType extends IStubFileElementType {
 
                 // TODO should be == but sometimes the tree includes a node that was already included before
                 // (see `exists` constructs for example)
-                assert index >= that.getStopIndex() + 1;
+                assert index >= that.getEndIndex();
             } else {
                 CompositeElement oldParent = parent;
                 if (!parentForced) {
@@ -188,25 +185,35 @@ public class CeylonStubFileElementType extends IStubFileElementType {
 
         @NotNull
         private TreeElement buildLeaf(Node ceylonNode, IElementType type, Token token) {
+            String tokenText = token.getText();
+            if (tokenText.length() != getTokenLength(token)) {
+                switch (token.getType()) {
+                    case CeylonLexer.LIDENTIFIER:
+                        tokenText = "\\i" + tokenText;
+                        break;
+                    case CeylonLexer.UIDENTIFIER:
+                        tokenText = "\\I" + tokenText;
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Unsupported token type " + token);
+                }
+            }
             if (LEAVES_TO_WRAP.contains(type)) {
                 CompositeElement comp = new CompositeElement(type);
-                LeafPsiElement leaf = new LeafPsiElement(TokenTypes.fromInt(token.getType()), token.getText());
+                LeafPsiElement leaf = new LeafPsiElement(TokenTypes.fromInt(token.getType()), tokenText);
                 comp.rawAddChildrenWithoutNotifications(leaf);
                 comp.putUserData(CEYLON_NODE_KEY, ceylonNode);
                 return comp;
             } else {
-                return new LeafPsiElement(TokenTypes.fromInt(token.getType()), token.getText());
+                return new LeafPsiElement(TokenTypes.fromInt(token.getType()), tokenText);
             }
         }
 
         private int consumeTokens(Node that, int index, boolean before) {
-            Integer targetIndex = before ? that.getStartIndex() : that.getStopIndex();
+            Integer targetIndex = before ? that.getStartIndex() : that.getEndIndex();
 
             if (targetIndex == null) {
                 return index;
-            }
-            if (!before) {
-                targetIndex++;
             }
 
             if (index > targetIndex) {
@@ -219,15 +226,21 @@ public class CeylonStubFileElementType extends IStubFileElementType {
             while (index < targetIndex) {
                 Token token = tokens.remove();
                 parent.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), token));
-                index += token.getText().length();
-                if (verbose) {
-                    System.out.println("c \"" + token.getText() + "\"");
-                }
+                index += getTokenLength(token);
             }
 
             assert index == targetIndex;
 
             return index;
+        }
+
+        private int getTokenLength(Token token) {
+            if (token instanceof CommonToken) {
+                CommonToken commonToken = (CommonToken) token;
+                return commonToken.getStopIndex() - commonToken.getStartIndex() + 1;
+            } else {
+                return token.getText().length();
+            }
         }
     }
 
