@@ -7,12 +7,127 @@
 
     <property file="build.properties"/>
     <property name="projects.base.dir" value="${basedir}/.." />
+    <property name="build.dir" value="${basedir}/ant-build" />
 
     <target name="help">
         <echo>Options for building the Ceylon IDE plugins:
     ant clean              - Cleans the build environment
     ant build              - Builds Ceylon IDE for IntelliJ
         </echo>
+    </target>
+
+    <path id="ceylon.runtime">
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/redhat/ceylon/common/1.1.1/com.redhat.ceylon.common-1.1.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/tautua/markdownpapers/core/1.2.7/org.tautua.markdownpapers.core-1.2.7.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/antlr/stringtemplate/3.2.1/org.antlr.stringtemplate-3.2.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/jboss/logmanager/1.4.0.Final/org.jboss.logmanager-1.4.0.Final.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/antlr/antlr/2.7.7/org.antlr.antlr-2.7.7.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/apache/httpcomponents/httpcore/4.3.2/org.apache.httpcomponents.httpcore-4.3.2.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/jboss/modules/1.3.3.Final/org.jboss.modules-1.3.3.Final.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/antlr/runtime/3.4/org.antlr.runtime-3.4.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/apache/commons/codec/1.8/org.apache.commons.codec-1.8.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/jboss/jandex/1.0.3.Final/org.jboss.jandex-1.0.3.Final.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/net/minidev/json-smart/1.1.1/net.minidev.json-smart-1.1.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/redhat/ceylon/compiler/js/1.1.1/com.redhat.ceylon.compiler.js-1.1.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/apache/httpcomponents/httpclient/4.3.2/org.apache.httpcomponents.httpclient-4.3.2.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/redhat/ceylon/compiler/java/1.1.1/com.redhat.ceylon.compiler.java-1.1.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/redhat/ceylon/module-resolver/1.1.1/com.redhat.ceylon.module-resolver-1.1.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/redhat/ceylon/maven-support/2.0/com.redhat.ceylon.maven-support-2.0.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/org/apache/commons/logging/1.1.1/org.apache.commons.logging-1.1.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/redhat/ceylon/typechecker/1.1.1/com.redhat.ceylon.typechecker-1.1.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/github/rjeschke/txtmark/0.11/com.github.rjeschke.txtmark-0.11.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/github/lookfirst/sardine/5.1/com.github.lookfirst.sardine-5.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/ceylon/runtime/1.1.1/ceylon.runtime-1.1.1.jar" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/ceylon/language/1.1.1/ceylon.language-1.1.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/repo/com/redhat/ceylon/model/1.1.1/com.redhat.ceylon.model-1.1.1.jar" />
+
+        <pathelement path="${projects.base.dir}/ceylon-dist/dist/lib/ceylon-bootstrap.jar" />
+    </path>
+
+    <path id="compile.runtime.classpath">
+        <path refid="ceylon.runtime"/>
+        <fileset dir="/Applications/IntelliJ IDEA 15 CE EAP.app/Contents/lib" includes="**/*.jar"/>
+    </path>
+
+    <path id="compile.ide.classpath">
+        <path refid="compile.runtime.classpath"/>
+
+        <pathelement path="${build.dir}/runtime"/>
+
+        <path refid="dist.classpath"/>
+    </path>
+
+    <path id="dist.classpath">
+        <pathelement path="${basedir}/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.1.1/org.intellij.plugins.ceylon.ide.ceylonCode-1.1.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.1.1/com.redhat.ceylon.ide.common-1.1.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.1.1/com.redhat.ceylon.ide.common-1.1.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/1.1.1/ceylon.collection-1.1.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.1.1/ceylon.interop.java-1.1.1.car" />
+        <pathelement path="${basedir}/lib/ceylon.tool.converter.java2ceylon-1.0.0.car" />
+        <pathelement path="${basedir}/lib/antlr-min-runtime-4.5.jar" />
+    </path>
+
+    <target name="build-runtime">
+        <mkdir dir="${build.dir}/CeylonRuntime/lib"/>
+        <mkdir dir="${build.dir}/runtime"/>
+        <javac srcdir="${basedir}/CeylonRuntime/src"
+               destdir="${build.dir}/runtime"
+               debug="true" debuglevel="lines,vars,source"
+               classpathref="compile.runtime.classpath">
+        </javac>
+        <copy todir="${build.dir}/runtime">
+            <fileset dir="${basedir}/CeylonRuntime/src" includes="META-INF/**"/>
+        </copy>
+        <jar destfile="${build.dir}/CeylonRuntime/lib/CeylonRuntime.jar"
+             basedir="${build.dir}/runtime"/>
+        <copy todir="${build.dir}/CeylonRuntime/lib" flatten="true">
+            <path refid="ceylon.runtime"/>
+        </copy>
+        <zip destfile="${basedir}/out/installation-packages/CeylonRuntime.zip"
+             basedir="${build.dir}" includes="CeylonRuntime/**"/>
+    </target>
+
+    <target name="build-ide">
+        <mkdir dir="${build.dir}/CeylonIDEA/classes"/>
+        <mkdir dir="${build.dir}/CeylonIDEA/lib"/>
+        <javac srcdir="${basedir}/compiler/src"
+               destdir="${build.dir}/CeylonIDEA/classes"
+               debug="true" debuglevel="lines,vars,source"
+               classpathref="compile.ide.classpath">
+        </javac>
+        <javac srcdir="${basedir}/jps-plugin/src"
+               destdir="${build.dir}/CeylonIDEA/classes"
+               debug="true" debuglevel="lines,vars,source"
+               classpathref="compile.ide.classpath">
+        </javac>
+        <copy todir="${build.dir}/CeylonIDEA/classes">
+            <fileset dir="${basedir}/jps-plugin/src" includes="META-INF/**"/>
+        </copy>
+        <javac srcdir="${basedir}/src"
+               destdir="${build.dir}/CeylonIDEA/classes"
+               debug="true" debuglevel="lines,vars,source"
+               classpathref="compile.ide.classpath">
+        </javac>
+        <copy todir="${build.dir}/CeylonIDEA/classes">
+            <fileset dir="${basedir}/resources"/>
+        </copy>
+        <copy todir="${build.dir}/CeylonIDEA/classes">
+            <fileset dir="${projects.base.dir}/ceylon-dist/dist" includes="repo/**"/>
+        </copy>
+
+        <copy todir="${build.dir}/CeylonIDEA">
+            <fileset dir="${basedir}" includes="META-INF/**"/>
+        </copy>
+        <copy todir="${build.dir}/CeylonIDEA/lib" flatten="true">
+           <path refid="dist.classpath"/>
+        </copy>
+
+        <!-- somehow this .car is not loaded unless it is renamed to .jar :/ -->
+        <move file="${build.dir}/CeylonIDEA/lib/org.intellij.plugins.ceylon.ide.ceylonCode-1.1.1.car"
+              tofile="${build.dir}/CeylonIDEA/lib/org.intellij.plugins.ceylon.ide.ceylonCode-1.1.1.jar"/>
+
+        <zip destfile="${basedir}/out/installation-packages/CeylonIDEA.zip"
+             basedir="${build.dir}" includes="CeylonIDEA/**"/>
     </target>
 
     <target name="build"
@@ -22,6 +137,8 @@
              dir="${basedir}/plugin-ceylon-code"
              inheritall="false">
         </ant>
+        <antcall target="build-runtime"/>
+        <antcall target="build-ide"/>
     </target>
 
     <target name="clean"
@@ -31,5 +148,6 @@
              dir="${basedir}/plugin-ceylon-code"
              inheritall="false">
         </ant>
+        <delete dir="${build.dir}"/>
     </target>
 </project>
