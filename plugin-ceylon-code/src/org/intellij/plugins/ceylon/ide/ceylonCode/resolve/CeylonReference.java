@@ -95,7 +95,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             FindMatchingPsiNodeVisitor psiVisitor = new FindMatchingPsiNodeVisitor(declarationNode, CeylonPsi.StatementOrArgumentPsi.class);
             PsiFile declaringFile = CeylonTreeUtil.getDeclaringFile(declaration.getUnit(), project);
             if (declaringFile instanceof CeylonFile) {
-                declaringFile.putUserData(CeylonStubFileElementType.FORCED_CU_KEY, compilationUnit);
+                declaringFile.putUserData(IdeaCeylonParser.FORCED_CU_KEY, compilationUnit);
             }
             psiVisitor.visitFile(declaringFile);
             return psiVisitor.getPsi();

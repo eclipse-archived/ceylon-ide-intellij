@@ -24,7 +24,7 @@ import java.util.*;
  * the official parser into an ASTNode tree. Comments and whitespaces are not present in the Ceylon AST,
  * but we can retrieve them by synchronizing our transformation with a lexer.
  */
-public class CeylonStubFileElementType extends IStubFileElementType {
+public class IdeaCeylonParser extends IStubFileElementType {
 
     private static final List<Integer> NODES_ALLOWED_AT_EOF = Arrays.asList(CeylonLexer.EOF,
             CeylonLexer.WS, CeylonLexer.LINE_COMMENT, CeylonLexer.MULTI_COMMENT);
@@ -36,7 +36,7 @@ public class CeylonStubFileElementType extends IStubFileElementType {
     public static final Key<Node> CEYLON_NODE_KEY = new Key<>("CEYLON-SPEC_NODE");
     public static final Key<Tree.CompilationUnit> FORCED_CU_KEY = new Key<>("CEYLON-FORCED_CU");
 
-    public CeylonStubFileElementType(Language language) {
+    public IdeaCeylonParser(Language language) {
         super(language);
     }
 

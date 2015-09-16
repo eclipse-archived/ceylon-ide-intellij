@@ -167,36 +167,5 @@
         <copy todir="../plugin-ceylon-code/gen" overwrite="true" >
             <fileset dir="gen" includes="**/*.java"/>
         </copy>
-
-        <copy todir="../plugin-ceylon-code/gen/org/intellij/plugins/ceylon/ide/ceylonCode/parser" overwrite="true">
-            <globmapper from="*CeylonParser.java" to="*PsiCompatibleCeylonParser.java"/>
-            <fileset dir="../../ceylon-spec/gensrc/com/redhat/ceylon/compiler/typechecker/parser" includes="CeylonParser.java"/>
-        </copy>
-        <replace file="../plugin-ceylon-code/gen/org/intellij/plugins/ceylon/ide/ceylonCode/parser/PsiCompatibleCeylonParser.java">
-            <replacefilter>
-                <replacetoken>import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.*;</replacetoken>
-                <replacevalue>import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.MethodDeclaration;
-import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.MethodDefinition;
-import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.FunctionArgument;
-import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.AttributeDeclaration;
-import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.Variable;
-import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.ClassDefinition;
-import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.IsCase;
-import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.ExtendedTypeExpression;
-import static com.redhat.ceylon.compiler.typechecker.tree.CustomTree.*;
-
-import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
-                </replacevalue>
-            </replacefilter>
-            <replacefilter
-                    token="package com.redhat.ceylon.compiler.typechecker.parser;"
-                    value="package org.intellij.plugins.ceylon.ide.ceylonCode.parser;"/>
-            <replacefilter
-                    token="CeylonParser"
-                    value="PsiCompatibleCeylonParser"/>
-            <replacefilter
-                    token="public final "
-                    value="public "/>
-        </replace>
     </target>
 </project>
