@@ -26,7 +26,8 @@ import java.util.*;
  */
 public class CeylonStubFileElementType extends IStubFileElementType {
 
-    private static final List<Integer> NODES_ALLOWED_AT_EOF = Arrays.asList(CeylonLexer.EOF, CeylonLexer.WS);
+    private static final List<Integer> NODES_ALLOWED_AT_EOF = Arrays.asList(CeylonLexer.EOF,
+            CeylonLexer.WS, CeylonLexer.LINE_COMMENT, CeylonLexer.MULTI_COMMENT);
 
     // Leaves which will be wrapped in a CeylonCompositeElement, for example to allow refactoring them
     private static final List<IElementType> LEAVES_TO_WRAP = Arrays.asList(CeylonTypes.IDENTIFIER,
