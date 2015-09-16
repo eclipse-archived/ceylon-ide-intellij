@@ -5,7 +5,7 @@
         <format property="NOW" pattern="yyyyMMddHHmm" />
     </tstamp>
 
-    <property file="build.properties"/>
+    <property file="${basedir}/plugin-ceylon-code/build.properties"/>
     <property name="projects.base.dir" value="${basedir}/.." />
     <property name="build.dir" value="${basedir}/ant-build" />
 
@@ -46,7 +46,7 @@
 
     <path id="compile.runtime.classpath">
         <path refid="ceylon.runtime"/>
-        <fileset dir="/Applications/IntelliJ IDEA 15 CE EAP.app/Contents/lib" includes="**/*.jar"/>
+        <fileset dir="${ideaRoot}/lib" includes="**/*.jar"/>
     </path>
 
     <path id="compile.ide.classpath">
