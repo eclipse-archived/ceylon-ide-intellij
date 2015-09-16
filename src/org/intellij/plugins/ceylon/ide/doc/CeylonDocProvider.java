@@ -46,6 +46,10 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         try {
             TypeChecker tc = TypeCheckerProvider.getFor(element);
+            if (tc == null) {
+                System.err.println("Can't get type checker for element " + element);
+                return null;
+            }
             IdeaDocGenerator generator = new IdeaDocGenerator(tc);
             if (element instanceof DummyPsiElement) {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;

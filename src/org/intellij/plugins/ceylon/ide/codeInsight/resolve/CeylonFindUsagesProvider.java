@@ -54,7 +54,7 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return element.getNode().getElementType() == CeylonTypes.INTERFACE_DEFINITION ? "Interface" : "Class";
         } else if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
             return "Attribute";
-        } else if (element instanceof CeylonPsi.MethodDefinitionPsi) {
+        } else if (element instanceof CeylonPsi.AnyMethodPsi) {
             return "Method";
         } else if (element instanceof ParameterDeclarationPsiIdOwner) {
             return "Function parameter";

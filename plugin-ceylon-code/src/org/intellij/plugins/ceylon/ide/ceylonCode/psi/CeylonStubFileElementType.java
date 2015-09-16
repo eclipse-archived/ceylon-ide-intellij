@@ -132,6 +132,9 @@ public class CeylonStubFileElementType extends IStubFileElementType {
                 parent = new CompositeElement(type);
             }
 
+            if (that instanceof Tree.DocLink) {
+                return;
+            }
             index = consumeTokens(that, index, true);
 
             Token token = that.getMainToken();
@@ -151,7 +154,7 @@ public class CeylonStubFileElementType extends IStubFileElementType {
                 } else {
                     CompositeElement comp = new CompositeElement(type);
 
-                    while (index <= that.getStopIndex()) {
+                    while (index < that.getEndIndex()) {
                         Token toRemove = tokens.remove();
                         comp.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), toRemove));
                         if (verbose) {
@@ -228,6 +231,9 @@ public class CeylonStubFileElementType extends IStubFileElementType {
                 Token token = tokens.remove();
                 parent.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), token));
                 index += getTokenLength(token);
+                if (verbose) {
+                    System.out.println("c \"" + token.getText() + "\"");
+                }
             }
 
             assert index == targetIndex;
