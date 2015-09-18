@@ -118,7 +118,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
                     parent.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), token));
                 }
 
-                assert NODES_ALLOWED_AT_EOF.contains(token.getType());
+                assert NODES_ALLOWED_AT_EOF.contains(token.getType()) : "Unexpected token " + token;
             }
         }
 
@@ -192,6 +192,8 @@ public class IdeaCeylonParser extends IStubFileElementType {
             String tokenText = token.getText();
             if (tokenText.length() != getTokenLength(token)) {
                 switch (token.getType()) {
+                    case CeylonLexer.PIDENTIFIER:
+                    case CeylonLexer.AIDENTIFIER:
                     case CeylonLexer.LIDENTIFIER:
                         tokenText = "\\i" + tokenText;
                         break;
