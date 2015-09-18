@@ -15,7 +15,18 @@
         <pathelement location="${ceylon.ant.lib}" />
     </path>
 
-    <typedef resource="com/redhat/ceylon/ant/antlib.xml" classpathref="ant-tasks" />
+    <target name="ceylondefs">
+        <typedef resource="com/redhat/ceylon/ant/antlib.xml" classpathref="ant-tasks" />
+
+        <moduleset id="modules.source">
+            <module name="org.intellij.plugins.ceylon.ide.ceylonCode" />
+        </moduleset>
+
+        <reposet id="reposet.compile">
+            <repo url="${out.repo}" />
+            <repo url="flat:${intellij.repo.dir}"/>
+        </reposet>
+    </target>
 
     <condition property="ideaRootDefined">
 		<isset property="ideaRoot"/>
@@ -30,16 +41,6 @@
 	                         match="moduleToImport\.(.*)"
 	                         select="\1"
 	                         casesensitive="true" />
-
-
-    <moduleset id="modules.source">
-        <module name="org.intellij.plugins.ceylon.ide.ceylonCode" />
-    </moduleset>
-
-    <reposet id="reposet.compile">
-        <repo url="${out.repo}" />
-        <repo url="flat:${intellij.repo.dir}"/>
-    </reposet>
 
     <target name="help">
         <echo>Options for building the Ceylon IDE plugins:
@@ -64,7 +65,7 @@
 		</foreach>
 	</target>
 
-    <target name="build" depends="copy-intellij-dependencies">
+    <target name="build" depends="ceylondefs,copy-intellij-dependencies">
         <ceylon-compile executable="${ceylon.executable}"
                         verbose="${ceylon.verbosity}"
                         encoding="UTF-8"
