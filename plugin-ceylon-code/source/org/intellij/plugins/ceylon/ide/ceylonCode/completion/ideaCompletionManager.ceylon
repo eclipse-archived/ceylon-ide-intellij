@@ -12,7 +12,8 @@ import com.intellij.codeInsight.lookup {
     LookupElement
 }
 import com.intellij.openapi.editor {
-    Document
+    Document,
+    Editor
 }
 import com.intellij.openapi.\imodule {
     Module
@@ -91,13 +92,16 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons,
     ideaIndents
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
+}
 
-shared class CompletionData(PhasedUnit pu, Document doc, TypeChecker tc) satisfies LocalAnalysisResult<Document,Module> {
-    shared actual Tree.CompilationUnit rootNode => pu.compilationUnit;
-    shared actual PhasedUnit phasedUnit => pu;
-    shared actual Document document => doc;
-    shared actual JList<CommonToken>? tokens => pu.tokens;
-    shared actual TypeChecker typeChecker => tc;
+shared class CompletionData(shared actual PhasedUnit phasedUnit, shared Editor editor,
+        shared actual TypeChecker typeChecker, shared CeylonFile file)
+        satisfies LocalAnalysisResult<Document,Module> {
+    shared actual Tree.CompilationUnit rootNode => phasedUnit.compilationUnit;
+    shared actual Document document => editor.document;
+    shared actual JList<CommonToken>? tokens => phasedUnit.tokens;
     shared actual CeylonProject<Module>? ceylonProject => null; // TODO
 }
 
@@ -108,7 +112,8 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         value isSecondLevel = parameters.invocationCount >= 2;
         value element = parameters.originalPosition;
         value doc = parameters.editor.document;
-        value params = CompletionData(pu, doc, tc);
+        assert(is CeylonFile ceylonFile = element.containingFile);
+        value params = CompletionData(pu, parameters.editor, tc, ceylonFile);
         value line = doc.getLineNumber(element.textOffset);
         
         value monitor = object satisfies ProgressMonitor {
@@ -154,7 +159,9 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         Boolean isMember, String? typeArgs, Boolean includeDefaulted, Declaration? qualifyingDec) {
         
         //print("newPositionalInvocationCompletion ``dec`` - ``typeArgs else "null"``");
-        return MyLookupElementBuilder(dec, dec.unit, true, typeArgs, qualifyingDec).lookupElement;
+        //return MyLookupElementBuilder(dec, dec.unit, true, typeArgs, qualifyingDec).lookupElement;
+        return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
+            includeDefaulted, true, false, isMember, qualifyingDec, data).lookupElement;
     }
     
     shared actual LookupElement newNamedInvocationCompletion(Integer offset, String prefix,
@@ -164,10 +171,12 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         //print("newNamedInvocationCompletion");
         assert(exists pr);
         
+        return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
+            includeDefaulted, false, true, isMember, null, data).lookupElement;
         // TODO linked mode in parameters (see InvocationCompletionProposal.activeLinkedMode)
-        return LookupElementBuilder.create(text)
-            .withPresentableText(desc)
-            .withIcon(PlatformIcons.\iMETHOD_ICON);
+        //return LookupElementBuilder.create(text)
+        //    .withPresentableText(desc)
+        //    .withIcon(PlatformIcons.\iMETHOD_ICON);
     }
     
     shared actual LookupElement newReferenceCompletion(Integer offset, String prefix,
@@ -330,6 +339,13 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         return LookupElementBuilder.create(text)
             .withPresentableText(desc);
     }
+    
+    shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc, Integer index)
+            => LookupElementBuilder.create(val);
+    
+    shared actual LookupElement newNestedCompletionProposal(Declaration dec, Declaration? qualifier, Integer loc,
+        Integer index, Boolean basic, String op)
+            => MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
 }
 
 class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocation, 
