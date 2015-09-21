@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.CompositeElement;
@@ -67,7 +68,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
         CeylonParser parser = new CeylonParser(stream);
 
         try {
-            AstVisitor visitor = new AstVisitor(tokens, verbose);
+            AstVisitor visitor = new AstVisitor(file, tokens, verbose);
 
             Tree.CompilationUnit cu = parser.compilationUnit();
             Tree.CompilationUnit forcedCu = file.getUserData(FORCED_CU_KEY);
@@ -98,11 +99,13 @@ public class IdeaCeylonParser extends IStubFileElementType {
 
     private class AstVisitor extends Visitor {
         private CompositeElement parent;
+        private CeylonFile file;
         private Queue<Token> tokens;
         private boolean verbose;
         private int index = 0;
 
-        public AstVisitor(Queue<Token> tokens, boolean verbose) {
+        public AstVisitor(CeylonFile file, Queue<Token> tokens, boolean verbose) {
+            this.file = file;
             this.tokens = tokens;
             this.verbose = verbose;
         }
@@ -118,7 +121,9 @@ public class IdeaCeylonParser extends IStubFileElementType {
                     parent.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), token));
                 }
 
-                assert NODES_ALLOWED_AT_EOF.contains(token.getType()) : "Unexpected token " + token;
+                if (!NODES_ALLOWED_AT_EOF.contains(token.getType())) {
+                    Logger.getInstance(IdeaCeylonParser.class).error("Unexpected token " + token + " in " + file.getName());
+                }
             }
         }
 
