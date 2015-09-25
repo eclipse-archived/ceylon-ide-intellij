@@ -1,14 +1,9 @@
-import ceylon.interop.java {
-    javaString
-}
-
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
 }
 import com.intellij.codeInsight.lookup {
-    LookupElement,
-    LookupElementBuilder
+    LookupElement
 }
 import com.intellij.openapi.application {
     Result
@@ -43,10 +38,6 @@ import com.redhat.ceylon.model.typechecker.model {
     Reference
 }
 
-import java.lang {
-    Character
-}
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     InsertEdit,
     TextEdit,
@@ -57,18 +48,22 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
+}
 
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
     Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
     Boolean qualified, Declaration? qualifyingValue, CompletionData data) 
-        extends InvocationCompletionProposal<CompletionData,Module,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,DefaultRegion,IdeaLinkedMode>
+        extends InvocationCompletionProposal<CompletionData,Module,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>
         (offset, prefix, desc, text, declaration, producedReference, scope, data.rootNode, includeDefaulted,
             positionalInvocation, namedInvocation, qualified, qualifyingValue, ideaCompletionManager)
-        satisfies IdeaDocumentChanges {
+        satisfies IdeaDocumentChanges & IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => LookupElementBuilder.create(text)
-        .withPresentableText(desc)
-        .withInsertHandler(object satisfies InsertHandler<LookupElement> {
+    shared actual variable Boolean toggleOverwrite = false;
+    
+    shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.forDeclaration(declaration),
+        object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
                 replaceInDoc(data.document, offset, text.size - prefix.size, "");
@@ -83,9 +78,11 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                     }
                 }.execute();
                 
+                adjustSelection(data);
                 activeLinkedMode(data.document);
             }
-        });
+        }
+    );
     
     shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode(text, adjustedOffset - prefix.size);
     
@@ -100,27 +97,13 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         
         // Undo our text insertion because we're replacing it with a live template
         replaceInDoc(data.document, adjustedOffset - prefix.size, text.size, "");
-        data.editor.caretModel.moveToOffset(adjustedOffset - prefix.size);
         
         lm.buildTemplate(data.editor);
     }
 
-    shared actual String completionMode => "overwrite";
-    
-    shared actual Character getDocChar(Document doc, Integer offset)
-            => Character(doc.getText(TextRange.from(offset, 1)).first else ' ');
-    
-    shared actual Integer getDocLength(Document doc) => doc.textLength;
-    
-    shared actual String getDocSpan(Document doc, Integer start, Integer length)
-            => doc.getText(TextRange.from(start, length));
-    
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals 
             => ideaImportProposals;
     
-    shared actual DefaultRegion newRegion(Integer start, Integer length) => DefaultRegion(start, length);
+    shared actual String completionMode => "overwrite";
     
-    shared actual void replaceInDoc(Document doc, Integer start, Integer length, String newText) {
-        doc.replaceString(start, start + length, javaString(newText));
-    }
 }

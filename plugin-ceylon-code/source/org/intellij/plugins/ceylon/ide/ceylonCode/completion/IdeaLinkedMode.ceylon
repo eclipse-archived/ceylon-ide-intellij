@@ -43,7 +43,7 @@ class IdeaLinkedMode(String text, Integer startInDoc) {
         templateText.append(text.span(startOffset - startInDoc, start - startInDoc - 1));
         templateText.append("$__Variable``variables.size``$");
         startOffset = start + len;
-        value varName = text.span(start - startInDoc, start - startInDoc - 1 + len);
+        value varName = len == 0 then "" else text.span(start - startInDoc, start - startInDoc - 1 + len);
         variables.add([varName, proposals]);
     }
     

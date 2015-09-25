@@ -40,8 +40,7 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
 import com.redhat.ceylon.ide.common.completion {
-    IdeCompletionManager,
-    appendTypeParameters
+    IdeCompletionManager
 }
 import com.redhat.ceylon.ide.common.model {
     CeylonProject
@@ -51,7 +50,8 @@ import com.redhat.ceylon.ide.common.typechecker {
 }
 import com.redhat.ceylon.ide.common.util {
     ProgressMonitor,
-    Indents
+    Indents,
+    escaping
 }
 import com.redhat.ceylon.model.typechecker.model {
     Function,
@@ -88,12 +88,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     ceylonHighlightingColors,
     textAttributes
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons,
     ideaIndents
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
 }
 
 shared class CompletionData(shared actual PhasedUnit phasedUnit, shared Editor editor,
@@ -126,7 +126,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         value returnedParamInfo = true; // The parameters tooltip has nothing to do with code completion, so we bypass it
         value completions = getContentProposals(params, parameters.editor.caretModel.offset, line, isSecondLevel, monitor, returnedParamInfo);
         
-        //MySimpleColoredComponent.patch(CompletionService.completionService.currentCompletion);
+        CustomLookupCellRenderer.install(parameters.editor.project);
         
         for (completion in completions) {
             result.addElement(completion);
@@ -173,10 +173,6 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         
         return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
             includeDefaulted, false, true, isMember, null, data).lookupElement;
-        // TODO linked mode in parameters (see InvocationCompletionProposal.activeLinkedMode)
-        //return LookupElementBuilder.create(text)
-        //    .withPresentableText(desc)
-        //    .withIcon(PlatformIcons.\iMETHOD_ICON);
     }
     
     shared actual LookupElement newReferenceCompletion(Integer offset, String prefix,
@@ -184,26 +180,15 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         CompletionData data, Boolean isMember, Boolean includeTypeArgs) {
         
         //print("newReferenceCompletion ``includeTypeArgs``");
-        String args;
-        if (includeTypeArgs) {
-            value sb = StringBuilder();
-            appendTypeParameters(dec, pr, u, sb, false);
-            args = sb.string.replace("&lt;", "<").replace("&gt;", ">");
-        } else {
-            args = "";
-        }
-        return MyLookupElementBuilder(dec, dec.unit, false, args).lookupElement;
+        return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
+            true, false, false, isMember, null, data).lookupElement;
     }
     
     shared actual LookupElement newRefinementCompletionProposal(Integer offset, String prefix,
         Reference? pr, String desc, String text, CompletionData data, Declaration dec, Scope scope) {
         
         //print("newRefinementCompletionProposal");
-        return LookupElementBuilder.create("", text)
-            .withPresentableText("")
-            .withIcon(ideaIcons.refinement)
-            .withInsertHandler(putCaretInBracesInsertHandler)
-            .withRenderer(ColoredTailElementRenderer.\iINSTANCE);
+        return newLookup(desc, text, ideaIcons.refinement, putCaretInBracesInsertHandler);
     }
     
     shared actual LookupElement newMemberNameCompletionProposal(Integer offset, String prefix, String name, String unquotedName) {
@@ -213,12 +198,14 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
             .withIcon(ideaIcons.local);
     }
     
-    shared actual LookupElement newKeywordCompletionProposal(Integer offset, String prefix, String keyword) {
+    shared actual LookupElement newKeywordCompletionProposal(Integer offset, String prefix, String keyword, String text) {
         value attr = textAttributes(ceylonHighlightingColors.keyword);
         
-        return LookupElementBuilder.create(keyword)
+        return LookupElementBuilder.create(text)
+            .withPresentableText(keyword)
             .withItemTextForeground(attr.foregroundColor)
             .withBoldness(attr.fontType.and(Font.\iBOLD) != 0);
+        // TODO move caret after insertion
     }
     
     shared actual LookupElement newAnonFunctionProposal(Integer offset, Type? requiredType,
@@ -227,8 +214,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         //print("newAnonFunctionProposal");
         
         // TODO should appear at the top of the list
-        // TODO select "nothing" or place caret inside braces
-        return LookupElementBuilder.create(text)
+        return newLookup(text, text)
             .withIcon(ideaIcons.anonymousFunction);
     }
     
@@ -236,10 +222,8 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         Reference? pr, String desc, String text, CompletionData data, Declaration dec, Scope scope) {
         
         //print("newNamedArgumentProposal");
-        // TODO select "nothing"
         // TODO should appear at the top of the completion list
-        return LookupElementBuilder.create(text)
-            .withPresentableText(desc)
+        return newLookup(desc, text)
             .withIcon(ideaIcons.param);
     }
     
@@ -247,10 +231,8 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         String desc, String text, CompletionData data, Declaration dec, Scope scope) {
 
         //print("newInlineFunctionProposal");
-        // TODO select "nothing"
         // TODO should appear at the top of the completion list
-        return LookupElementBuilder.create(text)
-            .withPresentableText(desc)
+        return newLookup(desc, text)
             .withIcon(ideaIcons.param);
     }
     
@@ -258,23 +240,24 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         Declaration dec, Unit? u, Reference? pr, Scope scope, CompletionData data, Boolean isMember) {
         
         //print("newProgramElementReferenceCompletion");
-        return MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
+        return IdeaInvocationCompletionProposal(offset, prefix, dec.getName(u), escaping.escapeName(dec, u),
+            dec, dec.reference, scope, true, false, false, isMember, null, data).lookupElement;
     }
     
     shared actual LookupElement newBasicCompletionProposal(Integer offset, String prefix,
         String text, String escapedText, Declaration decl, CompletionData data) {
 
         //print("newBasicCompletionProposal");
-        return LookupElementBuilder.create(escapedText)
-            .withPresentableText(text);
+        return newLookup(escapedText, text);
     }
     
-    shared actual LookupElement newPackageDescriptorProposal(Integer offset, String prefix, String packageName) {
-        return LookupElementBuilder.create(packageName);
+    shared actual LookupElement newPackageDescriptorProposal(Integer offset, String prefix, String desc, String text) {
+        return newLookup(desc, text);
     }
     
     shared actual LookupElement newCurrentPackageProposal(Integer offset, String prefix, String packageName, CompletionData data) {
-        return LookupElementBuilder.create(packageName); // TODO icon (module or package)
+        return LookupElementBuilder.create(packageName)
+            .withIcon(ideaIcons.packages);
     }
 
     shared actual LookupElement newImportedModulePackageProposal(Integer offset, String prefix,
@@ -282,9 +265,8 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         String fullPackageName, CompletionData data,
         Package candidate) {
         
-        value text = if (withBody) then "``memberPackageSubname`` { ... }" else memberPackageSubname;
-        
-        return LookupElementBuilder.create(text).withIcon(ideaIcons.packages);
+        return IdeaImportedModulePackageProposal(offset, prefix, memberPackageSubname,
+            withBody, fullPackageName, data, candidate).lookupElement;
     }
     
     shared actual LookupElement newQueriedModulePackageProposal(Integer offset, String prefix,
@@ -301,14 +283,16 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         Boolean withBody, ModuleVersionDetails version, String name, Node node) {
         
         //print("newModuleProposal");
-        // TODO linked mode in version
+        // TODO abstraction
         return LookupElementBuilder.create(versioned)
                 .withIcon(ideaIcons.modules);
     }
     
-    shared actual LookupElement newModuleDescriptorProposal(Integer offset, String prefix, String name) {
-        return LookupElementBuilder.create(name)
+    shared actual LookupElement newModuleDescriptorProposal(Integer offset, String prefix, String desc,
+        String text, Integer selectionStart, Integer selectionEnd) {
+        return newLookup(desc, text)
                 .withIcon(ideaIcons.modules);
+        // TODO selection
     }
 
     shared actual LookupElement newJDKModuleProposal(Integer offset, String prefix, Integer len, 
@@ -316,6 +300,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
 
         //print("newJDKModuleProposal");
         return LookupElementBuilder.create(versioned)
+                .withPresentableText(versioned.spanFrom(len))
                 .withIcon(ideaIcons.modules);
     }
 
@@ -327,10 +312,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     shared actual LookupElement newFunctionCompletionProposal(Integer offset, String prefix,
         String desc, String text, Declaration dec, Unit unit, CompletionData data) {
         
-        return LookupElementBuilder.create(text)
-            .withPresentableText(desc)
-            .withIcon(ideaIcons.surround)
-            .withInsertHandler(ReplaceTextHandler(offset - prefix.size, offset, text));
+        return IdeaFunctionCompletionProposal(offset, prefix, desc, text, dec, data).lookupElement;
     }
 
     shared actual LookupElement newControlStructureCompletionProposal(Integer offset, String prefix,
@@ -340,12 +322,18 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
             .withPresentableText(desc);
     }
     
-    shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc, Integer index)
-            => LookupElementBuilder.create(val);
+    shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc, Integer index) {
+        print("newNestedLiteralCompletionProposal ``val``");
+        return LookupElementBuilder.create(val);
+    }
     
     shared actual LookupElement newNestedCompletionProposal(Declaration dec, Declaration? qualifier, Integer loc,
-        Integer index, Boolean basic, String op)
-            => MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
+        Integer index, Boolean basic, String op) {
+        
+        print("newNestedCompletionProposal ``dec.qualifiedNameString``");
+        
+        return MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
+    }
 }
 
 class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocation, 

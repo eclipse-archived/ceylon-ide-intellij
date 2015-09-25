@@ -58,7 +58,7 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
             linkDescription = content.spanTo(pipe - 1);
             linkTarget = content.spanFrom(pipe + 1);
         } else {
-            value sep = content.firstOccurrence("::");
+            value sep = content.firstInclusion("::");
             if (exists sep) {
                 linkDescription = content.spanFrom(sep + 2);
             } else {
@@ -98,7 +98,7 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
             return pack?.\imodule;
         }
         
-        value pkgSeparatorIndex = linkTarget.firstOccurrence("::");
+        value pkgSeparatorIndex = linkTarget.firstInclusion("::");
         variable String declName;
         variable Scope? scope;
         

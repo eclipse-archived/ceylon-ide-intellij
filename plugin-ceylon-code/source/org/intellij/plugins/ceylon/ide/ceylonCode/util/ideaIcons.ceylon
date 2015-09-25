@@ -17,6 +17,17 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 import javax.swing {
     Icon
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration,
+    Class,
+    Interface,
+    Function,
+    Value,
+    ModelUtil,
+    TypeParameter,
+    TypeAlias,
+    NothingType
+}
 
 // TODO merge this with Icons.java?
 shared object ideaIcons {
@@ -31,27 +42,53 @@ shared object ideaIcons {
     shared Icon surround => IconLoader.getIcon("/icons/ceylonSurround.png");
     shared Icon refinement => AllIcons.General.\iImplementingMethod;
     shared Icon param => AllIcons.Nodes.\iParameter;
-    shared Icon local => AllIcons.Nodes.\iVariable;
+    shared Icon local => AllIcons.Nodes.\iVariable; // TODO should be different from values
+    shared Icon values => AllIcons.Nodes.\iVariable;
     shared Icon anonymousFunction => AllIcons.Nodes.\iFunction;
+    shared Icon types => IconLoader.getIcon("/icons/ceylonTypes.png");
     
-    shared Icon? forDeclaration(Tree.Declaration decl) {
-        value baseIcon = switch(decl)
+    shared Icon file => IconLoader.getIcon("/icons/ceylonFile.png");
+    
+    shared Icon? forDeclaration(Tree.Declaration|Declaration decl) {
+        variable value baseIcon = switch(decl)
         case (is Tree.AnyClass)
             classes
-        case (is Tree.AnyInterface)
+        case (is Class)
+            if (decl.anonymous) then objects else classes
+        case (is Tree.AnyInterface|Interface)
             interfaces
-        case (is Tree.AnyMethod)
+        case (is Tree.AnyMethod|Function)
             methods
         case (is Tree.ObjectDefinition)
             objects
+        case (is Value)
+            if (ModelUtil.isObject(decl)) then objects else values
+        case (is TypeAlias|NothingType)
+            types
+        case (is TypeParameter)
+            param // TODO wrong!
         else
             null;
         
-        if (exists baseIcon, exists model = decl.declarationModel) {
+        if (!exists a = baseIcon, is Declaration decl) {
+            if (ModelUtil.isConstructor(decl)) {
+                baseIcon = null; // TODO
+            } else if (decl.parameter) {
+                baseIcon = param;
+            }
+        }
+        Declaration? model = if (is Declaration decl) then decl else decl.declarationModel;
+        
+        if (exists icon = baseIcon, exists model) {
             value layer = if (model.shared) then PlatformIcons.\iPUBLIC_ICON
                                             else PlatformIcons.\iPRIVATE_ICON;
-            return LayeredIcon.createHorizontalIcon(baseIcon, layer);
+            return LayeredIcon.createHorizontalIcon(icon, layer);
         }
+        
+        if (baseIcon is Null) {
+            print("Missing icon for ``decl``");
+        }
+        
         return baseIcon;
     }
 }

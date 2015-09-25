@@ -54,7 +54,7 @@ shared abstract class ImportHandler() {
                 
             }
         } else {
-            value insertPosition = (cu.importList?.stopIndex?.intValue() else -1) + 1;
+            value insertPosition = cu.importList?.endIndex?.intValue() else 0;
             value prefix = if (insertPosition == 0) then "" else "\n";
             insertAndFormatImport(ctx.file, doc, "``prefix``import ``pkg`` {``decl.name``}\n", insertPosition);
         }
@@ -80,7 +80,7 @@ shared abstract class ImportHandler() {
                 return imtl.startIndex.intValue() + 1;
             }
             else {
-                return imts.get(imts.size()-1).stopIndex.intValue() + 1;
+                return imts.get(imts.size()-1).endIndex.intValue();
             }
         }
     }

@@ -3,3 +3,4 @@
 compile-jvm=false
 compile-js=false
 system-repository=
+source-attachments=.ceylon/attachments.properties
