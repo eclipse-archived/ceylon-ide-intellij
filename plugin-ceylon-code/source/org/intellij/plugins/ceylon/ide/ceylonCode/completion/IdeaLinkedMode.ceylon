@@ -1,78 +1,60 @@
-import java.lang {
-    ObjectArray
+import ceylon.collection {
+    ArrayList
 }
 import ceylon.interop.java {
     createJavaObjectArray
 }
-import com.intellij.openapi.editor {
-    Editor
+
+import com.intellij.codeInsight.lookup {
+    LookupElement
 }
 import com.intellij.codeInsight.template {
     TemplateManager,
     ExpressionContext,
     Expression,
-    Template,
     TemplateResult=Result,
-    TextResult
+    TextResult,
+    TemplateBuilderImpl
 }
-import com.intellij.codeInsight.lookup {
-    LookupElement
+import com.intellij.openapi.editor {
+    Editor
 }
-import com.intellij.codeInsight.template.impl {
-    TemplateImpl
+import com.intellij.openapi.util {
+    TextRange
 }
-import ceylon.collection {
-    ArrayList
+import com.intellij.psi {
+    PsiDocumentManager
 }
-//import com.intellij.openapi.editor.markup {
-//    HighlighterLayer,
-//    HighlighterTargetArea
-//}
-//import com.intellij.openapi.editor.colors {
-//    EditorColors,
-//    EditorColorsManager
-//}
 
+import java.lang {
+    ObjectArray
+}
 
-shared class IdeaLinkedMode(String text, Integer startInDoc) {
-    value variables = ArrayList<[String, LookupElement[]]>();
-    value templateText = StringBuilder();
-    variable Integer startOffset = startInDoc;
+shared class IdeaLinkedMode(Editor editor) {
+    value variables = ArrayList<[TextRange, LookupElement[]]>();
     
     shared void addEditableRegion(Integer start, Integer len, LookupElement[] proposals) {
-        if (start > startOffset) {
-            templateText.append(text.span(startOffset - startInDoc, start - startInDoc - 1));
-        }
-        templateText.append("$__Variable``variables.size``$");
-        startOffset = start + len;
-        value varName = len == 0 then "" else text.span(start - startInDoc, start - startInDoc - 1 + len);
-        variables.add([varName, proposals]);
+        variables.add([TextRange.from(start, len), proposals]);
     }
     
-    shared void buildTemplate(Editor editor, Boolean inline = false) {
-        if (startOffset < startInDoc + text.size) {
-            templateText.append(text.span(startOffset - startInDoc, startInDoc + text.size));
-        }
+    shared void buildTemplate(Editor editor) {
+        PsiDocumentManager.getInstance(editor.project).commitDocument(editor.document);
+        value file = PsiDocumentManager.getInstance(editor.project).getPsiFile(editor.document);
+        value builder = TemplateBuilderImpl(file.firstChild);
         
-        //print("-``templateText.string``-");
-        
-        TemplateImpl template = TemplateImpl("", templateText.string, "");
         for (var in variables) {
-            template.addVariable(object extends Expression() {
-                shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext) => createJavaObjectArray(var[1]);
-                shared actual TemplateResult? calculateQuickResult(ExpressionContext? expressionContext) => TextResult(var[0]);
-                shared actual TemplateResult? calculateResult(ExpressionContext? expressionContext) => TextResult(var[0]);
-            }, true);
+            value text = editor.document.getText(var[0]);
+            value proposals = object extends Expression() {
+                    shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext) => createJavaObjectArray(var[1]);
+                    shared actual TemplateResult? calculateQuickResult(ExpressionContext? expressionContext) => TextResult(text);
+                    shared actual TemplateResult? calculateResult(ExpressionContext? expressionContext) => TextResult(text);
+            };
+            builder.replaceRange(var[0], proposals);
         }
         
-        template.toReformat = false;
-        template.inline = inline;
+        editor.caretModel.moveToOffset(0);
         
-        // TODO replace live templates with this?
-        //value marker = editor.markupModel.addRangeHighlighter(5, 10, HighlighterLayer.\iLAST + 1,
-        //    EditorColorsManager.instance.globalScheme.getAttributes(EditorColors.\iLIVE_TEMPLATE_ATTRIBUTES),
-        //    HighlighterTargetArea.\iEXACT_RANGE);
-        
+        value template = builder.buildInlineTemplate();
         TemplateManager.getInstance(editor.project).startTemplate(editor, template);
     }
 }

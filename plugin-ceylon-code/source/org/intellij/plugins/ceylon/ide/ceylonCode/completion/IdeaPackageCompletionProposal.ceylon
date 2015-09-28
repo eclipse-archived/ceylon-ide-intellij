@@ -55,7 +55,6 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
         shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
             // Undo IntelliJ's completion
             replaceInDoc(data.document, offset, text.size - prefix.size, "");
-            PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);
             
             applyInternal(data.document);
         }
@@ -66,7 +65,7 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
             .withIcon(ideaIcons.forDeclaration(d));
         // TODO replace selection
     }
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode(text, offset - prefix.size);
+    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode(data.editor);
     
     shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start, Integer len,
         Integer exitSeqNumber, LookupElement[] proposals) {
@@ -76,10 +75,6 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
     
     shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber,
         Integer exitPosition) {
-        
-        // Undo our text insertion because we're replacing it with a live template
-        replaceInDoc(data.document, offset - prefix.size, text.size, "");
-        data.editor.caretModel.moveToOffset(offset - prefix.size);
         
         lm.buildTemplate(data.editor);
     }

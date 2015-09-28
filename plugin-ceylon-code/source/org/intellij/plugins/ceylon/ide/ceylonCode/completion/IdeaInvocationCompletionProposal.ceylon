@@ -84,7 +84,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         }
     );
     
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode(text, adjustedOffset - prefix.size);
+    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode(data.editor);
     
     shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start, Integer len,
         Integer exitSeqNumber, LookupElement[] proposals) {
@@ -94,9 +94,6 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     
     shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber,
         Integer exitPosition) {
-        
-        // Undo our text insertion because we're replacing it with a live template
-        replaceInDoc(data.document, adjustedOffset - prefix.size, text.size, "");
         
         lm.buildTemplate(data.editor);
     }
