@@ -34,27 +34,29 @@ import ceylon.collection {
 //}
 
 
-class IdeaLinkedMode(String text, Integer startInDoc) {
+shared class IdeaLinkedMode(String text, Integer startInDoc) {
     value variables = ArrayList<[String, LookupElement[]]>();
     value templateText = StringBuilder();
     variable Integer startOffset = startInDoc;
     
     shared void addEditableRegion(Integer start, Integer len, LookupElement[] proposals) {
-        templateText.append(text.span(startOffset - startInDoc, start - startInDoc - 1));
+        if (start > startOffset) {
+            templateText.append(text.span(startOffset - startInDoc, start - startInDoc - 1));
+        }
         templateText.append("$__Variable``variables.size``$");
         startOffset = start + len;
         value varName = len == 0 then "" else text.span(start - startInDoc, start - startInDoc - 1 + len);
         variables.add([varName, proposals]);
     }
     
-    shared void buildTemplate(Editor editor) {
+    shared void buildTemplate(Editor editor, Boolean inline = false) {
         if (startOffset < startInDoc + text.size) {
             templateText.append(text.span(startOffset - startInDoc, startInDoc + text.size));
         }
         
-        //print(templateText.string);
+        //print("-``templateText.string``-");
         
-        Template template = TemplateImpl("", templateText.string, "");
+        TemplateImpl template = TemplateImpl("", templateText.string, "");
         for (var in variables) {
             template.addVariable(object extends Expression() {
                 shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext) => createJavaObjectArray(var[1]);
@@ -64,6 +66,7 @@ class IdeaLinkedMode(String text, Integer startInDoc) {
         }
         
         template.toReformat = false;
+        template.inline = inline;
         
         // TODO replace live templates with this?
         //value marker = editor.markupModel.addRangeHighlighter(5, 10, HighlighterLayer.\iLAST + 1,

@@ -14,6 +14,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
+import com.redhat.ceylon.common.Backend;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleSourceMapper;
@@ -38,7 +39,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
 
@@ -163,6 +166,11 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             public ModuleManager createModuleManager(final Context context) {
                 // FIXME use a real LazyModuleManager to remove this hack
                 return new ModuleManager() {
+                    @Override
+                    public Set<String> getSupportedBackends() {
+                        return Collections.singleton(Backend.Java.nativeAnnotation);
+                    }
+
                     @Override
                     public void addImplicitImports() {
                         com.redhat.ceylon.model.typechecker.model.Module languageModule = getModules().getLanguageModule();
