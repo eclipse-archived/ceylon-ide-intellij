@@ -24,7 +24,11 @@ import com.redhat.ceylon.ide.common.correct {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaLinkedMode
+    IdeaLinkedMode,
+    ideaCompletionManager
+}
+import com.redhat.ceylon.ide.common.completion {
+    IdeCompletionManager
 }
 
 shared class DeclareLocalIntention(Tree.CompilationUnit rootNode, Node node, Project project)
@@ -61,4 +65,8 @@ shared class DeclareLocalIntention(Tree.CompilationUnit rootNode, Node node, Pro
             => getDeclareLocalTerm(rootNode, node) exists;
     
     shared actual void applyChange(Document doc, TextChange change) => change.apply();
+
+    shared actual IdeCompletionManager<out Object,out Object,LookupElement,Document> completionManager
+            => ideaCompletionManager;
+    
 }

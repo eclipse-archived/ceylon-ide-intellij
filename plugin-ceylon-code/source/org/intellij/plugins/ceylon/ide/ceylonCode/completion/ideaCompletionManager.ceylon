@@ -334,6 +334,11 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         
         return MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
     }
+    
+    shared actual LookupElement newTypeProposal(Integer offset, Type? type, String text, String desc, Tree.CompilationUnit rootNode) {
+        return IdeaTypeProposal(offset, type, text, desc, rootNode).lookupElement;
+    }
+    
 }
 
 class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocation, 

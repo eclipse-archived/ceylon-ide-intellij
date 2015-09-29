@@ -6,6 +6,8 @@ import com.intellij.codeInsight.completion.CompletionProgressIndicator;
 import com.intellij.codeInsight.completion.CompletionService;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
+import com.intellij.codeInsight.lookup.LookupEx;
+import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.codeInsight.lookup.impl.EmptyLookupItem;
 import com.intellij.codeInsight.lookup.impl.LookupCellRenderer;
 import com.intellij.codeInsight.lookup.impl.LookupImpl;
@@ -44,24 +46,31 @@ public class CustomLookupCellRenderer extends LookupCellRenderer {
     public static void install(final Project project) {
         CompletionProcess currentCompletion = CompletionService.getCompletionService().getCurrentCompletion();
         if (currentCompletion instanceof CompletionProgressIndicator) {
-            final LookupImpl lookup = ((CompletionProgressIndicator) currentCompletion).getLookup();
-
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    CustomLookupCellRenderer inst = new CustomLookupCellRenderer(lookup, project);
-                    try {
-                        Field f = LookupImpl.class.getDeclaredField("myCellRenderer");
-                        f.setAccessible(true);
-                        f.set(lookup, inst);
-                        f.setAccessible(false);
-                    } catch (ReflectiveOperationException e) {
-                        e.printStackTrace();
-                    }
-                    lookup.getList().setCellRenderer(inst);
-                }
-            });
+            installOnLookup(project, ((CompletionProgressIndicator) currentCompletion).getLookup());
+        } else {
+            LookupEx activeLookup = LookupManager.getInstance(project).getActiveLookup();
+            if (activeLookup instanceof LookupImpl) {
+                installOnLookup(project, (LookupImpl) activeLookup);
+            }
         }
+    }
+
+    private static void installOnLookup(final Project project, final LookupImpl lookup) {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                CustomLookupCellRenderer inst = new CustomLookupCellRenderer(lookup, project);
+                try {
+                    Field f = LookupImpl.class.getDeclaredField("myCellRenderer");
+                    f.setAccessible(true);
+                    f.set(lookup, inst);
+                    f.setAccessible(false);
+                } catch (ReflectiveOperationException e) {
+                    e.printStackTrace();
+                }
+                lookup.getList().setCellRenderer(inst);
+            }
+        });
     }
 
     public CustomLookupCellRenderer(LookupImpl lookup, Project project) {

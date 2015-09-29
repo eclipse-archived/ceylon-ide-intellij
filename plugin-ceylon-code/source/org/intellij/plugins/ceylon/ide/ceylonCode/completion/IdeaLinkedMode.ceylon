@@ -14,7 +14,9 @@ import com.intellij.codeInsight.template {
     Expression,
     TemplateResult=Result,
     TextResult,
-    TemplateBuilderImpl
+    TemplateBuilderImpl,
+    TemplateEditingAdapter,
+    Template
 }
 import com.intellij.openapi.editor {
     Editor
@@ -28,6 +30,9 @@ import com.intellij.psi {
 
 import java.lang {
     ObjectArray
+}
+import com.intellij.codeInsight.template.impl {
+    TemplateState
 }
 
 shared class IdeaLinkedMode(Editor editor) {
@@ -45,7 +50,8 @@ shared class IdeaLinkedMode(Editor editor) {
         for (var in variables) {
             value text = editor.document.getText(var[0]);
             value proposals = object extends Expression() {
-                    shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext) => createJavaObjectArray(var[1]);
+                    shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext)
+                        => createJavaObjectArray(var[1]);
                     shared actual TemplateResult? calculateQuickResult(ExpressionContext? expressionContext) => TextResult(text);
                     shared actual TemplateResult? calculateResult(ExpressionContext? expressionContext) => TextResult(text);
             };
@@ -55,6 +61,11 @@ shared class IdeaLinkedMode(Editor editor) {
         editor.caretModel.moveToOffset(0);
         
         value template = builder.buildInlineTemplate();
-        TemplateManager.getInstance(editor.project).startTemplate(editor, template);
+        value listener = object extends TemplateEditingAdapter() {
+            shared actual void currentVariableChanged(TemplateState? templateState, Template? template, Integer int, Integer int1) {
+                CustomLookupCellRenderer.install(editor.project);
+            }
+        };
+        TemplateManager.getInstance(editor.project).startTemplate(editor, template, listener);
     }
 }

@@ -12,9 +12,6 @@ import com.intellij.openapi.editor {
 import com.intellij.openapi.util {
     TextRange
 }
-import com.intellij.psi {
-    PsiDocumentManager
-}
 import com.redhat.ceylon.ide.common.completion {
     ImportedModulePackageProposal
 }
