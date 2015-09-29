@@ -1,5 +1,6 @@
 import com.intellij.codeInsight.lookup {
-    LookupElement
+    LookupElement,
+    LookupElementBuilder
 }
 import com.intellij.openapi.editor {
     Document
@@ -27,8 +28,8 @@ shared object ideaImportProposals
     shared actual Indents<Document> indents => ideaIndents;
 
     shared actual TextChange createImportChange(CeylonFile file)
-            => nothing;
+            => TextChange(file.viewProvider.document);
 
     shared actual LookupElement newImportProposal(String description, TextChange correctionChange)
-            => nothing;
+            => LookupElementBuilder.create(correctionChange, description);
 }

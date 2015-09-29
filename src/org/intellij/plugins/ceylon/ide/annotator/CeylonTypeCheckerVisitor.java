@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
@@ -7,7 +8,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiFile;
+import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
@@ -15,9 +20,11 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
 import org.apache.commons.lang.ArrayUtils;
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct.DeclareLocalIntention;
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct.RefineFormalMembersIntention;
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A visitor that visits a compilation unit returned by {@link com.redhat.ceylon.compiler.typechecker.parser.CeylonParser}
@@ -71,11 +78,24 @@ class CeylonTypeCheckerVisitor extends Visitor {
     }
 
     private void addQuickFixes(Node that, Message error, Annotation annotation) {
-        Tree.CompilationUnit cu = ((CeylonFile) annotationHolder.getCurrentAnnotationSession().getFile()).getCompilationUnit();
+        CeylonFile file = (CeylonFile) annotationHolder.getCurrentAnnotationSession().getFile();
+        Tree.CompilationUnit cu = file.getCompilationUnit();
+        TypeChecker tc = TypeCheckerProvider.getFor(file);
 
         switch (error.getCode()) {
             case 100:
-                annotation.registerFix(new DeclareLocalIntention(cu, that, annotationHolder.getCurrentAnnotationSession().getFile().getProject()));
+                annotation.registerFix(new DeclareLocalIntention(cu, that, file.getProject()));
+                // fall-through
+            case 102:
+                if (tc != null) {
+                    List<LookupElement> proposals = new ArrayList<>();
+                    ideaImportProposals_.get_().addImportProposals(cu, that, proposals, file);
+                    for (LookupElement proposal : proposals) {
+                        annotation.registerFix(new ImportTypeIntention(proposal));
+                    }
+                }
+                new CreateEnumIntention(file.getViewProvider().getDocument(), annotation)
+                        .addCreateEnumProposal(cu, that, tc);
                 break;
             case 300:
                 annotation.registerFix(new RefineFormalMembersIntention(that, false));

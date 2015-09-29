@@ -142,6 +142,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Not
             case (Icons.modules) AllIcons.Nodes.\iArtifact
             case (Icons.objects) PlatformIcons.\iANONYMOUS_CLASS_ICON
             case (Icons.classes) PlatformIcons.\iCLASS_ICON
+            case (Icons.interfaces) PlatformIcons.\iINTERFACE_ICON
             case (Icons.enumeration) PlatformIcons.\iENUM_ICON
             case (Icons.extendedType) AllIcons.General.\iOverridingMethod
             case (Icons.satisfiedTypes) AllIcons.General.\iImplementingMethod
@@ -152,6 +153,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Not
             case (Icons.returns) AllIcons.Actions.\iStepOut
             case (Icons.units) IconLoader.getIcon("/icons/ceylonFile.png")
             case (Icons.parameters) AllIcons.Nodes.\iParameter
+            case (Icons.attributes) AllIcons.Nodes.\iParameter // TODO
             case (Icons.types) AllIcons.Nodes.\iParameter // TODO
             ;
         }
