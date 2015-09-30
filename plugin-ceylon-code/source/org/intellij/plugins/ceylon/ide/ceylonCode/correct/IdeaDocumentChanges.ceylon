@@ -30,7 +30,8 @@ shared class InsertEdit(Integer position, shared String str) satisfies AliasedAs
     shared actual CharArray chars => javaString(str).toCharArray();
 }
 
-shared class DeleteEdit(shared actual Integer start, shared actual Integer end) satisfies AliasedAsTextEdit {
+shared class DeleteEdit(shared actual Integer start, Integer length) satisfies AliasedAsTextEdit {
+    shared actual Integer end => start + length;
     shared actual CharSequence text => javaString("");
     shared actual CharArray chars => javaString("").toCharArray();
 }
