@@ -55,14 +55,18 @@ shared interface AbstractIntention
     
     shared actual TextRange newRegion(Integer start, Integer length) => TextRange.from(start, length);
     
-    shared actual TextChange newTextChange(String desc, PhasedUnit|CeylonFile unitOrFile) {
-        VirtualFile? vfile = if (is PhasedUnit unitOrFile) 
-                      then VirtualFileManager.instance.findFileByUrl("file://" + unitOrFile.unit.fullPath)
-                      else unitOrFile.virtualFile;
-
-        assert (exists vfile);
-        
-        return TextChange(FileDocumentManager.instance.getDocument(vfile));
+    shared actual TextChange newTextChange(String desc, PhasedUnit|CeylonFile|Document unitOrFile) {
+        if (is Document unitOrFile) {
+            return TextChange(unitOrFile);
+        } else {
+            VirtualFile? vfile = if (is PhasedUnit unitOrFile) 
+                          then VirtualFileManager.instance.findFileByUrl("file://" + unitOrFile.unit.fullPath)
+                          else unitOrFile.virtualFile;
+    
+            assert (exists vfile);
+            
+            return TextChange(FileDocumentManager.instance.getDocument(vfile));
+        }
     }
     
     shared actual IdeCompletionManager<out Anything,out Anything,LookupElement,Document> completionManager

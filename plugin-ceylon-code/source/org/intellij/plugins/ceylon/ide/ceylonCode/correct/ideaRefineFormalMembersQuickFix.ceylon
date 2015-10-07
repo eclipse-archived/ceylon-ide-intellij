@@ -21,10 +21,6 @@ import com.redhat.ceylon.ide.common.correct {
     RefineFormalMembersQuickFix
 }
 
-import java.lang {
-    Character
-}
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
@@ -37,13 +33,13 @@ shared object ideaRefineFormalMembersQuickFix
                 & IdeaDocumentChanges & AbstractIntention {
     
      shared actual Character getDocChar(Document doc, Integer offset)
-            => Character(doc.getText(TextRange.from(offset, 1)).first else ' ');
+            => doc.getText(TextRange.from(offset, 1)).first else ' ';
     
     shared actual void newRefineFormalMembersProposal(IdeaQuickFixData data, String desc) {
         data.registerFix(desc, null, null, ideaIcons.refinement, false, void (Project project, Editor editor, PsiFile psiFile) {
             assert(is CeylonFile psiFile);
             
-            if (exists change = refineFormalMembers(data, psiFile, editor.caretModel.offset)) {
+            if (exists change = refineFormalMembers(data, editor.document, editor.caretModel.offset)) {
                 change.apply();
             }
         });
