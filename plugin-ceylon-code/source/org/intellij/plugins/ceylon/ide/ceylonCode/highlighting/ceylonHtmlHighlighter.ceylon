@@ -27,8 +27,62 @@ import ceylon.interop.java {
 import com.redhat.ceylon.ide.common.doc {
     convertToHTML
 }
+import java.lang {
+    StringBuffer
+}
+import java.util {
+    StringTokenizer
+}
+import java.util.regex {
+    Pattern
+}
 
-shared String highlight(String rawText, Project project) {
+Pattern path = Pattern.compile("\\b\\p{Ll}+(\\.\\p{Ll}+)+\\b");
+
+shared String highlightProposal(String description, Project project, Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
+    value result = StringBuffer();
+    StringTokenizer tokens = StringTokenizer(description, "'\"", true);
+    result.append("<html>");
+    result.append(tokens.nextToken());
+
+    value stringAttrs = textAttributes(ceylonHighlightingColors.strings);
+    
+    while (tokens.hasMoreTokens()) {
+        variable String tok = tokens.nextToken();
+        if (tok.equals("\'")) {
+            if (!eliminateQuotes) {
+                result.append(tok);
+            }
+            while (tokens.hasMoreTokens()) {
+                variable String token = tokens.nextToken();
+                if (token.equals("\'")) {
+                    if (!eliminateQuotes) {
+                        result.append(token);
+                    }
+                    break;
+                } else if (token.equals("\"")) {
+                    result.append(style(token, 0, token.size, stringAttrs));
+                    while (tokens.hasMoreTokens()) {
+                        value quoted = tokens.nextToken();
+                        result.append(style(quoted, 0, quoted.size, stringAttrs));
+                        if (quoted.equals("\"")) {
+                            break;
+                        }
+                    }
+                } else {
+                    result.append(highlight(token, project, qualifiedNameIsPath));
+                }
+            }
+        } else {
+            result.append(tok);
+        }
+    }
+    result.append("</html>");
+    
+    return result.string;
+}
+
+shared String highlight(String rawText, Project project, Boolean qualifiedNameIsPath = false) {
     EditorHighlighter highlighter = HighlighterFactory.createHighlighter(project, FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
     highlighter.setText(javaString(rawText));
 
@@ -36,7 +90,12 @@ shared String highlight(String rawText, Project project) {
     StringBuilder builder = StringBuilder();
 
     while (!iterator.atEnd()) {
-        builder.append(style(rawText, iterator.start, iterator.end, iterator.textAttributes));
+        // TODO this doesn't work because dots have their own attributes and split qualified names into multiple parts
+        value attrs = if (qualifiedNameIsPath && path.matcher(javaString(rawText.span(iterator.start, iterator.end - 1))).find())
+                        then textAttributes(ceylonHighlightingColors.packages)
+                        else iterator.textAttributes;
+        
+        builder.append(style(rawText, iterator.start, iterator.end, attrs));
         iterator.advance();
     }
 

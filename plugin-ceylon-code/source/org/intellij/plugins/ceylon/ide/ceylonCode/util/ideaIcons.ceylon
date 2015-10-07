@@ -32,12 +32,14 @@ import com.redhat.ceylon.model.typechecker.model {
 // TODO merge this with Icons.java?
 shared object ideaIcons {
     shared Icon imports => IconLoader.getIcon("/icons/ceylonImports.gif");
+    shared Icon singleImport => IconLoader.getIcon("/icons/ceylonImport.gif");
     shared Icon packages => IconLoader.getIcon("/icons/package.png");
     shared Icon modules => AllIcons.Nodes.\iArtifact;
     shared Icon classes => PlatformIcons.\iCLASS_ICON;
     shared Icon interfaces => PlatformIcons.\iINTERFACE_ICON;
     shared Icon objects => AllIcons.Nodes.\iAnonymousClass;
     shared Icon methods => PlatformIcons.\iMETHOD_ICON;
+    shared Icon attributes = PlatformIcons.\iFIELD_ICON;
     
     shared Icon surround => IconLoader.getIcon("/icons/ceylonSurround.png");
     shared Icon refinement => AllIcons.General.\iImplementingMethod;
@@ -46,6 +48,9 @@ shared object ideaIcons {
     shared Icon values => AllIcons.Nodes.\iVariable;
     shared Icon anonymousFunction => AllIcons.Nodes.\iFunction;
     shared Icon types => IconLoader.getIcon("/icons/ceylonTypes.png");
+    
+    shared Icon correction => AllIcons.Actions.\iRedo;
+    shared Icon addCorrection => AllIcons.General.\iAdd;
     
     shared Icon file => IconLoader.getIcon("/icons/ceylonFile.png");
     

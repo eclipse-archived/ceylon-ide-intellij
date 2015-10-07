@@ -35,7 +35,7 @@ import com.intellij.codeInsight.template.impl {
     TemplateState
 }
 
-shared class IdeaLinkedMode(Editor editor) {
+shared class IdeaLinkedMode() {
     value variables = ArrayList<[TextRange, LookupElement[]]>();
     
     shared void addEditableRegion(Integer start, Integer len, LookupElement[] proposals) {

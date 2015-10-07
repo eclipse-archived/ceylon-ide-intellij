@@ -20,6 +20,12 @@ import java.util {
     JList = List,
     ArrayList
 }
+import com.intellij.openapi.project {
+    Project
+}
+import com.intellij.psi {
+    PsiDocumentManager
+}
 
 shared alias TextEdit => AliasedAsTextEdit;
 
@@ -49,10 +55,14 @@ shared class TextChange(shared Document document) {
         changes.add(edit);
     }
 
-    shared void apply() {
+    shared void apply(Project? project = null) {
         value chars = javaString(document.text).toCharArray();
         value newText = BulkChangesMerger.\iINSTANCE.mergeToCharArray(chars, document.textLength, changes);
         document.setText(JString(newText));
+
+        if (exists project) {
+            PsiDocumentManager.getInstance(project).commitAllDocuments();
+        }
     }
 }
 

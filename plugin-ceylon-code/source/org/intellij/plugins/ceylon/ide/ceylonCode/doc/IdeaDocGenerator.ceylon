@@ -155,6 +155,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Not
             case (Icons.parameters) AllIcons.Nodes.\iParameter
             case (Icons.attributes) AllIcons.Nodes.\iParameter // TODO
             case (Icons.types) AllIcons.Nodes.\iParameter // TODO
+            else null
             ;
         }
     }

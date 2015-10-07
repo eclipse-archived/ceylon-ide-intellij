@@ -62,7 +62,7 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
             .withIcon(ideaIcons.forDeclaration(d));
         // TODO replace selection
     }
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode(data.editor);
+    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
     
     shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start, Integer len,
         Integer exitSeqNumber, LookupElement[] proposals) {
