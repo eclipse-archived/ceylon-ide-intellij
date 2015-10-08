@@ -124,7 +124,8 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
             shared actual void subTask(String? desc) {}
         };
         value returnedParamInfo = true; // The parameters tooltip has nothing to do with code completion, so we bypass it
-        value completions = getContentProposals(params, parameters.editor.caretModel.offset, line, isSecondLevel, monitor, returnedParamInfo);
+        value completions = getContentProposals(pu.compilationUnit, params, 
+            parameters.editor.caretModel.offset, line, isSecondLevel, monitor, returnedParamInfo);
         
         CustomLookupCellRenderer.install(parameters.editor.project);
         

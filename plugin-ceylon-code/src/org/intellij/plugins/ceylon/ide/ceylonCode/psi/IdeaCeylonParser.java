@@ -121,9 +121,9 @@ public class IdeaCeylonParser extends IStubFileElementType {
                     parent.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), token));
                 }
 
-                if (!NODES_ALLOWED_AT_EOF.contains(token.getType())) {
-                    Logger.getInstance(IdeaCeylonParser.class).error("Unexpected token " + token + " in " + file.getName());
-                }
+//                if (!NODES_ALLOWED_AT_EOF.contains(token.getType())) {
+//                    Logger.getInstance(IdeaCeylonParser.class).error("Unexpected token " + token + " in " + file.getName());
+//                }
             }
         }
 
