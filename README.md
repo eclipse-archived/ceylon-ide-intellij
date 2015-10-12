@@ -1,11 +1,11 @@
-IntelliJ Plugin for Ceylon
-==========================
+Ceylon IDE for IntelliJ
+=======================
 # Status
 This is an attempt at adding (awesome) support for the Ceylon programming language in IntelliJ IDEA.
 
 # Requirements
 
-This plugin is being written using IntelliJ 14. It will work on both Community and Ultimate editions.
+This plugin is being written using IntelliJ 14/15. It will work on both Community and Ultimate editions.
 We do not guarantee that this plugin will work with previous versions of IntelliJ (13 and below), as we may use APIs that were introduced in version 14.
 
 We embed most of the raw Ceylon installation in the plugin, so you won't necessarily have to download Ceylon separately. You may need a local repository though.
@@ -19,13 +19,13 @@ See the [Features](https://github.com/ceylon/ceylon-ide-intellij/wiki/Features) 
 # Testing & Hacking
 
 For the moment, we do not provide an official release package in the Jetbrains plugins repository, since it is still under early development.
-However, installable zips of the current development version are generated and will be made availabe in an alternate plugin repository, on a regular basis.
-You can either install the CeylonIDEA from there, or build it from sources.
+However, installable zips of the current development version are generated and will be made availabe in an alternate plugin repository, on a regular basis (see below).
+You can either install the Ceylon IDE for IntelliJ from there, or build it from sources.
 
 ## Common pre-requisites
 
-- a _Community_ or _Ultimate_ version of **[IntelliJ 14](http://www.jetbrains.com/idea/download/)**
-- **OSX users**: this plugin needs a JRE 7+, but IntelliJ 14 requires a JDK 6 by default. To run Ceylon IDEA, you can either:
+- a _Community_ or _Ultimate_ version of **[IntelliJ 14/15](http://www.jetbrains.com/idea/download/)**
+- **OSX users**: this plugin needs a JRE 7+, but IntelliJ 14 requires a JDK 6 by default. To run Ceylon IDE, you can either:
   - download IntelliJ with a [custom JDK bundled](https://confluence.jetbrains.com/display/IntelliJIDEA/Previous+IntelliJ+IDEA+Releases)
   - download the standard version, install it, then modify `Info.plist` to [force a recent version of Java](https://intellij-support.jetbrains.com/hc/en-us/articles/206827547-Selecting-the-JDK-version-the-IDE-will-run-under)
 
@@ -41,7 +41,7 @@ to the list of custom plugin repositories.
 
 Then, from this new repository, you should be able to install those 2 plugins at the same time :
 - **CeylonIDEA**, the Ceylon development environment for IntelliJ IDEA
-- **CeylonRuntime**, a required plugin that allows running Ceylon code inside an IntelliJ plugin. It is required by the CeylonIDEA plugin since CeylonIDEA will have parts developped in Ceylon. 
+- **CeylonRuntime**, a required plugin that allows running Ceylon code inside an IntelliJ plugin. It is required by Ceylon IDE since it contains parts developped in Ceylon. 
 
 After installing both plugins and restarting IntelliJ IDEA, you should have the ability to create Ceylon IntelliJ modules in which you can develop and run Ceylon code.
 
@@ -49,7 +49,7 @@ After installing both plugins and restarting IntelliJ IDEA, you should have the 
 
 If you want to use the current version, or debug/hack this plugin, you will need to build it from sources :
 
-1. Make sure you are using **IntelliJ 14** (it won't work with the current stable version 12.x, and might not work with version 13.x)
+1. Make sure you are using **IntelliJ 14 or 15** (it won't work with the current stable version 12.x, and might not work with version 13.x)
 
 2. A clone of https://github.com/JetBrains/intellij-community is highly recommended for hacking since you will likely have to debug code from the IntelliJ platform
 
@@ -67,12 +67,8 @@ If you want to use the current version, or debug/hack this plugin, you will need
 6. Setup all the Ceylon distribution sibling projects by running the `ant setup` command in direcrory `../ceylon-dist`. This will create sibling projects such as : `../ceylon-spec`, `../ceylon-compiler`, etc ...
 	
 7. Build a full Ceylon distribution locally (see [here](https://github.com/ceylon/ceylon-dist/blob/master/README.md#building-the-distribution) for more details) :
-    - In the `../ceylon-dist` directory run : `ant clean publish-all ide-quick`
+    - In the `../ceylon-dist` directory run : `ant clean dist sdk intellij`
     - This will create a `dist` sub-directory in `../ceylon-dist`, with the built Ceylon distribution.
-
-7. Some parts of the plugin are written in Ceylon, but cannot yet be built within IntelliJ, so you need to compile them manually:
-    - In the `ceylon-ide-intellij/plugin-ceylon-code` directory, run: `../../ceylon-dist/dist/bin/ceylon compile`
-    - This will generate a `.jar` archive that is required in `ceylon-ide-intellij`'s classpath
 
 8. Open the project `ceylon-ide-intellij` in IDEA. You might be requested to enter the value of 2 path variables (see next point).
 
