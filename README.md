@@ -63,7 +63,10 @@ If you want to use the current version, or debug/hack this plugin, you will need
     - `git clone https://github.com/ceylon/ceylon-dist`
     - `cd ceylon-dist`
     - `ant setup setup-sdk setup-ide` (this will create sibling projects such as: `../ceylon-spec`, `../ceylon-compiler`, etc)
-	
+
+5. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and add the following line:
+    - `ideaRoot=/Applications/IntelliJ IDEA 14 CE.app/Contents/` (change the path to point to your local IntelliJ installation)
+
 7. Build a full Ceylon distribution locally (see [here](https://github.com/ceylon/ceylon-dist/blob/master/README.md#building-the-distribution) for more details):
     - In the `../ceylon-dist` directory run : `ant clean dist sdk intellij`
     - This will create a `dist` sub-directory in `../ceylon-dist`, with a local Ceylon distribution.
