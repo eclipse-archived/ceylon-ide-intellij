@@ -89,8 +89,10 @@ String(String, Project) outerHighlight = highlight;
 shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Nothing>() {
 
     shared class DocParams(PhasedUnit pu, Project p) satisfies LocalAnalysisResult<Document,Nothing> {
-        shared actual Tree.CompilationUnit rootNode => pu.compilationUnit;
-        shared actual PhasedUnit phasedUnit => pu;
+        shared actual Tree.CompilationUnit lastCompilationUnit => pu.compilationUnit;
+        shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
+        shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
+        shared actual PhasedUnit lastPhasedUnit => pu;
         shared actual Document document => nothing;
         shared actual JList<CommonToken>? tokens => pu.tokens;
         shared actual TypeChecker typeChecker => nothing;

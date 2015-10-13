@@ -56,7 +56,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
     Boolean qualified, Declaration? qualifyingValue, CompletionData data) 
         extends InvocationCompletionProposal<CompletionData,Module,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>
-        (offset, prefix, desc, text, declaration, producedReference, scope, data.rootNode, includeDefaulted,
+        (offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
             positionalInvocation, namedInvocation, qualified, qualifyingValue, ideaCompletionManager)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
 

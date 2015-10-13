@@ -96,20 +96,22 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIndents
 }
 
-shared class CompletionData(shared actual PhasedUnit phasedUnit, shared Editor editor,
+shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Editor editor,
         shared actual TypeChecker typeChecker, shared CeylonFile file)
         satisfies LocalAnalysisResult<Document,Module> {
-    shared actual Tree.CompilationUnit rootNode => phasedUnit.compilationUnit;
+    shared actual Tree.CompilationUnit lastCompilationUnit => lastPhasedUnit.compilationUnit;
+    shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
+    shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
     shared actual Document document => editor.document;
-    shared actual JList<CommonToken>? tokens => phasedUnit.tokens;
-    shared actual CeylonProject<Module>? ceylonProject => null; // TODO
+    shared actual JList<CommonToken>? tokens => lastPhasedUnit.tokens;
+    shared actual CeylonProject<Module>? ceylonProject => null;// TODO
 }
 
 shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,Module,LookupElement,Document>() {
     
     shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result,
             PhasedUnit pu, TypeChecker tc) {
-        value isSecondLevel = parameters.invocationCount >= 2;
+        value isSecondLevel = parameters.invocationCount > 0 && parameters.invocationCount % 2 == 0;
         value element = parameters.originalPosition;
         value doc = parameters.editor.document;
         assert(is CeylonFile ceylonFile = element.containingFile);

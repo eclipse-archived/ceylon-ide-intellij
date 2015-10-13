@@ -81,7 +81,7 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null, Inse
         }
     };
     
-    variable LookupElementBuilder builder = LookupElementBuilder.create(newText)
+    variable LookupElementBuilder builder = LookupElementBuilder.create(text, newText)
             .withPresentableText(desc)
             .withIcon(icon)
             .withInsertHandler(newHandler);

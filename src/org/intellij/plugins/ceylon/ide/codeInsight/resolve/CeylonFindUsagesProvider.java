@@ -10,7 +10,6 @@ import com.redhat.ceylon.model.typechecker.model.Function;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.ParameterDeclarationPsiIdOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,8 +49,10 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getType(@NotNull PsiElement element) {
-        if (element instanceof CeylonPsi.ClassOrInterfacePsi) {
-            return element.getNode().getElementType() == CeylonTypes.INTERFACE_DEFINITION ? "Interface" : "Class";
+        if (element instanceof CeylonPsi.AnyClassPsi) {
+            return "Class";
+        } else if (element instanceof CeylonPsi.AnyInterfacePsi) {
+            return "Interface";
         } else if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
             return "Attribute";
         } else if (element instanceof CeylonPsi.AnyMethodPsi) {
@@ -62,6 +63,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return "Type parameter";
         } else if (element instanceof CeylonPsi.ObjectDefinitionPsi) {
             return "Object";
+        } else if (element instanceof CeylonPsi.ConstructorPsi) {
+            return "Constructor";
         }
 
         throw new UnsupportedOperationException(element.toString());

@@ -47,7 +47,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 class IdeaFunctionCompletionProposal
         (Integer _offset, String prefix, String desc, String text, Declaration decl, CompletionData data)
         extends FunctionCompletionProposal<LookupElement, CeylonFile, Document, InsertEdit, TextEdit, TextChange, TextRange>
-        (_offset, prefix, desc, text, decl, data.rootNode)
+        (_offset, prefix, desc, text, decl, data.lastCompilationUnit)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
 
     shared actual variable Boolean toggleOverwrite = false;
