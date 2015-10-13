@@ -24,6 +24,11 @@ public class VFileAdapter implements com.redhat.ceylon.compiler.typechecker.io.V
     }
 
     @Override
+    public boolean exists() {
+        return delegate.exists();
+    }
+
+    @Override
     public boolean isFolder() {
         return delegate.isDirectory();
     }

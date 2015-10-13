@@ -30,4 +30,7 @@ shared class PsiFileVirtualFile(PsiFile file) satisfies FileVirtualFile<Object, 
     shared actual default String path => file.virtualFile.canonicalPath;
     shared actual PsiFile nativeResource => file;
     shared actual String charset => file.virtualFile.charset.string;
+
+    shared actual Boolean \iexists() => file.physical;
+    
 }
