@@ -52,7 +52,8 @@ interface IdeaCompletionProposal satisfies CommonCompletionProposal<Document,Tex
     }
 }
 
-LookupElementBuilder newLookup(String desc, String text, Icon? icon = null, InsertHandler<LookupElement>? handler = null) {
+LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
+    InsertHandler<LookupElement>? handler = null, TextRange? selection = null) {
     variable Integer? cutOffset = null;
     
     Integer? parenOffset = desc.firstOccurrence('(');
@@ -77,6 +78,12 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null, Inse
             
             if (exists handler) {
                 handler.handleInsert(insertionContext, t);
+            }
+            
+            if (exists selection) {
+                insertionContext.editor.selectionModel.setSelection(
+                    selection.startOffset, selection.endOffset);
+                insertionContext.editor.caretModel.moveToOffset(selection.endOffset);
             }
         }
     };

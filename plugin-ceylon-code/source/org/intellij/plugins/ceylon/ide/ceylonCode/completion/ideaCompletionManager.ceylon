@@ -50,8 +50,7 @@ import com.redhat.ceylon.ide.common.typechecker {
 }
 import com.redhat.ceylon.ide.common.util {
     ProgressMonitor,
-    Indents,
-    escaping
+    Indents
 }
 import com.redhat.ceylon.model.typechecker.model {
     Function,
@@ -212,13 +211,11 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
     
     shared actual LookupElement newAnonFunctionProposal(Integer offset, Type? requiredType,
-        Unit unit, String text, String header, Boolean isVoid) {
+        Unit unit, String text, String header, Boolean isVoid,
+        Integer selectionStart, Integer selectionLength) {
         
-        //print("newAnonFunctionProposal");
-        
-        // TODO should appear at the top of the list
-        return newLookup(text, text)
-            .withIcon(ideaIcons.anonymousFunction);
+        return newLookup(text, text, ideaIcons.correction, 
+            null, TextRange.from(selectionStart, selectionLength));
     }
     
     shared actual LookupElement newNamedArgumentProposal(Integer offset, String prefix,
@@ -233,25 +230,22 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     shared actual LookupElement newInlineFunctionProposal(Integer offset, String prefix, Reference? pr,
         String desc, String text, CompletionData data, Declaration dec, Scope scope) {
 
-        //print("newInlineFunctionProposal");
-        // TODO should appear at the top of the completion list
         return newLookup(desc, text)
             .withIcon(ideaIcons.param);
     }
     
     shared actual LookupElement newProgramElementReferenceCompletion(Integer offset, String prefix,
-        Declaration dec, Unit? u, Reference? pr, Scope scope, CompletionData data, Boolean isMember) {
+        String name, String desc, Declaration dec, Reference? pr, Scope scope, CompletionData data, Boolean isMember) {
         
-        //print("newProgramElementReferenceCompletion");
-        return IdeaInvocationCompletionProposal(offset, prefix, dec.getName(u), escaping.escapeName(dec, u),
+        return IdeaInvocationCompletionProposal(offset, prefix, name, desc,
             dec, dec.reference, scope, true, false, false, isMember, null, data).lookupElement;
     }
     
-    shared actual LookupElement newBasicCompletionProposal(Integer offset, String prefix,
-        String text, String escapedText, Declaration decl, CompletionData data) {
+    shared actual LookupElement newBasicCompletionProposal(Integer offset,
+        String prefix, String text, String escapedText, Declaration decl,
+        CompletionData data) {
 
-        //print("newBasicCompletionProposal");
-        return newLookup(escapedText, text);
+        return newLookup(escapedText, text, ideaIcons.forDeclaration(decl));
     }
     
     shared actual LookupElement newPackageDescriptorProposal(Integer offset, String prefix, String desc, String text) {
@@ -320,9 +314,11 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
 
     shared actual LookupElement newControlStructureCompletionProposal(Integer offset, String prefix,
         String desc, String text, Declaration dec, CompletionData data) {
+        value loc = text.firstOccurrence('}') 
+            else ((text.firstOccurrence(';') else - 1) + 1);
+        value selection = TextRange.from(offset + loc - prefix.size, 0);
         
-        return LookupElementBuilder.create(text)
-            .withPresentableText(desc);
+        return newLookup(desc, text, ideaIcons.correction, null, selection);
     }
     
     shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc, Integer index) {
