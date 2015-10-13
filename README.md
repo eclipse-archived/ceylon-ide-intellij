@@ -47,7 +47,7 @@ After installing both plugins and restarting IntelliJ IDEA, you should have the 
 
 ## Install from sources 
 
-If you want to use the current version, or debug/hack this plugin, you will need to build it from sources :
+If you want to use the current version, or debug/hack this plugin, you will need to build it from sources:
 
 1. Make sure you are using **IntelliJ 14 or 15** (it won't work with the current stable version 12.x, and might not work with version 13.x)
 
@@ -58,17 +58,17 @@ If you want to use the current version, or debug/hack this plugin, you will need
     - **UI Designer** + **UI Designer (core)**, 
     - **PsiViewer** (optional but recommended)
 
-4. Setup a clone of https://github.com/ceylon/ceylon-ide-intellij (the main plugin project)
-
-5. Make sure that the following GitHub repositories have all been cloned locally into the same parent directory :
-    - https://github.com/ceylon/ceylon-dist (the Ceylon distribution project)
-    - https://github.com/ceylon/ceylon-ide-common (shared between the Eclipse plugin and the IntelliJ plugin)
-
-6. Setup all the Ceylon distribution sibling projects by running the `ant setup` command in direcrory `../ceylon-dist`. This will create sibling projects such as : `../ceylon-spec`, `../ceylon-compiler`, etc ...
+4. Set up a clone of `ceylon-dist` and all the other required dependencies:
+    - `mkdir ceylon && cd ceylon`
+    - `git clone https://github.com/ceylon/ceylon-dist`
+    - `cd ceylon-dist`
+    - `ant setup setup-sdk setup-ide` (this will create sibling projects such as: `../ceylon-spec`, `../ceylon-compiler`, etc)
 	
-7. Build a full Ceylon distribution locally (see [here](https://github.com/ceylon/ceylon-dist/blob/master/README.md#building-the-distribution) for more details) :
+7. Build a full Ceylon distribution locally (see [here](https://github.com/ceylon/ceylon-dist/blob/master/README.md#building-the-distribution) for more details):
     - In the `../ceylon-dist` directory run : `ant clean dist sdk intellij`
-    - This will create a `dist` sub-directory in `../ceylon-dist`, with the built Ceylon distribution.
+    - This will create a `dist` sub-directory in `../ceylon-dist`, with a local Ceylon distribution.
+    - This will also compile everything needed to build Ceylon IDE (SDK, Java to Ceylon converter, ceylon-ide-common)
+    - Finally, this will compile Ceylon IDE
 
 8. Open the project `ceylon-ide-intellij` in IDEA. You might be requested to enter the value of 2 path variables (see next point).
 
