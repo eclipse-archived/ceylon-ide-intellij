@@ -1,15 +1,22 @@
 package org.intellij.plugins.ceylon.ide.doc;
 
 import ceylon.language.language_;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.testFramework.LightCodeInsightTestCase;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+import org.antlr.runtime.CommonToken;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class CeylonDocProviderTest extends LightCodeInsightTestCase {
 
@@ -32,9 +39,51 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
         String suffix = testName.isEmpty() ? "" : "." + testName;
         String expectedFileName = sourceFileName + suffix + ".html";
 
-        Tree.CompilationUnit cu = tc.getPhasedUnitFromRelativePath(sourceFileName).getCompilationUnit();
+        final PhasedUnit pu = tc.getPhasedUnitFromRelativePath(sourceFileName);
+        final Tree.CompilationUnit cu = pu.getCompilationUnit();
 
-        String doc = new IdeaDocGenerator(tc).getDocumentation(cu, cursorOffset, getProject()).toString();
+        LocalAnalysisResult<Document, Object> params = new LocalAnalysisResult<Document, Object>() {
+            @Override
+            public Tree.CompilationUnit getLastCompilationUnit() {
+                return cu;
+            }
+
+            @Override
+            public Tree.CompilationUnit getParsedRootNode() {
+                return cu;
+            }
+
+            @Override
+            public Tree.CompilationUnit getTypecheckedRootNode() {
+                return cu;
+            }
+
+            @Override
+            public PhasedUnit getLastPhasedUnit() {
+                return pu;
+            }
+
+            @Override
+            public Document getDocument() {
+                return null;
+            }
+
+            @Override
+            public List<CommonToken> getTokens() {
+                return pu.getTokens();
+            }
+
+            @Override
+            public TypeChecker getTypeChecker() {
+                return tc;
+            }
+
+            @Override
+            public CeylonProject<Object> getCeylonProject() {
+                return null;
+            }
+        };
+        String doc = new IdeaDocGenerator(tc).getDocumentation(cu, cursorOffset, params).toString();
 
         File expectedFile = new File("plugin-ceylon-code/test-resources/" + expectedFileName);
         if (expectedFile.exists()) {
