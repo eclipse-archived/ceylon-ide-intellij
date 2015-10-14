@@ -7,6 +7,8 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
+import com.redhat.ceylon.compiler.typechecker.parser.LexError;
+import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
@@ -53,15 +55,24 @@ public class TypeCheckerInvoker {
 
         com.redhat.ceylon.compiler.typechecker.io.VirtualFile srcDir;
         Package pkg;
-        Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
-        if (cu == null) {
-            try {
-                CeylonParser parser = new CeylonParser(tokenStream);
-                cu = parser.compilationUnit();
-            } catch (RecognitionException e) {
-                LOGGER.error(e);
-            }
+
+        Tree.CompilationUnit cu;
+        CeylonParser parser;
+        try {
+            parser = new CeylonParser(tokenStream);
+            cu = parser.compilationUnit();
+        } catch (RecognitionException e) {
+            LOGGER.error(e);
+            return null;
         }
+
+        for (ParseError error : parser.getErrors()) {
+            cu.addParseError(error);
+        }
+        for (LexError error : lexer.getErrors()) {
+            cu.addLexError(error);
+        }
+
         if (phasedUnit == null) {
             srcDir = getSourceFolder(ceylonFile);
             if (srcDir == null) { // happens eg. for *.ceylon files that are not within a source root. Don't do typechecking for these.

@@ -7,10 +7,12 @@ import com.intellij.openapi.util.TextRange;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
+import com.redhat.ceylon.compiler.typechecker.parser.RecognitionError;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
+import org.antlr.runtime.CommonToken;
 import org.apache.commons.lang.ArrayUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.ideaQuickFixManager_;
@@ -50,9 +52,17 @@ class CeylonTypeCheckerVisitor extends Visitor {
                     range = new TextRange(id.getStartIndex() - crlfCountDiff, id.getEndIndex() - crlfCountDiff);
                 }
             }
+            if (error instanceof RecognitionError) {
+                RecognitionError recognitionError = (RecognitionError) error;
+                CommonToken token = (CommonToken) recognitionError.getRecognitionException().token;
+
+                if (token != null) {
+                    range = new TextRange(token.getStartIndex(), token.getStopIndex() + 1);
+                }
+            }
 
             Annotation annotation;
-            if (error instanceof AnalysisError) {
+            if (error instanceof AnalysisError || error instanceof RecognitionError) {
                 annotation = annotationHolder.createErrorAnnotation(range, error.getMessage());
 
                 if (ArrayUtils.contains(UNRESOLVED_REFERENCE_CODES, error.getCode())) {
