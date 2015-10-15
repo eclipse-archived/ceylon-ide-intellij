@@ -66,9 +66,6 @@ import com.redhat.ceylon.model.typechecker.model {
     Package
 }
 
-import java.awt {
-    Font
-}
 import java.util {
     JList=List
 }
@@ -82,10 +79,6 @@ import javax.swing {
 
 import org.antlr.runtime {
     CommonToken
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    ceylonHighlightingColors,
-    textAttributes
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
@@ -187,10 +180,12 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
     
     shared actual LookupElement newRefinementCompletionProposal(Integer offset, String prefix,
-        Reference? pr, String desc, String text, CompletionData data, Declaration dec, Scope scope) {
+        Reference? pr, String desc, String text, CompletionData data,
+        Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType) {
         
-        //print("newRefinementCompletionProposal");
-        return newLookup(desc, text, ideaIcons.refinement, putCaretInBracesInsertHandler);
+        assert(exists pr);
+        return IdeaRefinementCompletionProposal(offset, prefix, pr, desc, text,
+            data, dec, scope, fullType, explicitReturnType).lookupElement;
     }
     
     shared actual LookupElement newMemberNameCompletionProposal(Integer offset, String prefix, String name, String unquotedName) {
@@ -201,13 +196,11 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
     
     shared actual LookupElement newKeywordCompletionProposal(Integer offset, String prefix, String keyword, String text) {
-        value attr = textAttributes(ceylonHighlightingColors.keyword);
+        value selection = if (exists close = text.firstOccurrence(')'))
+            then TextRange.from(offset + close - prefix.size, 0)
+            else null;
         
-        return LookupElementBuilder.create(text)
-            .withPresentableText(keyword)
-            .withItemTextForeground(attr.foregroundColor)
-            .withBoldness(attr.fontType.and(Font.\iBOLD) != 0);
-        // TODO move caret after insertion
+        return newLookup(keyword, text, ideaIcons.correction, null, selection);
     }
     
     shared actual LookupElement newAnonFunctionProposal(Integer offset, Type? requiredType,
@@ -216,22 +209,6 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         
         return newLookup(text, text, ideaIcons.correction, 
             null, TextRange.from(selectionStart, selectionLength));
-    }
-    
-    shared actual LookupElement newNamedArgumentProposal(Integer offset, String prefix,
-        Reference? pr, String desc, String text, CompletionData data, Declaration dec, Scope scope) {
-        
-        //print("newNamedArgumentProposal");
-        // TODO should appear at the top of the completion list
-        return newLookup(desc, text)
-            .withIcon(ideaIcons.param);
-    }
-    
-    shared actual LookupElement newInlineFunctionProposal(Integer offset, String prefix, Reference? pr,
-        String desc, String text, CompletionData data, Declaration dec, Scope scope) {
-
-        return newLookup(desc, text)
-            .withIcon(ideaIcons.param);
     }
     
     shared actual LookupElement newProgramElementReferenceCompletion(Integer offset, String prefix,
