@@ -15,7 +15,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.1.1/org.intellij.plugins.ceylon.ide.ceylonCode-1.1.1.car!/" />
+          <root url="jar://$MODULE_DIR$/../plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.2.0/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
