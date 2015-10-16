@@ -224,29 +224,24 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }       
     
     shared actual LookupElement newModuleProposal(Integer offset, String prefix, Integer len, 
-        String versioned, ModuleSearchResult.ModuleDetails mod,
-        Boolean withBody, ModuleVersionDetails version, String name, Node node) {
+        String versioned, ModuleSearchResult.ModuleDetails mod, Boolean withBody,
+        ModuleVersionDetails version, String name, Node node, CompletionData data) {
         
-        //print("newModuleProposal");
-        // TODO abstraction
-        return LookupElementBuilder.create(versioned)
-                .withIcon(ideaIcons.modules);
+        return IdeaModuleCompletionProposal(offset, prefix, len, versioned,
+            mod, withBody, version, name, node, data).lookupElement;
     }
     
     shared actual LookupElement newModuleDescriptorProposal(Integer offset, String prefix, String desc,
-        String text, Integer selectionStart, Integer selectionEnd) {
-        return newLookup(desc, text)
-                .withIcon(ideaIcons.modules);
-        // TODO selection
+        String text, Integer selectionStart, Integer selectionLength) {
+        
+        value selection = TextRange.from(selectionStart, selectionLength); 
+        return newLookup(desc, text, ideaIcons.modules, null, selection);
     }
 
     shared actual LookupElement newJDKModuleProposal(Integer offset, String prefix, Integer len, 
         String versioned, String name) {
 
-        //print("newJDKModuleProposal");
-        return LookupElementBuilder.create(versioned)
-                .withPresentableText(versioned.spanFrom(len))
-                .withIcon(ideaIcons.modules);
+        return newLookup(versioned, versioned.spanFrom(len), ideaIcons.modules);
     }
 
     // Not supported in IntelliJ (see CeylonParameterInfoHandler instead)
