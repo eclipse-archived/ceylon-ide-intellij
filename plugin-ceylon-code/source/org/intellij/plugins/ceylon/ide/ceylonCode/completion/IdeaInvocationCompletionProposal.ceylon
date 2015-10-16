@@ -103,4 +103,13 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     
     shared actual String completionMode => "overwrite";
     
+    shared actual LookupElement newNestedCompletionProposal(Declaration dec, Declaration? qualifier, Integer loc, Integer index, Boolean basic, String op) {
+        value desc = getNestedCompletionText(op, data.lastCompilationUnit.unit, dec, qualifier, basic, true);
+        value text = getNestedCompletionText(op, data.lastCompilationUnit.unit, dec, qualifier, basic, false);
+        return newLookup(desc, text, ideaIcons.forDeclaration(dec));
+    }
+    
+    shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc, Integer index)
+        => newLookup(val, val, ideaIcons.correction);
+    
 }

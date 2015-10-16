@@ -149,36 +149,15 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     shared actual String getDocumentSubstring(Document doc, Integer start, Integer length)
             => doc.getText(TextRange.from(start, length));
     
-    shared actual LookupElement newPositionalInvocationCompletion(Integer offset, String prefix,
+    shared actual LookupElement newInvocationCompletion(Integer offset, String prefix,
         String desc, String text, Declaration dec, Reference? pr, Scope scope, CompletionData data,
-        Boolean isMember, String? typeArgs, Boolean includeDefaulted, Declaration? qualifyingDec) {
-        
-        //print("newPositionalInvocationCompletion ``dec`` - ``typeArgs else "null"``");
-        //return MyLookupElementBuilder(dec, dec.unit, true, typeArgs, qualifyingDec).lookupElement;
-        return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
-            includeDefaulted, true, false, isMember, qualifyingDec, data).lookupElement;
-    }
-    
-    shared actual LookupElement newNamedInvocationCompletion(Integer offset, String prefix,
-        String desc, String text, Declaration dec, Reference? pr, Scope scope, CompletionData data,
-        Boolean isMember, String? typeArgs, Boolean includeDefaulted) {
-        
-        //print("newNamedInvocationCompletion");
-        assert(exists pr);
+        Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation, 
+        Boolean qualified, Declaration? qualifyingDec) {
         
         return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
-            includeDefaulted, false, true, isMember, null, data).lookupElement;
+            includeDefaulted, positionalInvocation, namedInvocation, qualified, qualifyingDec, data).lookupElement;
     }
-    
-    shared actual LookupElement newReferenceCompletion(Integer offset, String prefix,
-        String desc, String text, Declaration dec, Unit u, Reference? pr, Scope scope,
-        CompletionData data, Boolean isMember, Boolean includeTypeArgs) {
-        
-        //print("newReferenceCompletion ``includeTypeArgs``");
-        return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
-            true, false, false, isMember, null, data).lookupElement;
-    }
-    
+
     shared actual LookupElement newRefinementCompletionProposal(Integer offset, String prefix,
         Reference? pr, String desc, String text, CompletionData data,
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType) {
@@ -209,13 +188,6 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         
         return newLookup(text, text, ideaIcons.correction, 
             null, TextRange.from(selectionStart, selectionLength));
-    }
-    
-    shared actual LookupElement newProgramElementReferenceCompletion(Integer offset, String prefix,
-        String name, String desc, Declaration dec, Reference? pr, Scope scope, CompletionData data, Boolean isMember) {
-        
-        return IdeaInvocationCompletionProposal(offset, prefix, name, desc,
-            dec, dec.reference, scope, true, false, false, isMember, null, data).lookupElement;
     }
     
     shared actual LookupElement newBasicCompletionProposal(Integer offset,
@@ -297,20 +269,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         
         return newLookup(desc, text, ideaIcons.correction, null, selection);
     }
-    
-    shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc, Integer index) {
-        print("newNestedLiteralCompletionProposal ``val``");
-        return LookupElementBuilder.create(val);
-    }
-    
-    shared actual LookupElement newNestedCompletionProposal(Declaration dec, Declaration? qualifier, Integer loc,
-        Integer index, Boolean basic, String op) {
-        
-        print("newNestedCompletionProposal ``dec.qualifiedNameString``");
-        
-        return MyLookupElementBuilder(dec, dec.unit, false).lookupElement;
-    }
-    
+   
     shared actual LookupElement newTypeProposal(Integer offset, Type? type, String text, String desc, Tree.CompilationUnit rootNode) {
         return IdeaTypeProposal(offset, type, text, desc, rootNode).lookupElement;
     }
