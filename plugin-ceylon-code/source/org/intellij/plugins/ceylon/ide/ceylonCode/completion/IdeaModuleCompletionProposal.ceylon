@@ -51,6 +51,9 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
            shared actual void handleInsert(InsertionContext insertionContext,
                LookupElement? t) {
                
+               // Undo IntelliJ's completion
+               replaceInDoc(data.document, offset, text.size - prefix.size, "");
+               
                applyInternal(insertionContext.document);
            }
         }

@@ -40,7 +40,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
 import com.redhat.ceylon.ide.common.completion {
-    IdeCompletionManager
+    IdeCompletionManager,
+    isModuleDescriptor
 }
 import com.redhat.ceylon.ide.common.model {
     CeylonProject
@@ -197,12 +198,15 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
     
     shared actual LookupElement newPackageDescriptorProposal(Integer offset, String prefix, String desc, String text) {
-        return newLookup(desc, text);
+        return newLookup(desc, text, ideaIcons.packages);
     }
     
     shared actual LookupElement newCurrentPackageProposal(Integer offset, String prefix, String packageName, CompletionData data) {
-        return LookupElementBuilder.create(packageName)
-            .withIcon(ideaIcons.packages);
+        value icon = isModuleDescriptor(data.lastCompilationUnit) 
+                     then ideaIcons.modules
+                     else ideaIcons.packages;
+        
+        return newLookup(packageName, packageName, icon);
     }
 
     shared actual LookupElement newImportedModulePackageProposal(Integer offset, String prefix,
@@ -219,8 +223,8 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         String fullPackageName, CompletionData data,
         ModuleVersionDetails version, Unit unit, ModuleSearchResult.ModuleDetails md) {
      
-        print("newQueriedModulePackageProposal");
-        return LookupElementBuilder.create(memberPackageSubname);
+        return IdeaQueriedModulePackageProposal(offset, prefix, memberPackageSubname, withBody,
+            fullPackageName, data, version, unit, md).lookupElement;
     }       
     
     shared actual LookupElement newModuleProposal(Integer offset, String prefix, Integer len, 
