@@ -140,10 +140,9 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     shared actual Indents<Document> indents => ideaIndents;
     
     shared actual LookupElement newParametersCompletionProposal(Integer offset,
-        Type type, JList<Type> argTypes, Node node, CompletionData data) {
-        
-        print("newParametersCompletionProposal");
-        return MyLookupElementBuilder(type.declaration, node.unit, true).lookupElement;
+        String prefix, String desc, String text, JList<Type> argTypes, Node node, Unit unit) {
+
+        return newLookup(prefix + desc, prefix + text, ideaIcons.correction);
     }
     
     shared actual String getDocumentSubstring(Document doc, Integer start, Integer length)
