@@ -28,6 +28,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,8 +37,7 @@ import static com.intellij.ui.SimpleTextAttributes.merge;
 public class CustomLookupCellRenderer extends LookupCellRenderer {
 
     private static final Color PREFIX_FOREGROUND_COLOR = new JBColor(new Color(176, 0, 176), new Color(209, 122, 214));
-    private static final Color SELECTED_PREFIX_FOREGROUND_COLOR = new JBColor(new Color(249, 236, 204), new Color(209, 122, 214));
-    private static final Color SELECTED_BACKGROUND_COLOR = new Color(122, 186, 232);
+    private static final Color SELECTED_PREFIX_FOREGROUND_COLOR = new JBColor(new Color(249, 209, 211), new Color(209, 122, 214));
 
     private LookupImpl myLookup;
     private Project project;
@@ -91,12 +91,6 @@ public class CustomLookupCellRenderer extends LookupCellRenderer {
             JPanel panel = (JPanel) comp;
             Component firstChild = panel.getComponent(0);
 
-            if (isSelected) {
-                panel.getComponent(0).setBackground(SELECTED_BACKGROUND_COLOR);
-                panel.getComponent(1).setBackground(SELECTED_BACKGROUND_COLOR);
-                panel.getComponent(2).setBackground(SELECTED_BACKGROUND_COLOR);
-            }
-
             if (firstChild instanceof SimpleColoredComponent) {
                 LookupElementPresentation pres = new LookupElementPresentation();
 
@@ -120,14 +114,21 @@ public class CustomLookupCellRenderer extends LookupCellRenderer {
                                 SimpleColoredComponent nameComponent) throws ReflectiveOperationException {
 
         int style = SimpleTextAttributes.STYLE_PLAIN;
-        List<PresentableNodeDescriptor.ColoredFragment> colors = highlight(name, project);
+        SimpleTextAttributes highlighted =
+                new SimpleTextAttributes(style, selected ? SELECTED_PREFIX_FOREGROUND_COLOR : PREFIX_FOREGROUND_COLOR);
+
+        List<PresentableNodeDescriptor.ColoredFragment> colors;
+        if (selected) {
+            colors = Collections.singletonList(new PresentableNodeDescriptor.ColoredFragment(name,
+                    new SimpleTextAttributes(style, JBColor.WHITE)));
+        } else {
+            colors = highlight(name, project);
+        }
 
         final String prefix = item instanceof EmptyLookupItem ? "" : myLookup.itemPattern(item);
         if (prefix.length() > 0) {
             Iterable<TextRange> ranges = getMatchingFragments(prefix, name);
             if (ranges != null) {
-                SimpleTextAttributes highlighted =
-                        new SimpleTextAttributes(style, selected ? SELECTED_PREFIX_FOREGROUND_COLOR : PREFIX_FOREGROUND_COLOR);
                 colors = mergeHighlightAndMatches(colors, ranges, highlighted);
             }
         }
