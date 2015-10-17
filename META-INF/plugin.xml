@@ -67,12 +67,13 @@
         <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.CeylonFileTypeFactory"/>
         <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.parser.CeylonParserDefinition"/>
 
-        <lang.syntaxHighlighterFactory key="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonHighlighterFactory"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonSyntaxAnnotator"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonFileHighlightFilter"/>
         <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonColorSettingsPage"/>
         <additionalTextAttributes scheme="Default" file="colorSchemes/CeylonDefault.xml"/>
+        <bundledColorScheme path="/colorSchemes/CeylonGavin"/>
 
         <moduleType id="CEYLON_MODULE" implementationClass="org.intellij.plugins.ceylon.ide.project.CeylonModuleType"/>
             

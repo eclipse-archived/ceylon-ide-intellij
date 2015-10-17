@@ -10,7 +10,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightin
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiVisitor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator {
@@ -57,13 +56,25 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
     }
 
     @Override
+    public void visitElement(PsiElement element) {
+        super.visitElement(element);
+
+        if (element.getNode().getElementType() == CeylonTokens.ASTRING_LITERAL) {
+            Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+            anno.setTextAttributes(ceylonHighlightingColors.getAnnotationString());
+        }
+    }
+
+    @Override
     public void visitIdentifierPsi(@NotNull CeylonPsi.IdentifierPsi element) {
         super.visitIdentifierPsi(element);
 
         String name = element.getName();
         PsiElement prevSibling = element.getPrevSibling();
 
-        if (StringUtil.isNotEmpty(name) && name.charAt(0) < 'z' && prevSibling != null && prevSibling.getNode().getElementType() == CeylonTypes.MEMBER_OP) {
+        if (!(element.getParent() instanceof CeylonPsi.ImportPathPsi)
+                && StringUtil.isNotEmpty(name) && name.charAt(0) < 'z' && prevSibling != null
+                && prevSibling.getNode().getElementType() == CeylonTokens.MEMBER_OP) {
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.setTextAttributes(ceylonHighlightingColors.getMember());
         }
@@ -72,5 +83,13 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.setTextAttributes(ceylonHighlightingColors.getAnnotation());
         }
+    }
+
+    @Override
+    public void visitImportPathPsi(@NotNull CeylonPsi.ImportPathPsi element) {
+        super.visitImportPathPsi(element);
+
+        Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+        anno.setTextAttributes(ceylonHighlightingColors.getPackages());
     }
 }

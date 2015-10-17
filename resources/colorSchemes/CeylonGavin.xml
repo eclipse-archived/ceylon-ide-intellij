@@ -1,0 +1,98 @@
+<scheme name="Gavin" version="1" parent_scheme="Default">
+    <option name="LINE_SPACING" value="1.0" />
+    <option name="EDITOR_FONT_SIZE" value="12" />
+    <option name="EDITOR_FONT_NAME" value="Monaco" />
+    <colors>
+        <!--<option name="CARET_COLOR" value="f8f8f0" />-->
+        <!--<option name="CARET_ROW_COLOR" value="3e3d32" />-->
+        <!--<option name="CONSOLE_BACKGROUND_KEY" value="272822" />-->
+        <!--<option name="GUTTER_BACKGROUND" value="272822" />-->
+        <!--<option name="INDENT_GUIDE" value="3b3a32" />-->
+        <!--<option name="LINE_NUMBERS_COLOR" value="f8f8f2" />-->
+        <!--<option name="SELECTED_INDENT_GUIDE" value="3b3a32" />-->
+        <!--<option name="SELECTION_BACKGROUND" value="49483e" />-->
+        <!--<option name="WHITESPACES" value="3b3a32" />-->
+    </colors>
+    <attributes>
+        <option name="CEYLON_IDENTIFIER">
+            <value>
+                <option name="FOREGROUND" value="003399"/>
+            </value>
+        </option>
+        <option name="CEYLON_TYPE">
+            <value>
+                <option name="FOREGROUND" value="990066"/>
+            </value>
+        </option>
+        <option name="CEYLON_TYPE_LITERAL">
+            <value>
+                <option name="FOREGROUND" value="000000"/>
+            </value>
+        </option>
+        <option name="CEYLON_KEYWORD">
+            <value>
+                <option name="FOREGROUND" value="4C4C4C"/>
+            </value>
+        </option>
+        <option name="CEYLON_NUMBER">
+            <value>
+                <option name="FOREGROUND" value="0000FF"/>
+            </value>
+        </option>
+        <option name="CEYLON_COMMENT">
+            <value>
+                <option name="FOREGROUND" value="808080"/>
+            </value>
+        </option>
+        <option name="CEYLON_STRING">
+            <value>
+                <option name="FOREGROUND" value="0000FF"/>
+            </value>
+        </option>
+        <option name="CEYLON_CHAR">
+            <value>
+                <option name="FOREGROUND" value="0000FF"/>
+            </value>
+        </option>
+        <option name="CEYLON_INTERP">
+            <value>
+                <option name="FOREGROUND" value="0000FF"/>
+            </value>
+        </option>
+        <option name="CEYLON_ANNOTATION_STRING">
+            <value>
+                <option name="FOREGROUND" value="008080"/>
+            </value>
+        </option>
+        <option name="CEYLON_ANNOTATION">
+            <value>
+                <option name="FOREGROUND" value="3399CC"/>
+            </value>
+        </option>
+        <option name="CEYLON_TODO">
+            <value>
+                <option name="FOREGROUND" value="FF8000"/>
+            </value>
+        </option>
+        <option name="CEYLON_SEMI">
+            <value>
+                <option name="FOREGROUND" value="000000"/>
+            </value>
+        </option>
+        <option name="CEYLON_BRACE">
+            <value>
+                <option name="FOREGROUND" value="000000"/>
+            </value>
+        </option>
+        <option name="CEYLON_PACKAGE">
+            <value>
+                <option name="FOREGROUND" value="808080"/>
+            </value>
+        </option>
+        <option name="CEYLON_MEMBER">
+            <value>
+                <option name="FOREGROUND" value="663399"/>
+            </value>
+        </option>
+    </attributes>
+</scheme>
