@@ -7,6 +7,7 @@ import com.intellij.openapi.util.TextRange;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.parser.RecognitionError;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
@@ -84,9 +85,10 @@ class CeylonTypeCheckerVisitor extends Visitor {
         CeylonFile file = (CeylonFile) annotationHolder.getCurrentAnnotationSession().getFile();
         Tree.CompilationUnit cu = file.getCompilationUnit();
         TypeChecker tc = TypeCheckerProvider.getFor(file);
+        PhasedUnit pu = TypeCheckerInvoker.invokeTypeChecker(file, tc);
 
         IdeaQuickFixData data = new IdeaQuickFixData(error, file.getViewProvider().getDocument(),
-                cu, that, tc, annotation);
+                pu.getCompilationUnit(), that, tc, annotation);
         ideaQuickFixManager_.get_().addQuickFixes(data, tc, file);
     }
 }

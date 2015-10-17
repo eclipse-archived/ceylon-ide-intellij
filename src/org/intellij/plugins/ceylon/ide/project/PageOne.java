@@ -6,6 +6,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
+import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +16,12 @@ public class PageOne implements CeylonConfigForm {
     private JCheckBox compileToJs;
     private JPanel panel;
     private JCheckBox workOffline;
+
+    public PageOne() {
+        String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
+        compileForJvm.setSelected(!defaultVm.equals("js"));
+        compileToJs.setSelected(!defaultVm.equals("jvm"));
+    }
 
     @Override
     public JPanel getPanel() {
