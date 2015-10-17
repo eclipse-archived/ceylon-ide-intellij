@@ -81,6 +81,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlight,
     textAttributes
 }
+import com.redhat.ceylon.ide.common.settings {
+    CompletionOptions
+}
 
 String psiProtocol = "psi_element://";
 
@@ -98,6 +101,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Not
         shared actual TypeChecker typeChecker => nothing;
         shared actual CeylonProject<Nothing>? ceylonProject => nothing;
         shared Project ideaProject => p;
+        shared actual CompletionOptions options => nothing;
     }
     
     String hexColor(Integer red, Integer green, Integer blue) {

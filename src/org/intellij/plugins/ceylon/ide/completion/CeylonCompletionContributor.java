@@ -8,13 +8,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.util.ProcessingContext;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
-import jtermios.windows.WinAPI;
+import com.redhat.ceylon.ide.common.settings.CompletionOptions;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion.ideaCompletionManager_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.settings.CompletionSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +51,9 @@ public class CeylonCompletionContributor extends CompletionContributor {
                 CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
                 PhasedUnit phasedUnit = TypeCheckerInvoker.invokeTypeChecker(ceylonFile);
                 if (phasedUnit != null) {
-                    ideaCompletionManager_.get_().addCompletions(parameters, context, result, phasedUnit, TypeCheckerProvider.getFor(element));
+                    CompletionOptions options = CompletionSettings.getInstance().getOptions();
+                    ideaCompletionManager_.get_().addCompletions(parameters, context, result,
+                            phasedUnit, TypeCheckerProvider.getFor(element), options);
                 }
             }
         }

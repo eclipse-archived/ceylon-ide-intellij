@@ -88,9 +88,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons,
     ideaIndents
 }
+import com.redhat.ceylon.ide.common.settings {
+    CompletionOptions
+}
 
 shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Editor editor,
-        shared actual TypeChecker typeChecker, shared CeylonFile file)
+        shared actual TypeChecker typeChecker, shared CeylonFile file, shared actual CompletionOptions options)
         satisfies LocalAnalysisResult<Document,Module> {
     shared actual Tree.CompilationUnit lastCompilationUnit => lastPhasedUnit.compilationUnit;
     shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
@@ -103,12 +106,12 @@ shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Edit
 shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,Module,LookupElement,Document>() {
     
     shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result,
-            PhasedUnit pu, TypeChecker tc) {
+            PhasedUnit pu, TypeChecker tc, CompletionOptions options) {
         value isSecondLevel = parameters.invocationCount > 0 && parameters.invocationCount % 2 == 0;
         value element = parameters.originalPosition;
         value doc = parameters.editor.document;
         assert(is CeylonFile ceylonFile = element.containingFile);
-        value params = CompletionData(pu, parameters.editor, tc, ceylonFile);
+        value params = CompletionData(pu, parameters.editor, tc, ceylonFile, options);
         value line = doc.getLineNumber(element.textOffset);
         
         value monitor = object satisfies ProgressMonitor {
@@ -134,10 +137,6 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
     
     shared actual List<Pattern> proposalFilters => empty;
-    shared actual Boolean showParameterTypes => true;
-    shared actual String inexactMatches => "positional";
-    shared actual Boolean supportsLinkedModeInArguments => false;
-    shared actual Boolean addParameterTypesInCompletions => true;
     shared actual Indents<Document> indents => ideaIndents;
     
     shared actual LookupElement newParametersCompletionProposal(Integer offset,

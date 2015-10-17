@@ -1,10 +1,14 @@
 package org.intellij.plugins.ceylon.ide.project;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class PageOne implements CeylonConfigForm {
     private JCheckBox compileForJvm;
@@ -42,4 +46,5 @@ public class PageOne implements CeylonConfigForm {
             workOffline.setSelected(false);
         }
     }
+
 }

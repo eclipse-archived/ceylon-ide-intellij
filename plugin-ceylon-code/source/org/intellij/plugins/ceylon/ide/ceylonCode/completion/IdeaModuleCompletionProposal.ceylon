@@ -37,13 +37,16 @@ import com.intellij.codeInsight.completion {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 
 class IdeaModuleCompletionProposal(Integer offset, String prefix,
         Integer len, String versioned, ModuleSearchResult.ModuleDetails mod,
         Boolean withBody, ModuleVersionDetails version, 
         String name, Node node, CompletionData data) 
-        extends ModuleProposal<CeylonFile, LookupElement, Document, InsertEdit, TextEdit, TextChange, TextRange, IdeaLinkedMode>
-        (offset, prefix, len, versioned, mod, withBody, version, name, node)
+        extends ModuleProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData,Module>
+        (offset, prefix, len, versioned, mod, withBody, version, name, node, data)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
    
     shared LookupElement lookupElement => newLookup(versioned, versioned.spanFrom(len),

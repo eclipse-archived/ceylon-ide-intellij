@@ -42,11 +42,14 @@ import com.redhat.ceylon.cmr.api {
     ModuleVersionDetails,
     ModuleSearchResult
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 
 class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
                 String fullPackageName, CompletionData data, Package candidate)
-        extends ImportedModulePackageProposal<CeylonFile, LookupElement, Document, InsertEdit, TextEdit, TextChange, TextRange, IdeaLinkedMode>
-        (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate)
+        extends ImportedModulePackageProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData,Module>
+        (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate, data)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
 
     shared actual variable Boolean toggleOverwrite = false;
@@ -58,6 +61,7 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
                 replaceInDoc(data.document, offset, text.size - prefix.size, "");
                 
                 applyInternal(data.document);
+                adjustSelection(data);
             }
         }
     );

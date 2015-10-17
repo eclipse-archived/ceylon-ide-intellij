@@ -6,9 +6,12 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class AetherRepositoryForm {
     private JPanel mainPanel;
@@ -32,4 +35,5 @@ public class AetherRepositoryForm {
     public JPanel getMainPanel() {
         return mainPanel;
     }
+
 }

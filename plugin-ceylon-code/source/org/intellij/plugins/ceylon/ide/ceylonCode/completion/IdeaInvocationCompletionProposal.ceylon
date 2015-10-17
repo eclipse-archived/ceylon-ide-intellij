@@ -79,7 +79,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 }.execute();
                 
                 adjustSelection(data);
-                activeLinkedMode(data.document);
+                activeLinkedMode(data.document, data);
             }
         }
     );

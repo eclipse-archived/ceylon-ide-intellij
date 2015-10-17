@@ -121,5 +121,17 @@
         <debugger.javaDebugAware implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonDebugAware"/>
         <debugger.positionManagerFactory implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonPositionManagerFactory"/>
         <debugger.nodeRenderer implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonNodeRenderer"/>
+
+        <!-- Settings -->
+        <applicationConfigurable groupId="root" displayName="Ceylon" id="preferences.Ceylon"
+                             instance="org.intellij.plugins.ceylon.ide.settings.CeylonConfigurable">
+            <configurable displayName="Editor" id="preferences.Ceylon.editor"
+                          instance="org.intellij.plugins.ceylon.ide.settings.EditorConfigurable">
+                <configurable displayName="Completion" id="preferences.Ceylon.editor.completion"
+                              instance="org.intellij.plugins.ceylon.ide.settings.CompletionConfigurable"/>
+            </configurable>
+        </applicationConfigurable>
+        <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.settings.CompletionSettings"/>
+        <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.settings.CeylonSettings"/>
     </extensions>
 </idea-plugin>

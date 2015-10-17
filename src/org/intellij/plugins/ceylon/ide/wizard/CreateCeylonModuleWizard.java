@@ -3,6 +3,9 @@ package org.intellij.plugins.ceylon.ide.wizard;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import org.apache.commons.lang.StringUtils;
@@ -10,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Set;
 
 import static com.google.common.base.Predicates.notNull;
@@ -60,7 +64,7 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
     private boolean moduleExists(String moduleName) {
         Set<Module> modules;
         if (all(asList(typeChecker, typeChecker.getContext(), typeChecker.getContext().getModules(),
-                        modules = typeChecker.getContext().getModules().getListOfModules()),
+                modules = typeChecker.getContext().getModules().getListOfModules()),
                 notNull())) {
             for (Module module : modules) {
                 if (module.getNameAsString().equals(moduleName)) {
@@ -94,4 +98,5 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
     public boolean isSharedPackage() {
         return sharedPackage.isSelected();
     }
+
 }

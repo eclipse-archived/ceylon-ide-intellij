@@ -3,9 +3,13 @@ package org.intellij.plugins.ceylon.ide.runner;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Graphical editor for Ceylon run configurations.
@@ -41,4 +45,5 @@ public class CeylonRunConfigurationEditor extends SettingsEditor<CeylonRunConfig
 
     private void createUIComponents() {
     }
+
 }
