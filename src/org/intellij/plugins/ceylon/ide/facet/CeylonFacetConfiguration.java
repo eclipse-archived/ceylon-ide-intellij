@@ -24,13 +24,12 @@ import javax.swing.*;
 /**
  * Settings for the Ceylon facet. Uses the same component than the "new module" wizard.
  */
-public class CeylonFacetConfiguration implements FacetConfiguration, PersistentStateComponent<CeylonFacetState> {
+public class CeylonFacetConfiguration implements FacetConfiguration {
 
     public static final String COMPILATION_TAB = "Compilation";
     public static final String REPOS_TAB = "Repositories";
 
     private CeylonProject<Module> ceylonProject;
-    private CeylonFacetState state;
 
     @Override
     public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
@@ -42,25 +41,13 @@ public class CeylonFacetConfiguration implements FacetConfiguration, PersistentS
 
     @Override
     public void readExternal(Element element) throws InvalidDataException {
-        // goto loadState()
     }
 
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
-        // goto getState()
-    }
+        element.addContent("see .config/ide-config");
 
-    @Nullable
-    @Override
-    public CeylonFacetState getState() {
-        ceylonProject.getConfiguration().save();
-        return state;
-    }
-
-    @Override
-    public void loadState(CeylonFacetState state) {
-        System.out.println("loadState()"); // When is it called anyway?
-        this.state = state;
+        ceylonProject.getIdeConfiguration().save();
     }
 
     public void setModule(Module module) {
@@ -69,11 +56,6 @@ public class CeylonFacetConfiguration implements FacetConfiguration, PersistentS
 
         if (ceylonProject == null && ceylonModel.addProject(module)) {
             ceylonProject = ceylonModel.getProject(module);
-        }
-
-        if (state == null) {
-            state = new CeylonFacetState();
-            System.out.println("!!!! Instantiating CeylonFacetState !!!!");
         }
     }
 
@@ -95,17 +77,17 @@ public class CeylonFacetConfiguration implements FacetConfiguration, PersistentS
 
         @Override
         public boolean isModified() {
-            return form.isModified(ceylonProject, state);
+            return form.isModified(ceylonProject);
         }
 
         @Override
         public void reset() {
-            form.load(ceylonProject, state);
+            form.load(ceylonProject);
         }
 
         @Override
         public void apply() throws ConfigurationException {
-            form.apply(ceylonProject, state);
+            form.apply(ceylonProject);
         }
 
         @Override

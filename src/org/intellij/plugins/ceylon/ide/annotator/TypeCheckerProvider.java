@@ -27,13 +27,11 @@ import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
 import com.redhat.ceylon.model.loader.model.LazyModule;
 import com.redhat.ceylon.model.typechecker.model.ModuleImport;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
-import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
-import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -141,8 +139,9 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                 .verbose(false)
                 .usageWarnings(true);
 
+        ceylon.language.String configRepo = ceylonProject.getIdeConfiguration().getSystemRepository();
+        String systemRepo = configRepo == null ? null : interpolateVariablesInRepositoryPath(configRepo.toString());
 
-        String systemRepo = getFacetSystemRepo();
         if (systemRepo == null) {
             systemRepo = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
         }
@@ -228,21 +227,6 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         }
 
         return checker;
-    }
-
-    private String getFacetSystemRepo() {
-        String repo = null;
-        CeylonFacet facet = CeylonFacet.forModule(module);
-
-        if (facet != null) {
-            CeylonFacetState state = facet.getConfiguration().getState();
-
-            if (state != null) {
-                repo = state.getSystemRepository();
-            }
-        }
-
-        return StringUtils.isBlank(repo) ? null : interpolateVariablesInRepositoryPath(repo);
     }
 
     private String interpolateVariablesInRepositoryPath(String repoPath) {

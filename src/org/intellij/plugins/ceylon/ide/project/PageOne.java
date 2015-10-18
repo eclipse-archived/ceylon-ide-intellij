@@ -1,15 +1,10 @@
 package org.intellij.plugins.ceylon.ide.project;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
-import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class PageOne implements CeylonConfigForm {
     private JCheckBox compileForJvm;
@@ -29,23 +24,23 @@ public class PageOne implements CeylonConfigForm {
     }
 
     @Override
-    public void apply(CeylonProject<Module> project, CeylonFacetState state) {
-        state.setCompileForJvm(compileForJvm.isSelected());
-        state.setCompileToJs(compileToJs.isSelected());
+    public void apply(CeylonProject<Module> project) {
+        project.getIdeConfiguration().setCompileToJvm(ceylon.language.Boolean.instance(compileForJvm.isSelected()));
+        project.getIdeConfiguration().setCompileToJs(ceylon.language.Boolean.instance(compileToJs.isSelected()));
         project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(workOffline.isSelected()));
     }
 
     @Override
-    public boolean isModified(CeylonProject<Module> project, CeylonFacetState state) {
-        return state.isCompileForJvm() != compileForJvm.isSelected()
-                || state.isCompileToJs() != compileToJs.isSelected()
+    public boolean isModified(CeylonProject<Module> project) {
+        return project.getIdeConfiguration().getCompileToJvm().booleanValue() != compileForJvm.isSelected()
+                || project.getIdeConfiguration().getCompileToJs().booleanValue() != compileToJs.isSelected()
                 || !ceylon.language.Boolean.equals(workOffline.isSelected(), project.getConfiguration().getProjectOffline());
     }
 
     @Override
-    public void load(CeylonProject<Module> project, CeylonFacetState state) {
-        compileForJvm.setSelected(state.isCompileForJvm());
-        compileToJs.setSelected(state.isCompileToJs());
+    public void load(CeylonProject<Module> project) {
+        compileForJvm.setSelected(project.getIdeConfiguration().getCompileToJvm().booleanValue());
+        compileToJs.setSelected(project.getIdeConfiguration().getCompileToJs().booleanValue());
 
         if (project.getConfiguration().getProjectOffline() != null) {
             workOffline.setSelected(project.getConfiguration().getProjectOffline().booleanValue());

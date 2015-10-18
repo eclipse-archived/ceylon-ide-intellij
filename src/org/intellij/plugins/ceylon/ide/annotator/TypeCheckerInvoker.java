@@ -84,7 +84,10 @@ public class TypeCheckerInvoker {
             pkg = phasedUnit.getPackage();
         }
         phasedUnit = new PhasedUnit(sourceCodeVirtualFile, srcDir, cu, pkg,
-                typeChecker.getPhasedUnits().getModuleManager(), typeChecker.getPhasedUnits().getModuleSourceMapper(), typeChecker.getContext(), tokenStream.getTokens());
+                typeChecker.getPhasedUnits().getModuleManager(),
+                typeChecker.getPhasedUnits().getModuleSourceMapper(),
+                typeChecker.getContext(),
+                tokenStream.getTokens());
 
 //        System.out.printf("Package for %s: %s, %s; module: %s%n", ceylonFile.getName(), ceylonFile.getPackageName(), phasedUnit.getPackage(), phasedUnit.getPackage().getModule());
 

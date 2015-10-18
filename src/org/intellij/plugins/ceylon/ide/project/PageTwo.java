@@ -12,9 +12,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextField;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
@@ -22,7 +19,6 @@ import com.redhat.ceylon.ide.common.configuration.CeylonRepositoryConfigurator;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
-import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -110,8 +106,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     }
 
     @Override
-    public void apply(CeylonProject<Module> config, CeylonFacetState state) {
-        state.setSystemRepository(systemRepository.getText());
+    public void apply(CeylonProject<Module> config) {
+        config.getIdeConfiguration().setSystemRepository(ceylon.language.String.instance(systemRepository.getText()));
         config.getConfiguration().setOutputRepo(outputDirectory.getText());
         config.getConfiguration().setProjectFlatClasspath(Boolean.instance(flatClasspath.isSelected()));
         config.getConfiguration().setProjectAutoExportMavenDependencies(Boolean.instance(exportMavenDeps.isSelected()));
@@ -119,8 +115,9 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     }
 
     @Override
-    public boolean isModified(CeylonProject<Module> config, CeylonFacetState state) {
-        return !StringUtils.equals(state.getSystemRepository(), systemRepository.getText())
+    public boolean isModified(CeylonProject<Module> config) {
+        ceylon.language.String systemRepo = config.getIdeConfiguration().getSystemRepository();
+        return !StringUtils.equals(systemRepo == null ? null : systemRepo.toString(), systemRepository.getText())
                 || !StringUtils.equals(config.getConfiguration().getOutputRepo(), outputDirectory.getText())
                 || !Boolean.equals(flatClasspath.isSelected(), config.getConfiguration().getProjectFlatClasspath())
                 || !Boolean.equals(exportMavenDeps.isSelected(), config.getConfiguration().getProjectAutoExportMavenDependencies())
@@ -129,9 +126,10 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     }
 
     @Override
-    public void load(CeylonProject<Module> config, CeylonFacetState state) {
+    public void load(CeylonProject<Module> config) {
         module = config.getIdeArtifact();
-        systemRepository.setText(state.getSystemRepository());
+        ceylon.language.String systemRepository = config.getIdeConfiguration().getSystemRepository();
+        this.systemRepository.setText(systemRepository == null ? null : systemRepository.toString());
         outputDirectory.setText(config.getConfiguration().getOutputRepo());
         flatClasspath.setSelected(boolValue(config.getConfiguration().getProjectFlatClasspath()));
         exportMavenDeps.setSelected(boolValue(config.getConfiguration().getProjectAutoExportMavenDependencies()));

@@ -10,6 +10,7 @@ import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
+import com.redhat.ceylon.ide.common.settings.CompletionOptions;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import org.antlr.runtime.CommonToken;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
@@ -80,6 +81,11 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
 
             @Override
             public CeylonProject<Object> getCeylonProject() {
+                return null;
+            }
+
+            @Override
+            public CompletionOptions getOptions() {
                 return null;
             }
         };

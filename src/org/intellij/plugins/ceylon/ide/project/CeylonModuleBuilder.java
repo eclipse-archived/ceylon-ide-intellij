@@ -18,7 +18,6 @@ import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
-import org.intellij.plugins.ceylon.ide.facet.CeylonFacetState;
 import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -89,14 +88,13 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
         IdeaCeylonProjects projects = module.getProject().getComponent(IdeaCeylonProjects.class);
         projects.addProject(module);
         CeylonProject<Module> ceylonProject = projects.getProject(module);
-        CeylonFacetState state = new CeylonFacetState();
 
-        pageOne.apply(ceylonProject, state);
-        pageTwo.apply(ceylonProject, state);
+        pageOne.apply(ceylonProject);
+        pageTwo.apply(ceylonProject);
 
         ceylonProject.getConfiguration().save();
         CeylonFacet facet = FacetManager.getInstance(module).addFacet(CeylonFacet.getFacetType(), CeylonFacet.getFacetType().getPresentableName(), null);
-        facet.getConfiguration().loadState(state);
+        facet.getConfiguration().setModule(module);
     }
 
     @Override
