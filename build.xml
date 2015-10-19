@@ -63,8 +63,8 @@
         <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.0/com.redhat.ceylon.ide.common-1.2.0.car" />
         <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/1.2.0/ceylon.collection-1.2.0.car" />
         <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.2.0/ceylon.interop.java-1.2.0.car" />
-        <pathelement path="${basedir}/lib/ceylon.tool.converter.java2ceylon-1.0.0.car" />
-        <pathelement path="${basedir}/lib/antlr-min-runtime-4.5.jar" />
+        <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.0/ceylon.tool.converter.java2ceylon-1.2.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar" />
     </path>
 
     <target name="build-runtime">
@@ -123,8 +123,8 @@
         </copy>
 
         <!-- somehow this .car is not loaded unless it is renamed to .jar :/ -->
-        <move file="${build.dir}/CeylonIDEA/lib/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.car"
-              tofile="${build.dir}/CeylonIDEA/lib/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.jar"/>
+        <!--<move file="${build.dir}/CeylonIDEA/lib/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.car"-->
+              <!--tofile="${build.dir}/CeylonIDEA/lib/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.jar"/>-->
 
         <zip destfile="${basedir}/out/installation-packages/CeylonIDEA.zip"
              basedir="${build.dir}" includes="CeylonIDEA/**"/>

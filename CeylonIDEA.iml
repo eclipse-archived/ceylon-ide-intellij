@@ -69,7 +69,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/antlr-min-runtime-4.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -78,7 +78,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/ceylon.tool.converter.java2ceylon-1.0.0.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.0/ceylon.tool.converter.java2ceylon-1.2.0.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
