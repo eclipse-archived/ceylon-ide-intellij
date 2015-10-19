@@ -35,10 +35,16 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
         long nano = System.nanoTime();
 
         for (Module module : ModuleManager.getInstance(project).getModules()) {
-            TypeChecker tc = module.getComponent(ITypeCheckerProvider.class).getTypeChecker();
+            TypeChecker tc = getTypeChecker(module);
+            if (tc == null) {
+                continue;
+            }
 
             for (PhasedUnit phasedUnit : tc.getPhasedUnits().getPhasedUnits()) {
                 for (Declaration declaration : phasedUnit.getDeclarations()) {
+                    if (declaration.getName() == null) {
+                        continue;
+                    }
                     if (declaration instanceof ClassOrInterface) {
                         declarationMap.putValue(declaration.getName(), declaration);
                     }
@@ -52,6 +58,9 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
                 for (com.redhat.ceylon.model.typechecker.model.Module m : tc.getContext().getModules().getListOfModules()) {
                     for (Package pack : m.getPackages()) {
                         for (Declaration declaration : pack.getMembers()) {
+                            if (declaration.getName() == null) {
+                                continue;
+                            }
                             if (declaration instanceof ClassOrInterface) {
                                 declarationMap.putValue(declaration.getName(), declaration);
                             }
@@ -77,7 +86,10 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
 
             // TODO this loop is ugly
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                TypeChecker tc = module.getComponent(ITypeCheckerProvider.class).getTypeChecker();
+                TypeChecker tc = getTypeChecker(module);
+                if (tc == null) {
+                    continue;
+                }
                 for (Declaration decl : declarationMap.get(name)) {
                     elements.add(resolveDeclaration(decl, tc, project));
                 }
@@ -111,5 +123,15 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
     @Override
     public String getQualifiedNameSeparator() {
         return ".";
+    }
+
+    @Nullable
+    private TypeChecker getTypeChecker(Module module) {
+        ITypeCheckerProvider provider = module.getComponent(ITypeCheckerProvider.class);
+        if (provider == null) {
+            return null;
+        }
+
+        return provider.getTypeChecker();
     }
 }
