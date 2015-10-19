@@ -4,11 +4,13 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ObjectUtils;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.model.typechecker.model.Value;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
@@ -49,22 +51,10 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @NotNull
     @Override
     public SearchScope getUseScope() {
-//        Scope ceylonScope = getCeylonNode().getScope();
-//
-//        if (ceylonScope instanceof Declaration) {
-//            FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor((Declaration) ceylonScope);
-//            visitor.visit(((CeylonFile) getContainingFile()).getCompilationUnit());
-//            Tree.Declaration decl = visitor.getDeclarationNode();
-//            if (decl != null) {
-//                PsiElement psiElt = PsiUtilCore.getElementAtOffset(getContainingFile(), decl.getStartIndex());
-//                if (!(psiElt instanceof CeylonPsi.DeclarationPsi)) {
-//                    psiElt = PsiTreeUtil.getParentOfType(psiElt, CeylonPsi.DeclarationPsi.class);
-//                }
-//                return new LocalSearchScope(psiElt);
-//            }
-//        }
-//
-//        return super.getUseScope();
-        return new LocalSearchScope(getContainingFile());
+        if (getCeylonNode().getScope() instanceof Value) {
+            return new LocalSearchScope(getContainingFile());
+        }
+
+        return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope();
     }
 }
