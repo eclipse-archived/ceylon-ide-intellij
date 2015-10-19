@@ -1,8 +1,10 @@
 package org.intellij.plugins.ceylon.ide.highlighting;
 
 import com.intellij.lexer.Lexer;
+import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import gnu.trove.THashMap;
@@ -95,6 +97,8 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
 
         keys.put(TokenTypes.UIDENTIFIER.getTokenType(), ceylonHighlightingColors.getType());
         keys.put(TokenTypes.LIDENTIFIER.getTokenType(), ceylonHighlightingColors.getIdentifier());
+
+        keys.put(TokenType.BAD_CHARACTER, HighlighterColors.BAD_CHARACTER);
     }
 
     @NotNull

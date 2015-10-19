@@ -4,7 +4,9 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.impl.source.tree.TreeElement;
@@ -52,14 +54,27 @@ public class IdeaCeylonParser extends IStubFileElementType {
         CeylonFile file = (CeylonFile) psi;
         final Queue<Token> tokens = new LinkedList<>();
         boolean verbose = false;
+        final Ref<CommonToken> lastToken = new Ref<>();
 
         CeylonLexer lexer = new CeylonLexer(new ANTLRStringStream(file.getText())) {
             @Override
             public Token nextToken() {
-                Token token = super.nextToken();
+                CommonToken token = (CommonToken) super.nextToken();
 
                 if (token != null) {
+                    int lastStopIndex = -1;
+                    if (!lastToken.isNull()) {
+                        lastStopIndex = lastToken.get().getStopIndex();
+                    }
+                    if (token.getType() != EOF
+                            && lastStopIndex != token.getStartIndex() - 1) {
+                        CommonToken badToken = new CommonToken(token.getInputStream(), -2, 0,
+                                lastStopIndex + 1,
+                                token.getStartIndex() - 1);
+                        tokens.add(badToken);
+                    }
                     tokens.add(token);
+                    lastToken.set(token);
                 }
 
                 return token;
@@ -136,12 +151,17 @@ public class IdeaCeylonParser extends IStubFileElementType {
                 Token token = tokens.remove();
 
                 if (token.getType() != CeylonLexer.EOF) {
-                    parent.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), token));
+                    parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), token));
                 }
 
                 if (verbose && !NODES_ALLOWED_AT_EOF.contains(token.getType())) {
                     Logger.getInstance(IdeaCeylonParser.class).error("Unexpected token " + token + " in " + file.getName());
                 }
+            }
+
+            if (parent.getTextLength() < file.getTextLength()) {
+                String notParsed = file.getText().substring(parent.getTextLength());
+                parent.rawAddChildrenWithoutNotifications(new LeafPsiElement(TokenType.BAD_CHARACTER, notParsed));
             }
         }
 
@@ -179,7 +199,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
 
                     while (index < that.getEndIndex()) {
                         Token toRemove = tokens.remove();
-                        comp.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), toRemove));
+                        comp.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), toRemove));
                         if (verbose) {
                             System.out.println("t \"" + toRemove.getText() + "\"");
                         }
@@ -210,6 +230,13 @@ public class IdeaCeylonParser extends IStubFileElementType {
             }
         }
 
+        private IElementType getElementType(int idx) {
+            if (idx == -2) {
+                return TokenType.BAD_CHARACTER;
+            }
+            return TokenTypes.fromInt(idx);
+        }
+
         @NotNull
         private TreeElement buildLeaf(Node ceylonNode, IElementType type, Token token) {
             String tokenText = token.getText();
@@ -234,7 +261,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
                 comp.putUserData(CEYLON_NODE_KEY, ceylonNode);
                 return comp;
             } else {
-                return new LeafPsiElement(TokenTypes.fromInt(token.getType()), tokenText);
+                return new LeafPsiElement(getElementType(token.getType()), tokenText);
             }
         }
 
@@ -254,7 +281,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
 
             while (index < targetIndex) {
                 Token token = tokens.remove();
-                parent.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), token));
+                parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), token));
                 index += getTokenLength(token);
                 if (verbose) {
                     System.out.println("c \"" + token.getText() + "\"");
