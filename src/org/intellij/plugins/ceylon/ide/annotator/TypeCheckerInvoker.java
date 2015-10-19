@@ -5,23 +5,15 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
-import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
-import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
-import com.redhat.ceylon.compiler.typechecker.parser.LexError;
-import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
-import org.antlr.runtime.ANTLRInputStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.PsiFileVirtualFile;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TypeCheckerInvoker {
@@ -42,36 +34,10 @@ public class TypeCheckerInvoker {
     public static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile, TypeChecker typeChecker) {
         PsiFileVirtualFile sourceCodeVirtualFile = new PsiFileVirtualFile(ceylonFile);
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
-
-        CeylonLexer lexer;
-        try {
-            lexer = new CeylonLexer(new ANTLRInputStream(sourceCodeVirtualFile.getInputStream()));
-        } catch (IOException e) {
-            LOGGER.error(e);
-            throw new RuntimeException("Unexpected error", e);
-        }
-        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-        tokenStream.fill();
+        Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
 
         com.redhat.ceylon.compiler.typechecker.io.VirtualFile srcDir;
         Package pkg;
-
-        Tree.CompilationUnit cu;
-        CeylonParser parser;
-        try {
-            parser = new CeylonParser(tokenStream);
-            cu = parser.compilationUnit();
-        } catch (RecognitionException e) {
-            LOGGER.error(e);
-            return null;
-        }
-
-        for (ParseError error : parser.getErrors()) {
-            cu.addParseError(error);
-        }
-        for (LexError error : lexer.getErrors()) {
-            cu.addLexError(error);
-        }
 
         if (phasedUnit == null) {
             srcDir = getSourceFolder(ceylonFile);
@@ -87,9 +53,7 @@ public class TypeCheckerInvoker {
                 typeChecker.getPhasedUnits().getModuleManager(),
                 typeChecker.getPhasedUnits().getModuleSourceMapper(),
                 typeChecker.getContext(),
-                tokenStream.getTokens());
-
-//        System.out.printf("Package for %s: %s, %s; module: %s%n", ceylonFile.getName(), ceylonFile.getPackageName(), phasedUnit.getPackage(), phasedUnit.getPackage().getModule());
+                ceylonFile.getTokens());
 
         phasedUnit.validateTree();
         phasedUnit.visitSrcModulePhase();
@@ -101,12 +65,13 @@ public class TypeCheckerInvoker {
         phasedUnit.analyseUsage();
         phasedUnit.analyseFlow();
 
-//        System.out.printf(" -- Package assigned by typechecker: %s in %s%n", phasedUnit.getPackage(), phasedUnit.getPackage().getModule());
-
         if (typeChecker.getPhasedUnitFromRelativePath(phasedUnit.getPathRelativeToSrcDir()) != null) {
             typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(phasedUnit.getPathRelativeToSrcDir());
         }
         typeChecker.getPhasedUnits().addPhasedUnit(phasedUnit.getUnitFile(), phasedUnit);
+
+        ceylonFile.setPhasedUnit(phasedUnit);
+
         return phasedUnit;
     }
 
@@ -137,7 +102,7 @@ public class TypeCheckerInvoker {
     private static Package createPackage(String packageName, Module module) {
         Package pkg;
         pkg = new Package();
-        List<String> name = packageName.isEmpty() ? Arrays.asList("") : ModuleManager.splitModuleName(packageName);
+        List<String> name = packageName.isEmpty() ? Collections.singletonList("") : ModuleManager.splitModuleName(packageName);
         pkg.setName(name);
         if (module != null) {
             module.getPackages().add(pkg);

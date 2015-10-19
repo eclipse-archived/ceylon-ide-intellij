@@ -7,9 +7,11 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.text.BlockSupport;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.indexing.IndexingDataKeys;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import org.antlr.runtime.CommonToken;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.NotNull;
@@ -18,17 +20,36 @@ import java.util.List;
 
 public class CeylonFile extends PsiFileBase {
 
+    private Tree.CompilationUnit rootNode;
+    private List<CommonToken> tokens;
+    private PhasedUnit phasedUnit;
+
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
     }
 
-    private CeylonPsi.CompilationUnitPsi getCompilationUnitPsi() {
-        return PsiTreeUtil.findChildOfType(this, CeylonPsi.CompilationUnitPsi.class);
+    void setRootNode(Tree.CompilationUnit rootNode) {
+        this.rootNode = rootNode;
+    }
+
+    void setTokens(List<CommonToken> tokens) {
+        this.tokens = ContainerUtil.immutableList(tokens);
     }
 
     public Tree.CompilationUnit getCompilationUnit() {
-        final CeylonPsi.CompilationUnitPsi cuPsi = getCompilationUnitPsi();
-        return cuPsi == null ? null : cuPsi.getCeylonNode();
+        return rootNode;
+    }
+
+    public List<CommonToken> getTokens() {
+        return tokens;
+    }
+
+    public PhasedUnit getPhasedUnit() {
+        return phasedUnit;
+    }
+
+    public void setPhasedUnit(PhasedUnit phasedUnit) {
+        this.phasedUnit = phasedUnit;
     }
 
     @NotNull

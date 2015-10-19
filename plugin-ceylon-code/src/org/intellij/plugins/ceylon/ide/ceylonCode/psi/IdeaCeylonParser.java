@@ -12,6 +12,8 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
+import com.redhat.ceylon.compiler.typechecker.parser.LexError;
+import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
@@ -65,6 +67,8 @@ public class IdeaCeylonParser extends IStubFileElementType {
         };
 
         CommonTokenStream stream = new CommonTokenStream(lexer);
+        stream.fill();
+
         CeylonParser parser = new CeylonParser(stream);
 
         try {
@@ -82,6 +86,20 @@ public class IdeaCeylonParser extends IStubFileElementType {
             if (verbose) {
                 dump(root, "");
             }
+
+            if (file.getOriginalFile() instanceof CeylonFile) {
+                CeylonFile orig = (CeylonFile) file.getOriginalFile();
+                orig.setRootNode(cu);
+                orig.setTokens(stream.getTokens());
+            }
+
+            for (ParseError error : parser.getErrors()) {
+                cu.addParseError(error);
+            }
+            for (LexError error : lexer.getErrors()) {
+                cu.addLexError(error);
+            }
+
             return root;
         } catch (RecognitionException e) {
             e.printStackTrace();
@@ -121,9 +139,9 @@ public class IdeaCeylonParser extends IStubFileElementType {
                     parent.rawAddChildrenWithoutNotifications(buildLeaf(null, TokenTypes.fromInt(token.getType()), token));
                 }
 
-//                if (!NODES_ALLOWED_AT_EOF.contains(token.getType())) {
-//                    Logger.getInstance(IdeaCeylonParser.class).error("Unexpected token " + token + " in " + file.getName());
-//                }
+                if (verbose && !NODES_ALLOWED_AT_EOF.contains(token.getType())) {
+                    Logger.getInstance(IdeaCeylonParser.class).error("Unexpected token " + token + " in " + file.getName());
+                }
             }
         }
 
@@ -273,8 +291,12 @@ public class IdeaCeylonParser extends IStubFileElementType {
                     Integer idx1 = o1.getStartIndex();
                     Integer idx2 = o2.getStartIndex();
 
-                    if (idx1 == null) { return idx2 == null ? 0 : 1; }
-                    if (idx2 == null) { return -1; }
+                    if (idx1 == null) {
+                        return idx2 == null ? 0 : 1;
+                    }
+                    if (idx2 == null) {
+                        return -1;
+                    }
 
                     return idx1.compareTo(idx2);
                 }

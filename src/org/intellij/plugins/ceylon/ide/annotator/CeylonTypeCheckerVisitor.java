@@ -81,11 +81,15 @@ class CeylonTypeCheckerVisitor extends Visitor {
         super.visitAny(that);
     }
 
+    @Override
+    public void handleException(Exception e, Node that) {
+        e.printStackTrace();
+    }
+
     private void addQuickFixes(Node that, Message error, Annotation annotation) {
         CeylonFile file = (CeylonFile) annotationHolder.getCurrentAnnotationSession().getFile();
-        Tree.CompilationUnit cu = file.getCompilationUnit();
         TypeChecker tc = TypeCheckerProvider.getFor(file);
-        PhasedUnit pu = TypeCheckerInvoker.invokeTypeChecker(file, tc);
+        PhasedUnit pu = file.getPhasedUnit();
 
         IdeaQuickFixData data = new IdeaQuickFixData(error, file.getViewProvider().getDocument(),
                 pu.getCompilationUnit(), that, tc, annotation);
