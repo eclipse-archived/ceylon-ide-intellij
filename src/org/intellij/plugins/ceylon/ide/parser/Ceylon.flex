@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide.parser;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import CeylonTokens;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 
 %%
 
@@ -284,10 +284,10 @@ BinaryDigit = [01]
 "\"" { yybegin(IN_STRING); return CeylonTokens.STRING_LITERAL; }
 
 <IN_STRING> {
-    "``" [^`\"]* "``"? { return CeylonTokens.STRING_TEMPLATE; }
+    "``" [^``]* "``"? { return CeylonTokens.STRING_TEMPLATE; }
     "`" [^`\"]* "`"? { return CeylonTokens.STRING_INTERP; }
-    "\"" { yybegin(YYINITIAL); return CeylonTokens.STRING_LITERAL; }
-    [^`\"]* { return CeylonTokens.STRING_LITERAL; }
+    [^\\]? "\"" { yybegin(YYINITIAL); return CeylonTokens.STRING_LITERAL; }
+    ([^`\"] | "\\\"")* { return CeylonTokens.STRING_LITERAL; }
 }
 
 // Nested multiline comments.
