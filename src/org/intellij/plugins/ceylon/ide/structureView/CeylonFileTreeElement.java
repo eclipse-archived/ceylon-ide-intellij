@@ -40,7 +40,7 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
         List<StructureViewTreeElement> elements = new ArrayList<>();
 
         if (!compilationUnit.getImportList().getImports().isEmpty()) {
-            CeylonPsi.ImportPsi[] imports = PsiTreeUtil.getChildrenOfType(myElement.getFirstChild(), CeylonPsi.ImportPsi.class);
+            CeylonPsi.ImportPsi[] imports = PsiTreeUtil.getChildrenOfType(myElement.getFirstChild().getFirstChild(), CeylonPsi.ImportPsi.class);
 
             if (imports != null && imports.length > 0) {
                 elements.add(new CeylonImportListTreeElement(imports));

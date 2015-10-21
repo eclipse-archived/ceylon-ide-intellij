@@ -31,10 +31,10 @@ import com.redhat.ceylon.model.typechecker.model {
 
 // TODO merge this with Icons.java?
 shared object ideaIcons {
-    shared Icon imports => IconLoader.getIcon("/icons/ceylonImports.gif");
-    shared Icon singleImport => IconLoader.getIcon("/icons/ceylonImport.gif");
-    shared Icon packages => IconLoader.getIcon("/icons/package.png");
-    shared Icon modules => AllIcons.Nodes.\iArtifact;
+    shared Icon imports => IconLoader.getIcon("/icons/ceylonImports.png");
+    shared Icon singleImport => IconLoader.getIcon("/icons/ceylonImport.png");
+    shared Icon packages => IconLoader.getIcon("/icons/ceylonPackage.png");
+    shared Icon modules => IconLoader.getIcon("/icons/ceylonModule.png");
     shared Icon classes => PlatformIcons.\iCLASS_ICON;
     shared Icon interfaces => PlatformIcons.\iINTERFACE_ICON;
     shared Icon objects => AllIcons.Nodes.\iAnonymousClass;
@@ -44,7 +44,7 @@ shared object ideaIcons {
     shared Icon surround => IconLoader.getIcon("/icons/ceylonSurround.png");
     shared Icon refinement => AllIcons.General.\iImplementingMethod;
     shared Icon param => AllIcons.Nodes.\iParameter;
-    shared Icon local => AllIcons.Nodes.\iVariable; // TODO should be different from values
+    shared Icon local => IconLoader.getIcon("/icons/ceylonLocal.png");
     shared Icon values => AllIcons.Nodes.\iVariable;
     shared Icon anonymousFunction => AllIcons.Nodes.\iFunction;
     shared Icon types => IconLoader.getIcon("/icons/ceylonTypes.png");

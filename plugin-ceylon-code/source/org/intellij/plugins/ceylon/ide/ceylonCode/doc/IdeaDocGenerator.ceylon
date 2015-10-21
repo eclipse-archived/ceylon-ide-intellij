@@ -131,7 +131,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Not
         if (is Referenceable thing) {
             return switch (thing)
             case (is Module) AllIcons.Nodes.\iArtifact
-            case (is Package) IconLoader.getIcon("/icons/package.png")
+            case (is Package) IconLoader.getIcon("/icons/ceylonPackage.png")
             case (is Class) if (thing.anonymous) 
                 then PlatformIcons.\iANONYMOUS_CLASS_ICON 
                 else PlatformIcons.\iCLASS_ICON

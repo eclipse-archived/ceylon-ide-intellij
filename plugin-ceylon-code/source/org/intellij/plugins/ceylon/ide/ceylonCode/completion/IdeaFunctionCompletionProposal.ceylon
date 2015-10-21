@@ -43,6 +43,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
+}
 
 class IdeaFunctionCompletionProposal
         (Integer _offset, String prefix, String desc, String text, Declaration decl, CompletionData data)
@@ -52,7 +55,7 @@ class IdeaFunctionCompletionProposal
 
     shared actual variable Boolean toggleOverwrite = false;
     
-    shared LookupElement lookupElement => newLookup(desc, text)
+    shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.surround)
             .withInsertHandler(object satisfies InsertHandler<LookupElement> {
         shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
             // Undo IntelliJ's completion

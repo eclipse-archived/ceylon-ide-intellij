@@ -7,6 +7,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.text.BlockSupport;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.indexing.IndexingDataKeys;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
@@ -36,7 +37,17 @@ public class CeylonFile extends PsiFileBase {
         this.tokens = ContainerUtil.immutableList(tokens);
     }
 
+    private CeylonPsi.CompilationUnitPsi getCompilationUnitPsi() {
+        return PsiTreeUtil.findChildOfType(this, CeylonPsi.CompilationUnitPsi.class);
+    }
+
     public Tree.CompilationUnit getCompilationUnit() {
+        if (rootNode == null) {
+            CeylonPsi.CompilationUnitPsi cu = getCompilationUnitPsi();
+            if (cu != null) {
+                return cu.getCeylonNode();
+            }
+        }
         return rootNode;
     }
 
