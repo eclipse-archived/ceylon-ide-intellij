@@ -170,6 +170,9 @@ public class IdeaCeylonParser extends IStubFileElementType {
             IElementType type = NodeToIElementTypeMap.get(that);
             boolean parentForced = false;
 
+            if (type == null) {
+                System.err.println("Unknown IElementType for " + that);
+            }
             if (parent == null) {
                 parentForced = true;
                 parent = new CompositeElement(type);

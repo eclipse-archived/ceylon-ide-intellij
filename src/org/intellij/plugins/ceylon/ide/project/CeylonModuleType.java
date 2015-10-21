@@ -5,9 +5,9 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.projectRoots.SdkTypeId;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.Condition;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.ArrayUtil;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,12 +53,12 @@ public class CeylonModuleType extends ModuleType<CeylonModuleBuilder> {
 
     @Override
     public Icon getBigIcon() {
-        return IconLoader.getIcon("/icons/ceylon.png");
+        return ideaIcons_.get_().getCeylon();
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return IconLoader.getIcon("/icons/ceylon.png");
+        return ideaIcons_.get_().getCeylon();
     }
 
 

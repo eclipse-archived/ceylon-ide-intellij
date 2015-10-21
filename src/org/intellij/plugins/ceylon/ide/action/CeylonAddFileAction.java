@@ -7,12 +7,12 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.apache.commons.lang.StringUtils;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +23,7 @@ import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 public class CeylonAddFileAction extends CeylonAddingFilesAction {
 
     public CeylonAddFileAction() {
-        super(IconLoader.getIcon("/icons/ceylonFile.png"));
+        super(ideaIcons_.get_().getFile());
     }
 
     @Override

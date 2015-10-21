@@ -1,14 +1,12 @@
 package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
-import com.intellij.ui.LayeredIcon;
-import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,17 +67,6 @@ public class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonP
 
     @Override
     public Icon getIcon(boolean open) {
-        Declaration model = getElement().getCeylonNode().getDeclarationModel();
-        Icon icon = myClass instanceof CeylonPsi.AnyInterfacePsi ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
-
-        if (model != null) {
-            if (model.isShared()) {
-                return LayeredIcon.createHorizontalIcon(icon, PlatformIcons.PUBLIC_ICON);
-            } else {
-                return LayeredIcon.createHorizontalIcon(icon, PlatformIcons.PRIVATE_ICON);
-            }
-        }
-
-        return icon;
+        return ideaIcons_.get_().forDeclaration(getElement().getCeylonNode());
     }
 }

@@ -14,13 +14,13 @@ import com.intellij.openapi.editor.colors {
     CodeInsightColors,
     EditorColorsManager
 }
+import com.intellij.openapi.editor.markup {
+    TextAttributes
+}
 import com.intellij.openapi.options.colors {
     ColorSettingsPage,
     AttributesDescriptor,
     ColorDescriptor
-}
-import com.intellij.openapi.util {
-    IconLoader
 }
 
 import java.lang {
@@ -35,8 +35,9 @@ import java.util {
 import javax.swing {
     Icon
 }
-import com.intellij.openapi.editor.markup {
-    TextAttributes
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
 }
 
 
@@ -93,7 +94,7 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
     
     shared actual String displayName => "Ceylon";
     
-    shared actual Icon icon => IconLoader.getIcon("/icons/ceylon.png");
+    shared actual Icon icon => ideaIcons.ceylon;
     
 }
 

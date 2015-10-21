@@ -8,21 +8,21 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Properties;
 
-import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageNameIsLegal;
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
+import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageNameIsLegal;
 
 public class CeylonAddPackageAction extends CeylonAddingFilesAction {
     public CeylonAddPackageAction() {
-        super(IconLoader.getIcon("/icons/package.png"));
+        super(ideaIcons_.get_().getPackages());
     }
 
     @Override

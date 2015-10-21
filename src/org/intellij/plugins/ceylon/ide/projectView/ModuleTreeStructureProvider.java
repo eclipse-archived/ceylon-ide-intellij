@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.ide.projectView;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.projectView.TreeStructureProvider;
 import com.intellij.ide.projectView.ViewSettings;
@@ -14,6 +13,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -167,7 +167,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
         @Override
         public void update(PresentationData presentation) {
             presentation.setPresentableText(moduleName);
-            presentation.setIcon(AllIcons.Nodes.Artifact);
+            presentation.setIcon(ideaIcons_.get_().getModules());
         }
     }
 }

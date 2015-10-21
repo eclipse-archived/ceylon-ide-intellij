@@ -52,6 +52,7 @@ shared object ideaIcons {
     shared Icon correction => AllIcons.Actions.\iRedo;
     shared Icon addCorrection => AllIcons.General.\iAdd;
     
+    shared Icon ceylon => IconLoader.getIcon("/icons/ceylon.png");
     shared Icon file => IconLoader.getIcon("/icons/ceylonFile.png");
     
     shared Icon? forDeclaration(Tree.Declaration|Declaration decl) {
@@ -72,6 +73,8 @@ shared object ideaIcons {
             types
         case (is TypeParameter)
             param // TODO wrong!
+        case (is Tree.AttributeDeclaration)
+            values
         else
             null;
         

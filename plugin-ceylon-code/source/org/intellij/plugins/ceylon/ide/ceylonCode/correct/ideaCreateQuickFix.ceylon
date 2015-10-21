@@ -1,3 +1,6 @@
+import com.intellij.codeInsight.lookup {
+    LookupElement
+}
 import com.intellij.openapi.editor {
     Document
 }
@@ -11,29 +14,24 @@ import com.redhat.ceylon.ide.common.correct {
     CreateQuickFix,
     CreateParameterQuickFix
 }
+import com.redhat.ceylon.ide.common.doc {
+    Icons
+}
 import com.redhat.ceylon.model.typechecker.model {
     Unit,
     Type,
     Scope
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
-}
-import com.redhat.ceylon.ide.common.doc {
-    Icons
-}
 import javax.swing {
     Icon
 }
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
-}
-import com.intellij.icons {
-    AllIcons
-}
-import com.intellij.codeInsight.lookup {
-    LookupElement
 }
 
 object ideaCreateQuickFix
@@ -48,7 +46,7 @@ object ideaCreateQuickFix
         Icon icon = switch(icons)
         case (Icons.localClass) ideaIcons.classes
         case (Icons.localAttribute) ideaIcons.local
-        else AllIcons.General.\iAdd;
+        else ideaIcons.addCorrection;
         
         data.registerFix(desc, change, selection, icon);
     }

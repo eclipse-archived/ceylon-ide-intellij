@@ -2,9 +2,9 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +42,7 @@ public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement> 
 
     @Override
     public Icon getIcon(boolean open) {
-        return IconLoader.getIcon("/icons/ceylonImports.gif");
+        return ideaIcons_.get_().getImports();
     }
 }
 
@@ -67,6 +67,6 @@ class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi> {
 
     @Override
     public Icon getIcon(boolean open) {
-        return IconLoader.getIcon("/icons/ceylonImport.gif");
+        return ideaIcons_.get_().getSingleImport();
     }
 }

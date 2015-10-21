@@ -5,7 +5,7 @@ import com.intellij.facet.FacetType;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
-import com.intellij.openapi.util.IconLoader;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.intellij.plugins.ceylon.ide.project.CeylonModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +37,6 @@ public class CeylonFacetType extends FacetType<CeylonFacet, CeylonFacetConfigura
     @Nullable
     @Override
     public Icon getIcon() {
-        return IconLoader.getIcon("/icons/ceylon.png");
+        return ideaIcons_.get_().getCeylon();
     }
 }

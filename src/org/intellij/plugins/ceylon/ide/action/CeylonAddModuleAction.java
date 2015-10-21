@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.ide.action;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.ide.util.DirectoryUtil;
@@ -17,6 +16,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.io.impl.FileSystemVirtualFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.intellij.plugins.ceylon.ide.wizard.CreateCeylonModuleWizard;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +26,7 @@ import java.util.Properties;
 public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
     public CeylonAddModuleAction() {
-        super(AllIcons.Nodes.Artifact);
+        super(ideaIcons_.get_().getModules());
     }
 
     @Override
