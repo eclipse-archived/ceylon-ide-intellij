@@ -5,7 +5,9 @@
     <facet type="ceylon" name="Ceylon">
       <configuration>
         <option name="compileForJvm" value="false" />
+        <option name="compileToJs" value="false" />
         <option name="systemRepository" value="" />
+        Do not edit, modify .config/ide-config instead
       </configuration>
     </facet>
   </component>

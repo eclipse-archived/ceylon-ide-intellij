@@ -4,11 +4,11 @@ import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
-import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.redhat.ceylon.ide.common.model.CeylonIdeConfig;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.project.CeylonConfigForm;
@@ -17,7 +17,6 @@ import org.intellij.plugins.ceylon.ide.project.PageTwo;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -45,9 +44,21 @@ public class CeylonFacetConfiguration implements FacetConfiguration {
 
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
-        element.addContent("see .config/ide-config");
+        CeylonIdeConfig<Module> conf = ceylonProject.getIdeConfiguration();
 
-        ceylonProject.getIdeConfiguration().save();
+        element.addContent(new Element("option")
+                .setAttribute("name", "compileForJvm")
+                .setAttribute("value", conf.getCompileToJvm().toString()));
+        element.addContent(new Element("option")
+                .setAttribute("name", "compileToJs")
+                .setAttribute("value", conf.getCompileToJs().toString()));
+        element.addContent(new Element("option")
+                .setAttribute("name", "systemRepository")
+                .setAttribute("value", conf.getSystemRepository() == null ? "" : conf.getSystemRepository().toString()));
+
+        element.addContent("Do not edit, modify .config/ide-config instead");
+
+        conf.save();
     }
 
     public void setModule(Module module) {
