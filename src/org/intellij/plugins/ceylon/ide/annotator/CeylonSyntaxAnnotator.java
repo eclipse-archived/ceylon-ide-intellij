@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
@@ -49,7 +50,8 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
 
         for (PsiElement child : element.getChildren()) {
             if (child instanceof CeylonPsi.ExpressionPsi) {
-                Annotation anno = annotationHolder.createInfoAnnotation(child, null);
+                TextRange range = new TextRange(child.getTextRange().getStartOffset() - 2, child.getTextRange().getEndOffset() + 2);
+                Annotation anno = annotationHolder.createInfoAnnotation(range, null);
                 anno.setTextAttributes(ceylonHighlightingColors.getInterp());
             }
         }

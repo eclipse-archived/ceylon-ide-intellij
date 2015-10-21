@@ -4,6 +4,7 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
@@ -18,6 +19,8 @@ import org.apache.commons.lang.ArrayUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.ideaQuickFixManager_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+
+import java.util.ArrayList;
 
 /**
  * A visitor that visits a compilation unit returned by {@link com.redhat.ceylon.compiler.typechecker.parser.CeylonParser}
@@ -40,7 +43,7 @@ class CeylonTypeCheckerVisitor extends Visitor {
 
     @Override
     public void visitAny(Node that) {
-        for (Message error : that.getErrors()) {
+        for (Message error : new ArrayList<>(that.getErrors())) {
             int crlfCountDiff = 0; //SystemInfo.isWindows ? (error.getLine() - 1) * 2 : 0;
             if (that.getStartIndex() == null || that.getEndIndex() == null) {
                 continue;

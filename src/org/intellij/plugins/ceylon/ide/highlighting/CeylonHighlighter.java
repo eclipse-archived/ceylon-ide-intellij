@@ -9,7 +9,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import gnu.trove.THashMap;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
-import org.intellij.plugins.ceylon.ide.parser.CeylonFlexLexerAdapter;
+import org.intellij.plugins.ceylon.ide.parser.CeylonAntlrToIntellijLexerAdapter;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
@@ -82,6 +82,9 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
 
         keys.put(TokenTypes.CHAR_LITERAL.getTokenType(), ceylonHighlightingColors.getChar());
 
+        keys.put(CeylonTokens.STRING_START, ceylonHighlightingColors.getStrings());
+        keys.put(CeylonTokens.STRING_MID, ceylonHighlightingColors.getStrings());
+        keys.put(CeylonTokens.STRING_END, ceylonHighlightingColors.getStrings());
         keys.put(CeylonTokens.STRING_LITERAL, ceylonHighlightingColors.getStrings());
         keys.put(CeylonTokens.STRING_INTERP, ceylonHighlightingColors.getStrings());
         keys.put(CeylonTokens.VERBATIM_STRING, ceylonHighlightingColors.getStrings());
@@ -104,7 +107,7 @@ public class CeylonHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new CeylonFlexLexerAdapter();
+        return new CeylonAntlrToIntellijLexerAdapter();
     }
 
     @NotNull
