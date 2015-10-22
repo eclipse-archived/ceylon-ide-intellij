@@ -49,7 +49,8 @@ shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
 
     VirtualFile moduleRoot
             => let (defaultRoot = getDefaultRoot())
-                    if (exists contentsRoot = ModuleRootManager.getInstance(ideaModule)?.contentRoots)
+                    if (exists contentsRoot = ModuleRootManager.getInstance(ideaModule)?.contentRoots,
+                        contentsRoot.array.size == 1)
                         then ( contentsRoot.array.first else defaultRoot)
                         else defaultRoot;
 
