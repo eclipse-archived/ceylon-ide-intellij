@@ -38,6 +38,9 @@ import com.redhat.ceylon.ide.common.doc {
 import com.redhat.ceylon.ide.common.model {
     CeylonProject
 }
+import com.redhat.ceylon.ide.common.settings {
+    CompletionOptions
+}
 import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
@@ -81,15 +84,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlight,
     textAttributes
 }
-import com.redhat.ceylon.ide.common.settings {
-    CompletionOptions
-}
 
 String psiProtocol = "psi_element://";
 
 String(String, Project) outerHighlight = highlight;
 
-shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Nothing>() {
+shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,Nothing> {
 
     shared class DocParams(PhasedUnit pu, Project p) satisfies LocalAnalysisResult<Document,Nothing> {
         shared actual Tree.CompilationUnit lastCompilationUnit => pu.compilationUnit;
@@ -111,6 +111,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Not
     TextAttributesKey getAttributes(Colors color) {
         switch (color)
         case (Colors.strings) { return ceylonHighlightingColors.strings; }
+        case (Colors.annotationStrings) { return ceylonHighlightingColors.annotationString; }
         case (Colors.numbers) { return ceylonHighlightingColors.number; }
         case (Colors.annotations) { return ceylonHighlightingColors.annotation; }
         case (Colors.keywords) { return ceylonHighlightingColors.keyword; }
@@ -178,8 +179,6 @@ shared class IdeaDocGenerator(TypeChecker? tc) extends DocGenerator<Document,Not
         builder.append(text).append("</div>");
     }
     
-    shared actual String getInitialValueDescription(Declaration d, LocalAnalysisResult<Document,Nothing> cmp) => "";
-
     shared actual void appendJavadoc(Declaration model, StringBuilder buffer) {}
         
     shared actual String highlight(String text, LocalAnalysisResult<Document,Nothing> cmp) {
