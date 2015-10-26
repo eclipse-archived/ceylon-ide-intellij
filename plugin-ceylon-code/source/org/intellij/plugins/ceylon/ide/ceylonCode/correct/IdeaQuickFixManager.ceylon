@@ -86,7 +86,7 @@ shared object ideaQuickFixManager
             => ideaImportProposals;
     shared actual CreateQuickFix<CeylonFile,TypeChecker,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> createQuickFix
             => ideaCreateQuickFix;
-    shared actual CreateEnumQuickFix<TypeChecker,Document,InsertEdit,TextEdit,TextChange,IdeaQuickFixData> createEnumQuickFix
+    shared actual CreateEnumQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,TypeChecker,IdeaQuickFixData,LookupElement> createEnumQuickFix
             => ideaCreateEnumIntention;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
