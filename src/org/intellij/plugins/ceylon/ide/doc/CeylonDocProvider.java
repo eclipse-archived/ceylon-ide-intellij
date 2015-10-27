@@ -95,7 +95,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 CeylonCompositeElement target = resolveDeclaration((Declaration) first, tc, element.getProject());
 
                 if (target instanceof DeclarationPsiNameIdOwner) {
-                    return ((DeclarationPsiNameIdOwner) target).getNameIdentifier();Show
+                    return ((DeclarationPsiNameIdOwner) target).getNameIdentifier();
                 }
                 return target;
             }
