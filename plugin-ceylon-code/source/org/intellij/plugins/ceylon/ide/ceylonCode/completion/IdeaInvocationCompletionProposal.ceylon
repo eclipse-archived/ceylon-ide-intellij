@@ -35,7 +35,8 @@ import com.redhat.ceylon.ide.common.refactoring {
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     Scope,
-    Reference
+    Reference,
+    TypedDeclaration
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
@@ -54,14 +55,23 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
     Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
-    Boolean qualified, Declaration? qualifyingValue, CompletionData data) 
-        extends InvocationCompletionProposal<CompletionData,Module,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>
-        (offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
-            positionalInvocation, namedInvocation, qualified, qualifyingValue, ideaCompletionManager)
+    Boolean qualified, Declaration? qualifyingValue, CompletionData data)
+        extends InvocationCompletionProposal<CompletionData,Module,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
+    positionalInvocation, namedInvocation, qualified, qualifyingValue, ideaCompletionManager)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
-
+    
     shared actual variable Boolean toggleOverwrite = false;
     
+    String? greyText = " (``declaration.container.qualifiedNameString``)";
+    
+    String? returnType {
+        if (is TypedDeclaration declaration) {
+            return declaration.type.asString();
+        }
+        
+        return null;
+    }
+
     shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.forDeclaration(declaration),
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
@@ -71,7 +81,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 
                 value change = TextChange(data.document);
                 createChange(change, data.document);
-
+                
                 object extends WriteCommandAction<DefaultRegion?>(data.editor.project, data.file) {
                     shared actual void run(Result<DefaultRegion?> result) {
                         change.apply();
@@ -82,7 +92,9 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 activeLinkedMode(data.document, data);
             }
         }
-    );
+    , null, [declaration, text])
+            .withTailText(greyText, true)
+            .withTypeText(returnType);
     
     shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
     
@@ -97,8 +109,8 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         
         lm.buildTemplate(data.editor);
     }
-
-    shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals 
+    
+    shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
             => ideaImportProposals;
     
     shared actual String completionMode => "overwrite";
@@ -110,6 +122,5 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     }
     
     shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc, Integer index)
-        => newLookup(val, val, ideaIcons.correction);
-    
+            => newLookup(val, val, ideaIcons.correction);
 }

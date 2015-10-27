@@ -46,6 +46,7 @@ shared object ideaIcons {
     shared Icon values => AllIcons.Nodes.\iVariable;
     shared Icon anonymousFunction => AllIcons.Nodes.\iFunction;
     shared Icon annotations => AllIcons.Gutter.\iExtAnnotation;
+    shared Icon constructors => AllIcons.Nodes.\iClassInitializer;
     
     shared Icon refinement => AllIcons.General.\iImplementingMethod;
     shared Icon extendedType => AllIcons.General.\iOverridingMethod;
@@ -86,7 +87,7 @@ shared object ideaIcons {
         
         if (!exists a = baseIcon, is Declaration decl) {
             if (ModelUtil.isConstructor(decl)) {
-                baseIcon = null; // TODO
+                baseIcon = constructors;
             } else if (decl.parameter) {
                 baseIcon = param;
             }

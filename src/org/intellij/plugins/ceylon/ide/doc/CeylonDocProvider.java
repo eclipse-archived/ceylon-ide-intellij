@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.doc;
 
+import ceylon.language.Tuple;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
@@ -16,13 +17,14 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.*;
+import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
-import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +32,8 @@ import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference.resolveDeclaration;
 
 public class CeylonDocProvider extends AbstractDocumentationProvider {
 
@@ -47,6 +51,9 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         try {
             TypeChecker tc = TypeCheckerProvider.getFor(element);
             if (tc == null) {
+                tc = TypeCheckerProvider.getFor(originalElement);
+            }
+            if (tc == null) {
                 System.err.println("Can't get type checker for element " + element);
                 return null;
             }
@@ -58,8 +65,8 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 return generator.getDocumentationText(referenceable, null, cu, generator.DocParams$new$(pu, element.getProject())).value;
             }
             if (element.getContainingFile() != null) {
-                Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
-                PhasedUnit pu = tc.getPhasedUnitFromRelativePath(cu.getUnit().getRelativePath());
+                PhasedUnit pu = TypeCheckerInvoker.invokeTypeChecker((CeylonFile) element.getContainingFile(), tc);
+                Tree.CompilationUnit cu = pu.getCompilationUnit();
                 return Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), generator.DocParams$new$(pu, element.getProject())), null);
             }
         } catch (ceylon.language.AssertionError | Exception e) {
@@ -74,6 +81,24 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     public PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {
         if (contextElement != null && !TYPES_TO_IGNORE.contains(contextElement.getNode().getElementType())) {
             return contextElement;
+        }
+
+        return null;
+    }
+
+    @Override
+    public PsiElement getDocumentationElementForLookupItem(PsiManager psiManager, Object object, PsiElement element) {
+        TypeChecker tc = TypeCheckerProvider.getFor(element);
+        if (object instanceof Tuple) {
+            Object first = ((Tuple) object).getFirst();
+            if (first instanceof Declaration) {
+                CeylonCompositeElement target = resolveDeclaration((Declaration) first, tc, element.getProject());
+
+                if (target instanceof DeclarationPsiNameIdOwner) {
+                    return ((DeclarationPsiNameIdOwner) target).getNameIdentifier();Show
+                }
+                return target;
+            }
         }
 
         return null;
@@ -95,7 +120,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             if (link.startsWith("doc:")) {
                 return new DummyPsiElement(target, context.getContainingFile());
             } else if (link.startsWith("dec:")) {
-                CeylonCompositeElement psiDecl = CeylonReference.resolveDeclaration(target, tc, context.getProject());
+                CeylonCompositeElement psiDecl = resolveDeclaration(target, tc, context.getProject());
 
                 if (psiDecl != null) {
                     psiDecl.navigate(true);

@@ -53,7 +53,9 @@ interface IdeaCompletionProposal satisfies CommonCompletionProposal<Document,Tex
 }
 
 LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
-    InsertHandler<LookupElement>? handler = null, TextRange? selection = null) {
+    InsertHandler<LookupElement>? handler = null, TextRange? selection = null,
+    Object? obj = null) {
+    
     variable Integer? cutOffset = null;
     
     Integer? parenOffset = desc.firstOccurrence('(');
@@ -88,7 +90,7 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
         }
     };
     
-    variable LookupElementBuilder builder = LookupElementBuilder.create(text, newText)
+    variable LookupElementBuilder builder = LookupElementBuilder.create(obj else text, newText)
             .withPresentableText(desc)
             .withIcon(icon)
             .withInsertHandler(newHandler);
