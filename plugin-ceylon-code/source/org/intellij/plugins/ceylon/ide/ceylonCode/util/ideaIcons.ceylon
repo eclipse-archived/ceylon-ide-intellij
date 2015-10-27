@@ -29,7 +29,6 @@ import com.redhat.ceylon.model.typechecker.model {
     NothingType
 }
 
-// TODO merge this with Icons.java?
 shared object ideaIcons {
     shared Icon imports => IconLoader.getIcon("/icons/ceylonImports.png");
     shared Icon singleImport => IconLoader.getIcon("/icons/ceylonImport.png");
@@ -40,17 +39,24 @@ shared object ideaIcons {
     shared Icon objects => AllIcons.Nodes.\iAnonymousClass;
     shared Icon methods => PlatformIcons.\iMETHOD_ICON;
     shared Icon attributes = PlatformIcons.\iFIELD_ICON;
-    
-    shared Icon surround => IconLoader.getIcon("/icons/ceylonSurround.png");
-    shared Icon refinement => AllIcons.General.\iImplementingMethod;
+    shared Icon enumerations = PlatformIcons.\iENUM_ICON;
+    shared Icon exceptions = AllIcons.Nodes.\iExceptionClass;
     shared Icon param => AllIcons.Nodes.\iParameter;
     shared Icon local => IconLoader.getIcon("/icons/ceylonLocal.png");
     shared Icon values => AllIcons.Nodes.\iVariable;
     shared Icon anonymousFunction => AllIcons.Nodes.\iFunction;
+    shared Icon annotations => AllIcons.Gutter.\iExtAnnotation;
+    
+    shared Icon refinement => AllIcons.General.\iImplementingMethod;
+    shared Icon extendedType => AllIcons.General.\iOverridingMethod;
+    shared Icon satisfiedTypes => AllIcons.General.\iImplementingMethod;
     shared Icon types => IconLoader.getIcon("/icons/ceylonTypes.png");
     
+    shared Icon surround => IconLoader.getIcon("/icons/ceylonSurround.png");
     shared Icon correction => AllIcons.Actions.\iRedo;
     shared Icon addCorrection => AllIcons.General.\iAdd;
+    shared Icon see => AllIcons.Actions.\iShare;
+    shared Icon returns => AllIcons.Actions.\iStepOut;
     
     shared Icon ceylon => IconLoader.getIcon("/icons/ceylon.png");
     shared Icon file => IconLoader.getIcon("/icons/ceylonFile.png");

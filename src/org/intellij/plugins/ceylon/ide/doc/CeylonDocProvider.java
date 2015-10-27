@@ -79,55 +79,22 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         return null;
     }
 
-    // FIXME refactor with com.redhat.ceylon.eclipse.code.hover.DocumentationHover.getLinkedModel(String, TypeChecker)
     @Override
     public PsiElement getDocumentationElementForLink(PsiManager psiManager, String link, PsiElement context) {
-        String[] bits = link.split(":");
-        String moduleNameAndVersion = bits[1];
-        int loc = moduleNameAndVersion.indexOf('/');
-        String moduleName = moduleNameAndVersion.substring(0, loc);
-        String moduleVersion = moduleNameAndVersion.substring(loc + 1);
-
         TypeChecker tc = TypeCheckerProvider.getFor(context);
-
-        Module theModule = null;
-
-        for (Module module : tc.getContext().getModules().getListOfModules()) {
-            if (module.getNameAsString().equals(moduleName) && module.getVersion().equals(moduleVersion)) {
-                theModule = module;
-            }
+        if (tc == null) {
+            return null;
         }
+        Tree.CompilationUnit cu = ((CeylonFile) context.getContainingFile()).getCompilationUnit();
+        PhasedUnit pu = tc.getPhasedUnitFromRelativePath(cu.getUnit().getRelativePath());
 
-        if (theModule == null || bits.length == 2) {
-            return new DummyPsiElement(theModule, context.getContainingFile());
-        }
-
-        Referenceable target = theModule.getPackage(bits[2]);
-
-        for (int i = 3; i < bits.length; i++) {
-            Scope scope;
-            if (target instanceof Scope) {
-                scope = (Scope) target;
-            } else if (target instanceof TypedDeclaration) {
-                TypedDeclaration td = (TypedDeclaration) target;
-                scope = td.getType().getDeclaration();
-            } else {
-                return null;
-            }
-            if (scope instanceof Value) {
-                Value v = (Value) scope;
-                TypeDeclaration val = v.getTypeDeclaration();
-                if (val.isAnonymous()) {
-                    scope = val;
-                }
-            }
-            target = scope.getDirectMember(bits[i], null, false);
-        }
+        IdeaDocGenerator gen = new IdeaDocGenerator(tc);
+        Referenceable target = gen.getLinkedModel(new ceylon.language.String(link), gen.DocParams$new$(pu, context.getProject()));
 
         if (target != null) {
-            if (Objects.equals(bits[0], "doc")) {
+            if (link.startsWith("doc:")) {
                 return new DummyPsiElement(target, context.getContainingFile());
-            } else if (Objects.equals(bits[0], "dec")) {
+            } else if (link.startsWith("dec:")) {
                 CeylonCompositeElement psiDecl = CeylonReference.resolveDeclaration(target, tc, context.getProject());
 
                 if (psiDecl != null) {

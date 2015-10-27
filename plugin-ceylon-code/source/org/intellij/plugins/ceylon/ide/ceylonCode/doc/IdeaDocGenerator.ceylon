@@ -2,9 +2,6 @@ import com.github.rjeschke.txtmark {
     Processor,
     Configuration
 }
-import com.intellij.icons {
-    AllIcons
-}
 import com.intellij.openapi.editor {
     Document
 }
@@ -13,12 +10,6 @@ import com.intellij.openapi.editor.colors {
 }
 import com.intellij.openapi.project {
     Project
-}
-import com.intellij.openapi.util {
-    IconLoader
-}
-import com.intellij.util {
-    PlatformIcons
 }
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
@@ -52,14 +43,9 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     Package,
     Module,
-    Class,
-    Interface,
     Constructor,
     Unit,
-    Scope,
-    Value,
-    Function,
-    TypeParameter
+    Scope
 }
 import com.redhat.ceylon.model.typechecker.util {
     TypePrinter
@@ -84,6 +70,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlight,
     textAttributes
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
+}
 
 String psiProtocol = "psi_element://";
 
@@ -98,7 +87,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,N
         shared actual PhasedUnit lastPhasedUnit => pu;
         shared actual Document document => nothing;
         shared actual JList<CommonToken>? tokens => pu.tokens;
-        shared actual TypeChecker typeChecker => nothing;
+        shared actual TypeChecker typeChecker => tc else nothing;
         shared actual CeylonProject<Nothing>? ceylonProject => nothing;
         shared Project ideaProject => p;
         shared actual CompletionOptions options => nothing;
@@ -129,41 +118,33 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,N
     }
     
     Icon? getIconUrl(Icons|Referenceable thing) {
-        if (is Referenceable thing) {
+        if (is Declaration thing) {
+            return ideaIcons.forDeclaration(thing);
+        } else if (is Referenceable thing) {
             return switch (thing)
-            case (is Module) AllIcons.Nodes.\iArtifact
-            case (is Package) IconLoader.getIcon("/icons/ceylonPackage.png")
-            case (is Class) if (thing.anonymous) 
-                then PlatformIcons.\iANONYMOUS_CLASS_ICON 
-                else PlatformIcons.\iCLASS_ICON
-            case (is Interface) PlatformIcons.\iINTERFACE_ICON
-            case (is Constructor) PlatformIcons.\iCLASS_INITIALIZER
-            case (is Value) PlatformIcons.\iFIELD_ICON
-            case (is Function) if (thing.shared) then PlatformIcons.\iMETHOD_ICON else PlatformIcons.\iFUNCTION_ICON
-            case (is TypeParameter) PlatformIcons.\iVARIABLE_ICON
-            else if (is Declaration thing, thing.parameter) then PlatformIcons.\iPARAMETER_ICON
-            else null;
+                case (is Module) ideaIcons.modules
+                case (is Package) ideaIcons.packages
+                else null;
         } else {
             return switch (thing)
-            case (Icons.annotations) AllIcons.Gutter.\iExtAnnotation
-            case (Icons.modules) AllIcons.Nodes.\iArtifact
-            case (Icons.objects) PlatformIcons.\iANONYMOUS_CLASS_ICON
-            case (Icons.classes) PlatformIcons.\iCLASS_ICON
-            case (Icons.interfaces) PlatformIcons.\iINTERFACE_ICON
-            case (Icons.enumeration) PlatformIcons.\iENUM_ICON
-            case (Icons.extendedType) AllIcons.General.\iOverridingMethod
-            case (Icons.satisfiedTypes) AllIcons.General.\iImplementingMethod
-            case (Icons.exceptions) AllIcons.Nodes.\iExceptionClass
-            case (Icons.see) AllIcons.Actions.\iShare
-            case (Icons.implementation) AllIcons.General.\iOverridingMethod
-            case (Icons.override) AllIcons.General.\iImplementingMethod
-            case (Icons.returns) AllIcons.Actions.\iStepOut
-            case (Icons.units) IconLoader.getIcon("/icons/ceylonFile.png")
-            case (Icons.parameters) AllIcons.Nodes.\iParameter
-            case (Icons.attributes) AllIcons.Nodes.\iParameter // TODO
-            case (Icons.types) AllIcons.Nodes.\iParameter // TODO
-            else null
-            ;
+                case (Icons.annotations) ideaIcons.annotations
+                case (Icons.modules) ideaIcons.modules
+                case (Icons.objects) ideaIcons.objects
+                case (Icons.classes) ideaIcons.classes
+                case (Icons.interfaces) ideaIcons.interfaces
+                case (Icons.enumeration) ideaIcons.enumerations
+                case (Icons.extendedType) ideaIcons.extendedType
+                case (Icons.satisfiedTypes) ideaIcons.satisfiedTypes
+                case (Icons.exceptions) ideaIcons.exceptions
+                case (Icons.see) ideaIcons.see
+                case (Icons.implementation) ideaIcons.satisfiedTypes
+                case (Icons.override) ideaIcons.extendedType
+                case (Icons.returns) ideaIcons.returns
+                case (Icons.units) ideaIcons.file
+                case (Icons.parameters) ideaIcons.param
+                case (Icons.attributes) ideaIcons.attributes
+                case (Icons.types) ideaIcons.types
+                else null;
         }
     }
     

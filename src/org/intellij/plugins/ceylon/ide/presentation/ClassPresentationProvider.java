@@ -8,13 +8,15 @@ import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Scope;
 import com.redhat.ceylon.model.typechecker.model.TypeDeclaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
 public class ClassPresentationProvider implements ItemPresentationProvider<CeylonClass> {
     @Override
-    public ItemPresentation getPresentation(final CeylonClass item) {
+    public ItemPresentation getPresentation(@NotNull final CeylonClass item) {
         final Tree.ClassOrInterface parentClass = item.getCeylonNode();
 
         return new ItemPresentation() {
@@ -53,7 +55,7 @@ public class ClassPresentationProvider implements ItemPresentationProvider<Ceylo
             @Override
             public Icon getIcon(boolean unused) {
                 if (item != null) {
-                    return item.isInterface() ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
+                    return ideaIcons_.get_().forDeclaration(item);
                 }
 
                 return PlatformIcons.ERROR_INTRODUCTION_ICON;

@@ -38,6 +38,7 @@ public class CeylonFileType extends LanguageFileType {
     @Nullable
     @Override
     public Icon getIcon() {
+        // can't use ideaIcons because it's compiled after this file
         return IconLoader.getIcon("/icons/ceylonFile.png");
     }
 }
