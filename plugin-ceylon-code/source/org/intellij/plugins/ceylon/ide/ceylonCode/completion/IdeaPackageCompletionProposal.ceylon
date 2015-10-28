@@ -43,7 +43,11 @@ import com.redhat.ceylon.cmr.api {
     ModuleSearchResult
 }
 import com.intellij.openapi.\imodule {
-    Module
+    Module,
+    ModuleUtil
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
+    ideaModuleImportUtils
 }
 
 class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
@@ -100,7 +104,11 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
     shared LookupElement lookupElement => newLookup(description, text, ideaIcons.modules,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext ctx, LookupElement? t) {
-                // TODO add import to module.ceylon!!
+                ideaModuleImportUtils.addModuleImport(ModuleUtil.findModuleForPsiElement(ctx.file),
+                    data.lastPhasedUnit.\ipackage.\imodule,
+                    version.\imodule,
+                    version.version);
+
                 value selection = getSelectionInternal(ctx.document);
                 ctx.editor.selectionModel.setSelection(selection.startOffset,
                     selection.endOffset);
