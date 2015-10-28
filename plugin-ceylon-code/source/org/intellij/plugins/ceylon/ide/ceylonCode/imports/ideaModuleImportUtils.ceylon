@@ -1,15 +1,34 @@
-import com.redhat.ceylon.ide.common.imports {
-    AbstractModuleImportUtil
+import ceylon.interop.java {
+    javaClass
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile,
-    CeylonTreeUtil
+
+import com.intellij.openapi.editor {
+    Document
 }
 import com.intellij.openapi.\imodule {
     IJModule=Module
 }
-import com.intellij.openapi.editor {
-    Document
+import com.intellij.openapi.util {
+    TextRange
+}
+import com.redhat.ceylon.compiler.typechecker.context {
+    TypecheckerUnit
+}
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
+import com.redhat.ceylon.ide.common.imports {
+    AbstractModuleImportUtil
+}
+import com.redhat.ceylon.ide.common.util {
+    Indents
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Module
+}
+
+import org.intellij.plugins.ceylon.ide.ceylonCode {
+    ITypeCheckerProvider
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     InsertEdit,
@@ -17,29 +36,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     TextChange,
     IdeaDocumentChanges
 }
-import com.redhat.ceylon.ide.common.util {
-    Indents
-}
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
-}
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Module
-}
-import com.intellij.openapi.util {
-    TextRange
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile,
+    CeylonTreeUtil
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIndents
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode {
-    ITypeCheckerProvider
-}
-import ceylon.interop.java {
-    javaClass
 }
 
 shared object ideaModuleImportUtils
@@ -52,7 +54,7 @@ shared object ideaModuleImportUtils
     
     shared actual Integer getEditOffset(TextChange change) => 0;
     
-    shared actual [CeylonFile, Tree.CompilationUnit, PhasedUnit]
+    shared actual [CeylonFile, Tree.CompilationUnit, TypecheckerUnit]
     getUnit(IJModule project, Module mod) {
         value tc = project.getComponent(javaClass<ITypeCheckerProvider>()).typeChecker;
         value pu = tc.getPhasedUnitFromRelativePath(mod.unit.relativePath);
@@ -60,7 +62,7 @@ shared object ideaModuleImportUtils
         
         assert(is CeylonFile file);
         
-        return [file, pu.compilationUnit, pu];
+        return [file, pu.compilationUnit, pu.unit];
     }
     
     shared actual Indents<Document> indents => ideaIndents;
@@ -72,6 +74,9 @@ shared object ideaModuleImportUtils
         change.apply();
     }
     
-    
-    
+    shared actual void gotoLocation(TypecheckerUnit unit, Integer offset,
+        Integer length) {
+        
+        // TODO?
+    }
 }
