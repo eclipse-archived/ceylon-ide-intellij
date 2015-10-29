@@ -55,9 +55,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
     Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
-    Boolean qualified, Declaration? qualifyingValue, CompletionData data)
+    Boolean inherited, Boolean qualified, Declaration? qualifyingValue, CompletionData data)
         extends InvocationCompletionProposal<CompletionData,Module,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
-    positionalInvocation, namedInvocation, qualified, qualifyingValue, ideaCompletionManager)
+    positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue, ideaCompletionManager)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
     
     shared actual variable Boolean toggleOverwrite = false;

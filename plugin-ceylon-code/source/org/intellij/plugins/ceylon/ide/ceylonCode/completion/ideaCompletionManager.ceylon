@@ -151,10 +151,11 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     shared actual LookupElement newInvocationCompletion(Integer offset, String prefix,
         String desc, String text, Declaration dec, Reference? pr, Scope scope, CompletionData data,
         Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation, 
-        Boolean qualified, Declaration? qualifyingDec) {
+        Boolean inherited, Boolean qualified, Declaration? qualifyingDec) {
         
         return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
-            includeDefaulted, positionalInvocation, namedInvocation, qualified, qualifyingDec, data).lookupElement;
+            includeDefaulted, positionalInvocation, namedInvocation, 
+            inherited, qualified, qualifyingDec, data).lookupElement;
     }
 
     shared actual LookupElement newRefinementCompletionProposal(Integer offset, String prefix,
