@@ -33,6 +33,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIndents
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration
+}
 
 shared class CeylonImportOptimizer()
         satisfies AbstractImportsCleaner<Document, InsertEdit, TextEdit, TextChange>
@@ -62,7 +65,9 @@ shared class CeylonImportOptimizer()
     
     shared actual Boolean supports(PsiFile? psiFile)
             => psiFile is CeylonFile;
-    
-    
-    
+
+    shared actual Declaration? select(List<Declaration> proposals) {
+        // TODO
+        return proposals.first;
+    }
 }

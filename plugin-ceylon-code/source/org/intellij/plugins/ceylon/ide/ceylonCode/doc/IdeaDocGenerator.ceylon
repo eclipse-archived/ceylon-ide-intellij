@@ -73,6 +73,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import com.redhat.ceylon.ide.common.imports {
+    AbstractModuleImportUtil
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
+    ideaModuleImportUtils
+}
 
 String psiProtocol = "psi_element://";
 
@@ -266,4 +272,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,N
         
         return null;
     }
+    
+    shared actual AbstractModuleImportUtil<out Anything,out Anything,out Anything,out Anything,out Anything,out Anything> moduleImportUtil
+            => ideaModuleImportUtils;
 }
