@@ -9,8 +9,15 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 import com.intellij.openapi.util {
     TextRange
+}
+import com.redhat.ceylon.cmr.api {
+    ModuleVersionDetails,
+    ModuleSearchResult
 }
 import com.redhat.ceylon.ide.common.completion {
     ImportedModulePackageProposal,
@@ -37,17 +44,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
-}
-import com.redhat.ceylon.cmr.api {
-    ModuleVersionDetails,
-    ModuleSearchResult
-}
-import com.intellij.openapi.\imodule {
-    Module,
-    ModuleUtil
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
-    ideaModuleImportUtils
 }
 
 class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
@@ -104,10 +100,11 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
     shared LookupElement lookupElement => newLookup(description, text, ideaIcons.modules,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext ctx, LookupElement? t) {
-                ideaModuleImportUtils.addModuleImport(ModuleUtil.findModuleForPsiElement(ctx.file),
-                    data.lastPhasedUnit.\ipackage.\imodule,
-                    version.\imodule,
-                    version.version);
+                // TODO
+                //ideaModuleImportUtils.addModuleImport(ModuleUtil.findModuleForPsiElement(ctx.file),
+                //    data.lastPhasedUnit.\ipackage.\imodule,
+                //    version.\imodule,
+                //    version.version);
 
                 value selection = getSelectionInternal(ctx.document);
                 ctx.editor.selectionModel.setSelection(selection.startOffset,

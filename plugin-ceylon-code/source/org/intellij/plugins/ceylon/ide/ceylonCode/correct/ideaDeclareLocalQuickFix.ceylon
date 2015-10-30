@@ -6,11 +6,17 @@ import com.intellij.openapi.editor {
     EditorFactory,
     Editor
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
+import com.intellij.openapi.project {
+    Project
+}
 import com.intellij.openapi.util {
     TextRange
 }
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
+import com.intellij.psi {
+    PsiFile
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
@@ -28,15 +34,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
-import com.intellij.openapi.project {
-    Project
-}
-import com.intellij.psi {
-    PsiFile
-}
 
 object ideaDeclareLocalQuickFix 
-        satisfies DeclareLocalQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,IdeaLinkedMode,LookupElement,TypeChecker,IdeaQuickFixData,TextRange>
+        satisfies DeclareLocalQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,IdeaLinkedMode,LookupElement,Module,IdeaQuickFixData,TextRange>
                 & IdeaDocumentChanges & AbstractIntention {
     
     shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start,

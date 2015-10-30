@@ -4,11 +4,11 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 import com.intellij.openapi.util {
     TextRange
-}
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
 }
 import com.redhat.ceylon.ide.common.correct {
     CreateQuickFix,
@@ -35,7 +35,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 object ideaCreateQuickFix
-        satisfies CreateQuickFix<CeylonFile,TypeChecker,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
+        satisfies CreateQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
                 & AbstractIntention & IdeaDocumentChanges {
     
     shared actual Integer getLineOfOffset(Document doc, Integer offset) => doc.getLineNumber(offset);
@@ -51,7 +51,7 @@ object ideaCreateQuickFix
         data.registerFix(desc, change, selection, icon);
     }
     
-    shared actual CreateParameterQuickFix<CeylonFile,TypeChecker,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> createParameterQuickFix
+    shared actual CreateParameterQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> createParameterQuickFix
             => ideaCreateParameterQuickFix;
     
 }

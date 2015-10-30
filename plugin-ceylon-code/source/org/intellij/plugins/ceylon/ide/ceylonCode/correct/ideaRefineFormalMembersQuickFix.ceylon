@@ -5,6 +5,9 @@ import com.intellij.openapi.editor {
     Editor,
     Document
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 import com.intellij.openapi.project {
     Project
 }
@@ -13,9 +16,6 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiFile
-}
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
 }
 import com.redhat.ceylon.ide.common.correct {
     RefineFormalMembersQuickFix
@@ -29,7 +29,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 shared object ideaRefineFormalMembersQuickFix 
-        satisfies RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,TypeChecker,IdeaQuickFixData,LookupElement>
+        satisfies RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges & AbstractIntention {
     
      shared actual Character getDocChar(Document doc, Integer offset)

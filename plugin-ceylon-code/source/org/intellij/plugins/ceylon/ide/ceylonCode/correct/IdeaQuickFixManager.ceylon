@@ -18,6 +18,9 @@ import com.intellij.openapi.editor {
     Document,
     Editor
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 import com.intellij.openapi.project {
     Project
 }
@@ -27,9 +30,6 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiFile
-}
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Message,
@@ -74,19 +74,19 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 shared object ideaQuickFixManager
-        extends IdeQuickFixManager<Document, InsertEdit, TextEdit, TextChange, TextRange, TypeChecker, CeylonFile, LookupElement,IdeaQuickFixData,IdeaLinkedMode>
+        extends IdeQuickFixManager<Document,InsertEdit,TextEdit,TextChange,TextRange,Module,CeylonFile,LookupElement,IdeaQuickFixData,IdeaLinkedMode>
         () {
 
     
-    shared actual AddAnnotationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,TypeChecker,IdeaQuickFixData,LookupElement> addAnnotations
+    shared actual AddAnnotationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> addAnnotations
             => addRemoveAnnotationIntention;
-    shared actual RemoveAnnotationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,TypeChecker,IdeaQuickFixData,LookupElement> removeAnnotations
+    shared actual RemoveAnnotationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> removeAnnotations
             => addRemoveAnnotationIntention;
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
             => ideaImportProposals;
-    shared actual CreateQuickFix<CeylonFile,TypeChecker,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> createQuickFix
+    shared actual CreateQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> createQuickFix
             => ideaCreateQuickFix;
-    shared actual CreateEnumQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,TypeChecker,IdeaQuickFixData,LookupElement> createEnumQuickFix
+    shared actual CreateEnumQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> createEnumQuickFix
             => ideaCreateEnumIntention;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
@@ -96,13 +96,13 @@ shared object ideaQuickFixManager
         }
     }
     
-    shared actual ChangeReferenceQuickFix<CeylonFile,TypeChecker,Document,InsertEdit,TextEdit,TextChange,IdeaQuickFixData,TextRange,LookupElement> changeReferenceQuickFix
+    shared actual ChangeReferenceQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,IdeaQuickFixData,TextRange,LookupElement> changeReferenceQuickFix
             => ideaChangeReferenceQuickFix;
     
-    shared actual DeclareLocalQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,IdeaLinkedMode,LookupElement,TypeChecker,IdeaQuickFixData,TextRange> declareLocalQuickFix
+    shared actual DeclareLocalQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,IdeaLinkedMode,LookupElement,Module,IdeaQuickFixData,TextRange> declareLocalQuickFix
             => ideaDeclareLocalQuickFix;
 
-    shared actual RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,TypeChecker,IdeaQuickFixData,LookupElement> refineFormalMembersQuickFix 
+    shared actual RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> refineFormalMembersQuickFix 
             => ideaRefineFormalMembersQuickFix;
 }
 
@@ -155,8 +155,8 @@ class CustomIntention(Integer position, String desc, TextChange? change, TextRan
 shared class IdeaQuickFixData(Message message, Document doc,
     shared actual Tree.CompilationUnit rootNode,
     shared actual Node node,
-    shared actual TypeChecker project,
-    shared Annotation annotation) satisfies QuickFixData<TypeChecker> {
+    shared actual Module project,
+    shared Annotation annotation) satisfies QuickFixData<Module> {
     
     shared actual Integer errorCode => message.code;
     shared actual Integer problemOffset => annotation.startOffset;

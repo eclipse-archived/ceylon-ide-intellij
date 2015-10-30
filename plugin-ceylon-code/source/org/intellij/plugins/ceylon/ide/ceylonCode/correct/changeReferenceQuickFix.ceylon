@@ -4,11 +4,11 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 import com.intellij.openapi.util {
     TextRange
-}
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
 }
 import com.redhat.ceylon.ide.common.correct {
     ChangeReferenceQuickFix
@@ -22,7 +22,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 object ideaChangeReferenceQuickFix
-        satisfies ChangeReferenceQuickFix<CeylonFile,TypeChecker,Document,InsertEdit,TextEdit,TextChange,IdeaQuickFixData,TextRange,LookupElement> 
+        satisfies ChangeReferenceQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,IdeaQuickFixData,TextRange,LookupElement> 
                 & IdeaDocumentChanges & AbstractIntention {
     
     shared actual void newChangeReferenceProposal(IdeaQuickFixData data, String desc, TextChange change, TextRange selection) {

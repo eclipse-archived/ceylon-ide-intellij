@@ -55,10 +55,10 @@ shared object ideaModuleImportUtils
     shared actual Integer getEditOffset(TextChange change) => 0;
     
     shared actual [CeylonFile, Tree.CompilationUnit, TypecheckerUnit]
-    getUnit(IJModule project, Module mod) {
-        value tc = project.getComponent(javaClass<ITypeCheckerProvider>()).typeChecker;
+    getUnit(IJModule ijModule, Module mod) {
+        value tc = ijModule.getComponent(javaClass<ITypeCheckerProvider>()).typeChecker;
         value pu = tc.getPhasedUnitFromRelativePath(mod.unit.relativePath);
-        value file = CeylonTreeUtil.getDeclaringFile(pu.unit, project.project);
+        value file = CeylonTreeUtil.getDeclaringFile(pu.unit, ijModule.project);
         
         assert(is CeylonFile file);
         

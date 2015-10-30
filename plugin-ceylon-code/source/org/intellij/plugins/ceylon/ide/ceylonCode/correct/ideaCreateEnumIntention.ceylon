@@ -4,11 +4,11 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
 import com.intellij.openapi.util {
     TextRange
-}
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
 }
 import com.redhat.ceylon.ide.common.correct {
     CreateEnumQuickFix
@@ -29,7 +29,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 shared object ideaCreateEnumIntention
-        satisfies CreateEnumQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,TypeChecker,IdeaQuickFixData,LookupElement>
+        satisfies CreateEnumQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
                 & AbstractIntention {
     
