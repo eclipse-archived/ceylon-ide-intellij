@@ -1,5 +1,7 @@
 package org.intellij.plugins.ceylon.ide.validate;
 
+import ceylon.interop.java.JavaIterable;
+import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import com.redhat.ceylon.ide.common.util.escaping_;
 
 import java.util.regex.Pattern;
@@ -13,7 +15,10 @@ public class NameValidator {
 
     static {
         StringBuilder sb = new StringBuilder();
-        for (String kw : escaping_.get_().getKeywords()) {
+
+        JavaIterable<ceylon.language.String> it = new JavaIterable<>(TypeDescriptor.klass(String.class),
+                escaping_.get_().getKeywords());
+        for (ceylon.language.String kw : it) {
             sb.append(kw).append('|');
         }
         sb.setLength(sb.length() - 1);

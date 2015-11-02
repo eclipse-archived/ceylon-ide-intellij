@@ -3,8 +3,9 @@ package org.intellij.plugins.ceylon.ide.annotator;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
@@ -91,11 +92,12 @@ class CeylonTypeCheckerVisitor extends Visitor {
 
     private void addQuickFixes(Node that, Message error, Annotation annotation) {
         CeylonFile file = (CeylonFile) annotationHolder.getCurrentAnnotationSession().getFile();
+        Module module = ModuleUtil.findModuleForFile(file.getVirtualFile(), file.getProject());
         TypeChecker tc = TypeCheckerProvider.getFor(file);
         PhasedUnit pu = file.getPhasedUnit();
 
         IdeaQuickFixData data = new IdeaQuickFixData(error, file.getViewProvider().getDocument(),
-                pu.getCompilationUnit(), that, tc, annotation);
+                pu.getCompilationUnit(), that, module, annotation);
         ideaQuickFixManager_.get_().addQuickFixes(data, tc, file);
     }
 }
