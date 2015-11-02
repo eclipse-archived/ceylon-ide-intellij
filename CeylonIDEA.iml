@@ -33,11 +33,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.0/com.redhat.ceylon.ide.common-1.2.0.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.1/com.redhat.ceylon.ide.common-1.2.1.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.0/com.redhat.ceylon.ide.common-1.2.0.src!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.1/com.redhat.ceylon.ide.common-1.2.1.src!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -53,7 +53,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.2.0/ceylon.collection-1.2.0.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.2.1/ceylon.collection-1.2.1.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -62,7 +62,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.2.0/ceylon.interop.java-1.2.0.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.2.1/ceylon.interop.java-1.2.1.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -80,7 +80,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.0/ceylon.tool.converter.java2ceylon-1.2.0.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.1/ceylon.tool.converter.java2ceylon-1.2.1.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
