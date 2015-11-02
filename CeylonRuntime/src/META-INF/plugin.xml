@@ -1,39 +1,34 @@
 <idea-plugin version="2">
-  <id>org.intellij.plugins.ceylon.runtime</id>
-  <name>Ceylon Runtime</name>
-  <version>1.1.1</version>
-  <vendor email="support@ceylon.org" url="http://www.ceylon-lang.org">RedHat JBoss</vendor>
+    <id>org.intellij.plugins.ceylon.runtime</id>
+    <name>Ceylon Runtime</name>
+    <version>1.2.0-0</version>
+    <vendor email="support@ceylon.org" url="http://www.ceylon-lang.org">RedHat JBoss</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
       Runtime components required to use Ceylon modules inside an IntelliJ plugin.
     ]]></description>
 
-  <change-notes>
-  </change-notes>
+    <change-notes>
+        Bundles Ceylon 1.2.0
+    </change-notes>
 
-  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="131"/>
+    <idea-version since-build="131"/>
 
-  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.lang</depends>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
 
-  <application-components>
-    <component>
-      <implementation-class>org.intellij.plugins.ceylon.runtime.CeylonRuntime</implementation-class>
-    </component>
-  </application-components>
+    <application-components>
+        <component>
+            <implementation-class>org.intellij.plugins.ceylon.runtime.CeylonRuntime</implementation-class>
+        </component>
+    </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+    <project-components>
+    </project-components>
 
-  <actions>
-    <!-- Add your actions here -->
-  </actions>
+    <actions>
+    </actions>
 
 </idea-plugin>

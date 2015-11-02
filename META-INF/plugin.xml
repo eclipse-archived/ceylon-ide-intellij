@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.intellij.plugins.ceylon.ide</id>
-    <name>Ceylon IDEA</name>
-    <version>1.1.1</version>
+    <name>Ceylon IDE</name>
+    <version>1.2.0-0</version>
     <vendor email="bastien.jansen [at] gmx.com">Bastien Jansen</vendor>
 
     <description>Provides support for the Ceylon programming language</description>
@@ -12,7 +12,6 @@
 
     <idea-version since-build="131"/>
 
-    <!-- uncomment to enable plugin in all products -->
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.ceylon.runtime</depends>
 
@@ -23,14 +22,12 @@
     </application-components>
 
     <project-components>
-        <!-- Add your project components here -->
         <component>
             <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects</implementation-class>
         </component>
     </project-components>
 
     <module-components>
-        <!-- Add your module components here -->
         <component>
             <interface-class>org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider</interface-class>
             <implementation-class>org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider</implementation-class>
@@ -76,7 +73,7 @@
         <bundledColorScheme path="/colorSchemes/CeylonGavin"/>
 
         <moduleType id="CEYLON_MODULE" implementationClass="org.intellij.plugins.ceylon.ide.project.CeylonModuleType"/>
-            
+
         <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonCommenter"/>
         <lang.braceMatcher language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonBraceMatcher"/>
         <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.ide.lang.CeylonQuoteHandler"/>
@@ -98,7 +95,8 @@
         <codeInsight.parameterInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonParameterInfoHandler"/>
 
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass" implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
-        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner" implementationClass="org.intellij.plugins.ceylon.ide.presentation.DeclarationPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.DeclarationPresentationProvider"/>
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
         <lang.importOptimizer language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonImportOptimizer"/>
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementDescriptionProvider"/>
@@ -109,7 +107,8 @@
         <framework.detector implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetDetector"/>
 
         <lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonFindUsagesProvider"/>
-        <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi$IdentifierPsi" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
+        <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi$IdentifierPsi"
+                                 implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
@@ -126,7 +125,7 @@
 
         <!-- Settings -->
         <applicationConfigurable groupId="root" displayName="Ceylon" id="preferences.Ceylon"
-                             instance="org.intellij.plugins.ceylon.ide.settings.CeylonConfigurable">
+                                 instance="org.intellij.plugins.ceylon.ide.settings.CeylonConfigurable">
             <configurable displayName="Editor" id="preferences.Ceylon.editor"
                           instance="org.intellij.plugins.ceylon.ide.settings.EditorConfigurable">
                 <configurable displayName="Completion" id="preferences.Ceylon.editor.completion"
