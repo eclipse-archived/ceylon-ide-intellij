@@ -70,7 +70,7 @@
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonFileHighlightFilter"/>
         <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonColorSettingsPage"/>
         <additionalTextAttributes scheme="Default" file="colorSchemes/CeylonDefault.xml"/>
-        <bundledColorScheme path="/colorSchemes/CeylonGavin"/>
+        <additionalTextAttributes scheme="Darcula" file="colorSchemes/CeylonDarcula.xml"/>
 
         <moduleType id="CEYLON_MODULE" implementationClass="org.intellij.plugins.ceylon.ide.project.CeylonModuleType"/>
 

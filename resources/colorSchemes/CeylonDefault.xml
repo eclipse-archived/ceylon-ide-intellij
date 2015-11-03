@@ -1,13 +1,83 @@
 <?xml version='1.0'?>
 <list>
-    <option name="CEYLON_MEMBER">
+    <option name="CEYLON_IDENTIFIER">
         <value>
-            <option name="FOREGROUND" value="660e7a"/>
+            <option name="FOREGROUND" value="003399"/>
         </value>
     </option>
     <option name="CEYLON_TYPE">
         <value>
             <option name="FOREGROUND" value="990066"/>
+        </value>
+    </option>
+    <option name="CEYLON_TYPE_LITERAL">
+        <value>
+            <option name="FOREGROUND" value="000000"/>
+        </value>
+    </option>
+    <option name="CEYLON_KEYWORD">
+        <value>
+            <option name="FOREGROUND" value="4C4C4C"/>
+        </value>
+    </option>
+    <option name="CEYLON_NUMBER">
+        <value>
+            <option name="FOREGROUND" value="0000FF"/>
+        </value>
+    </option>
+    <option name="CEYLON_COMMENT">
+        <value>
+            <option name="FOREGROUND" value="808080"/>
+        </value>
+    </option>
+    <option name="CEYLON_STRING">
+        <value>
+            <option name="FOREGROUND" value="0000FF"/>
+        </value>
+    </option>
+    <option name="CEYLON_CHAR">
+        <value>
+            <option name="FOREGROUND" value="0000FF"/>
+        </value>
+    </option>
+    <option name="CEYLON_INTERP">
+        <value>
+            <option name="FOREGROUND" value="0000FF"/>
+        </value>
+    </option>
+    <option name="CEYLON_ANNOTATION_STRING">
+        <value>
+            <option name="FOREGROUND" value="008080"/>
+        </value>
+    </option>
+    <option name="CEYLON_ANNOTATION">
+        <value>
+            <option name="FOREGROUND" value="3399CC"/>
+        </value>
+    </option>
+    <option name="CEYLON_TODO">
+        <value>
+            <option name="FOREGROUND" value="FF8000"/>
+        </value>
+    </option>
+    <option name="CEYLON_SEMI">
+        <value>
+            <option name="FOREGROUND" value="000000"/>
+        </value>
+    </option>
+    <option name="CEYLON_BRACE">
+        <value>
+            <option name="FOREGROUND" value="000000"/>
+        </value>
+    </option>
+    <option name="CEYLON_PACKAGE">
+        <value>
+            <option name="FOREGROUND" value="808080"/>
+        </value>
+    </option>
+    <option name="CEYLON_MEMBER">
+        <value>
+            <option name="FOREGROUND" value="663399"/>
         </value>
     </option>
 </list>
