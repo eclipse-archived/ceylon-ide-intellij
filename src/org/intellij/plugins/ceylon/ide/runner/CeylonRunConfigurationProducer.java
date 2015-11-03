@@ -72,7 +72,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
                             if (cu != null && cu.getUnit() != null && cu.getUnit().getPackage() != null && cu.getUnit().getPackage().getModule() != null) {
                                 final Module mdl = cu.getUnit().getPackage().getModule();
                                 final String moduleName = mdl.getNameAsString();
-                                final String packageName = ceylonFile.getPackageName();
+                                final String packageName = cu.getUnit().getPackage().getNameAsString();
                                 return new RunConfigParams(moduleName, packageName, identifier);
                             }
                         }
