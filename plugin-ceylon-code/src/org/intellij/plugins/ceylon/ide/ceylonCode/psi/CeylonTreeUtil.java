@@ -50,7 +50,7 @@ public class CeylonTreeUtil {
         }
 
         throw new IllegalArgumentException(String.format("No PSI node found for ceylon node of type %s at (%d-%d).%n",
-                ceylonNode.getNodeType(), ceylonNode.getStartIndex(), ceylonNode.getStopIndex()));
+                ceylonNode.getNodeType(), ceylonNode.getStartIndex(), ceylonNode.getEndIndex()));
     }
 
     @Nullable

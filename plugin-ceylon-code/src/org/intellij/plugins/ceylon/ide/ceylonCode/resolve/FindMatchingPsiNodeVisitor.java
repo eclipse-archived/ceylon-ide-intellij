@@ -23,7 +23,7 @@ public class FindMatchingPsiNodeVisitor extends CeylonPsiVisitor {
         super.visitElement(element);
 
         if (node.getStartIndex().equals(element.getTextOffset())
-                && node.getStopIndex() == (element.getTextOffset() + element.getTextLength() - 1)
+                && node.getEndIndex() == (element.getTextOffset() + element.getTextLength())
                 && klass.isAssignableFrom(element.getClass())) {
             psi = (CeylonCompositeElement) element;
         }
