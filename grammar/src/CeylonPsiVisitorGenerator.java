@@ -47,7 +47,7 @@ public class CeylonPsiVisitorGenerator {
 
             String psiClass = toCamelCase(field.getName()) + "Psi";
 
-            os.write(("        } else if (element.getNode().getElementType() == CeylonTypes." + field.getName() + ") {\n").getBytes());
+            os.write(("        } else if (element instanceof " + psiClass + ") {\n").getBytes());
             os.write(("            visit" + psiClass + "((" + psiClass + ") element);\n").getBytes());
         }
 

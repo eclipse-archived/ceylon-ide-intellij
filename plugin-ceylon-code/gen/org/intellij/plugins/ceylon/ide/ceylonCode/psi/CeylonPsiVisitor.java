@@ -19,601 +19,601 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         super.visitElement(element);
         if (false) {
 
-        } else if (element.getNode().getElementType() == CeylonTypes.COMPILATION_UNIT) {
+        } else if (element instanceof CompilationUnitPsi) {
             visitCompilationUnitPsi((CompilationUnitPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MODULE_DESCRIPTOR) {
+        } else if (element instanceof ModuleDescriptorPsi) {
             visitModuleDescriptorPsi((ModuleDescriptorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PACKAGE_DESCRIPTOR) {
+        } else if (element instanceof PackageDescriptorPsi) {
             visitPackageDescriptorPsi((PackageDescriptorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_MODULE_LIST) {
+        } else if (element instanceof ImportModuleListPsi) {
             visitImportModuleListPsi((ImportModuleListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_MODULE) {
+        } else if (element instanceof ImportModulePsi) {
             visitImportModulePsi((ImportModulePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_LIST) {
+        } else if (element instanceof ImportListPsi) {
             visitImportListPsi((ImportListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT) {
+        } else if (element instanceof ImportPsi) {
             visitImportPsi((ImportPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_PATH) {
+        } else if (element instanceof ImportPathPsi) {
             visitImportPathPsi((ImportPathPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_MEMBER_OR_TYPE_LIST) {
+        } else if (element instanceof ImportMemberOrTypeListPsi) {
             visitImportMemberOrTypeListPsi((ImportMemberOrTypeListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_MEMBER_OR_TYPE) {
+        } else if (element instanceof ImportMemberOrTypePsi) {
             visitImportMemberOrTypePsi((ImportMemberOrTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_MEMBER) {
+        } else if (element instanceof ImportMemberPsi) {
             visitImportMemberPsi((ImportMemberPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_TYPE) {
+        } else if (element instanceof ImportTypePsi) {
             visitImportTypePsi((ImportTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ALIAS) {
+        } else if (element instanceof AliasPsi) {
             visitAliasPsi((AliasPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IMPORT_WILDCARD) {
+        } else if (element instanceof ImportWildcardPsi) {
             visitImportWildcardPsi((ImportWildcardPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DECLARATION) {
+        } else if (element instanceof DeclarationPsi) {
             visitDeclarationPsi((DeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MISSING_DECLARATION) {
+        } else if (element instanceof MissingDeclarationPsi) {
             visitMissingDeclarationPsi((MissingDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_DECLARATION) {
+        } else if (element instanceof TypeDeclarationPsi) {
             visitTypeDeclarationPsi((TypeDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CLASS_OR_INTERFACE) {
+        } else if (element instanceof ClassOrInterfacePsi) {
             visitClassOrInterfacePsi((ClassOrInterfacePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_ALIAS_DECLARATION) {
+        } else if (element instanceof TypeAliasDeclarationPsi) {
             visitTypeAliasDeclarationPsi((TypeAliasDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SATISFIED_TYPES) {
+        } else if (element instanceof SatisfiedTypesPsi) {
             visitSatisfiedTypesPsi((SatisfiedTypesPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ABSTRACTED_TYPE) {
+        } else if (element instanceof AbstractedTypePsi) {
             visitAbstractedTypePsi((AbstractedTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CASE_TYPES) {
+        } else if (element instanceof CaseTypesPsi) {
             visitCaseTypesPsi((CaseTypesPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXTENDED_TYPE) {
+        } else if (element instanceof ExtendedTypePsi) {
             visitExtendedTypePsi((ExtendedTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_CONSTRAINT_LIST) {
+        } else if (element instanceof TypeConstraintListPsi) {
             visitTypeConstraintListPsi((TypeConstraintListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_CONSTRAINT) {
+        } else if (element instanceof TypeConstraintPsi) {
             visitTypeConstraintPsi((TypeConstraintPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_SPECIFIER) {
+        } else if (element instanceof TypeSpecifierPsi) {
             visitTypeSpecifierPsi((TypeSpecifierPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DEFAULT_TYPE_ARGUMENT) {
+        } else if (element instanceof DefaultTypeArgumentPsi) {
             visitDefaultTypeArgumentPsi((DefaultTypeArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CLASS_SPECIFIER) {
+        } else if (element instanceof ClassSpecifierPsi) {
             visitClassSpecifierPsi((ClassSpecifierPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ANY_CLASS) {
+        } else if (element instanceof AnyClassPsi) {
             visitAnyClassPsi((AnyClassPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CLASS_DEFINITION) {
+        } else if (element instanceof ClassDefinitionPsi) {
             visitClassDefinitionPsi((ClassDefinitionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ENUMERATED) {
+        } else if (element instanceof EnumeratedPsi) {
             visitEnumeratedPsi((EnumeratedPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CONSTRUCTOR) {
+        } else if (element instanceof ConstructorPsi) {
             visitConstructorPsi((ConstructorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DELEGATED_CONSTRUCTOR) {
+        } else if (element instanceof DelegatedConstructorPsi) {
             visitDelegatedConstructorPsi((DelegatedConstructorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CLASS_DECLARATION) {
+        } else if (element instanceof ClassDeclarationPsi) {
             visitClassDeclarationPsi((ClassDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ANY_INTERFACE) {
+        } else if (element instanceof AnyInterfacePsi) {
             visitAnyInterfacePsi((AnyInterfacePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INTERFACE_DEFINITION) {
+        } else if (element instanceof InterfaceDefinitionPsi) {
             visitInterfaceDefinitionPsi((InterfaceDefinitionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INTERFACE_DECLARATION) {
+        } else if (element instanceof InterfaceDeclarationPsi) {
             visitInterfaceDeclarationPsi((InterfaceDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPED_DECLARATION) {
+        } else if (element instanceof TypedDeclarationPsi) {
             visitTypedDeclarationPsi((TypedDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ANY_ATTRIBUTE) {
+        } else if (element instanceof AnyAttributePsi) {
             visitAnyAttributePsi((AnyAttributePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ATTRIBUTE_DECLARATION) {
+        } else if (element instanceof AttributeDeclarationPsi) {
             visitAttributeDeclarationPsi((AttributeDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ATTRIBUTE_GETTER_DEFINITION) {
+        } else if (element instanceof AttributeGetterDefinitionPsi) {
             visitAttributeGetterDefinitionPsi((AttributeGetterDefinitionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ATTRIBUTE_SETTER_DEFINITION) {
+        } else if (element instanceof AttributeSetterDefinitionPsi) {
             visitAttributeSetterDefinitionPsi((AttributeSetterDefinitionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ANY_METHOD) {
+        } else if (element instanceof AnyMethodPsi) {
             visitAnyMethodPsi((AnyMethodPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.METHOD_DEFINITION) {
+        } else if (element instanceof MethodDefinitionPsi) {
             visitMethodDefinitionPsi((MethodDefinitionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.METHOD_DECLARATION) {
+        } else if (element instanceof MethodDeclarationPsi) {
             visitMethodDeclarationPsi((MethodDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.VOID_MODIFIER) {
+        } else if (element instanceof VoidModifierPsi) {
             visitVoidModifierPsi((VoidModifierPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OBJECT_DEFINITION) {
+        } else if (element instanceof ObjectDefinitionPsi) {
             visitObjectDefinitionPsi((ObjectDefinitionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PARAMETER_LIST) {
+        } else if (element instanceof ParameterListPsi) {
             visitParameterListPsi((ParameterListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PARAMETER) {
+        } else if (element instanceof ParameterPsi) {
             visitParameterPsi((ParameterPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PARAMETER_DECLARATION) {
+        } else if (element instanceof ParameterDeclarationPsi) {
             visitParameterDeclarationPsi((ParameterDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.VALUE_PARAMETER_DECLARATION) {
+        } else if (element instanceof ValueParameterDeclarationPsi) {
             visitValueParameterDeclarationPsi((ValueParameterDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FUNCTIONAL_PARAMETER_DECLARATION) {
+        } else if (element instanceof FunctionalParameterDeclarationPsi) {
             visitFunctionalParameterDeclarationPsi((FunctionalParameterDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INITIALIZER_PARAMETER) {
+        } else if (element instanceof InitializerParameterPsi) {
             visitInitializerParameterPsi((InitializerParameterPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_PARAMETER_LIST) {
+        } else if (element instanceof TypeParameterListPsi) {
             visitTypeParameterListPsi((TypeParameterListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_PARAMETER_DECLARATION) {
+        } else if (element instanceof TypeParameterDeclarationPsi) {
             visitTypeParameterDeclarationPsi((TypeParameterDeclarationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_VARIANCE) {
+        } else if (element instanceof TypeVariancePsi) {
             visitTypeVariancePsi((TypeVariancePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BODY) {
+        } else if (element instanceof BodyPsi) {
             visitBodyPsi((BodyPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BLOCK) {
+        } else if (element instanceof BlockPsi) {
             visitBlockPsi((BlockPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CLASS_BODY) {
+        } else if (element instanceof ClassBodyPsi) {
             visitClassBodyPsi((ClassBodyPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INTERFACE_BODY) {
+        } else if (element instanceof InterfaceBodyPsi) {
             visitInterfaceBodyPsi((InterfaceBodyPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE) {
+        } else if (element instanceof TypePsi) {
             visitTypePsi((TypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.STATIC_TYPE) {
+        } else if (element instanceof StaticTypePsi) {
             visitStaticTypePsi((StaticTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.GROUPED_TYPE) {
+        } else if (element instanceof GroupedTypePsi) {
             visitGroupedTypePsi((GroupedTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SIMPLE_TYPE) {
+        } else if (element instanceof SimpleTypePsi) {
             visitSimpleTypePsi((SimpleTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BASE_TYPE) {
+        } else if (element instanceof BaseTypePsi) {
             visitBaseTypePsi((BaseTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.QUALIFIED_TYPE) {
+        } else if (element instanceof QualifiedTypePsi) {
             visitQualifiedTypePsi((QualifiedTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.UNION_TYPE) {
+        } else if (element instanceof UnionTypePsi) {
             visitUnionTypePsi((UnionTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INTERSECTION_TYPE) {
+        } else if (element instanceof IntersectionTypePsi) {
             visitIntersectionTypePsi((IntersectionTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SEQUENCE_TYPE) {
+        } else if (element instanceof SequenceTypePsi) {
             visitSequenceTypePsi((SequenceTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ITERABLE_TYPE) {
+        } else if (element instanceof IterableTypePsi) {
             visitIterableTypePsi((IterableTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OPTIONAL_TYPE) {
+        } else if (element instanceof OptionalTypePsi) {
             visitOptionalTypePsi((OptionalTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TUPLE_TYPE) {
+        } else if (element instanceof TupleTypePsi) {
             visitTupleTypePsi((TupleTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FUNCTION_TYPE) {
+        } else if (element instanceof FunctionTypePsi) {
             visitFunctionTypePsi((FunctionTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ENTRY_TYPE) {
+        } else if (element instanceof EntryTypePsi) {
             visitEntryTypePsi((EntryTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_CONSTRUCTOR) {
+        } else if (element instanceof TypeConstructorPsi) {
             visitTypeConstructorPsi((TypeConstructorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SUPER_TYPE) {
+        } else if (element instanceof SuperTypePsi) {
             visitSuperTypePsi((SuperTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.META_LITERAL) {
+        } else if (element instanceof MetaLiteralPsi) {
             visitMetaLiteralPsi((MetaLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_LITERAL) {
+        } else if (element instanceof TypeLiteralPsi) {
             visitTypeLiteralPsi((TypeLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MEMBER_LITERAL) {
+        } else if (element instanceof MemberLiteralPsi) {
             visitMemberLiteralPsi((MemberLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CLASS_LITERAL) {
+        } else if (element instanceof ClassLiteralPsi) {
             visitClassLiteralPsi((ClassLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NEW_LITERAL) {
+        } else if (element instanceof NewLiteralPsi) {
             visitNewLiteralPsi((NewLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INTERFACE_LITERAL) {
+        } else if (element instanceof InterfaceLiteralPsi) {
             visitInterfaceLiteralPsi((InterfaceLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ALIAS_LITERAL) {
+        } else if (element instanceof AliasLiteralPsi) {
             visitAliasLiteralPsi((AliasLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_PARAMETER_LITERAL) {
+        } else if (element instanceof TypeParameterLiteralPsi) {
             visitTypeParameterLiteralPsi((TypeParameterLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.VALUE_LITERAL) {
+        } else if (element instanceof ValueLiteralPsi) {
             visitValueLiteralPsi((ValueLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FUNCTION_LITERAL) {
+        } else if (element instanceof FunctionLiteralPsi) {
             visitFunctionLiteralPsi((FunctionLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MODULE_LITERAL) {
+        } else if (element instanceof ModuleLiteralPsi) {
             visitModuleLiteralPsi((ModuleLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PACKAGE_LITERAL) {
+        } else if (element instanceof PackageLiteralPsi) {
             visitPackageLiteralPsi((PackageLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DYNAMIC_MODIFIER) {
+        } else if (element instanceof DynamicModifierPsi) {
             visitDynamicModifierPsi((DynamicModifierPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LOCAL_MODIFIER) {
+        } else if (element instanceof LocalModifierPsi) {
             visitLocalModifierPsi((LocalModifierPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.VALUE_MODIFIER) {
+        } else if (element instanceof ValueModifierPsi) {
             visitValueModifierPsi((ValueModifierPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FUNCTION_MODIFIER) {
+        } else if (element instanceof FunctionModifierPsi) {
             visitFunctionModifierPsi((FunctionModifierPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SYNTHETIC_VARIABLE) {
+        } else if (element instanceof SyntheticVariablePsi) {
             visitSyntheticVariablePsi((SyntheticVariablePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_ARGUMENTS) {
+        } else if (element instanceof TypeArgumentsPsi) {
             visitTypeArgumentsPsi((TypeArgumentsPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_ARGUMENT_LIST) {
+        } else if (element instanceof TypeArgumentListPsi) {
             visitTypeArgumentListPsi((TypeArgumentListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INFERRED_TYPE_ARGUMENTS) {
+        } else if (element instanceof InferredTypeArgumentsPsi) {
             visitInferredTypeArgumentsPsi((InferredTypeArgumentsPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SEQUENCED_TYPE) {
+        } else if (element instanceof SequencedTypePsi) {
             visitSequencedTypePsi((SequencedTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DEFAULTED_TYPE) {
+        } else if (element instanceof DefaultedTypePsi) {
             visitDefaultedTypePsi((DefaultedTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SPREAD_TYPE) {
+        } else if (element instanceof SpreadTypePsi) {
             visitSpreadTypePsi((SpreadTypePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DIRECTIVE) {
+        } else if (element instanceof DirectivePsi) {
             visitDirectivePsi((DirectivePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.RETURN) {
+        } else if (element instanceof ReturnPsi) {
             visitReturnPsi((ReturnPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.THROW) {
+        } else if (element instanceof ThrowPsi) {
             visitThrowPsi((ThrowPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CONTINUE) {
+        } else if (element instanceof ContinuePsi) {
             visitContinuePsi((ContinuePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BREAK) {
+        } else if (element instanceof BreakPsi) {
             visitBreakPsi((BreakPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.STATEMENT_OR_ARGUMENT) {
+        } else if (element instanceof StatementOrArgumentPsi) {
             visitStatementOrArgumentPsi((StatementOrArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.STATEMENT) {
+        } else if (element instanceof StatementPsi) {
             visitStatementPsi((StatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.COMPILER_ANNOTATION) {
+        } else if (element instanceof CompilerAnnotationPsi) {
             visitCompilerAnnotationPsi((CompilerAnnotationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXECUTABLE_STATEMENT) {
+        } else if (element instanceof ExecutableStatementPsi) {
             visitExecutableStatementPsi((ExecutableStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ASSERTION) {
+        } else if (element instanceof AssertionPsi) {
             visitAssertionPsi((AssertionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SPECIFIER_STATEMENT) {
+        } else if (element instanceof SpecifierStatementPsi) {
             visitSpecifierStatementPsi((SpecifierStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXPRESSION_STATEMENT) {
+        } else if (element instanceof ExpressionStatementPsi) {
             visitExpressionStatementPsi((ExpressionStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PATTERN) {
+        } else if (element instanceof PatternPsi) {
             visitPatternPsi((PatternPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.VARIABLE_PATTERN) {
+        } else if (element instanceof VariablePatternPsi) {
             visitVariablePatternPsi((VariablePatternPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TUPLE_PATTERN) {
+        } else if (element instanceof TuplePatternPsi) {
             visitTuplePatternPsi((TuplePatternPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.KEY_VALUE_PATTERN) {
+        } else if (element instanceof KeyValuePatternPsi) {
             visitKeyValuePatternPsi((KeyValuePatternPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DESTRUCTURE) {
+        } else if (element instanceof DestructurePsi) {
             visitDestructurePsi((DestructurePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CONTROL_STATEMENT) {
+        } else if (element instanceof ControlStatementPsi) {
             visitControlStatementPsi((ControlStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CONTROL_CLAUSE) {
+        } else if (element instanceof ControlClausePsi) {
             visitControlClausePsi((ControlClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DYNAMIC_STATEMENT) {
+        } else if (element instanceof DynamicStatementPsi) {
             visitDynamicStatementPsi((DynamicStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DYNAMIC_CLAUSE) {
+        } else if (element instanceof DynamicClausePsi) {
             visitDynamicClausePsi((DynamicClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LET_EXPRESSION) {
+        } else if (element instanceof LetExpressionPsi) {
             visitLetExpressionPsi((LetExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LET_CLAUSE) {
+        } else if (element instanceof LetClausePsi) {
             visitLetClausePsi((LetClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IF_STATEMENT) {
+        } else if (element instanceof IfStatementPsi) {
             visitIfStatementPsi((IfStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IF_CLAUSE) {
+        } else if (element instanceof IfClausePsi) {
             visitIfClausePsi((IfClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ELSE_CLAUSE) {
+        } else if (element instanceof ElseClausePsi) {
             visitElseClausePsi((ElseClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SWITCH_STATEMENT) {
+        } else if (element instanceof SwitchStatementPsi) {
             visitSwitchStatementPsi((SwitchStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SWITCH_CLAUSE) {
+        } else if (element instanceof SwitchClausePsi) {
             visitSwitchClausePsi((SwitchClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SWITCHED) {
+        } else if (element instanceof SwitchedPsi) {
             visitSwitchedPsi((SwitchedPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SWITCH_CASE_LIST) {
+        } else if (element instanceof SwitchCaseListPsi) {
             visitSwitchCaseListPsi((SwitchCaseListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CASE_CLAUSE) {
+        } else if (element instanceof CaseClausePsi) {
             visitCaseClausePsi((CaseClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CASE_ITEM) {
+        } else if (element instanceof CaseItemPsi) {
             visitCaseItemPsi((CaseItemPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MATCH_CASE) {
+        } else if (element instanceof MatchCasePsi) {
             visitMatchCasePsi((MatchCasePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IS_CASE) {
+        } else if (element instanceof IsCasePsi) {
             visitIsCasePsi((IsCasePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SATISFIES_CASE) {
+        } else if (element instanceof SatisfiesCasePsi) {
             visitSatisfiesCasePsi((SatisfiesCasePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TRY_CATCH_STATEMENT) {
+        } else if (element instanceof TryCatchStatementPsi) {
             visitTryCatchStatementPsi((TryCatchStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TRY_CLAUSE) {
+        } else if (element instanceof TryClausePsi) {
             visitTryClausePsi((TryClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CATCH_CLAUSE) {
+        } else if (element instanceof CatchClausePsi) {
             visitCatchClausePsi((CatchClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FINALLY_CLAUSE) {
+        } else if (element instanceof FinallyClausePsi) {
             visitFinallyClausePsi((FinallyClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.RESOURCE_LIST) {
+        } else if (element instanceof ResourceListPsi) {
             visitResourceListPsi((ResourceListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.RESOURCE) {
+        } else if (element instanceof ResourcePsi) {
             visitResourcePsi((ResourcePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CATCH_VARIABLE) {
+        } else if (element instanceof CatchVariablePsi) {
             visitCatchVariablePsi((CatchVariablePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FOR_STATEMENT) {
+        } else if (element instanceof ForStatementPsi) {
             visitForStatementPsi((ForStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FOR_CLAUSE) {
+        } else if (element instanceof ForClausePsi) {
             visitForClausePsi((ForClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FOR_ITERATOR) {
+        } else if (element instanceof ForIteratorPsi) {
             visitForIteratorPsi((ForIteratorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.VALUE_ITERATOR) {
+        } else if (element instanceof ValueIteratorPsi) {
             visitValueIteratorPsi((ValueIteratorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PATTERN_ITERATOR) {
+        } else if (element instanceof PatternIteratorPsi) {
             visitPatternIteratorPsi((PatternIteratorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.WHILE_STATEMENT) {
+        } else if (element instanceof WhileStatementPsi) {
             visitWhileStatementPsi((WhileStatementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.WHILE_CLAUSE) {
+        } else if (element instanceof WhileClausePsi) {
             visitWhileClausePsi((WhileClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CONDITION_LIST) {
+        } else if (element instanceof ConditionListPsi) {
             visitConditionListPsi((ConditionListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CONDITION) {
+        } else if (element instanceof ConditionPsi) {
             visitConditionPsi((ConditionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BOOLEAN_CONDITION) {
+        } else if (element instanceof BooleanConditionPsi) {
             visitBooleanConditionPsi((BooleanConditionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXISTS_OR_NONEMPTY_CONDITION) {
+        } else if (element instanceof ExistsOrNonemptyConditionPsi) {
             visitExistsOrNonemptyConditionPsi((ExistsOrNonemptyConditionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXISTS_CONDITION) {
+        } else if (element instanceof ExistsConditionPsi) {
             visitExistsConditionPsi((ExistsConditionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NONEMPTY_CONDITION) {
+        } else if (element instanceof NonemptyConditionPsi) {
             visitNonemptyConditionPsi((NonemptyConditionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IS_CONDITION) {
+        } else if (element instanceof IsConditionPsi) {
             visitIsConditionPsi((IsConditionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SATISFIES_CONDITION) {
+        } else if (element instanceof SatisfiesConditionPsi) {
             visitSatisfiesConditionPsi((SatisfiesConditionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.VARIABLE) {
+        } else if (element instanceof VariablePsi) {
             visitVariablePsi((VariablePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TERM) {
+        } else if (element instanceof TermPsi) {
             visitTermPsi((TermPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OPERATOR_EXPRESSION) {
+        } else if (element instanceof OperatorExpressionPsi) {
             visitOperatorExpressionPsi((OperatorExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BINARY_OPERATOR_EXPRESSION) {
+        } else if (element instanceof BinaryOperatorExpressionPsi) {
             visitBinaryOperatorExpressionPsi((BinaryOperatorExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ARITHMETIC_OP) {
+        } else if (element instanceof ArithmeticOpPsi) {
             visitArithmeticOpPsi((ArithmeticOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SUM_OP) {
+        } else if (element instanceof SumOpPsi) {
             visitSumOpPsi((SumOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DIFFERENCE_OP) {
+        } else if (element instanceof DifferenceOpPsi) {
             visitDifferenceOpPsi((DifferenceOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PRODUCT_OP) {
+        } else if (element instanceof ProductOpPsi) {
             visitProductOpPsi((ProductOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.QUOTIENT_OP) {
+        } else if (element instanceof QuotientOpPsi) {
             visitQuotientOpPsi((QuotientOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.POWER_OP) {
+        } else if (element instanceof PowerOpPsi) {
             visitPowerOpPsi((PowerOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.REMAINDER_OP) {
+        } else if (element instanceof RemainderOpPsi) {
             visitRemainderOpPsi((RemainderOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ASSIGNMENT_OP) {
+        } else if (element instanceof AssignmentOpPsi) {
             visitAssignmentOpPsi((AssignmentOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ASSIGN_OP) {
+        } else if (element instanceof AssignOpPsi) {
             visitAssignOpPsi((AssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ARITHMETIC_ASSIGNMENT_OP) {
+        } else if (element instanceof ArithmeticAssignmentOpPsi) {
             visitArithmeticAssignmentOpPsi((ArithmeticAssignmentOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ADD_ASSIGN_OP) {
+        } else if (element instanceof AddAssignOpPsi) {
             visitAddAssignOpPsi((AddAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SUBTRACT_ASSIGN_OP) {
+        } else if (element instanceof SubtractAssignOpPsi) {
             visitSubtractAssignOpPsi((SubtractAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MULTIPLY_ASSIGN_OP) {
+        } else if (element instanceof MultiplyAssignOpPsi) {
             visitMultiplyAssignOpPsi((MultiplyAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DIVIDE_ASSIGN_OP) {
+        } else if (element instanceof DivideAssignOpPsi) {
             visitDivideAssignOpPsi((DivideAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.REMAINDER_ASSIGN_OP) {
+        } else if (element instanceof RemainderAssignOpPsi) {
             visitRemainderAssignOpPsi((RemainderAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BITWISE_ASSIGNMENT_OP) {
+        } else if (element instanceof BitwiseAssignmentOpPsi) {
             visitBitwiseAssignmentOpPsi((BitwiseAssignmentOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INTERSECT_ASSIGN_OP) {
+        } else if (element instanceof IntersectAssignOpPsi) {
             visitIntersectAssignOpPsi((IntersectAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.UNION_ASSIGN_OP) {
+        } else if (element instanceof UnionAssignOpPsi) {
             visitUnionAssignOpPsi((UnionAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.COMPLEMENT_ASSIGN_OP) {
+        } else if (element instanceof ComplementAssignOpPsi) {
             visitComplementAssignOpPsi((ComplementAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LOGICAL_ASSIGNMENT_OP) {
+        } else if (element instanceof LogicalAssignmentOpPsi) {
             visitLogicalAssignmentOpPsi((LogicalAssignmentOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.AND_ASSIGN_OP) {
+        } else if (element instanceof AndAssignOpPsi) {
             visitAndAssignOpPsi((AndAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OR_ASSIGN_OP) {
+        } else if (element instanceof OrAssignOpPsi) {
             visitOrAssignOpPsi((OrAssignOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LOGICAL_OP) {
+        } else if (element instanceof LogicalOpPsi) {
             visitLogicalOpPsi((LogicalOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.AND_OP) {
+        } else if (element instanceof AndOpPsi) {
             visitAndOpPsi((AndOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OR_OP) {
+        } else if (element instanceof OrOpPsi) {
             visitOrOpPsi((OrOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BITWISE_OP) {
+        } else if (element instanceof BitwiseOpPsi) {
             visitBitwiseOpPsi((BitwiseOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INTERSECTION_OP) {
+        } else if (element instanceof IntersectionOpPsi) {
             visitIntersectionOpPsi((IntersectionOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.UNION_OP) {
+        } else if (element instanceof UnionOpPsi) {
             visitUnionOpPsi((UnionOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.COMPLEMENT_OP) {
+        } else if (element instanceof ComplementOpPsi) {
             visitComplementOpPsi((ComplementOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EQUALITY_OP) {
+        } else if (element instanceof EqualityOpPsi) {
             visitEqualityOpPsi((EqualityOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EQUAL_OP) {
+        } else if (element instanceof EqualOpPsi) {
             visitEqualOpPsi((EqualOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NOT_EQUAL_OP) {
+        } else if (element instanceof NotEqualOpPsi) {
             visitNotEqualOpPsi((NotEqualOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.COMPARISON_OP) {
+        } else if (element instanceof ComparisonOpPsi) {
             visitComparisonOpPsi((ComparisonOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LARGER_OP) {
+        } else if (element instanceof LargerOpPsi) {
             visitLargerOpPsi((LargerOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SMALLER_OP) {
+        } else if (element instanceof SmallerOpPsi) {
             visitSmallerOpPsi((SmallerOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LARGE_AS_OP) {
+        } else if (element instanceof LargeAsOpPsi) {
             visitLargeAsOpPsi((LargeAsOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SMALL_AS_OP) {
+        } else if (element instanceof SmallAsOpPsi) {
             visitSmallAsOpPsi((SmallAsOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SCALE_OP) {
+        } else if (element instanceof ScaleOpPsi) {
             visitScaleOpPsi((ScaleOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BOUND) {
+        } else if (element instanceof BoundPsi) {
             visitBoundPsi((BoundPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OPEN_BOUND) {
+        } else if (element instanceof OpenBoundPsi) {
             visitOpenBoundPsi((OpenBoundPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CLOSED_BOUND) {
+        } else if (element instanceof ClosedBoundPsi) {
             visitClosedBoundPsi((ClosedBoundPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.WITHIN_OP) {
+        } else if (element instanceof WithinOpPsi) {
             visitWithinOpPsi((WithinOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DEFAULT_OP) {
+        } else if (element instanceof DefaultOpPsi) {
             visitDefaultOpPsi((DefaultOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.THEN_OP) {
+        } else if (element instanceof ThenOpPsi) {
             visitThenOpPsi((ThenOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IDENTICAL_OP) {
+        } else if (element instanceof IdenticalOpPsi) {
             visitIdenticalOpPsi((IdenticalOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ENTRY_OP) {
+        } else if (element instanceof EntryOpPsi) {
             visitEntryOpPsi((EntryOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.RANGE_OP) {
+        } else if (element instanceof RangeOpPsi) {
             visitRangeOpPsi((RangeOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SEGMENT_OP) {
+        } else if (element instanceof SegmentOpPsi) {
             visitSegmentOpPsi((SegmentOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.COMPARE_OP) {
+        } else if (element instanceof CompareOpPsi) {
             visitCompareOpPsi((CompareOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IN_OP) {
+        } else if (element instanceof InOpPsi) {
             visitInOpPsi((InOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.UNARY_OPERATOR_EXPRESSION) {
+        } else if (element instanceof UnaryOperatorExpressionPsi) {
             visitUnaryOperatorExpressionPsi((UnaryOperatorExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NOT_OP) {
+        } else if (element instanceof NotOpPsi) {
             visitNotOpPsi((NotOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXISTS) {
+        } else if (element instanceof ExistsPsi) {
             visitExistsPsi((ExistsPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NONEMPTY) {
+        } else if (element instanceof NonemptyPsi) {
             visitNonemptyPsi((NonemptyPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NEGATIVE_OP) {
+        } else if (element instanceof NegativeOpPsi) {
             visitNegativeOpPsi((NegativeOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.POSITIVE_OP) {
+        } else if (element instanceof PositiveOpPsi) {
             visitPositiveOpPsi((PositiveOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPE_OPERATOR_EXPRESSION) {
+        } else if (element instanceof TypeOperatorExpressionPsi) {
             visitTypeOperatorExpressionPsi((TypeOperatorExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IS_OP) {
+        } else if (element instanceof IsOpPsi) {
             visitIsOpPsi((IsOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SATISFIES) {
+        } else if (element instanceof SatisfiesPsi) {
             visitSatisfiesPsi((SatisfiesPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXTENDS) {
+        } else if (element instanceof ExtendsPsi) {
             visitExtendsPsi((ExtendsPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OF_OP) {
+        } else if (element instanceof OfOpPsi) {
             visitOfOpPsi((OfOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PREFIX_OPERATOR_EXPRESSION) {
+        } else if (element instanceof PrefixOperatorExpressionPsi) {
             visitPrefixOperatorExpressionPsi((PrefixOperatorExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INCREMENT_OP) {
+        } else if (element instanceof IncrementOpPsi) {
             visitIncrementOpPsi((IncrementOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DECREMENT_OP) {
+        } else if (element instanceof DecrementOpPsi) {
             visitDecrementOpPsi((DecrementOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.POSTFIX_OPERATOR_EXPRESSION) {
+        } else if (element instanceof PostfixOperatorExpressionPsi) {
             visitPostfixOperatorExpressionPsi((PostfixOperatorExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.POSTFIX_INCREMENT_OP) {
+        } else if (element instanceof PostfixIncrementOpPsi) {
             visitPostfixIncrementOpPsi((PostfixIncrementOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.POSTFIX_DECREMENT_OP) {
+        } else if (element instanceof PostfixDecrementOpPsi) {
             visitPostfixDecrementOpPsi((PostfixDecrementOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXPRESSION_LIST) {
+        } else if (element instanceof ExpressionListPsi) {
             visitExpressionListPsi((ExpressionListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXPRESSION) {
+        } else if (element instanceof ExpressionPsi) {
             visitExpressionPsi((ExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PRIMARY) {
+        } else if (element instanceof PrimaryPsi) {
             visitPrimaryPsi((PrimaryPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.POSTFIX_EXPRESSION) {
+        } else if (element instanceof PostfixExpressionPsi) {
             visitPostfixExpressionPsi((PostfixExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INVOCATION_EXPRESSION) {
+        } else if (element instanceof InvocationExpressionPsi) {
             visitInvocationExpressionPsi((InvocationExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PARAMETERIZED_EXPRESSION) {
+        } else if (element instanceof ParameterizedExpressionPsi) {
             visitParameterizedExpressionPsi((ParameterizedExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MEMBER_OR_TYPE_EXPRESSION) {
+        } else if (element instanceof MemberOrTypeExpressionPsi) {
             visitMemberOrTypeExpressionPsi((MemberOrTypeExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXTENDED_TYPE_EXPRESSION) {
+        } else if (element instanceof ExtendedTypeExpressionPsi) {
             visitExtendedTypeExpressionPsi((ExtendedTypeExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.STATIC_MEMBER_OR_TYPE_EXPRESSION) {
+        } else if (element instanceof StaticMemberOrTypeExpressionPsi) {
             visitStaticMemberOrTypeExpressionPsi((StaticMemberOrTypeExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BASE_MEMBER_OR_TYPE_EXPRESSION) {
+        } else if (element instanceof BaseMemberOrTypeExpressionPsi) {
             visitBaseMemberOrTypeExpressionPsi((BaseMemberOrTypeExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BASE_MEMBER_EXPRESSION) {
+        } else if (element instanceof BaseMemberExpressionPsi) {
             visitBaseMemberExpressionPsi((BaseMemberExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.BASE_TYPE_EXPRESSION) {
+        } else if (element instanceof BaseTypeExpressionPsi) {
             visitBaseTypeExpressionPsi((BaseTypeExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.QUALIFIED_MEMBER_OR_TYPE_EXPRESSION) {
+        } else if (element instanceof QualifiedMemberOrTypeExpressionPsi) {
             visitQualifiedMemberOrTypeExpressionPsi((QualifiedMemberOrTypeExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.QUALIFIED_MEMBER_EXPRESSION) {
+        } else if (element instanceof QualifiedMemberExpressionPsi) {
             visitQualifiedMemberExpressionPsi((QualifiedMemberExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.QUALIFIED_TYPE_EXPRESSION) {
+        } else if (element instanceof QualifiedTypeExpressionPsi) {
             visitQualifiedTypeExpressionPsi((QualifiedTypeExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MEMBER_OPERATOR) {
+        } else if (element instanceof MemberOperatorPsi) {
             visitMemberOperatorPsi((MemberOperatorPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.MEMBER_OP) {
+        } else if (element instanceof MemberOpPsi) {
             visitMemberOpPsi((MemberOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SAFE_MEMBER_OP) {
+        } else if (element instanceof SafeMemberOpPsi) {
             visitSafeMemberOpPsi((SafeMemberOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SPREAD_OP) {
+        } else if (element instanceof SpreadOpPsi) {
             visitSpreadOpPsi((SpreadOpPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INDEX_EXPRESSION) {
+        } else if (element instanceof IndexExpressionPsi) {
             visitIndexExpressionPsi((IndexExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ELEMENT_OR_RANGE) {
+        } else if (element instanceof ElementOrRangePsi) {
             visitElementOrRangePsi((ElementOrRangePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ELEMENT) {
+        } else if (element instanceof ElementPsi) {
             visitElementPsi((ElementPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ELEMENT_RANGE) {
+        } else if (element instanceof ElementRangePsi) {
             visitElementRangePsi((ElementRangePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OUTER) {
+        } else if (element instanceof OuterPsi) {
             visitOuterPsi((OuterPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.PACKAGE) {
+        } else if (element instanceof PackagePsi) {
             visitPackagePsi((PackagePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ARGUMENT_LIST) {
+        } else if (element instanceof ArgumentListPsi) {
             visitArgumentListPsi((ArgumentListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NAMED_ARGUMENT_LIST) {
+        } else if (element instanceof NamedArgumentListPsi) {
             visitNamedArgumentListPsi((NamedArgumentListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SEQUENCED_ARGUMENT) {
+        } else if (element instanceof SequencedArgumentPsi) {
             visitSequencedArgumentPsi((SequencedArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.POSITIONAL_ARGUMENT_LIST) {
+        } else if (element instanceof PositionalArgumentListPsi) {
             visitPositionalArgumentListPsi((PositionalArgumentListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.POSITIONAL_ARGUMENT) {
+        } else if (element instanceof PositionalArgumentPsi) {
             visitPositionalArgumentPsi((PositionalArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LISTED_ARGUMENT) {
+        } else if (element instanceof ListedArgumentPsi) {
             visitListedArgumentPsi((ListedArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SPREAD_ARGUMENT) {
+        } else if (element instanceof SpreadArgumentPsi) {
             visitSpreadArgumentPsi((SpreadArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FUNCTION_ARGUMENT) {
+        } else if (element instanceof FunctionArgumentPsi) {
             visitFunctionArgumentPsi((FunctionArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OBJECT_EXPRESSION) {
+        } else if (element instanceof ObjectExpressionPsi) {
             visitObjectExpressionPsi((ObjectExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IF_EXPRESSION) {
+        } else if (element instanceof IfExpressionPsi) {
             visitIfExpressionPsi((IfExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SWITCH_EXPRESSION) {
+        } else if (element instanceof SwitchExpressionPsi) {
             visitSwitchExpressionPsi((SwitchExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NAMED_ARGUMENT) {
+        } else if (element instanceof NamedArgumentPsi) {
             visitNamedArgumentPsi((NamedArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SPECIFIED_ARGUMENT) {
+        } else if (element instanceof SpecifiedArgumentPsi) {
             visitSpecifiedArgumentPsi((SpecifiedArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TYPED_ARGUMENT) {
+        } else if (element instanceof TypedArgumentPsi) {
             visitTypedArgumentPsi((TypedArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.METHOD_ARGUMENT) {
+        } else if (element instanceof MethodArgumentPsi) {
             visitMethodArgumentPsi((MethodArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ATTRIBUTE_ARGUMENT) {
+        } else if (element instanceof AttributeArgumentPsi) {
             visitAttributeArgumentPsi((AttributeArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.OBJECT_ARGUMENT) {
+        } else if (element instanceof ObjectArgumentPsi) {
             visitObjectArgumentPsi((ObjectArgumentPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SPECIFIER_OR_INITIALIZER_EXPRESSION) {
+        } else if (element instanceof SpecifierOrInitializerExpressionPsi) {
             visitSpecifierOrInitializerExpressionPsi((SpecifierOrInitializerExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SPECIFIER_EXPRESSION) {
+        } else if (element instanceof SpecifierExpressionPsi) {
             visitSpecifierExpressionPsi((SpecifierExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LAZY_SPECIFIER_EXPRESSION) {
+        } else if (element instanceof LazySpecifierExpressionPsi) {
             visitLazySpecifierExpressionPsi((LazySpecifierExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INITIALIZER_EXPRESSION) {
+        } else if (element instanceof InitializerExpressionPsi) {
             visitInitializerExpressionPsi((InitializerExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ATOM) {
+        } else if (element instanceof AtomPsi) {
             visitAtomPsi((AtomPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.LITERAL) {
+        } else if (element instanceof LiteralPsi) {
             visitLiteralPsi((LiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.NATURAL_LITERAL) {
+        } else if (element instanceof NaturalLiteralPsi) {
             visitNaturalLiteralPsi((NaturalLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FLOAT_LITERAL) {
+        } else if (element instanceof FloatLiteralPsi) {
             visitFloatLiteralPsi((FloatLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.CHAR_LITERAL) {
+        } else if (element instanceof CharLiteralPsi) {
             visitCharLiteralPsi((CharLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.STRING_LITERAL) {
+        } else if (element instanceof StringLiteralPsi) {
             visitStringLiteralPsi((StringLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.QUOTED_LITERAL) {
+        } else if (element instanceof QuotedLiteralPsi) {
             visitQuotedLiteralPsi((QuotedLiteralPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DOC_LINK) {
+        } else if (element instanceof DocLinkPsi) {
             visitDocLinkPsi((DocLinkPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SELF_EXPRESSION) {
+        } else if (element instanceof SelfExpressionPsi) {
             visitSelfExpressionPsi((SelfExpressionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.THIS) {
+        } else if (element instanceof ThisPsi) {
             visitThisPsi((ThisPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SUPER) {
+        } else if (element instanceof SuperPsi) {
             visitSuperPsi((SuperPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.SEQUENCE_ENUMERATION) {
+        } else if (element instanceof SequenceEnumerationPsi) {
             visitSequenceEnumerationPsi((SequenceEnumerationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.TUPLE) {
+        } else if (element instanceof TuplePsi) {
             visitTuplePsi((TuplePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.DYNAMIC) {
+        } else if (element instanceof DynamicPsi) {
             visitDynamicPsi((DynamicPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.STRING_TEMPLATE) {
+        } else if (element instanceof StringTemplatePsi) {
             visitStringTemplatePsi((StringTemplatePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ANNOTATION) {
+        } else if (element instanceof AnnotationPsi) {
             visitAnnotationPsi((AnnotationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ANONYMOUS_ANNOTATION) {
+        } else if (element instanceof AnonymousAnnotationPsi) {
             visitAnonymousAnnotationPsi((AnonymousAnnotationPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.ANNOTATION_LIST) {
+        } else if (element instanceof AnnotationListPsi) {
             visitAnnotationListPsi((AnnotationListPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IDENTIFIER) {
+        } else if (element instanceof IdentifierPsi) {
             visitIdentifierPsi((IdentifierPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.COMPREHENSION) {
+        } else if (element instanceof ComprehensionPsi) {
             visitComprehensionPsi((ComprehensionPsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.COMPREHENSION_CLAUSE) {
+        } else if (element instanceof ComprehensionClausePsi) {
             visitComprehensionClausePsi((ComprehensionClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.INITIAL_COMPREHENSION_CLAUSE) {
+        } else if (element instanceof InitialComprehensionClausePsi) {
             visitInitialComprehensionClausePsi((InitialComprehensionClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.EXPRESSION_COMPREHENSION_CLAUSE) {
+        } else if (element instanceof ExpressionComprehensionClausePsi) {
             visitExpressionComprehensionClausePsi((ExpressionComprehensionClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.FOR_COMPREHENSION_CLAUSE) {
+        } else if (element instanceof ForComprehensionClausePsi) {
             visitForComprehensionClausePsi((ForComprehensionClausePsi) element);
-        } else if (element.getNode().getElementType() == CeylonTypes.IF_COMPREHENSION_CLAUSE) {
+        } else if (element instanceof IfComprehensionClausePsi) {
             visitIfComprehensionClausePsi((IfComprehensionClausePsi) element);
         }
 
