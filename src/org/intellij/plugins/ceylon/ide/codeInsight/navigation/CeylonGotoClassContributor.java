@@ -112,9 +112,9 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
                 return node.getDeclarationModel().getQualifiedNameString();
             }
             return node.getIdentifier().getText();
+        } else if (item instanceof CeylonCompositeElement) {
+            Logger.getInstance(CeylonGotoClassContributor.class).error("Couldn't get qualified name for item " + item.getClass().getName());
         }
-
-        Logger.getInstance(CeylonGotoClassContributor.class).error("Couldn't get qualified name for item " + item.getClass().getName());
 
         return null;
     }
