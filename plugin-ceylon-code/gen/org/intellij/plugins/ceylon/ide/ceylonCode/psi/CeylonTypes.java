@@ -4,6 +4,7 @@ import com.intellij.psi.tree.IElementType;
 
 /* Generated using Antlr by IdeaAstTypesGen.g */
 public interface CeylonTypes {
+    IElementType GUARDED_VARIABLE = new CeylonElementType("GUARDED_VARIABLE");
     IElementType COMPILATION_UNIT = new CeylonElementType("COMPILATION_UNIT");
     IElementType MODULE_DESCRIPTOR = new CeylonElementType("MODULE_DESCRIPTOR");
     IElementType PACKAGE_DESCRIPTOR = new CeylonElementType("PACKAGE_DESCRIPTOR");

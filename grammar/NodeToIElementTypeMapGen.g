@@ -27,6 +27,7 @@ nodeList : {
             println("    }");
             println("");
             println("    static {");
+            println("        map.put(CustomTree.GuardedVariable.class, CeylonTypes.GUARDED_VARIABLE);");
            }
            (nodeDescription? node)+ 
            EOF

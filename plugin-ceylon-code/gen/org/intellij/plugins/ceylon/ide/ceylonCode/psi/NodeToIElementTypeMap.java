@@ -15,6 +15,7 @@ public class NodeToIElementTypeMap {
     }
 
     static {
+        map.put(CustomTree.GuardedVariable.class, CeylonTypes.GUARDED_VARIABLE);
         map.put(CustomTree.CompilationUnit.class, CeylonTypes.COMPILATION_UNIT);
         map.put(CustomTree.ModuleDescriptor.class, CeylonTypes.MODULE_DESCRIPTOR);
         map.put(CustomTree.PackageDescriptor.class, CeylonTypes.PACKAGE_DESCRIPTOR);

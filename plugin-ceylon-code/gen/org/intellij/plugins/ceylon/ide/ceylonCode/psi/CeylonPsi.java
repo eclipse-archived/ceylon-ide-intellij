@@ -1,10 +1,14 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 /* Generated using Antlr by PsiIntfGen.g */
 
 public class CeylonPsi {
 
+    public static interface GuardedVariablePsi extends CeylonCompositeElement {
+        @Override CustomTree.GuardedVariable getCeylonNode();
+    }
     public static interface CompilationUnitPsi extends CeylonCompositeElement {
         @Override Tree.CompilationUnit getCeylonNode();
     }

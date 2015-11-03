@@ -19,6 +19,8 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
         super.visitElement(element);
         if (false) {
 
+        } else if (element instanceof GuardedVariablePsi) {
+            visitGuardedVariablePsi((GuardedVariablePsi) element);
         } else if (element instanceof CompilationUnitPsi) {
             visitCompilationUnitPsi((CompilationUnitPsi) element);
         } else if (element instanceof ModuleDescriptorPsi) {
@@ -919,4 +921,5 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitPackageDescriptorPsi(@NotNull PackageDescriptorPsi element) { visitStatementOrArgumentPsi(element); }
     public void visitModuleDescriptorPsi(@NotNull ModuleDescriptorPsi element) { visitStatementOrArgumentPsi(element); }
     public void visitCompilationUnitPsi(@NotNull CompilationUnitPsi element) {}
+    public void visitGuardedVariablePsi(@NotNull GuardedVariablePsi element) {}
 }

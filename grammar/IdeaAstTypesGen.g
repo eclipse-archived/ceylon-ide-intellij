@@ -14,6 +14,7 @@ nodeList : {
 
             println("/* Generated using Antlr by IdeaAstTypesGen.g */");
             println("public interface CeylonTypes {");
+            println("    IElementType GUARDED_VARIABLE = new CeylonElementType(\"GUARDED_VARIABLE\");");
 
            }
            (DESCRIPTION? node)+ 

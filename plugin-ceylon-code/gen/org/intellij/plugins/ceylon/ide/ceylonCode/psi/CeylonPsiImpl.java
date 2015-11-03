@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
 import com.intellij.lang.ASTNode;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonResolvable;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.CeylonCompositeElementImpl;
@@ -9,7 +10,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.CeylonCompositeElemen
 
 public class CeylonPsiImpl {
 
-    public static class CompilationUnitPsiImpl extends CeylonCompositeElementImpl
+    public static class GuardedVariablePsiImpl extends CeylonCompositeElementImpl            implements CeylonPsi.GuardedVariablePsi {        public GuardedVariablePsiImpl(ASTNode astNode) { super(astNode); }        @Override public CustomTree.GuardedVariable getCeylonNode() { return (CustomTree.GuardedVariable) super.getCeylonNode(); }    }    public static class CompilationUnitPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.CompilationUnitPsi {
         public CompilationUnitPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.CompilationUnit getCeylonNode() { return (Tree.CompilationUnit) super.getCeylonNode(); }

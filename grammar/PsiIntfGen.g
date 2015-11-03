@@ -11,8 +11,12 @@ grammar PsiIntfGen;
 nodeList : { 
            println("package org.intellij.plugins.ceylon.ide.ceylonCode.psi;\n");
            println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
+           println("import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;");
            println("/* Generated using Antlr by PsiIntfGen.g */");
            println("\npublic class CeylonPsi {\n");
+           println("    public static interface GuardedVariablePsi extends CeylonCompositeElement {");
+           println("        @Override CustomTree.GuardedVariable getCeylonNode();");
+           println("    }");
            }
            (nodeDescription? node)+ 
            EOF

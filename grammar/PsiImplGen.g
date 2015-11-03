@@ -12,11 +12,17 @@ nodeList : {
            println("package org.intellij.plugins.ceylon.ide.ceylonCode.psi;\n");
            println("import com.intellij.lang.ASTNode;");
            println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
+           println("import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;");
            println("import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonResolvable;");
            println("import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.*;");
            println("import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.CeylonCompositeElementImpl;");
            println("/* Generated using Antlr by PsiImplGen.g */");
            println("\npublic class CeylonPsiImpl {\n");
+           print("    public static class GuardedVariablePsiImpl extends CeylonCompositeElementImpl");
+           print("            implements CeylonPsi.GuardedVariablePsi {");
+           print("        public GuardedVariablePsiImpl(ASTNode astNode) { super(astNode); }");
+           print("        @Override public CustomTree.GuardedVariable getCeylonNode() { return (CustomTree.GuardedVariable) super.getCeylonNode(); }");
+           print("    }");
            }
            (nodeDescription? node)+ 
            EOF
