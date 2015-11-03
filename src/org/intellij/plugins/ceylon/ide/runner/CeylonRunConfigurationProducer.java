@@ -5,6 +5,7 @@ import com.intellij.execution.actions.RunConfigurationProducer;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -31,7 +32,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
         if (params == null) {
             return false;
         }
-        String pfx = params.pkg.isEmpty() ? "" : params.pkg + ".";
+        String pfx = StringUtil.isEmpty(params.pkg) ? "" : params.pkg + ".";
         final String topLevelNameFull = pfx + params.topLevel;
         configuration.setTopLevelNameFull(topLevelNameFull);
         configuration.setName(topLevelNameFull);
