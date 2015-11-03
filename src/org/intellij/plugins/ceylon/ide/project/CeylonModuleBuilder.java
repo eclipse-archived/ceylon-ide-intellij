@@ -93,6 +93,7 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
         pageTwo.apply(ceylonProject);
 
         ceylonProject.getConfiguration().save();
+        ceylonProject.getIdeConfiguration().save();
         CeylonFacet facet = FacetManager.getInstance(module).addFacet(CeylonFacet.getFacetType(), CeylonFacet.getFacetType().getPresentableName(), null);
         facet.getConfiguration().setModule(module);
     }
