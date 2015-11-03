@@ -31,6 +31,8 @@ import java.util.*;
  */
 public class IdeaCeylonParser extends IStubFileElementType {
 
+    private static Logger LOGGER = Logger.getInstance(IdeaCeylonParser.class);
+
     private static final List<Integer> NODES_ALLOWED_AT_EOF = Arrays.asList(CeylonLexer.EOF,
             CeylonLexer.WS, CeylonLexer.LINE_COMMENT, CeylonLexer.MULTI_COMMENT);
 
@@ -171,7 +173,8 @@ public class IdeaCeylonParser extends IStubFileElementType {
             boolean parentForced = false;
 
             if (type == null) {
-                System.err.println("Unknown IElementType for " + that);
+                LOGGER.error("Unknown IElementType for " + that + " in " + that.getUnit().getFullPath());
+                return;
             }
             if (parent == null) {
                 parentForced = true;
