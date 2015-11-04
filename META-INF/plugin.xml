@@ -113,6 +113,7 @@
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
         <compileServer.plugin classpath=".;./classes/"/>
+        <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonBuilder" execute="AFTER"/>
 
         <moduleService serviceInterface="org.intellij.plugins.ceylon.ide.repo.RepositoryManager" serviceImplementation="org.intellij.plugins.ceylon.ide.repo.RepositoryManagerImpl"/>
 

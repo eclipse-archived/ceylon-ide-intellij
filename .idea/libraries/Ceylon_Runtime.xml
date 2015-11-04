@@ -47,6 +47,7 @@
       <root url="file://$PROJECT_DIR$/../ceylon-runtime/bootstrap/src/main/java" />
       <root url="file://$PROJECT_DIR$/../ceylon-runtime/testsuite/src/test/java" />
       <root url="file://$PROJECT_DIR$/../ceylon-model/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon-js/src/main/java" />
     </SOURCES>
   </library>
 </component>
