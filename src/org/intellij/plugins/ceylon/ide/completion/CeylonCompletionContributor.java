@@ -24,6 +24,12 @@ public class CeylonCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new MyCompletionProvider());
     }
 
+    @Override
+    public void beforeCompletion(@NotNull CompletionInitializationContext context) {
+        super.beforeCompletion(context);
+        context.setDummyIdentifier(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED);
+    }
+
     private static class MyCompletionProvider extends CompletionProvider<CompletionParameters> {
         @Override
         protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
