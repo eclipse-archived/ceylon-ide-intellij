@@ -19,6 +19,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.io.FileUtil;
+import com.redhat.ceylon.common.Backend;
 import org.apache.commons.lang.ObjectUtils;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.jdom.Element;
@@ -39,6 +40,8 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
     /** Full top level name, including the package, including the module */
     private String topLevelNameFull;
+
+    private Backend backend = Backend.Java;
 
     public CeylonRunConfiguration(String name, RunConfigurationModule configurationModule, ConfigurationFactory factory) {
         super(name, configurationModule, factory);
@@ -73,7 +76,7 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
                 params.setMainClass("com.redhat.ceylon.launcher.Bootstrap");
                 params.getClassPath().add(getBootstrapJarPath());
-                params.getProgramParametersList().add("run");
+                params.getProgramParametersList().add(backend == Backend.JavaScript ? "run-js" : "run");
                 params.getProgramParametersList().add("--run", topLevelNameFull);
                 final Iterable<String> outputPaths = getOutputPaths(CeylonRunConfiguration.this.getProject());
                 for (String outputPath : outputPaths) {
@@ -111,6 +114,7 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
         setCeylonModule(element.getAttributeValue("ceylon-module"));
         setTopLevelNameFull(element.getAttributeValue("top-level"));
+        setBackend(Backend.fromAnnotation(element.getAttributeValue("backend")));
     }
 
     @Override
@@ -119,6 +123,7 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
         element.setAttribute("ceylon-module", (String) ObjectUtils.defaultIfNull(getCeylonModule(), ""));
         element.setAttribute("top-level", (String) ObjectUtils.defaultIfNull(getTopLevelNameFull(), ""));
+        element.setAttribute("backend", (String) ObjectUtils.defaultIfNull(getBackend().nativeAnnotation, ""));
     }
 
     private static Iterable<String> getOutputPaths(Project project) {
@@ -169,5 +174,16 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
     public void setCeylonModule(String ceylonModule) {
         this.ceylonModule = ceylonModule;
+    }
+
+    public Backend getBackend() {
+        return backend;
+    }
+
+    public void setBackend(Backend backend) {
+        if (backend == null) {
+            backend = Backend.Java;
+        }
+        this.backend = backend;
     }
 }

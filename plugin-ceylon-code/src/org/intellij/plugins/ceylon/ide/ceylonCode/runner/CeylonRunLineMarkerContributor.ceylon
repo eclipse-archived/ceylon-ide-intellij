@@ -39,7 +39,6 @@ shared class CeylonRunLineMarkerContributor()
             // and are shared
             isShared(node)) {
             
-            // check if this is a top level declaration
             return Info(AllIcons.RunConfigurations.\iApplication,
                 null, *ExecutorAction.getActions(0).iterable);
         }

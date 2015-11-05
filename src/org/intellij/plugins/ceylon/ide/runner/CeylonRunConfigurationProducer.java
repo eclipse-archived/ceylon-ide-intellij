@@ -10,11 +10,16 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
+import com.redhat.ceylon.common.Backend;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.model.CeylonIdeConfig;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.model.typechecker.model.Module;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,8 +30,20 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
         super(ContainerUtil.findInstance(Extensions.getExtensions(ConfigurationType.CONFIGURATION_TYPE_EP), CeylonRunConfigurationType.class));
     }
 
+    CeylonRunConfigurationProducer(ConfigurationType configurationType) {
+        super(configurationType);
+    }
+
     @Override
     protected boolean setupConfigurationFromContext(CeylonRunConfiguration configuration, ConfigurationContext context, Ref<PsiElement> sourceElement) {
+        IdeaCeylonProjects projects = context.getProject().getComponent(IdeaCeylonProjects.class);
+        if (projects == null) {
+            return false;
+        }
+        CeylonProject project = projects.getProject(context.getModule());
+        if (project == null || !isBackendEnabled(project.getIdeConfiguration())) {
+            return false;
+        }
         final RunConfigParams params = getRunConfigParams(sourceElement.get());
 
         if (params == null) {
@@ -35,8 +52,9 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
         String pfx = StringUtil.isEmpty(params.pkg) ? "" : params.pkg + ".";
         final String topLevelNameFull = pfx + params.topLevel;
         configuration.setTopLevelNameFull(topLevelNameFull);
-        configuration.setName(topLevelNameFull);
+        configuration.setName(topLevelNameFull + " ➝ " + getBackend().nativeAnnotation);
         configuration.setCeylonModule(params.module);
+        configuration.setBackend(getBackend());
         return true;
     }
 
@@ -47,7 +65,15 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
             params = getRunConfigParams(context.getLocation().getPsiElement());
         }
 
-        return params != null && params.equals(new RunConfigParams(rc));
+        IdeaCeylonProjects projects = context.getProject().getComponent(IdeaCeylonProjects.class);
+        if (projects == null) {
+            return false;
+        }
+        CeylonProject project = projects.getProject(context.getModule());
+
+        return params != null
+                && params.equals(new RunConfigParams(rc))
+                && isBackendEnabled(project.getIdeConfiguration());
     }
 
     private RunConfigParams getRunConfigParams(PsiElement psiElement) {
@@ -73,7 +99,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
                                 final Module mdl = cu.getUnit().getPackage().getModule();
                                 final String moduleName = mdl.getNameAsString();
                                 final String packageName = cu.getUnit().getPackage().getNameAsString();
-                                return new RunConfigParams(moduleName, packageName, identifier);
+                                return new RunConfigParams(moduleName, packageName, identifier, getBackend());
                             }
                         }
                     }
@@ -106,15 +132,26 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
         return true;
     }
 
+    @NotNull
+    Backend getBackend() {
+        return Backend.Java;
+    }
+
+    boolean isBackendEnabled(CeylonIdeConfig config) {
+        return config.getCompileToJvm() != null && config.getCompileToJvm().booleanValue();
+    }
+
     static class RunConfigParams {
         final String module;
         final String pkg;
         final String topLevel;
+        final Backend backend;
 
-        RunConfigParams(String module, String pkg, String topLevel) {
+        RunConfigParams(String module, String pkg, String topLevel, Backend backend) {
             this.module = module;
             this.pkg = pkg;
             this.topLevel = topLevel;
+            this.backend = backend;
         }
 
         public RunConfigParams(CeylonRunConfiguration rc) {
@@ -123,6 +160,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
             final int dot = full.lastIndexOf('.');
             topLevel = (dot < 0) ? full : full.substring(dot + 1);
             pkg = (dot < 0) ? "" : full.substring(0, dot);
+            backend = rc.getBackend();
         }
 
         @Override
@@ -132,12 +170,13 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
             final RunConfigParams that = (RunConfigParams) o;
             return Objects.equals(this.module, that.module)
                     && Objects.equals(this.pkg, that.pkg)
-                    && Objects.equals(this.topLevel, that.topLevel);
+                    && Objects.equals(this.topLevel, that.topLevel)
+                    && Objects.equals(this.backend, that.backend);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(module, pkg, topLevel);
+            return Objects.hash(module, pkg, topLevel, backend);
         }
     }
 }
