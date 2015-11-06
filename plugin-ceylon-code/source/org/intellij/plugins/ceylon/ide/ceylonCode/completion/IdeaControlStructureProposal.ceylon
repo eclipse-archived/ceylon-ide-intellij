@@ -58,13 +58,16 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
                 if (exists node) {
-                    value start = node.startIndex.intValue();
-                    replaceInDoc(data.document, start, prefix.size, "");
+                    value start = offset;
+                    value nodeText = getDocSpan(data.document, node.startIndex.intValue(), node.distance.intValue());
+                    value len = text.size - (prefix.size - nodeText.size) + 1; 
+
+                    replaceInDoc(data.document, start, len, "");
+                    PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);
                 }
-                PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);
                 
+                applyInternal(data.document);
                 adjustSelection(data);
-                enterLinkedMode(data.document);
             }
         }
     , null, [declaration, text]);
