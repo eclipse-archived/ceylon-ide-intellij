@@ -259,13 +259,13 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         return IdeaFunctionCompletionProposal(offset, prefix, desc, text, dec, data).lookupElement;
     }
 
-    shared actual LookupElement newControlStructureCompletionProposal(Integer offset, String prefix,
-        String desc, String text, Declaration dec, CompletionData data) {
-        value loc = text.firstOccurrence('}') 
-            else ((text.firstOccurrence(';') else - 1) + 1);
-        value selection = TextRange.from(offset + loc - prefix.size, 0);
-        
-        return newLookup(desc, text, ideaIcons.correction, null, selection);
+    shared actual LookupElement newControlStructureCompletionProposal(Integer offset,
+        String prefix, String desc, String text, Declaration dec,
+        CompletionData data, Node? node) {
+
+
+        return IdeaControlStructureProposal(offset, prefix, desc, text, 
+            dec, data, node).lookupElement;
     }
    
     shared actual LookupElement newTypeProposal(Integer offset, Type? type, String text, String desc, Tree.CompilationUnit rootNode) {
