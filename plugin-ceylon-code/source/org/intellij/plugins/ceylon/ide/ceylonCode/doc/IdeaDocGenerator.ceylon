@@ -210,8 +210,11 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,N
         return Processor.process(text, builder.build());
     }
     
-    shared actual String buildLink(Referenceable model, String text, String protocol) {
-        return "<a href=\"``psiProtocol````protocol``:``buildUrl(model)``\">``text``</a>";
+    shared actual String buildLink(Referenceable|String model, String text,
+        String protocol) {
+        
+        value href = if (is Referenceable model) then buildUrl(model) else model;
+        return "<a href=\"``psiProtocol````protocol``:``href``\">``text``</a>";
     }
 
     shared actual object printer extends TypePrinter(true, true, false, true, false) {
@@ -275,4 +278,6 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,N
     
     shared actual AbstractModuleImportUtil<out Anything,out Anything,out Anything,out Anything,out Anything,out Anything> moduleImportUtil
             => ideaModuleImportUtils;
+    
+    shared actual Boolean supportsQuickAssists => true;
 }

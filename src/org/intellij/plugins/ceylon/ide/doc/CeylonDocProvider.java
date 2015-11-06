@@ -1,12 +1,17 @@
 package org.intellij.plugins.ceylon.ide.doc;
 
 import ceylon.language.Tuple;
+import com.intellij.codeInsight.documentation.DocumentationManager;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.application.Result;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -15,10 +20,15 @@ import com.intellij.psi.impl.PsiElementBase;
 import com.intellij.psi.tree.IElementType;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.model.typechecker.model.*;
+import com.redhat.ceylon.ide.common.util.nodes_;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
+import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct.ideaSpecifyTypeQuickFix_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
@@ -105,13 +115,37 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     }
 
     @Override
-    public PsiElement getDocumentationElementForLink(PsiManager psiManager, String link, PsiElement context) {
+    public PsiElement getDocumentationElementForLink(PsiManager psiManager, String link, final PsiElement context) {
         TypeChecker tc = TypeCheckerProvider.getFor(context);
         if (tc == null) {
             return null;
         }
-        Tree.CompilationUnit cu = ((CeylonFile) context.getContainingFile()).getCompilationUnit();
+        final Tree.CompilationUnit cu = ((CeylonFile) context.getContainingFile()).getCompilationUnit();
         PhasedUnit pu = tc.getPhasedUnitFromRelativePath(cu.getUnit().getRelativePath());
+
+        if (link.startsWith("stp:")) {
+            int offset = Integer.parseInt(link.substring(4));
+            final Node node = nodes_.get_().findNode(cu, null, offset, offset + 1);
+
+            if (node instanceof Tree.Type) {
+                JBPopup hint = DocumentationManager.getInstance(context.getProject()).getDocInfoHint();
+                if (hint != null) {
+                    hint.cancel();
+                    context.getContainingFile().navigate(true);
+                }
+
+                System.out.println("stp");
+                new WriteCommandAction(context.getProject()) {
+                    @Override
+                    protected void run(@NotNull Result result) throws Throwable {
+                        Document doc = context.getContainingFile().getViewProvider().getDocument();
+                        IdeaQuickFixData data = new IdeaQuickFixData(null, doc, cu, node, null, null);
+                        ideaSpecifyTypeQuickFix_.get_().createProposal((Tree.Type) node, data);
+                    }
+                }.execute();
+                return context; // whatever value, we just want to avoid other providers being called
+            }
+        }
 
         IdeaDocGenerator gen = new IdeaDocGenerator(tc);
         Referenceable target = gen.getLinkedModel(new ceylon.language.String(link), gen.DocParams$new$(pu, context.getProject()));

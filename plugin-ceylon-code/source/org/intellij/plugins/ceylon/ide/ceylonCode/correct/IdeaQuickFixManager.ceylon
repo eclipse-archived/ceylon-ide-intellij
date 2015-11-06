@@ -46,7 +46,8 @@ import com.redhat.ceylon.ide.common.correct {
     ChangeReferenceQuickFix,
     DeclareLocalQuickFix,
     CreateEnumQuickFix,
-    RefineFormalMembersQuickFix
+    RefineFormalMembersQuickFix,
+    SpecifyTypeQuickFix
 }
 
 import java.lang {
@@ -104,6 +105,10 @@ shared object ideaQuickFixManager
 
     shared actual RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> refineFormalMembersQuickFix 
             => ideaRefineFormalMembersQuickFix;
+    
+    shared actual SpecifyTypeQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
+        TextChange,TextRange,Module,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
+            specifyTypeQuickFix => ideaSpecifyTypeQuickFix;
 }
 
 class CustomIntention(Integer position, String desc, TextChange? change, TextRange? selection = null, Icon? image = null,
@@ -152,18 +157,19 @@ class CustomIntention(Integer position, String desc, TextChange? change, TextRan
     }
 }
 
-shared class IdeaQuickFixData(Message message, Document doc,
+shared class IdeaQuickFixData(Message message, shared Document doc,
     shared actual Tree.CompilationUnit rootNode,
     shared actual Node node,
     shared actual Module project,
-    shared Annotation annotation) satisfies QuickFixData<Module> {
+    shared Annotation? annotation) satisfies QuickFixData<Module> {
     
     shared actual Integer errorCode => message.code;
-    shared actual Integer problemOffset => annotation.startOffset;
+    shared actual Integer problemOffset => annotation?.startOffset else 0;
     
     shared void registerFix(String desc, TextChange? change, TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
         
+        assert(exists annotation);
         value position = annotation.quickFixes?.size() else 0;
         IntentionAction intention = CustomIntention(position, desc, change, 
             selection, image, qualifiedNameIsPath, callback);
