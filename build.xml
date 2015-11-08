@@ -59,11 +59,10 @@
 
     <path id="dist.classpath">
         <pathelement path="${basedir}/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.2.0/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.car" />
-        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.0/com.redhat.ceylon.ide.common-1.2.0.car" />
-        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.0/com.redhat.ceylon.ide.common-1.2.0.car" />
-        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/1.2.0/ceylon.collection-1.2.0.car" />
-        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.2.0/ceylon.interop.java-1.2.0.car" />
-        <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.0/ceylon.tool.converter.java2ceylon-1.2.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.1/com.redhat.ceylon.ide.common-1.2.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/1.2.1/ceylon.collection-1.2.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.2.1/ceylon.interop.java-1.2.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.1/ceylon.tool.converter.java2ceylon-1.2.1.car" />
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar" />
     </path>
 
