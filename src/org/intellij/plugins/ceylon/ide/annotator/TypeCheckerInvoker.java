@@ -10,13 +10,14 @@ import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.PsiFileVirtualFile;
 
 import java.util.Collections;
 import java.util.List;
 
-public class TypeCheckerInvoker {
+public class TypeCheckerInvoker implements ITypeCheckerInvoker {
     public static final Logger LOGGER = Logger.getInstance(CeylonTypeCheckerAnnotator.class);
 
     /*
@@ -114,5 +115,10 @@ public class TypeCheckerInvoker {
     private static String constructPackageName(com.redhat.ceylon.compiler.typechecker.io.VirtualFile file, com.redhat.ceylon.compiler.typechecker.io.VirtualFile srcDir) {
         return file.getPath().substring(srcDir.getPath().length() + 1)
                 .replace("/" + file.getName(), "").replace('/', '.');
+    }
+
+    @Override
+    public PhasedUnit typecheck(CeylonFile ceylonFile) {
+        return invokeTypeChecker(ceylonFile);
     }
 }

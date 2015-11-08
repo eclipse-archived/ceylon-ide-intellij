@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
+import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.FileViewProvider;
@@ -10,6 +11,7 @@ import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.antlr.runtime.CommonToken;
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.NotNull;
@@ -21,12 +23,14 @@ public class CeylonFile extends PsiFileBase {
     private Tree.CompilationUnit rootNode;
     private List<CommonToken> tokens;
     private PhasedUnit phasedUnit;
-
+    private boolean typechecked = false;
+    
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
     }
 
     void setRootNode(Tree.CompilationUnit rootNode) {
+        typechecked = false;
         this.rootNode = rootNode;
     }
 
@@ -74,5 +78,15 @@ public class CeylonFile extends PsiFileBase {
             return (T) Boolean.TRUE;
         }
         return super.getUserData(key);
+    }
+    
+    public void ensureTypechecked() {
+        synchronized (this) {
+            if (!typechecked) {
+                ITypeCheckerInvoker invoker = Extensions.getExtensions(ITypeCheckerInvoker.EP_NAME)[0];
+                invoker.typecheck(this);
+                typechecked = true;
+            }
+        }
     }
 }

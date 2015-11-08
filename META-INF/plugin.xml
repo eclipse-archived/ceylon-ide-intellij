@@ -52,10 +52,12 @@
     <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
     <extensionPoints>
         <extensionPoint name="importHandler" interface="org.intellij.plugins.ceylon.ide.ceylonCode.completion.ImportHandler"/>
+        <extensionPoint name="typecheckerInvoker" interface="org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="org.intellij.plugins.ceylon.ide">
         <importHandler implementation="org.intellij.plugins.ceylon.ide.completion.CeylonImportHandler"/>
+        <typecheckerInvoker implementation="org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -101,6 +103,7 @@
         <lang.importOptimizer language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonImportOptimizer"/>
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementDescriptionProvider"/>
         <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>
+        <codeInsight.lineMarkerProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonLineMarkerProvider"/>
 
         <projectStructureDetector implementation="org.intellij.plugins.ceylon.ide.project.CeylonProjectStructureDetector"/>
         <facetType implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetType"/>
