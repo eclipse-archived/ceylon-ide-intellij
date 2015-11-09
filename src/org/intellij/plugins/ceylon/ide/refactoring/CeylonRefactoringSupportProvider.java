@@ -10,12 +10,7 @@ import org.jetbrains.annotations.Nullable;
 public class CeylonRefactoringSupportProvider extends RefactoringSupportProvider {
     @Override
     public boolean isInplaceRenameAvailable(@NotNull PsiElement element, PsiElement context) {
-        if (context != null && context.getContainingFile() != element.getContainingFile()) return false;
-
-        if (!(element instanceof PsiNameIdentifierOwner)) {
-            return false;
-        }
-        return true;
+        return false; // see org.intellij.plugins.ceylon.ide.refactoring.CeylonVariableRenameHandler
     }
 
     @Nullable

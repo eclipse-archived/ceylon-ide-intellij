@@ -1,10 +1,12 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.text.BlockSupport;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
@@ -93,5 +95,13 @@ public class CeylonFile extends PsiFileBase {
 
             return phasedUnit;
         }
+    }
+
+    public PhasedUnit forceReparse(Document document) {
+        document.replaceString(0, document.getTextLength(), document.getText());
+        PsiDocumentManager.getInstance(getProject()).commitDocument(document);
+        onContentReload();
+        getNode().getLastChildNode();
+        return ensureTypechecked();
     }
 }

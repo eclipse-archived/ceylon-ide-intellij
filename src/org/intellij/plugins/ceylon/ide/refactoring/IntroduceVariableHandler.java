@@ -48,7 +48,7 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
     }
 
     private void createAndIntroduceValue(final Project project, final Editor editor, final PsiFile file, final PsiElement value) {
-        CeylonFile ceylonFile = (CeylonFile) file;
+        final CeylonFile ceylonFile = (CeylonFile) file;
         Tree.Term node = ((CeylonPsi.TermPsi) value).getCeylonNode();
 
         IdeaExtractValueRefactoring refacto = new IdeaExtractValueRefactoring(ceylonFile, editor.getDocument(), node);
@@ -64,7 +64,7 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
                     // This sucks: the file was not reparsed, so getCeylonNode() returns null for elements we just inserted. This means
                     // that CeylonReference (find usages) will not work, and when we rename the declaration, its usages won't be renamed.
                     // Workaround: replace the whole document with the same content to force a reparse, then typecheck. Ugh.
-                    reparseFile(file, editor, project);
+                    ceylonFile.forceReparse(editor.getDocument());
 
                     PsiElement identifierElement = file.findElementAt((int) newIdentifier.getStart());
 
@@ -84,21 +84,12 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
                     myDataContext.put(CommonDataKeys.PSI_FILE.getName(), file);
                     myDataContext.put(LangDataKeys.PSI_ELEMENT_ARRAY.getName(), new PsiElement[]{inserted});
 
-                    RefactoringSupportProvider supportProvider = LanguageRefactoringSupport.INSTANCE.forLanguage(CeylonLanguage.INSTANCE);
-                    if (supportProvider.isInplaceRenameAvailable(inserted, identifier)) {
-                        new VariableInplaceRenameHandler().invoke(project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
+                    CeylonVariableRenameHandler handler = new CeylonVariableRenameHandler();
+                    if (handler.isAvailable(inserted, editor, file)) {
+                        handler.invoke(project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
                     }
                 }
             }.execute();
-        }
-    }
-
-    private void reparseFile(PsiFile file, Editor editor, Project project) {
-        editor.getDocument().replaceString(0, editor.getDocument().getTextLength(), editor.getDocument().getText());
-        PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
-
-        if (file instanceof CeylonFile) {
-            ((CeylonFile) file).ensureTypechecked();
         }
     }
 
