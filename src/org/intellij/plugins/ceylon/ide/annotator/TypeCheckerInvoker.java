@@ -23,7 +23,7 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
     /*
      * Mimics com.redhat.ceylon.eclipse.code.parse.CeylonParseController#parse
      */
-    public static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile) {
+    static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile) {
         TypeChecker typeChecker = TypeCheckerProvider.getFor(ceylonFile);
 
         if (typeChecker == null) {
@@ -32,7 +32,7 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
         return invokeTypeChecker(ceylonFile, typeChecker);
     }
 
-    public static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile, TypeChecker typeChecker) {
+    static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile, TypeChecker typeChecker) {
         PsiFileVirtualFile sourceCodeVirtualFile = new PsiFileVirtualFile(ceylonFile);
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
         Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();

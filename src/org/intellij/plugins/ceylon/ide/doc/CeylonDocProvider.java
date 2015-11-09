@@ -25,7 +25,6 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.ideaSpecifyTypeQuickFix_;
@@ -75,7 +74,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 return generator.getDocumentationText(referenceable, null, cu, generator.DocParams$new$(pu, element.getProject())).value;
             }
             if (element.getContainingFile() != null) {
-                PhasedUnit pu = TypeCheckerInvoker.invokeTypeChecker((CeylonFile) element.getContainingFile(), tc);
+                PhasedUnit pu = ((CeylonFile) element.getContainingFile()).ensureTypechecked();
                 Tree.CompilationUnit cu = pu.getCompilationUnit();
                 return Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), generator.DocParams$new$(pu, element.getProject())), null);
             }

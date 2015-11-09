@@ -2,7 +2,6 @@ package org.intellij.plugins.ceylon.ide;
 
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -24,7 +23,7 @@ public abstract class CeylonCodeInsightTestSupport extends LightCodeInsightFixtu
         myFixture.configureByFiles(PATH + filename);
         final CeylonFile ceylonFile = (CeylonFile) myFixture.getFile();
 
-        TypeCheckerInvoker.invokeTypeChecker(ceylonFile, typeChecker);
+        ceylonFile.ensureTypechecked();
         return ceylonFile;
     }
 

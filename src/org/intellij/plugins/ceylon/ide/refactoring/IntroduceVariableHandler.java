@@ -23,7 +23,6 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.refactoring.FindContainingExpressionsVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -99,7 +98,7 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
         PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
 
         if (file instanceof CeylonFile) {
-            TypeCheckerInvoker.invokeTypeChecker((CeylonFile) file);
+            ((CeylonFile) file).ensureTypechecked();
         }
     }
 

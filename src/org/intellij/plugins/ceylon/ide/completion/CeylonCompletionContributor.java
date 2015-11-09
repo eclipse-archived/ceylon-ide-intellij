@@ -9,7 +9,6 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.util.ProcessingContext;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.ide.common.settings.CompletionOptions;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion.ideaCompletionManager_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -55,7 +54,7 @@ public class CeylonCompletionContributor extends CompletionContributor {
 
             if (element != null) {
                 CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
-                PhasedUnit phasedUnit = TypeCheckerInvoker.invokeTypeChecker(ceylonFile);
+                PhasedUnit phasedUnit = ceylonFile.ensureTypechecked();
                 if (phasedUnit != null) {
                     CompletionOptions options = CompletionSettings.getInstance().getOptions();
                     ideaCompletionManager_.get_().addCompletions(parameters, context, result,

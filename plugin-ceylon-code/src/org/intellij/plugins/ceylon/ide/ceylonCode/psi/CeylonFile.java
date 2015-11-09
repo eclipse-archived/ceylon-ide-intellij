@@ -80,13 +80,18 @@ public class CeylonFile extends PsiFileBase {
         return super.getUserData(key);
     }
     
-    public void ensureTypechecked() {
+    public PhasedUnit ensureTypechecked() {
         synchronized (this) {
             if (!typechecked) {
                 ITypeCheckerInvoker invoker = Extensions.getExtensions(ITypeCheckerInvoker.EP_NAME)[0];
-                invoker.typecheck(this);
-                typechecked = true;
+
+                if (invoker.typecheck(this) != null) {
+                    typechecked = true;
+                    return phasedUnit;
+                }
             }
+
+            return phasedUnit;
         }
     }
 }
