@@ -5,6 +5,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
+import com.redhat.ceylon.compiler.typechecker.io.impl.Helper;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
@@ -50,6 +51,12 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
             srcDir = phasedUnit.getSrcDir();
             pkg = phasedUnit.getPackage();
         }
+        String relativePath = Helper.computeRelativePath(sourceCodeVirtualFile, srcDir);
+
+        if (typeChecker.getPhasedUnitFromRelativePath(relativePath) != null) {
+            typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(relativePath);
+        }
+
         phasedUnit = new PhasedUnit(sourceCodeVirtualFile, srcDir, cu, pkg,
                 typeChecker.getPhasedUnits().getModuleManager(),
                 typeChecker.getPhasedUnits().getModuleSourceMapper(),
@@ -66,9 +73,6 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
         phasedUnit.analyseUsage();
         phasedUnit.analyseFlow();
 
-        if (typeChecker.getPhasedUnitFromRelativePath(phasedUnit.getPathRelativeToSrcDir()) != null) {
-            typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(phasedUnit.getPathRelativeToSrcDir());
-        }
         typeChecker.getPhasedUnits().addPhasedUnit(phasedUnit.getUnitFile(), phasedUnit);
 
         ceylonFile.setPhasedUnit(phasedUnit);
