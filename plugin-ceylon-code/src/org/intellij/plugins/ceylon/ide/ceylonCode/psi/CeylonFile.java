@@ -1,12 +1,10 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.FileViewProvider;
-import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.text.BlockSupport;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
@@ -26,7 +24,7 @@ public class CeylonFile extends PsiFileBase {
     private List<CommonToken> tokens;
     private PhasedUnit phasedUnit;
     private boolean typechecked = false;
-    
+
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
     }
@@ -81,7 +79,7 @@ public class CeylonFile extends PsiFileBase {
         }
         return super.getUserData(key);
     }
-    
+
     public PhasedUnit ensureTypechecked() {
         synchronized (this) {
             if (!typechecked) {
@@ -97,9 +95,8 @@ public class CeylonFile extends PsiFileBase {
         }
     }
 
-    public PhasedUnit forceReparse(Document document) {
-        document.replaceString(0, document.getTextLength(), document.getText());
-        PsiDocumentManager.getInstance(getProject()).commitDocument(document);
+    public PhasedUnit forceReparse() {
+        putUserData(IdeaCeylonParser.FORCED_CU_KEY, null);
         onContentReload();
         getNode().getLastChildNode();
         return ensureTypechecked();
