@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.refactoring;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.refactoring.listeners.RefactoringElementListener;
 import com.intellij.refactoring.listeners.RefactoringElementListenerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -15,6 +16,7 @@ public class CeylonRefactoringListener implements RefactoringElementListenerProv
     @Nullable
     @Override
     public RefactoringElementListener getListener(PsiElement element) {
+        final PsiFile containingFile = element.getContainingFile();
         if (element instanceof DeclarationPsiNameIdOwner) {
             return new RefactoringElementListener() {
                 @Override
@@ -23,13 +25,15 @@ public class CeylonRefactoringListener implements RefactoringElementListenerProv
 
                 @Override
                 public void elementRenamed(@NotNull PsiElement newElement) {
-                    final CeylonFile file = (CeylonFile) newElement.getContainingFile();
-                    new WriteCommandAction(file.getProject()) {
-                        @Override
-                        protected void run(@NotNull Result result) throws Throwable {
-                            file.forceReparse(file.getViewProvider().getDocument());
-                        }
-                    }.execute();
+                    if (containingFile instanceof CeylonFile) {
+                        final CeylonFile file = (CeylonFile) containingFile;
+                        new WriteCommandAction(file.getProject()) {
+                            @Override
+                            protected void run(@NotNull Result result) throws Throwable {
+                                file.forceReparse();
+                            }
+                        }.execute();
+                    }
                 }
             };
         }

@@ -79,17 +79,17 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     public String getDescriptiveName(@NotNull PsiElement element) {
         if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
             return ((CeylonPsi.AttributeDeclarationPsi) element).getCeylonNode().getDeclarationModel().getQualifiedNameString();
-        } else if (element instanceof CeylonClass) {
-            Tree.Declaration ceylonNode = ((CeylonClass) element).getCeylonNode();
-            if (ceylonNode == null) {
-                // perhaps a stub
-                return ((CeylonClass) element).getQualifiedName();
-            }
+        } else if (element instanceof CeylonPsi.ClassOrInterfacePsi) {
+            Tree.Declaration ceylonNode = ((CeylonPsi.ClassOrInterfacePsi) element).getCeylonNode();
+//            if (ceylonNode == null) {
+//                // perhaps a stub
+//                return ((CeylonPsi.ClassOrInterfacePsi) element).getQualifiedName();
+//            }
             Declaration model = ceylonNode.getDeclarationModel();
             return model == null ? ceylonNode.getIdentifier().getText() : model.getQualifiedNameString();
-        } else if (element instanceof CeylonPsi.MethodDefinitionPsi) {
-            Function model = ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getDeclarationModel();
-            return model == null ? ((CeylonPsi.MethodDefinitionPsi) element).getCeylonNode().getIdentifier().getText() : model.getQualifiedNameString();
+        } else if (element instanceof CeylonPsi.AnyMethodPsi) {
+            Function model = ((CeylonPsi.AnyMethodPsi) element).getCeylonNode().getDeclarationModel();
+            return model == null ? ((CeylonPsi.AnyMethodPsi) element).getCeylonNode().getIdentifier().getText() : model.getQualifiedNameString();
         } else if (element instanceof CeylonPsi.ParameterDeclarationPsi) {
             return ((CeylonPsi.ParameterDeclarationPsi) element).getCeylonNode().getTypedDeclaration().getIdentifier().getText();
         } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {

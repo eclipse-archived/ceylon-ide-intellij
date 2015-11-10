@@ -1,7 +1,5 @@
 package org.intellij.plugins.ceylon.ide.refactoring;
 
-import com.intellij.lang.LanguageRefactoringSupport;
-import com.intellij.lang.refactoring.RefactoringSupportProvider;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
@@ -11,19 +9,16 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pass;
-import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.refactoring.IntroduceTargetChooser;
 import com.intellij.refactoring.RefactoringActionHandler;
-import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler;
 import com.intellij.util.Function;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.refactoring.FindContainingExpressionsVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -64,7 +59,7 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
                     // This sucks: the file was not reparsed, so getCeylonNode() returns null for elements we just inserted. This means
                     // that CeylonReference (find usages) will not work, and when we rename the declaration, its usages won't be renamed.
                     // Workaround: replace the whole document with the same content to force a reparse, then typecheck. Ugh.
-                    ceylonFile.forceReparse(editor.getDocument());
+                    ceylonFile.forceReparse();
 
                     PsiElement identifierElement = file.findElementAt((int) newIdentifier.getStart());
 

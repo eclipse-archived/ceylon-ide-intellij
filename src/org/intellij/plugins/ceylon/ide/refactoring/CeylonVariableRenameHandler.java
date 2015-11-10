@@ -24,7 +24,7 @@ public class CeylonVariableRenameHandler extends VariableInplaceRenameHandler {
                 super.finish(success);
 
                 if (success && file instanceof CeylonFile) {
-                    ((CeylonFile) file).forceReparse(editor.getDocument());
+                    ((CeylonFile) file).forceReparse();
                 }
             }
         };
