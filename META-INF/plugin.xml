@@ -113,6 +113,7 @@
         <framework.detector implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetDetector"/>
 
         <lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonFindUsagesProvider"/>
+        <readWriteAccessDetector implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReadWriteAccessDetector"/>
         <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi$IdentifierPsi"
                                  implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->

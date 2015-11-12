@@ -7,9 +7,9 @@ import com.intellij.psi.PsiNamedElement;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Function;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.ParameterDeclarationPsiIdOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,21 +23,7 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
 
     @Override
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-        if (psiElement instanceof CeylonPsi.AttributeDeclarationPsi) {
-            return true;
-        } else if (psiElement instanceof CeylonClass) {
-            return true;
-        } else if (psiElement instanceof CeylonPsi.MethodDefinitionPsi) {
-            return true;
-        } else if (psiElement instanceof ParameterDeclarationPsiIdOwner) {
-            return true;
-        } else if (psiElement instanceof CeylonPsi.TypeParameterDeclarationPsi) {
-            return true;
-        } else if (psiElement instanceof CeylonPsi.ObjectDefinitionPsi) {
-            return true;
-        }
-//        System.out.println("Can't find usages for " + psiElement);
-        return false;
+        return psiElement instanceof DeclarationPsiNameIdOwner;
     }
 
     @Nullable
@@ -50,25 +36,25 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @Override
     public String getType(@NotNull PsiElement element) {
         if (element instanceof CeylonPsi.AnyClassPsi) {
-            return "Class";
+            return "class";
         } else if (element instanceof CeylonPsi.AnyInterfacePsi) {
-            return "Interface";
+            return "interface";
         } else if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
-            return "Attribute";
+            return "attribute";
         } else if (element instanceof CeylonPsi.AnyMethodPsi) {
             Tree.AnyMethod node = ((CeylonPsi.AnyMethodPsi) element).getCeylonNode();
             if (node.getDeclarationModel() != null && node.getDeclarationModel().isAnnotation()) {
-                return "Annotation";
+                return "annotation";
             }
-            return "Function";
+            return "function";
         } else if (element instanceof ParameterDeclarationPsiIdOwner) {
-            return "Function parameter";
+            return "function parameter";
         } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {
-            return "Type parameter";
+            return "type parameter";
         } else if (element instanceof CeylonPsi.ObjectDefinitionPsi) {
-            return "Object";
+            return "object";
         } else if (element instanceof CeylonPsi.ConstructorPsi) {
-            return "Constructor";
+            return "constructor";
         }
 
         throw new UnsupportedOperationException(element.toString());
