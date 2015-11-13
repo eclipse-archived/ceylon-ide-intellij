@@ -3,9 +3,7 @@ package org.intellij.plugins.ceylon.ide.wizard;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
+import com.intellij.ui.JBColor;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import org.apache.commons.lang.StringUtils;
@@ -13,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Set;
 
 import static com.google.common.base.Predicates.notNull;
@@ -30,12 +27,14 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
     private JTextField moduleVersion;
     private JCheckBox sharedPackage;
     private JTextField compilationUnit;
+    private JPanel headerPane;
 
     public CreateCeylonModuleWizard(@NotNull Project project, @NotNull TypeChecker typeChecker) {
         super(project, true);
         this.typeChecker = typeChecker;
 
         setTitle(message("ceylon.module.wizard.title"));
+        headerPane.setBackground(JBColor.WHITE);
         init();
     }
 
