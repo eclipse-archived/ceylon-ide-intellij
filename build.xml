@@ -20,13 +20,13 @@
     <path id="ceylon.runtime">
         <pathelement path="${ceylon.repo.dir}/org/tautua/markdownpapers/core/1.2.7/org.tautua.markdownpapers.core-1.2.7.jar" />
         <pathelement path="${ceylon.repo.dir}/org/antlr/stringtemplate/3.2.1/org.antlr.stringtemplate-3.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/jboss/logmanager/1.4.0.Final/org.jboss.logmanager-1.4.0.Final.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/jboss/logmanager/2.0.3.Final/org.jboss.logmanager-2.0.3.Final.jar" />
         <pathelement path="${ceylon.repo.dir}/org/antlr/antlr/2.7.7/org.antlr.antlr-2.7.7.jar" />
         <pathelement path="${ceylon.repo.dir}/org/apache/httpcomponents/httpcore/4.3.2/org.apache.httpcomponents.httpcore-4.3.2.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/jboss/modules/1.3.3.Final/org.jboss.modules-1.3.3.Final.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/jboss/modules/1.4.4.Final/org.jboss.modules-1.4.4.Final.jar" />
         <pathelement path="${ceylon.repo.dir}/org/antlr/runtime/3.4/org.antlr.runtime-3.4.jar" />
         <pathelement path="${ceylon.repo.dir}/org/apache/commons/codec/1.8/org.apache.commons.codec-1.8.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/jboss/jandex/1.0.3.Final/org.jboss.jandex-1.0.3.Final.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/jboss/jandex/2.0.0.Final/org.jboss.jandex-2.0.0.Final.jar" />
         <pathelement path="${ceylon.repo.dir}/net/minidev/json-smart/1.1.1/net.minidev.json-smart-1.1.1.jar" />
         <pathelement path="${ceylon.repo.dir}/org/apache/httpcomponents/httpclient/4.3.2/org.apache.httpcomponents.httpclient-4.3.2.jar" />
         <pathelement path="${ceylon.repo.dir}/org/apache/commons/logging/1.1.1/org.apache.commons.logging-1.1.1.jar" />
@@ -43,7 +43,7 @@
         <pathelement path="${ceylon.repo.dir}/ceylon/language/1.2.1/ceylon.language-1.2.1.car" />
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/model/1.2.1/com.redhat.ceylon.model-1.2.1.jar" />
 
-        <pathelement path="${projects.base.dir}/ceylon-dist/dist/lib/ceylon-bootstrap.jar" />
+        <pathelement path="${projects.base.dir}/ceylon/dist/dist/lib/ceylon-bootstrap.jar" />
     </path>
 
     <path id="compile.runtime.classpath">
@@ -113,7 +113,7 @@
             <fileset dir="${basedir}/resources"/>
         </copy>
         <copy todir="${build.dir}/CeylonIDEA/classes">
-            <fileset dir="${projects.base.dir}/ceylon-dist/dist" includes="repo/**"/>
+            <fileset dir="${projects.base.dir}/ceylon/dist/dist" includes="repo/**"/>
         </copy>
 
         <copy todir="${build.dir}/CeylonIDEA">

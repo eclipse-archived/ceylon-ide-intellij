@@ -4,13 +4,13 @@
       <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/common/1.2.1/com.redhat.ceylon.common-1.2.1.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/tautua/markdownpapers/core/1.2.7/org.tautua.markdownpapers.core-1.2.7.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/antlr/stringtemplate/3.2.1/org.antlr.stringtemplate-3.2.1.jar!/" />
-      <root url="jar://$CEYLON_DIST_REPO$/org/jboss/logmanager/1.4.0.Final/org.jboss.logmanager-1.4.0.Final.jar!/" />
+      <root url="jar://$CEYLON_DIST_REPO$/org/jboss/logmanager/2.0.3.Final/org.jboss.logmanager-2.0.3.Final.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/antlr/antlr/2.7.7/org.antlr.antlr-2.7.7.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/apache/httpcomponents/httpcore/4.3.2/org.apache.httpcomponents.httpcore-4.3.2.jar!/" />
-      <root url="jar://$CEYLON_DIST_REPO$/org/jboss/modules/1.3.3.Final/org.jboss.modules-1.3.3.Final.jar!/" />
+      <root url="jar://$CEYLON_DIST_REPO$/org/jboss/modules/1.4.4.Final/org.jboss.modules-1.4.4.Final.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/antlr/runtime/3.4/org.antlr.runtime-3.4.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/apache/commons/codec/1.8/org.apache.commons.codec-1.8.jar!/" />
-      <root url="jar://$CEYLON_DIST_REPO$/org/jboss/jandex/1.0.3.Final/org.jboss.jandex-1.0.3.Final.jar!/" />
+      <root url="jar://$CEYLON_DIST_REPO$/org/jboss/jandex/2.0.0.Final/org.jboss.jandex-2.0.0.Final.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/net/minidev/json-smart/1.1.1/net.minidev.json-smart-1.1.1.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/compiler/js/1.2.1/com.redhat.ceylon.compiler.js-1.2.1.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/apache/httpcomponents/httpclient/4.3.2/org.apache.httpcomponents.httpclient-4.3.2.jar!/" />
@@ -28,26 +28,26 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../ceylon-spec/src" />
-      <root url="file://$PROJECT_DIR$/../ceylon-compiler/src" />
-      <root url="file://$PROJECT_DIR$/../ceylon-spec/gensrc" />
-      <root url="file://$PROJECT_DIR$/../ceylon-common/src" />
-      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/api/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/spi/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/impl/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/maven/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/maven/src/test/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/ceylon/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/webdav/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-module-resolver/testsuite/src/test/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-runtime/bootstrap/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-runtime/api/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-runtime/spi/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-runtime/impl/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-runtime/bootstrap/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-runtime/testsuite/src/test/java" />
-      <root url="file://$PROJECT_DIR$/../ceylon-model/src" />
-      <root url="file://$PROJECT_DIR$/../ceylon-js/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/typechecker/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon/compiler-java/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon/typechecker/gensrc" />
+      <root url="file://$PROJECT_DIR$/../ceylon/common/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cmr/api/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cmr/spi/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cmr/impl/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cmr/maven/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cmr/maven/src/test/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cmr/ceylon/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cmr/webdav/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cmr/testsuite/src/test/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/runtime/bootstrap/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/runtime/api/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/runtime/spi/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/runtime/impl/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/runtime/bootstrap/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/runtime/testsuite/src/test/java" />
+      <root url="file://$PROJECT_DIR$/../ceylon/model/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon/compiler-js/src/main/java" />
     </SOURCES>
   </library>
 </component>

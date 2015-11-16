@@ -1,17 +1,22 @@
 package org.intellij.plugins.ceylon.ide.facet;
 
+import ceylon.language.false_;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -42,6 +47,13 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
 
     @Override
     public void setupFacet(@NotNull CeylonFacet facet, ModifiableRootModel model) {
+        IdeaCeylonProjects ceylonModel = facet.getModule().getProject().getComponent(IdeaCeylonProjects.class);
+        CeylonProject<Module> project = ceylonModel.getProject(facet.getModule());
+        String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
+        project.getIdeConfiguration().setCompileToJs(ceylon.language.Boolean.instance(!defaultVm.equals("js")));
+        project.getIdeConfiguration().setCompileToJvm(ceylon.language.Boolean.instance(!defaultVm.equals("jvm")));
+        project.getConfiguration().setProjectOffline(false_.get_());
+
         ModulesConfigurator.showFacetSettingsDialog(facet, CeylonFacetConfiguration.COMPILATION_TAB);
         ((TypeCheckerProvider) facet.getModule().getComponent(ITypeCheckerProvider.class)).typecheck();
     }

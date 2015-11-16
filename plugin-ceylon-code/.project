@@ -15,7 +15,7 @@
 			<arguments>
 				<dictionary>
 					<key>systemRepo</key>
-					<value>../../ceylon-dist/osgi/embeddedRepository/repo</value>
+					<value>../../ceylon/dist/osgi/embeddedRepository/repo</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>

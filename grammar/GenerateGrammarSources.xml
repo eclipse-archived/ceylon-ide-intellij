@@ -8,14 +8,14 @@
    language, compared with the English reference.
 -->
 <project name="Generate Grammar-related Sources" default="generateSources" basedir=".">
-    <property name="base.path" location="../../ceylon-spec/lib"/>
+    <property name="base.path" location="../../ceylon/typechecker/lib"/>
 
-    <property file="../../ceylon-common/common-build.properties"/>
-    <property file="../../ceylon-spec/build.properties"/>
+    <property file="../../ceylon/common/common-build.properties"/>
+    <property file="../../ceylon/typechecker/build.properties"/>
 
     <!-- Set build directories for all formats. -->
     <property name="build.dir" value="${basedir}/build"/>
-    <property name="build.dist" value="../../ceylon-dist/dist"/>
+    <property name="build.dist" value="../../ceylon/dist/dist"/>
     <property name="build.dist.repo" value="${build.dist}/repo"/>
     <property name="build.classes" location="${build.dir}/classes"/>
 
@@ -107,7 +107,7 @@
 
     <target name="tree" depends="treegen"
             description="Generate the tree builder code">
-        <property name="NodesFile" location="../../ceylon-spec/Ceylon.nodes"/>
+        <property name="NodesFile" location="../../ceylon/typechecker/Ceylon.nodes"/>
         <java classname="com.redhat.ceylon.compiler.typechecker.treegen.GenerateIdeaElements" dir="${basedir}" fork="yes">
             <arg value="${NodesFile}"/>
             <arg path="gen"/>
@@ -154,7 +154,7 @@
         </java>
     </target>
 
-    <fail message="The ceylon-dist Git repo is not accessible locally">
+    <fail message="The ceylon Git repo is not accessible locally">
         <condition>
             <not>
                 <available file="${build.dist}" />
