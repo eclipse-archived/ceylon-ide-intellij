@@ -49,7 +49,7 @@ After installing both plugins and restarting IntelliJ IDEA, you should have the 
 
 If you want to use the current version, or debug/hack this plugin, you will need to build it from sources:
 
-1. Make sure you are using **IntelliJ 14 or 15** (it won't work with the current stable version 12.x, and might not work with version 13.x)
+1. Make sure you are using **IntelliJ 15** (support for IntelliJ 14 is planned at runtime, but the compilation involves features that are only in 15)
 
 2. A clone of https://github.com/JetBrains/intellij-community is highly recommended for hacking since you will likely have to debug code from the IntelliJ platform
 
@@ -58,26 +58,26 @@ If you want to use the current version, or debug/hack this plugin, you will need
     - **UI Designer** + **UI Designer (core)**, 
     - **PsiViewer** (optional but recommended)
 
-4. Set up a clone of `ceylon-dist` and all the other required dependencies:
+4. Set up a clone of [`ceylon`](http://github.com/ceylon/ceylon) and all the other required dependencies:
     - `mkdir ceylon && cd ceylon`
-    - `git clone https://github.com/ceylon/ceylon-dist`
-    - `cd ceylon-dist`
-    - `ant setup setup-sdk setup-ide` (this will create sibling projects such as: `../ceylon-spec`, `../ceylon-compiler`, etc)
+    - `git clone https://github.com/ceylon/ceylon`
+    - `cd ceylon/dist`
+    - `ant setup-sdk setup-ide` (this will create sibling projects such as: `../ceylon-sdk`, `../ceylon-ide-common`, etc)
 
 5. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and add the following line:
-    - `ideaRoot=/Applications/IntelliJ IDEA 14 CE.app/Contents/` (change the path to point to your local IntelliJ installation)
+    - `ideaRoot=/Applications/IntelliJ IDEA 15 CE.app/Contents/` (change the path to point to your local IntelliJ installation)
 
 7. Build a full Ceylon distribution locally (see [here](https://github.com/ceylon/ceylon-dist/blob/master/README.md#building-the-distribution) for more details):
-    - In the `../ceylon-dist` directory run : `ant clean dist sdk intellij`
-    - This will create a `dist` sub-directory in `../ceylon-dist`, with a local Ceylon distribution.
+    - In the `../ceylon/dist` directory run : `ant clean-all dist sdk intellij`
+    - This will create a `dist` sub-directory in `../ceylon/dist`, with a local Ceylon distribution.
     - This will also compile everything needed to build Ceylon IDE (SDK, Java to Ceylon converter, ceylon-ide-common)
     - Finally, this will compile Ceylon IDE
 
 8. Open the project `ceylon-ide-intellij` in IDEA. You might be requested to enter the value of 2 path variables (see next point).
 
 9. In `Settings > Build, Execution, Deployment > Path Variable`, you should add 2 path variables :
-    - `̀CEYLON_DIST_LIB` should point to `../ceylon-dist/dist/lib`
-    - `̀CEYLON_DIST_REPO` should point to `../ceylon-dist/dist/repo`
+    - `̀CEYLON_DIST_LIB` should point to `../ceylon/dist/dist/lib`
+    - `̀CEYLON_DIST_REPO` should point to `../ceylon/dist/dist/repo`
 
 10. In the IDE's `Preferences > File Types`, under `Recognized File Types`, register `*.car` as `Archive files`
 
