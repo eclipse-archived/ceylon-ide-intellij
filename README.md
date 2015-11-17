@@ -55,7 +55,7 @@ If you want to use the current version, or debug/hack this plugin, you will need
 
 3. Ensure that the following IntelliJ plugins are installed and enabled in your IDEA instance:
     - **Plugin DevKit**, 
-    - **UI Designer** + **UI Designer (core)**, 
+    - **UI Designer**, 
     - **PsiViewer** (optional but recommended)
 
 4. Set up a clone of [`ceylon`](http://github.com/ceylon/ceylon) and all the other required dependencies:
@@ -85,7 +85,7 @@ If you want to use the current version, or debug/hack this plugin, you will need
 
 12. Click on the `+` icon and add a new `JDK` pointing to a *Java SDK 1.7*
 
-13. Click on the '+' icon and add a new `IntelliJ Platform Plugin SDK` pointing to where IntelliJ is installed (the correct folder should be preselected)
+13. Click on the `+` icon and add a new `IntelliJ Platform Plugin SDK` pointing to where IntelliJ is installed (the correct folder should be preselected)
 
 14. In the `Project` part, set the `Project SDK` to the previously created IntelliJ plugin SDK
 
