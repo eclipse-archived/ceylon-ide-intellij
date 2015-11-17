@@ -35,6 +35,9 @@ import com.redhat.ceylon.ide.common.correct {
 import com.redhat.ceylon.ide.common.util {
     Indents
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Unit
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerProvider
@@ -50,7 +53,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 shared interface AbstractIntention
-        satisfies AbstractQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,LookupElement> {
+        satisfies AbstractQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
+        TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     shared actual Integer getTextEditOffset(TextEdit change) => change.start;
     
@@ -82,4 +86,14 @@ shared interface AbstractIntention
     
     shared actual ImportProposals<out Anything,out Anything,Document,InsertEdit,TextEdit,TextChange> importProposals
             => ideaImportProposals;
+
+    
+    shared actual PhasedUnit? getPhasedUnit(Unit? u, IdeaQuickFixData data) {
+        if (exists u,
+            exists tc = data.project.getComponent(javaClass<ITypeCheckerProvider>()).typeChecker) {
+            
+            tc.phasedUnits.getPhasedUnitFromRelativePath(u.relativePath);
+        }
+        return null;
+    }
 }
