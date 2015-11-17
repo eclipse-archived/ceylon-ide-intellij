@@ -1,8 +1,7 @@
-Ceylon IDE for IntelliJ
+Ceylon IDE for IntelliJ [![Join the chat at https://gitter.im/ceylon/ceylon-ide-intellij](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ceylon/ceylon-ide-intellij)
 =======================
 # Status
 
-[![Join the chat at https://gitter.im/ceylon/ceylon-ide-intellij](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ceylon/ceylon-ide-intellij?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 This is an attempt at adding (awesome) support for the Ceylon programming language in IntelliJ IDEA.
 
 # Requirements
