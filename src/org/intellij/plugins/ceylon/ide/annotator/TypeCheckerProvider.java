@@ -90,6 +90,9 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     }
 
     public void typecheck() {
+        if (ceylonModel == null) {
+            return; // the module was just created, moduleAdded() will typecheck again
+        }
         if (typeChecker == null) {
             ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Preparing typechecker for module " + module.getName()) {
                 @Override

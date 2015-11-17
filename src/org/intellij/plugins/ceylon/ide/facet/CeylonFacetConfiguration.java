@@ -48,10 +48,10 @@ public class CeylonFacetConfiguration implements FacetConfiguration {
 
         element.addContent(new Element("option")
                 .setAttribute("name", "compileForJvm")
-                .setAttribute("value", conf.getCompileToJvm().toString()));
+                .setAttribute("value", conf.getCompileToJvm() == null ? "false" : conf.getCompileToJvm().toString()));
         element.addContent(new Element("option")
                 .setAttribute("name", "compileToJs")
-                .setAttribute("value", conf.getCompileToJs().toString()));
+                .setAttribute("value", conf.getCompileToJs() == null ? "false" : conf.getCompileToJs().toString()));
         element.addContent(new Element("option")
                 .setAttribute("name", "systemRepository")
                 .setAttribute("value", conf.getSystemRepository() == null ? "" : conf.getSystemRepository().toString()));

@@ -32,21 +32,23 @@ public class PageOne implements CeylonConfigForm {
 
     @Override
     public boolean isModified(CeylonProject<Module> project) {
-        return project.getIdeConfiguration().getCompileToJvm().booleanValue() != compileForJvm.isSelected()
+        return project.getIdeConfiguration().getCompileToJvm() == null
+                || project.getIdeConfiguration().getCompileToJs() == null
+                || project.getConfiguration().getProjectOffline() == null
+                || project.getIdeConfiguration().getCompileToJvm().booleanValue() != compileForJvm.isSelected()
                 || project.getIdeConfiguration().getCompileToJs().booleanValue() != compileToJs.isSelected()
-                || !ceylon.language.Boolean.equals(workOffline.isSelected(), project.getConfiguration().getProjectOffline());
+                || project.getConfiguration().getProjectOffline().booleanValue() != workOffline.isSelected();
     }
 
     @Override
     public void load(CeylonProject<Module> project) {
-        compileForJvm.setSelected(project.getIdeConfiguration().getCompileToJvm().booleanValue());
-        compileToJs.setSelected(project.getIdeConfiguration().getCompileToJs().booleanValue());
-
-        if (project.getConfiguration().getProjectOffline() != null) {
-            workOffline.setSelected(project.getConfiguration().getProjectOffline().booleanValue());
-        } else {
-            workOffline.setSelected(false);
-        }
+        String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
+        compileForJvm.setSelected(safeNullBoolean(project.getIdeConfiguration().getCompileToJvm(), !defaultVm.equals("js")));
+        compileToJs.setSelected(safeNullBoolean(project.getIdeConfiguration().getCompileToJs(), !defaultVm.equals("jvm")));
+        workOffline.setSelected(safeNullBoolean(project.getConfiguration().getProjectOffline(), false));
     }
 
+    private boolean safeNullBoolean(ceylon.language.Boolean bool, boolean def) {
+        return bool == null ? def : bool.booleanValue();
+    }
 }

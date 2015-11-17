@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.ide.facet;
 
-import ceylon.language.false_;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
@@ -10,11 +9,10 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
+import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 import org.jetbrains.annotations.NotNull;
@@ -52,9 +50,13 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
         String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
         project.getIdeConfiguration().setCompileToJs(ceylon.language.Boolean.instance(!defaultVm.equals("js")));
         project.getIdeConfiguration().setCompileToJvm(ceylon.language.Boolean.instance(!defaultVm.equals("jvm")));
-        project.getConfiguration().setProjectOffline(false_.get_());
+        project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(false));
 
         ModulesConfigurator.showFacetSettingsDialog(facet, CeylonFacetConfiguration.COMPILATION_TAB);
-        ((TypeCheckerProvider) facet.getModule().getComponent(ITypeCheckerProvider.class)).typecheck();
+        TypeCheckerProvider tcp = (TypeCheckerProvider) facet.getModule().getComponent(ITypeCheckerProvider.class);
+        if (tcp != null) {
+            tcp.moduleAdded();
+            tcp.typecheck();
+        }
     }
 }
