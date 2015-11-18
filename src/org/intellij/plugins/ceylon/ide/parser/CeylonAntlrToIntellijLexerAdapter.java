@@ -26,9 +26,9 @@ public class CeylonAntlrToIntellijLexerAdapter extends LexerBase {
     private CommonToken myToken;
     private int myStart;
 
-    private boolean needsRecover = false;
-    private int lastTokenEnd = -1;
-    private CommonToken tokenAfterLastError = null;
+    private boolean needsRecover;
+    private int lastTokenEnd;
+    private CommonToken tokenAfterLastError;
 
     public CeylonAntlrToIntellijLexerAdapter() {
     }
@@ -38,6 +38,9 @@ public class CeylonAntlrToIntellijLexerAdapter extends LexerBase {
         this.buffer = buffer;
         this.myStart = startOffset;
         this.endOffset = endOffset;
+        needsRecover = false;
+        lastTokenEnd = -1;
+        tokenAfterLastError = null;
         String text = buffer.subSequence(startOffset, endOffset).toString();
         lexer = new CeylonLexer(new ANTLRStringStream(text)) {
             @Override
