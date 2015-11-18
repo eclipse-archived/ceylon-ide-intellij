@@ -12,8 +12,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class CeylonReadWriteAccessDetector() extends ReadWriteAccessDetector() {
     shared actual Access getExpressionAccess(PsiElement psiElement) {
-        print(psiElement.parent.parent);
-        
         return (psiElement.parent is CeylonPsi.AttributeDeclarationPsi
              || psiElement.parent.parent is CeylonPsi.SpecifierStatementPsi)
                 then Access.\iWrite else Access.\iRead;

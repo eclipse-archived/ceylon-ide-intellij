@@ -76,7 +76,7 @@ shared object ideaIcons {
             objects
         case (is Value)
             if (ModelUtil.isObject(decl)) then objects else values
-        case (is TypeAlias|NothingType)
+        case (is Tree.TypeAliasDeclaration|TypeAlias|NothingType)
             types
         case (is TypeParameter)
             param // TODO wrong!
