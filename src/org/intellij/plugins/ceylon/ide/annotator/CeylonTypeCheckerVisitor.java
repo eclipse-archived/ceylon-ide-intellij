@@ -10,6 +10,7 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.RecognitionError;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 class CeylonTypeCheckerVisitor extends Visitor {
 
     private AnnotationHolder annotationHolder;
+    private CeylonFile file;
 
     private static final int[] UNRESOLVED_REFERENCE_CODES = {100, 102};
 
@@ -38,8 +40,9 @@ class CeylonTypeCheckerVisitor extends Visitor {
      *
      * @param annotationHolder the receiver of the annotations
      */
-    public CeylonTypeCheckerVisitor(AnnotationHolder annotationHolder) {
+    public CeylonTypeCheckerVisitor(AnnotationHolder annotationHolder, CeylonFile file) {
         this.annotationHolder = annotationHolder;
+        this.file = file;
     }
 
     @Override
@@ -62,7 +65,25 @@ class CeylonTypeCheckerVisitor extends Visitor {
                 CommonToken token = (CommonToken) recognitionError.getRecognitionException().token;
 
                 if (token != null) {
-                    range = new TextRange(token.getStartIndex(), token.getStopIndex() + 1);
+                    if (token.getType() == CeylonLexer.EOF) {
+                        // we can't underline EOF, so we try to underline the last word instead
+                        int lastNonWS = file.getTextLength() - 1;
+                        while (lastNonWS >= 0 && Character.isWhitespace(file.getText().charAt(lastNonWS))) {
+                            lastNonWS--;
+                        }
+                        int wordStart = lastNonWS;
+                        while (wordStart >= 0 && !Character.isWhitespace(file.getText().charAt(wordStart))) {
+                            wordStart--;
+                        }
+
+                        if (wordStart < lastNonWS) {
+                            range = new TextRange(wordStart + 1, lastNonWS + 1);
+                        } else {
+                            range = new TextRange(token.getStartIndex() - 1, token.getStopIndex());
+                        }
+                    } else {
+                        range = new TextRange(token.getStartIndex(), token.getStopIndex() + 1);
+                    }
                 }
             }
 
