@@ -93,7 +93,7 @@ public class CeylonBlock implements Block {
         final IElementType nodeType = node.getElementType();
         final Indent normalChildIndent = INDENT_CHILDREN_NORMAL.contains(nodeType) ? Indent.getNormalIndent()
                 : INDENT_CHILDREN_NONE.contains(nodeType) ? Indent.getNoneIndent()
-                : null;
+                : Indent.getNoneIndent();
 //        System.out.printf("normalChildIndent for %s: %s%n", nodeType, indent);
         IElementType prevChildType = null;
         for (ASTNode child = node.getFirstChildNode(); child != null; child = child.getTreeNext()) {
@@ -160,9 +160,9 @@ public class CeylonBlock implements Block {
         } else if (TYPES_REQUIRING_EMPTY_LINE.contains(type1) && type2 != CeylonTokens.RBRACE
                 || TYPES_REQUIRING_EMPTY_LINE.contains(type2) && !Arrays.asList(CeylonTokens.LBRACE, CeylonTypes.ANNOTATION_LIST).contains(type1)) {
             result = EMPTY_LINE_SPACING;
-        } else if (Arrays.asList(CeylonTypes.IMPORT_MODULE).contains(type1)) {
+        } else if (CeylonTypes.IMPORT_MODULE.equals(type1)) {
             result = NEW_LINE_SPACING;
-        } else if (Arrays.asList(CeylonTypes.IMPORT_MEMBER).contains(type2)) {
+        } else if (CeylonTypes.IMPORT_MEMBER.equals(type2)) {
             result = NEW_LINE_SPACING;
         } else if (TYPES_REQUIRING_NO_RIGHT_SPACING.contains(type1) || TYPES_REQUIRING_NO_LEFT_SPACING.contains(type2)
                 || (type1 == CeylonTypes.SMALLER_OP && type2 == CeylonTypes.TYPE_PARAMETER_DECLARATION)

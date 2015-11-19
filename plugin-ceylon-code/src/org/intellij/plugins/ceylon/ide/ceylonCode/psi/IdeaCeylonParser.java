@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl;
 import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IStubFileElementType;
@@ -49,10 +50,6 @@ public class IdeaCeylonParser extends IStubFileElementType {
 
     @Override
     protected ASTNode doParseContents(@NotNull ASTNode chameleon, @NotNull PsiElement psi) {
-//        if (psi instanceof CeylonFile) {
-//            return super.doParseContents(chameleon, psi);
-//        }
-
         CeylonFile file = (CeylonFile) psi;
         final Queue<Token> tokens = new LinkedList<>();
         boolean verbose = false;
@@ -266,6 +263,8 @@ public class IdeaCeylonParser extends IStubFileElementType {
                 comp.rawAddChildrenWithoutNotifications(leaf);
                 comp.putUserData(CEYLON_NODE_KEY, ceylonNode);
                 return comp;
+            } else if (type == TokenType.WHITE_SPACE || token.getType() == CeylonLexer.WS) {
+                return new PsiWhiteSpaceImpl(tokenText);
             } else {
                 return new LeafPsiElement(getElementType(token.getType()), tokenText);
             }
