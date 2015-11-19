@@ -40,6 +40,8 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             throw new UnsupportedOperationException();
         }
 
+        ((CeylonFile) myElement.getContainingFile()).ensureTypechecked();
+
         // Try using the type checker
         Tree.CompilationUnit compilationUnit = ((CeylonFile) myElement.getContainingFile()).getCompilationUnit();
 

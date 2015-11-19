@@ -1,16 +1,21 @@
 package org.intellij.plugins.ceylon.ide.codeInsight.resolve;
 
+import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Function;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.ParameterDeclarationPsiIdOwner;
+import org.intellij.plugins.ceylon.ide.parser.CeylonAntlrToIntellijLexerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +23,12 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @Nullable
     @Override
     public WordsScanner getWordsScanner() {
-        return null;
+        return new DefaultWordsScanner(
+                new CeylonAntlrToIntellijLexerAdapter(),
+                TokenSet.create(TokenTypes.LIDENTIFIER.getTokenType(), TokenTypes.UIDENTIFIER.getTokenType()),
+                TokenSet.create(TokenTypes.MULTI_COMMENT.getTokenType(), TokenTypes.LINE_COMMENT.getTokenType()),
+                TokenSet.create(TokenTypes.STRING_LITERAL.getTokenType())
+        );
     }
 
     @Override
