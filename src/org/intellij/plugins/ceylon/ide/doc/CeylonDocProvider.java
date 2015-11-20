@@ -8,6 +8,7 @@ import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -46,6 +47,8 @@ import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference
 
 public class CeylonDocProvider extends AbstractDocumentationProvider {
 
+    private static final Logger LOGGER = Logger.getInstance(CeylonDocProvider.class);
+
     // A few common element types we know will never trigger a doc popup
     private static final List<IElementType> TYPES_TO_IGNORE = Arrays.asList(
             CeylonTokens.WS, CeylonTokens.LINE_COMMENT, CeylonTokens.COMMA, CeylonTokens.SEMICOLON,
@@ -75,8 +78,12 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             }
             if (element.getContainingFile() != null) {
                 PhasedUnit pu = ((CeylonFile) element.getContainingFile()).ensureTypechecked();
-                Tree.CompilationUnit cu = pu.getCompilationUnit();
-                return Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), generator.DocParams$new$(pu, element.getProject())), null);
+                if (pu == null) {
+                    LOGGER.warn("No phased unit for file " + element.getContainingFile().getVirtualFile().getPath());
+                } else {
+                    Tree.CompilationUnit cu = pu.getCompilationUnit();
+                    return Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), generator.DocParams$new$(pu, element.getProject())), null);
+                }
             }
         } catch (ceylon.language.AssertionError | Exception e) {
             e.printStackTrace();
