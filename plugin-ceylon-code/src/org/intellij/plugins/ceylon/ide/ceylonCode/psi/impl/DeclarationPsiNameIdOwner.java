@@ -1,8 +1,6 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.application.Result;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.LocalSearchScope;
@@ -13,10 +11,16 @@ import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ObjectUtils;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Value;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.DeclarationPsiImpl implements PsiNameIdentifierOwner {
     public DeclarationPsiNameIdOwner(ASTNode astNode) {
@@ -62,5 +66,21 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
         }
 
         return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope();
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return ideaIcons_.get_().forDeclaration(getCeylonNode());
+    }
+
+    @Override
+    public int getTextOffset() {
+        PsiElement id = getNameIdentifier();
+
+        if (id != null) {
+            return id.getTextOffset();
+        }
+        return super.getTextOffset();
     }
 }

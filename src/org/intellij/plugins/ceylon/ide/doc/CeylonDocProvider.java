@@ -82,7 +82,8 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                     LOGGER.warn("No phased unit for file " + element.getContainingFile().getVirtualFile().getPath());
                 } else {
                     Tree.CompilationUnit cu = pu.getCompilationUnit();
-                    return Objects.toString(generator.getDocumentation(cu, element.getTextOffset(), generator.DocParams$new$(pu, element.getProject())), null);
+                    return Objects.toString(generator.getDocumentation(cu, element.getTextRange().getStartOffset(),
+                            generator.DocParams$new$(pu, element.getProject())), null);
                 }
             }
         } catch (ceylon.language.AssertionError | Exception e) {

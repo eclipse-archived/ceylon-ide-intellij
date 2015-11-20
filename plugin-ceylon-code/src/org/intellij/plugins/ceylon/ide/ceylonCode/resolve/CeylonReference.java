@@ -114,7 +114,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         for (int i = 0; i < descriptor.getIdentifiers().size(); i++) {
             Tree.Identifier identifier = descriptor.getIdentifiers().get(i);
 
-            if (identifier.getStartIndex().equals(path.getTextOffset())) {
+            if (identifier.getStartIndex().equals(path.getTextRange().getStartOffset())) {
                 int nbUpLevels = descriptor.getIdentifiers().size() - i - 1;
                 PsiDirectory directory = path.getContainingFile().getParent();
 

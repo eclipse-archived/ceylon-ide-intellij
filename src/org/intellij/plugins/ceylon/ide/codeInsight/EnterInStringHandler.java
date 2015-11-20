@@ -24,7 +24,7 @@ public class EnterInStringHandler implements EnterHandlerDelegate {
 
         PsiElement el = PsiUtilCore.getElementAtOffset(file, caretOffset.get());
 
-        boolean onFirstLine = editor.getDocument().getLineNumber(el.getTextOffset())
+        boolean onFirstLine = editor.getDocument().getLineNumber(el.getTextRange().getStartOffset())
                 == editor.getDocument().getLineNumber(editor.getCaretModel().getOffset());
 
         if (el.getNode().getElementType() == CeylonTokens.ASTRING_LITERAL && onFirstLine) {
@@ -37,13 +37,13 @@ public class EnterInStringHandler implements EnterHandlerDelegate {
     @Override
     public Result postProcessEnter(@NotNull PsiFile file, @NotNull Editor editor, @NotNull DataContext dataContext) {
         PsiElement el = PsiUtilCore.getElementAtOffset(file, editor.getCaretModel().getOffset());
-        boolean onFirstLine = editor.getDocument().getLineNumber(el.getTextOffset()) + 1
+        boolean onFirstLine = editor.getDocument().getLineNumber(el.getTextRange().getStartOffset()) + 1
                 == editor.getDocument().getLineNumber(editor.getCaretModel().getOffset());
 
         if ((el.getNode().getElementType() == CeylonTokens.VERBATIM_STRING
                 || el.getNode().getElementType() == CeylonTokens.AVERBATIM_STRING) && onFirstLine) {
-            int parentLine = editor.getDocument().getLineNumber(el.getTextOffset());
-            int parentOffsetInLine = el.getTextOffset() - editor.getDocument().getLineStartOffset(parentLine);
+            int parentLine = editor.getDocument().getLineNumber(el.getTextRange().getStartOffset());
+            int parentOffsetInLine = el.getTextRange().getStartOffset() - editor.getDocument().getLineStartOffset(parentLine);
             int line = editor.getDocument().getLineNumber(editor.getCaretModel().getOffset());
             int offsetInLine = editor.getCaretModel().getOffset() - editor.getDocument().getLineStartOffset(line);
             int nbSpacesToInsert = parentOffsetInLine - offsetInLine + 3;

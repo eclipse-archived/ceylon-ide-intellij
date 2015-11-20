@@ -15,6 +15,8 @@ import com.redhat.ceylon.model.typechecker.model.Unit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class CeylonTreeUtil {
 
     public static CeylonPsi.DeclarationPsi createDeclarationFromText(Project project, String code) {
@@ -43,6 +45,12 @@ public class CeylonTreeUtil {
                     candidateCeylonNode = ((Tree.ParameterDeclaration) candidateCeylonNode).getTypedDeclaration();
                 }
                 if (candidateCeylonNode == ceylonNode) {
+                    return candidate;
+                } else if (candidateCeylonNode.getClass() == ceylonNode.getClass()
+                        && Objects.equals(candidateCeylonNode.getStartIndex(), ceylonNode.getStartIndex())
+                        && Objects.equals(candidateCeylonNode.getEndIndex(), ceylonNode.getEndIndex())) {
+                    // TODO if this file has never been opened in the editor, the compilation
+                    // unit is not the same as the one that contains ceylonNode, so we can't use ==
                     return candidate;
                 }
             }
