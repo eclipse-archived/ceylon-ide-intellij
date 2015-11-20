@@ -39,6 +39,9 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         if (!(myElement instanceof CeylonPsi.IdentifierPsi)) {
             throw new UnsupportedOperationException();
         }
+        if (myElement.getParent() instanceof CeylonPsi.DeclarationPsi) {
+            return null;
+        }
 
         ((CeylonFile) myElement.getContainingFile()).ensureTypechecked();
 
