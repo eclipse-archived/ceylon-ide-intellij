@@ -27,14 +27,19 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
 
     @NotNull
     @Override
-    public Collection<AbstractTreeNode> modify(@NotNull AbstractTreeNode parent, @NotNull Collection<AbstractTreeNode> children, ViewSettings settings) {
-        // We're only interested in directories, which are source roots, belonging to a module with a Ceylon facet
+    public Collection<AbstractTreeNode> modify(@NotNull AbstractTreeNode parent,
+                                               @NotNull Collection<AbstractTreeNode> children,
+                                               ViewSettings settings) {
+        // We're only interested in directories, which are source roots,
+        // belonging to a module with a Ceylon facet
         if (parent instanceof PsiDirectoryNode) {
             VirtualFile sourceRoot = ((PsiDirectoryNode) parent).getVirtualFile();
             Project project = parent.getProject();
 
-            if (project != null && sourceRoot != null && ProjectRootsUtil.isModuleSourceRoot(sourceRoot, project)) {
-                Module module = ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(sourceRoot);
+            if (project != null && sourceRoot != null
+                    && ProjectRootsUtil.isModuleSourceRoot(sourceRoot, project)) {
+                Module module = ProjectRootManager.getInstance(project)
+                        .getFileIndex().getModuleForFile(sourceRoot);
 
                 if (module != null) {
                     CeylonFacet ceylonFacet = CeylonFacet.forModule(module);
@@ -71,7 +76,9 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
     }
 
     @NotNull
-    private Collection<AbstractTreeNode> buildModuleList(@NotNull AbstractTreeNode parent, @NotNull Collection<AbstractTreeNode> children, @NotNull VirtualFile sourceRoot) {
+    private Collection<AbstractTreeNode> buildModuleList(@NotNull AbstractTreeNode parent,
+                                                         @NotNull Collection<AbstractTreeNode> children,
+                                                         @NotNull VirtualFile sourceRoot) {
         List<AbstractTreeNode> modules = new ArrayList<>();
         ModuleTreeNode defaultModule = new ModuleTreeNode(parent.getProject(), null, "(default module)");
         modules.add(defaultModule);
@@ -94,7 +101,8 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
             } else {
                 for (PsiDirectoryNode submodule : submodules) {
                     String moduleName = computeModuleName(sourceRoot, submodule.getVirtualFile());
-                    ModuleTreeNode subModule = new ModuleTreeNode(parent.getProject(), submodule.getValue(), moduleName);
+                    ModuleTreeNode subModule = new ModuleTreeNode(parent.getProject(),
+                            submodule.getValue(), moduleName);
                     subModule.addChild(submodule);
                     modules.add(subModule);
                     modulesByName.put(moduleName, subModule);
@@ -106,7 +114,8 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
     }
 
     @Nullable
-    private ModuleTreeNode getContainingModule(Map<String, ModuleTreeNode> existingModules, AbstractTreeNode node, VirtualFile root) {
+    private ModuleTreeNode getContainingModule(Map<String, ModuleTreeNode> existingModules,
+                                               AbstractTreeNode node, VirtualFile root) {
         if (node instanceof PsiDirectoryNode) {
             String packageName = computeModuleName(root, ((PsiDirectoryNode) node).getVirtualFile());
 
