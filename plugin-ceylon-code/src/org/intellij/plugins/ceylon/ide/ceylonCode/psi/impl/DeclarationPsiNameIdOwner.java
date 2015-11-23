@@ -15,7 +15,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,7 +71,7 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return ideaIcons_.get_().forDeclaration(getCeylonNode());
+        return utilJ2C.getIconForDeclaration(getCeylonNode());
     }
 
     @Override
