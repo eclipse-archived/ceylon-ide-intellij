@@ -109,6 +109,13 @@ shared object ideaQuickFixManager
     shared actual SpecifyTypeQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
         TextChange,TextRange,Module,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
             specifyTypeQuickFix => ideaSpecifyTypeQuickFix;
+        
+    shared actual void addCreateTypeParameterProposal<Data>(Data data,
+        Tree.BaseType bt, String brokenName)
+            given Data satisfies QuickFixData<Module> {
+        // TODO
+    }
+    
 }
 
 class CustomIntention(Integer position, String desc, TextChange? change, TextRange? selection = null, Icon? image = null,
