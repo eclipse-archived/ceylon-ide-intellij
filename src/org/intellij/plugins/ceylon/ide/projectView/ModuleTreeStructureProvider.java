@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.ide.projectView;
 
 import com.intellij.ide.projectView.PresentationData;
+import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.TreeStructureProvider;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.projectView.impl.ProjectRootsUtil;
@@ -80,7 +81,11 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
                                                          @NotNull Collection<AbstractTreeNode> children,
                                                          @NotNull VirtualFile sourceRoot) {
         List<AbstractTreeNode> modules = new ArrayList<>();
-        ModuleTreeNode defaultModule = new ModuleTreeNode(parent.getProject(), null, "(default module)");
+        PsiDirectory root = null;
+        if (parent instanceof PsiDirectoryNode) {
+            root = ((PsiDirectoryNode) parent).getValue();
+        }
+        ModuleTreeNode defaultModule = new ModuleTreeNode(parent.getProject(), root, "(default module)");
         modules.add(defaultModule);
 
         Map<String, ModuleTreeNode> modulesByName = new HashMap<>();
@@ -150,7 +155,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
         }
     }
 
-    private static class ModuleTreeNode extends AbstractTreeNode<String> {
+    private static class ModuleTreeNode extends ProjectViewNode<PsiDirectory> {
 
         List<AbstractTreeNode> children = new ArrayList<>();
         @Nullable
@@ -158,7 +163,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
         private final String moduleName;
 
         public ModuleTreeNode(Project parent, @Nullable PsiDirectory directory, String moduleName) {
-            super(parent, moduleName);
+            super(parent, directory, ViewSettings.DEFAULT);
             this.directory = directory;
             this.moduleName = moduleName;
         }
@@ -177,6 +182,18 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
         public void update(PresentationData presentation) {
             presentation.setPresentableText(moduleName);
             presentation.setIcon(ideaIcons_.get_().getModules());
+        }
+
+        @Override
+        public boolean contains(@NotNull VirtualFile file) {
+            for (AbstractTreeNode child : children) {
+                if (child instanceof ProjectViewNode) {
+                    if (((ProjectViewNode) child).contains(file)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }
