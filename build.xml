@@ -68,6 +68,10 @@
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar" />
     </path>
 
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2">
+        <classpath refid="compile.runtime.classpath"/>
+    </taskdef>
+
     <target name="build-runtime">
         <mkdir dir="${build.dir}/CeylonRuntime/lib"/>
         <mkdir dir="${build.dir}/runtime"/>
@@ -104,11 +108,11 @@
         <copy todir="${build.dir}/CeylonIDEA/classes">
             <fileset dir="${basedir}/jps-plugin/src" includes="META-INF/**"/>
         </copy>
-        <javac srcdir="${basedir}/src"
+        <javac2 srcdir="${basedir}/src:${basedir}/plugin-ceylon-code/src:${basedir}/plugin-ceylon-code/gen"
                destdir="${build.dir}/CeylonIDEA/classes"
                debug="true" debuglevel="lines,vars,source"
                classpathref="compile.ide.classpath">
-        </javac>
+        </javac2>
         <copy todir="${build.dir}/CeylonIDEA/classes">
             <fileset dir="${basedir}/resources"/>
         </copy>
