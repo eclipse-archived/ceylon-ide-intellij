@@ -46,16 +46,21 @@ public class CeylonBlock implements Block {
             CeylonTypes.SEQUENCE_ENUMERATION, CeylonTypes.ANNOTATION_LIST, CeylonTypes.TYPE_CONSTRAINT_LIST,
             CeylonTypes.IF_STATEMENT, CeylonTypes.ELSE_CLAUSE
     );
+    private static final List<IElementType> INDENT_CHILDREN_CONTINUE = Arrays.asList(
+            CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES
+    );
 
     private static final Collection<IElementType> TYPES_REQUIRING_NO_LEFT_SPACING = Arrays.asList(
             CeylonTypes.PARAMETER_LIST, CeylonTokens.RPAREN, CeylonTokens.COMMA, CeylonTokens.SEMICOLON,
-            CeylonTypes.TYPE_PARAMETER_LIST,
+            CeylonTypes.TYPE_PARAMETER_LIST, CeylonTypes.INVOCATION_EXPRESSION,
             CeylonTokens.UNION_OP, CeylonTypes.UNION_OP, CeylonTokens.INTERSECTION_OP, CeylonTypes.INTERSECTION_OP,
             CeylonTypes.TYPE_ARGUMENT_LIST,
             CeylonTypes.SEQUENCED_TYPE, CeylonTokens.OPTIONAL, CeylonTokens.RBRACKET,
             CeylonTypes.INCREMENT_OP, CeylonTypes.DECREMENT_OP, CeylonTypes.POSTFIX_INCREMENT_OP, CeylonTypes.POSTFIX_DECREMENT_OP,
             CeylonTokens.LBRACKET,
-            CeylonTokens.ENTRY_OP, CeylonTypes.ENTRY_OP
+            CeylonTokens.ENTRY_OP, CeylonTypes.ENTRY_OP,
+            CeylonTokens.SMALL_AS_OP, CeylonTokens.SMALLER_OP,
+            CeylonTokens.LARGE_AS_OP, CeylonTokens.LARGER_OP
     );
     private static final Collection<IElementType> TYPES_REQUIRING_NO_RIGHT_SPACING = Arrays.asList(
             CeylonTokens.LPAREN,
@@ -66,7 +71,9 @@ public class CeylonBlock implements Block {
             CeylonTokens.LBRACKET, CeylonTypes.SAFE_MEMBER_OP,
             CeylonTypes.SPREAD_OP,
             CeylonTokens.ENTRY_OP, CeylonTypes.ENTRY_OP,
-            CeylonTypes.POSITIVE_OP, CeylonTypes.NEGATIVE_OP
+            CeylonTypes.POSITIVE_OP, CeylonTypes.NEGATIVE_OP,
+            CeylonTokens.SMALL_AS_OP, CeylonTokens.SMALLER_OP,
+            CeylonTokens.LARGE_AS_OP, CeylonTokens.LARGER_OP
     );
     private static final Collection<IElementType> TYPES_REQUIRING_EMPTY_LINE = Arrays.asList(
             CeylonTypes.IMPORT_LIST, CeylonTypes.CLASS_DEFINITION, CeylonTypes.METHOD_DEFINITION
@@ -93,6 +100,7 @@ public class CeylonBlock implements Block {
         final IElementType nodeType = node.getElementType();
         final Indent normalChildIndent = INDENT_CHILDREN_NORMAL.contains(nodeType) ? Indent.getNormalIndent()
                 : INDENT_CHILDREN_NONE.contains(nodeType) ? Indent.getNoneIndent()
+                : INDENT_CHILDREN_CONTINUE.contains(nodeType) ? Indent.getContinuationIndent()
                 : Indent.getNoneIndent();
 //        System.out.printf("normalChildIndent for %s: %s%n", nodeType, indent);
         IElementType prevChildType = null;
@@ -148,15 +156,10 @@ public class CeylonBlock implements Block {
 
         Spacing result;
 
-        if (block1 == null) {
+        if (block1 == null || COMMENTS.contains(type1)) {
             result = NO_SPACING;
-        } else if (CeylonTokens.LINE_COMMENT.equals(type1)) {
-            // This is wrong because it inserts a linebreak after line comments, but better than not doing anything.
-            // The problem is that the lexer treats the newline as part of the line comment, so the line after
-            // the line comment is considered to be in the same line as the comment by Intellij.
-            result = NEW_LINE_SPACING;
-        } else if (COMMENTS.contains(type1) || COMMENTS.contains(type2)) {
-            result = KEEP_SOME_SPACE;
+        } else if (COMMENTS.contains(type2)) {
+            result = SINGLE_SPACE_SPACING_INLINE;
         } else if (TYPES_REQUIRING_EMPTY_LINE.contains(type1) && type2 != CeylonTokens.RBRACE
                 || TYPES_REQUIRING_EMPTY_LINE.contains(type2) && !Arrays.asList(CeylonTokens.LBRACE, CeylonTypes.ANNOTATION_LIST).contains(type1)) {
             result = EMPTY_LINE_SPACING;
@@ -164,6 +167,9 @@ public class CeylonBlock implements Block {
             result = NEW_LINE_SPACING;
         } else if (CeylonTypes.IMPORT_MEMBER.equals(type2)) {
             result = NEW_LINE_SPACING;
+        } else if ((type1 == CeylonTokens.UNION_OP || type2 == CeylonTokens.UNION_OP)
+                && nodeType == CeylonTypes.CASE_TYPES){
+            result = SINGLE_SPACE_SPACING;
         } else if (TYPES_REQUIRING_NO_RIGHT_SPACING.contains(type1) || TYPES_REQUIRING_NO_LEFT_SPACING.contains(type2)
                 || (type1 == CeylonTypes.SMALLER_OP && type2 == CeylonTypes.TYPE_PARAMETER_DECLARATION)
                 || (type1 == CeylonTypes.TYPE_PARAMETER_LITERAL && type2 == CeylonTypes.LARGER_OP)
@@ -189,7 +195,7 @@ public class CeylonBlock implements Block {
             result = SINGLE_SPACE_SPACING_INLINE;
         } else if (nodeType == CeylonTypes.ANNOTATION_LIST && type1 == CeylonTypes.STRING_LITERAL) {
             result = NEW_LINE_SPACING;
-        } else if (Arrays.asList(CeylonTypes.METHOD_DEFINITION).contains(nodeType) && type2 == CeylonTypes.BLOCK) {
+        } else if (CeylonTypes.METHOD_DEFINITION.equals(nodeType) && type2 == CeylonTypes.BLOCK) {
             result = SINGLE_SPACE_SPACING_INLINE;
         } else if (bothTypes.contains(CeylonTypes.IDENTIFIER) && Arrays.asList(CeylonTypes.CLASS_DEFINITION, CeylonTypes.INTERFACE_DEFINITION).contains(nodeType)) {
             result = SINGLE_SPACE_SPACING_INLINE;
@@ -215,7 +221,9 @@ public class CeylonBlock implements Block {
             result = SINGLE_SPACE_SPACING;
         }
 
-//        System.out.printf("Spacing between %s and %s in %s: %s%n", type1, type2, nodeType, getSpacingName(result));
+        if (NO_SPACING != result) {
+            System.out.printf("Spacing between %s and %s in %s: %s%n", type1, type2, nodeType, getSpacingName(result));
+        }
         return result;
     }
 
