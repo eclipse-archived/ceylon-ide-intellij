@@ -13,10 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * This is a wrapper for Ceylons's antlr lexer that conforms to the IntelliJ API.
- * <p/>
- * Note that this lexer is only capable of lexing the whole file and doesn't do incremental lexing. This is enough for parsing;
- * for syntax highlighting incremental lexing capabilities are required, and the JFlex-based {@link CeylonFlexLexerAdapter}
- * is used for this purpuse.
  */
 public class CeylonAntlrToIntellijLexerAdapter extends LexerBase {
     private Lexer lexer;
