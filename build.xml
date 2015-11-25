@@ -68,10 +68,6 @@
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar" />
     </path>
 
-    <taskdef name="javac2" classname="com.intellij.ant.Javac2">
-        <classpath refid="compile.runtime.classpath"/>
-    </taskdef>
-
     <target name="build-runtime">
         <mkdir dir="${build.dir}/CeylonRuntime/lib"/>
         <mkdir dir="${build.dir}/runtime"/>
@@ -93,6 +89,10 @@
     </target>
 
     <target name="build-ide">
+        <taskdef name="javac2" classname="com.intellij.ant.Javac2">
+            <classpath refid="compile.runtime.classpath"/>
+        </taskdef>
+
         <mkdir dir="${build.dir}/CeylonIDEA/classes"/>
         <mkdir dir="${build.dir}/CeylonIDEA/lib"/>
         <javac srcdir="${basedir}/compiler/src"
