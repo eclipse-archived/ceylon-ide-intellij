@@ -14,6 +14,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 
 import javax.swing.*;
 
+import static com.intellij.openapi.module.ModuleUtilCore.findModuleForFile;
+
 public abstract class CeylonAddingFilesAction extends AnAction {
 
     public CeylonAddingFilesAction(Icon icon) {
@@ -21,7 +23,8 @@ public abstract class CeylonAddingFilesAction extends AnAction {
     }
 
     protected VirtualFile getSourceRoot(AnActionEvent e, VirtualFile eventDir) {
-        return ProjectRootManager.getInstance(e.getProject()).getFileIndex().getSourceRootForFile(eventDir);
+        return ProjectRootManager.getInstance(e.getProject()).getFileIndex()
+                .getSourceRootForFile(eventDir);
     }
 
     protected VirtualFile findEventDir(AnActionEvent e) {
@@ -38,7 +41,8 @@ public abstract class CeylonAddingFilesAction extends AnAction {
         final VirtualFile srcRootDir = findEventDir(e);
 
         if (srcRootDir != null && e.getProject() != null) {
-            ITypeCheckerProvider typeCheckerProvider = ModuleUtil.findModuleForFile(srcRootDir, e.getProject()).getComponent(ITypeCheckerProvider.class);
+            ITypeCheckerProvider typeCheckerProvider = findModuleForFile(srcRootDir, e.getProject())
+                    .getComponent(ITypeCheckerProvider.class);
             final TypeChecker typeChecker = typeCheckerProvider.getTypeChecker();
 
             final VirtualFile srcRoot = getSourceRoot(e, srcRootDir);
@@ -48,7 +52,9 @@ public abstract class CeylonAddingFilesAction extends AnAction {
                 assert eventPath.startsWith(srcRootPath) : eventPath + " not in " + srcRootPath;
 
                 // Make eventPath relative
-                eventPath = eventPath.length() <= srcRootPath.length() ? "" : eventPath.substring(srcRootPath.length() + 1);
+                eventPath = eventPath.length() <= srcRootPath.length()
+                        ? ""
+                        : eventPath.substring(srcRootPath.length() + 1);
 
                 final String eventPackage = eventPath.replace('/', '.');
                 final PsiDirectory eventPsiDir = PsiManager.getInstance(e.getProject()).findDirectory(srcRoot);
@@ -57,7 +63,9 @@ public abstract class CeylonAddingFilesAction extends AnAction {
         }
     }
 
-    protected abstract void createFiles(AnActionEvent e, TypeChecker typeChecker, VirtualFile srcRoot, String eventPackage, PsiDirectory srcRootDir);
+    protected abstract void createFiles(AnActionEvent e, TypeChecker typeChecker,
+                                        VirtualFile srcRoot, String eventPackage,
+                                        PsiDirectory srcRootDir);
 
     @Override
     public void update(AnActionEvent e) {

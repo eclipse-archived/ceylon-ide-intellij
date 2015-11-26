@@ -29,14 +29,21 @@ public class CeylonAddFileAction extends CeylonAddingFilesAction {
     }
 
     @Override
-    protected void createFiles(final AnActionEvent e, TypeChecker typeChecker, VirtualFile srcRoot, String eventPackage, final PsiDirectory srcRootDir) {
+    protected void createFiles(final AnActionEvent e, TypeChecker typeChecker, VirtualFile srcRoot,
+                               String eventPackage, final PsiDirectory srcRootDir) {
         final VirtualFile eventDir = findEventDir(e);
-        String input = Messages.showInputDialog(e.getProject(), message("ceylon.file.wizard.message"), message("ceylon.file.wizard.title"), null, null, new AddFileInputValidator(eventDir));
+        String input = Messages.showInputDialog(e.getProject(),
+                message("ceylon.file.wizard.message"),
+                message("ceylon.file.wizard.title"), null, null,
+                new AddFileInputValidator(eventDir));
 
         if (input != null) {
             final String fileName = getCompleteFileName(input);
-            final String unitName = input.endsWith(".ceylon") ? input.substring(0, input.length() - ".ceylon".length()) : input;
-            final PsiDirectory subdirectory = PsiManager.getInstance(e.getProject()).findDirectory(eventDir);
+            final String unitName = input.endsWith(".ceylon")
+                    ? input.substring(0, input.length() - ".ceylon".length())
+                    : input;
+            final PsiDirectory subdirectory = PsiManager.getInstance(e.getProject())
+                    .findDirectory(eventDir);
 
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
 
@@ -49,12 +56,15 @@ public class CeylonAddFileAction extends CeylonAddingFilesAction {
                     variables.put("UNIT_NAME", unitName);
 
                     try {
-                        PsiElement file = FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("unit.ceylon"), fileName, variables, subdirectory);
+                        PsiElement file = FileTemplateUtil.createFromTemplate(
+                                templateManager.getInternalTemplate("unit.ceylon"),
+                                fileName, variables, subdirectory);
                         if (file instanceof PsiFile) {
                             ((PsiFile) file).navigate(true);
                         }
                     } catch (Exception e1) {
-                        Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
+                        Logger.getInstance(CeylonAddModuleAction.class)
+                                .error("Can't create file from template", e1);
                     }
                 }
             });

@@ -1,8 +1,6 @@
 package org.intellij.plugins.ceylon.ide.action;
 
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.ide.fileTemplates.FileTemplateUtil;
-import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.util.DirectoryUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Properties;
 
+import static com.intellij.ide.fileTemplates.FileTemplateUtil.createFromTemplate;
+
 public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
     public CeylonAddModuleAction() {
@@ -33,15 +33,23 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
     }
 
     @Override
-    protected void createFiles(final AnActionEvent e, final TypeChecker typeChecker, final VirtualFile srcRoot, final String eventPackage, final PsiDirectory srcRootDir) {
+    protected void createFiles(final AnActionEvent e, final TypeChecker typeChecker,
+                               final VirtualFile srcRoot, final String eventPackage,
+                               final PsiDirectory srcRootDir) {
+
         final CreateCeylonModuleWizard wizard = new CreateCeylonModuleWizard(e.getProject(), typeChecker);
 
         wizard.show();
 
         if (wizard.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
             final String moduleName = wizard.getModuleName();
-            final String unitFileName = wizard.getCompilationUnitName().endsWith(".ceylon") ? wizard.getCompilationUnitName() : wizard.getCompilationUnitName() + ".ceylon";
-            final String unitName = wizard.getCompilationUnitName().endsWith(".ceylon") ? wizard.getCompilationUnitName().substring(0, ".ceylon".length()) : wizard.getCompilationUnitName();
+            boolean hasSuffix = wizard.getCompilationUnitName().endsWith(".ceylon");
+            final String unitFileName = hasSuffix
+                    ? wizard.getCompilationUnitName()
+                    : wizard.getCompilationUnitName() + ".ceylon";
+            final String unitName = hasSuffix
+                    ? wizard.getCompilationUnitName().substring(0, ".ceylon".length())
+                    : wizard.getCompilationUnitName();
 
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 @Override
@@ -56,37 +64,47 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                     variables.put("FUN_NAME", unitName);
 
                     try {
-                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("module.ceylon"), "module.ceylon", variables, subdirectory);
-                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("package.ceylon"), "package.ceylon", variables, subdirectory);
-                        PsiElement run = FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), unitFileName, variables, subdirectory);
+                        createFromTemplate(templateManager.getInternalTemplate("module.ceylon"),
+                                "module.ceylon", variables, subdirectory);
+                        createFromTemplate(templateManager.getInternalTemplate("package.ceylon"),
+                                "package.ceylon", variables, subdirectory);
+                        PsiElement run = createFromTemplate(templateManager.getInternalTemplate("run.ceylon"),
+                                unitFileName, variables, subdirectory);
                         if (run instanceof PsiFile) {
                             ((PsiFile) run).navigate(true);
                         }
                     } catch (Exception e1) {
-                        Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
+                        Logger.getInstance(CeylonAddModuleAction.class)
+                                .error("Can't create file from template", e1);
                     }
 
-                    // FIXME com.redhat.ceylon.compiler.typechecker.context.PhasedUnits expects to parse modules from the root folder
-                    // so the only way to not parse everything here seems to be by modifying PhaseUnits or injecting a different ModuleManager into it
-                    FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(new File(srcRoot.getCanonicalPath()));
+                    // FIXME com.redhat.ceylon.compiler.typechecker.context.PhasedUnits expects
+                    // to parse modules from the root folder so the only way to not parse everything
+                    // here seems to be by modifying PhaseUnits or injecting a different ModuleManager into it
+                    FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(
+                            new File(srcRoot.getCanonicalPath()));
                     parseUnit(virtualFile, typeChecker, e.getProject());
                 }
 
                 @NotNull
                 private PsiDirectory findOrCreateModuleDirectory() {
                     VirtualFile targetDir = srcRoot.findChild(moduleName.replace('.', '/'));
-                    return targetDir != null ? PsiManager.getInstance(e.getProject()).findDirectory(targetDir) : DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
+                    return targetDir != null
+                            ? PsiManager.getInstance(e.getProject()).findDirectory(targetDir)
+                            : DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
                 }
             });
         }
     }
 
-    private void parseUnit(final FileSystemVirtualFile virtualFile, final TypeChecker typeChecker, Project project) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Parsing Ceylon compilation units...") {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                typeChecker.getPhasedUnits().parseUnit(virtualFile);
-            }
-        });
+    private void parseUnit(final FileSystemVirtualFile virtualFile,
+                           final TypeChecker typeChecker, Project project) {
+        ProgressManager.getInstance().run(
+                new Task.Backgroundable(project, "Parsing Ceylon compilation units...") {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        typeChecker.getPhasedUnits().parseUnit(virtualFile);
+                    }
+                });
     }
 }
