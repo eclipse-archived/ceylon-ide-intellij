@@ -3,7 +3,6 @@ package org.intellij.plugins.ceylon.ide.refactoring;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler;
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenamer;
@@ -16,10 +15,11 @@ public class CeylonVariableRenameHandler extends VariableInplaceRenameHandler {
 
     @Nullable
     @Override
-    protected VariableInplaceRenamer createRenamer(@NotNull final PsiElement elementToRename, final Editor editor) {
+    protected VariableInplaceRenamer createRenamer(@NotNull final PsiElement elementToRename,
+                                                   final Editor editor) {
         final PsiFile file = elementToRename.getContainingFile();
 
-        return new VariableInplaceRenamer((PsiNamedElement)elementToRename, editor) {
+        return new VariableInplaceRenamer((PsiNamedElement) elementToRename, editor) {
             @Override
             public void finish(boolean success) {
                 super.finish(success);
@@ -32,7 +32,7 @@ public class CeylonVariableRenameHandler extends VariableInplaceRenameHandler {
     }
 
     @Override
-    protected boolean isAvailable(PsiElement element, Editor editor, PsiFile file) {
+    protected boolean isAvailable(@Nullable PsiElement element, Editor editor, PsiFile file) {
         PsiElement context = file.findElementAt(editor.getCaretModel().getOffset());
 
         if (context != null && element != null &&
