@@ -169,7 +169,7 @@ public class CustomLookupCellRendererTest {
             PresentableNodeDescriptor.ColoredFragment fragment = iterator.next();
 
             if (!StringUtil.equals(c1.getText(), fragment.getText())
-                    || c1.getAttributes() != fragment.getAttributes()) {
+                    || c1.getAttributes().getFgColor() != fragment.getAttributes().getFgColor()) {
 
                 fail("Expected fragment \"" + c1.getText() + "\" with color " + c1.getAttributes().getFgColor().toString()
                     + " but got fragment \"" + fragment.getText() + "\" with color " + fragment.getAttributes().getFgColor().toString());
