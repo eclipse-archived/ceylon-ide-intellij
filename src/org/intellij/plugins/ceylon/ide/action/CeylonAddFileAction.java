@@ -9,6 +9,8 @@ import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.apache.commons.lang.StringUtils;
@@ -47,7 +49,10 @@ public class CeylonAddFileAction extends CeylonAddingFilesAction {
                     variables.put("UNIT_NAME", unitName);
 
                     try {
-                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("unit.ceylon"), fileName, variables, subdirectory);
+                        PsiElement file = FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("unit.ceylon"), fileName, variables, subdirectory);
+                        if (file instanceof PsiFile) {
+                            ((PsiFile) file).navigate(true);
+                        }
                     } catch (Exception e1) {
                         Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
                     }

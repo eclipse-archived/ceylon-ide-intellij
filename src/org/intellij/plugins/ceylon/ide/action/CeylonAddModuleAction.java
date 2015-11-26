@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.ide.action;
 
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
+import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.util.DirectoryUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -13,6 +14,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.io.impl.FileSystemVirtualFile;
@@ -55,7 +58,10 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                     try {
                         FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("module.ceylon"), "module.ceylon", variables, subdirectory);
                         FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("package.ceylon"), "package.ceylon", variables, subdirectory);
-                        FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), unitFileName, variables, subdirectory);
+                        PsiElement run = FileTemplateUtil.createFromTemplate(templateManager.getInternalTemplate("run.ceylon"), unitFileName, variables, subdirectory);
+                        if (run instanceof PsiFile) {
+                            ((PsiFile) run).navigate(true);
+                        }
                     } catch (Exception e1) {
                         Logger.getInstance(CeylonAddModuleAction.class).error("Can't create file from template", e1);
                     }
