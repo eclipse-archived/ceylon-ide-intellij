@@ -14,15 +14,15 @@ public class FindUsagesTest extends CeylonCodeInsightTestSupport {
     public void testFindUsages() throws Exception {
         initFile("referenceTest.ceylon");
         final Editor editor = myFixture.getEditor();
-        assertUsages(editor, 100, 3, "myHelloWorld");
-        assertUsages(editor, 164, 3, "prout");
-        assertUsages(editor, 183, 3, "bar2");
-        assertUsages(editor, 422, 3, "BarBar");
-        assertUsages(editor, 366, 2, "plop");
-        assertUsages(editor, 473, 2, "plop");
-        assertUsages(editor, 292, 3, "myHelloWorld");
-        assertUsages(editor, 545, 2, "par");
-        assertUsages(editor, 563, 2, "par");
+        assertUsages(editor, 100, 2, "myHelloWorld");
+        assertUsages(editor, 164, 2, "prout");
+        assertUsages(editor, 183, 2, "bar2");
+        assertUsages(editor, 422, 2, "BarBar");
+        assertUsages(editor, 366, 1, "plop");
+        assertUsages(editor, 473, 1, "plop");
+        assertUsages(editor, 292, 2, "myHelloWorld");
+        assertUsages(editor, 545, 1, "par");
+        assertUsages(editor, 563, 1, "par");
     }
 
     private void assertUsages(Editor editor, int offset, int expectedCount, String identifier) {
