@@ -59,9 +59,10 @@ public class CeylonReferenceTest extends CeylonCodeInsightTestSupport {
     }
 
     private <PSI extends CeylonPsi.ValueParameterDeclarationPsi> PSI assertRefdParamDeclarationAtCaret(CeylonFile ceylonFile, String referencedId, Class<? extends PSI> psiClass, int referencedOffest) {
-        PSI referenced = assertRefdAtCaret(ceylonFile, referencedOffest, psiClass);
-        assertEquals(referencedId, referenced.getCeylonNode().getTypedDeclaration().getIdentifier().getText());
-        return referenced;
+        CeylonPsi.AttributeDeclarationPsi referenced = assertRefdAtCaret(ceylonFile, referencedOffest, CeylonPsi.AttributeDeclarationPsi.class);
+        PSI parent = (PSI) referenced.getParent();
+        assertEquals(referencedId, parent.getCeylonNode().getTypedDeclaration().getIdentifier().getText());
+        return parent;
     }
 
     private <PSI extends CeylonCompositeElement> PSI assertRefdAtCaret(CeylonFile ceylonFile, int referencedOffset, Class<? extends PSI> psiClass) {
