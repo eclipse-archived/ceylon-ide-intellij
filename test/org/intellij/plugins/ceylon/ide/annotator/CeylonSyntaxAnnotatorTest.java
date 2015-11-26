@@ -1,8 +1,12 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
+import com.intellij.facet.FacetManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 
 public class CeylonSyntaxAnnotatorTest extends LightCodeInsightFixtureTestCase {
 
@@ -15,19 +19,22 @@ public class CeylonSyntaxAnnotatorTest extends LightCodeInsightFixtureTestCase {
         testSyntax("SyntaxError", false, false, false);
     }
 
-/*
-    public void testInexistentPackage() throws Exception {
-        testSyntax("InexistentPackage", false, false, false);
-        // todo: Make sure CeylonTypeCheckerAnnotator finishes its job to test this
-    }
-*/
-
     private void testSyntax(String cuName, boolean checkWarnings, boolean checkInfos, boolean checkWeakWarnings) {
-        final PsiFile[] files = myFixture.configureByFiles("org/intellij/plugins/ceylon/annotator/" + cuName + ".ceylon");
-        final CeylonFile file = (CeylonFile) files[0];
-//        TypeCheckerInvoker.invokeTypeChecker(file);
-//        System.out.println(file.getContainingDirectory());
-//        System.out.println(file.getCompilationUnit().getUnit());
+        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+            @Override
+            public void run() {
+                FacetManager.getInstance(myModule).addFacet(CeylonFacet.getFacetType(), CeylonFacet.getFacetType().getPresentableName(), null);
+            }
+        });
+
+        ITypeCheckerProvider component = myModule.getComponent(ITypeCheckerProvider.class);
+        if (component instanceof TypeCheckerProvider) {
+            ((TypeCheckerProvider) component).moduleAdded();
+        }
+
+        PsiFile[] files = myFixture.configureByFiles("org/intellij/plugins/ceylon/annotator/" + cuName + ".ceylon");
+        TypeCheckerInvoker.invokeTypeChecker((CeylonFile) files[0]);
+
         myFixture.checkHighlighting(checkWarnings, checkInfos, checkWeakWarnings);
     }
 }

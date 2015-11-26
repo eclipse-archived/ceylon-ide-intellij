@@ -12,7 +12,8 @@ import com.intellij.openapi.vfs {
 }
 import com.intellij.openapi.application {
     WriteAction,
-    Result
+    Result,
+    ApplicationManager
 }
 import com.intellij.openapi.ui {
     Messages
@@ -44,6 +45,9 @@ shared class IdeaCeylonProject(ideArtifact) extends CeylonProject<Module>() {
             return VirtualFileManager.instance.findFileByUrl("file://``parentPath``");
         }
 
+        if (ApplicationManager.application.unitTestMode) {
+            return ideaModule.project.baseDir;
+        }
         throw Exception("Couldn't get module root for ``path``");
     }
 

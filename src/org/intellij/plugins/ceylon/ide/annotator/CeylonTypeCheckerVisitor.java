@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.annotator;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.util.TextRange;
@@ -101,7 +102,9 @@ class CeylonTypeCheckerVisitor extends Visitor {
                 annotation = annotationHolder.createInfoAnnotation(range, error.getMessage());
             }
 
-            addQuickFixes(that, error, annotation);
+            if (!ApplicationManager.getApplication().isUnitTestMode()) {
+                addQuickFixes(that, error, annotation);
+            }
         }
         super.visitAny(that);
     }
