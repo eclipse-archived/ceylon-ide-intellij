@@ -8,6 +8,7 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler;
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenamer;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,11 +35,11 @@ public class CeylonVariableRenameHandler extends VariableInplaceRenameHandler {
     protected boolean isAvailable(PsiElement element, Editor editor, PsiFile file) {
         PsiElement context = file.findElementAt(editor.getCaretModel().getOffset());
 
-        if (context != null && context.getContainingFile() != element.getContainingFile()) return false;
-
-        if (!(element instanceof PsiNameIdentifierOwner)) {
+        if (context != null && element != null &&
+                context.getContainingFile() != element.getContainingFile()) {
             return false;
         }
-        return true;
+
+        return element instanceof DeclarationPsiNameIdOwner;
     }
 }
