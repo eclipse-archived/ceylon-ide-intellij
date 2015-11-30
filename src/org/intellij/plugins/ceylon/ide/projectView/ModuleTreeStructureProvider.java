@@ -11,6 +11,7 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -18,6 +19,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jps.model.java.JavaSourceRootType;
 
 import java.util.*;
 
@@ -37,8 +39,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
             VirtualFile sourceRoot = ((PsiDirectoryNode) parent).getVirtualFile();
             Project project = parent.getProject();
 
-            if (project != null && sourceRoot != null
-                    && ProjectRootsUtil.isModuleSourceRoot(sourceRoot, project)) {
+            if (isSourceFolder(sourceRoot, project)) {
                 Module module = ProjectRootManager.getInstance(project)
                         .getFileIndex().getModuleForFile(sourceRoot);
 
@@ -52,6 +53,15 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider {
             }
         }
         return children;
+    }
+
+    private boolean isSourceFolder(VirtualFile sourceRoot, Project project) {
+        if (project != null && sourceRoot != null) {
+            SourceFolder root = ProjectRootsUtil.getModuleSourceRoot(sourceRoot, project);
+            return (root != null && root.getRootType() instanceof JavaSourceRootType);
+        }
+
+        return false;
     }
 
     @Nullable
