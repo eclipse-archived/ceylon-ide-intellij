@@ -108,6 +108,8 @@
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementDescriptionProvider"/>
         <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>
         <codeInsight.lineMarkerProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonLineMarkerProvider"/>
+        <lang.smartEnterProcessor language="Ceylon"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.editor.TerminateStatementAction"/>
 
         <projectStructureDetector implementation="org.intellij.plugins.ceylon.ide.project.CeylonProjectStructureDetector"/>
         <facetType implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetType"/>

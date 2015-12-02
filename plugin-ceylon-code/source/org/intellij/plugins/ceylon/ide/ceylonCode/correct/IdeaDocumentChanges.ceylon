@@ -64,6 +64,8 @@ shared class TextChange(shared Document document) {
             PsiDocumentManager.getInstance(project).commitAllDocuments();
         }
     }
+    
+    shared Boolean hasChildren => !changes.empty;
 }
 
 shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertEdit, TextEdit, TextChange> {
@@ -87,4 +89,7 @@ shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertE
 
     shared actual String getInsertedText(InsertEdit edit)
             => edit.str;
+    
+    shared actual Boolean hasChildren(TextChange change)
+            => change.hasChildren;
 }
