@@ -9,9 +9,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -47,7 +44,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
     String text, Declaration declaration, CompletionData data, Node? node)
-        extends ControlStructureProposal<CompletionData,Module,CeylonFile,
+        extends ControlStructureProposal<CompletionData,CeylonFile,
         LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>
         (offset, prefix, desc, text, node, declaration, data)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {

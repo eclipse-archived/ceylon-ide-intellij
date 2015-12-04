@@ -14,9 +14,6 @@ import com.intellij.openapi.command {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -55,7 +52,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference pr,
         String desc, String text, CompletionData data,
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType)
-        extends RefinementCompletionProposal<CompletionData,Module,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>
+        extends RefinementCompletionProposal<CompletionData,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>
         (offset, prefix, pr, desc, text, data, dec, scope, fullType, explicitReturnType) 
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
 

@@ -9,7 +9,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.redhat.ceylon.ide.common.model.CeylonIdeConfig;
-import com.redhat.ceylon.ide.common.model.CeylonProject;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.project.CeylonConfigForm;
 import org.intellij.plugins.ceylon.ide.project.PageOne;
@@ -28,7 +28,7 @@ public class CeylonFacetConfiguration implements FacetConfiguration {
     public static final String COMPILATION_TAB = "Compilation";
     public static final String REPOS_TAB = "Repositories";
 
-    private CeylonProject<Module> ceylonProject;
+    private IdeaCeylonProject ceylonProject;
 
     @Override
     public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
@@ -44,7 +44,7 @@ public class CeylonFacetConfiguration implements FacetConfiguration {
 
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
-        CeylonIdeConfig<Module> conf = ceylonProject.getIdeConfiguration();
+        CeylonIdeConfig conf = ceylonProject.getIdeConfiguration();
 
         element.addContent(new Element("option")
                 .setAttribute("name", "compileForJvm")
@@ -63,10 +63,10 @@ public class CeylonFacetConfiguration implements FacetConfiguration {
 
     public void setModule(Module module) {
         IdeaCeylonProjects ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
-        ceylonProject = ceylonModel.getProject(module);
+        ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
 
         if (ceylonProject == null && ceylonModel.addProject(module)) {
-            ceylonProject = ceylonModel.getProject(module);
+            ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
         }
     }
 

@@ -1,7 +1,6 @@
 package org.intellij.plugins.ceylon.ide.project;
 
-import com.intellij.openapi.module.Module;
-import com.redhat.ceylon.ide.common.model.CeylonProject;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 
 import javax.swing.*;
@@ -24,14 +23,14 @@ public class PageOne implements CeylonConfigForm {
     }
 
     @Override
-    public void apply(CeylonProject<Module> project) {
+    public void apply(IdeaCeylonProject project) {
         project.getIdeConfiguration().setCompileToJvm(ceylon.language.Boolean.instance(compileForJvm.isSelected()));
         project.getIdeConfiguration().setCompileToJs(ceylon.language.Boolean.instance(compileToJs.isSelected()));
         project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(workOffline.isSelected()));
     }
 
     @Override
-    public boolean isModified(CeylonProject<Module> project) {
+    public boolean isModified(IdeaCeylonProject project) {
         return project.getIdeConfiguration().getCompileToJvm() == null
                 || project.getIdeConfiguration().getCompileToJs() == null
                 || project.getConfiguration().getProjectOffline() == null
@@ -41,7 +40,7 @@ public class PageOne implements CeylonConfigForm {
     }
 
     @Override
-    public void load(CeylonProject<Module> project) {
+    public void load(IdeaCeylonProject project) {
         String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
         compileForJvm.setSelected(safeNullBoolean(project.getIdeConfiguration().getCompileToJvm(), !defaultVm.equals("js")));
         compileToJs.setSelected(safeNullBoolean(project.getIdeConfiguration().getCompileToJs(), !defaultVm.equals("jvm")));

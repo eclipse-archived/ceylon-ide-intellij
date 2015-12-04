@@ -23,7 +23,6 @@ import com.redhat.ceylon.compiler.typechecker.context.Context;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
 import com.redhat.ceylon.compiler.typechecker.util.ModuleManagerFactory;
-import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
 import com.redhat.ceylon.model.loader.model.LazyModule;
 import com.redhat.ceylon.model.typechecker.model.ModuleImport;
@@ -31,6 +30,7 @@ import com.redhat.ceylon.model.typechecker.model.Package;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
@@ -137,8 +137,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     }
 
     public TypeChecker createTypeChecker() {
-        CeylonProject<Module> ceylonProject = ceylonModel.getProject(module);
-        CeylonProjectConfig<Module> ceylonConfig = ceylonProject.getConfiguration();
+        IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
+        CeylonProjectConfig ceylonConfig = ceylonProject.getConfiguration();
 
         TypeCheckerBuilder builder = new TypeCheckerBuilder()
                 .verbose(false)
@@ -205,10 +205,10 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                                 }
                                 // then try in dependencies
                                 Set<com.redhat.ceylon.model.typechecker.model.Module> visited = new HashSet<com.redhat.ceylon.model.typechecker.model.Module>();
-                                for(ModuleImport dependency : getImports()){
+                                for (ModuleImport dependency : getImports()) {
                                     // we don't have to worry about the default module here since we can't depend on it
                                     Package pkg = findPackageInImport(name, dependency, visited);
-                                    if(pkg != null)
+                                    if (pkg != null)
                                         return pkg;
                                 }
                                 return null;
@@ -217,19 +217,19 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                             private Package findPackageInImport(String name, ModuleImport dependency, Set<com.redhat.ceylon.model.typechecker.model.Module> visited) {
                                 com.redhat.ceylon.model.typechecker.model.Module module = dependency.getModule();
                                 // only visit modules once
-                                if(!visited.add(module))
+                                if (!visited.add(module))
                                     return null;
 
                                 // this is the equivalent of getDirectPackage, it does not recurse
                                 Package pkg = module.getDirectPackage(name);
-                                if(pkg != null)
+                                if (pkg != null)
                                     return pkg;
                                 // not found, try in its exported dependencies
-                                for(ModuleImport dep : module.getImports()){
-                                    if(!dep.isExport())
+                                for (ModuleImport dep : module.getImports()) {
+                                    if (!dep.isExport())
                                         continue;
                                     pkg = findPackageInImport(name, dep, visited);
-                                    if(pkg != null)
+                                    if (pkg != null)
                                         return pkg;
                                 }
                                 // not found

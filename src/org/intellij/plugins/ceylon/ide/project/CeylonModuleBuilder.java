@@ -13,9 +13,9 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
@@ -87,7 +87,7 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
     public void persistConfiguration(Module module) {
         IdeaCeylonProjects projects = module.getProject().getComponent(IdeaCeylonProjects.class);
         projects.addProject(module);
-        CeylonProject<Module> ceylonProject = projects.getProject(module);
+        IdeaCeylonProject ceylonProject = (IdeaCeylonProject) projects.getProject(module);
 
         pageOne.apply(ceylonProject);
         pageTwo.apply(ceylonProject);

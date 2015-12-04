@@ -15,9 +15,6 @@ import com.intellij.openapi.editor {
     Document,
     Editor
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -44,14 +41,17 @@ import com.redhat.ceylon.ide.common.completion {
     isModuleDescriptor
 }
 import com.redhat.ceylon.ide.common.model {
-    CeylonProject
+    BaseCeylonProject
+}
+import com.redhat.ceylon.ide.common.settings {
+    CompletionOptions
 }
 import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
 import com.redhat.ceylon.ide.common.util {
-    ProgressMonitor,
-    Indents
+    Indents,
+    BaseProgressMonitor
 }
 import com.redhat.ceylon.model.typechecker.model {
     Function,
@@ -88,22 +88,19 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons,
     ideaIndents
 }
-import com.redhat.ceylon.ide.common.settings {
-    CompletionOptions
-}
 
 shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Editor editor,
         shared actual TypeChecker typeChecker, shared CeylonFile file, shared actual CompletionOptions options)
-        satisfies LocalAnalysisResult<Document,Module> {
+        satisfies LocalAnalysisResult<Document> {
     shared actual Tree.CompilationUnit lastCompilationUnit => lastPhasedUnit.compilationUnit;
     shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
     shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
     shared actual Document document => editor.document;
     shared actual JList<CommonToken>? tokens => lastPhasedUnit.tokens;
-    shared actual CeylonProject<Module>? ceylonProject => null;// TODO
+    shared actual BaseCeylonProject? ceylonProject => null;// TODO
 }
 
-shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,Module,LookupElement,Document>() {
+shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,LookupElement,Document>() {
     
     shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result,
             PhasedUnit pu, TypeChecker tc, CompletionOptions options) {
@@ -114,7 +111,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         value params = CompletionData(pu, parameters.editor, tc, ceylonFile, options);
         value line = doc.getLineNumber(element.textOffset);
         
-        value monitor = object satisfies ProgressMonitor {
+        value monitor = object satisfies BaseProgressMonitor {
             shared actual variable Integer workRemaining = 100;
             shared actual void worked(Integer amount) {
                 workRemaining -= amount;

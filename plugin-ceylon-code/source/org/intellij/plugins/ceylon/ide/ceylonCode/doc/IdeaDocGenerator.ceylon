@@ -26,8 +26,11 @@ import com.redhat.ceylon.ide.common.doc {
     Colors,
     Icons
 }
+import com.redhat.ceylon.ide.common.imports {
+    AbstractModuleImportUtil
+}
 import com.redhat.ceylon.ide.common.model {
-    CeylonProject
+    BaseCeylonProject
 }
 import com.redhat.ceylon.ide.common.settings {
     CompletionOptions
@@ -70,23 +73,20 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlight,
     textAttributes
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
-}
-import com.redhat.ceylon.ide.common.imports {
-    AbstractModuleImportUtil
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
     ideaModuleImportUtils
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
 }
 
 String psiProtocol = "psi_element://";
 
 String(String, Project) outerHighlight = highlight;
 
-shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,Nothing> {
+shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> {
 
-    shared class DocParams(PhasedUnit pu, Project p) satisfies LocalAnalysisResult<Document,Nothing> {
+    shared class DocParams(PhasedUnit pu, Project p) satisfies LocalAnalysisResult<Document> {
         shared actual Tree.CompilationUnit lastCompilationUnit => pu.compilationUnit;
         shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
         shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
@@ -94,7 +94,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,N
         shared actual Document document => nothing;
         shared actual JList<CommonToken>? tokens => pu.tokens;
         shared actual TypeChecker typeChecker => tc else nothing;
-        shared actual CeylonProject<Nothing>? ceylonProject => nothing;
+        shared actual BaseCeylonProject? ceylonProject => nothing;
         shared Project ideaProject => p;
         shared actual CompletionOptions options => nothing;
     }
@@ -168,7 +168,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,N
     
     shared actual void appendJavadoc(Declaration model, StringBuilder buffer) {}
         
-    shared actual String highlight(String text, LocalAnalysisResult<Document,Nothing> cmp) {
+    shared actual String highlight(String text, LocalAnalysisResult<Document> cmp) {
         assert (is DocParams cmp);
         return outerHighlight(text, cmp.ideaProject);
     }
@@ -195,7 +195,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document,N
         }
     }
     
-    shared actual String markdown(String text, LocalAnalysisResult<Document,Nothing> cmp, Scope? linkScope, Unit? unit) {
+    shared actual String markdown(String text, LocalAnalysisResult<Document> cmp, Scope? linkScope, Unit? unit) {
         assert (is DocParams cmp);
         value project = cmp.ideaProject;
         value builder = Configuration.builder().forceExtentedProfile();

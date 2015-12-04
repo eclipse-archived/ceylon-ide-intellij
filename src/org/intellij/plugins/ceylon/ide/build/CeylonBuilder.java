@@ -13,9 +13,9 @@ import com.redhat.ceylon.compiler.js.util.Options;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
-import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 
 import java.io.File;
@@ -42,7 +42,7 @@ public class CeylonBuilder implements CompileTask {
         }
 
         for (Module module : context.getCompileScope().getAffectedModules()) {
-            CeylonProject<Module> project = projects.getProject(module);
+            IdeaCeylonProject project = (IdeaCeylonProject) projects.getProject(module);
             Collection<VirtualFile> files = filesByModule.get(module);
             List<File> jsFiles = new ArrayList<>();
 
@@ -73,7 +73,7 @@ public class CeylonBuilder implements CompileTask {
     }
 
     private boolean compileJs(final CompileContext context, Module module, List<File> files,
-                              CeylonProject<Module> project, TypeChecker tc) {
+                              IdeaCeylonProject project, TypeChecker tc) {
 
         context.addMessage(CompilerMessageCategory.INFORMATION,
                 "Compiling module " + module.getName() + " to JS", null, -1, -1);

@@ -1,7 +1,6 @@
 package org.intellij.plugins.ceylon.ide.project;
 
-import com.intellij.openapi.module.Module;
-import com.redhat.ceylon.ide.common.model.CeylonProject;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 
 import javax.swing.*;
 
@@ -15,17 +14,17 @@ public interface CeylonConfigForm {
     /**
      * Applies the user settings to the module's config.
      */
-    void apply(CeylonProject<Module> project);
+    void apply(IdeaCeylonProject project);
 
     /**
      * Checks if the settings were modified by the user.
      *
      * @return true if the settings were modified
      */
-    boolean isModified(CeylonProject<Module> project);
+    boolean isModified(IdeaCeylonProject project);
 
     /**
      * Loads the setting from a .ceylon/config file.
      */
-    void load(CeylonProject<Module> project);
+    void load(IdeaCeylonProject project);
 }

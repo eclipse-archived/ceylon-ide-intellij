@@ -55,7 +55,7 @@ public class PasteJavaToCeylonAction extends AnAction {
             PsiFile psiFile = PsiDocumentManager.getInstance(e.getProject()).getPsiFile(editor.getDocument());
             IdeaCeylonProjects projects = e.getProject().getComponent(IdeaCeylonProjects.class);
             Module module = ModuleUtil.findModuleForFile(psiFile.getVirtualFile(), psiFile.getProject());
-            CeylonIdeConfig<Module> ideConfig = projects.getProject(module).getIdeConfiguration();
+            CeylonIdeConfig ideConfig = projects.getProject(module).getIdeConfiguration();
 
             ceylonCode = transformJavaToCeylon(javaCode, ideConfig);
         } catch (IOException exc) {
@@ -65,7 +65,7 @@ public class PasteJavaToCeylonAction extends AnAction {
         insertTextInEditor(ceylonCode, e);
     }
 
-    private String transformJavaToCeylon(String javaCode, CeylonIdeConfig<Module> ideConfig) throws IOException {
+    private String transformJavaToCeylon(String javaCode, CeylonIdeConfig ideConfig) throws IOException {
         ANTLRInputStream input = new ANTLRInputStream(javaCode);
         Java8Lexer lexer = new Java8Lexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);

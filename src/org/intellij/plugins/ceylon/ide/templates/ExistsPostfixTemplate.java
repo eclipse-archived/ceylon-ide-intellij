@@ -105,12 +105,8 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
         TypeChecker typeChecker = module.getComponent(ITypeCheckerProvider.class).getTypeChecker();
 
         // FIXME I'd prefer having an up-to-date CompilationUnit in CeylonFile instead of having to retrieve another one
-        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(new PsiFileVirtualFile(ceylonFile) {
-            @Override
-            public String getPath() {
-                return virtualFile.getPath();
-            }
-        });
+        PhasedUnit phasedUnit = typeChecker.getPhasedUnit(
+                new PsiFileVirtualFile(ceylonFile, new ceylon.language.String(virtualFile.getPath())));
         Tree.CompilationUnit compilationUnit = phasedUnit.getCompilationUnit();
 
         FindNodeVisitor visitor = new FindNodeVisitor(null, expr.getTextOffset() + 1, expr.getTextOffset() + 2);

@@ -9,9 +9,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -48,7 +45,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
                 String fullPackageName, CompletionData data, Package candidate)
-        extends ImportedModulePackageProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData,Module>
+        extends ImportedModulePackageProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData>
         (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate, data)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
 

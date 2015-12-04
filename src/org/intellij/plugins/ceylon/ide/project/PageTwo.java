@@ -16,9 +16,9 @@ import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
 import com.redhat.ceylon.ide.common.configuration.CeylonRepositoryConfigurator;
-import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -106,7 +106,7 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     }
 
     @Override
-    public void apply(CeylonProject<Module> config) {
+    public void apply(IdeaCeylonProject config) {
         config.getIdeConfiguration().setSystemRepository(ceylon.language.String.instance(systemRepository.getText()));
         config.getConfiguration().setOutputRepo(outputDirectory.getText());
         config.getConfiguration().setProjectFlatClasspath(Boolean.instance(flatClasspath.isSelected()));
@@ -115,7 +115,7 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     }
 
     @Override
-    public boolean isModified(CeylonProject<Module> config) {
+    public boolean isModified(IdeaCeylonProject config) {
         ceylon.language.String systemRepo = config.getIdeConfiguration().getSystemRepository();
         return !StringUtils.equals(systemRepo == null ? null : systemRepo.toString(), systemRepository.getText())
                 || !StringUtils.equals(config.getConfiguration().getOutputRepo(), outputDirectory.getText())
@@ -126,7 +126,7 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     }
 
     @Override
-    public void load(CeylonProject<Module> config) {
+    public void load(IdeaCeylonProject config) {
         module = config.getIdeArtifact();
         ceylon.language.String systemRepository = config.getIdeConfiguration().getSystemRepository();
         this.systemRepository.setText(systemRepository == null ? null : systemRepository.toString());

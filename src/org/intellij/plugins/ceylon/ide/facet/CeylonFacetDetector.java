@@ -13,6 +13,7 @@ import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,7 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
     @Override
     public void setupFacet(@NotNull CeylonFacet facet, ModifiableRootModel model) {
         IdeaCeylonProjects ceylonModel = facet.getModule().getProject().getComponent(IdeaCeylonProjects.class);
-        CeylonProject<Module> project = ceylonModel.getProject(facet.getModule());
+        IdeaCeylonProject project = (IdeaCeylonProject) ceylonModel.getProject(facet.getModule());
         String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
         project.getIdeConfiguration().setCompileToJs(ceylon.language.Boolean.instance(!defaultVm.equals("js")));
         project.getIdeConfiguration().setCompileToJvm(ceylon.language.Boolean.instance(!defaultVm.equals("jvm")));

@@ -65,14 +65,18 @@ shared interface AbstractIntention
     
     shared actual Indents<Document> indents => ideaIndents;
     
-    shared actual TextRange newRegion(Integer start, Integer length) => TextRange.from(start, length);
+    shared actual TextRange newRegion(Integer start, Integer length)
+            => TextRange.from(start, length);
     
-    shared actual TextChange newTextChange(String desc, PhasedUnit|CeylonFile|Document unitOrFile) {
+    shared actual TextChange newTextChange(String desc,
+        PhasedUnit|CeylonFile|Document unitOrFile) {
+        
         if (is Document unitOrFile) {
             return TextChange(unitOrFile);
         } else {
             VirtualFile? vfile = if (is PhasedUnit unitOrFile) 
-                          then VirtualFileManager.instance.findFileByUrl("file://" + unitOrFile.unit.fullPath)
+                          then VirtualFileManager.instance
+                            .findFileByUrl("file://" + unitOrFile.unit.fullPath)
                           else unitOrFile.virtualFile;
     
             assert (exists vfile);
@@ -81,16 +85,19 @@ shared interface AbstractIntention
         }
     }
     
-    shared actual IdeCompletionManager<out Anything,out Anything,LookupElement,Document> completionManager
-            => ideaCompletionManager;
+    shared actual IdeCompletionManager<out Anything,LookupElement,Document>
+            completionManager => ideaCompletionManager;
     
-    shared actual ImportProposals<out Anything,out Anything,Document,InsertEdit,TextEdit,TextChange> importProposals
+    shared actual ImportProposals<out Anything,out Anything,Document,InsertEdit,
+        TextEdit,TextChange> importProposals
             => ideaImportProposals;
 
     
     shared actual PhasedUnit? getPhasedUnit(Unit? u, IdeaQuickFixData data) {
         if (exists u,
-            exists tc = data.project.getComponent(javaClass<ITypeCheckerProvider>()).typeChecker) {
+            exists tc = data.project
+                    .getComponent(javaClass<ITypeCheckerProvider>())
+                    .typeChecker) {
             
             tc.phasedUnits.getPhasedUnitFromRelativePath(u.relativePath);
         }

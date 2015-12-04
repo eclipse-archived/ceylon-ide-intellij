@@ -1,21 +1,12 @@
-import com.redhat.ceylon.ide.common.completion {
-    ModuleProposal
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
+import com.intellij.codeInsight.completion {
+    InsertHandler,
+    InsertionContext
 }
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
 import com.intellij.openapi.editor {
     Document
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    InsertEdit,
-    TextEdit,
-    TextChange,
-    IdeaDocumentChanges,
-    ideaImportProposals
 }
 import com.intellij.openapi.util {
     TextRange
@@ -27,25 +18,32 @@ import com.redhat.ceylon.cmr.api {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
+import com.redhat.ceylon.ide.common.completion {
+    ModuleProposal
+}
 import com.redhat.ceylon.ide.common.correct {
     ImportProposals
 }
-import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
+    InsertEdit,
+    TextEdit,
+    TextChange,
+    IdeaDocumentChanges,
+    ideaImportProposals
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
-}
-import com.intellij.openapi.\imodule {
-    Module
 }
 
 class IdeaModuleCompletionProposal(Integer offset, String prefix,
         Integer len, String versioned, ModuleSearchResult.ModuleDetails mod,
         Boolean withBody, ModuleVersionDetails version, 
         String name, Node node, CompletionData data) 
-        extends ModuleProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData,Module>
+        extends ModuleProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData>
         (offset, prefix, len, versioned, mod, withBody, version, name, node, data)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
    

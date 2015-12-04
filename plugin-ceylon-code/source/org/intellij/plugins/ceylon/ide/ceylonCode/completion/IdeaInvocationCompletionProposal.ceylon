@@ -14,9 +14,6 @@ import com.intellij.openapi.command {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -56,7 +53,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
     Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
     Boolean inherited, Boolean qualified, Declaration? qualifyingValue, CompletionData data)
-        extends InvocationCompletionProposal<CompletionData,Module,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
+        extends InvocationCompletionProposal<CompletionData,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
     positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue, ideaCompletionManager)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
     
