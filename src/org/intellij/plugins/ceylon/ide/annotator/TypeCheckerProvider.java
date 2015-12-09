@@ -11,6 +11,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
@@ -133,7 +134,14 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         }
         ceylonModel.addProject(module);
 
-        typecheck();
+        StartupManager.getInstance(module.getProject()).runWhenProjectIsInitialized(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        typecheck();
+                    }
+                }
+        );
     }
 
     public TypeChecker createTypeChecker() {
