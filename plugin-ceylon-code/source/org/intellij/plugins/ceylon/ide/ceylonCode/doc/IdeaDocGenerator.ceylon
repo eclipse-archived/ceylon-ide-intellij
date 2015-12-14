@@ -217,7 +217,8 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
         return "<a href=\"``psiProtocol````protocol``:``href``\">``text``</a>";
     }
 
-    shared actual object printer extends TypePrinter(true, true, false, true, false) {
+    class MyPrinter(Boolean abbreviate)
+            extends TypePrinter(abbreviate, true, false, true, false) {
         
         shared actual String getSimpleDeclarationName(Declaration? declaration, Unit unit) {
             if (exists declaration) {
@@ -225,7 +226,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
                 if (!exists n = name, is Constructor declaration) {
                     name = "new";
                 }
-    
+                
                 if (exists n = name) {
                     value col = if (n.first?.lowercase else false) then Colors.identifiers else Colors.types;
                     return buildLink(declaration, color(name, col));
@@ -239,6 +240,9 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
         shared actual String lt() => "&lt;";
         shared actual String gt() => "&gt";
     }
+
+    shared actual TypePrinter printer = MyPrinter(true);
+    shared actual TypePrinter verbosePrinter => MyPrinter(false);
 
     shared actual Boolean showMembers => false;
     
