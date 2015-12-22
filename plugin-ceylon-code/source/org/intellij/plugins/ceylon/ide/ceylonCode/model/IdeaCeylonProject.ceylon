@@ -48,6 +48,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared actual Module ideArtifact;
     shared actual IdeaCeylonProjects model;
+    shared actual String name => ideArtifact.name;
 
     shared Module ideaModule => ideArtifact;
 

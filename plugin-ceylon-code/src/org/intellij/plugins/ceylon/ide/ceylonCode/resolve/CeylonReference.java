@@ -14,6 +14,7 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.model.CeylonUnit;
 import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
@@ -89,18 +90,18 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
     @Nullable
     public static CeylonCompositeElement resolveDeclaration(Referenceable declaration, TypeChecker tc, Project project) {
-        PhasedUnit pu = tc.getPhasedUnitFromRelativePath(declaration.getUnit().getRelativePath());
-        Tree.CompilationUnit compilationUnit = pu.getCompilationUnit();
-
-        FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
-        compilationUnit.visit(visitor);
-        Tree.StatementOrArgument declarationNode = visitor.getDeclarationNode();
+        Node declarationNode = nodes_.get_().getReferencedNode(declaration);
+//        Tree.CompilationUnit compilationUnit = ((CeylonUnit) declaration.getUnit()).getCompilationUnit();
+//
+//        FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
+//        compilationUnit.visit(visitor);
+//        Tree.StatementOrArgument declarationNode = visitor.getDeclarationNode();
 
         if (declarationNode != null) {
             FindMatchingPsiNodeVisitor psiVisitor = new FindMatchingPsiNodeVisitor(declarationNode, CeylonPsi.StatementOrArgumentPsi.class);
             PsiFile declaringFile = CeylonTreeUtil.getDeclaringFile(declaration.getUnit(), project);
             if (declaringFile instanceof CeylonFile) {
-                declaringFile.putUserData(IdeaCeylonParser.FORCED_CU_KEY, compilationUnit);
+                //declaringFile.putUserData(IdeaCeylonParser.FORCED_CU_KEY, compilationUnit);
             }
             psiVisitor.visitFile(declaringFile);
             return psiVisitor.getPsi();

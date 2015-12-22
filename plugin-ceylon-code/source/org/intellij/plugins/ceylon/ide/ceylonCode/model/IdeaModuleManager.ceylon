@@ -20,9 +20,11 @@ import com.intellij.openapi.vfs {
 import com.intellij.psi {
     JavaPsiFacade
 }
+import com.redhat.ceylon.cmr.api {
+    RepositoryManager
+}
 import com.redhat.ceylon.ide.common.model {
     IdeModuleManager,
-    IdeModelLoader,
     BaseIdeModuleManager,
     BaseIdeModuleSourceMapper,
     BaseIdeModule,
@@ -36,10 +38,14 @@ import com.redhat.ceylon.model.typechecker.model {
     CeylonModule=Module
 }
 
-shared class IdeaModuleManager(IdeaCeylonProject ceylonProject)
-        extends IdeModuleManager<IJModule,VirtualFile,VirtualFile,VirtualFile>(ceylonProject) {
+shared class IdeaModuleManager(
+    shared RepositoryManager repositoryManager,
+    IdeaCeylonProject ceylonProject
+)
+        extends IdeModuleManager<IJModule,VirtualFile,VirtualFile,VirtualFile>
+        (ceylonProject) {
     
-    shared actual IdeModelLoader newModelLoader(BaseIdeModuleManager self,
+    shared actual IdeaModelLoader newModelLoader(BaseIdeModuleManager self,
         BaseIdeModuleSourceMapper sourceMapper, Modules modules) {
         
         assert (is IdeaModuleSourceMapper sourceMapper);

@@ -7,4 +7,5 @@ module org.intellij.plugins.ceylon.ide.ceylonCode "1.2.0" {
     shared import com.intellij.openapi "current";
     import com.github.rjeschke.txtmark "0.13";
     shared import java.desktop "7";
+    import java.compiler "7";
 }

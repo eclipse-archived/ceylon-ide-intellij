@@ -7,6 +7,9 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
 import com.redhat.ceylon.compiler.typechecker.io.impl.Helper;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
+import com.redhat.ceylon.ide.common.model.BaseIdeModule;
+import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
@@ -62,6 +65,11 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
                 typeChecker.getPhasedUnits().getModuleSourceMapper(),
                 typeChecker.getContext(),
                 ceylonFile.getTokens());
+
+        BaseIdeModelLoader loader = ((BaseIdeModuleManager) typeChecker.getPhasedUnits()
+                .getModuleManager()).getModelLoader();
+
+        loader.loadPackageDescriptors();
 
         phasedUnit.validateTree();
         phasedUnit.visitSrcModulePhase();

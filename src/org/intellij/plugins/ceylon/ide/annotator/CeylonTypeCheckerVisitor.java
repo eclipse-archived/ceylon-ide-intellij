@@ -115,6 +115,7 @@ class CeylonTypeCheckerVisitor extends Visitor {
     }
 
     private void addQuickFixes(Node that, Message error, Annotation annotation) {
+        if (true) return;
         CeylonFile file = (CeylonFile) annotationHolder.getCurrentAnnotationSession().getFile();
         Module module = ModuleUtil.findModuleForFile(file.getVirtualFile(), file.getProject());
         TypeChecker tc = TypeCheckerProvider.getFor(file);

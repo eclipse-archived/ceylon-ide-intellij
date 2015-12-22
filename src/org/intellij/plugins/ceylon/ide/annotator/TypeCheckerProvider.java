@@ -15,8 +15,6 @@ import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
-import com.redhat.ceylon.common.Backend;
-import com.redhat.ceylon.common.Backends;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleSourceMapper;
@@ -24,15 +22,15 @@ import com.redhat.ceylon.compiler.typechecker.context.Context;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
 import com.redhat.ceylon.compiler.typechecker.util.ModuleManagerFactory;
+import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
 import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
-import com.redhat.ceylon.model.loader.model.LazyModule;
-import com.redhat.ceylon.model.typechecker.model.ModuleImport;
-import com.redhat.ceylon.model.typechecker.model.Package;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModuleManager;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModuleSourceMapper;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
@@ -40,9 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
 
@@ -145,10 +141,10 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     }
 
     public TypeChecker createTypeChecker() {
-        IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
+        final IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
         CeylonProjectConfig ceylonConfig = ceylonProject.getConfiguration();
 
-        TypeCheckerBuilder builder = new TypeCheckerBuilder()
+        TypeCheckerBuilder builder = new TypeCheckerBuilder(ceylonModel.getVfs())
                 .verbose(false)
                 .usageWarnings(true);
 
@@ -163,7 +159,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
         LOGGER.info("Using Ceylon system repository in " + systemRepo);
 
-        RepositoryManager repositoryManager = repoManager()
+        final RepositoryManager repositoryManager = repoManager()
                 .offline(offline)
                 .cwd(cwd)
                 .systemRepo(systemRepo)
@@ -177,83 +173,84 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             @Override
             public ModuleManager createModuleManager(final Context context) {
                 // FIXME use a real LazyModuleManager to remove this hack
-                return new ModuleManager() {
-                    @Override
-                    public Backends getSupportedBackends() {
-                        return Backend.Java.asSet();
-                    }
-
-                    @Override
-                    public void addImplicitImports() {
-                        com.redhat.ceylon.model.typechecker.model.Module languageModule = getModules().getLanguageModule();
-                        for (com.redhat.ceylon.model.typechecker.model.Module m : getModules().getListOfModules()) {
-                            // Java modules don't depend on ceylon.language
-                            if ((!(m instanceof LazyModule) || !m.isJava()) && !m.equals(languageModule)) {
-                                // add ceylon.language if required
-                                ModuleImport moduleImport = findImport(m, languageModule);
-                                if (moduleImport == null) {
-                                    moduleImport = new ModuleImport(languageModule, false, true);
-                                    m.addImport(moduleImport);
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    protected com.redhat.ceylon.model.typechecker.model.Module createModule(List<String> moduleName, String version) {
-                        com.redhat.ceylon.model.typechecker.model.Module module = new com.redhat.ceylon.model.typechecker.model.Module() {
-                            @Override
-                            public Package getPackage(String name) {
-                                if ("default".equals(name)) {
-                                    name = "";
-                                }
-                                Package p = getDirectPackage(name);
-                                if (p != null) {
-                                    return p;
-                                }
-                                // then try in dependencies
-                                Set<com.redhat.ceylon.model.typechecker.model.Module> visited = new HashSet<com.redhat.ceylon.model.typechecker.model.Module>();
-                                for (ModuleImport dependency : getImports()) {
-                                    // we don't have to worry about the default module here since we can't depend on it
-                                    Package pkg = findPackageInImport(name, dependency, visited);
-                                    if (pkg != null)
-                                        return pkg;
-                                }
-                                return null;
-                            }
-
-                            private Package findPackageInImport(String name, ModuleImport dependency, Set<com.redhat.ceylon.model.typechecker.model.Module> visited) {
-                                com.redhat.ceylon.model.typechecker.model.Module module = dependency.getModule();
-                                // only visit modules once
-                                if (!visited.add(module))
-                                    return null;
-
-                                // this is the equivalent of getDirectPackage, it does not recurse
-                                Package pkg = module.getDirectPackage(name);
-                                if (pkg != null)
-                                    return pkg;
-                                // not found, try in its exported dependencies
-                                for (ModuleImport dep : module.getImports()) {
-                                    if (!dep.isExport())
-                                        continue;
-                                    pkg = findPackageInImport(name, dep, visited);
-                                    if (pkg != null)
-                                        return pkg;
-                                }
-                                // not found
-                                return null;
-                            }
-                        };
-                        module.setName(moduleName);
-                        module.setVersion(version);
-                        return module;
-                    }
-                };
+//                return new ModuleManager() {
+//                    @Override
+//                    public Backends getSupportedBackends() {
+//                        return Backend.Java.asSet();
+//                    }
+//
+//                    @Override
+//                    public void addImplicitImports() {
+//                        com.redhat.ceylon.model.typechecker.model.Module languageModule = getModules().getLanguageModule();
+//                        for (com.redhat.ceylon.model.typechecker.model.Module m : getModules().getListOfModules()) {
+//                            // Java modules don't depend on ceylon.language
+//                            if ((!(m instanceof LazyModule) || !m.isJava()) && !m.equals(languageModule)) {
+//                                // add ceylon.language if required
+//                                ModuleImport moduleImport = findImport(m, languageModule);
+//                                if (moduleImport == null) {
+//                                    moduleImport = new ModuleImport(languageModule, false, true);
+//                                    m.addImport(moduleImport);
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    protected com.redhat.ceylon.model.typechecker.model.Module createModule(List<String> moduleName, String version) {
+//                        com.redhat.ceylon.model.typechecker.model.Module module = new com.redhat.ceylon.model.typechecker.model.Module() {
+//                            @Override
+//                            public Package getPackage(String name) {
+//                                if ("default".equals(name)) {
+//                                    name = "";
+//                                }
+//                                Package p = getDirectPackage(name);
+//                                if (p != null) {
+//                                    return p;
+//                                }
+//                                // then try in dependencies
+//                                Set<com.redhat.ceylon.model.typechecker.model.Module> visited = new HashSet<com.redhat.ceylon.model.typechecker.model.Module>();
+//                                for (ModuleImport dependency : getImports()) {
+//                                    // we don't have to worry about the default module here since we can't depend on it
+//                                    Package pkg = findPackageInImport(name, dependency, visited);
+//                                    if (pkg != null)
+//                                        return pkg;
+//                                }
+//                                return null;
+//                            }
+//
+//                            private Package findPackageInImport(String name, ModuleImport dependency, Set<com.redhat.ceylon.model.typechecker.model.Module> visited) {
+//                                com.redhat.ceylon.model.typechecker.model.Module module = dependency.getModule();
+//                                // only visit modules once
+//                                if (!visited.add(module))
+//                                    return null;
+//
+//                                // this is the equivalent of getDirectPackage, it does not recurse
+//                                Package pkg = module.getDirectPackage(name);
+//                                if (pkg != null)
+//                                    return pkg;
+//                                // not found, try in its exported dependencies
+//                                for (ModuleImport dep : module.getImports()) {
+//                                    if (!dep.isExport())
+//                                        continue;
+//                                    pkg = findPackageInImport(name, dep, visited);
+//                                    if (pkg != null)
+//                                        return pkg;
+//                                }
+//                                // not found
+//                                return null;
+//                            }
+//                        };
+//                        module.setName(moduleName);
+//                        module.setVersion(version);
+//                        return module;
+//                    }
+//                };
+                return new IdeaModuleManager(repositoryManager, ceylonProject);
             }
 
             @Override
             public ModuleSourceMapper createModuleManagerUtil(Context context, ModuleManager moduleManager) {
-                return new ModuleSourceMapper(context, moduleManager);
+                return new IdeaModuleSourceMapper(context, (IdeaModuleManager) moduleManager);
             }
         });
 
@@ -264,6 +261,10 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         long startTime = System.currentTimeMillis();
         TypeChecker checker = builder.getTypeChecker();
         LOGGER.info("Got type checker in " + (System.currentTimeMillis() - startTime) + "ms");
+
+        BaseIdeModuleManager mm = (BaseIdeModuleManager) checker.getPhasedUnits().getModuleManager();
+        mm.setTypeChecker(checker);
+        mm.getModuleSourceMapper().setTypeChecker(checker);
 
         startTime = System.currentTimeMillis();
         checker.process();

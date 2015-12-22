@@ -17,10 +17,9 @@ import com.redhat.ceylon.ide.common.util {
 }
 
 shared class IdeaModuleSourceMapper(
-    Context context,
-    IdeaModuleManager moduleManager
-) extends IdeModuleSourceMapper
-<Module,VirtualFile,VirtualFile,VirtualFile>(context, moduleManager) {
+    Context context, IdeaModuleManager moduleManager)
+        extends IdeModuleSourceMapper
+        <Module,VirtualFile,VirtualFile,VirtualFile>(context, moduleManager) {
     
     shared actual String defaultCharset
             => moduleManager.ceylonProject?.defaultCharset else "UTF-8";

@@ -11,6 +11,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.model.CeylonUnit;
 import com.redhat.ceylon.model.typechecker.model.Unit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.Nullable;
@@ -63,10 +64,14 @@ public class CeylonTreeUtil {
 
     @Nullable
     public static PsiFile getDeclaringFile(Unit unit, Project project) {
-        String protocol = unit.getFullPath().contains("!/") ? "jar://" : "file://";
-        VirtualFile vfile = VirtualFileManager.getInstance().findFileByUrl(protocol + unit.getFullPath());
-        if (vfile != null) {
-            return PsiManager.getInstance(project).findFile(vfile);
+        if (unit instanceof CeylonUnit) {
+            CeylonUnit ceylonUnit = (CeylonUnit) unit;
+            String path = ceylonUnit.getSourceFullPath().toString();
+            String protocol = path.contains("!/") ? "jar://" : "file://";
+            VirtualFile vfile = VirtualFileManager.getInstance().findFileByUrl(protocol + path);
+            if (vfile != null) {
+                return PsiManager.getInstance(project).findFile(vfile);
+            }
         }
 
         return null;

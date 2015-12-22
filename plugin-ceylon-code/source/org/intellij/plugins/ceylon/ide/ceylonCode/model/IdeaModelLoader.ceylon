@@ -1,5 +1,16 @@
+import com.intellij.openapi.\imodule {
+    IJModule=Module
+}
+import com.intellij.openapi.vfs {
+    VirtualFile
+}
+import com.intellij.psi {
+    JavaPsiFacade,
+    PsiClass
+}
 import com.redhat.ceylon.ide.common.model {
-    IdeModelLoader
+    IdeModelLoader,
+    BaseIdeModule
 }
 import com.redhat.ceylon.model.cmr {
     ArtifactResult
@@ -9,49 +20,86 @@ import com.redhat.ceylon.model.loader.mirror {
     MethodMirror
 }
 import com.redhat.ceylon.model.loader.model {
-    LazyFunction,
-    AnnotationProxyClass,
-    AnnotationProxyMethod
+    LazyPackage
 }
 import com.redhat.ceylon.model.typechecker.model {
     Module,
-    Parameter,
-    UnknownType,
-    Modules
+    Modules,
+    Unit
 }
 
-import java.util {
-    List
-}
-
-// TODO wait for IdeModelLoader to be finished
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     IdeaModuleSourceMapper ideaModuleSourceMapper, Modules modules)
-        extends IdeModelLoader() {
+        extends IdeModelLoader<IJModule,VirtualFile,VirtualFile,VirtualFile,PsiClass>
+        (ideaModuleManager, ideaModuleSourceMapper, modules) {
+
+    // TODO
+    shared actual void addModuleToClasspathInternal(
+        ArtifactResult? artifactResult) {}
     
-    shared actual void addJDKModuleToClassPath(Module jdkModule) {}
+    shared actual Boolean isOverloadingMethod(MethodMirror method) {
+        assert(is PSIMethod method);
+        return method.isOverloading;
+    }
     
-    shared actual void addModuleToClassPath(Module? \imodule, ArtifactResult? artifactResult) {}
+    shared actual Boolean isOverridingMethod(MethodMirror method) {
+        assert(is PSIMethod method);
+        return method.isOverriding;
+    }
     
-    shared actual Module findModuleForClassMirror(ClassMirror? classMirror) => nothing;
+    // TODO
+    shared actual Boolean loadPackage(Module? mod, String? name,
+        Boolean boolean) => true;
+
+    // TODO
+    shared actual Boolean moduleContainsClass(BaseIdeModule ideModule,
+        String packageName, String className) {
+        
+        assert(is IdeaModule ideModule);
+        if (exists cp = ideModule.ceylonProject) {
+            value p = cp.ideArtifact;
+            value name = packageName + "." + className;
+            value scope = p.getModuleScope(true);
+            
+            return JavaPsiFacade.getInstance(p.project).findClass(name, scope)
+                exists;
+        }
+        
+        return false;
+    }
     
-    shared actual Boolean isOverloadingMethod(MethodMirror? methodMirror) => nothing;
+    shared actual ClassMirror? buildClassMirrorInternal(String name) {
+        return doWithLock(() {
+            if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) { 
+                value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
+                value facade = JavaPsiFacade.getInstance(m.project);
+                
+                if (exists psi = facade.findClass(name, scope)) {
+                    return PSIClass(psi);
+                }
+            }
+            return null;
+        });
+    }
     
-    shared actual Boolean isOverridingMethod(MethodMirror? methodMirror) => nothing;
+    shared actual PsiClass getJavaClassRoot(ClassMirror classMirror) {
+        assert(is PSIClass classMirror);
+        return classMirror.psi;
+    }
     
-    shared actual Boolean loadPackage(Module? \imodule, String? string, Boolean boolean) => nothing;
+    shared actual Unit newCeylonBinaryUnit(PsiClass cls,
+        String relativePath, String fileName, String fullPath, LazyPackage pkg)
+        => IdeaCeylonBinaryUnit(cls, fileName, relativePath, fullPath, pkg);
     
-    shared actual void logError(String? string) {}
+    shared actual Unit newCrossProjectBinaryUnit(PsiClass cls,
+        String relativePath, String fileName, String fullPath, LazyPackage pkg)
+            => IdeaCrossProjectBinaryUnit(cls, fileName, relativePath, fullPath, pkg);
     
-    shared actual void logVerbose(String? string) {}
+    shared actual Unit newJavaClassFile(PsiClass cls, String relativePath,
+        String fileName, String fullPath, LazyPackage pkg)
+            => IdeaJavaClassFile(cls, fileName, relativePath, fullPath, pkg);
     
-    shared actual void logWarning(String? string) {}
-    
-    shared actual ClassMirror lookupNewClassMirror(Module? \imodule, String? string) => nothing;
-    
-    shared actual void makeInteropAnnotationConstructorInvocation(AnnotationProxyMethod? annotationProxyMethod, AnnotationProxyClass? annotationProxyClass, List<Parameter>? list) {}
-    
-    shared actual UnknownType.ErrorReporter makeModelErrorReporter(Module? \imodule, String? string) => nothing;
-    
-    shared actual void setAnnotationConstructor(LazyFunction? lazyFunction, MethodMirror? methodMirror) {}    
+    shared actual Unit newJavaCompilationUnit(PsiClass cls,
+        String relativePath, String fileName, String fullPath, LazyPackage pkg)
+            => IdeaJavaCompilationUnit(cls, fileName, relativePath, fullPath, pkg);
 }
