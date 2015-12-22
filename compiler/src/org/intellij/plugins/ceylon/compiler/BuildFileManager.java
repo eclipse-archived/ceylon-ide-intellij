@@ -1,12 +1,12 @@
 package org.intellij.plugins.ceylon.compiler;
 
 import com.redhat.ceylon.compiler.java.tools.CeyloncFileManager;
-import com.sun.tools.javac.file.RelativePath;
-import com.sun.tools.javac.util.Context;
+import com.redhat.ceylon.langtools.tools.javac.file.RelativePath;
+import com.redhat.ceylon.langtools.tools.javac.util.Context;
 import org.jetbrains.jps.incremental.CompileContext;
 
-import javax.tools.FileObject;
-import javax.tools.JavaFileObject;
+import com.redhat.ceylon.javax.tools.FileObject;
+import com.redhat.ceylon.javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.nio.charset.Charset;
 

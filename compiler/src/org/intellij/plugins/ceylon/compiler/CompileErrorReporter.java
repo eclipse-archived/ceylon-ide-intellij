@@ -6,9 +6,9 @@ import org.jetbrains.jps.incremental.Utils;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticListener;
-import javax.tools.JavaFileObject;
+import com.redhat.ceylon.javax.tools.Diagnostic;
+import com.redhat.ceylon.javax.tools.DiagnosticListener;
+import com.redhat.ceylon.javax.tools.JavaFileObject;
 import java.io.File;
 
 /**

@@ -7,8 +7,8 @@ import com.redhat.ceylon.compiler.java.launcher.Main;
 import com.redhat.ceylon.compiler.java.tools.CeylonLog;
 import com.redhat.ceylon.compiler.java.tools.CeyloncTaskImpl;
 import com.redhat.ceylon.compiler.java.tools.CeyloncTool;
-import com.sun.source.util.TaskEvent;
-import com.sun.source.util.TaskListener;
+import com.redhat.ceylon.langtools.source.util.TaskEvent;
+import com.redhat.ceylon.langtools.source.util.TaskListener;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.messages.ProgressMessage;
@@ -16,14 +16,15 @@ import org.jetbrains.jps.javac.PlainMessageDiagnostic;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
 
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticListener;
-import javax.tools.JavaFileObject;
+import com.redhat.ceylon.javax.tools.Diagnostic;
+import com.redhat.ceylon.javax.tools.DiagnosticListener;
+import com.redhat.ceylon.javax.tools.JavaFileObject;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * TODO
@@ -45,8 +46,8 @@ public class CeylonCompiler {
 
         CompileErrorReporter errorReporter = new CompileErrorReporter(ctx);
 
-        final com.sun.tools.javac.util.Context context = new com.sun.tools.javac.util.Context();
-        context.put(com.sun.tools.javac.util.Log.outKey, printWriter);
+        final com.redhat.ceylon.langtools.tools.javac.util.Context context = new com.redhat.ceylon.langtools.tools.javac.util.Context();
+        context.put(com.redhat.ceylon.langtools.tools.javac.util.Log.outKey, printWriter);
         context.put(DiagnosticListener.class, errorReporter);
         CeylonLog.preRegister(context);
 
@@ -83,7 +84,52 @@ public class CeylonCompiler {
         }
         if (!success) {
             final Main.ExitState exitState = task.getExitState();
-            errorReporter.report(new PlainMessageDiagnostic(Diagnostic.Kind.ERROR, exitState.abortingException == null ? "Unknown error" : exitState.abortingException.toString()));
+            errorReporter.report(new Diagnostic<JavaFileObject>() {
+                @Override
+                public Kind getKind() {
+                    return Kind.ERROR;
+                }
+
+                @Override
+                public JavaFileObject getSource() {
+                    return null;
+                }
+
+                @Override
+                public long getPosition() {
+                    return 0;
+                }
+
+                @Override
+                public long getStartPosition() {
+                    return 0;
+                }
+
+                @Override
+                public long getEndPosition() {
+                    return 0;
+                }
+
+                @Override
+                public long getLineNumber() {
+                    return 0;
+                }
+
+                @Override
+                public long getColumnNumber() {
+                    return 0;
+                }
+
+                @Override
+                public String getCode() {
+                    return null;
+                }
+
+                @Override
+                public String getMessage(Locale locale) {
+                    return exitState.abortingException == null ? "Unknown error" : exitState.abortingException.toString();
+                }
+            });
             errorReporter.failed();
         }
     }
