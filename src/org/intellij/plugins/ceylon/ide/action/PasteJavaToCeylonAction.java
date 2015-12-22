@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.action;
 import ceylon.tool.converter.java2ceylon.Java8Lexer;
 import ceylon.tool.converter.java2ceylon.Java8Parser;
 import ceylon.tool.converter.java2ceylon.JavaToCeylonConverter;
+import ceylon.tool.converter.java2ceylon.ScopeTree;
 import com.intellij.ide.PasteProvider;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.Result;
@@ -74,11 +75,15 @@ public class PasteJavaToCeylonAction extends AnAction {
 
         StringWriter out = new StringWriter();
 
+        ScopeTree scopeTree = new ScopeTree();
+        tree.accept(scopeTree);
+
         JavaToCeylonConverter converter = new JavaToCeylonConverter(out,
                 ideConfig.getConverterConfig().getTransformGetters(),
                 ideConfig.getConverterConfig().getUseVariableInParameters(),
                 ideConfig.getConverterConfig().getUseVariableInLocals(),
-                ideConfig.getConverterConfig().getUseValues());
+                ideConfig.getConverterConfig().getUseValues(),
+                scopeTree);
 
         tree.accept(converter);
 
