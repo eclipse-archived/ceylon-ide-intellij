@@ -50,6 +50,9 @@ shared class IdeaCeylonProject(ideArtifact, model)
     shared actual IdeaCeylonProjects model;
     shared actual String name => ideArtifact.name;
 
+    // TODO
+    shared actual ModuleDependencies moduleDependencies = ModuleDependencies();
+
     shared Module ideaModule => ideArtifact;
 
     VirtualFile getDefaultRoot() {
@@ -152,9 +155,6 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared actual Boolean compileToJs
             => ideConfiguration.compileToJs else false;
-    
-    // TODO
-    shared actual ModuleDependencies moduleDependencies => nothing;
     
     // TODO check if the module is open?
     shared actual Boolean nativeProjectIsAccessible => true;

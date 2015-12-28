@@ -29,8 +29,7 @@ import java.lang {
     JShort=Short
 }
 
-class PSIAnnotation(shared PsiAnnotation psi)
-    satisfies AnnotationMirror {
+class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
 
     value values = HashMap<String, Object>();
 
@@ -46,7 +45,7 @@ class PSIAnnotation(shared PsiAnnotation psi)
         } else if (is PsiReferenceExpression v) {
             return javaString(v.referenceName);
         } else if (is PsiClassObjectAccessExpression v) {
-            return PSIType(v.type);
+            return PSIType(v.operand.type);
         } else if (is PsiLiteralExpression v) {
             // TODO this is super ultra ugly, but we can't get the type associated
             // to a PsiArrayInitializerMemberValue, and IJ parses shorts as ints :(
@@ -64,7 +63,6 @@ class PSIAnnotation(shared PsiAnnotation psi)
     }
     
     doWithLock(() {
-        // TODO return values according to contract!!
         psi.parameterList.attributes.array.coalesced.each((pair) {
             value name = pair.name else "value";
             value val = convert(pair.\ivalue, name);
@@ -78,7 +76,7 @@ class PSIAnnotation(shared PsiAnnotation psi)
     shared actual Object? \ivalue => getValue("value");
 }
 
-Return doWithLock<Return>(Callable<Return, []> callback) {
+Return doWithLock<Return>(Return() callback) {
     value lock = ApplicationManager.application.acquireReadActionLock();
     try {
         return callback();

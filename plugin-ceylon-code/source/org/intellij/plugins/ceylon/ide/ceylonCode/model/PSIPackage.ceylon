@@ -6,7 +6,7 @@ import com.redhat.ceylon.model.loader.mirror {
     PackageMirror
 }
 
-class PSIPackageMirror(PsiClass psi) 
+class PSIPackage(PsiClass psi) 
     satisfies PackageMirror {
     
     variable String? _name = null;

@@ -5,7 +5,9 @@ import com.intellij.psi {
     PsiWildcardType,
     PsiPrimitiveType,
     PsiMethodReferenceType,
-    PsiClassType
+    PsiClassType,
+    PsiTypeParameter,
+    PsiClass
 }
 import com.intellij.psi.impl.source {
     PsiClassReferenceType
@@ -18,17 +20,25 @@ import com.redhat.ceylon.model.loader.mirror {
 
 import java.util {
     List,
-    Collections
+    Collections,
+    IdentityHashMap,
+    Map
 }
 
 import javax.lang.model.type {
     TypeKind
 }
+import java.lang {
+    ObjectArray
+}
 
-class PSIType(PsiType psi)
+class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
+        = IdentityHashMap<PsiType,PSIType?>(), PSIType? enclosing = null)
         satisfies TypeMirror {
-    
-    shared actual TypeMirror? componentType
+
+   originatingTypes.put(psi, null);
+   
+   shared actual TypeMirror? componentType
             => if (is PsiArrayType psi)
                then PSIType(psi.componentType)
                else null;
@@ -56,6 +66,9 @@ class PSIType(PsiType psi)
         value kind = 
         if (is PsiArrayType psi) then TypeKind.\iARRAY
         else if (is PsiTypeVariable psi) then TypeKind.\iTYPEVAR
+        else if (is PsiClassReferenceType psi,
+                 is PsiTypeParameter tp = doWithLock(() => psi.resolve() of PsiClass?))
+            then TypeKind.\iTYPEVAR 
         else if (is PsiWildcardType psi) then TypeKind.\iWILDCARD
         else if (is PsiClassReferenceType|PsiMethodReferenceType psi)
             then TypeKind.\iDECLARED
@@ -77,27 +90,29 @@ class PSIType(PsiType psi)
     
     shared actual Boolean primitive => psi is PsiPrimitiveType;
     
-    shared actual String qualifiedName => psi.canonicalText;
-    
-    shared actual TypeMirror? qualifyingType {
-        //if (is PsiClassType psi,
-        //    exists cls = psi.resolve(),
-        //    exists encl = getContextOfType(cls, javaClass<PsiClass>())) {
-        //    
-        //    //return PSIType(encl.);
-        //}
-        return null;
-    }
+    shared actual String qualifiedName
+             => let(name = psi.canonicalText)
+                if (exists pos = name.firstOccurrence('<'))
+                then name.spanTo(pos - 1)
+                else name;
+
+    // TODO
+    shared actual TypeMirror? qualifyingType => null; //enclosing;
     
     shared actual Boolean raw =
             if (is PsiClassType psi)
             then doWithLock(() => psi.raw) else false;
     
-    shared actual List<TypeMirror> typeArguments
-            => Collections.emptyList<TypeMirror>(); // TODO
-    
-    shared actual TypeParameterMirror? typeParameter
-            => null; // TODO
+    ObjectArray<PsiType>? getTypeArguments(PsiType type) {
+        return switch(type)
+        case (is PsiClassType) type.parameters
+        else null;
+    }
+
+    shared actual TypeParameterMirror? typeParameter =>
+            if (is PsiTypeParameter psi)
+            then PSITypeParameter(psi)
+            else null;
     
     shared actual TypeMirror? upperBound =
             if (is PsiWildcardType psi,
@@ -106,5 +121,13 @@ class PSIType(PsiType psi)
             then PSIType(upper)
             else null;
 
+    shared actual List<TypeMirror> typeArguments
+            => if (exists types = getTypeArguments(psi))
+               then mirror<TypeMirror,PsiType>(types,
+                    (t) => PSIType(t, originatingTypes, this)
+               )
+               else Collections.emptyList<TypeMirror>();
+
     string => "PSIType[``qualifiedName``]";
+    
 }

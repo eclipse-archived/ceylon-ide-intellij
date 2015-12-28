@@ -1,7 +1,3 @@
-import ceylon.language.meta.declaration {
-    ClassOrInterfaceDeclaration
-}
-
 import com.intellij.psi {
     PsiMethod,
     PsiModifier {
@@ -9,7 +5,6 @@ import com.intellij.psi {
     },
     PsiType,
     PsiAnnotationMethod,
-    PsiNamedElement,
     PsiParameter
 }
 import com.intellij.psi.search.searches {
@@ -20,8 +15,7 @@ import com.redhat.ceylon.model.loader.mirror {
     TypeParameterMirror,
     ClassMirror,
     VariableMirror,
-    TypeMirror,
-    AnnotationMirror
+    TypeMirror
 }
 
 import java.util {
@@ -29,30 +23,35 @@ import java.util {
     ArrayList
 }
 
-class PSIMethod(shared PsiMethod psi) satisfies MethodMirror {
+shared void a() {
+    print(`class Object`.string);
+}
+class PSIMethod(shared PsiMethod psi)
+        extends PSIAnnotatedMirror(psi)
+        satisfies MethodMirror {
     
-    Boolean classIs(ClassOrInterfaceDeclaration cls) {
-        return (psi.containingClass of PsiNamedElement).name
-                == cls.qualifiedName;
+    Boolean classIs(String cls) {
+        return psi.containingClass.qualifiedName == cls;
     }
     
     shared Boolean isOverriding;
     
-    if (classIs(`interface Identifiable`),
+    if (classIs("ceylon.language.Identifiable"),
         ["equals", "hashCode"].contains(psi.name)) {
         
         isOverriding = true;
-    } else if (classIs(`class Object`),
+    } else if (classIs("ceylon.language.Object"),
         ["equals", "hashCode", "toString"].contains(psi.name)) {
         
         isOverriding = false;
     } else {
-        isOverriding = SuperMethodsSearch.search(psi, null, true, false) exists;
+        isOverriding = SuperMethodsSearch.search(psi, null, true, false)
+                .findFirst() exists;
     }
 
     shared Boolean isOverloading;
     
-    if (classIs(`class Exception`)) {
+    if (classIs("ceylon.language.Exception")) {
         isOverloading = false;
     } else {
         value overloads = psi.containingClass.findMethodsByName(psi.name, true);
@@ -78,20 +77,6 @@ class PSIMethod(shared PsiMethod psi) satisfies MethodMirror {
     shared actual ClassMirror enclosingClass => PSIClass(psi.containingClass);
     
     shared actual Boolean final => psi.hasModifierProperty(\iFINAL);
-    
-    shared actual AnnotationMirror? getAnnotation(String name) {
-        value ann = psi.modifierList.annotations.array.coalesced.find(
-            (a) => a.qualifiedName == name
-        ) else psi.modifierList.annotations.array.coalesced.find(
-            // somehow, IJ produces c.l.Annotation.annotation$
-            // but the ML expects c.l.Annotation$annotation$
-            (a) => a.qualifiedName.replaceLast(".", "$") == name
-        ); 
-        
-        return if (exists ann) then PSIAnnotation(ann) else null;
-    }
-    
-    shared actual String name => psi.name;
     
     shared actual List<VariableMirror> parameters
             => mirror<VariableMirror,PsiParameter>

@@ -1,8 +1,27 @@
+import ceylon.interop.java {
+    javaString
+}
+
+import com.intellij.openapi.application {
+    ApplicationManager
+}
 import com.intellij.openapi.\imodule {
     IJModule=Module
 }
+import com.intellij.openapi.roots {
+    ModuleRootManager,
+    OrderRootType
+}
+import com.intellij.openapi.roots.libraries {
+    Library
+}
+import com.intellij.openapi.util {
+    Disposer
+}
 import com.intellij.openapi.vfs {
-    VirtualFile
+    VirtualFile,
+    VirtualFileManager,
+    JarFileSystem
 }
 import com.intellij.psi {
     JavaPsiFacade,
@@ -11,6 +30,9 @@ import com.intellij.psi {
 import com.redhat.ceylon.ide.common.model {
     IdeModelLoader,
     BaseIdeModule
+}
+import com.redhat.ceylon.ide.common.util {
+    synchronize
 }
 import com.redhat.ceylon.model.cmr {
     ArtifactResult
@@ -28,14 +50,54 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit
 }
 
+import java.lang {
+    Runnable
+}
+
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     IdeaModuleSourceMapper ideaModuleSourceMapper, Modules modules)
         extends IdeModelLoader<IJModule,VirtualFile,VirtualFile,VirtualFile,PsiClass>
         (ideaModuleManager, ideaModuleSourceMapper, modules) {
 
-    // TODO
-    shared actual void addModuleToClasspathInternal(
-        ArtifactResult? artifactResult) {}
+    shared actual void addModuleToClasspathInternal(ArtifactResult? artifact) {
+        if (exists artifact,
+            exists vfile = VirtualFileManager.instance.findFileByUrl(
+                VirtualFileManager.constructUrl(JarFileSystem.\iPROTOCOL, 
+                    artifact.artifact().absolutePath) + JarFileSystem.\iJAR_SEPARATOR
+            ),
+            exists mod = ideaModuleManager.ceylonProject?.ideArtifact) {
+            
+            // TODO everytime we add a jar, it's indexed, which is slowing down
+            // the process
+            ApplicationManager.application.invokeLater(object satisfies Runnable {
+                shared actual void run() {
+                    value lock = ApplicationManager.application.acquireWriteActionLock(null);        
+                    
+                    try {
+                        value model = ModuleRootManager.getInstance(mod).modifiableModel;
+                        value lib = model.moduleLibraryTable.getLibraryByName("Ceylon Stuff")
+                        else model.moduleLibraryTable.createLibrary("Ceylon Stuff");
+                        
+                        Library.ModifiableModel libModel = lib.modifiableModel;
+                        
+                        if (libModel.getUrls(OrderRootType.\iCLASSES).array.coalesced
+                            .find((name) => name == vfile.path) exists) {
+                            
+                            Disposer.dispose(libModel);
+                            model.dispose();
+                        } else {
+                            libModel.addRoot(vfile, OrderRootType.\iCLASSES);
+                        
+                            libModel.commit();
+                            model.commit();
+                        } 
+                    } finally {
+                        lock.finish();
+                    }
+                }
+            });
+        }
+    }
     
     shared actual Boolean isOverloadingMethod(MethodMirror method) {
         assert(is PSIMethod method);
@@ -48,8 +110,28 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     }
     
     // TODO
-    shared actual Boolean loadPackage(Module? mod, String? name,
-        Boolean boolean) => true;
+    shared actual Boolean loadPackage(Module? mod, String? packageName, 
+        Boolean loadDeclarations) {
+        
+        if (exists mod,
+            exists packageName,
+            exists key = cacheKeyByModule(mod, packageName)) {
+            
+            return synchronize(lock, () {
+                if(loadDeclarations && !loadedPackages.add(javaString(key))) {
+                    return true;
+                }
+                
+                if (is IdeaModule mod) {
+                    //mod.
+                }
+                
+                return false;
+            });
+        }
+        
+        return false;
+    }
 
     // TODO
     shared actual Boolean moduleContainsClass(BaseIdeModule ideModule,

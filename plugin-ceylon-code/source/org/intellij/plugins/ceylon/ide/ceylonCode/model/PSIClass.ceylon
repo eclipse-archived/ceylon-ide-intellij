@@ -5,8 +5,6 @@ import ceylon.interop.java {
 import com.intellij.psi {
     PsiClass,
     PsiModifier,
-    PsiNamedElement,
-    PsiAnnotation,
     PsiAnonymousClass,
     PsiMethod,
     PsiTypeParameter,
@@ -36,8 +34,7 @@ import com.redhat.ceylon.model.loader.mirror {
     FieldMirror,
     PackageMirror,
     TypeMirror,
-    MethodMirror,
-    AnnotationMirror
+    MethodMirror
 }
 import com.redhat.ceylon.model.typechecker.model {
     Module
@@ -51,8 +48,9 @@ import java.util {
     ArrayList
 }
 
-shared class PSIClass(shared PsiClass psi)
-    satisfies IdeClassMirror {
+class PSIClass(shared PsiClass psi)
+        extends PSIAnnotatedMirror(psi)
+        satisfies IdeClassMirror {
     
     variable String? cacheKey = null;
     
@@ -113,17 +111,7 @@ shared class PSIClass(shared PsiClass psi)
             => psi.hasModifierProperty(PsiModifier.\iFINAL);
     
     shared actual String flatName => psi.qualifiedName else "";
-    
-    shared actual AnnotationMirror? getAnnotation(String name) {
-        PsiAnnotation? ann = psi.modifierList.annotations.array.coalesced.find(
-            (_) => _.qualifiedName == name
-        ) else psi.modifierList.annotations.array.coalesced.find(
-            (_) => _.qualifiedName.replaceLast(".", "$") == name
-        );
-        
-        return if (exists ann) then PSIAnnotation(ann) else null;
-    }
-    
+   
     shared actual String getCacheKey(Module mod) 
             => cacheKey else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
     
@@ -132,7 +120,9 @@ shared class PSIClass(shared PsiClass psi)
     shared actual Boolean \iinterface => psi.\iinterface;
     
     shared actual List<TypeMirror> interfaces
-            => mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType);
+            => if (psi.\iinterface)
+               then mirror<TypeMirror,PsiClassType>(psi.extendsListTypes, PSIType)
+               else mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType);
     
     shared actual Boolean javaSource
             => psi.containingFile.name.endsWith(".java");
@@ -143,9 +133,7 @@ shared class PSIClass(shared PsiClass psi)
             => PsiUtil.isLocalClass(psi)
                || hasAnnotation(Annotations.localContainer);
     
-    shared actual String name => (psi of PsiNamedElement).name;
-    
-    shared actual PackageMirror \ipackage => PSIPackageMirror(psi);
+    shared actual PackageMirror \ipackage => PSIPackage(psi);
      
     shared actual Boolean protected
              => psi.hasModifierProperty(PsiModifier.\iPROTECTED);
