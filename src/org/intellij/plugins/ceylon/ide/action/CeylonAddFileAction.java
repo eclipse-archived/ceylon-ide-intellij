@@ -18,15 +18,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.Properties;
 
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 
 public class CeylonAddFileAction extends CeylonAddingFilesAction {
-
-    public CeylonAddFileAction() {
-        super(ideaIcons_.get_().getFile());
-    }
 
     @Override
     protected void createFiles(final AnActionEvent e, TypeChecker typeChecker, VirtualFile srcRoot,
@@ -69,6 +66,11 @@ public class CeylonAddFileAction extends CeylonAddingFilesAction {
                 }
             });
         }
+    }
+
+    @Override
+    protected Icon getCeylonIcon() {
+        return ideaIcons_.get_().getFile();
     }
 
     @NotNull

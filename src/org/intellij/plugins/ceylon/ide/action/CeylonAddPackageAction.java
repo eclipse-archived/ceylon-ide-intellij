@@ -15,15 +15,13 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.Properties;
 
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageNameIsLegal;
 
 public class CeylonAddPackageAction extends CeylonAddingFilesAction {
-    public CeylonAddPackageAction() {
-        super(ideaIcons_.get_().getPackages());
-    }
 
     @Override
     protected void createFiles(final AnActionEvent e, final TypeChecker typeChecker, final VirtualFile srcRoot, final String eventPackage, final PsiDirectory eventPsiDir) {
@@ -50,6 +48,11 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
                 }
             });
         }
+    }
+
+    @Override
+    protected Icon getCeylonIcon() {
+        return ideaIcons_.get_().getPackages();
     }
 
     private class AddPackageInputValidator implements InputValidatorEx {

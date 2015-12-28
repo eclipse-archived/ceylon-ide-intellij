@@ -3,7 +3,6 @@ package org.intellij.plugins.ceylon.ide.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
@@ -17,10 +16,6 @@ import javax.swing.*;
 import static com.intellij.openapi.module.ModuleUtilCore.findModuleForFile;
 
 public abstract class CeylonAddingFilesAction extends AnAction {
-
-    public CeylonAddingFilesAction(Icon icon) {
-        super(icon);
-    }
 
     protected VirtualFile getSourceRoot(AnActionEvent e, VirtualFile eventDir) {
         return ProjectRootManager.getInstance(e.getProject()).getFileIndex()
@@ -71,5 +66,8 @@ public abstract class CeylonAddingFilesAction extends AnAction {
     public void update(AnActionEvent e) {
         final VirtualFile eventDir = findEventDir(e);
         e.getPresentation().setVisible(eventDir != null && getSourceRoot(e, eventDir) != null);
+        e.getPresentation().setIcon(getCeylonIcon());
     }
+
+    protected abstract Icon getCeylonIcon();
 }

@@ -21,16 +21,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.intellij.plugins.ceylon.ide.wizard.CreateCeylonModuleWizard;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.Properties;
 
 import static com.intellij.ide.fileTemplates.FileTemplateUtil.createFromTemplate;
 
 public class CeylonAddModuleAction extends CeylonAddingFilesAction {
-
-    public CeylonAddModuleAction() {
-        super(ideaIcons_.get_().getModules());
-    }
 
     @Override
     protected void createFiles(final AnActionEvent e, final TypeChecker typeChecker,
@@ -95,6 +92,11 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                 }
             });
         }
+    }
+
+    @Override
+    protected Icon getCeylonIcon() {
+        return ideaIcons_.get_().getModules();
     }
 
     private void parseUnit(final FileSystemVirtualFile virtualFile,
