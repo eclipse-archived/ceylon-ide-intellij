@@ -89,9 +89,16 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
             else null;
     
     shared actual Boolean primitive => psi is PsiPrimitiveType;
+
+    // TODO this is super clunky
+    String typeName =>
+            let(name = psi.canonicalText)
+            if (name.endsWith(".impl") || name.contains(".impl."))
+            then name.replaceLast(".impl", "$impl")
+            else name;
     
     shared actual String qualifiedName
-             => let(name = psi.canonicalText)
+             => let(name = typeName)
                 if (exists pos = name.firstOccurrence('<'))
                 then name.spanTo(pos - 1)
                 else name;
