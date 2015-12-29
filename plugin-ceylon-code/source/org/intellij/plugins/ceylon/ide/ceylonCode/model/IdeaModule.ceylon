@@ -95,38 +95,9 @@ shared class IdeaModule(
 
                 listPackagesInternal(vfile, packageList);
             }
-            
-            
-
-            //ApplicationManager.application.runReadAction(object satisfies Runnable {
-            //    shared actual void run() {
-            //        if (exists rootPack = 
-            //            JavaPsiFacade.getInstance(mod.project).findPackage("")) {
-            //            
-            //            //value scope = mod.getModuleScope(true);
-            //            value subPacks = rootPack.getSubPackages(scope);
-            //            
-            //            for (pack in subPacks.array.coalesced) {
-            //                packageList.add(pack.qualifiedName);
-            //                listPackagesInternal(pack, packageList, scope);
-            //            }
-            //        } else {
-            //            platformUtils.log(Status._WARNING,
-            //                "No root package in module " + mod.name);
-            //        }
-            //    }
-            //});
-        }
+         }
     }
     
-    //void listPackagesInternal(PsiPackage pack, MutableSet<String> packageList,
-    //    GlobalSearchScope scope) {
-    //    
-    //    for (child in pack.getSubPackages(scope).array.coalesced) {
-    //        packageList.add(child.qualifiedName);
-    //        listPackagesInternal(child, packageList, scope);
-    //    }
-    //}
     void listPackagesInternal(VirtualFile vfile, MutableSet<String> packageList,
         String parentPackage = "") {
         
