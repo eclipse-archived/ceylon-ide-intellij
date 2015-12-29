@@ -10,6 +10,7 @@ import com.intellij.openapi.util.TextRange;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.analyzer.AnalysisError;
 import com.redhat.ceylon.compiler.typechecker.analyzer.UsageWarning;
+import com.redhat.ceylon.compiler.typechecker.analyzer.Warning;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.RecognitionError;
@@ -35,6 +36,11 @@ class CeylonTypeCheckerVisitor extends Visitor {
     private CeylonFile file;
 
     private static final int[] UNRESOLVED_REFERENCE_CODES = {100, 102};
+
+    private static final String[] UNUSED_CODES = {
+            Warning.unusedDeclaration.toString(),
+            Warning.unusedImport.toString()
+    };
 
     /**
      * Creates a new visitor that will report errors and warnings in {@code annotationHolder}.
@@ -97,7 +103,12 @@ class CeylonTypeCheckerVisitor extends Visitor {
                 }
             } else if (error instanceof UsageWarning) {
                 annotation = annotationHolder.createWarningAnnotation(range, error.getMessage());
-                annotation.setHighlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL);
+
+                if (ArrayUtils.contains(UNUSED_CODES, ((UsageWarning) error).getWarningName())) {
+                    annotation.setHighlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL);
+                } else {
+                    annotation.setHighlightType(ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+                }
             } else {
                 annotation = annotationHolder.createInfoAnnotation(range, error.getMessage());
             }
