@@ -4,8 +4,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.folding.FoldingBuilderEx;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +30,12 @@ public class CeylonFoldingBuilder extends FoldingBuilderEx {
     private void appendDescriptors(PsiElement root, List<FoldingDescriptor> descriptors) {
         if (root instanceof CeylonPsi.BodyPsi) {
             descriptors.add(new FoldingDescriptor(root.getNode(), root.getTextRange()));
+        } else if (root instanceof CeylonPsi.ImportListPsi && root.getTextLength() > 0) {
+            TextRange range = TextRange.create(
+                    root.getTextRange().getStartOffset() + "import ".length(),
+                    root.getTextRange().getEndOffset()
+            );
+            descriptors.add(new FoldingDescriptor(root.getNode(), range));
         }
 
         for (PsiElement child : root.getChildren()) {
@@ -38,11 +46,11 @@ public class CeylonFoldingBuilder extends FoldingBuilderEx {
     @Nullable
     @Override
     public String getPlaceholderText(@NotNull ASTNode node) {
-        return "{...}";
+        return node.getElementType() == CeylonTypes.IMPORT_LIST ? "..." : "{...}";
     }
 
     @Override
     public boolean isCollapsedByDefault(@NotNull ASTNode node) {
-        return false;
+        return node.getElementType() == CeylonTypes.IMPORT_LIST;
     }
 }
