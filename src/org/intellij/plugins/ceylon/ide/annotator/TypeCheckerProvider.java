@@ -22,21 +22,15 @@ import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
-import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleSourceMapper;
-import com.redhat.ceylon.compiler.typechecker.context.Context;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
-import com.redhat.ceylon.compiler.typechecker.util.ModuleManagerFactory;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
 import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
-import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModuleManager;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModuleSourceMapper;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaPlatformUtils_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
@@ -52,7 +46,7 @@ import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
 public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvider {
 
     private static final Logger LOGGER = Logger.getInstance(TypeCheckerProvider.class);
-    private final Module module;
+    private Module module;
     private TypeChecker typeChecker;
     private IdeaCeylonProjects ceylonModel;
 
@@ -87,7 +81,9 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
     @Override
     public void disposeComponent() {
-
+        typeChecker = null;
+        ceylonModel = null;
+        module = null;
     }
 
     @NotNull
@@ -107,7 +103,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         if (typeChecker == null) {
             ideaPlatformUtils_.get_().register();
 
-            ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Preparing typechecker for module " + module.getName()) {
+            ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(),
+                    "Preparing typechecker for module " + module.getName()) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     typeChecker = createTypeChecker();
@@ -197,17 +194,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                 .buildManager();
         builder.setRepositoryManager(repositoryManager);
 
-        builder.moduleManagerFactory(new ModuleManagerFactory() {
-            @Override
-            public ModuleManager createModuleManager(final Context context) {
-                return new IdeaModuleManager(repositoryManager, ceylonProject);
-            }
-
-            @Override
-            public ModuleSourceMapper createModuleManagerUtil(Context context, ModuleManager moduleManager) {
-                return new IdeaModuleSourceMapper(context, (IdeaModuleManager) moduleManager);
-            }
-        });
+        builder.moduleManagerFactory(new IdeaModuleManagerFactory(repositoryManager, ceylonProject));
 
         for (VirtualFile sourceRoot : ModuleRootManager.getInstance(module).getSourceRoots()) {
             builder.addSrcDirectory(VFileAdapter.createInstance(sourceRoot));
