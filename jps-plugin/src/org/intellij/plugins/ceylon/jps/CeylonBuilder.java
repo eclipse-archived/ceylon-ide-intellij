@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 public class CeylonBuilder extends ModuleLevelBuilder {
 
-    public static final String BUILDER_NAME = "ceylon";
+    private static final String BUILDER_NAME = "ceylon";
 
     protected CeylonBuilder() {
         super(BuilderCategory.TRANSLATOR);
@@ -75,6 +75,7 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             "org.jboss.modules",
             "com.github.rjeschke.txtmark",
             "com.redhat.ceylon.compiler.java",
+            "com.redhat.ceylon.langtools.classfile",
             "com.redhat.ceylon.module-resolver",
             "com.redhat.ceylon.typechecker",
             "com.redhat.ceylon.model",
@@ -82,7 +83,7 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             "ceylon.language"
     };
 
-    public void searchArchivesFromRepo(File path, Map<String, File> filesToAddToClasspath) {
+    private void searchArchivesFromRepo(File path, Map<String, File> filesToAddToClasspath) {
         if (path.isDirectory()) {
             for (File f : path.listFiles()) {
                 searchArchivesFromRepo(f, filesToAddToClasspath);
