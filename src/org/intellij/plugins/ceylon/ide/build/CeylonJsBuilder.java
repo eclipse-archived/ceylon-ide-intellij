@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CeylonBuilder implements CompileTask {
+public class CeylonJsBuilder implements CompileTask {
 
     @Override
     public boolean execute(CompileContext context) {
