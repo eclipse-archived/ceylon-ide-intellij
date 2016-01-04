@@ -7,7 +7,8 @@ import com.intellij.psi {
     PsiMethodReferenceType,
     PsiClassType,
     PsiTypeParameter,
-    PsiClass
+    PsiClass,
+    JavaPsiFacade
 }
 import com.intellij.psi.impl.source {
     PsiClassReferenceType
@@ -18,6 +19,9 @@ import com.redhat.ceylon.model.loader.mirror {
     ClassMirror
 }
 
+import java.lang {
+    ObjectArray
+}
 import java.util {
     List,
     Collections,
@@ -27,9 +31,6 @@ import java.util {
 
 import javax.lang.model.type {
     TypeKind
-}
-import java.lang {
-    ObjectArray
 }
 
 class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
@@ -72,13 +73,14 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         else if (is PsiWildcardType psi) then TypeKind.\iWILDCARD
         else if (is PsiClassReferenceType|PsiMethodReferenceType psi)
             then TypeKind.\iDECLARED
+        else if (is PsiClassType psi) then TypeKind.\iDECLARED
         else if (is PsiPrimitiveType psi) then primitiveKind(psi)
         else null;
         
         if (exists kind) {
             return kind;
         }
-        throw Exception("Unknown PsiType " + psi.string);
+        throw Exception("Unknown PsiType " + className(psi));
     }
 
     shared actual TypeMirror? lowerBound = 
@@ -89,19 +91,22 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
             else null;
     
     shared actual Boolean primitive => psi is PsiPrimitiveType;
-
-    // TODO this is super clunky
-    String typeName =>
-            let(name = psi.canonicalText)
-            if (name.endsWith(".impl") || name.contains(".impl."))
-            then name.replaceLast(".impl", "$impl")
-            else name;
     
-    shared actual String qualifiedName
-             => let(name = typeName)
-                if (exists pos = name.firstOccurrence('<'))
-                then name.spanTo(pos - 1)
-                else name;
+    PsiClass? findClass(String name) {
+        assert(is PsiClassReferenceType psi);
+        value scope = psi.resolveScope;
+        
+        return  doWithLock(() {
+            if (exists p = psi.reference?.project) {
+                return JavaPsiFacade.getInstance(p)
+                        .findClass(name, scope);            
+            }
+            return null;
+        });
+    }
+    
+    // TODO reeeeally ugly, but canonicalText is wrong (replaces $ with dots)
+    shared actual String qualifiedName => psi.canonicalText;
 
     // TODO
     shared actual TypeMirror? qualifyingType => null; //enclosing;

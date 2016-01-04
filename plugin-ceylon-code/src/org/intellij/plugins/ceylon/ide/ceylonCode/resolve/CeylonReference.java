@@ -44,7 +44,9 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             return null;
         }
 
-        ((CeylonFile) myElement.getContainingFile()).ensureTypechecked();
+        if (((CeylonFile) myElement.getContainingFile()).ensureTypechecked() == null) {
+            return null;
+        }
 
         // Try using the type checker
         Tree.CompilationUnit compilationUnit = ((CeylonFile) myElement.getContainingFile()).getCompilationUnit();

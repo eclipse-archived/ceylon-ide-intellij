@@ -16,12 +16,15 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.startup.StartupManager;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
+import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleValidator;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
@@ -31,8 +34,12 @@ import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaModulesScanner;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaRootFolderScanner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaPlatformUtils_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.IdeaVirtualFolder;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,6 +56,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     private Module module;
     private TypeChecker typeChecker;
     private IdeaCeylonProjects ceylonModel;
+    private boolean isReady;
 
     public TypeCheckerProvider(Module module) {
         this.module = module;
@@ -63,7 +71,11 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             Module module = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject());
 
             if (module != null) {
-                return module.getComponent(ITypeCheckerProvider.class).getTypeChecker();
+                ITypeCheckerProvider provider = module.getComponent(ITypeCheckerProvider.class);
+
+                if (((TypeCheckerProvider) provider).isReady) {
+                    return provider.getTypeChecker();
+                }
             }
         }
 
@@ -109,6 +121,17 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                 public void run(@NotNull ProgressIndicator indicator) {
                     typeChecker = createTypeChecker();
 
+                    parseCeylonModel();
+
+                    ApplicationManager.getApplication().runReadAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            fullTypeCheck();
+                        }
+                    });
+
+                    isReady = true;
+
                     ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -122,9 +145,124 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         }
     }
 
+    private void fullTypeCheck() {
+        List<PhasedUnit> phasedUnitsOfDependencies = new ArrayList<>();
+
+        for (PhasedUnits phasedUnits : typeChecker.getPhasedUnitsOfDependencies()) {
+            for (PhasedUnit pu : phasedUnits.getPhasedUnits()) {
+                phasedUnitsOfDependencies.add(pu);
+            }
+        }
+
+        for (PhasedUnit pu : phasedUnitsOfDependencies) {
+            pu.scanDeclarations();
+        }
+
+        for (PhasedUnit pu : phasedUnitsOfDependencies) {
+            pu.scanTypeDeclarations();
+        }
+
+        for (PhasedUnit pu : phasedUnitsOfDependencies) {
+            pu.analyseTypes();
+        }
+
+        BaseIdeModuleManager mm = (BaseIdeModuleManager) typeChecker.getPhasedUnits().getModuleManager();
+        BaseIdeModelLoader loader = mm.getModelLoader();
+        loader.loadPackage(loader.getLanguageModule(), "com.redhat.ceylon.compiler.java.metadata", true);
+        loader.loadPackage(loader.getLanguageModule(), "ceylon.language", true);
+        loader.loadPackage(loader.getLanguageModule(), "ceylon.language.descriptor", true);
+        loader.loadPackageDescriptors();
+
+        List<PhasedUnit> phasedUnits = typeChecker.getPhasedUnits().getPhasedUnits();
+        for (PhasedUnit pu : phasedUnits) {
+            if (!pu.isDeclarationsScanned()) {
+                pu.validateTree();
+                pu.scanDeclarations();
+            }
+        }
+        for (PhasedUnit pu : phasedUnits) {
+            if (!pu.isTypeDeclarationsScanned()) {
+                pu.scanTypeDeclarations();
+            }
+        }
+        for (PhasedUnit pu : phasedUnits) {
+            if (!pu.isRefinementValidated()) {
+                pu.validateRefinement();
+            }
+        }
+        for (PhasedUnit pu : phasedUnits) {
+            if (!pu.isFullyTyped()) {
+                pu.analyseTypes();
+                pu.analyseUsage();
+            }
+        }
+        for (PhasedUnit pu : phasedUnits) {
+            pu.analyseFlow();
+        }
+    }
+
+    private void parseCeylonModel() {
+        final IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
+
+
+        BaseIdeModuleManager mm = (BaseIdeModuleManager) typeChecker.getPhasedUnits().getModuleManager();
+        mm.setTypeChecker(typeChecker);
+        mm.getModuleSourceMapper().setTypeChecker(typeChecker);
+
+        BaseIdeModelLoader loader = mm.getModelLoader();
+
+        mm.prepareForTypeChecking();
+
+        for (final VirtualFile sourceRoot : ModuleRootManager.getInstance(module).getSourceRoots()) {
+            final IdeaModulesScanner scanner = new IdeaModulesScanner(ceylonProject, sourceRoot);
+
+            VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor() {
+                @Override
+                public boolean visitFile(@NotNull VirtualFile file) {
+                    if (file.isDirectory()) {
+                        scanner.visit(new IdeaVirtualFolder(file));
+                    } else {
+                        scanner.visit(new VirtualFileVirtualFile(file));
+                    }
+                    return true;
+                }
+            });
+        }
+        for (final VirtualFile sourceRoot : ModuleRootManager.getInstance(module).getSourceRoots()) {
+            final IdeaRootFolderScanner scanner = new IdeaRootFolderScanner(ceylonProject, sourceRoot);
+
+            VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor() {
+                @Override
+                public boolean visitFile(@NotNull VirtualFile file) {
+                    if (file.isDirectory()) {
+                        scanner.visit(new IdeaVirtualFolder(file));
+                    } else {
+                        scanner.visit(new VirtualFileVirtualFile(file));
+                    }
+                    return true;
+                }
+            });
+        }
+
+        loader.setupSourceFileObjects(typeChecker.getPhasedUnits().getPhasedUnits());
+        typeChecker.getPhasedUnits().visitModules();
+
+        ModuleValidator moduleValidator = new ModuleValidator(typeChecker.getContext(), typeChecker.getPhasedUnits());
+        moduleValidator.verifyModuleDependencyTree();
+
+        typeChecker.setPhasedUnitsOfDependencies(moduleValidator.getPhasedUnitsOfDependencies());
+
+        for (PhasedUnits dependencyPhasedUnits : typeChecker.getPhasedUnitsOfDependencies()) {
+            loader.addSourceArchivePhasedUnits(dependencyPhasedUnits.getPhasedUnits());
+        }
+
+        loader.setModuleAndPackageUnits();
+    }
+
     @Override
     public void projectClosed() {
         typeChecker = null;
+        isReady = false;
         if (ceylonModel != null) {
             ceylonModel.removeProject(module);
         }
@@ -196,49 +334,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
         builder.moduleManagerFactory(new IdeaModuleManagerFactory(repositoryManager, ceylonProject));
 
-        for (VirtualFile sourceRoot : ModuleRootManager.getInstance(module).getSourceRoots()) {
-            builder.addSrcDirectory(VFileAdapter.createInstance(sourceRoot));
-        }
-
-        long startTime = System.currentTimeMillis();
-        TypeChecker checker = builder.getTypeChecker();
-        LOGGER.info("Got type checker in " + (System.currentTimeMillis() - startTime) + "ms");
-
-        BaseIdeModuleManager mm = (BaseIdeModuleManager) checker.getPhasedUnits().getModuleManager();
-        mm.setTypeChecker(checker);
-        mm.getModuleSourceMapper().setTypeChecker(checker);
-
-        BaseIdeModelLoader loader = mm.getModelLoader();
-        loader.loadPackage(loader.getLanguageModule(), "com.redhat.ceylon.compiler.java.metadata", true);
-        loader.loadPackage(loader.getLanguageModule(), "ceylon.language", true);
-        loader.loadPackage(loader.getLanguageModule(), "ceylon.language.descriptor", true);
-        loader.loadPackageDescriptors();
-
-        startTime = System.currentTimeMillis();
-        checker.process();
-        LOGGER.info("Type checker process()ed in " + (System.currentTimeMillis() - startTime) + "ms");
-
-        List<PhasedUnit> phasedUnitsOfDependencies = new ArrayList<>();
-
-        for (PhasedUnits phasedUnits : checker.getPhasedUnitsOfDependencies()) {
-            for (PhasedUnit pu : phasedUnits.getPhasedUnits()) {
-                phasedUnitsOfDependencies.add(pu);
-            }
-        }
-
-        for (PhasedUnit pu : phasedUnitsOfDependencies) {
-            pu.scanDeclarations();
-        }
-
-        for (PhasedUnit pu : phasedUnitsOfDependencies) {
-            pu.scanTypeDeclarations();
-        }
-
-        for (PhasedUnit pu : phasedUnitsOfDependencies) {
-            pu.analyseTypes();
-        }
-
-        return checker;
+        return builder.getTypeChecker();
     }
 
     private String interpolateVariablesInRepositoryPath(String repoPath) {

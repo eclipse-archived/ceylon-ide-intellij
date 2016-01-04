@@ -143,7 +143,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             value name = packageName + "." + className;
             value scope = p.getModuleScope(true);
             
-            return JavaPsiFacade.getInstance(p.project).findClass(name, scope)
+            return JavaPsiFacade.getInstance(p.project).findClass(name.replace("$", "."), scope)
                 exists;
         }
         
@@ -156,7 +156,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                 value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
                 value facade = JavaPsiFacade.getInstance(m.project);
                 
-                if (exists psi = facade.findClass(name, scope)) {
+                if (exists psi = facade.findClass(name.replace("$", "."), scope)) {
                     return PSIClass(psi);
                 }
             }

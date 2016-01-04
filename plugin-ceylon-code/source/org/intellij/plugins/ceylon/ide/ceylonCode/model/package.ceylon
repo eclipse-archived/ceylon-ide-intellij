@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.ceylonCode.model;
+shared package org.intellij.plugins.ceylon.ide.ceylonCode.model;
