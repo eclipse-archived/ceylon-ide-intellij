@@ -105,8 +105,57 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         });
     }
     
-    // TODO reeeeally ugly, but canonicalText is wrong (replaces $ with dots)
-    shared actual String qualifiedName => psi.canonicalText;
+    shared actual String qualifiedName {
+        value canonicalText = 
+                let (t = psi.canonicalText)
+                if (exists i = t.firstOccurrence('<'))
+                then t.spanTo(i - 1)
+                else t;
+
+        if (is PsiClassReferenceType psi) {
+            if (exists cls = findClass(canonicalText)) {
+                return cls.qualifiedName; 
+            }
+            
+            value parts = canonicalText.split('.'.equals);
+            value facade = JavaPsiFacade.getInstance(psi.reference?.project);
+            value clsName = doWithLock(() {
+                variable value pkg = facade.findPackage("");
+                value sb = StringBuilder();
+                variable value lookingForPkg = true;
+                
+                for (part in parts) {
+                    if (lookingForPkg,
+                        exists subPkg = pkg.subPackages.array.coalesced.find(
+                        (el) => el.name == part)) {
+                        pkg = subPkg;
+                    } else {
+                        lookingForPkg = false;
+                        sb.append(part).append(".");
+                    }
+                }
+                
+                if (sb.endsWith(".")) {
+                    sb.deleteTerminal(1);
+                }
+                if (exists cls = pkg.findClassByShortName(sb.string, psi.resolveScope).array.first) {
+                    return cls.qualifiedName;
+                }
+                // TODO not cool, we got an incorrect qualified name
+                if (sb.string.contains(".impl"),
+                    exists cls = pkg.findClassByShortName(sb.string.replace(".impl", "$impl"), psi.resolveScope).array.first) {
+                    return cls.qualifiedName;
+                }
+                return null;
+            });
+            
+            if (exists clsName) {
+                return clsName;
+            }
+        }
+        
+        return canonicalText;
+    }
 
     // TODO
     shared actual TypeMirror? qualifyingType => null; //enclosing;

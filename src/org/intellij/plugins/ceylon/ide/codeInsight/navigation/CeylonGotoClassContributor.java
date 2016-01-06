@@ -8,24 +8,28 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.containers.MultiMap;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.model.typechecker.model.*;
+import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
+import com.redhat.ceylon.model.typechecker.model.Function;
 import com.redhat.ceylon.model.typechecker.model.Package;
-import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference.resolveDeclaration;
 
 public class CeylonGotoClassContributor implements GotoClassContributor {
 
-    MultiMap<String, Declaration> declarationMap = MultiMap.createSet();
+    private MultiMap<String, Declaration> declarationMap = MultiMap.createSet();
 
     @NotNull
     @Override
@@ -34,28 +38,22 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
 
         long nano = System.nanoTime();
 
+        IdeaCeylonProjects ceylonProjects = project.getComponent(IdeaCeylonProjects.class);
+
         for (Module module : ModuleManager.getInstance(project).getModules()) {
-            TypeChecker tc = getTypeChecker(module);
+            IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonProjects.getProject(module);
+
+            TypeChecker tc = ceylonProject.getTypechecker();
             if (tc == null) {
                 continue;
             }
 
-            for (PhasedUnit phasedUnit : tc.getPhasedUnits().getPhasedUnits()) {
-                for (Declaration declaration : phasedUnit.getDeclarations()) {
-                    if (declaration.getName() == null) {
+            for (com.redhat.ceylon.model.typechecker.model.Module m : tc.getContext().getModules().getListOfModules()) {
+                if (m instanceof IdeaModule) {
+                    if (!includeNonProjectItems && !((IdeaModule) m).getIsProjectModule()) {
                         continue;
                     }
-                    if (declaration instanceof ClassOrInterface) {
-                        declarationMap.putValue(declaration.getName(), declaration);
-                    }
-                    if (declaration instanceof Function) {
-                        declarationMap.putValue(declaration.getName(), declaration);
-                    }
-                }
-            }
 
-            if (includeNonProjectItems) {
-                for (com.redhat.ceylon.model.typechecker.model.Module m : tc.getContext().getModules().getListOfModules()) {
                     for (Package pack : m.getPackages()) {
                         for (Declaration declaration : pack.getMembers()) {
                             if (declaration.getName() == null) {
@@ -84,14 +82,23 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
         if (declarationMap.containsKey(name)) {
             Set<CeylonCompositeElement> elements = new HashSet<>();
 
+            IdeaCeylonProjects ceylonProjects = project.getComponent(IdeaCeylonProjects.class);
+
             // TODO this loop is ugly
             for (Module module : ModuleManager.getInstance(project).getModules()) {
-                TypeChecker tc = getTypeChecker(module);
+                IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonProjects.getProject(module);
+
+                TypeChecker tc = ceylonProject.getTypechecker();
                 if (tc == null) {
                     continue;
                 }
                 for (Declaration decl : declarationMap.get(name)) {
-                    elements.add(resolveDeclaration(decl, tc, project));
+                    CeylonCompositeElement resolved = resolveDeclaration(decl, tc, project);
+                    if (resolved == null) {
+                        System.out.println("Resolved null: " + decl);
+                    } else {
+                        elements.add(resolved);
+                    }
                 }
             }
 
@@ -125,13 +132,4 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
         return ".";
     }
 
-    @Nullable
-    private TypeChecker getTypeChecker(Module module) {
-        ITypeCheckerProvider provider = module.getComponent(ITypeCheckerProvider.class);
-        if (provider == null) {
-            return null;
-        }
-
-        return provider.getTypeChecker();
-    }
 }

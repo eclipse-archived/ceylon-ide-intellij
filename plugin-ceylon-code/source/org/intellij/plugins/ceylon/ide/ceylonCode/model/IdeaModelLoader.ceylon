@@ -1,9 +1,11 @@
 import ceylon.interop.java {
-    javaString
+    javaString,
+    javaClass
 }
 
 import com.intellij.openapi.application {
-    ApplicationManager
+    ApplicationManager,
+    ModalityState
 }
 import com.intellij.openapi.\imodule {
     IJModule=Module
@@ -69,9 +71,9 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             
             // TODO everytime we add a jar, it's indexed, which is slowing down
             // the process
-            ApplicationManager.application.invokeLater(object satisfies Runnable {
+            ApplicationManager.application.invokeAndWait(object satisfies Runnable {
                 shared actual void run() {
-                    value lock = ApplicationManager.application.acquireWriteActionLock(null);        
+                    value lock = ApplicationManager.application.acquireWriteActionLock(javaClass<IdeaModelLoader>());        
                     
                     try {
                         value model = ModuleRootManager.getInstance(mod).modifiableModel;
@@ -81,7 +83,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                         Library.ModifiableModel libModel = lib.modifiableModel;
                         
                         if (libModel.getUrls(OrderRootType.\iCLASSES).array.coalesced
-                            .find((name) => name == vfile.path) exists) {
+                            .find((name) => name.string == vfile.url) exists) {
                             
                             Disposer.dispose(libModel);
                             model.dispose();
@@ -95,7 +97,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                         lock.finish();
                     }
                 }
-            });
+            }, ModalityState.any());
         }
     }
     
@@ -133,30 +135,34 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         return false;
     }
 
-    // TODO
+    // TODO something like ModelLoaderNameEnvironment
     shared actual Boolean moduleContainsClass(BaseIdeModule ideModule,
         String packageName, String className) {
         
         assert(is IdeaModule ideModule);
+        
         if (exists cp = ideModule.ceylonProject) {
             value p = cp.ideArtifact;
             value name = packageName + "." + className;
             value scope = p.getModuleScope(true);
+            PsiClass? cls = JavaPsiFacade.getInstance(p.project)
+                    .findClass(name, scope);
             
-            return JavaPsiFacade.getInstance(p.project).findClass(name.replace("$", "."), scope)
-                exists;
+            return cls exists;
         }
         
         return false;
     }
     
     shared actual ClassMirror? buildClassMirrorInternal(String name) {
-        return doWithLock(() {
+        assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
+        
+        return doWithIndex(project, () {
             if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) { 
                 value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
                 value facade = JavaPsiFacade.getInstance(m.project);
                 
-                if (exists psi = facade.findClass(name.replace("$", "."), scope)) {
+                if (exists psi = facade.findClass(name, scope)) {
                     return PSIClass(psi);
                 }
             }

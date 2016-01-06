@@ -5,9 +5,6 @@ import ceylon.interop.java {
     CeylonIterable
 }
 
-import com.intellij.openapi.application {
-    ApplicationManager
-}
 import com.intellij.openapi.\imodule {
     IJModule=Module
 }
@@ -16,9 +13,6 @@ import com.intellij.openapi.roots {
 }
 import com.intellij.openapi.vfs {
     VirtualFile
-}
-import com.intellij.psi {
-    JavaPsiFacade
 }
 import com.redhat.ceylon.cmr.api {
     RepositoryManager
@@ -62,15 +56,12 @@ shared class IdeaModuleManager(
         }
         assert (is IdeaCeylonProject ceylonProject);
         value mod = ceylonProject.ideaModule;
-        
-        value lock = ApplicationManager.application.acquireReadActionLock();
-        
-        try {
-            value facade = JavaPsiFacade.getInstance(mod.project);
-            return facade.findPackage(moduleName) exists;
-        } finally {
-            lock.finish();
-        }
+        value modulePath = moduleName.replace(".", "/");
+
+        return ModuleRootManager.getInstance(mod)
+                .sourceRoots.array.coalesced
+                .find((el) => el.findChild(modulePath) exists)
+                exists;
     }
     
     shared actual BaseIdeModule newModule(String moduleName, String version) {

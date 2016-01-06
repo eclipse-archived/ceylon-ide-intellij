@@ -23,9 +23,6 @@ import java.util {
     ArrayList
 }
 
-shared void a() {
-    print(`class Object`.string);
-}
 class PSIMethod(shared PsiMethod psi)
         extends PSIAnnotatedMirror(psi)
         satisfies MethodMirror {

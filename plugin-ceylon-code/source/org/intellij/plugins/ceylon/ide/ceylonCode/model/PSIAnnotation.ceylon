@@ -1,5 +1,19 @@
-import com.redhat.ceylon.model.loader.mirror {
-    AnnotationMirror
+import ceylon.collection {
+    HashMap
+}
+import ceylon.interop.java {
+    javaString
+}
+
+import com.intellij.openapi.application {
+    ApplicationManager
+}
+import com.intellij.openapi.project {
+    DumbService,
+    Project
+}
+import com.intellij.openapi.util {
+    Ref
 }
 import com.intellij.psi {
     PsiAnnotation,
@@ -9,24 +23,20 @@ import com.intellij.psi {
     PsiReferenceExpression,
     PsiClassObjectAccessExpression
 }
-import com.intellij.openapi.application {
-    ApplicationManager
-}
-import ceylon.collection {
-    HashMap
-}
-import java.util {
-    ArrayList
-}
 import com.redhat.ceylon.ide.common.util {
     platformUtils,
     Status
 }
-import ceylon.interop.java {
-    javaString
+import com.redhat.ceylon.model.loader.mirror {
+    AnnotationMirror
 }
+
 import java.lang {
-    JShort=Short
+    JShort=Short,
+    Runnable
+}
+import java.util {
+    ArrayList
 }
 
 class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
@@ -83,4 +93,16 @@ Return doWithLock<Return>(Return() callback) {
     } finally {
         lock.finish();
     }
+}
+
+Return doWithIndex<Return>(Project p, Return() callback) {
+
+    value ref = Ref<Return>();
+    value runnable = object satisfies Runnable {
+        shared actual void run() => ref.set(callback());
+    };
+    
+    DumbService.getInstance(p).runReadActionInSmartMode(runnable);
+
+    return ref.get();
 }
