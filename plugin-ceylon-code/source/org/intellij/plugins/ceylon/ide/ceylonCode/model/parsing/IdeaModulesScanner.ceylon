@@ -19,7 +19,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 
 shared class IdeaModulesScanner(IdeaCeylonProject project, VirtualFile srcDir)
         extends ModulesScanner<Module,VirtualFile,VirtualFile,VirtualFile>(
-    project, IdeaVirtualFolder(srcDir), DummyProgressMonitor()
+    project, IdeaVirtualFolder(srcDir, project), DummyProgressMonitor()
 ) {
 
 }

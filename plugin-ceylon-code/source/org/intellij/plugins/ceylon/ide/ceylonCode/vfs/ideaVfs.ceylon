@@ -1,39 +1,47 @@
-import com.redhat.ceylon.ide.common.vfs {
-    FileVirtualFile,
-    FolderVirtualFile,
-    BaseFolderVirtualFile,
-    ResourceVirtualFile
+import ceylon.interop.java {
+    javaString
+}
+
+import com.intellij.openapi.\imodule {
+    Module
+}
+import com.intellij.openapi.vfs {
+    VirtualFile
 }
 import com.intellij.psi {
     PsiFile
 }
+import com.redhat.ceylon.ide.common.model {
+    CeylonProject
+}
+import com.redhat.ceylon.ide.common.vfs {
+    FileVirtualFile,
+    FolderVirtualFile,
+    ResourceVirtualFile
+}
+
 import java.io {
     InputStream,
     ByteArrayInputStream
-}
-import ceylon.interop.java {
-    javaString
-}
-import com.intellij.openapi.vfs {
-    VirtualFile,
-    VfsUtilCore {
-        getRelativePath
-    }
 }
 import java.util {
     List,
     ArrayList
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    IdeaCeylonProject
+}
+
 shared class PsiFileVirtualFile(PsiFile file, String? forcedPath = null)
-        satisfies FileVirtualFile<Object, PsiFile, PsiFile> {
+        satisfies FileVirtualFile<Module,Object, PsiFile, PsiFile> {
     
-    shared actual FolderVirtualFile<Object, PsiFile, PsiFile>? parent => null;
+    shared actual FolderVirtualFile<Module,Object, PsiFile, PsiFile>? parent => null;
 
     shared actual Boolean equals(Object that)
-            => (super of FileVirtualFile<Object, PsiFile, PsiFile>).equals(that);
+            => (super of FileVirtualFile<Module,Object, PsiFile, PsiFile>).equals(that);
     shared actual Integer hash
-            => (super of FileVirtualFile<Object, PsiFile, PsiFile>).hash;
+            => (super of FileVirtualFile<Module,Object, PsiFile, PsiFile>).hash;
     
     shared actual InputStream inputStream {
         return ByteArrayInputStream(javaString(file.text).bytes);
@@ -47,16 +55,18 @@ shared class PsiFileVirtualFile(PsiFile file, String? forcedPath = null)
 
     shared actual Boolean \iexists() => file.physical;
     
+    shared actual CeylonProject<Module,Object,PsiFile,PsiFile> ceylonProject
+    => nothing;
 }
 
-shared alias IdeaResource => ResourceVirtualFile<VirtualFile,VirtualFile,VirtualFile>;
+shared alias IdeaResource => ResourceVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>;
 
-shared class VirtualFileVirtualFile(VirtualFile file)
-        satisfies FileVirtualFile<VirtualFile, VirtualFile, VirtualFile> {
+shared class VirtualFileVirtualFile(VirtualFile file, IdeaCeylonProject project)
+        satisfies FileVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile> {
     
-    shared actual FolderVirtualFile<VirtualFile, VirtualFile, VirtualFile>? 
+    shared actual FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>? 
     parent => if (exists parent = file.parent)
-              then IdeaVirtualFolder(parent)
+              then IdeaVirtualFolder(parent, project)
               else null;
     
     shared actual Boolean equals(Object that) {
@@ -74,55 +84,39 @@ shared class VirtualFileVirtualFile(VirtualFile file)
     shared actual VirtualFile nativeResource => file;
     shared actual String charset => file.charset.string;
     
-    shared actual Boolean \iexists() => file.\iexists();
-    
+    shared actual CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>
+    ceylonProject => project;
 }
 
-shared class IdeaVirtualFolder(VirtualFile folder)
-        satisfies FolderVirtualFile<VirtualFile,VirtualFile,VirtualFile> {
+shared class IdeaVirtualFolder(VirtualFile folder, IdeaCeylonProject project)
+        satisfies FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile> {
     
     shared actual List<out IdeaResource> children {
         value result = ArrayList<IdeaResource>();
         
         folder.children.array.coalesced.each((child) {
             if (child.directory) {
-                result.add(IdeaVirtualFolder(child));
+                result.add(IdeaVirtualFolder(child, project));
             } else {
                 
-                result.add(VirtualFileVirtualFile(child));
+                result.add(VirtualFileVirtualFile(child, project));
             }
         });
         
         return result;
     }
     
-    shared actual Boolean \iexists() => folder.\iexists();
-    
-    shared actual FileVirtualFile<VirtualFile,VirtualFile,VirtualFile>? 
-    findFile(String fileName) => if (exists child = folder.findChild(fileName))
-                                 then VirtualFileVirtualFile(child)
-                                 else null;
-    
     shared actual String name => folder.name;
     
     shared actual VirtualFile nativeResource => folder;
     
-    shared actual FolderVirtualFile<VirtualFile,VirtualFile,VirtualFile>?
+    shared actual FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>?
     parent => if (exists parent = folder.parent)
-              then IdeaVirtualFolder(parent)
+              then IdeaVirtualFolder(parent, project)
               else null;
     
     shared actual String path => folder.canonicalPath;
-    
-    shared actual String[] toPackageName(BaseFolderVirtualFile srcDir) {
-        assert(is IdeaVirtualFolder srcDir);
         
-        if (exists relativePath = getRelativePath(folder, srcDir.folder)) {
-            return relativePath.split('/'.equals).sequence();
-        }
-        return empty;
-    }
-    
     shared actual Integer hash => folder.hash;
     
     shared actual Boolean equals(Object that) {
@@ -132,4 +126,6 @@ shared class IdeaVirtualFolder(VirtualFile folder)
         return false;
     }
     
+    shared actual CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>
+    ceylonProject => project;
 }

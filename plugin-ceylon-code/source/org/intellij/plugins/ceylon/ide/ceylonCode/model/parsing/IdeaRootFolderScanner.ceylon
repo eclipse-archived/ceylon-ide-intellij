@@ -17,6 +17,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 
 shared class IdeaRootFolderScanner(IdeaCeylonProject project, VirtualFile srcDir)
         extends RootFolderScanner<Module,VirtualFile,VirtualFile,VirtualFile>(
-    project, IdeaVirtualFolder(srcDir), DummyProgressMonitor()
+    project, IdeaVirtualFolder(srcDir, project), DummyProgressMonitor()
 ) {
 }

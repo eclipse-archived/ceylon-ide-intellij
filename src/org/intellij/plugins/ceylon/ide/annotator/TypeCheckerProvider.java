@@ -219,12 +219,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor() {
                 @Override
                 public boolean visitFile(@NotNull VirtualFile file) {
-                    if (file.isDirectory()) {
-                        scanner.visit(new IdeaVirtualFolder(file));
-                    } else {
-                        scanner.visit(new VirtualFileVirtualFile(file));
-                    }
-                    return true;
+                    return scanner.visit(file);
                 }
             });
         }
@@ -234,12 +229,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor() {
                 @Override
                 public boolean visitFile(@NotNull VirtualFile file) {
-                    if (file.isDirectory()) {
-                        scanner.visit(new IdeaVirtualFolder(file));
-                    } else {
-                        scanner.visit(new VirtualFileVirtualFile(file));
-                    }
-                    return true;
+                    return scanner.visit(file);
                 }
             });
         }
