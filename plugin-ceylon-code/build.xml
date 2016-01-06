@@ -7,7 +7,7 @@
 
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
         <classpath>
-            <pathelement location="${dist.root.dir}/lib/ant-contrib-1.0b3.jar"/>
+            <pathelement location="${dist.root.dir}/../lib/ant-contrib-1.0b3.jar"/>
         </classpath>
     </taskdef>
 
@@ -25,6 +25,7 @@
         <reposet id="reposet.compile">
             <repo url="${out.repo}" />
             <repo url="flat:${intellij.repo.dir}"/>
+            <repo url="${basedir}/../../ceylon-ide-common/repo"/>
         </reposet>
     </target>
 
