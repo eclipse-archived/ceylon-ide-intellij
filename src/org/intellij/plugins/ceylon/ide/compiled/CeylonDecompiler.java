@@ -8,7 +8,6 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.compiled.ClassFileDecompilers;
 import com.intellij.psi.compiled.ClsStubBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.org.objectweb.asm.AnnotationVisitor;
 import org.jetbrains.org.objectweb.asm.ClassReader;
 import org.jetbrains.org.objectweb.asm.ClassVisitor;
 import org.jetbrains.org.objectweb.asm.Opcodes;
@@ -39,16 +38,13 @@ public class CeylonDecompiler extends ClassFileDecompilers.Full {
             return false;
         }
 
-        return isCeylonCompiledFile(file);
+        return isInnerClass(file);
     }
 
-    static boolean isCeylonCompiledFile(VirtualFile file) {
+    static boolean isInnerClass(VirtualFile file) {
         try {
-            // TODO possible optimization: return false if file.contentsToByteArray() does
-            // not contain "com/redhat/ceylon/compiler/java/metadata/Ceylon"
             ClassReader reader = new ClassReader(file.contentsToByteArray());
 
-            final Ref<Boolean> isCeylonClass = new Ref<>(Boolean.FALSE);
             final Ref<Boolean> isInnerClass = new Ref<>(Boolean.FALSE);
 
             String name = file.getNameWithoutExtension();
@@ -58,19 +54,10 @@ public class CeylonDecompiler extends ClassFileDecompilers.Full {
                 parentName = name.substring(0, index);
                 childName = name.substring(index + 1);
             } else {
-                parentName = null;
-                childName = null;
+                return false;
             }
 
             reader.accept(new ClassVisitor(Opcodes.ASM5) {
-                @Override
-                public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-                    if (desc.equals("Lcom/redhat/ceylon/compiler/java/metadata/Ceylon;")) {
-                        isCeylonClass.set(Boolean.TRUE);
-                    }
-                    return null;
-                }
-
                 @Override
                 public void visitOuterClass(String owner, String name, String desc) {
                     isInnerClass.set(Boolean.TRUE);
@@ -87,7 +74,7 @@ public class CeylonDecompiler extends ClassFileDecompilers.Full {
                 }
             }, 0);
 
-            return /*isCeylonClass.get() &&*/ !isInnerClass.get();
+            return !isInnerClass.get();
         } catch (IOException e) {
             e.printStackTrace();
             return false;

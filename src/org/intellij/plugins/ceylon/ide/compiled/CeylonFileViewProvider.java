@@ -42,7 +42,7 @@ public class CeylonFileViewProvider extends SingleRootFileViewProvider {
             return new PsiBinaryFileImpl((PsiManagerImpl)getManager(), this);
         }
 
-        if (!CeylonDecompiler.isCeylonCompiledFile(file)) {
+        if (!CeylonDecompiler.isInnerClass(file)) {
             return null;
         }
 

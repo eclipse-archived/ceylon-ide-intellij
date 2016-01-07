@@ -17,7 +17,7 @@ import org.jetbrains.org.objectweb.asm.ClassReader;
 
 import java.io.IOException;
 
-import static org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler.isCeylonCompiledFile;
+import static org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler.isInnerClass;
 
 class CeylonClsStubBuilder extends ClsStubBuilder {
     private static final int STUB_VERSION = 1;
@@ -35,7 +35,7 @@ class CeylonClsStubBuilder extends ClsStubBuilder {
         byte[] bytes = fileContent.getContent();
         VirtualFile file = fileContent.getFile();
 
-        if (fileContent.getFileName().indexOf('$') >= 0 && !isCeylonCompiledFile(file)) {
+        if (fileContent.getFileName().indexOf('$') >= 0 && !isInnerClass(file)) {
             return null;
         }
 
