@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaString,
-    javaClass
+    javaString
 }
 
 import com.intellij.codeHighlighting {
@@ -33,9 +32,6 @@ import java.lang {
     JString=String
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode {
-    ITypeCheckerProvider
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
     CeylonFile
@@ -45,10 +41,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
-}
-import com.intellij.openapi.\imodule {
-    ModuleUtil,
-    Module
 }
 
 shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
@@ -93,14 +85,9 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
         
         shared actual void navigate(MouseEvent? mouseEvent, PsiElement t) {
             assert(is CeylonFile ceylonFile = t.containingFile);
-            
-            Module mod = ModuleUtil.findModuleForFile(ceylonFile.virtualFile, 
-                ceylonFile.project);
-            value provider = mod.getComponent(javaClass<ITypeCheckerProvider>());
-            value tc = provider.typeChecker;
 
             if (exists psi = CeylonReference
-                    .resolveDeclaration(target, tc, t.project)) {
+                    .resolveDeclaration(target, t.project)) {
                 psi.navigate(true);
             }
         }
