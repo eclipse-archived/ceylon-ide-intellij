@@ -105,11 +105,10 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
 
     @Override
     public PsiElement getDocumentationElementForLookupItem(PsiManager psiManager, Object object, PsiElement element) {
-        TypeChecker tc = TypeCheckerProvider.getFor(element);
         if (object instanceof Tuple) {
             Object first = ((Tuple) object).getFirst();
             if (first instanceof Declaration) {
-                CeylonCompositeElement target = resolveDeclaration((Declaration) first, tc, element.getProject());
+                CeylonCompositeElement target = resolveDeclaration((Declaration) first, element.getProject());
 
                 if (target instanceof DeclarationPsiNameIdOwner) {
                     return ((DeclarationPsiNameIdOwner) target).getNameIdentifier();
@@ -161,7 +160,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             if (link.startsWith("doc:")) {
                 return new DummyPsiElement(target, context.getContainingFile());
             } else if (link.startsWith("dec:")) {
-                CeylonCompositeElement psiDecl = resolveDeclaration(target, tc, context.getProject());
+                CeylonCompositeElement psiDecl = resolveDeclaration(target, context.getProject());
 
                 if (psiDecl != null) {
                     psiDecl.navigate(true);

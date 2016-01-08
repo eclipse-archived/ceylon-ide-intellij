@@ -18,11 +18,11 @@ nodeList : {
            println("import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.CeylonCompositeElementImpl;");
            println("/* Generated using Antlr by PsiImplGen.g */");
            println("\npublic class CeylonPsiImpl {\n");
-           print("    public static class GuardedVariablePsiImpl extends CeylonCompositeElementImpl");
-           print("            implements CeylonPsi.GuardedVariablePsi {");
-           print("        public GuardedVariablePsiImpl(ASTNode astNode) { super(astNode); }");
-           print("        @Override public CustomTree.GuardedVariable getCeylonNode() { return (CustomTree.GuardedVariable) super.getCeylonNode(); }");
-           print("    }");
+           println("    public static class GuardedVariablePsiImpl extends CeylonCompositeElementImpl");
+           println("            implements CeylonPsi.GuardedVariablePsi {");
+           println("        public GuardedVariablePsiImpl(ASTNode astNode) { super(astNode); }");
+           println("        @Override public CustomTree.GuardedVariable getCeylonNode() { return (CustomTree.GuardedVariable) super.getCeylonNode(); }");
+           println("    }");
            }
            (nodeDescription? node)+ 
            EOF
@@ -44,6 +44,11 @@ node : '^' '('
            |
            { $n.text.equals("IDENTIFIER") }?=> (
              { print("IdentifierPsiImpl extends CeylonResolvable"); }
+             (':' NODE_NAME)?
+           )
+           |
+           { $n.text.equals("MODULE_DESCRIPTOR") || $n.text.equals("PACKAGE_DESCRIPTOR") }?=> (
+             { print(className($n.text) + "PsiImpl extends NamedStatementOrArgumentPsi"); }
              (':' NODE_NAME)?
            )
            |

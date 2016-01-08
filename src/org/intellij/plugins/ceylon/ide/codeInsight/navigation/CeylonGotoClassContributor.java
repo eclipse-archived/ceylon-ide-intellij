@@ -82,23 +82,12 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
         if (declarationMap.containsKey(name)) {
             Set<CeylonCompositeElement> elements = new HashSet<>();
 
-            IdeaCeylonProjects ceylonProjects = project.getComponent(IdeaCeylonProjects.class);
-
-            // TODO this loop is ugly
-            for (Module module : ModuleManager.getInstance(project).getModules()) {
-                IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonProjects.getProject(module);
-
-                TypeChecker tc = ceylonProject.getTypechecker();
-                if (tc == null) {
-                    continue;
-                }
-                for (Declaration decl : declarationMap.get(name)) {
-                    CeylonCompositeElement resolved = resolveDeclaration(decl, tc, project);
-                    if (resolved == null) {
-                        System.out.println("Resolved null: " + decl);
-                    } else {
-                        elements.add(resolved);
-                    }
+            for (Declaration decl : declarationMap.get(name)) {
+                CeylonCompositeElement resolved = resolveDeclaration(decl, project);
+                if (resolved == null) {
+                    System.out.println("Resolved null: " + decl);
+                } else {
+                    elements.add(resolved);
                 }
             }
 

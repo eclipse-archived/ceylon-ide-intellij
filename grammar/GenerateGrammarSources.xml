@@ -8,10 +8,10 @@
    language, compared with the English reference.
 -->
 <project name="Generate Grammar-related Sources" default="generateSources" basedir=".">
-    <property name="base.path" location="../../ceylon/typechecker/lib"/>
+    <property name="base.path" location="../../ceylon/lib"/>
 
-    <property file="../../ceylon/common/common-build.properties"/>
-    <property file="../../ceylon/typechecker/build.properties"/>
+    <property file="../../ceylon/common-build.properties"/>
+    <property file="../../ceylon/lib/build.properties"/>
 
     <!-- Set build directories for all formats. -->
     <property name="build.dir" value="${basedir}/build"/>

@@ -10,6 +10,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModule;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
+import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
@@ -32,6 +33,12 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
 
         if (typeChecker == null) {
             return null;
+        }
+        if (ceylonFile.getPhasedUnit() instanceof ExternalPhasedUnit) {
+            PhasedUnit pu = ceylonFile.getPhasedUnit();
+            pu.analyseTypes();
+            pu.analyseUsage();
+            return pu;
         }
         return invokeTypeChecker(ceylonFile, typeChecker);
     }

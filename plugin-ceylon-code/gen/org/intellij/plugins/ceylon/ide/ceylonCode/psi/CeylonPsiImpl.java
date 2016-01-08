@@ -10,19 +10,24 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.CeylonCompositeElemen
 
 public class CeylonPsiImpl {
 
-    public static class GuardedVariablePsiImpl extends CeylonCompositeElementImpl            implements CeylonPsi.GuardedVariablePsi {        public GuardedVariablePsiImpl(ASTNode astNode) { super(astNode); }        @Override public CustomTree.GuardedVariable getCeylonNode() { return (CustomTree.GuardedVariable) super.getCeylonNode(); }    }    public static class CompilationUnitPsiImpl extends CeylonCompositeElementImpl
+    public static class GuardedVariablePsiImpl extends CeylonCompositeElementImpl
+            implements CeylonPsi.GuardedVariablePsi {
+        public GuardedVariablePsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public CustomTree.GuardedVariable getCeylonNode() { return (CustomTree.GuardedVariable) super.getCeylonNode(); }
+    }
+    public static class CompilationUnitPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.CompilationUnitPsi {
         public CompilationUnitPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.CompilationUnit getCeylonNode() { return (Tree.CompilationUnit) super.getCeylonNode(); }
     }
 
-    public static class ModuleDescriptorPsiImpl extends StatementOrArgumentPsiImpl
+    public static class ModuleDescriptorPsiImpl extends NamedStatementOrArgumentPsi
             implements CeylonPsi.ModuleDescriptorPsi {
         public ModuleDescriptorPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.ModuleDescriptor getCeylonNode() { return (Tree.ModuleDescriptor) super.getCeylonNode(); }
     }
 
-    public static class PackageDescriptorPsiImpl extends StatementOrArgumentPsiImpl
+    public static class PackageDescriptorPsiImpl extends NamedStatementOrArgumentPsi
             implements CeylonPsi.PackageDescriptorPsi {
         public PackageDescriptorPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.PackageDescriptor getCeylonNode() { return (Tree.PackageDescriptor) super.getCeylonNode(); }

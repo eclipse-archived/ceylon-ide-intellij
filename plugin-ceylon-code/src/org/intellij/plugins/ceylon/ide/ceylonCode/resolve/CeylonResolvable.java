@@ -15,17 +15,19 @@ import org.jetbrains.annotations.NotNull;
 
 public class CeylonResolvable extends CeylonCompositeElementImpl implements PsiNamedElement {
 
-    public static final TokenSet UIDENT = TokenSet.create(CeylonTokens.UIDENTIFIER);
-
     public CeylonResolvable(ASTNode node) {
         super(node);
     }
 
     @Override
     public PsiReference getReference() {
-        final boolean isType = getNode().getChildren(UIDENT).length > 0;
         TextRange range = TextRange.from(0, getTextLength());
-        return isType ? new CeylonTypeReference<>(this, range, true) : new CeylonReference<>(this, range, true);
+
+        if (getParent() instanceof CeylonPsi.ImportPathPsi) {
+            TextRange parentRange = TextRange.from(0, getParent().getTextLength());
+            return new CeylonReference<>(getParent(), parentRange, true);
+        }
+        return new CeylonReference<>(this, range, true);
     }
 
     @Override

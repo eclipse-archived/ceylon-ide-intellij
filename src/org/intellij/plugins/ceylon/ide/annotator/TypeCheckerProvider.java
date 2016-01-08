@@ -30,6 +30,7 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
 import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
+import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
@@ -38,8 +39,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaModulesScann
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaRootFolderScanner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaPlatformUtils_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.IdeaVirtualFolder;
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,6 +65,13 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     public static TypeChecker getFor(PsiElement element) {
         if (element.getContainingFile() instanceof CeylonFile) {
             CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
+
+            if (ceylonFile.getPhasedUnit() instanceof IdePhasedUnit) {
+                IdePhasedUnit phasedUnit = (IdePhasedUnit) ceylonFile.getPhasedUnit();
+                return phasedUnit.getTypeChecker();
+            }
+
+            //LOGGER.warn("CeylonFile has no IdePhasedUnit: " + ceylonFile.getVirtualFile().getCanonicalPath());
 
             // TODO .ceylon files loaded from .src archives don't belong to any module, what should we do?
             Module module = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject());
