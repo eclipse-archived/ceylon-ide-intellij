@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.ide.settings;
 
-import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleText;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;

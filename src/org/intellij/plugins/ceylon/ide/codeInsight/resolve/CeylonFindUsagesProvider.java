@@ -11,7 +11,6 @@ import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Function;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.ParameterDeclarationPsiIdOwner;
@@ -83,10 +82,6 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return ((CeylonPsi.AttributeDeclarationPsi) element).getCeylonNode().getDeclarationModel().getQualifiedNameString();
         } else if (element instanceof CeylonPsi.ClassOrInterfacePsi) {
             Tree.Declaration ceylonNode = ((CeylonPsi.ClassOrInterfacePsi) element).getCeylonNode();
-//            if (ceylonNode == null) {
-//                // perhaps a stub
-//                return ((CeylonPsi.ClassOrInterfacePsi) element).getQualifiedName();
-//            }
             Declaration model = ceylonNode.getDeclarationModel();
             return model == null ? ceylonNode.getIdentifier().getText() : model.getQualifiedNameString();
         } else if (element instanceof CeylonPsi.AnyMethodPsi) {

@@ -12,7 +12,6 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 
-import java.awt.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
