@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -31,7 +32,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.ideaSpecifyTypeQuickFix_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
@@ -108,7 +108,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         if (object instanceof Tuple) {
             Object first = ((Tuple) object).getFirst();
             if (first instanceof Declaration) {
-                CeylonCompositeElement target = resolveDeclaration((Declaration) first, element.getProject());
+                PsiElement target = resolveDeclaration((Declaration) first, element.getProject());
 
                 if (target instanceof DeclarationPsiNameIdOwner) {
                     return ((DeclarationPsiNameIdOwner) target).getNameIdentifier();
@@ -160,10 +160,10 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             if (link.startsWith("doc:")) {
                 return new DummyPsiElement(target, context.getContainingFile());
             } else if (link.startsWith("dec:")) {
-                CeylonCompositeElement psiDecl = resolveDeclaration(target, context.getProject());
+                PsiElement psiDecl = resolveDeclaration(target, context.getProject());
 
-                if (psiDecl != null) {
-                    psiDecl.navigate(true);
+                if (psiDecl != null && psiDecl instanceof Navigatable) {
+                    ((Navigatable) psiDecl).navigate(true);
                 }
             }
         }
@@ -180,7 +180,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         private Referenceable referenceable;
         private PsiFile containingFile;
 
-        public DummyPsiElement(Referenceable referenceable, PsiFile containingFile) {
+        DummyPsiElement(Referenceable referenceable, PsiFile containingFile) {
             this.referenceable = referenceable;
             this.containingFile = containingFile;
         }

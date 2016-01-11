@@ -6,6 +6,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.MultiMap;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -80,14 +81,14 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
         if (declarationMap.containsKey(name)) {
-            Set<CeylonCompositeElement> elements = new HashSet<>();
+            Set<NavigationItem> elements = new HashSet<>();
 
             for (Declaration decl : declarationMap.get(name)) {
-                CeylonCompositeElement resolved = resolveDeclaration(decl, project);
+                PsiElement resolved = resolveDeclaration(decl, project);
                 if (resolved == null) {
                     System.out.println("Resolved null: " + decl);
                 } else {
-                    elements.add(resolved);
+                    elements.add((NavigationItem) resolved);
                 }
             }
 

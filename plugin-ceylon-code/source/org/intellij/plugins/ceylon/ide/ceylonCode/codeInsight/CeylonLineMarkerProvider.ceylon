@@ -42,6 +42,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import com.intellij.pom {
+    Navigatable
+}
 
 shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
     
@@ -87,7 +90,8 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             assert(is CeylonFile ceylonFile = t.containingFile);
 
             if (exists psi = CeylonReference
-                    .resolveDeclaration(target, t.project)) {
+                    .resolveDeclaration(target, t.project),
+                is Navigatable psi) {
                 psi.navigate(true);
             }
         }
