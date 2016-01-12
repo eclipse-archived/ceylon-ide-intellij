@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    javaString,
     javaClass
 }
 
@@ -27,14 +26,15 @@ import com.intellij.openapi.vfs {
 }
 import com.intellij.psi {
     JavaPsiFacade,
-    PsiClass
+    PsiClass,
+    PsiNamedElement
+}
+import com.intellij.psi.search {
+    GlobalSearchScope
 }
 import com.redhat.ceylon.ide.common.model {
     IdeModelLoader,
     BaseIdeModule
-}
-import com.redhat.ceylon.ide.common.util {
-    synchronize
 }
 import com.redhat.ceylon.model.cmr {
     ArtifactResult
@@ -47,7 +47,6 @@ import com.redhat.ceylon.model.loader.model {
     LazyPackage
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Module,
     Modules,
     Unit
 }
@@ -58,7 +57,7 @@ import java.lang {
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     IdeaModuleSourceMapper ideaModuleSourceMapper, Modules modules)
-        extends IdeModelLoader<IJModule,VirtualFile,VirtualFile,VirtualFile,PsiClass>
+        extends IdeModelLoader<IJModule,VirtualFile,VirtualFile,VirtualFile,PsiClass,PsiClass>
         (ideaModuleManager, ideaModuleSourceMapper, modules) {
 
     shared actual void addModuleToClasspathInternal(ArtifactResult? artifact) {
@@ -109,30 +108,6 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     shared actual Boolean isOverridingMethod(MethodMirror method) {
         assert(is PSIMethod method);
         return method.isOverriding;
-    }
-    
-    // TODO
-    shared actual Boolean loadPackage(Module? mod, String? packageName, 
-        Boolean loadDeclarations) {
-        
-        if (exists mod,
-            exists packageName,
-            exists key = cacheKeyByModule(mod, packageName)) {
-            
-            return synchronize(lock, () {
-                if(loadDeclarations && !loadedPackages.add(javaString(key))) {
-                    return true;
-                }
-                
-                if (is IdeaModule mod) {
-                    //mod.
-                }
-                
-                return false;
-            });
-        }
-        
-        return false;
     }
 
     // TODO something like ModelLoaderNameEnvironment
@@ -190,4 +165,33 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     shared actual Unit newJavaCompilationUnit(PsiClass cls,
         String relativePath, String fileName, String fullPath, LazyPackage pkg)
             => IdeaJavaCompilationUnit(cls, fileName, relativePath, fullPath, pkg);
+    
+    shared actual String typeName(PsiClass type) => (type of PsiNamedElement).name;
+
+    shared actual class PackageLoader(BaseIdeModule ideModule)
+             extends super.PackageLoader(ideModule) {
+        
+        assert(is IdeaModule ideModule);
+        assert(exists mod = ideModule.ceylonProject?.ideArtifact);
+        assert(exists project = mod.project);
+
+        value facade = JavaPsiFacade.getInstance(project);
+        
+        shared actual Boolean packageExists(String quotedPackageName) 
+                => facade.findPackage(quotedPackageName) exists;
+        
+        shared actual {PsiClass*}? packageMembers(String quotedPackageName) {
+            
+            if (exists pkg = facade.findPackage(quotedPackageName)) {
+                value classes = pkg.getClasses(GlobalSearchScope.moduleScope(mod));
+                
+                return classes.iterable.coalesced;
+            }
+            
+            return null;
+        }
+        
+        // TODO remove inner/anonymous classes?
+        shared actual Boolean shouldBeOmitted(PsiClass type) => false;
+    }
 }
