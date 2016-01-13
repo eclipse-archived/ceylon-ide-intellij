@@ -72,8 +72,8 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             IdeaDocGenerator generator = new IdeaDocGenerator(tc);
             if (element instanceof DummyPsiElement) {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;
-                PhasedUnit pu = tc.getPhasedUnitFromRelativePath(referenceable.getUnit().getRelativePath());
-                Tree.CompilationUnit cu = pu.getCompilationUnit();
+                PhasedUnit pu = ((CeylonFile) element.getContainingFile()).getPhasedUnit();
+                Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
                 return generator.getDocumentationText(referenceable, null, cu, generator.DocParams$new$(pu, element.getProject())).value;
             }
             if (element.getContainingFile() != null) {
