@@ -8,5 +8,6 @@
         <add module="com.intellij.extensions" version="current" shared="true"/>
         <add module="com.intellij.annotations" version="current" shared="true"/>
         <add module="com.intellij.util" version="current" shared="true"/>
+        <add module="com.intellij.openapi" version="current" shared="true"/>
     </module>
 </overrides>

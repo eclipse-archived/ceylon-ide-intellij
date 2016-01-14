@@ -32,6 +32,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.ideaSpecifyTypeQuickFix_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeyLightClass;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
@@ -82,8 +83,17 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                     LOGGER.warn("No phased unit for file " + element.getContainingFile().getVirtualFile().getPath());
                 } else {
                     Tree.CompilationUnit cu = pu.getCompilationUnit();
-                    return Objects.toString(generator.getDocumentation(cu, element.getTextRange().getStartOffset(),
-                            generator.DocParams$new$(pu, element.getProject())), null);
+                    IdeaDocGenerator.DocParams params = generator.DocParams$new$(pu, element.getProject());
+
+                    ceylon.language.String doc;
+                    if (element instanceof CeyLightClass) {
+                        doc = generator.getDocumentationText(((CeyLightClass) element).getDelegate(),
+                                null, cu, params);
+                    } else {
+                        doc = generator.getDocumentation(cu, element.getTextRange().getStartOffset(),
+                                params);
+                    }
+                    return Objects.toString(doc, null);
                 }
             }
         } catch (ceylon.language.AssertionError | Exception e) {
