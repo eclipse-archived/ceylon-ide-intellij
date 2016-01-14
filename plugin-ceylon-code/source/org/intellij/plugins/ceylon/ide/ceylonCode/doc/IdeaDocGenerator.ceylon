@@ -30,7 +30,8 @@ import com.redhat.ceylon.ide.common.imports {
     AbstractModuleImportUtil
 }
 import com.redhat.ceylon.ide.common.model {
-    BaseCeylonProject
+    BaseCeylonProject,
+    IJavaModelAware
 }
 import com.redhat.ceylon.ide.common.settings {
     CompletionOptions
@@ -48,7 +49,8 @@ import com.redhat.ceylon.model.typechecker.model {
     Module,
     Constructor,
     Unit,
-    Scope
+    Scope,
+    Function
 }
 import com.redhat.ceylon.model.typechecker.util {
     TypePrinter
@@ -78,6 +80,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
+}
+import com.intellij.psi {
+    PsiDocCommentOwner
 }
 
 String psiProtocol = "psi_element://";
@@ -166,7 +171,17 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
         builder.append(text).append("</div>");
     }
     
-    shared actual void appendJavadoc(Declaration model, StringBuilder buffer) {}
+    shared actual void appendJavadoc(Declaration model, StringBuilder buffer) {
+        value declaration = if (is Function model, model.annotation)
+                            then model.typeDeclaration
+                            else model;
+
+        if (is IJavaModelAware<out Anything,out Anything,out PsiDocCommentOwner> unit = declaration.unit,
+            exists javaEl = unit.toJavaElement(declaration)) {
+
+            buffer.append(javaEl.docComment.text);
+        }
+    }
         
     shared actual String highlight(String text, LocalAnalysisResult<Document> cmp) {
         assert (is DocParams cmp);

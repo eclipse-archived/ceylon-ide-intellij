@@ -18,6 +18,7 @@ import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitor
 }
 
+// TODO should not restrict to PsiClass (can also be a PsiMethod)
 class IdeaJavaClassFile(
     PsiClass cls,
     String filename,
