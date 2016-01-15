@@ -307,6 +307,6 @@ public class CeyLightClass extends LightElement implements PsiClass {
 
     @Override
     public String toString() {
-        return "Ceylon light class " + delegate.getName();
+        return "CeyLightClass:" + delegate.getName();
     }
 }

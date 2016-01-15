@@ -42,6 +42,19 @@ import java.lang {
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerProvider
 }
+import com.redhat.ceylon.ide.common.vfs {
+    FolderVirtualFile
+}
+import java.lang.ref {
+    WeakReference
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Package
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
+    vfsKeychain,
+    IdeaVirtualFolder
+}
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
@@ -169,6 +182,20 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared actual TypeChecker? typechecker
             => ideArtifact.getComponent(javaClass<ITypeCheckerProvider>())?.typeChecker;
+    
+    shared actual void setPackageForNativeFolder(VirtualFile folder, WeakReference<Package> p) {
+        folder.putUserData(vfsKeychain.findOrCreate<Package>(ideaModule), p.get());
+    }
+    
+    shared actual void setRootForNativeFolder(VirtualFile folder, WeakReference<FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>> root) {
+        assert(is IdeaVirtualFolder r = root.get());
+        folder.putUserData(vfsKeychain.findOrCreate<IdeaVirtualFolder>(ideaModule), r);
+    }
+    
+    shared actual void setRootIsForSource(VirtualFile rootFolder, Boolean isSource) {
+        rootFolder.putUserData(vfsKeychain.findOrCreate<Boolean>(ideaModule), isSource);
+    }
+    
      
 }
 

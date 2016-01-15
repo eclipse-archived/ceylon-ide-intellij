@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
+import ceylon.collection.MutableList;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -22,6 +23,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
+import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleValidator;
@@ -31,6 +33,7 @@ import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
 import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
 import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
+import com.redhat.ceylon.ide.common.vfs.FileVirtualFile;
 import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
@@ -225,17 +228,27 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor() {
                 @Override
                 public boolean visitFile(@NotNull VirtualFile file) {
-                    return scanner.visit(file);
+                    return scanner.visitNativeResource(file);
                 }
             });
         }
+
+        TypeDescriptor fileVirtualFileTypeDescriptor = TypeDescriptor.klass(FileVirtualFile.class,
+                TypeDescriptor.klass(VirtualFile.class),
+                TypeDescriptor.klass(VirtualFile.class),
+                TypeDescriptor.klass(VirtualFile.class));
+
+        MutableList<FileVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>> projectVirtualFiles
+                = new ceylon.collection.ArrayList<>(fileVirtualFileTypeDescriptor);
+
+        // todo separate sources from resources
         for (final VirtualFile sourceRoot : ModuleRootManager.getInstance(module).getSourceRoots()) {
-            final IdeaRootFolderScanner scanner = new IdeaRootFolderScanner(ceylonProject, sourceRoot);
+            final IdeaRootFolderScanner scanner = new IdeaRootFolderScanner(ceylonProject, sourceRoot, true, projectVirtualFiles);
 
             VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor() {
                 @Override
                 public boolean visitFile(@NotNull VirtualFile file) {
-                    return scanner.visit(file);
+                    return scanner.visitNativeResource(file);
                 }
             });
         }

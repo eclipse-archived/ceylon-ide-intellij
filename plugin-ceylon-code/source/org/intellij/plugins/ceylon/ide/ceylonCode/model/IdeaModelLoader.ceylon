@@ -194,4 +194,6 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         // TODO remove inner/anonymous classes?
         shared actual Boolean shouldBeOmitted(PsiClass type) => false;
     }
+
+    shared actual Boolean typeExists(PsiClass type) => true;
 }

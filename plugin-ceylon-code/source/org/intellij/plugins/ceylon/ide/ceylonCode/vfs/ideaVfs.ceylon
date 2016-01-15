@@ -1,9 +1,15 @@
+import ceylon.collection {
+    ArrayList
+}
 import ceylon.interop.java {
     javaString
 }
 
 import com.intellij.openapi.\imodule {
     Module
+}
+import com.intellij.openapi.util {
+    Key
 }
 import com.intellij.openapi.vfs {
     VirtualFile
@@ -19,6 +25,9 @@ import com.redhat.ceylon.ide.common.vfs {
     FolderVirtualFile,
     ResourceVirtualFile
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Package
+}
 
 import java.io {
     InputStream,
@@ -26,7 +35,7 @@ import java.io {
 }
 import java.util {
     List,
-    ArrayList
+    JArrayList=ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
@@ -36,7 +45,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 shared class PsiFileVirtualFile(PsiFile file, String? forcedPath = null)
         satisfies FileVirtualFile<Module,Object, PsiFile, PsiFile> {
     
-    shared actual FolderVirtualFile<Module,Object, PsiFile, PsiFile>? parent => null;
+    shared actual FolderVirtualFile<Module,Object, PsiFile, PsiFile> parent => nothing;
 
     shared actual Boolean equals(Object that)
             => (super of FileVirtualFile<Module,Object, PsiFile, PsiFile>).equals(that);
@@ -64,10 +73,10 @@ shared alias IdeaResource => ResourceVirtualFile<Module,VirtualFile,VirtualFile,
 shared class VirtualFileVirtualFile(VirtualFile file, IdeaCeylonProject project)
         satisfies FileVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile> {
     
-    shared actual FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>? 
+    shared actual FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile> 
     parent => if (exists parent = file.parent)
               then IdeaVirtualFolder(parent, project)
-              else null;
+              else nothing;
     
     shared actual Boolean equals(Object that) {
         if (is VirtualFileVirtualFile that) {
@@ -92,7 +101,7 @@ shared class IdeaVirtualFolder(VirtualFile folder, IdeaCeylonProject project)
         satisfies FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile> {
     
     shared actual List<out IdeaResource> children {
-        value result = ArrayList<IdeaResource>();
+        value result = JArrayList<IdeaResource>();
         
         folder.children.array.coalesced.each((child) {
             if (child.directory) {
@@ -128,4 +137,35 @@ shared class IdeaVirtualFolder(VirtualFile folder, IdeaCeylonProject project)
     
     shared actual CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>
     ceylonProject => project;
+    
+    shared actual Package? ceylonPackage
+            => folder.getUserData(vfsKeychain.findOrCreate<Package>(project.ideArtifact));
+    
+    shared actual Boolean isSource
+            => folder.getUserData(vfsKeychain.findOrCreate<Boolean>(project.ideArtifact));
+    
+    shared actual FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>? rootFolder
+            => folder.getUserData(vfsKeychain.findOrCreate<IdeaVirtualFolder>(project.ideArtifact));
+    
+}
+
+shared object vfsKeychain {
+    
+    shared alias VfsKey<T> => Key<T>;
+    
+    value keys = ArrayList<VfsKey<out Anything>>();
+    
+    shared VfsKey<T> findOrCreate<T>(Module mod) {
+        if (is MyKey<T> key = keys.find(
+            (k) => if (is MyKey<T> k) then k.mod == mod else false)) {
+            return key;
+        } else {
+            value key = MyKey<T>("VfsKey", mod);
+            keys.add(key);
+            return key;
+        }
+    }
+    
+    class MyKey<T>(String name, shared Module mod) extends Key<T>(name) {
+    }
 }

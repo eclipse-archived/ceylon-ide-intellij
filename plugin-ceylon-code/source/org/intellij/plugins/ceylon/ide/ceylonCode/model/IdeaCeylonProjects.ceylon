@@ -76,7 +76,7 @@ shared class IdeaCeylonProjects(IdeaProject ideProject)
                 => VfsUtilCore.getRelativePath(resource, sourceDir)
                     .split(VfsUtilCore.\iVFS_SEPARATOR_CHAR.equals).sequence();
         
-        
+        shared actual String getShortName(VirtualFile resource) => resource.name;
     }
     
     shared actual VirtualFileSystem vfs 
