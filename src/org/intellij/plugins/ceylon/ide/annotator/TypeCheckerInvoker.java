@@ -1,7 +1,9 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
@@ -9,14 +11,18 @@ import com.redhat.ceylon.compiler.typechecker.io.impl.Helper;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
+import com.redhat.ceylon.ide.common.typechecker.EditedPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.PsiFileVirtualFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.IdeaVirtualFolder;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,22 +48,27 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
         return invokeTypeChecker(ceylonFile, typeChecker);
     }
 
-    static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile, TypeChecker typeChecker) {
-        PsiFileVirtualFile sourceCodeVirtualFile = new PsiFileVirtualFile(ceylonFile);
+    private static PhasedUnit invokeTypeChecker(CeylonFile ceylonFile, TypeChecker typeChecker) {
+        IdeaCeylonProjects projects = ceylonFile.getProject().getComponent(IdeaCeylonProjects.class);
+        com.intellij.openapi.module.Module module = ModuleUtil.findModuleForFile(
+                ceylonFile.getVirtualFile(), ceylonFile.getProject());
+        IdeaCeylonProject project = (IdeaCeylonProject) projects.getProject(module);
+        VirtualFileVirtualFile sourceCodeVirtualFile
+                = new VirtualFileVirtualFile(ceylonFile.getVirtualFile(), project);
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
         Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
 
-        com.redhat.ceylon.compiler.typechecker.io.VirtualFile srcDir;
+        IdeaVirtualFolder srcDir;
         Package pkg;
 
         if (phasedUnit == null) {
-            srcDir = getSourceFolder(ceylonFile);
+            srcDir = getSourceFolder(ceylonFile, project);
             if (srcDir == null) { // happens eg. for *.ceylon files that are not within a source root. Don't do typechecking for these.
                 return null;
             }
             pkg = getPackage(sourceCodeVirtualFile, srcDir, typeChecker);
         } else {
-            srcDir = phasedUnit.getSrcDir();
+            srcDir = (IdeaVirtualFolder) phasedUnit.getSrcDir();
             pkg = phasedUnit.getPackage();
         }
         String relativePath = Helper.computeRelativePath(sourceCodeVirtualFile, srcDir);
@@ -66,11 +77,17 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
             typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(relativePath);
         }
 
-        phasedUnit = new PhasedUnit(sourceCodeVirtualFile, srcDir, cu, pkg,
+        phasedUnit = new EditedPhasedUnit<>(
+                TypeDescriptor.klass(com.intellij.openapi.module.Module.class),
+                TypeDescriptor.klass(com.intellij.openapi.vfs.VirtualFile.class),
+                TypeDescriptor.klass(com.intellij.openapi.vfs.VirtualFile.class),
+                TypeDescriptor.klass(com.intellij.openapi.vfs.VirtualFile.class),
+                sourceCodeVirtualFile, srcDir, cu, pkg,
                 typeChecker.getPhasedUnits().getModuleManager(),
                 typeChecker.getPhasedUnits().getModuleSourceMapper(),
-                typeChecker.getContext(),
-                ceylonFile.getTokens());
+                typeChecker,
+                ceylonFile.getTokens(),
+                null);
 
         BaseIdeModelLoader loader = ((BaseIdeModuleManager) typeChecker.getPhasedUnits()
                 .getModuleManager()).getModelLoader();
@@ -94,8 +111,13 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
         return phasedUnit;
     }
 
-    private static com.redhat.ceylon.compiler.typechecker.io.VirtualFile getSourceFolder(CeylonFile sourceFile) {
-        return VFileAdapter.createInstance(ProjectRootManager.getInstance(sourceFile.getProject()).getFileIndex().getSourceRootForFile(sourceFile.getVirtualFile()));
+    private static IdeaVirtualFolder getSourceFolder(CeylonFile sourceFile, IdeaCeylonProject project) {
+        com.intellij.openapi.vfs.VirtualFile root = ProjectRootManager
+                .getInstance(sourceFile.getProject())
+                .getFileIndex()
+                .getSourceRootForFile(sourceFile.getVirtualFile());
+
+        return new IdeaVirtualFolder(root, project);
     }
 
     private static Package getPackage(VirtualFile file, VirtualFile srcDir,

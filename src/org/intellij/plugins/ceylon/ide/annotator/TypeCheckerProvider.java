@@ -3,7 +3,9 @@ package org.intellij.plugins.ceylon.ide.annotator;
 import ceylon.collection.MutableList;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.facet.FacetManager;
+import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
@@ -11,6 +13,7 @@ import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
@@ -38,6 +41,8 @@ import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModuleManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaModulesScanner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaRootFolderScanner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -47,6 +52,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,6 +137,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     typeChecker = createTypeChecker();
 
                     parseCeylonModel();
+
+                    setupCeylonLanguageSrc();
 
                     ApplicationManager.getApplication().runReadAction(new Runnable() {
                         @Override
@@ -288,21 +296,6 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         }
         ceylonModel.addProject(module);
 
-        ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
-        // TODO repo manager, and move this somewhere else probably
-        String carFile = "jar:///Users/bastien/Dev/ceylon/ceylon/dist/dist/repo/ceylon/language/1.2.1/ceylon.language-1.2.1.car!/";
-        LibraryTable tbl = model.getModuleLibraryTable();
-
-        Library lib = tbl.getLibraryByName("Ceylon Stuff");
-        if (lib == null) {
-            lib = tbl.createLibrary("Ceylon Stuff");
-        }
-        Library.ModifiableModel modifiableModel = lib.getModifiableModel();
-        modifiableModel.addRoot(VirtualFileManager.getInstance().findFileByUrl(carFile), OrderRootType.CLASSES);
-
-        modifiableModel.commit();
-        model.commit();
-
         StartupManager.getInstance(module.getProject()).runWhenProjectIsInitialized(
                 new Runnable() {
                     @Override
@@ -311,6 +304,43 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     }
                 }
         );
+    }
+
+    private void setupCeylonLanguageSrc() {
+        if (typeChecker != null) {
+            ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    AccessToken lock = ApplicationManager.getApplication().acquireWriteActionLock(TypeCheckerProvider.class);
+                    IdeaModule languageModule = (IdeaModule) typeChecker.getPhasedUnits()
+                            .getModuleManager().getModules().getLanguageModule();
+
+                    ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
+
+                    LibraryTable tbl = model.getModuleLibraryTable();
+                    Library lib = tbl.getLibraryByName("Ceylon Stuff");
+
+                    if (lib == null) {
+                        lib = tbl.createLibrary("Ceylon Stuff");
+                    }
+                    Library.ModifiableModel modifiableModel = lib.getModifiableModel();
+                    try {
+                        String srcFile = "jar://" + languageModule.getArtifact().getCanonicalPath() + "!/";
+                        modifiableModel.addRoot(VirtualFileManager.getInstance().findFileByUrl(srcFile), OrderRootType.CLASSES);
+
+                        modifiableModel.commit();
+                        model.commit();
+                    } catch (Exception e) {
+                        modifiableModel.dispose();
+                        model.dispose();
+                    } finally {
+                        lock.finish();
+                    }
+                }
+            }, ModalityState.any());
+
+            DumbService.getInstance(module.getProject()).waitForSmartMode();
+        }
     }
 
     private TypeChecker createTypeChecker() {

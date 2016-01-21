@@ -43,7 +43,11 @@ public class CeylonDecompiler extends ClassFileDecompilers.Full {
 
     static boolean isInnerClass(VirtualFile file) {
         try {
-            ClassReader reader = new ClassReader(file.contentsToByteArray());
+            byte[] contents = file.contentsToByteArray();
+            if (contents.length == 0) {
+                return false;
+            }
+            ClassReader reader = new ClassReader(contents);
 
             final Ref<Boolean> isInnerClass = new Ref<>(Boolean.FALSE);
 

@@ -1,47 +1,49 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.PsiClassImplUtil;
+import com.intellij.psi.impl.light.LightElement;
+import com.intellij.psi.impl.light.LightModifierList;
+import com.intellij.psi.impl.source.ClassInnerStuffCache;
+import com.intellij.psi.impl.source.PsiExtensibleClass;
+import com.intellij.psi.javadoc.PsiDocComment;
+import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.util.PsiUtil;
+import com.intellij.util.IncorrectOperationException;
+import com.redhat.ceylon.ide.common.model.asjava.JClassMirror;
+import com.redhat.ceylon.model.loader.mirror.ClassMirror;
+import com.redhat.ceylon.model.loader.mirror.MethodMirror;
+import com.redhat.ceylon.model.loader.mirror.TypeMirror;
+import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
+public class CeyLightClass extends LightElement implements PsiExtensibleClass {
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
-import com.intellij.psi.HierarchicalMethodSignature;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiClassInitializer;
-import com.intellij.psi.PsiClassType;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiIdentifier;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiModifierList;
-import com.intellij.psi.PsiReferenceList;
-import com.intellij.psi.PsiSubstitutor;
-import com.intellij.psi.PsiTypeParameter;
-import com.intellij.psi.PsiTypeParameterList;
-import com.intellij.psi.impl.light.LightElement;
-import com.intellij.psi.impl.light.LightModifierList;
-import com.intellij.psi.javadoc.PsiDocComment;
-import com.intellij.util.IncorrectOperationException;
-import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
-import com.redhat.ceylon.model.typechecker.model.Interface;
+    private JClassMirror delegate;
 
-public class CeyLightClass extends LightElement implements PsiClass {
-
-    private ClassOrInterface delegate;
+    private final ClassInnerStuffCache myInnersCache = new ClassInnerStuffCache(this);
 
     public CeyLightClass(ClassOrInterface delegate, Project project) {
         super(PsiManager.getInstance(project), CeylonLanguage.INSTANCE);
-        this.delegate = delegate;
+        this.delegate = new JClassMirror(delegate);
+    }
+
+    public CeyLightClass(JClassMirror mirror, Project project) {
+        super(PsiManager.getInstance(project), CeylonLanguage.INSTANCE);
+        delegate = mirror;
     }
 
     public ClassOrInterface getDelegate() {
-        return delegate;
+        return delegate.getDecl();
     }
 
     @Override
@@ -62,7 +64,7 @@ public class CeyLightClass extends LightElement implements PsiClass {
 
     @Override
     public boolean isDeprecated() {
-        return delegate.isDeprecated();
+        return delegate.getDecl().isDeprecated();
     }
 
     @Override
@@ -83,22 +85,22 @@ public class CeyLightClass extends LightElement implements PsiClass {
 
     @Override
     public String getQualifiedName() {
-        return delegate.getQualifiedNameString().replace("::", ".");
+        return delegate.getQualifiedName();
     }
 
     @Override
     public boolean isInterface() {
-        return delegate instanceof Interface;
+        return delegate.isInterface();
     }
 
     @Override
     public boolean isAnnotationType() {
-        return delegate.isAnnotation();
+        return delegate.isAnnotationType();
     }
 
     @Override
     public boolean isEnum() {
-        return delegate.isJavaEnum();
+        return delegate.isEnum();
     }
 
     @Override
@@ -127,6 +129,10 @@ public class CeyLightClass extends LightElement implements PsiClass {
 
     @Override
     public PsiClass getSuperClass() {
+        if (delegate.getSuperclass() != null) {
+            System.out.println(delegate.getSuperclass());
+            //return new CeyLightClass(delegate.getSuperclass());
+        }
         // TODO Auto-generated method stub
         return null;
     }
@@ -145,32 +151,40 @@ public class CeyLightClass extends LightElement implements PsiClass {
 
     @Override
     public PsiClassType[] getSuperTypes() {
-        // TODO Auto-generated method stub
-        return PsiClassType.EMPTY_ARRAY;
+        List<PsiClassType> superTypes = new ArrayList<>();
+
+        if (delegate.getSuperclass() != null) {
+            superTypes.add(new CeyLightType(delegate.getSuperclass(), getProject()));
+        }
+        for (TypeMirror intf : delegate.getInterfaces()) {
+            superTypes.add(new CeyLightType(intf, getProject()));
+        }
+
+        if (superTypes.size() == 0) {
+            return PsiClassType.EMPTY_ARRAY;
+        } else {
+            return superTypes.toArray(PsiClassType.ARRAY_FACTORY.create(superTypes.size()));
+        }
     }
 
     @Override
     public PsiField[] getFields() {
-        // TODO Auto-generated method stub
-        return PsiField.EMPTY_ARRAY;
+        return myInnersCache.getFields();
     }
 
     @Override
     public PsiMethod[] getMethods() {
-        // TODO Auto-generated method stub
-        return PsiMethod.EMPTY_ARRAY;
+        return myInnersCache.getMethods();
     }
 
     @Override
     public PsiMethod[] getConstructors() {
-        // TODO Auto-generated method stub
-        return PsiMethod.EMPTY_ARRAY;
+        return myInnersCache.getConstructors();
     }
 
     @Override
     public PsiClass[] getInnerClasses() {
-        // TODO Auto-generated method stub
-        return PsiClass.EMPTY_ARRAY;
+        return myInnersCache.getInnerClasses();
     }
 
     @Override
@@ -181,14 +195,12 @@ public class CeyLightClass extends LightElement implements PsiClass {
 
     @Override
     public PsiField[] getAllFields() {
-        // TODO Auto-generated method stub
-        return PsiField.EMPTY_ARRAY;
+        return PsiClassImplUtil.getAllFields(this);
     }
 
     @Override
     public PsiMethod[] getAllMethods() {
-        // TODO Auto-generated method stub
-        return PsiMethod.EMPTY_ARRAY;
+        return PsiClassImplUtil.getAllMethods(this);
     }
 
     @Override
@@ -205,14 +217,14 @@ public class CeyLightClass extends LightElement implements PsiClass {
 
     @Override
     public PsiMethod findMethodBySignature(PsiMethod patternMethod,
-            boolean checkBases) {
+                                           boolean checkBases) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public PsiMethod[] findMethodsBySignature(PsiMethod patternMethod,
-            boolean checkBases) {
+                                              boolean checkBases) {
         // TODO Auto-generated method stub
         return PsiMethod.EMPTY_ARRAY;
     }
@@ -297,7 +309,7 @@ public class CeyLightClass extends LightElement implements PsiClass {
 
     @Override
     public PsiFile getContainingFile() {
-        return CeylonTreeUtil.getDeclaringFile(delegate.getUnit(), getProject());
+        return CeylonTreeUtil.getDeclaringFile(delegate.getDecl().getUnit(), getProject());
     }
 
     @Override
@@ -308,5 +320,37 @@ public class CeyLightClass extends LightElement implements PsiClass {
     @Override
     public String toString() {
         return "CeyLightClass:" + delegate.getName();
+    }
+
+    @NotNull
+    @Override
+    public List<PsiField> getOwnFields() {
+        return Collections.emptyList();
+    }
+
+    @NotNull
+    @Override
+    public List<PsiMethod> getOwnMethods() {
+        List<PsiMethod> methods = new ArrayList<>();
+
+        for (MethodMirror meth : delegate.getDirectMethods()) {
+            methods.add(new CeyLightMethod(this, meth, getProject()));
+        }
+
+        return methods;
+    }
+
+    @Override
+    public boolean processDeclarations(@NotNull PsiScopeProcessor processor,
+                                       @NotNull ResolveState state, PsiElement lastParent,
+                                       @NotNull PsiElement place) {
+        return PsiClassImplUtil.processDeclarationsInClass(this, processor, state, null,
+                lastParent, place, PsiUtil.getLanguageLevel(place), false);
+    }
+
+    @NotNull
+    @Override
+    public List<PsiClass> getOwnInnerClasses() {
+        return Collections.emptyList();
     }
 }

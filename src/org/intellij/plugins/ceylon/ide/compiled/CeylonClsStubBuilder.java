@@ -1,6 +1,6 @@
 package org.intellij.plugins.ceylon.ide.compiled;
 
-import com.intellij.openapi.util.Comparing;
+import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.compiled.ClsStubBuilder;
 import com.intellij.psi.impl.compiled.InnerClassSourceStrategy;
@@ -41,10 +41,8 @@ class CeylonClsStubBuilder extends ClsStubBuilder {
 
         try {
             ClassReader reader = new ClassReader(bytes);
-            String internalName = reader.getClassName();
             String className = file.getNameWithoutExtension();
-            String fqn = StubBuildingVisitor.getFqn(internalName, className, null);
-            String packageName = getPackageName(fqn, className);
+            String packageName = getPackageName(reader.getClassName());
             PsiJavaFileStubImpl stub = new PsiJavaFileStubImpl(packageName, true);
 
             try {
@@ -62,8 +60,9 @@ class CeylonClsStubBuilder extends ClsStubBuilder {
         }
     }
 
-    private static String getPackageName(String fqn, String shortName) {
-        return fqn == null || Comparing.equal(shortName, fqn) ? "" : fqn.substring(0, fqn.lastIndexOf('.'));
+    private static String getPackageName(String internalName) {
+        int p = internalName.lastIndexOf('/');
+        return p > 0 ? internalName.substring(0, p).replace('/', '.') : StringUtilRt.EMPTY_STRING;
     }
 
     private static final InnerClassSourceStrategy<VirtualFile> STRATEGY = new InnerClassSourceStrategy<VirtualFile>() {

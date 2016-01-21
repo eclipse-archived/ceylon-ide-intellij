@@ -52,7 +52,7 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
     }
     
     shared actual ObjectArray<PsiClass> findClasses(String fqName, GlobalSearchScope scope) {
-        return javaObjectArray(Array<PsiClass?>({}));
+        return javaObjectArray(Array<PsiClass?>({findClass(fqName, scope)}.coalesced));
     }
     
     shared actual ObjectArray<PsiClass> getClasses(PsiPackage pkg, GlobalSearchScope scope) {
