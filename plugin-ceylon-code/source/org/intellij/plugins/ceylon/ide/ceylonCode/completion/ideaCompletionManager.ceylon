@@ -88,6 +88,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons,
     ideaIndents
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
+    DummyProgressMonitor
+}
 
 shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Editor editor,
         shared actual TypeChecker typeChecker, shared CeylonFile file, shared actual CompletionOptions options)
@@ -111,13 +114,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         value params = CompletionData(pu, parameters.editor, tc, ceylonFile, options);
         value line = doc.getLineNumber(element.textOffset);
         
-        value monitor = object satisfies BaseProgressMonitor {
-            shared actual variable Integer workRemaining = 100;
-            shared actual void worked(Integer amount) {
-                workRemaining -= amount;
-            }
-            shared actual void subTask(String? desc) {}
-        };
+        value monitor = DummyProgressMonitor();
         value returnedParamInfo = true; // The parameters tooltip has nothing to do with code completion, so we bypass it
         value completions = getContentProposals(pu.compilationUnit, params, 
             parameters.editor.caretModel.offset, line, isSecondLevel, monitor, returnedParamInfo);

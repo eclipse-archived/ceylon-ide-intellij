@@ -24,8 +24,9 @@ shared class IdeaModulesScanner(IdeaCeylonProject project, VirtualFile srcDir)
 
 }
 
-class DummyProgressMonitor() extends ProgressMonitor<String>("") {
+shared class DummyProgressMonitor() extends ProgressMonitor<String>("") {
     shared actual void subTask(String? desc) {}
     
     shared actual void worked(Integer amount) {}
+    shared actual Boolean cancelled => false;
 }

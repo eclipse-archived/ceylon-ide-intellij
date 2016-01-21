@@ -105,8 +105,10 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
         if (exists pkgSeparatorIndex) {
             value pkgName = linkTarget.spanTo(pkgSeparatorIndex);
             declName = linkTarget.spanFrom(pkgSeparatorIndex + 2);
-            if (exists mod = resolveModule(scope)) {
+            if (exists mod = resolveModule(linkScope)) {
                 scope = mod.getPackage(pkgName);
+            } else {
+                scope = null;
             }
         } else {
             declName = linkTarget;
