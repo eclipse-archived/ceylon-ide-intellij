@@ -12,11 +12,11 @@ import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.redhat.ceylon.ide.common.model.asjava.JClassMirror;
-import com.redhat.ceylon.model.loader.mirror.ClassMirror;
+import com.redhat.ceylon.ide.common.model.asjava.AbstractClassMirror;
+import com.redhat.ceylon.ide.common.model.asjava.ceylonToJavaMapper_;
 import com.redhat.ceylon.model.loader.mirror.MethodMirror;
 import com.redhat.ceylon.model.loader.mirror.TypeMirror;
-import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
 import org.jetbrains.annotations.NotNull;
@@ -28,21 +28,21 @@ import java.util.List;
 
 public class CeyLightClass extends LightElement implements PsiExtensibleClass {
 
-    private JClassMirror delegate;
+    private AbstractClassMirror delegate;
 
     private final ClassInnerStuffCache myInnersCache = new ClassInnerStuffCache(this);
 
-    public CeyLightClass(ClassOrInterface delegate, Project project) {
+    public CeyLightClass(Declaration delegate, Project project) {
         super(PsiManager.getInstance(project), CeylonLanguage.INSTANCE);
-        this.delegate = new JClassMirror(delegate);
+        this.delegate = (AbstractClassMirror) ceylonToJavaMapper_.get_().mapDeclaration(delegate).getFirst();
     }
 
-    public CeyLightClass(JClassMirror mirror, Project project) {
+    public CeyLightClass(AbstractClassMirror mirror, Project project) {
         super(PsiManager.getInstance(project), CeylonLanguage.INSTANCE);
         delegate = mirror;
     }
 
-    public ClassOrInterface getDelegate() {
+    public Declaration getDelegate() {
         return delegate.getDecl();
     }
 

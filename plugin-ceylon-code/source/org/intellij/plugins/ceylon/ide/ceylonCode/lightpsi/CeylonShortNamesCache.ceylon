@@ -27,7 +27,8 @@ import com.intellij.util.containers {
 }
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
-    Class
+    Value,
+    Declaration
 }
 
 import java.lang {
@@ -37,6 +38,12 @@ import java.lang {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
+}
+
+String getJavaName(Declaration decl) {
+    return switch(decl)
+        case (is Value) decl.name + "_"
+    else decl.name;
 }
 
 shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache() {
@@ -50,8 +57,8 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
                     for (pack in CeylonIterable(mod.packages)) {
                         classes.addAll(
                             CeylonIterable(pack.members)
-                                .narrow<ClassOrInterface>()
-                                .map((c) => JString(c.name))
+                                .narrow<ClassOrInterface|Value>()
+                                .map((c) => JString(getJavaName(c)))
                         );
                     }
                 }
@@ -90,9 +97,9 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
                     for (mod in mods) {
                         for (pack in CeylonIterable(mod.packages)) {
                             for (dec in CeylonIterable(pack.members)) {
-                                if (name == dec.name) {
-                                    if (is Class dec) {
-                                        classes.add(CeyLightClass(dec, project));
+                                if (name == getJavaName(dec)) {
+                                    if (is ClassOrInterface|Value dec) {
+                                        classes.add(CeyLightClass(dec of Declaration, project));
                                     }
                                 }
                             }

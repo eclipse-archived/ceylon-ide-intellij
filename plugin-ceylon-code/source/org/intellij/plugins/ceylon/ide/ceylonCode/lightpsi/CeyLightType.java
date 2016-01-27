@@ -5,6 +5,7 @@ import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.EmptySubstitutorImpl;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.redhat.ceylon.ide.common.model.asjava.AbstractClassMirror;
 import com.redhat.ceylon.ide.common.model.asjava.JClassMirror;
 import com.redhat.ceylon.model.loader.mirror.ClassMirror;
 import com.redhat.ceylon.model.loader.mirror.TypeMirror;
@@ -23,8 +24,8 @@ class CeyLightType extends PsiClassType {
         @Override
         public PsiClass getElement() {
             ClassMirror mirror = delegate.getDeclaredClass();
-            return mirror instanceof JClassMirror
-                    ? new CeyLightClass((JClassMirror) mirror, project)
+            return mirror instanceof AbstractClassMirror
+                    ? new CeyLightClass((AbstractClassMirror) mirror, project)
                     : null;
         }
 

@@ -1,26 +1,33 @@
-import com.intellij.psi {
-    PsiElementFinder,
-    PsiClass,
-    PsiPackage
-}
-import java.lang {
-    ObjectArray
-}
-import com.intellij.psi.search {
-    GlobalSearchScope
-}
 import ceylon.interop.java {
     javaObjectArray,
     javaClass,
     CeylonIterable,
     createJavaObjectArray
 }
+
+import com.intellij.psi {
+    PsiElementFinder,
+    PsiClass,
+    PsiPackage
+}
+import com.intellij.psi.search {
+    GlobalSearchScope
+}
+import com.redhat.ceylon.model.typechecker.model {
+    ClassOrInterface,
+    Value,
+    Declaration
+}
+
+import java.lang {
+    ObjectArray
+}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
 }
-import com.redhat.ceylon.model.typechecker.model {
-    Class,
-    ClassOrInterface
+import com.redhat.ceylon.ide.common.model.asjava {
+    getJavaQualifiedName
 }
 
 shared class CeylonElementFinder() extends PsiElementFinder() {
@@ -38,9 +45,9 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     
                     for (pack in CeylonIterable(mod.packages)) {
                         for (dec in CeylonIterable(pack.members)) {
-                            if (fqName == dec.qualifiedNameString.replace("::", ".")) {
-                                if (is Class dec) {
-                                    return CeyLightClass(dec, p);
+                            if (fqName == getJavaQualifiedName(dec)) {
+                                if (is ClassOrInterface|Value dec) {
+                                    return CeyLightClass(dec of Declaration, p);
                                 }
                             }
                         }
@@ -71,8 +78,8 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                         if (pack.qualifiedNameString == fqName) {
                             return createJavaObjectArray(
                                 CeylonIterable(pack.members)
-                                    .narrow<ClassOrInterface>()
-                                    .map((dec) => CeyLightClass(dec, p))
+                                    .narrow<ClassOrInterface|Value>()
+                                    .map((dec) => CeyLightClass(dec of Declaration, p))
                             );
                         }
                     }

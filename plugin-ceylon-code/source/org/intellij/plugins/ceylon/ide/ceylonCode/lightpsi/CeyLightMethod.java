@@ -144,6 +144,9 @@ public class CeyLightMethod extends LightElement implements PsiMethod {
 
     @Override
     public boolean hasModifierProperty(@PsiModifier.ModifierConstant @NonNls @NotNull String name) {
+        if (name.equals(PsiModifier.STATIC)) {
+            return delegate.isStatic();
+        }
         return false;
     }
 
@@ -224,10 +227,10 @@ public class CeyLightMethod extends LightElement implements PsiMethod {
             return PsiType.INT;
         } else if (type.getKind() == TypeKind.BYTE) {
             return PsiType.BYTE;
-        } else if (type.getQualifiedName().equals("java.lang::String")) {
-            return PsiType.getJavaLangString(getManager(), GlobalSearchScope.projectScope(getProject()));
+        } else if (type.getQualifiedName().equals("java.lang.String")) {
+            return PsiType.getJavaLangString(getManager(), GlobalSearchScope.allScope(getProject()));
         } else if (type.getQualifiedName().equals("ceylon.language::Object")) {
-            return PsiType.getJavaLangObject(getManager(), GlobalSearchScope.projectScope(getProject()));
+            return PsiType.getJavaLangObject(getManager(), GlobalSearchScope.allScope(getProject()));
         }
         return new CeyLightType(type, getProject());
     }
