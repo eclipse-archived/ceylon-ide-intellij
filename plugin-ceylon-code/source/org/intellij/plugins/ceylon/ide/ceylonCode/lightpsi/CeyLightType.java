@@ -127,7 +127,7 @@ class CeyLightType extends PsiClassType {
 
     @Override
     public String getClassName() {
-        return delegate.getDeclaredClass().getName();
+        return delegate.getQualifiedName();
     }
 
     @NotNull
