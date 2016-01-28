@@ -76,7 +76,7 @@ class CeyLightType extends PsiClassType {
     @NotNull
     @Override
     public String getCanonicalText() {
-        return delegate.getQualifiedName();
+        return delegate.getQualifiedName().replace("::", ".");
     }
 
     @NotNull
@@ -127,7 +127,8 @@ class CeyLightType extends PsiClassType {
 
     @Override
     public String getClassName() {
-        return delegate.getQualifiedName();
+        ClassMirror cls = delegate.getDeclaredClass();
+        return cls == null ? "unknown" : cls.getName();
     }
 
     @NotNull
