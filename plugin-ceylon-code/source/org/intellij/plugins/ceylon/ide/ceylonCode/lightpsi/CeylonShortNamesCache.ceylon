@@ -37,7 +37,8 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
+    IdeaCeylonProjects,
+    IdeaModuleManager
 }
 
 String getJavaName(Declaration decl) {
@@ -84,6 +85,19 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
     shared actual void getAllMethodNames(HashSet<JString> hashSet)
             => allMethodNames.array.coalesced.each(hashSet.add);
     
+    void scanInners(ClassOrInterface|Value decl, String name, ArrayList<PsiClass> classes) {
+        value members = if (is ClassOrInterface decl) then decl.members else decl.members;
+        
+        for (member in CeylonIterable(members)) {
+            if (is ClassOrInterface member) {
+                if (name == getJavaName(member)) {
+                    classes.add(CeyLightClass(decl of Declaration, project));
+                }
+                scanInners(member, name, classes);
+            }
+        }
+    }
+    
     shared actual ObjectArray<PsiClass> getClassesByName(String name, GlobalSearchScope scope) {
         value classes = ArrayList<PsiClass>();
 
@@ -92,17 +106,15 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
                 value ijMod = proj.ideArtifact;
                 
                 if (scope.isSearchInModuleContent(ijMod),
-                    exists mods = proj.modules?.fromProject) {
+                    is IdeaModuleManager mm = proj.modules?.manager) {
                     
-                    for (mod in mods) {
-                        for (pack in CeylonIterable(mod.packages)) {
-                            for (dec in CeylonIterable(pack.members)) {
-                                if (name == getJavaName(dec)) {
-                                    if (is ClassOrInterface|Value dec) {
-                                        classes.add(CeyLightClass(dec of Declaration, project));
-                                    }
-                                }
+                    for (declName->source in mm.modelLoader.sourceDeclarations) {
+                        if (is ClassOrInterface|Value decl = source.modelDeclaration) {
+                            if (name == getJavaName(decl)) {
+                                classes.add(CeyLightClass(decl of Declaration, project));
                             }
+                            
+                            scanInners(decl, name, classes);
                         }
                     }
                 }

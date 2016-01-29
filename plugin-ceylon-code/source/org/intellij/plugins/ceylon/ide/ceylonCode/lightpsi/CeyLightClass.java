@@ -14,6 +14,7 @@ import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.ide.common.model.asjava.AbstractClassMirror;
 import com.redhat.ceylon.ide.common.model.asjava.ceylonToJavaMapper_;
+import com.redhat.ceylon.model.loader.mirror.ClassMirror;
 import com.redhat.ceylon.model.loader.mirror.MethodMirror;
 import com.redhat.ceylon.model.loader.mirror.TypeMirror;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
@@ -351,6 +352,12 @@ public class CeyLightClass extends LightElement implements PsiExtensibleClass {
     @NotNull
     @Override
     public List<PsiClass> getOwnInnerClasses() {
-        return Collections.emptyList();
+        List<PsiClass> classes = new ArrayList<>();
+
+        for (ClassMirror cls : delegate.getDirectInnerClasses()) {
+            classes.add(new CeyLightClass((AbstractClassMirror) cls, getProject()));
+        }
+
+        return classes;
     }
 }
