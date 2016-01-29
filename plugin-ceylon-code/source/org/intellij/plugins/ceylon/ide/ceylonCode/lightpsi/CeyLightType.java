@@ -6,7 +6,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.EmptySubstitutorImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.redhat.ceylon.ide.common.model.asjava.AbstractClassMirror;
-import com.redhat.ceylon.ide.common.model.asjava.JClassMirror;
 import com.redhat.ceylon.model.loader.mirror.ClassMirror;
 import com.redhat.ceylon.model.loader.mirror.TypeMirror;
 import org.jetbrains.annotations.NonNls;

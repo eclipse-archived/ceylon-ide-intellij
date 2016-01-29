@@ -28,7 +28,7 @@ shared class IdeaRootFolderScanner(
     Boolean isSource,
     MutableList<FileVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>> scannedFiles)
         extends RootFolderScanner<Module,VirtualFile,VirtualFile,VirtualFile>(
-    project, IdeaVirtualFolder(srcDir, project), isSource, 
+    project, IdeaVirtualFolder(srcDir, project.ideArtifact), isSource, 
     scannedFiles,
     DummyProgressMonitor()
 ) {

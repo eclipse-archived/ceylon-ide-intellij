@@ -40,20 +40,18 @@ shared class IdeaCeylonProjects(IdeaProject ideProject)
             extends super.VirtualFileSystem() {
         
         shared actual FileVirtualFileAlias createVirtualFile(VirtualFile file,
-            CeylonProject<IdeaModule,VirtualFile,VirtualFile,VirtualFile> p) {
+            IdeaModule project) {
             
-            assert(is IdeaCeylonProject p);
-            return VirtualFileVirtualFile(file, p);
+            return VirtualFileVirtualFile(file, project);
         }
         
         shared actual FileVirtualFileAlias createVirtualFileFromProject
         (IdeaModule project, Path path) => nothing;
         
         shared actual FolderVirtualFileAlias createVirtualFolder(VirtualFile folder,
-            CeylonProject<IdeaModule,VirtualFile,VirtualFile,VirtualFile> p) {
+            IdeaModule project) {
             
-            assert(is IdeaCeylonProject p);
-            return IdeaVirtualFolder(folder, p);
+            return IdeaVirtualFolder(folder, project);
         }
         
         shared actual FolderVirtualFileAlias createVirtualFolderFromProject

@@ -2,7 +2,8 @@ import ceylon.collection {
     ArrayList
 }
 import ceylon.interop.java {
-    javaString
+    javaString,
+    javaClass
 }
 
 import com.intellij.openapi.\imodule {
@@ -18,7 +19,8 @@ import com.intellij.psi {
     PsiFile
 }
 import com.redhat.ceylon.ide.common.model {
-    CeylonProject
+    CeylonProject,
+    CeylonProjects
 }
 import com.redhat.ceylon.ide.common.vfs {
     FileVirtualFile,
@@ -39,7 +41,7 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProject
+    IdeaCeylonProjects
 }
 
 shared class PsiFileVirtualFile(PsiFile file, String? forcedPath = null)
@@ -66,16 +68,21 @@ shared class PsiFileVirtualFile(PsiFile file, String? forcedPath = null)
     
     shared actual CeylonProject<Module,Object,PsiFile,PsiFile> ceylonProject
     => nothing;
+    
+    shared actual Module nativeProject => nothing;
+    
+    shared actual CeylonProjects<Module,Object,PsiFile,PsiFile>.VirtualFileSystem vfs => nothing;
+    
 }
 
 shared alias IdeaResource => ResourceVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>;
 
-shared class VirtualFileVirtualFile(VirtualFile file, IdeaCeylonProject project)
+shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
         satisfies FileVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile> {
     
     shared actual FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile> 
     parent => if (exists parent = file.parent)
-              then IdeaVirtualFolder(parent, project)
+              then IdeaVirtualFolder(parent, mod)
               else nothing;
     
     shared actual Boolean equals(Object that) {
@@ -94,10 +101,16 @@ shared class VirtualFileVirtualFile(VirtualFile file, IdeaCeylonProject project)
     shared actual String charset => file.charset.string;
     
     shared actual CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>
-    ceylonProject => project;
+    ceylonProject => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod) else nothing;
+    
+    shared actual Module nativeProject => mod;
+    
+    shared actual CeylonProjects<Module,VirtualFile,VirtualFile,VirtualFile>.VirtualFileSystem
+    vfs => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).vfs;
+    
 }
 
-shared class IdeaVirtualFolder(VirtualFile folder, IdeaCeylonProject project)
+shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
         satisfies FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile> {
     
     shared actual List<out IdeaResource> children {
@@ -105,10 +118,10 @@ shared class IdeaVirtualFolder(VirtualFile folder, IdeaCeylonProject project)
         
         folder.children.array.coalesced.each((child) {
             if (child.directory) {
-                result.add(IdeaVirtualFolder(child, project));
+                result.add(IdeaVirtualFolder(child, mod));
             } else {
                 
-                result.add(VirtualFileVirtualFile(child, project));
+                result.add(VirtualFileVirtualFile(child, mod));
             }
         });
         
@@ -121,7 +134,7 @@ shared class IdeaVirtualFolder(VirtualFile folder, IdeaCeylonProject project)
     
     shared actual FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>?
     parent => if (exists parent = folder.parent)
-              then IdeaVirtualFolder(parent, project)
+              then IdeaVirtualFolder(parent, mod)
               else null;
     
     shared actual String path => folder.canonicalPath;
@@ -136,16 +149,22 @@ shared class IdeaVirtualFolder(VirtualFile folder, IdeaCeylonProject project)
     }
     
     shared actual CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>
-    ceylonProject => project;
+    ceylonProject => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod) else nothing;
     
     shared actual Package? ceylonPackage
-            => folder.getUserData(vfsKeychain.findOrCreate<Package>(project.ideArtifact));
+            => folder.getUserData(vfsKeychain.findOrCreate<Package>(mod));
     
     shared actual Boolean isSource
-            => folder.getUserData(vfsKeychain.findOrCreate<Boolean>(project.ideArtifact));
+            => folder.getUserData(vfsKeychain.findOrCreate<Boolean>(mod));
     
     shared actual FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>? rootFolder
-            => folder.getUserData(vfsKeychain.findOrCreate<IdeaVirtualFolder>(project.ideArtifact));
+            => folder.getUserData(vfsKeychain.findOrCreate<IdeaVirtualFolder>(mod));
+    
+    shared actual Module nativeProject => mod;
+    
+    shared actual CeylonProjects<Module,VirtualFile,VirtualFile,VirtualFile>.VirtualFileSystem
+    vfs => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).vfs;
+    
     
 }
 
