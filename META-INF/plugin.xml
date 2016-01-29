@@ -44,9 +44,9 @@
         <action id="Ceylon.AddCeylonFile" class="org.intellij.plugins.ceylon.ide.action.CeylonAddFileAction" text="Ceylon _File" description="Add a new Ceylon file">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="Ceylon.AddCeylonPackage"/>
         </action>
-        <action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction" id="Ceylon.PasteAsCeylon" text="Paste Java as Ceylon">
-            <add-to-group group-id="CutCopyPasteGroup" anchor="last"/>
-        </action>
+        <!--<action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction" id="Ceylon.PasteAsCeylon" text="Paste Java as Ceylon">-->
+            <!--<add-to-group group-id="CutCopyPasteGroup" anchor="last"/>-->
+        <!--</action>-->
     </actions>
 
     <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
