@@ -138,6 +138,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
                 else null;
         } else {
             return switch (thing)
+                case (Icons.imports) ideaIcons.imports
                 case (Icons.annotations) ideaIcons.annotations
                 case (Icons.modules) ideaIcons.modules
                 case (Icons.objects) ideaIcons.objects
