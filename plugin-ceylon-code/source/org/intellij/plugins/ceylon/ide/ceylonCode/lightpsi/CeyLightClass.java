@@ -17,6 +17,7 @@ import com.redhat.ceylon.ide.common.model.asjava.ceylonToJavaMapper_;
 import com.redhat.ceylon.model.loader.mirror.ClassMirror;
 import com.redhat.ceylon.model.loader.mirror.MethodMirror;
 import com.redhat.ceylon.model.loader.mirror.TypeMirror;
+import com.redhat.ceylon.model.loader.mirror.TypeParameterMirror;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
@@ -79,9 +80,17 @@ public class CeyLightClass extends LightElement implements PsiExtensibleClass {
         return null;
     }
 
+    @NotNull
     @Override
     public PsiTypeParameter[] getTypeParameters() {
-        return PsiTypeParameter.EMPTY_ARRAY;
+        List<TypeParameterMirror> list = delegate.getTypeParameters();
+        PsiTypeParameter[] params = new PsiTypeParameter[list.size()];
+        int i = 0;
+
+        for (TypeParameterMirror mirror : list) {
+            params[i++] = new CeyLightTypeParameter(mirror, getManager());
+        }
+        return params;
     }
 
     @Override

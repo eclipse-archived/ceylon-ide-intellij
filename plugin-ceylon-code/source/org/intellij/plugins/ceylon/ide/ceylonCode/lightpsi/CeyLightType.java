@@ -5,12 +5,16 @@ import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.EmptySubstitutorImpl;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.ide.common.model.asjava.AbstractClassMirror;
 import com.redhat.ceylon.model.loader.mirror.ClassMirror;
 import com.redhat.ceylon.model.loader.mirror.TypeMirror;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class CeyLightType extends PsiClassType {
 
@@ -133,7 +137,16 @@ class CeyLightType extends PsiClassType {
     @NotNull
     @Override
     public PsiType[] getParameters() {
-        return new PsiType[0];
+        List<PsiType> types = new ArrayList<>();
+
+        for (TypeMirror type : delegate.getTypeArguments()) {
+            types.add(new CeyLightType(type, project));
+        }
+
+        if (types.isEmpty()) {
+            return PsiType.EMPTY_ARRAY;
+        }
+        return ContainerUtil.toArray(types, PsiType.ARRAY_FACTORY);
     }
 
     @NotNull
