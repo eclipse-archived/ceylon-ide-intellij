@@ -1,11 +1,6 @@
-import ceylon.interop.java {
-    Iter=CeylonIterable
-}
-
 import com.intellij.codeInsight.completion {
     CompletionParameters,
-    CompletionResultSet,
-    InsertHandler
+    CompletionResultSet
 }
 import com.intellij.codeInsight.lookup {
     LookupElementBuilder,
@@ -19,8 +14,7 @@ import com.intellij.openapi.util {
     TextRange
 }
 import com.intellij.util {
-    ProcessingContext,
-    PlatformIcons
+    ProcessingContext
 }
 import com.redhat.ceylon.cmr.api {
     ModuleVersionDetails,
@@ -50,16 +44,10 @@ import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
 import com.redhat.ceylon.ide.common.util {
-    Indents,
-    BaseProgressMonitor
+    Indents
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Function,
-    Value,
     Declaration,
-    Class,
-    Interface,
-    TypeAlias,
     Unit,
     Scope,
     Type,
@@ -74,12 +62,11 @@ import java.util.regex {
     Pattern
 }
 
-import javax.swing {
-    Icon
-}
-
 import org.antlr.runtime {
     CommonToken
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
+    DummyProgressMonitor
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
@@ -87,9 +74,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons,
     ideaIndents
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
-    DummyProgressMonitor
 }
 
 shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Editor editor,
@@ -266,87 +250,4 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         return IdeaTypeProposal(offset, type, text, desc, rootNode).lookupElement;
     }
     
-}
-
-class MyLookupElementBuilder(Declaration decl, Unit unit, Boolean allowInvocation, 
-        String? typeArgs = null, Declaration? parentDecl = null) {
-    
-    String text = (if (exists name = parentDecl?.nameAsString) 
-                  then "``name``.``decl.nameAsString``"
-                  else decl.nameAsString)
-                + (typeArgs else "");
-    
-    variable String tailText = "";
-    variable Boolean grayTailText = false;
-    variable Icon? icon = null;
-    variable String? typeText = null;
-    variable InsertHandler<LookupElement>? handler = null;
-    
-    void visitFunction(Function fun) {
-        if (fun.annotation) {
-            icon = PlatformIcons.\iANNOTATION_TYPE_ICON;
-        } else {
-            icon = PlatformIcons.\iMETHOD_ICON;
-            
-            if (allowInvocation) {
-                value params = Iter(fun.firstParameterList.parameters).map((p) => p.type.declaration.name + " " + p.name);
-                tailText = "(``", ".join(params)``)";
-                typeText = if (fun.declaredVoid) then "void" else fun.typeDeclaration.name;
-                handler = functionInsertHandler;
-            } else {
-                handler = declarationInsertHandler;
-            }
-        }
-    }
-    
-    void visitValue(Value val) {
-        if (is Class t = val.type?.declaration, t.name.first?.lowercase else false) {
-            icon = PlatformIcons.\iANONYMOUS_CLASS_ICON;
-            handler = declarationInsertHandler;
-        } else {
-            icon = PlatformIcons.\iPROPERTY_ICON;
-            typeText = val.typeDeclaration?.name;
-        }
-    }
-    
-    void visitClass(Class klass) {
-        icon = PlatformIcons.\iCLASS_ICON;
-        tailText = " (``klass.container.qualifiedNameString``)";
-        grayTailText = true;
-        handler = declarationInsertHandler;
-    }
-    
-    void visitInterface(Interface int) {
-        icon = PlatformIcons.\iINTERFACE_ICON;
-        tailText = " (``int.container.qualifiedNameString``)";
-        grayTailText = true;
-        handler = declarationInsertHandler;
-    }
-    
-    void visitAlias(TypeAlias typeAlias) {
-        print("alias");
-        // TODO create an icon for aliases
-    }
-    
-    void visit(Declaration decl) {
-        if (is Function decl) {
-            visitFunction(decl);
-        } else if (is Value decl) {
-            visitValue(decl);
-        } else if (is Class decl) {
-            visitClass(decl);
-        } else if (is Interface decl) {
-            visitInterface(decl);
-        } else if (is TypeAlias decl) {
-            visitAlias(decl);
-        }
-    }
-    
-    visit(decl);
-    
-    shared LookupElement lookupElement = LookupElementBuilder.create([decl, unit], text)
-        .withTailText(tailText, grayTailText)
-        .withTypeText(typeText)
-        .withIcon(icon)
-        .withInsertHandler(handler);
 }

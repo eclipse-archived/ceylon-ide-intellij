@@ -51,12 +51,10 @@
 
     <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
     <extensionPoints>
-        <extensionPoint name="importHandler" interface="org.intellij.plugins.ceylon.ide.ceylonCode.completion.ImportHandler"/>
         <extensionPoint name="typecheckerInvoker" interface="org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="org.intellij.plugins.ceylon.ide">
-        <importHandler implementation="org.intellij.plugins.ceylon.ide.completion.CeylonImportHandler"/>
         <typecheckerInvoker implementation="org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker"/>
     </extensions>
 
