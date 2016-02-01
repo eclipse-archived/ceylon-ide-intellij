@@ -22,6 +22,9 @@ import com.redhat.ceylon.ide.common.model {
     CeylonProject,
     CeylonProjects
 }
+import com.redhat.ceylon.ide.common.util {
+    synchronize
+}
 import com.redhat.ceylon.ide.common.vfs {
     FileVirtualFile,
     FolderVirtualFile,
@@ -179,9 +182,11 @@ shared object vfsKeychain {
             (k) => if (is MyKey<T> k) then k.mod == mod else false)) {
             return key;
         } else {
-            value key = MyKey<T>("VfsKey", mod);
-            keys.add(key);
-            return key;
+            return synchronize(keys, () {
+                value key = MyKey<T>("VfsKey", mod);
+                keys.add(key);
+                return key;
+            });
         }
     }
     
