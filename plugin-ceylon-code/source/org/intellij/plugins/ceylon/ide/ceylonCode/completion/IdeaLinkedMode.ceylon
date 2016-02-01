@@ -47,15 +47,15 @@ shared class IdeaLinkedMode() {
         value file = PsiDocumentManager.getInstance(editor.project).getPsiFile(editor.document);
         value builder = TemplateBuilderImpl(file.firstChild);
         
-        for (var in variables) {
-            value text = editor.document.getText(var[0]);
+        for ([range,elements] in variables) {
+            value text = editor.document.getText(range);
             value proposals = object extends Expression() {
                     shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext)
-                        => createJavaObjectArray(var[1]);
+                        => createJavaObjectArray(elements);
                     shared actual TemplateResult? calculateQuickResult(ExpressionContext? expressionContext) => TextResult(text);
                     shared actual TemplateResult? calculateResult(ExpressionContext? expressionContext) => TextResult(text);
             };
-            builder.replaceRange(var[0], proposals);
+            builder.replaceRange(range, proposals);
         }
         
         editor.caretModel.moveToOffset(0);

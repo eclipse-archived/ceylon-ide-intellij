@@ -46,8 +46,8 @@ shared object ideaSpecifyTypeQuickFix
                 change = null;
                 image = ideaIcons.correction;
                 callback = (project, editor, file) {
-                    // TODO
-                    print("TODO newSpecifyTypeProposal");
+                    value change = TextChange(data.doc);
+                    enterLinkedMode(change, type, true, cu, infType);
                 };
             };
         } else {
