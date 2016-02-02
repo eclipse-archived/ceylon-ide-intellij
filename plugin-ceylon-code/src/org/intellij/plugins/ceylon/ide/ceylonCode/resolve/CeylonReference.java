@@ -69,21 +69,6 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
     @Nullable
     public static PsiNameIdentifierOwner resolveDeclaration(Referenceable declaration, Project project) {
-//        Node declarationNode = nodes_.get_().getReferencedNode(declaration);
-//
-//        if (declarationNode != null) {
-//            FindMatchingPsiNodeVisitor psiVisitor = new FindMatchingPsiNodeVisitor(declarationNode, CeylonPsi.StatementOrArgumentPsi.class);
-//            PsiFile declaringFile = CeylonTreeUtil.getDeclaringFile(declaration.getUnit(), project);
-//
-//            if (declaringFile instanceof CeylonFile && declaration.getUnit() instanceof CeylonUnit) {
-//                // make our parser use the compilation unit created by the typechecker
-//                CeylonUnit ceylonUnit = (CeylonUnit) declaration.getUnit();
-//                declaringFile.putUserData(IdeaCeylonParser.FORCED_CU_KEY, ceylonUnit.getCompilationUnit());
-//                ((CeylonFile) declaringFile).setPhasedUnit(ceylonUnit.getPhasedUnit());
-//            }
-//            psiVisitor.visitFile(declaringFile);
-//            return psiVisitor.getPsi();
-//        }
         return new IdeaNavigation(project).gotoDeclaration(declaration);
     }
 
