@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    CeylonIterable
-}
-
 import com.intellij.codeInsight.intention {
     IntentionAction
 }
@@ -91,7 +87,7 @@ shared object ideaQuickFixManager
             => ideaCreateEnumIntention;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
-        for (proposal in CeylonIterable(proposals)) {
+        for (proposal in proposals) {
             assert(is TextChange change = proposal.\iobject);
             data.registerFix(proposal.lookupString, change, null, ideaIcons.singleImport, true);
         }

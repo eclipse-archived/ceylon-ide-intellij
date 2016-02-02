@@ -43,8 +43,8 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     exists mods = proj.modules?.fromProject,
                     exists mod = mods.find((m) => fqName.startsWith(m.nameAsString))) {
                     
-                    for (pack in CeylonIterable(mod.packages)) {
-                        for (dec in CeylonIterable(pack.members)) {
+                    for (pack in mod.packages) {
+                        for (dec in pack.members) {
                             if (fqName == getJavaQualifiedName(dec)) {
                                 if (is ClassOrInterface|Value dec) {
                                     return CeyLightClass(dec of Declaration, p);
@@ -74,7 +74,7 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     exists mods = proj.modules?.fromProject,
                     exists mod = mods.find((m) => fqName.startsWith(m.nameAsString))) {
                     
-                    for (pack in CeylonIterable(mod.packages)) {
+                    for (pack in mod.packages) {
                         if (pack.qualifiedNameString == fqName) {
                             return createJavaObjectArray(
                                 CeylonIterable(pack.members)

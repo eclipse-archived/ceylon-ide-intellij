@@ -50,7 +50,7 @@ object findUsageDescriptionProvider satisfies ElementDescriptionProvider {
         value builder = StringBuilder()
                 .append(fun.toplevel then fun.qualifiedNameString else fun.nameAsString);
         
-        for (paramList in CeylonIterable(fun.parameterLists)) {
+        for (paramList in fun.parameterLists) {
             builder.append("(");
             value params = CeylonIterable(paramList.parameters);
             builder.append(", ".join(params.map((_) => _.type.asString())));

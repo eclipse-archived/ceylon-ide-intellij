@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    CeylonIterable
-}
 
 import com.intellij.openapi.\imodule {
     IJModule=Module
@@ -76,7 +73,7 @@ shared class IdeaModuleManager(
             
             for (root in sr.iterable) {
                 if (JDKUtils.isJDKModule(moduleName)) {
-                    for (pkg in CeylonIterable(JDKUtils.getJDKPackagesByModule(moduleName))) {
+                    for (pkg in JDKUtils.getJDKPackagesByModule(moduleName)) {
                         // TODO
                         //if (root.getPackageFragment(pkg.string).\iexists()) {
                         //    roots.add(root);
@@ -84,7 +81,7 @@ shared class IdeaModuleManager(
                         //}
                     }
                 } else if (JDKUtils.isOracleJDKModule(moduleName)) {
-                    for (pkg in CeylonIterable(JDKUtils.getOracleJDKPackagesByModule(moduleName))) {
+                    for (pkg in JDKUtils.getOracleJDKPackagesByModule(moduleName)) {
                         // TODO
                         //if (root.getPackageFragment(pkg.string).\iexists()) {
                         //    roots.add(root);

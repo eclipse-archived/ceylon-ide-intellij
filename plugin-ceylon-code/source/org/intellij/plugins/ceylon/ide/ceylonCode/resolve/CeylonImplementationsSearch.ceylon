@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaClass,
-    CeylonIterable
+    javaClass
 }
 
 import com.intellij.openapi.application {
@@ -67,11 +66,11 @@ shared class CeylonImplementationsSearch()
             value provider = mod.getComponent(javaClass<ITypeCheckerProvider>());
 
             if (is TypeDeclaration decl, exists tc = provider.typeChecker) {
-                for (pu in CeylonIterable(tc.phasedUnits.phasedUnits)) {
+                for (pu in tc.phasedUnits.phasedUnits) {
                     value cu = pu.compilationUnit;
                     value vis = FindSubtypesVisitor(decl);
                     cu.visit(vis);
-                    for (d in CeylonIterable(vis.declarationNodes)) {
+                    for (d in vis.declarationNodes) {
                         if (!d.equals(node)) {
                             Node declNode = d;
                             value run = object satisfies Runnable {

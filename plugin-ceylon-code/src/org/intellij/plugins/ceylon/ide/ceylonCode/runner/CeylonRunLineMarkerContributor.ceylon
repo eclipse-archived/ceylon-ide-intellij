@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    CeylonIterable
-}
-
 import com.intellij.execution.lineMarker {
     RunLineMarkerContributor,
     ExecutorAction
@@ -61,7 +57,7 @@ shared class CeylonRunLineMarkerContributor()
     }
     
     Boolean isShared(Tree.Declaration clazz) {
-        for (ann in CeylonIterable(clazz.annotationList.annotations)) {
+        for (ann in clazz.annotationList.annotations) {
             if (is Tree.BaseMemberExpression name = ann.primary,
                 "shared" == name.identifier.text) {
                 return true;

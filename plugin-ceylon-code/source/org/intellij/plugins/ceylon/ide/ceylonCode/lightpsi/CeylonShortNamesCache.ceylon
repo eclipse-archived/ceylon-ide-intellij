@@ -55,7 +55,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
         if (exists projects = project.getComponent(javaClass<IdeaCeylonProjects>())) {
             for (proj in projects.ceylonProjects) {
                 for (mod in proj.modules?.fromProject else []) {
-                    for (pack in CeylonIterable(mod.packages)) {
+                    for (pack in mod.packages) {
                         classes.addAll(
                             CeylonIterable(pack.members)
                                 .narrow<ClassOrInterface|Value>()
@@ -88,7 +88,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
     void scanInners(ClassOrInterface|Value decl, String name, ArrayList<PsiClass> classes) {
         value members = if (is ClassOrInterface decl) then decl.members else decl.members;
         
-        for (member in CeylonIterable(members)) {
+        for (member in members) {
             if (is ClassOrInterface member) {
                 if (name == getJavaName(member)) {
                     classes.add(CeyLightClass(decl of Declaration, project));
