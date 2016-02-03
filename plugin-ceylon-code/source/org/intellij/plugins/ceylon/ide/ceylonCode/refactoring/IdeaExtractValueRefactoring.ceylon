@@ -10,6 +10,9 @@ import com.intellij.openapi.command {
 import com.intellij.openapi.editor {
     Document
 }
+import com.intellij.openapi.\imodule {
+    ModuleUtil
+}
 import com.intellij.openapi.project {
     Project
 }
@@ -36,6 +39,7 @@ import com.redhat.ceylon.ide.common.refactoring {
 import com.redhat.ceylon.model.typechecker.model {
     Type
 }
+
 import java.util {
     List,
     ArrayList
@@ -56,7 +60,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    PsiFileVirtualFile
+    VirtualFileVirtualFile
 }
 
 shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node)
@@ -78,7 +82,8 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
         shared actual List<CommonToken>? tokens => null;
         shared actual Tree.CompilationUnit? rootNode => file.compilationUnit;
         shared actual Node? node => _node;
-        shared actual VirtualFile? sourceVirtualFile => PsiFileVirtualFile(file);
+        shared actual VirtualFile? sourceVirtualFile
+                => VirtualFileVirtualFile(file.virtualFile, ModuleUtil.findModuleForFile(file.virtualFile, file.project));
     };
 
     shared variable actual String? internalNewName = "";

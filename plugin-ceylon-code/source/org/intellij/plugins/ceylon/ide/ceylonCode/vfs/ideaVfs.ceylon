@@ -2,7 +2,6 @@ import ceylon.collection {
     ArrayList
 }
 import ceylon.interop.java {
-    javaString,
     javaClass
 }
 
@@ -14,9 +13,6 @@ import com.intellij.openapi.util {
 }
 import com.intellij.openapi.vfs {
     VirtualFile
-}
-import com.intellij.psi {
-    PsiFile
 }
 import com.redhat.ceylon.ide.common.model {
     CeylonProject,
@@ -35,8 +31,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.io {
-    InputStream,
-    ByteArrayInputStream
+    InputStream
 }
 import java.util {
     List,
@@ -45,37 +40,6 @@ import java.util {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
-}
-
-shared class PsiFileVirtualFile(PsiFile file, String? forcedPath = null)
-        satisfies FileVirtualFile<Module,Object, PsiFile, PsiFile> {
-    
-    shared actual FolderVirtualFile<Module,Object, PsiFile, PsiFile> parent => nothing;
-
-    shared actual Boolean equals(Object that)
-            => (super of FileVirtualFile<Module,Object, PsiFile, PsiFile>).equals(that);
-    shared actual Integer hash
-            => (super of FileVirtualFile<Module,Object, PsiFile, PsiFile>).hash;
-    
-    shared actual InputStream inputStream {
-        return ByteArrayInputStream(javaString(file.text).bytes);
-    }
-
-    shared actual String name => file.name;
-    shared actual default String path
-            => forcedPath else file.virtualFile.canonicalPath;
-    shared actual PsiFile nativeResource => file;
-    shared actual String charset => file.virtualFile.charset.string;
-
-    shared actual Boolean \iexists() => file.physical;
-    
-    shared actual CeylonProject<Module,Object,PsiFile,PsiFile> ceylonProject
-    => nothing;
-    
-    shared actual Module nativeProject => nothing;
-    
-    shared actual CeylonProjects<Module,Object,PsiFile,PsiFile>.VirtualFileSystem vfs => nothing;
-    
 }
 
 shared alias IdeaResource => ResourceVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>;

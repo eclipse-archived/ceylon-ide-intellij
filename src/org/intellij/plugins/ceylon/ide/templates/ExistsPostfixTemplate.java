@@ -30,7 +30,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.PsiFileVirtualFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,7 +105,7 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
 
         // FIXME I'd prefer having an up-to-date CompilationUnit in CeylonFile instead of having to retrieve another one
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(
-                new PsiFileVirtualFile(ceylonFile, new ceylon.language.String(virtualFile.getPath())));
+                new VirtualFileVirtualFile(virtualFile, module));
         Tree.CompilationUnit compilationUnit = phasedUnit.getCompilationUnit();
 
         FindNodeVisitor visitor = new FindNodeVisitor(null, expr.getTextOffset() + 1, expr.getTextOffset() + 2);
