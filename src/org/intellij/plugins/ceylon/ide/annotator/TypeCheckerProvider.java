@@ -6,7 +6,6 @@ import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.module.ModuleUtil;
@@ -34,10 +33,8 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
-import com.redhat.ceylon.ide.common.model.CeylonProjectConfig;
 import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 import com.redhat.ceylon.ide.common.vfs.FileVirtualFile;
-import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
@@ -50,15 +47,11 @@ import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.redhat.ceylon.cmr.ceylon.CeylonUtils.repoManager;
-
 public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvider {
 
-    private static final Logger LOGGER = Logger.getInstance(TypeCheckerProvider.class);
     private Module module;
     private TypeChecker typeChecker;
     private IdeaCeylonProjects ceylonModel;
@@ -344,7 +337,6 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
     private TypeChecker createTypeChecker() {
         final IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
-        CeylonProjectConfig ceylonConfig = ceylonProject.getConfiguration();
 
         ceylonProject.setupFileWatcher();
 
@@ -352,35 +344,11 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                 .verbose(false)
                 .usageWarnings(true);
 
-        ceylon.language.String configRepo = ceylonProject.getIdeConfiguration().getSystemRepository();
-        String systemRepo = configRepo == null ? null : interpolateVariablesInRepositoryPath(configRepo.toString());
-
-        if (systemRepo == null) {
-            systemRepo = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
-        }
-        boolean offline = ceylonConfig.getOffline();
-        File cwd = ceylonConfig.getProject().getRootDirectory();
-
-        LOGGER.info("Using Ceylon system repository in " + systemRepo);
-
-        final RepositoryManager repositoryManager = repoManager()
-                .offline(offline)
-                .cwd(cwd)
-                .systemRepo(systemRepo)
-//                .extraUserRepos(getReferencedProjectsOutputRepositories(project))
-                .isJDKIncluded(true)
-                .buildManager();
+        final RepositoryManager repositoryManager = ceylonProject.getRepositoryManager();
         builder.setRepositoryManager(repositoryManager);
 
         builder.moduleManagerFactory(new IdeaModuleManagerFactory(repositoryManager, ceylonProject));
 
         return builder.getTypeChecker();
     }
-
-    private String interpolateVariablesInRepositoryPath(String repoPath) {
-        String userHomePath = System.getProperty("user.home");
-        String pluginRepoPath = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
-        return repoPath.replace("${user.home}", userHomePath).replace("${ceylon.repo}", pluginRepoPath);
-    }
-
 }

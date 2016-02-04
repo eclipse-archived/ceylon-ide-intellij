@@ -45,19 +45,31 @@ import java.io {
     IOException
 }
 import java.lang {
-    Void
+    Void,
+    System
 }
 import java.lang.ref {
     WeakReference
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
-    ITypeCheckerProvider
+    ITypeCheckerProvider,
+    ITypeCheckerInvoker
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     vfsKeychain,
     IdeaVirtualFolder,
     FileWatcher
+}
+import com.intellij.util {
+    PathUtil
+}
+import com.intellij.diagnostic {
+    PluginException
+}
+import com.intellij.openapi.extensions {
+    PluginId,
+    Extensions
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -211,6 +223,24 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared void shutdownFileWatcher() {
         VirtualFileManager.instance.removeVirtualFileListener(watcher);
+    }
+    
+    shared actual void createOverridesProblemMarker(Exception ex, File absoluteFile, Integer overridesLine, Integer overridesColumn) {
+        // TODO
+    }
+    
+    shared actual void removeOverridesProblemMarker() {
+        // TODO
+    }
+    
+    shared actual String systemRepository 
+            => interpolateVariablesInRepositoryPath(ideConfiguration.systemRepository else "${ceylon.repo}");
+    
+    String interpolateVariablesInRepositoryPath(String repoPath) {
+        String userHomePath = System.getProperty("user.home");
+        value ext = Extensions.getExtensions(ITypeCheckerInvoker.\iEP_NAME).get(0);
+        String pluginRepoPath = ext.embeddedCeylonRepository.absolutePath;
+        return repoPath.replace("${user.home}", userHomePath).replace("${ceylon.repo}", pluginRepoPath);
     }
 }
 

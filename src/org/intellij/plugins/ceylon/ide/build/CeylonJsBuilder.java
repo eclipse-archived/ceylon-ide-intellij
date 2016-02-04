@@ -4,6 +4,7 @@ import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompileTask;
 import com.intellij.openapi.compiler.CompilerMessageCategory;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.MultiMap;
@@ -13,7 +14,6 @@ import com.redhat.ceylon.compiler.js.util.Options;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
-import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
@@ -79,21 +79,14 @@ public class CeylonJsBuilder implements CompileTask {
                 "Compiling module " + module.getName() + " to JS", null, -1, -1);
 
         List<File> sources = new ArrayList<>();
-        for (VirtualFile source : context.getSourceRoots(module)) {
+        for (VirtualFile source : ModuleRootManager.getInstance(module).getSourceRoots()) {
             sources.add(new File(source.getPath()));
-        }
-
-        String systemRepo = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
-
-        if (project.getIdeConfiguration().getSystemRepository() != null
-                && !project.getIdeConfiguration().getSystemRepository().toString().equals("")) {
-            systemRepo = project.getIdeConfiguration().getSystemRepository().toString();
         }
 
         Options options = new Options()
                 .outWriter(new MessageWriter(context))
                 .sourceDirs(sources)
-                .systemRepo(systemRepo)
+                .systemRepo(project.getSystemRepository())
                 .outRepo(context.getModuleOutputDirectory(module).getCanonicalPath())
                 .optimize(true)
                 .generateSourceArchive(true);
@@ -123,7 +116,7 @@ public class CeylonJsBuilder implements CompileTask {
     private boolean isNative(VirtualFile vfile, CompileContext context, Module module, TypeChecker tc, Backend backend) {
         VirtualFile source = null;
 
-        for (VirtualFile root : context.getSourceRoots(module)) {
+        for (VirtualFile root : ModuleRootManager.getInstance(module).getSourceRoots()) {
             if (VfsUtil.isAncestor(root, vfile, true)) {
                 source = root;
                 break;

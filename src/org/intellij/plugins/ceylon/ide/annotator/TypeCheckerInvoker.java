@@ -16,11 +16,13 @@ import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
+import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.IdeaVirtualFolder;
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -153,5 +155,10 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
     @Override
     public PhasedUnit typecheck(CeylonFile ceylonFile) {
         return invokeTypeChecker(ceylonFile);
+    }
+
+    @Override
+    public File getEmbeddedCeylonRepository() {
+        return IdePluginCeylonStartup.getEmbeddedCeylonRepository();
     }
 }
