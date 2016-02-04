@@ -8,6 +8,9 @@ import com.intellij.openapi.application {
     Result,
     ApplicationManager
 }
+import com.intellij.openapi.fileEditor {
+    FileEditorManagerListener
+}
 import com.intellij.openapi.\imodule {
     Module,
     ModuleManager
@@ -30,6 +33,12 @@ import com.redhat.ceylon.ide.common.model {
     CeylonProject,
     ModuleDependencies
 }
+import com.redhat.ceylon.ide.common.vfs {
+    FolderVirtualFile
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Package
+}
 
 import java.io {
     File,
@@ -38,22 +47,17 @@ import java.io {
 import java.lang {
     Void
 }
+import java.lang.ref {
+    WeakReference
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerProvider
 }
-import com.redhat.ceylon.ide.common.vfs {
-    FolderVirtualFile
-}
-import java.lang.ref {
-    WeakReference
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Package
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     vfsKeychain,
-    IdeaVirtualFolder
+    IdeaVirtualFolder,
+    FileWatcher
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -196,6 +200,17 @@ shared class IdeaCeylonProject(ideArtifact, model)
         rootFolder.putUserData(vfsKeychain.findOrCreate<Boolean>(ideaModule), isSource);
     }
     
-     
+    late FileWatcher watcher;
+    
+    shared void setupFileWatcher() {
+        watcher = FileWatcher(this);
+        VirtualFileManager.instance.addVirtualFileListener(watcher);
+        ideArtifact.project.messageBus.connect()
+                .subscribe(FileEditorManagerListener.\iFILE_EDITOR_MANAGER, watcher);
+    }
+    
+    shared void shutdownFileWatcher() {
+        VirtualFileManager.instance.removeVirtualFileListener(watcher);
+    }
 }
 

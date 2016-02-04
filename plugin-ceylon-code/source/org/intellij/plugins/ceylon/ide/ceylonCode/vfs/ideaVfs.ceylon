@@ -140,6 +140,15 @@ shared object vfsKeychain {
     shared alias VfsKey<T> => Key<T>;
     
     value keys = ArrayList<VfsKey<out Anything>>();
+
+    shared VfsKey<T>? find<T>(Module mod) {
+        if (is MyKey<T> key = keys.find(
+            (k) => if (is MyKey<T> k) then k.mod == mod else false)) {
+            return key;
+        }
+        
+        return null;
+    }
     
     shared VfsKey<T> findOrCreate<T>(Module mod) {
         if (is MyKey<T> key = keys.find(

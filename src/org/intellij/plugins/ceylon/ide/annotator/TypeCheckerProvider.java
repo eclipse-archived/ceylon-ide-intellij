@@ -42,7 +42,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModuleManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaModulesScanner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaRootFolderScanner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -52,7 +51,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -246,7 +244,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                 TypeDescriptor.klass(VirtualFile.class),
                 TypeDescriptor.klass(VirtualFile.class));
 
-        MutableList<FileVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>> projectVirtualFiles
+        MutableList<FileVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile>> projectVirtualFiles
                 = new ceylon.collection.ArrayList<>(fileVirtualFileTypeDescriptor);
 
         // todo separate sources from resources
@@ -279,6 +277,9 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     @Override
     public void projectClosed() {
         typeChecker = null;
+        IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
+        ceylonProject.shutdownFileWatcher();
+
         isReady = false;
         if (ceylonModel != null) {
             ceylonModel.removeProject(module);
@@ -346,6 +347,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     private TypeChecker createTypeChecker() {
         final IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
         CeylonProjectConfig ceylonConfig = ceylonProject.getConfiguration();
+
+        ceylonProject.setupFileWatcher();
 
         TypeCheckerBuilder builder = new TypeCheckerBuilder(ceylonModel.getVfs())
                 .verbose(false)
