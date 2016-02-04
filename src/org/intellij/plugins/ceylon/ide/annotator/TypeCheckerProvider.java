@@ -277,8 +277,6 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     @Override
     public void projectClosed() {
         typeChecker = null;
-        IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
-        ceylonProject.shutdownFileWatcher();
 
         isReady = false;
         if (ceylonModel != null) {
