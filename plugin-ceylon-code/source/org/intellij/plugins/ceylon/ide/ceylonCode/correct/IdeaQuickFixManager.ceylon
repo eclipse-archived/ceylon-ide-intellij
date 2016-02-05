@@ -43,7 +43,8 @@ import com.redhat.ceylon.ide.common.correct {
     DeclareLocalQuickFix,
     CreateEnumQuickFix,
     RefineFormalMembersQuickFix,
-    SpecifyTypeQuickFix
+    SpecifyTypeQuickFix,
+    ExportModuleImportQuickFix
 }
 
 import java.lang {
@@ -111,6 +112,9 @@ shared object ideaQuickFixManager
             given Data satisfies QuickFixData<Module> {
         // TODO
     }
+
+    shared actual ExportModuleImportQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> exportModuleImportQuickFix
+            => ideaExportModuleImportQuickFix;    
     
 }
 
