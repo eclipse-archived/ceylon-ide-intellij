@@ -45,7 +45,8 @@ import com.redhat.ceylon.ide.common.correct {
     RefineFormalMembersQuickFix,
     SpecifyTypeQuickFix,
     ExportModuleImportQuickFix,
-    AddPunctuationQuickFix
+    AddPunctuationQuickFix,
+    AddParameterListQuickFix
 }
 
 import java.lang {
@@ -119,6 +120,10 @@ shared object ideaQuickFixManager
     
     shared actual AddPunctuationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> addPunctuationQuickFix 
             => ideaAddPunctuationQuickFix;
+    
+    shared actual AddParameterListQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> addParameterListQuickFix
+            => ideaAddParameterListQuickFix;
+    
 }
 
 class CustomIntention(Integer position, String desc, TextChange? change, TextRange? selection = null, Icon? image = null,
