@@ -26,6 +26,9 @@ import com.intellij.openapi.project {
 import com.intellij.psi {
     PsiDocumentManager
 }
+import com.intellij.openapi.util {
+    TextRange
+}
 
 shared alias TextEdit => AliasedAsTextEdit;
 
@@ -92,4 +95,8 @@ shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertE
     
     shared actual Boolean hasChildren(TextChange change)
             => change.hasChildren;
+    
+    shared actual String getDocContent(Document doc, Integer start, Integer length) {
+        return doc.getText(TextRange.from(start, length));
+    }
 }

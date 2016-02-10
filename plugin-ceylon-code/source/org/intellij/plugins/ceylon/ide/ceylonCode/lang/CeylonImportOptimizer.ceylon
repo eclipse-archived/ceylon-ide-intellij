@@ -41,9 +41,6 @@ shared class CeylonImportOptimizer()
         satisfies AbstractImportsCleaner<Document, InsertEdit, TextEdit, TextChange>
                 & IdeaDocumentChanges
                 & ImportOptimizer {
-
-    shared actual String getDocContent(Document doc, Integer start, Integer length)
-            => doc.getText(TextRange.from(start, length));
     
     shared actual Indents<Document> indents => ideaIndents;
     
