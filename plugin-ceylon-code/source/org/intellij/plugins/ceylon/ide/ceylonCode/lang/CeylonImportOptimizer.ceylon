@@ -4,9 +4,6 @@ import com.intellij.lang {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.intellij.psi {
     PsiFile
 }
@@ -15,6 +12,9 @@ import com.redhat.ceylon.ide.common.imports {
 }
 import com.redhat.ceylon.ide.common.util {
     Indents
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration
 }
 
 import java.lang {
@@ -32,9 +32,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIndents
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Declaration
 }
 
 shared class CeylonImportOptimizer()

@@ -48,7 +48,8 @@ import com.redhat.ceylon.ide.common.correct {
     AddPunctuationQuickFix,
     AddParameterListQuickFix,
     AddParameterQuickFix,
-    AddInitializerQuickFix
+    AddInitializerQuickFix,
+    AddConstructorQuickFix
 }
 
 import java.lang {
@@ -131,6 +132,9 @@ shared object ideaQuickFixManager
     
     shared actual AddInitializerQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> addInitializerQuickFix
             => ideaAddInitializerQuickFix;
+    
+    shared actual AddConstructorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> addConstructorQuickFix
+            => ideaAddConstructorQuickFix;
 }
 
 class CustomIntention(Integer position, String desc, TextChange? change, TextRange? selection = null, Icon? image = null,
