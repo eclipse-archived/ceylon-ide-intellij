@@ -46,13 +46,11 @@ shared object ideaSpecifyTypeQuickFix
                 change = null;
                 image = ideaIcons.correction;
                 callback = (project, editor, file) {
-                    value change = TextChange(data.doc);
-                    enterLinkedMode(change, type, true, cu, infType);
+                    specifyType(data.doc, type, true, cu, infType);
                 };
             };
         } else {
-            value change = TextChange(data.doc);
-            enterLinkedMode(change, type, true, cu, infType);
+            specifyType(data.doc, type, true, cu, infType);
         }
     }
     
