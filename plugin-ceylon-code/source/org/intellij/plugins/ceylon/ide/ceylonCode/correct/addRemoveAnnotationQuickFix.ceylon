@@ -32,7 +32,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
 
-shared object addRemoveAnnotationIntention
+shared object ideaAddRemoveAnnotationQuickFix
         satisfies AddAnnotationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & RemoveAnnotationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges & AbstractIntention {

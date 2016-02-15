@@ -64,11 +64,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 shared object ideaQuickFixManager
         extends IdeQuickFixManager<Document,InsertEdit,TextEdit,TextChange,TextRange,Module,CeylonFile,LookupElement,IdeaQuickFixData,IdeaLinkedMode>() {
     
-    addAnnotations => addRemoveAnnotationIntention;
-    removeAnnotations => addRemoveAnnotationIntention;
+    addAnnotations => ideaAddRemoveAnnotationQuickFix;
+    removeAnnotations => ideaAddRemoveAnnotationQuickFix;
     importProposals => ideaImportProposals;
     createQuickFix => ideaCreateQuickFix;
-    createEnumQuickFix => ideaCreateEnumIntention;
+    createEnumQuickFix => ideaCreateEnumQuickFix;
     changeReferenceQuickFix => ideaChangeReferenceQuickFix;
     declareLocalQuickFix => ideaDeclareLocalQuickFix;
     refineFormalMembersQuickFix => ideaRefineFormalMembersQuickFix;

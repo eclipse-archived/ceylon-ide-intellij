@@ -28,7 +28,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
 
-shared object ideaCreateEnumIntention
+shared object ideaCreateEnumQuickFix
         satisfies CreateEnumQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
                 & AbstractIntention {
