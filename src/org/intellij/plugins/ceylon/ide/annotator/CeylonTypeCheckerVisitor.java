@@ -18,6 +18,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Message;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
+import com.redhat.ceylon.ide.common.util.nodes_;
 import org.antlr.runtime.CommonToken;
 import org.apache.commons.lang.ArrayUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
@@ -131,8 +132,9 @@ class CeylonTypeCheckerVisitor extends Visitor {
         TypeChecker tc = TypeCheckerProvider.getFor(file);
         PhasedUnit pu = file.getPhasedUnit();
 
+        Node node = nodes_.get_().findNode(pu.getCompilationUnit(), null, that.getStartIndex(), that.getEndIndex());
         IdeaQuickFixData data = new IdeaQuickFixData(error, file.getViewProvider().getDocument(),
-                pu.getCompilationUnit(), that, module, annotation);
+                pu.getCompilationUnit(), node, module, annotation);
         ideaQuickFixManager_.get_().addQuickFixes(data, tc, file);
     }
 }
