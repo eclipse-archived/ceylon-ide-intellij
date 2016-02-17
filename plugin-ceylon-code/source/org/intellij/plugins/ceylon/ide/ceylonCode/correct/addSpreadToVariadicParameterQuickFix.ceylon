@@ -11,27 +11,26 @@ import com.intellij.openapi.util {
     TextRange
 }
 import com.redhat.ceylon.ide.common.correct {
-    ChangeTypeQuickFix
+    AddSpreadToVariadicParameterQuickFix
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Unit
+    TypedDeclaration
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
-}
 
-object ideaChangeTypeQuickFix
-        satisfies ChangeTypeQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+object ideaAddSpreadToVariadicParameterQuickFix
+        satisfies AddSpreadToVariadicParameterQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
                 & AbstractIntention {
     
     shared actual void newProposal(IdeaQuickFixData data, String desc, 
-        TextChange change, Integer offset, Integer length, Unit unit) {
+        TypedDeclaration parameter, Integer offset, TextChange change) {
         
-        data.registerFix(desc, change, TextRange.from(offset, length), ideaIcons.correction);
+        data.registerFix(desc, change, TextRange.from(offset, 0));
     }
+    
+    
 }
