@@ -115,7 +115,7 @@ class CeylonTypeCheckerVisitor extends Visitor {
             }
 
             if (!ApplicationManager.getApplication().isUnitTestMode()) {
-                addQuickFixes(that, error, annotation);
+                addQuickFixes(range, error, annotation);
             }
         }
         super.visitAny(that);
@@ -126,13 +126,13 @@ class CeylonTypeCheckerVisitor extends Visitor {
         e.printStackTrace();
     }
 
-    private void addQuickFixes(Node that, Message error, Annotation annotation) {
+    private void addQuickFixes(TextRange range, Message error, Annotation annotation) {
         CeylonFile file = (CeylonFile) annotationHolder.getCurrentAnnotationSession().getFile();
         Module module = ModuleUtil.findModuleForFile(file.getVirtualFile(), file.getProject());
         TypeChecker tc = TypeCheckerProvider.getFor(file);
         PhasedUnit pu = file.getPhasedUnit();
 
-        Node node = nodes_.get_().findNode(pu.getCompilationUnit(), null, that.getStartIndex(), that.getEndIndex());
+        Node node = nodes_.get_().findNode(pu.getCompilationUnit(), null, range.getStartOffset(), range.getEndOffset());
         IdeaQuickFixData data = new IdeaQuickFixData(error, file.getViewProvider().getDocument(),
                 pu.getCompilationUnit(), node, module, annotation);
         ideaQuickFixManager_.get_().addQuickFixes(data, tc, file);
