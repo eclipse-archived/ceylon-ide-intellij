@@ -88,6 +88,7 @@ shared object ideaQuickFixManager
     addTypeParameterQuickFix => ideaAddTypeParameterQuickFix;
     shadowReferenceQuickFix => ideaShadowReferenceQuickFix;
     changeInitialCaseQuickFix => ideaChangeInitialCaseQuickFix;
+    fixMultilineStringIndentationQuickFix => ideaFixMultilineStringIndentationQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
         for (proposal in proposals) {
