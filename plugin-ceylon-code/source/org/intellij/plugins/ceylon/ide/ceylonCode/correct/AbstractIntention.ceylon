@@ -51,6 +51,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIndents
 }
+import com.redhat.ceylon.ide.common.model {
+    IResourceAware
+}
+import com.intellij.psi {
+    PsiManager
+}
 
 shared interface AbstractIntention
         satisfies AbstractQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
@@ -101,6 +107,15 @@ shared interface AbstractIntention
             
             tc.phasedUnits.getPhasedUnitFromRelativePath(u.relativePath);
         }
+        return null;
+    }
+    
+    shared actual CeylonFile? getFile<NativeFile>(IResourceAware<out Anything,out Anything,NativeFile> pu, IdeaQuickFixData data) {
+        if (is VirtualFile vf = pu.resourceFile,
+            is CeylonFile file = PsiManager.getInstance(data.project.project).findFile(vf)) {
+            return file;
+        }
+        
         return null;
     }
 }
