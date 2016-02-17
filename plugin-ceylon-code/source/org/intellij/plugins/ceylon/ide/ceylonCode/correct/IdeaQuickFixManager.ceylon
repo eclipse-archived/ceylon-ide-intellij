@@ -83,6 +83,7 @@ shared object ideaQuickFixManager
     fixAliasQuickFix => ideaFixAliasQuickFix;
     appendMemberReferenceQuickFix => ideaAppendMemberReferenceQuickFix;
     changeTypeQuickFix => ideaChangeTypeQuickFix;
+    addSatisfiesQuickFix => ideaAddSatisfiesQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
         for (proposal in proposals) {

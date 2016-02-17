@@ -12,6 +12,7 @@ import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
 import com.redhat.ceylon.ide.common.typechecker.EditedPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
+import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
@@ -72,6 +73,13 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
             typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(relativePath);
         }
 
+        ProjectPhasedUnit projectPu = null;
+        if (phasedUnit instanceof EditedPhasedUnit) {
+            projectPu = ((EditedPhasedUnit) phasedUnit).getOriginalPhasedUnit();
+        } else if (phasedUnit instanceof ProjectPhasedUnit) {
+            projectPu = (ProjectPhasedUnit) phasedUnit;
+        }
+
         phasedUnit = new EditedPhasedUnit<>(
                 TypeDescriptor.klass(com.intellij.openapi.module.Module.class),
                 TypeDescriptor.klass(com.intellij.openapi.vfs.VirtualFile.class),
@@ -82,7 +90,7 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
                 typeChecker.getPhasedUnits().getModuleSourceMapper(),
                 typeChecker,
                 ceylonFile.getTokens(),
-                null);
+                projectPu);
 
         BaseIdeModelLoader loader = ((BaseIdeModuleManager) typeChecker.getPhasedUnits()
                 .getModuleManager()).getModelLoader();
