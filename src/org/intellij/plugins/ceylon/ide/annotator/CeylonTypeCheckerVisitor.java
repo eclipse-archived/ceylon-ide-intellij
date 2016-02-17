@@ -18,11 +18,13 @@ import com.redhat.ceylon.compiler.typechecker.tree.Message;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
+import com.redhat.ceylon.ide.common.model.BaseCeylonProject;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import org.antlr.runtime.CommonToken;
 import org.apache.commons.lang.ArrayUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.ideaQuickFixManager_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 
 import java.util.ArrayList;
@@ -131,10 +133,12 @@ class CeylonTypeCheckerVisitor extends Visitor {
         Module module = ModuleUtil.findModuleForFile(file.getVirtualFile(), file.getProject());
         TypeChecker tc = TypeCheckerProvider.getFor(file);
         PhasedUnit pu = file.getPhasedUnit();
+        IdeaCeylonProjects projects = file.getProject().getComponent(IdeaCeylonProjects.class);
+        BaseCeylonProject project = projects.getProject(module);
 
         Node node = nodes_.get_().findNode(pu.getCompilationUnit(), null, range.getStartOffset(), range.getEndOffset());
         IdeaQuickFixData data = new IdeaQuickFixData(error, file.getViewProvider().getDocument(),
-                pu.getCompilationUnit(), node, module, annotation);
+                pu.getCompilationUnit(), node, module, annotation, project);
         ideaQuickFixManager_.get_().addQuickFixes(data, tc, file);
     }
 }

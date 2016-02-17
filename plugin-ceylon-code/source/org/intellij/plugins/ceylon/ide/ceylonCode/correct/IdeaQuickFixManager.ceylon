@@ -60,6 +60,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import com.redhat.ceylon.ide.common.model {
+    BaseCeylonProject
+}
 
 shared object ideaQuickFixManager
         extends IdeQuickFixManager<Document,InsertEdit,TextEdit,TextChange,TextRange,Module,CeylonFile,LookupElement,IdeaQuickFixData,IdeaLinkedMode>() {
@@ -89,6 +92,7 @@ shared object ideaQuickFixManager
     shadowReferenceQuickFix => ideaShadowReferenceQuickFix;
     changeInitialCaseQuickFix => ideaChangeInitialCaseQuickFix;
     fixMultilineStringIndentationQuickFix => ideaFixMultilineStringIndentationQuickFix;
+    addModuleImportQuickFix => ideaAddModuleImportQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
         for (proposal in proposals) {
@@ -153,7 +157,8 @@ shared class IdeaQuickFixData(Message message, shared Document doc,
     shared actual Tree.CompilationUnit rootNode,
     shared actual Node node,
     shared actual Module project,
-    shared Annotation? annotation) satisfies QuickFixData<Module> {
+    shared Annotation? annotation,
+    shared actual BaseCeylonProject ceylonProject) satisfies QuickFixData<Module> {
     
     shared actual Integer errorCode => message.code;
     shared actual Integer problemOffset => annotation?.startOffset else 0;
