@@ -5,6 +5,10 @@ import com.intellij.psi {
 import com.redhat.ceylon.model.loader.mirror {
     PackageMirror
 }
+import com.redhat.ceylon.ide.common.util {
+    platformUtils,
+    Status
+}
 
 class PSIPackage(PsiClass psi) 
     satisfies PackageMirror {
@@ -14,8 +18,12 @@ class PSIPackage(PsiClass psi)
     shared actual String qualifiedName { 
         if (!_name exists) {
             _name = doWithLock(() {
-                assert(is PsiJavaFile f = psi.containingFile);
-                return f.packageName; 
+                if (is PsiJavaFile f = psi.containingFile) {
+                    return f.packageName;
+                }
+                platformUtils.log(Status._WARNING, 
+                    "No qualified name for file ``className(psi.containingFile)``");
+                return "";
             });
         }
         

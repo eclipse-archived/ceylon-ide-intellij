@@ -94,6 +94,7 @@ shared object ideaQuickFixManager
     fixMultilineStringIndentationQuickFix => ideaFixMultilineStringIndentationQuickFix;
     addModuleImportQuickFix => ideaAddModuleImportQuickFix;
     renameDescriptorQuickFix => ideaRenameDescriptorQuickFix;
+    changeRefiningTypeQuickType => ideaChangeRefiningTypeQuickType;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
         for (proposal in proposals) {
