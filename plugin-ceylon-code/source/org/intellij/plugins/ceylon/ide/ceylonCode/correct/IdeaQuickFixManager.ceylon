@@ -95,6 +95,7 @@ shared object ideaQuickFixManager
     addModuleImportQuickFix => ideaAddModuleImportQuickFix;
     renameDescriptorQuickFix => ideaRenameDescriptorQuickFix;
     changeRefiningTypeQuickType => ideaChangeRefiningTypeQuickType;
+    switchQuickFix => ideaSwitchQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
         for (proposal in proposals) {
