@@ -93,6 +93,7 @@ shared object ideaQuickFixManager
     changeInitialCaseQuickFix => ideaChangeInitialCaseQuickFix;
     fixMultilineStringIndentationQuickFix => ideaFixMultilineStringIndentationQuickFix;
     addModuleImportQuickFix => ideaAddModuleImportQuickFix;
+    renameDescriptorQuickFix => ideaRenameDescriptorQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
         for (proposal in proposals) {
@@ -160,8 +161,9 @@ shared class IdeaQuickFixData(Message message, shared Document doc,
     shared Annotation? annotation,
     shared actual BaseCeylonProject ceylonProject) satisfies QuickFixData<Module> {
     
-    shared actual Integer errorCode => message.code;
-    shared actual Integer problemOffset => annotation?.startOffset else 0;
+    errorCode => message.code;
+    problemOffset => annotation?.startOffset else 0;
+    problemLength => (annotation?.endOffset else 0) - problemOffset;
     
     shared void registerFix(String desc, TextChange? change, TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
