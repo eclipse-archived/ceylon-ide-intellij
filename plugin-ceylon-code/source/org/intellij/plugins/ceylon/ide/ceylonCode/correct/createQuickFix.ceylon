@@ -36,7 +36,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 object ideaCreateQuickFix
         satisfies CreateQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
-                & AbstractIntention & IdeaDocumentChanges {
+                & IdeaQuickFix & IdeaDocumentChanges {
     
     shared actual Integer getLineOfOffset(Document doc, Integer offset) => doc.getLineNumber(offset);
     

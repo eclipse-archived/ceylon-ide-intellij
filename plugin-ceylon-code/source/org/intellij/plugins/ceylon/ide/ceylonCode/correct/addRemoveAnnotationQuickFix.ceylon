@@ -35,7 +35,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 shared object ideaAddRemoveAnnotationQuickFix
         satisfies AddAnnotationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & RemoveAnnotationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges & AbstractIntention {
+                & IdeaDocumentChanges & IdeaQuickFix {
     
     shared actual void newAddAnnotationQuickFix(Referenceable dec, String text, String desc,
         Integer offset, TextChange change, TextRange? selection, IdeaQuickFixData data) {

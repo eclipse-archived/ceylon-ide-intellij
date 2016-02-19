@@ -35,7 +35,7 @@ shared object ideaSpecifyTypeQuickFix
         satisfies SpecifyTypeQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
             TextChange,TextRange,Module,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
                 
     shared actual void newSpecifyTypeProposal(String desc, Tree.Type type,
         Tree.CompilationUnit cu, Type infType, IdeaQuickFixData data) {

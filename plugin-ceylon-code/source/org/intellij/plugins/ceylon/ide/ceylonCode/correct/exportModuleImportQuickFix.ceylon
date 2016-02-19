@@ -39,7 +39,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
 object ideaExportModuleImportQuickFix
         satisfies ExportModuleImportQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual void newExportModuleImportProposal(IdeaQuickFixData data, Unit u,
         String desc, String name, String version) {

@@ -21,7 +21,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 object ideaAddPunctuationQuickFix 
         satisfies AddPunctuationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
         & IdeaDocumentChanges
-        & AbstractIntention {
+        & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, Integer offset, 
         Integer length, String desc, TextChange change) {

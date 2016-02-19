@@ -30,7 +30,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 shared object ideaCreateParameterQuickFix
         satisfies CreateParameterQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges & AbstractIntention {
+                & IdeaDocumentChanges & IdeaQuickFix {
     
     shared actual void newCreateParameterProposal(IdeaQuickFixData data, String desc, Declaration dec, Type? type,
         TextRange selection, Icons image, TextChange change, Integer exitPos) {

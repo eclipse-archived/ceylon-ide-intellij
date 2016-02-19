@@ -30,7 +30,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 shared object ideaRefineFormalMembersQuickFix 
         satisfies RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges & AbstractIntention {
+                & IdeaDocumentChanges & IdeaQuickFix {
     
      shared actual Character getDocChar(Document doc, Integer offset)
             => doc.getText(TextRange.from(offset, 1)).first else ' ';

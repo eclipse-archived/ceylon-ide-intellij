@@ -27,7 +27,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 object ideaAddNamedArgumentQuickFix
         satisfies AddNamedArgumentQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual Integer getLineOfOffset(Document doc, Integer offset)
             => doc.getLineNumber(offset);

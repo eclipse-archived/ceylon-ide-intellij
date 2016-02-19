@@ -58,7 +58,7 @@ import com.intellij.psi {
     PsiManager
 }
 
-shared interface AbstractIntention
+shared interface IdeaQuickFix
         satisfies AbstractQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
         TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     

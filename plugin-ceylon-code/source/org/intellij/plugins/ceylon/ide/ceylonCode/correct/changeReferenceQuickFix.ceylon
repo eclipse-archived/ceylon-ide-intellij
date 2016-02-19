@@ -23,7 +23,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 object ideaChangeReferenceQuickFix
         satisfies ChangeReferenceQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,IdeaQuickFixData,TextRange,LookupElement> 
-                & IdeaDocumentChanges & AbstractIntention {
+                & IdeaDocumentChanges & IdeaQuickFix {
     
     shared actual void newChangeReferenceProposal(IdeaQuickFixData data, String desc, TextChange change, TextRange selection) {
         data.registerFix(desc, change, selection, ideaIcons.correction, true);

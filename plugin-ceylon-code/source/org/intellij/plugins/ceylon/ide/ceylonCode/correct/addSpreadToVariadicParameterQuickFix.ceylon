@@ -24,7 +24,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 object ideaAddSpreadToVariadicParameterQuickFix
         satisfies AddSpreadToVariadicParameterQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, String desc, 
         TypedDeclaration parameter, Integer offset, TextChange change) {

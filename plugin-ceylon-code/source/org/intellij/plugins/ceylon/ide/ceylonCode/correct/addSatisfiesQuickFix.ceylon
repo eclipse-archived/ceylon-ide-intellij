@@ -30,7 +30,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 object ideaAddSatisfiesQuickFix
         satisfies AddSatisfiesQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, TypeDeclaration typeParam,
         String description, String missingSatisfiedTypeText, TextChange change, 

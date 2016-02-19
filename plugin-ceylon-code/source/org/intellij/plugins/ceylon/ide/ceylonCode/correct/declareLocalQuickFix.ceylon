@@ -37,7 +37,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 object ideaDeclareLocalQuickFix 
         satisfies DeclareLocalQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,IdeaLinkedMode,LookupElement,Module,IdeaQuickFixData,TextRange>
-                & IdeaDocumentChanges & AbstractIntention {
+                & IdeaDocumentChanges & IdeaQuickFix {
     
     shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start,
         Integer len, Integer exitSeqNumber, LookupElement[] proposals) {

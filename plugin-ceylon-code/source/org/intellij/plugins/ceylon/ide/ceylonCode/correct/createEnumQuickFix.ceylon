@@ -31,7 +31,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 shared object ideaCreateEnumQuickFix
         satisfies CreateEnumQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual Integer getDocLength(Document doc) => doc.textLength;
     

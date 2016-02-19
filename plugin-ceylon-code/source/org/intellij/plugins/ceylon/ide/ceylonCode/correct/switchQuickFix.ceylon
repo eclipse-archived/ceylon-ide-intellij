@@ -27,7 +27,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 object ideaSwitchQuickFix
         satisfies SwitchQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, String desc, 
         TextChange change, DefaultRegion region) {

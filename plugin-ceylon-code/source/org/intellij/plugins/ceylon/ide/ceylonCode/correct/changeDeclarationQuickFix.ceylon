@@ -21,7 +21,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 object ideaChangeDeclarationQuickFix
         satisfies ChangeDeclarationQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, String keyword, 
         String desc, Integer position, TextChange change) {

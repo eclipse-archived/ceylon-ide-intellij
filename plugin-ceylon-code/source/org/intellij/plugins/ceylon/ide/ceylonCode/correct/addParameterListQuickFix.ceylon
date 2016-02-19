@@ -21,7 +21,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 object ideaAddParameterListQuickFix
         satisfies AddParameterListQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
         & IdeaDocumentChanges
-        & AbstractIntention {
+        & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, Integer start, String desc, TextChange change) {
         data.registerFix(desc, change, TextRange.from(start, 0));

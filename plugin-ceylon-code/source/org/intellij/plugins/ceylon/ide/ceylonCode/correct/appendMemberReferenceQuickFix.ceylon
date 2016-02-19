@@ -21,7 +21,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 object ideaAppendMemberReferenceQuickFix
         satisfies AppendMemberReferenceQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, String desc, 
         TextChange change, Integer offset, Integer length) {

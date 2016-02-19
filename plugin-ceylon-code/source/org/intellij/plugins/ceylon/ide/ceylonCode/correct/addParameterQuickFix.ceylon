@@ -31,7 +31,7 @@ import com.redhat.ceylon.ide.common.refactoring {
 object ideaAddParameterQuickFix
         satisfies AddParameterQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
         & IdeaDocumentChanges
-        & AbstractIntention {
+        & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, String desc, 
         Declaration dec, Type? type, Integer offset, Integer length, 

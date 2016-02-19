@@ -30,7 +30,7 @@ import com.redhat.ceylon.ide.common.refactoring {
 object ideaAddInitializerQuickFix
         satisfies AddInitializerQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, String desc, 
         TypedDeclaration dec, Integer offset, Integer length, TextChange change) {

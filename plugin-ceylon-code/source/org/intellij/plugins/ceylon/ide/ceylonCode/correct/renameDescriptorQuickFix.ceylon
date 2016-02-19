@@ -24,7 +24,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 object ideaRenameDescriptorQuickFix
         satisfies RenameDescriptorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change) {
         data.registerFix(desc, change, null, ideaIcons.correction);

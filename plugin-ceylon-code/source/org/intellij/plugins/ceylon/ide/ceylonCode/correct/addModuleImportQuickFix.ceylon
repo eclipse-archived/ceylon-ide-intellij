@@ -30,7 +30,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 object ideaAddModuleImportQuickFix
         satisfies AddModuleImportQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
-                & AbstractIntention {
+                & IdeaQuickFix {
     
     importUtil => ideaModuleImportUtils;
     
