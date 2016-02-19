@@ -1,0 +1,3 @@
+void func(Boolean cond) {
+    value result = if (cond) then "true" else "false";
+}

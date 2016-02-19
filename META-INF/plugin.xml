@@ -153,5 +153,10 @@
         </applicationConfigurable>
         <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.settings.CompletionSettings"/>
         <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.settings.CeylonSettings"/>
+
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertThenElseToIfElseIntention</className>
+            <category>Ceylon intentions</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>
