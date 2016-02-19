@@ -45,8 +45,6 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     
     value dummyMsg = UsageWarning(null, null, null);
     
-    shared actual String familyName => "Ceylon inspections";
-    
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
         if (exists chg = change) {
             chg.apply(project);
@@ -88,7 +86,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     
     shared formal void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset);
     
-    shared void makeAvailable(String desc, TextChange change, DefaultRegion? sel) {
+    shared void makeAvailable(String desc, TextChange change, DefaultRegion? sel = null) {
         setText(desc);
         available = true;
         this.change = change;

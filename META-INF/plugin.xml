@@ -156,7 +156,23 @@
 
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertThenElseToIfElseIntention</className>
-            <category>Ceylon intentions</category>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ReverseOperatorIntention</className>
+            <category>Ceylon/Operators</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.InvertOperatorIntention</className>
+            <category>Ceylon/Operators</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.SwapBinaryOperandsIntention</className>
+            <category>Ceylon/Operators</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ParenthesesIntention</className>
+            <category>Ceylon/Operators</category>
         </intentionAction>
     </extensions>
 </idea-plugin>

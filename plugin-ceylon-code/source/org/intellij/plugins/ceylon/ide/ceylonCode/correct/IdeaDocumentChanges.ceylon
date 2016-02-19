@@ -18,7 +18,8 @@ import com.intellij.openapi.editor.impl {
 }
 import java.util {
     JList = List,
-    ArrayList
+    ArrayList,
+    Comparator
 }
 import com.intellij.openapi.project {
     Project
@@ -59,6 +60,16 @@ shared class TextChange(shared Document document) {
     }
 
     shared void apply(Project? project = null) {
+        changes.sort(object satisfies Comparator<TextEdit> {
+            shared actual Integer compare(TextEdit? a, TextEdit? b) {
+                if (exists a, exists b) {
+                    return a.start - b.start;
+                }
+                return 0;
+            }
+            
+            shared actual Boolean equals(Object that) => false;
+        });
         value chars = javaString(document.text).toCharArray();
         value newText = BulkChangesMerger.\iINSTANCE.mergeToCharArray(chars, document.textLength, changes);
         document.setText(JString(newText));

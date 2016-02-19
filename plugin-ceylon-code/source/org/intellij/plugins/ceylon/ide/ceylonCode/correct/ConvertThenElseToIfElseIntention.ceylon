@@ -30,6 +30,8 @@ shared class ConvertThenElseToIfElseIntention()
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
     
+    familyName => "Convert if/then/else to statement";
+
     shared actual void newProposal(IdeaQuickFixData data, String desc, 
         TextChange change, DefaultRegion region)
             => makeAvailable(desc, change, region);
