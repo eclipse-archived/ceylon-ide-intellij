@@ -56,8 +56,9 @@ shared class FileWatcher(IdeaCeylonProject project)
     shared actual void propertyChanged(VirtualFilePropertyEvent evt) {}
     
     shared actual void selectionChanged(FileEditorManagerEvent evt) {
-        if (isCeylonSource(evt.oldFile),
-            exists doc = FileDocumentManager.instance.getCachedDocument(evt.oldFile)) {
+        if (exists oldFile = evt.oldFile,
+            isCeylonSource(oldFile),
+            exists doc = FileDocumentManager.instance.getCachedDocument(oldFile)) {
 
             // Will trigger contentsChanged(), which will call the typechecker
             FileDocumentManager.instance.saveDocument(doc);
