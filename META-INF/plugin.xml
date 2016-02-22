@@ -179,7 +179,7 @@
             <category>Ceylon/Syntax</category>
         </intentionAction>
         <intentionAction>
-            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.NonVerboseRefinementIntention</className>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ShortcutRefinementIntention</className>
             <category>Ceylon/Syntax</category>
         </intentionAction>
         <intentionAction>

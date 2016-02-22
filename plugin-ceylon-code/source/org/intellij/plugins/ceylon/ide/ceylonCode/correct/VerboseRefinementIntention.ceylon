@@ -38,19 +38,19 @@ shared class VerboseRefinementIntention()
     }
 }
 
-shared class NonVerboseRefinementIntention()
+shared class ShortcutRefinementIntention()
         extends AbstractIntention()
         satisfies VerboseRefinementQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
     
-    familyName => "Convert refinement to non-verbose form";
+    familyName => "Convert refinement to shortcut form";
     
     shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change)
             => makeAvailable(desc, change);
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
-        addNonVerboseRefinementProposal(data, file, statement);
+        addShortcutRefinementProposal(data, file, statement);
     }
 }
