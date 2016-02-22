@@ -178,18 +178,17 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         value facade = JavaPsiFacade.getInstance(project);
         
         shared actual Boolean packageExists(String quotedPackageName) 
-                => facade.findPackage(quotedPackageName) exists;
+            => doWithLock(() => facade.findPackage(quotedPackageName) exists);
         
-        shared actual {PsiClass*}? packageMembers(String quotedPackageName) {
-            
-            if (exists pkg = facade.findPackage(quotedPackageName)) {
-                value classes = pkg.getClasses(GlobalSearchScope.moduleScope(mod));
-                
-                return classes.iterable.coalesced;
-            }
-            
-            return null;
-        }
+        shared actual {PsiClass*}? packageMembers(String quotedPackageName)
+            => doWithLock(() {
+                if (exists pkg = facade.findPackage(quotedPackageName)) {
+                    value classes = pkg.getClasses(GlobalSearchScope.moduleScope(mod));
+                    
+                    return classes.iterable.coalesced;
+                }
+                return null;
+            });
         
         // TODO remove inner/anonymous classes?
         shared actual Boolean shouldBeOmitted(PsiClass type) => false;

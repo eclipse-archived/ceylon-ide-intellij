@@ -176,15 +176,19 @@
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.VerboseRefinementIntention</className>
-            <category>Ceylon/Others</category>
+            <category>Ceylon/Syntax</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.NonVerboseRefinementIntention</className>
-            <category>Ceylon/Others</category>
+            <category>Ceylon/Syntax</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaSpecifyTypeIntention</className>
-            <category>Ceylon/Others</category>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AnonymousFunctionIntention</className>
+            <category>Ceylon/Syntax</category>
         </intentionAction>
     </extensions>
 </idea-plugin>
