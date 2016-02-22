@@ -174,5 +174,13 @@
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ParenthesesIntention</className>
             <category>Ceylon/Operators</category>
         </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.VerboseRefinementIntention</className>
+            <category>Ceylon/Others</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.NonVerboseRefinementIntention</className>
+            <category>Ceylon/Others</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>

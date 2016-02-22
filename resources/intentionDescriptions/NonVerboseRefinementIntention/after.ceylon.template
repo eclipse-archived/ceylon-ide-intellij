@@ -1,0 +1,7 @@
+interface A {
+    shared formal Integer int;
+}
+
+class MyA() {
+    int => 1;
+}
