@@ -12,8 +12,9 @@ import com.intellij.openapi.util {
 }
 import com.redhat.ceylon.ide.common.correct {
     ConvertToSpecifierQuickFix,
-    AnonymousFunctionQuickFix,
-    ConvertToBlockQuickFix
+    MiscQuickFixes,
+    ConvertToBlockQuickFix,
+    ConvertToGetterQuickFix
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
@@ -22,15 +23,15 @@ import com.redhat.ceylon.ide.common.refactoring {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import com.redhat.ceylon.ide.common.util {
+    nodes
+}
 
-shared class AnonymousFunctionIntention()
+shared abstract class MiscIntention()
         extends AbstractIntention()
-        satisfies AnonymousFunctionQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+        satisfies MiscQuickFixes<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
-    
-    shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset)
-            => addAnonymousFunctionProposals(data, file);
     
     convertToBlockQuickFix => object satisfies ConvertToBlockQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
             & IdeaDocumentChanges
@@ -52,5 +53,29 @@ shared class AnonymousFunctionIntention()
         }
     };
     
+    convertToGetterQuickFix => object satisfies ConvertToGetterQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+            & IdeaDocumentChanges
+            & IdeaQuickFix {
+
+        shared actual void newProposal(IdeaQuickFixData data, String desc, 
+            TextChange change, DefaultRegion region) {
+            makeAvailable(desc, change, region);
+        }
+    };   
+}
+
+shared class AnonymousFunctionIntention() extends MiscIntention() {
     familyName => "Convert anonymous function block";
+    
+    shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset)
+            => addAnonymousFunctionProposals(data, file);
+}
+
+shared class DeclarationIntention() extends MiscIntention() {
+    familyName => "Convert declaration";
+    
+    shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
+        value decl = nodes.findDeclaration(data.rootNode, data.node);
+        addDeclarationProposals(data, file, decl, offset);
+    }
 }

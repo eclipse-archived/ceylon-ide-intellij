@@ -1,0 +1,5 @@
+class Cls() {
+    value a {
+        return "a";
+    }
+}

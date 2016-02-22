@@ -1,0 +1,3 @@
+class Cls() {
+    value a => "a";
+}
