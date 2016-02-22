@@ -30,14 +30,19 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
     IdeaLinkedMode
 }
+import com.redhat.ceylon.ide.common.util {
+    nodes
+}
 
-shared object ideaSpecifyTypeQuickFix
+shared object ideaSpecifyTypeQuickFix satisfies IdeaSpecifyTypeQuickFix { }
+
+shared interface IdeaSpecifyTypeQuickFix
         satisfies SpecifyTypeQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
             TextChange,TextRange,Module,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
                 
-    shared actual void newSpecifyTypeProposal(String desc, Tree.Type type,
+    shared default actual void newSpecifyTypeProposal(String desc, Tree.Type type,
         Tree.CompilationUnit cu, Type infType, IdeaQuickFixData data) {
 
         if (exists ann = data.annotation) {
@@ -71,4 +76,24 @@ shared object ideaSpecifyTypeQuickFix
     
     shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
     
+    specifyTypeArgumentsQuickFix => ideaSpecifyTypeArgumentsQuickFix;
+}
+
+shared class IdeaSpecifyTypeIntention()
+        extends AbstractIntention()
+        satisfies IdeaSpecifyTypeQuickFix {
+
+    shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
+        value declaration = nodes.findDeclaration(data.rootNode, data.node);
+        addTypingProposals(data, file, declaration);
+    }
+    
+    shared actual void newSpecifyTypeProposal(String desc, Tree.Type type, 
+        Tree.CompilationUnit cu, Type infType, IdeaQuickFixData data)
+            => makeAvailable(desc, null, null, (project, editor, file) {
+                    specifyType(data.doc, type, true, cu, infType);
+                }
+            );
+
+    familyName => "Specify type";
 }

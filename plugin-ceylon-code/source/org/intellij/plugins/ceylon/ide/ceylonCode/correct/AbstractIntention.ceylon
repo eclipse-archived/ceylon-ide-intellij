@@ -42,6 +42,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     variable TextChange? change = null;
     variable TextRange? selection = null;
     variable Boolean available = false;
+    variable Anything(Project, Editor, PsiFile) callback = noop;
     
     value dummyMsg = UsageWarning(null, null, null);
     
@@ -53,6 +54,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             editor.selectionModel.setSelection(sel.startOffset, sel.endOffset);
             editor.caretModel.moveToOffset(sel.endOffset);
         }
+        callback(project, editor, psiFile);
     }
     
     shared actual Boolean isAvailable(Project project, Editor editor, PsiFile psiFile) {
@@ -86,10 +88,14 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     
     shared formal void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset);
     
-    shared void makeAvailable(String desc, TextChange change, DefaultRegion? sel = null) {
+    shared void makeAvailable(String desc, TextChange? change = null,
+        DefaultRegion? sel = null, 
+        Anything callback(Project p, Editor e, PsiFile f) => noop) {
+        
         setText(desc);
         available = true;
         this.change = change;
+        this.callback = callback;
 
         if (exists sel) {
             selection = TextRange.from(sel.start, sel.length);

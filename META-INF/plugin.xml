@@ -182,5 +182,9 @@
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.NonVerboseRefinementIntention</className>
             <category>Ceylon/Others</category>
         </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaSpecifyTypeIntention</className>
+            <category>Ceylon/Others</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>
