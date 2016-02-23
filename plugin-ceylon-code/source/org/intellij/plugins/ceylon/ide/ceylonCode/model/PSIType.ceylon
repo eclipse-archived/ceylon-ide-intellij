@@ -37,6 +37,8 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         = IdentityHashMap<PsiType,PSIType?>(), PSIType? enclosing = null)
         satisfies TypeMirror {
 
+    variable String? cachedQualifiedName = null;
+    
    originatingTypes.put(psi, null);
    
    shared actual TypeMirror? componentType
@@ -105,7 +107,7 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         });
     }
     
-    shared actual String qualifiedName {
+    String computedQualifiedName {
         value canonicalText = 
                 let (t = psi.canonicalText)
                 if (exists i = t.firstOccurrence('<'))
@@ -157,6 +159,9 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         return canonicalText;
     }
 
+    shared actual String qualifiedName
+            => cachedQualifiedName else (cachedQualifiedName = computedQualifiedName);
+    
     // TODO
     shared actual TypeMirror? qualifyingType => null; //enclosing;
     

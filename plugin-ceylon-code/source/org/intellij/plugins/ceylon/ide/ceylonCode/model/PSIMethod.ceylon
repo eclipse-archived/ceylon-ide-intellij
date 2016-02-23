@@ -31,29 +31,39 @@ class PSIMethod(shared PsiMethod psi)
         return psi.containingClass.qualifiedName == cls;
     }
     
-    shared Boolean isOverriding;
+    variable Boolean? lazyIsOverriding = null;
     
-    if (classIs("ceylon.language.Identifiable"),
-        ["equals", "hashCode"].contains(psi.name)) {
-        
-        isOverriding = true;
-    } else if (classIs("ceylon.language.Object"),
-        ["equals", "hashCode", "toString"].contains(psi.name)) {
-        
-        isOverriding = false;
-    } else {
-        isOverriding = SuperMethodsSearch.search(psi, null, true, false)
-                .findFirst() exists;
+    Boolean computedIsOverriding {
+        if (classIs("ceylon.language.Identifiable"),
+            ["equals", "hashCode"].contains(psi.name)) {
+            
+            return true;
+        } else if (classIs("ceylon.language.Object"),
+            ["equals", "hashCode", "toString"].contains(psi.name)) {
+            
+            return false;
+        } else {
+            return SuperMethodsSearch.search(psi, null, true, false)
+                    .findFirst() exists;
+        }
     }
 
-    shared Boolean isOverloading;
-    
-    if (classIs("ceylon.language.Exception")) {
-        isOverloading = false;
-    } else {
-        value overloads = psi.containingClass.findMethodsByName(psi.name, true);
-        isOverloading = overloads.size > 1;
+    shared Boolean isOverriding => lazyIsOverriding else (lazyIsOverriding = computedIsOverriding);
+
+    Boolean computedIsOverloading {
+        if (classIs("ceylon.language.Exception")) {
+            return false;
+        } else {
+            value overloads = doWithLock(
+                () => psi.containingClass.findMethodsByName(psi.name, true)
+            );
+            return overloads.size > 1;
+        }
     }
+    
+    variable Boolean? lazyIsOverloading = null;
+    
+    shared Boolean isOverloading => lazyIsOverloading else (lazyIsOverloading = computedIsOverloading);
     
     shared actual Boolean abstract =>
         psi.hasModifierProperty(\iABSTRACT)
