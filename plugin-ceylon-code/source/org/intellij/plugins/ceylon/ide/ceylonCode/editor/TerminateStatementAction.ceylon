@@ -1,63 +1,50 @@
 import com.intellij.codeInsight.editorActions.smartEnter {
     SmartEnterProcessor
 }
-import com.redhat.ceylon.ide.common.editor {
-    AbstractTerminateStatementAction
-}
 import com.intellij.openapi.editor {
     Document,
     Editor
+}
+import com.intellij.openapi.project {
+    Project
+}
+import com.intellij.openapi.util {
+    TextRange
+}
+import com.intellij.psi {
+    PsiFile
+}
+import com.redhat.ceylon.compiler.typechecker.parser {
+    CeylonParser,
+    CeylonLexer
+}
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
+import com.redhat.ceylon.ide.common.editor {
+    AbstractTerminateStatementAction
+}
+import com.redhat.ceylon.ide.common.refactoring {
+    DefaultRegion
+}
+import com.redhat.ceylon.ide.common.util {
+    unsafeCast
+}
+
+import java.util {
+    List
+}
+
+import org.antlr.runtime {
+    CommonToken,
+    ANTLRStringStream,
+    CommonTokenStream
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     InsertEdit,
     TextEdit,
     TextChange,
     IdeaDocumentChanges
-}
-import com.intellij.openapi.project {
-    Project
-}
-import com.intellij.psi {
-    PsiFile
-}
-import com.redhat.ceylon.ide.common.typechecker {
-    LocalAnalysisResult
-}
-import com.redhat.ceylon.ide.common.refactoring {
-    DefaultRegion
-}
-import com.intellij.openapi.util {
-    TextRange
-}
-import java.util {
-    List
-}
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
-}
-import com.redhat.ceylon.ide.common.settings {
-    CompletionOptions
-}
-import com.redhat.ceylon.ide.common.model {
-    CeylonProject
-}
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
-}
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
-}
-import org.antlr.runtime {
-    CommonToken,
-    ANTLRStringStream,
-    CommonTokenStream
-}
-import com.redhat.ceylon.compiler.typechecker.parser {
-    CeylonParser,
-    CeylonLexer
-}
-import com.redhat.ceylon.ide.common.util {
-    unsafeCast
 }
 
 shared class TerminateStatementAction()

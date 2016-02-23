@@ -8,6 +8,9 @@ import com.intellij.openapi.application {
     Result,
     ApplicationManager
 }
+import com.intellij.openapi.extensions {
+    Extensions
+}
 import com.intellij.openapi.fileEditor {
     FileEditorManagerListener
 }
@@ -60,16 +63,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     vfsKeychain,
     IdeaVirtualFolder,
     FileWatcher
-}
-import com.intellij.util {
-    PathUtil
-}
-import com.intellij.diagnostic {
-    PluginException
-}
-import com.intellij.openapi.extensions {
-    PluginId,
-    Extensions
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
