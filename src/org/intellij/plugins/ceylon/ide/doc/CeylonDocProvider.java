@@ -150,12 +150,11 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                     context.getContainingFile().navigate(true);
                 }
 
-                System.out.println("stp");
                 new WriteCommandAction(context.getProject()) {
                     @Override
                     protected void run(@NotNull Result result) throws Throwable {
                         Document doc = context.getContainingFile().getViewProvider().getDocument();
-                        IdeaQuickFixData data = new IdeaQuickFixData(null, doc, cu, node, null, null);
+                        IdeaQuickFixData data = new IdeaQuickFixData(null, doc, cu, node, null, null, null);
                         ideaSpecifyTypeQuickFix_.get_().createProposal((Tree.Type) node, data);
                     }
                 }.execute();
