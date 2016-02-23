@@ -202,5 +202,9 @@
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AssignToFieldIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertToDefaultConstructorIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>
