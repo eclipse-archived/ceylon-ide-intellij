@@ -194,5 +194,9 @@
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.DeclarationIntention</className>
             <category>Ceylon/Syntax</category>
         </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AssignToFieldIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>

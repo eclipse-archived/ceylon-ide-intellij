@@ -1,0 +1,6 @@
+class Clz {
+    String a;
+    shared new (String a) {
+        this.a = a;
+    }
+}
