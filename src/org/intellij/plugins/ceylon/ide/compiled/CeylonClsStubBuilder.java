@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.ide.compiled;
 
-import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.compiled.ClsStubBuilder;
 import com.intellij.psi.impl.compiled.InnerClassSourceStrategy;
@@ -62,7 +61,7 @@ class CeylonClsStubBuilder extends ClsStubBuilder {
 
     private static String getPackageName(String internalName) {
         int p = internalName.lastIndexOf('/');
-        return p > 0 ? internalName.substring(0, p).replace('/', '.') : StringUtilRt.EMPTY_STRING;
+        return p > 0 ? internalName.substring(0, p).replace('/', '.') : "";
     }
 
     private static final InnerClassSourceStrategy<VirtualFile> STRATEGY = new InnerClassSourceStrategy<VirtualFile>() {
