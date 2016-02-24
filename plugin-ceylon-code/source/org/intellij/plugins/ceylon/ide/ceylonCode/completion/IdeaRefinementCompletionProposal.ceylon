@@ -54,7 +54,9 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType)
         extends RefinementCompletionProposal<CompletionData,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>
         (offset, prefix, pr, desc, text, data, dec, scope, fullType, explicitReturnType) 
-        satisfies IdeaDocumentChanges & IdeaCompletionProposal {
+        satisfies IdeaDocumentChanges
+                & IdeaCompletionProposal
+                & IdeaLinkedModeSupport {
 
     shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.forDeclaration(dec),
         object satisfies InsertHandler<LookupElement> {
@@ -78,12 +80,6 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         }
     );
 
-    shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, 
-        Integer start, Integer len, Integer exitSeqNumber, LookupElement[] proposals) {
-        
-        lm.addEditableRegion(start, len, proposals);
-    }
-    
     shared actual String completionMode => "overwrite";
     
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals => ideaImportProposals;
@@ -91,8 +87,6 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
     shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber, Integer exitPosition) {
         lm.buildTemplate(data.editor);
     }
-    
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
     
     shared actual LookupElement newNestedCompletionProposal(Declaration dec, Integer loc) {
         value unit = data.lastCompilationUnit.unit;

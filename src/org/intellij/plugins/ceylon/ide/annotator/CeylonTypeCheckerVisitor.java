@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
+import ceylon.language.AssertionError;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
@@ -139,6 +140,11 @@ class CeylonTypeCheckerVisitor extends Visitor {
         Node node = nodes_.get_().findNode(pu.getCompilationUnit(), null, range.getStartOffset(), range.getEndOffset());
         IdeaQuickFixData data = new IdeaQuickFixData(error, file.getViewProvider().getDocument(),
                 pu.getCompilationUnit(), node, module, annotation, project);
-        ideaQuickFixManager_.get_().addQuickFixes(data, tc, file);
+
+        try {
+            ideaQuickFixManager_.get_().addQuickFixes(data, tc, file);
+        } catch (Exception|AssertionError e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -47,8 +47,9 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         extends ControlStructureProposal<CompletionData,CeylonFile,
         LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>
         (offset, prefix, desc, text, node, declaration, data)
-        satisfies IdeaDocumentChanges & IdeaCompletionProposal {
-    
+        satisfies IdeaDocumentChanges
+                & IdeaCompletionProposal
+                & IdeaLinkedModeSupport {
 
     shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.correction,
         object satisfies InsertHandler<LookupElement> {
@@ -68,15 +69,7 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
             }
         }
     , null, [declaration, text]);
-    
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
-    
-    shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start, Integer len,
-        Integer exitSeqNumber, LookupElement[] proposals) {
         
-        lm.addEditableRegion(start, len, proposals);
-    }
-    
     shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber,
         Integer exitPosition) {
         
@@ -93,5 +86,4 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
             => LookupElementBuilder.create(name);
     
     shared actual Boolean toggleOverwrite => false;
-    
 }

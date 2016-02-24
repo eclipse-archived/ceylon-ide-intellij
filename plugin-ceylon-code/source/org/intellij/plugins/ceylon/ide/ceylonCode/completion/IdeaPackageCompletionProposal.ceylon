@@ -47,7 +47,9 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
                 String fullPackageName, CompletionData data, Package candidate)
         extends ImportedModulePackageProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData>
         (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate, data)
-        satisfies IdeaDocumentChanges & IdeaCompletionProposal {
+        satisfies IdeaDocumentChanges
+                & IdeaCompletionProposal
+                & IdeaLinkedModeSupport {
 
     shared actual variable Boolean toggleOverwrite = false;
     
@@ -67,13 +69,6 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
         return LookupElementBuilder.create(d.name)
             .withIcon(ideaIcons.forDeclaration(d));
     }
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
-    
-    shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start, Integer len,
-        Integer exitSeqNumber, LookupElement[] proposals) {
-        
-        lm.addEditableRegion(start, len, proposals);
-    }
     
     shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber,
         Integer exitPosition) {
@@ -92,7 +87,9 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
     ModuleSearchResult.ModuleDetails md)
         extends PackageCompletionProposal<CeylonFile, LookupElement, Document, InsertEdit, TextEdit, TextChange, TextRange, IdeaLinkedMode>
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
-        satisfies IdeaDocumentChanges & IdeaCompletionProposal {
+        satisfies IdeaDocumentChanges
+                & IdeaCompletionProposal
+                & IdeaLinkedModeSupport {
 
     shared LookupElement lookupElement => newLookup(description, text, ideaIcons.modules,
         object satisfies InsertHandler<LookupElement> {
@@ -110,12 +107,7 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
             }
         }
     );
-    shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc,
-        Integer start, Integer len, Integer exitSeqNumber, LookupElement[] proposals) {
-        
-        lm.addEditableRegion(start, len, proposals);
-    }
-    
+
     shared actual String completionMode => "overwrite";
     
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
@@ -125,9 +117,5 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
         lm.buildTemplate(data.editor);
     }
     
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
-    
     shared actual Boolean toggleOverwrite => false;
-    
-
 }

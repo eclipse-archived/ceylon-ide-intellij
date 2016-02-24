@@ -45,7 +45,9 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         String name, Node node, CompletionData data) 
         extends ModuleProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData>
         (offset, prefix, len, versioned, mod, withBody, version, name, node, data)
-        satisfies IdeaDocumentChanges & IdeaCompletionProposal {
+        satisfies IdeaDocumentChanges 
+                & IdeaCompletionProposal
+                & IdeaLinkedModeSupport {
    
     shared LookupElement lookupElement => newLookup(versioned, versioned.spanFrom(len),
        ideaIcons.modules, object satisfies InsertHandler<LookupElement> {
@@ -60,12 +62,6 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         }
     );
     
-    shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, 
-       Integer start, Integer len, Integer exitSeqNumber, LookupElement[] proposals) {
-       
-       lm.addEditableRegion(start, len, proposals);
-   }
-    
     shared actual String completionMode => "overwrite";
     
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
@@ -75,13 +71,8 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         lm.buildTemplate(data.editor);
     }
     
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
-    
     shared actual LookupElement newModuleProposal(ModuleVersionDetails d, TextRange selection, IdeaLinkedMode lm)
             => newLookup(d.version, d.version, null, null, selection); // TODO icon
     
     shared actual Boolean toggleOverwrite => false;
-    
-    
-    
 }

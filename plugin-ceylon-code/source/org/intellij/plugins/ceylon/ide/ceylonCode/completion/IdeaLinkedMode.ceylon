@@ -16,10 +16,14 @@ import com.intellij.codeInsight.template {
     TextResult,
     TemplateBuilderImpl,
     TemplateEditingAdapter,
-    Template
+    Template,
+    TemplateBuilder
 }
 import com.intellij.openapi.editor {
-    Editor
+    Editor,
+    Document,
+    EditorFactory,
+    RangeMarker
 }
 import com.intellij.openapi.util {
     TextRange
@@ -32,14 +36,31 @@ import java.lang {
     ObjectArray
 }
 import com.intellij.codeInsight.template.impl {
-    TemplateState
+    TemplateState,
+    SelectionNode,
+    TextExpression,
+    TemplateImpl
+}
+import com.redhat.ceylon.ide.common.completion {
+    LinkedModeSupport
+}
+import com.intellij.openapi.application {
+    ApplicationManager
+}
+import com.intellij.codeInsight.daemon.impl.quickfix {
+    EmptyExpression
 }
 
 shared class IdeaLinkedMode() {
     value variables = ArrayList<[TextRange, LookupElement[]]>();
+    value multiVariables = ArrayList<{TextRange+}>();
     
     shared void addEditableRegion(Integer start, Integer len, LookupElement[] proposals) {
         variables.add([TextRange.from(start, len), proposals]);
+    }
+    
+    shared void addEditableRegions({TextRange+} ranges) {
+        multiVariables.add(ranges);
     }
     
     shared void buildTemplate(Editor editor) {
@@ -50,12 +71,39 @@ shared class IdeaLinkedMode() {
         for ([range,elements] in variables) {
             value text = editor.document.getText(range);
             value proposals = object extends Expression() {
-                    shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext)
+                shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext)
                         => createJavaObjectArray(elements);
-                    shared actual TemplateResult? calculateQuickResult(ExpressionContext? expressionContext) => TextResult(text);
-                    shared actual TemplateResult? calculateResult(ExpressionContext? expressionContext) => TextResult(text);
+                shared actual TemplateResult? calculateQuickResult(ExpressionContext? expressionContext) => TextResult(text);
+                shared actual TemplateResult? calculateResult(ExpressionContext? expressionContext) => TextResult(text);
             };
             builder.replaceRange(range, proposals);
+        }
+        
+        variable value i = 0;
+        for (ranges in multiVariables) {
+            value rangeName = "multi``i``";
+            value marker = editor.document.createRangeMarker(ranges.first);
+            value text = editor.document.getText(ranges.first);
+            
+            variable value j = 0;
+            for (range in ranges) {
+                value expr = object extends Expression() {
+                    shared actual ObjectArray<LookupElement>? calculateLookupItems(ExpressionContext? expressionContext)
+                            => null;
+                    shared actual TemplateResult? calculateQuickResult(ExpressionContext ctx) => null;
+                    shared actual TemplateResult? calculateResult(ExpressionContext ctx)
+                            => TextResult(text);
+                };
+                
+                if (j == 0) {
+                    builder.replaceElement(file, range, rangeName, expr, true);
+                } else {
+                    builder.replaceElement(file, range, rangeName, rangeName + "Other", false);
+                }
+                
+                j++;
+            }
+            i++;
         }
         
         editor.caretModel.moveToOffset(0);
@@ -68,4 +116,30 @@ shared class IdeaLinkedMode() {
         };
         TemplateManager.getInstance(editor.project).startTemplate(editor, template, listener);
     }
+}
+
+shared interface IdeaLinkedModeSupport 
+        satisfies LinkedModeSupport<IdeaLinkedMode, Document, LookupElement> {
+    
+    shared actual default void addEditableRegion(IdeaLinkedMode lm, Document doc,
+        Integer start, Integer len, Integer exitSeqNumber, LookupElement[] proposals) {
+        
+        lm.addEditableRegion(start, len, proposals);
+    }
+    
+    shared actual default void addEditableRegions(IdeaLinkedMode lm, Document doc, Integer[3]+ positions) {
+        value ranges = positions.map((el) => TextRange.from(el[0], el[1]));
+        lm.addEditableRegions(ranges);
+    }
+    
+    shared actual default void installLinkedMode(Document doc, IdeaLinkedMode lm,
+        Object owner, Integer exitSeqNumber, Integer exitPosition) {
+        
+        value editors = EditorFactory.instance.getEditors(doc);
+        if (editors.size > 0) {
+            lm.buildTemplate(editors.get(0));
+        }
+    }
+    
+    shared actual default IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
 }

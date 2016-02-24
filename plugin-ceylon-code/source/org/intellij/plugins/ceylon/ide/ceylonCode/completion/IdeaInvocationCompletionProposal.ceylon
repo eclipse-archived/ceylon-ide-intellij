@@ -55,7 +55,9 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     Boolean inherited, Boolean qualified, Declaration? qualifyingValue, CompletionData data)
         extends InvocationCompletionProposal<CompletionData,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
     positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue, ideaCompletionManager)
-        satisfies IdeaDocumentChanges & IdeaCompletionProposal {
+        satisfies IdeaDocumentChanges
+                & IdeaCompletionProposal
+                & IdeaLinkedModeSupport {
     
     shared actual variable Boolean toggleOverwrite = false;
     
@@ -92,14 +94,6 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     , null, [declaration, text])
             .withTailText(greyText, true)
             .withTypeText(returnType);
-    
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
-    
-    shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start, Integer len,
-        Integer exitSeqNumber, LookupElement[] proposals) {
-        
-        lm.addEditableRegion(start, len, proposals);
-    }
     
     shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber,
         Integer exitPosition) {

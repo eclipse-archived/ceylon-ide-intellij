@@ -1,48 +1,33 @@
-import com.redhat.ceylon.ide.common.correct {
-    AbstractInitializerQuickFix
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaLinkedMode
-}
-import com.intellij.openapi.editor {
-    Document,
-    EditorFactory
-}
 import com.intellij.codeInsight.lookup {
     LookupElement,
     LookupElementBuilder
 }
-import com.redhat.ceylon.model.typechecker.model {
-    Declaration,
-    Functional
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+import com.intellij.openapi.editor {
+    Document
 }
 import com.redhat.ceylon.ide.common.completion {
     getProposedName,
     appendPositionalArgs
 }
+import com.redhat.ceylon.ide.common.correct {
+    AbstractInitializerQuickFix
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration,
+    Functional
+}
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
+    IdeaLinkedMode,
+    IdeaLinkedModeSupport
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
+}
 
 class IdeaInitializer()
-        satisfies AbstractInitializerQuickFix<IdeaLinkedMode,Document,LookupElement> {
-
-    shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, 
-        Integer start, Integer len, Integer exitSeqNumber, LookupElement[] proposals) {
-        
-        lm.addEditableRegion(start, len, proposals);
-    }
-    
-    shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, 
-        Object owner, Integer exitSeqNumber, Integer exitPosition) {
-        
-        value editors = EditorFactory.instance.getEditors(doc);
-        if (editors.size > 0) {
-            lm.buildTemplate(editors.get(0));
-        }
-    }
-    
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
+        satisfies AbstractInitializerQuickFix<IdeaLinkedMode,Document,LookupElement>
+                & IdeaLinkedModeSupport {
 
     shared actual LookupElement newNestedCompletionProposal(Declaration dec, 
         Integer offset) => LookupElementBuilder.create(getText(dec, false))
@@ -63,5 +48,4 @@ class IdeaInitializer()
         
         return sb.string;
     }
-    
 }

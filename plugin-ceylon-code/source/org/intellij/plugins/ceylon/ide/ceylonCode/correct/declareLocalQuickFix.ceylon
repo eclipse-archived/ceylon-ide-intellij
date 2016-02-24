@@ -3,7 +3,6 @@ import com.intellij.codeInsight.lookup {
 }
 import com.intellij.openapi.editor {
     Document,
-    EditorFactory,
     Editor
 }
 import com.intellij.openapi.\imodule {
@@ -26,7 +25,8 @@ import com.redhat.ceylon.ide.common.correct {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaLinkedMode
+    IdeaLinkedMode,
+    IdeaLinkedModeSupport
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
@@ -37,26 +37,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 object ideaDeclareLocalQuickFix 
         satisfies DeclareLocalQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,IdeaLinkedMode,LookupElement,Module,IdeaQuickFixData,TextRange>
-                & IdeaDocumentChanges & IdeaQuickFix {
-    
-    shared actual void addEditableRegion(IdeaLinkedMode lm, Document doc, Integer start,
-        Integer len, Integer exitSeqNumber, LookupElement[] proposals) {
-        
-        lm.addEditableRegion(start, len, proposals);
-    }
-    
-    shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner,
-        Integer exitSeqNumber, Integer exitPosition) {
-        
-        // TODO this is lame, not guaranteed to be the active editor
-        value editors = EditorFactory.instance.getEditors(doc);
-        if (editors.size > 0) {
-            lm.buildTemplate(editors.get(0));
-        }
-    }
-    
-    shared actual IdeaLinkedMode newLinkedMode() => IdeaLinkedMode();
-    
+                & IdeaDocumentChanges
+                & IdeaQuickFix
+                & IdeaLinkedModeSupport {
+
     shared actual void newDeclareLocalQuickFix(IdeaQuickFixData data, String desc, TextChange change,
         Tree.Term term, Tree.BaseMemberExpression bme) {
         
