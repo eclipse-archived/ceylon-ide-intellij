@@ -34,15 +34,15 @@
         <pathelement path="${ceylon.repo.dir}/com/github/lookfirst/sardine/5.1/com.github.lookfirst.sardine-5.1.jar" />
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/maven-support/2.0/com.redhat.ceylon.maven-support-2.0.jar" />
 
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/common/1.2.1/com.redhat.ceylon.common-1.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/compiler/js/1.2.1/com.redhat.ceylon.compiler.js-1.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/compiler/java/1.2.1/com.redhat.ceylon.compiler.java-1.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/module-resolver/1.2.1/com.redhat.ceylon.module-resolver-1.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/typechecker/1.2.1/com.redhat.ceylon.typechecker-1.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/ceylon/runtime/1.2.1/ceylon.runtime-1.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/ceylon/language/1.2.1/ceylon.language-1.2.1.car" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/model/1.2.1/com.redhat.ceylon.model-1.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/langtools/classfile/1.2.1/com.redhat.ceylon.langtools.classfile-1.2.1.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/common/1.2.2/com.redhat.ceylon.common-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/compiler/js/1.2.2/com.redhat.ceylon.compiler.js-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/compiler/java/1.2.2/com.redhat.ceylon.compiler.java-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/module-resolver/1.2.2/com.redhat.ceylon.module-resolver-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/typechecker/1.2.2/com.redhat.ceylon.typechecker-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/ceylon/runtime/1.2.2/ceylon.runtime-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/ceylon/language/1.2.2/ceylon.language-1.2.2.car" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/model/1.2.2/com.redhat.ceylon.model-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/langtools/classfile/1.2.2/com.redhat.ceylon.langtools.classfile-1.2.2.jar" />
 
         <pathelement path="${projects.base.dir}/ceylon/dist/dist/lib/ceylon-bootstrap.jar" />
     </path>
@@ -62,11 +62,11 @@
 
     <path id="dist.classpath">
         <pathelement path="${basedir}/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.2.0/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.car" />
-        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.1/com.redhat.ceylon.ide.common-1.2.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.2/com.redhat.ceylon.ide.common-1.2.2.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar" />
-        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/1.2.1/ceylon.collection-1.2.1.car" />
-        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.2.1/ceylon.interop.java-1.2.1.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/1.2.2/ceylon.collection-1.2.2.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.2.2/ceylon.interop.java-1.2.2.car" />
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.1/ceylon.tool.converter.java2ceylon-1.2.1.car" />
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar" />
     </path>

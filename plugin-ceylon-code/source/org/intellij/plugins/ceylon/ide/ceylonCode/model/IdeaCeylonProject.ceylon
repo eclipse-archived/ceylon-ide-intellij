@@ -33,8 +33,7 @@ import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
 }
 import com.redhat.ceylon.ide.common.model {
-    CeylonProject,
-    ModuleDependencies
+    CeylonProject
 }
 import com.redhat.ceylon.ide.common.vfs {
     FolderVirtualFile
@@ -64,6 +63,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     IdeaVirtualFolder,
     FileWatcher
 }
+import org.jetbrains.jps.model.java {
+    JavaSourceRootType,
+    JavaResourceRootType
+}
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
@@ -71,9 +74,6 @@ shared class IdeaCeylonProject(ideArtifact, model)
     shared actual Module ideArtifact;
     shared actual IdeaCeylonProjects model;
     shared actual String name => ideArtifact.name;
-
-    // TODO
-    shared actual ModuleDependencies moduleDependencies = ModuleDependencies();
 
     shared Module ideaModule => ideArtifact;
 
@@ -234,6 +234,20 @@ shared class IdeaCeylonProject(ideArtifact, model)
         value ext = Extensions.getExtensions(ITypeCheckerInvoker.\iEP_NAME).get(0);
         String pluginRepoPath = ext.embeddedCeylonRepository.absolutePath;
         return repoPath.replace("${user.home}", userHomePath).replace("${ceylon.repo}", pluginRepoPath);
+    }
+    
+    shared actual {VirtualFile*} resourceNativeFolders {
+        value roots = ModuleRootManager.getInstance(ideaModule)
+                ?.getSourceRoots(JavaResourceRootType.\iRESOURCE);
+        
+        return if (exists roots) then CeylonIterable(roots) else empty;
+    }
+    
+    shared actual {VirtualFile*} sourceNativeFolders {
+        value roots = ModuleRootManager.getInstance(ideaModule)
+                ?.getSourceRoots(JavaSourceRootType.\iSOURCE);
+        
+        return if (exists roots) then CeylonIterable(roots) else empty;
     }
 }
 

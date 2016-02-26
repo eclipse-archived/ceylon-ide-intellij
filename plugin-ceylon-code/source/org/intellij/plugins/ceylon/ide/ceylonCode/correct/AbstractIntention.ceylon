@@ -79,7 +79,11 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     pr
                 );
 
-                checkAvailable(data, psiFile, offset);
+                try {
+                    checkAvailable(data, psiFile, offset);
+                } catch (Exception|AssertionError e) {
+                    e.printStackTrace();
+                }
             }
         }
         

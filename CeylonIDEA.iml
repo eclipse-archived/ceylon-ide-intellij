@@ -13,18 +13,18 @@
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$CEYLON_DIST_REPO$">
-      <sourceFolder url="file://$CEYLON_DIST_REPO$" isTestSource="false" packagePrefix="repo" />
-    </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/testdata" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/source" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/gen" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/ant-build" />
+    </content>
+    <content url="file://$CEYLON_DIST_REPO$">
+      <sourceFolder url="file://$CEYLON_DIST_REPO$" isTestSource="false" packagePrefix="repo" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -33,11 +33,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.1/com.redhat.ceylon.ide.common-1.2.1.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.2/com.redhat.ceylon.ide.common-1.2.2.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.1/com.redhat.ceylon.ide.common-1.2.1.src!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.2/com.redhat.ceylon.ide.common-1.2.2.src!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -53,7 +53,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.2.1/ceylon.collection-1.2.1.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.2.2/ceylon.collection-1.2.2.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -62,7 +62,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.2.1/ceylon.interop.java-1.2.1.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.2.2/ceylon.interop.java-1.2.2.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -80,7 +80,27 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.1/ceylon.tool.converter.java2ceylon-1.2.1.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.2/ceylon.tool.converter.java2ceylon-1.2.2.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.src!/Zip4j/src" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
