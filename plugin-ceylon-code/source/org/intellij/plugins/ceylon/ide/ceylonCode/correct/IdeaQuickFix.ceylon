@@ -105,7 +105,7 @@ shared interface IdeaQuickFix
                     .getComponent(javaClass<ITypeCheckerProvider>())
                     .typeChecker) {
             
-            tc.phasedUnits.getPhasedUnitFromRelativePath(u.relativePath);
+            return tc.phasedUnits.getPhasedUnitFromRelativePath(u.relativePath);
         }
         return null;
     }
