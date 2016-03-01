@@ -210,5 +210,9 @@
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertToClassIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddAnnotationIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>
