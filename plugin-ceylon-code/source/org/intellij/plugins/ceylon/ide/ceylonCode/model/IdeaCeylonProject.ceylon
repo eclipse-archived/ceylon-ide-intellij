@@ -27,7 +27,9 @@ import com.intellij.openapi.ui {
 import com.intellij.openapi.vfs {
     VirtualFile,
     VfsUtil,
-    VirtualFileManager
+    VirtualFileManager,
+    VirtualFileVisitor,
+    VfsUtilCore
 }
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
@@ -66,6 +68,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 import org.jetbrains.jps.model.java {
     JavaSourceRootType,
     JavaResourceRootType
+}
+import com.redhat.ceylon.ide.common.model.parsing {
+    RootFolderScanner
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -249,5 +254,12 @@ shared class IdeaCeylonProject(ideArtifact, model)
         
         return if (exists roots) then CeylonIterable(roots) else empty;
     }
+    
+    shared actual void scanRootFolder(RootFolderScanner<Module,VirtualFile,VirtualFile,VirtualFile> scanner) {
+        VfsUtilCore.visitChildrenRecursively(scanner.nativeRootDir, 
+            object extends VirtualFileVisitor<Nothing>() {
+                visitFile(VirtualFile file) => scanner.visitNativeResource(file);
+            }
+        );
+    }
 }
-

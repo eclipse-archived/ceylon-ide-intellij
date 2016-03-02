@@ -1,6 +1,5 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
-import ceylon.collection.MutableList;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.AccessToken;
@@ -19,13 +18,9 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.startup.StartupManager;
-import com.intellij.openapi.vfs.VfsUtilCore;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.cmr.api.RepositoryManager;
-import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.analyzer.ModuleValidator;
@@ -34,13 +29,11 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
 import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
-import com.redhat.ceylon.ide.common.vfs.FileVirtualFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaModulesScanner;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.IdeaRootFolderScanner;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.DummyProgressMonitor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaPlatformUtils_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
@@ -221,36 +214,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
         mm.prepareForTypeChecking();
 
-        for (final VirtualFile sourceRoot : ModuleRootManager.getInstance(module).getSourceRoots()) {
-            final IdeaModulesScanner scanner = new IdeaModulesScanner(ceylonProject, sourceRoot);
-
-            VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor() {
-                @Override
-                public boolean visitFile(@NotNull VirtualFile file) {
-                    return scanner.visitNativeResource(file);
-                }
-            });
-        }
-
-        TypeDescriptor fileVirtualFileTypeDescriptor = TypeDescriptor.klass(FileVirtualFile.class,
-                TypeDescriptor.klass(VirtualFile.class),
-                TypeDescriptor.klass(VirtualFile.class),
-                TypeDescriptor.klass(VirtualFile.class));
-
-        MutableList<FileVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile>> projectVirtualFiles
-                = new ceylon.collection.ArrayList<>(fileVirtualFileTypeDescriptor);
-
-        // todo separate sources from resources
-        for (final VirtualFile sourceRoot : ModuleRootManager.getInstance(module).getSourceRoots()) {
-            final IdeaRootFolderScanner scanner = new IdeaRootFolderScanner(ceylonProject, sourceRoot, true, projectVirtualFiles);
-
-            VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor() {
-                @Override
-                public boolean visitFile(@NotNull VirtualFile file) {
-                    return scanner.visitNativeResource(file);
-                }
-            });
-        }
+        ceylonProject.scanFiles(new DummyProgressMonitor());
 
         loader.setupSourceFileObjects(typeChecker.getPhasedUnits().getPhasedUnits());
         typeChecker.getPhasedUnits().visitModules();
