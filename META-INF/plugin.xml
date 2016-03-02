@@ -199,6 +199,14 @@
             <category>Ceylon/Syntax</category>
         </intentionAction>
         <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertArgumentBlockIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.FillInArgumentNameIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AssignToFieldIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>

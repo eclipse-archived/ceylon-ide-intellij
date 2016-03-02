@@ -14,7 +14,8 @@ import com.redhat.ceylon.ide.common.correct {
     ConvertToSpecifierQuickFix,
     MiscQuickFixes,
     ConvertToBlockQuickFix,
-    ConvertToGetterQuickFix
+    ConvertToGetterQuickFix,
+    FillInArgumentNameQuickFix
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
@@ -62,6 +63,16 @@ shared abstract class MiscIntention()
             makeAvailable(desc, change, region);
         }
     };   
+    
+    fillInQuickFix => object satisfies FillInArgumentNameQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+            & IdeaDocumentChanges
+            & IdeaQuickFix {
+        
+        shared actual void newProposal(IdeaQuickFixData data, String desc,
+            TextChange change) {
+            makeAvailable(desc, change);
+        }
+    };
 }
 
 shared class AnonymousFunctionIntention() extends MiscIntention() {
@@ -77,5 +88,23 @@ shared class DeclarationIntention() extends MiscIntention() {
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value decl = nodes.findDeclaration(data.rootNode, data.node);
         addDeclarationProposals(data, file, decl, offset);
+    }
+}
+
+shared class ConvertArgumentBlockIntention() extends MiscIntention() {
+    familyName => "Convert argument block/specifier";
+    
+    shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
+        value arg = nodes.findArgument(data.rootNode, data.node);
+        addArgumentBlockProposals(data, file, arg);
+    }
+}
+
+shared class FillInArgumentNameIntention() extends MiscIntention() {
+    familyName => "Fill in argument name";
+    
+    shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
+        value arg = nodes.findArgument(data.rootNode, data.node);
+        addArgumentFillInProposals(data, file, arg);
     }
 }
