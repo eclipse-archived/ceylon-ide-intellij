@@ -25,15 +25,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class ReverseOperatorIntention()
-        extends AbstractIntention()
-        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+        extends GenericIntention()
+        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     familyName => "Reverse operator";
-    
-    shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change)
-            => makeAvailable(desc, change);
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         if (is Tree.BinaryOperatorExpression oe = nodes.findOperator(data.rootNode, data.node)) {
@@ -43,15 +38,10 @@ shared class ReverseOperatorIntention()
 }
 
 shared class InvertOperatorIntention()
-        extends AbstractIntention()
-        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+        extends GenericIntention()
+        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     familyName => "Invert operator";
-
-    shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change)
-            => makeAvailable(desc, change);
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         if (is Tree.BinaryOperatorExpression oe = nodes.findOperator(data.rootNode, data.node)) {
@@ -61,15 +51,10 @@ shared class InvertOperatorIntention()
 }
 
 shared class SwapBinaryOperandsIntention()
-        extends AbstractIntention()
-        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+        extends GenericIntention()
+        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     familyName => "Swap binary operands";
-
-    shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change)
-            => makeAvailable(desc, change);
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         if (is Tree.BinaryOperatorExpression oe = nodes.findOperator(data.rootNode, data.node)) {
@@ -79,15 +64,10 @@ shared class SwapBinaryOperandsIntention()
 }
 
 shared class ParenthesesIntention()
-        extends AbstractIntention()
-        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+        extends GenericIntention()
+        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     familyName => "Add/remove parentheses";
-
-    shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change)
-            => makeAvailable(desc, change);
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         if (is Tree.BinaryOperatorExpression oe = nodes.findOperator(data.rootNode, data.node)) {

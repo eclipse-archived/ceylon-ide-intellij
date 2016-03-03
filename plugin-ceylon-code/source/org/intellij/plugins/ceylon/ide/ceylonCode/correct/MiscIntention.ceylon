@@ -39,7 +39,7 @@ shared abstract class MiscIntention()
             & IdeaQuickFix {
 
         shared actual void newProposal(IdeaQuickFixData data, String desc, 
-            TextChange change, DefaultRegion region) {
+            TextChange change, DefaultRegion? region) {
             makeAvailable(desc, change, region);
         }
     };
@@ -49,7 +49,7 @@ shared abstract class MiscIntention()
             & IdeaQuickFix {
 
         shared actual void newProposal(IdeaQuickFixData data, String desc, 
-            TextChange change, DefaultRegion region) {
+            TextChange change, DefaultRegion? region) {
             makeAvailable(desc, change, region);
         }
     };
@@ -59,7 +59,7 @@ shared abstract class MiscIntention()
             & IdeaQuickFix {
 
         shared actual void newProposal(IdeaQuickFixData data, String desc, 
-            TextChange change, DefaultRegion region) {
+            TextChange change, DefaultRegion? region) {
             makeAvailable(desc, change, region);
         }
     };   
@@ -69,7 +69,7 @@ shared abstract class MiscIntention()
             & IdeaQuickFix {
         
         shared actual void newProposal(IdeaQuickFixData data, String desc,
-            TextChange change) {
+            TextChange change, DefaultRegion? region) {
             makeAvailable(desc, change);
         }
     };

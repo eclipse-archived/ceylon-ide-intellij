@@ -22,15 +22,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class VerboseRefinementIntention()
-        extends AbstractIntention()
-        satisfies VerboseRefinementQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+        extends GenericIntention()
+        satisfies VerboseRefinementQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     familyName => "Convert refinement to verbose form";
-    
-    shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change)
-            => makeAvailable(desc, change);
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
@@ -39,15 +34,10 @@ shared class VerboseRefinementIntention()
 }
 
 shared class ShortcutRefinementIntention()
-        extends AbstractIntention()
-        satisfies VerboseRefinementQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+        extends GenericIntention()
+        satisfies VerboseRefinementQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     familyName => "Convert refinement to shortcut form";
-    
-    shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change)
-            => makeAvailable(desc, change);
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);

@@ -16,14 +16,15 @@ import com.intellij.codeInsight.template {
     TextResult,
     TemplateBuilderImpl,
     TemplateEditingAdapter,
-    Template,
-    TemplateBuilder
+    Template
+}
+import com.intellij.codeInsight.template.impl {
+    TemplateState
 }
 import com.intellij.openapi.editor {
     Editor,
     Document,
-    EditorFactory,
-    RangeMarker
+    EditorFactory
 }
 import com.intellij.openapi.util {
     TextRange
@@ -31,24 +32,12 @@ import com.intellij.openapi.util {
 import com.intellij.psi {
     PsiDocumentManager
 }
-
-import java.lang {
-    ObjectArray
-}
-import com.intellij.codeInsight.template.impl {
-    TemplateState,
-    SelectionNode,
-    TextExpression,
-    TemplateImpl
-}
 import com.redhat.ceylon.ide.common.completion {
     LinkedModeSupport
 }
-import com.intellij.openapi.application {
-    ApplicationManager
-}
-import com.intellij.codeInsight.daemon.impl.quickfix {
-    EmptyExpression
+
+import java.lang {
+    ObjectArray
 }
 
 shared class IdeaLinkedMode() {

@@ -6,10 +6,12 @@ import com.intellij.codeInsight.intention.impl {
     BaseIntentionAction
 }
 import com.intellij.openapi.editor {
-    Editor
+    Editor,
+    Document
 }
 import com.intellij.openapi.\imodule {
-    ModuleUtil
+    ModuleUtil,
+    Module
 }
 import com.intellij.openapi.project {
     Project
@@ -35,6 +37,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
+}
+import com.redhat.ceylon.ide.common.correct {
+    GenericQuickFix
+}
+import com.intellij.codeInsight.lookup {
+    LookupElement
 }
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
@@ -107,4 +115,15 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             selection = null;
         }
     }
+}
+
+abstract shared class GenericIntention() 
+        extends AbstractIntention()
+        satisfies GenericQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> 
+                & IdeaDocumentChanges
+                & IdeaQuickFix {
+    
+    newProposal(IdeaQuickFixData data, String desc, TextChange change, DefaultRegion? region)
+            => makeAvailable(desc, change, region);
+
 }

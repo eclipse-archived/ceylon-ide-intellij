@@ -22,15 +22,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class AssignToFieldIntention()
-        extends AbstractIntention()
-        satisfies AssignToFieldQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+        extends GenericIntention()
+        satisfies AssignToFieldQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     familyName => "Assign to field";
-    
-    shared actual void newProposal(IdeaQuickFixData data, String desc, TextChange change)
-            => makeAvailable(desc, change);
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
