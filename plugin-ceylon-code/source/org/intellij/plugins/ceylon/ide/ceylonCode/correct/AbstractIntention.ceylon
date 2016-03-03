@@ -69,6 +69,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
         available = false;
 
         if (is CeylonFile psiFile) {
+            psiFile.ensureTypechecked();
             value offset = editor.caretModel.offset;
             value node = nodes.findNode(psiFile.compilationUnit, 
                 psiFile.tokens, offset);
