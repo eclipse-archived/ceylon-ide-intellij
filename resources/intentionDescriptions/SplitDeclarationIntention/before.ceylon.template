@@ -1,0 +1,3 @@
+void run() {
+    String val = "a";
+}
