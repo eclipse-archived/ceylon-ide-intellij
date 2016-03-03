@@ -110,4 +110,16 @@ shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertE
     shared actual String getDocContent(Document doc, Integer start, Integer length) {
         return doc.getText(TextRange.from(start, length));
     }
+    
+    shared actual Integer getLineOfOffset(Document doc, Integer offset)
+             => doc.getLineNumber(offset);
+    
+    shared actual Integer getLineStartOffset(Document doc, Integer line)
+            => doc.getLineStartOffset(line);
+    
+    shared actual String getLineContent(Document doc, Integer line)
+            => doc.getText(TextRange.create(
+                    doc.getLineStartOffset(line),
+                    doc.getLineEndOffset(line)
+               ));
 }

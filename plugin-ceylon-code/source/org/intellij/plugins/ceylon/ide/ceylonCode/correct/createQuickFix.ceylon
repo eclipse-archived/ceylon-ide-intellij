@@ -38,8 +38,6 @@ object ideaCreateQuickFix
         satisfies CreateQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
                 & IdeaQuickFix & IdeaDocumentChanges {
     
-    shared actual Integer getLineOfOffset(Document doc, Integer offset) => doc.getLineNumber(offset);
-    
     shared actual void newCreateQuickFix(IdeaQuickFixData data, String desc, Scope scope, Unit unit,
         Type? returnType, Icons icons, TextChange change, Integer exitPos, TextRange selection) {
         
@@ -53,5 +51,4 @@ object ideaCreateQuickFix
     
     shared actual CreateParameterQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> createParameterQuickFix
             => ideaCreateParameterQuickFix;
-    
 }

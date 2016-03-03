@@ -29,9 +29,6 @@ object ideaAddNamedArgumentQuickFix
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
     
-    shared actual Integer getLineOfOffset(Document doc, Integer offset)
-            => doc.getLineNumber(offset);
-    
     shared actual void newProposal(IdeaQuickFixData data, String desc, 
         TextChange change, DefaultRegion region) {
         
