@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    javaClass,
     CeylonIterable
 }
 
@@ -31,17 +30,29 @@ import com.intellij.openapi.vfs {
     VirtualFileVisitor,
     VfsUtilCore
 }
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
+import com.redhat.ceylon.compiler.typechecker.context {
+    Context
+}
+import com.redhat.ceylon.compiler.typechecker.util {
+    ModuleManagerFactory
 }
 import com.redhat.ceylon.ide.common.model {
     CeylonProject
+}
+import com.redhat.ceylon.ide.common.model.parsing {
+    RootFolderScanner
+}
+import com.redhat.ceylon.ide.common.util {
+    BaseProgressMonitor
 }
 import com.redhat.ceylon.ide.common.vfs {
     FolderVirtualFile
 }
 import com.redhat.ceylon.model.typechecker.model {
     Package
+}
+import com.redhat.ceylon.model.typechecker.util {
+    TCModManager=ModuleManager
 }
 
 import java.io {
@@ -57,7 +68,6 @@ import java.lang.ref {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
-    ITypeCheckerProvider,
     ITypeCheckerInvoker
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
@@ -68,9 +78,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 import org.jetbrains.jps.model.java {
     JavaSourceRootType,
     JavaResourceRootType
-}
-import com.redhat.ceylon.ide.common.model.parsing {
-    RootFolderScanner
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -194,9 +201,6 @@ shared class IdeaCeylonProject(ideArtifact, model)
             => CeylonIterable(ModuleManager.getInstance(mod.project)
                 .getModuleDependentModules(mod));
     
-    shared actual TypeChecker? typechecker
-            => ideArtifact.getComponent(javaClass<ITypeCheckerProvider>())?.typeChecker;
-    
     shared actual void setPackageForNativeFolder(VirtualFile folder, WeakReference<Package> p) {
         folder.putUserData(vfsKeychain.findOrCreate<Package>(ideaModule), p.get());
     }
@@ -262,4 +266,18 @@ shared class IdeaCeylonProject(ideArtifact, model)
             }
         );
     }
+    shared actual void completeCeylonModelParsing(BaseProgressMonitor monitor) {}
+    
+    shared actual ModuleManagerFactory moduleManagerFactory => 
+            object satisfies ModuleManagerFactory {
+        
+                createModuleManager(Context context)
+                        => IdeaModuleManager(context.repositoryManager, outer);
+                
+                shared actual IdeaModuleSourceMapper
+                createModuleManagerUtil(Context context, TCModManager moduleManager) {
+                    assert(is IdeaModuleManager moduleManager);
+                    return IdeaModuleSourceMapper(context, moduleManager);
+                }
+            };
 }

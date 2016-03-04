@@ -30,6 +30,12 @@ shared object ideaPlatformUtils satisfies IdePlatformUtils {
     }
     
     shared actual RuntimeException newOperationCanceledException(String message)
-            => RuntimeException(message);
+            => OperationCanceledException(message);
+    
+    shared actual Boolean isOperationCanceledException(Exception exception)
+            => exception is OperationCanceledException;
 
+    class OperationCanceledException(String message)
+            extends RuntimeException(message) {
+    }
 }
