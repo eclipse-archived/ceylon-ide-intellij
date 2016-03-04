@@ -7,7 +7,8 @@ import com.intellij.codeInsight.intention.impl {
 }
 import com.intellij.openapi.editor {
     Editor,
-    Document
+    Document,
+    AliasedAsTextEdit=TextChange
 }
 import com.intellij.openapi.\imodule {
     ModuleUtil,
@@ -120,7 +121,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
 abstract shared class GenericIntention() 
         extends AbstractIntention()
-        satisfies GenericQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> 
+        satisfies GenericQuickFix<CeylonFile,Document,InsertEdit,AliasedAsTextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> 
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
     
