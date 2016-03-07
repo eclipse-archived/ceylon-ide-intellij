@@ -44,6 +44,12 @@
         <action id="Ceylon.AddCeylonFile" class="org.intellij.plugins.ceylon.ide.action.CeylonAddFileAction" text="Ceylon _File" description="Add a new Ceylon file">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="Ceylon.AddCeylonPackage"/>
         </action>
+        <action id="Ceylon.RefineEqualsHash"
+                class="org.intellij.plugins.ceylon.ide.ceylonCode.action.RefineEqualsHashAction"
+                text="Refine equals()/hash">
+            <add-to-group group-id="GenerateGroup"/>
+            <keyboard-shortcut first-keystroke="control shift 2" second-keystroke="H" keymap="$default"/>
+        </action>
         <!--<action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction" id="Ceylon.PasteAsCeylon" text="Paste Java as Ceylon">-->
             <!--<add-to-group group-id="CutCopyPasteGroup" anchor="last"/>-->
         <!--</action>-->
@@ -256,6 +262,10 @@
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddThrowsAnnotationIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.RefineEqualsHashIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>
     </extensions>

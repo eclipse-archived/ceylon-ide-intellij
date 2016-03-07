@@ -1,0 +1,17 @@
+class Hello() {
+
+    shared actual Boolean equals(Object that) {
+        if (is Hello that) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    shared actual Integer hash {
+        variable value hash = 1;
+        return hash;
+    }
+
+}
