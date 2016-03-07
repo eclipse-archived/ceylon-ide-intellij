@@ -1,0 +1,5 @@
+if (cond1)
+    if (cond 2) {
+        print("true");
+    }
+}
