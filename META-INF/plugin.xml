@@ -274,5 +274,21 @@
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.RefineEqualsHashIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertStringToVerbatimIntention</className>
+            <category>Ceylon/String</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertVerbatimToStringIntention</className>
+            <category>Ceylon/String</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertToInterpolationIntention</className>
+            <category>Ceylon/String</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertToConcatenationIntention</className>
+            <category>Ceylon/String</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>

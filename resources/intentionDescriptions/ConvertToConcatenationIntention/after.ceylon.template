@@ -1,0 +1,1 @@
+value str = "ab" + 1.string;
