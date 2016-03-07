@@ -3,3 +3,10 @@ if (cond1)
         print("true");
     }
 }
+
+if (cond1) {
+} else {
+    if (cond2) {
+
+    }
+}

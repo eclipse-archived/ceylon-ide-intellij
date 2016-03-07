@@ -179,6 +179,10 @@
             <category>Ceylon/Control flow</category>
         </intentionAction>
         <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.JoinIfStatementsIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertIfToSwitchIntention</className>
             <category>Ceylon/Control flow</category>
         </intentionAction>
