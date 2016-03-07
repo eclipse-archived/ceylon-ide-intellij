@@ -254,5 +254,9 @@
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.JoinDeclarationIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddThrowsAnnotationIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>

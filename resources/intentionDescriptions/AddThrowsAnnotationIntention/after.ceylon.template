@@ -1,0 +1,4 @@
+throws (`class Exception`, "")
+void run() {
+    throw Exception("!!");
+}
