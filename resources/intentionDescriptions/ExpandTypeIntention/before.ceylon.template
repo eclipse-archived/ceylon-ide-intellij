@@ -1,0 +1,3 @@
+void run() {
+    value a = "abcd";
+}
