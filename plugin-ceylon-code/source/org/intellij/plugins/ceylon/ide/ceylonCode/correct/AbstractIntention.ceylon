@@ -86,7 +86,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     psiFile.compilationUnit, node,
                     mod,
                     null,
-                    pr
+                    pr,
+                    editor
                 );
 
                 try {

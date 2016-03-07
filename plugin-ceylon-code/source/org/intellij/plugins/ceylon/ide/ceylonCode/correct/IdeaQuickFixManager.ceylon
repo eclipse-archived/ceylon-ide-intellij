@@ -163,7 +163,9 @@ shared class IdeaQuickFixData(Message message, shared Document doc,
     shared actual Node node,
     shared actual Module project,
     shared Annotation? annotation,
-    shared actual BaseCeylonProject ceylonProject) satisfies QuickFixData<Module> {
+    shared actual BaseCeylonProject ceylonProject,
+    shared variable Editor? editor = null
+) satisfies QuickFixData<Module> {
     
     errorCode => message.code;
     problemOffset => annotation?.startOffset else 0;

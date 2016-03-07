@@ -50,6 +50,12 @@
             <add-to-group group-id="GenerateGroup"/>
             <keyboard-shortcut first-keystroke="control shift 2" second-keystroke="H" keymap="$default"/>
         </action>
+        <action id="Ceylon.RefineFormalMembers"
+                class="org.intellij.plugins.ceylon.ide.ceylonCode.action.RefineFormalMembersAction"
+                text="Refine formal members">
+            <add-to-group group-id="GenerateGroup"/>
+            <keyboard-shortcut first-keystroke="control shift 2" second-keystroke="F" keymap="$default"/>
+        </action>
         <!--<action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction" id="Ceylon.PasteAsCeylon" text="Paste Java as Ceylon">-->
             <!--<add-to-group group-id="CutCopyPasteGroup" anchor="last"/>-->
         <!--</action>-->
