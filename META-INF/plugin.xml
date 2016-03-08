@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.intellij.plugins.ceylon.ide</id>
     <name>Ceylon IDE</name>
-    <version>1.2.0-0</version>
+    <version>1.2.2-0</version>
     <vendor email="bastien.jansen [at] gmx.com">Bastien Jansen</vendor>
 
     <description>Provides support for the Ceylon programming language</description>
@@ -10,7 +10,8 @@
         See https://github.com/ceylon/ceylon-ide-intellij/wiki/Features
     </change-notes>
 
-    <idea-version since-build="131"/>
+    <!-- We need IJ 16 because of https://youtrack.jetbrains.com/issue/IDEA-132606 -->
+    <idea-version since-build="145"/>
 
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.ceylon.runtime</depends>
