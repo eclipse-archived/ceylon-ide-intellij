@@ -2,38 +2,56 @@ import com.intellij.openapi.progress {
     ProgressIndicator
 }
 import com.redhat.ceylon.ide.common.util {
-    ProgressMonitor
+    ProgressMonitorImpl
 }
 
-shared class DummyProgressMonitor() extends ProgressMonitor<String>() {
-    shared actual void subTask(String? desc) {}
+shared class DummyProgressMonitor extends ProgressMonitorImpl<String> {
+    shared new child(ProgressMonitorImpl<String> parent, Integer allocatedWork)
+            extends super.child(parent, allocatedWork) {
+    }
     
-    shared actual void worked(Integer amount) {}
-    shared actual Boolean cancelled => false;
+    shared new wrap(String? monitor) 
+            extends super.wrap(monitor) {
+    }
     
-    shared actual ProgressMonitor<String> convert(Integer work, String taskName) => this;
+    cancelled => false;
     
-    shared actual ProgressMonitor<String> newChild(Integer work, Boolean prependMainLabelToSubtask) => this;
+    newChild(Integer allocatedWork) => this;
+    
+    shared actual void subTask(String subTaskDescription) {}
     
     shared actual void updateRemainingWork(Integer remainingWork) {}
     
-    shared actual String wrapped => "";
+    shared actual void worked(Integer amount) {}
     
-    shared actual void done() {}
+    wrapped => "";
+    
 }
 
-shared class ProgressIndicatorMonitor(ind, initialWork = 0)
-        extends ProgressMonitor<ProgressIndicator>() {
-    
-    ProgressIndicator ind;
+shared class ProgressIndicatorMonitor
+        extends ProgressMonitorImpl<ProgressIndicator> {
+
     variable Integer initialWork;
+    ProgressIndicator ind;
+
+    shared new child(ProgressMonitorImpl<ProgressIndicator> parent, Integer allocatedWork)
+            extends super.child(parent, allocatedWork) {
+        ind = parent.wrapped;
+        initialWork = allocatedWork;
+    }
+    
+    shared new wrap(ProgressIndicator monitor) 
+            extends super.wrap(monitor) {
+        ind = monitor;
+        initialWork = 0;
+    }
+
     variable Integer remainingWork = 0;
     variable String text2 = "";
     
-    shared actual void subTask(String? desc) { 
-        if (exists desc) {
-            changeText(desc);
-        }
+    shared actual void subTask(String desc) { 
+        text2 = desc;
+        ind.text2 = desc;
     }
     
     shared actual Float worked(Integer amount) {
@@ -42,19 +60,6 @@ shared class ProgressIndicatorMonitor(ind, initialWork = 0)
     }
     
     cancelled => ind.canceled;
-    
-    shared actual ProgressIndicatorMonitor convert(Integer work, String taskName) { 
-        this.initialWork = work;
-        changeText(taskName);
-        return this; 
-    }
-    
-    void changeText(String text) {
-        text2 = text;
-        ind.text2 = text;
-    }
-    
-    newChild(Integer work, Boolean prependMainLabelToSubtask) => ProgressIndicatorMonitor(ind, work);
     
     shared actual void updateRemainingWork(Integer remainingWork) {
         this.remainingWork = remainingWork;
@@ -67,7 +72,9 @@ shared class ProgressIndicatorMonitor(ind, initialWork = 0)
         }
     }
     
-    wrapped => ind;
-    
     shared actual void done() {}
+    
+    newChild(Integer allocatedWork) => child(this, allocatedWork);
+    
+    wrapped => ind;
 }

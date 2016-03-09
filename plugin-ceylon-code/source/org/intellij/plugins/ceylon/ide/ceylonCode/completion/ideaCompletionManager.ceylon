@@ -98,7 +98,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         value params = CompletionData(pu, parameters.editor, tc, ceylonFile, options);
         value line = doc.getLineNumber(element.textOffset);
         
-        value monitor = DummyProgressMonitor();
+        value monitor = DummyProgressMonitor.wrap("");
         value returnedParamInfo = true; // The parameters tooltip has nothing to do with code completion, so we bypass it
         value completions = getContentProposals(pu.compilationUnit, params, 
             parameters.editor.caretModel.offset, line, isSecondLevel, monitor, returnedParamInfo);

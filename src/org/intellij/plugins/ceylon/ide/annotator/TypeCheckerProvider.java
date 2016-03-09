@@ -106,7 +106,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     "Preparing typechecker for module " + module.getName()) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
-                    ceylonProject.parseCeylonModel(new ProgressIndicatorMonitor(indicator));
+                    ceylonProject.parseCeylonModel(new ProgressIndicatorMonitor(ProgressIndicatorMonitor.wrap_, indicator));
                     typeChecker = ceylonProject.getTypechecker();
 
                     //setupCeylonLanguageSrc();
