@@ -80,8 +80,6 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         }
     );
 
-    shared actual String completionMode => "overwrite";
-    
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals => ideaImportProposals;
     
     shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber, Integer exitPosition) {

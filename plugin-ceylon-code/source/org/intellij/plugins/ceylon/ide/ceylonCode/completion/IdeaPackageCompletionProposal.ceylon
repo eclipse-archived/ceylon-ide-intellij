@@ -78,8 +78,6 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
     
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals 
             => ideaImportProposals;
-    
-    shared actual String completionMode => "overwrite";
 }
 
 class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
@@ -108,8 +106,6 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
         }
     );
 
-    shared actual String completionMode => "overwrite";
-    
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
             => ideaImportProposals;
     

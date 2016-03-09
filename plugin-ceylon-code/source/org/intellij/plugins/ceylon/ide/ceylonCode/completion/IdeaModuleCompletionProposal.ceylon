@@ -62,8 +62,6 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         }
     );
     
-    shared actual String completionMode => "overwrite";
-    
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
             => ideaImportProposals;
     

@@ -77,8 +77,6 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         lm.buildTemplate(data.editor);
     }
     
-    shared actual String completionMode => data.options.completionMode;
-    
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,
         TextEdit,TextChange> importProposals => ideaImportProposals;
     

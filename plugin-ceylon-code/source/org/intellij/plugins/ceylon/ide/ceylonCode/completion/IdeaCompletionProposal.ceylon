@@ -27,7 +27,7 @@ import com.intellij.codeInsight.completion {
     InsertionContext
 }
 
-interface IdeaCompletionProposal satisfies CommonCompletionProposal<Document,TextRange> {
+shared interface IdeaCompletionProposal satisfies CommonCompletionProposal<Document,TextRange> {
     
     shared actual Character getDocChar(Document doc, Integer offset)
             => Character(doc.getText(TextRange.from(offset, 1)).first else ' ');
@@ -50,6 +50,8 @@ interface IdeaCompletionProposal satisfies CommonCompletionProposal<Document,Tex
         data.editor.selectionModel.setSelection(selection.startOffset, selection.endOffset);
         data.editor.caretModel.moveToOffset(selection.endOffset);
     }
+    
+    shared actual String completionMode => "insert";
 }
 
 LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,

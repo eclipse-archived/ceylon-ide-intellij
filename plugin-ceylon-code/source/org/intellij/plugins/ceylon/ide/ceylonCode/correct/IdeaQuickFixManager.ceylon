@@ -98,6 +98,7 @@ shared object ideaQuickFixManager
     switchQuickFix => ideaSwitchQuickFix;
     changeToQuickFix => ideaChangeToQuickFix;
     addNamedArgumentQuickFix => ideaAddNamedArgumentQuickFix;
+    assignToLocalQuickFix => ideaAssignToLocalQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
         for (proposal in proposals) {

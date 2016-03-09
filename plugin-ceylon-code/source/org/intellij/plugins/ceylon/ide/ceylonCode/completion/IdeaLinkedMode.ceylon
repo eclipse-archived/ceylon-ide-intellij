@@ -71,7 +71,6 @@ shared class IdeaLinkedMode() {
         variable value i = 0;
         for (ranges in multiVariables) {
             value rangeName = "multi``i``";
-            value marker = editor.document.createRangeMarker(ranges.first);
             value text = editor.document.getText(ranges.first);
             
             variable value j = 0;

@@ -38,8 +38,6 @@ class IdeaTypeProposal(Integer offset, Type? type, String text, String desc, Tre
         (offset, type, text, desc, rootNode)
         satisfies IdeaDocumentChanges & IdeaCompletionProposal {
     
-    shared actual String completionMode => "overwrite";
-    
     shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
             => ideaImportProposals;
     
