@@ -19,7 +19,8 @@ import com.intellij.openapi.editor.impl {
 import java.util {
     JList = List,
     ArrayList,
-    Comparator
+    Comparator,
+    Collections
 }
 import com.intellij.openapi.project {
     Project
@@ -60,7 +61,7 @@ shared class TextChange(shared Document document) {
     }
 
     shared void apply(Project? project = null) {
-        changes.sort(object satisfies Comparator<TextEdit> {
+        Collections.sort(changes, object satisfies Comparator<TextEdit> {
             shared actual Integer compare(TextEdit? a, TextEdit? b) {
                 if (exists a, exists b) {
                     return a.start - b.start;
