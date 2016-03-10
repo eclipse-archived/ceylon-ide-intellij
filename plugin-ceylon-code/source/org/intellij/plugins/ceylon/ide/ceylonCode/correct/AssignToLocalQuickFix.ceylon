@@ -39,7 +39,7 @@ import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
 }
-import com.intellij.util.containers {
+import java.util {
     HashSet
 }
 
