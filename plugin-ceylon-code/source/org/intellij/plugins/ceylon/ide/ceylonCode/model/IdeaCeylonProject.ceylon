@@ -43,7 +43,7 @@ import com.redhat.ceylon.ide.common.model.parsing {
     RootFolderScanner
 }
 import com.redhat.ceylon.ide.common.util {
-    BaseProgressMonitor
+    BaseProgressMonitorChild
 }
 import com.redhat.ceylon.ide.common.vfs {
     FolderVirtualFile
@@ -266,7 +266,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
             }
         );
     }
-    shared actual void completeCeylonModelParsing(BaseProgressMonitor monitor) {}
+    shared actual void completeCeylonModelParsing(BaseProgressMonitorChild monitor) {}
     
     shared actual ModuleManagerFactory moduleManagerFactory => 
             object satisfies ModuleManagerFactory {
