@@ -2,14 +2,23 @@ package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.facet.FacetManager;
+import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.startup.StartupManager;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
@@ -20,6 +29,7 @@ import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.ProgressIndicatorMonitor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaPlatformUtils_;
@@ -109,7 +119,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     ceylonProject.parseCeylonModel(new ProgressIndicatorMonitor(ProgressIndicatorMonitor.wrap_, indicator));
                     typeChecker = ceylonProject.getTypechecker();
 
-                    //setupCeylonLanguageSrc();
+                    setupCeylonLanguageSrc();
 
                     ApplicationManager.getApplication().runReadAction(new Runnable() {
                         @Override
@@ -218,6 +228,43 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     }
                 }
         );
+    }
+
+    private void setupCeylonLanguageSrc() {
+        if (typeChecker != null) {
+            ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    AccessToken lock = ApplicationManager.getApplication().acquireWriteActionLock(TypeCheckerProvider.class);
+                    IdeaModule languageModule = (IdeaModule) typeChecker.getPhasedUnits()
+                            .getModuleManager().getModules().getLanguageModule();
+
+                    ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
+
+                    LibraryTable tbl = model.getModuleLibraryTable();
+                    Library lib = tbl.getLibraryByName("Ceylon Stuff");
+
+                    if (lib == null) {
+                        lib = tbl.createLibrary("Ceylon Stuff");
+                    }
+                    Library.ModifiableModel modifiableModel = lib.getModifiableModel();
+                    try {
+                        String srcFile = "jar://" + languageModule.getArtifact().getCanonicalPath() + "!/";
+                        modifiableModel.addRoot(VirtualFileManager.getInstance().findFileByUrl(srcFile), OrderRootType.CLASSES);
+
+                        modifiableModel.commit();
+                        model.commit();
+                    } catch (Exception e) {
+                        modifiableModel.dispose();
+                        model.dispose();
+                    } finally {
+                        lock.finish();
+                    }
+                }
+            }, ModalityState.any());
+
+            DumbService.getInstance(module.getProject()).waitForSmartMode();
+        }
     }
 
 }
