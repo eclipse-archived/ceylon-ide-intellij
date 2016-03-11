@@ -62,6 +62,11 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
 
     private boolean moduleExists(String moduleName) {
         Set<Module> modules;
+
+        // Might not be a Ceylon project yet
+        if (typeChecker == null) {
+            return false;
+        }
         if (all(asList(typeChecker, typeChecker.getContext(), typeChecker.getContext().getModules(),
                 modules = typeChecker.getContext().getModules().getListOfModules()),
                 notNull())) {

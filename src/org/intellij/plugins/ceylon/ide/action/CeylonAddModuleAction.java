@@ -80,7 +80,10 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                     // here seems to be by modifying PhaseUnits or injecting a different ModuleManager into it
                     FileSystemVirtualFile virtualFile = new FileSystemVirtualFile(
                             new File(srcRoot.getCanonicalPath()));
-                    parseUnit(virtualFile, typeChecker, e.getProject());
+
+                    if (typeChecker != null) {
+                        parseUnit(virtualFile, typeChecker, e.getProject());
+                    }
                 }
 
                 @NotNull
