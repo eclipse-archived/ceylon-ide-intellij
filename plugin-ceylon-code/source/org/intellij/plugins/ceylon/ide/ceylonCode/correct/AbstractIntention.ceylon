@@ -45,6 +45,9 @@ import com.redhat.ceylon.ide.common.correct {
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    ModifiablePhasedUnit
+}
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
@@ -69,7 +72,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     shared actual Boolean isAvailable(Project project, Editor editor, PsiFile psiFile) {
         available = false;
 
-        if (is CeylonFile psiFile) {
+        if (is CeylonFile psiFile,
+            is ModifiablePhasedUnit<out Anything,out Anything,out Anything,out Anything> u=psiFile.phasedUnit) {
             psiFile.ensureTypechecked();
             value offset = editor.caretModel.offset;
             value node = nodes.findNode(psiFile.compilationUnit, 
