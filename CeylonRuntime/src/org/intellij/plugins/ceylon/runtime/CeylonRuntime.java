@@ -1,6 +1,8 @@
 package org.intellij.plugins.ceylon.runtime;
 
+import com.intellij.ide.ApplicationLoadListener;
 import com.intellij.ide.plugins.cl.PluginClassLoader;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.redhat.ceylon.compiler.java.runtime.metamodel.Metamodel;
 import com.redhat.ceylon.model.cmr.*;
@@ -19,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CeylonRuntime extends PluginCeylonStartup {
+public class CeylonRuntime extends PluginCeylonStartup implements ApplicationLoadListener {
     static Map<String, String> registeredModules = new HashMap<>();
 
     public static void registerIntellijApiModules() {
@@ -161,5 +163,10 @@ public class CeylonRuntime extends PluginCeylonStartup {
     @NotNull
     public String getComponentName() {
         return "CeylonRuntime";
+    }
+
+    @Override
+    public void beforeApplicationLoaded(Application application) {
+        super.initComponent();
     }
 }
