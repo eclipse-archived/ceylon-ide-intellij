@@ -1,6 +1,8 @@
 package org.intellij.plugins.ceylon.ide;
 
 import com.intellij.diagnostic.PluginException;
+import com.intellij.ide.ApplicationLoadListener;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.util.PathUtil;
 import org.intellij.plugins.ceylon.runtime.CeylonRuntime;
@@ -9,15 +11,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-public class IdePluginCeylonStartup extends PluginCeylonStartup {
-    public IdePluginCeylonStartup(CeylonRuntime ceylonRuntime) {
+public class IdePluginCeylonStartup extends PluginCeylonStartup implements ApplicationLoadListener {
+
+    @Override
+    public void beforeApplicationLoaded(Application application) {
+        super.initComponent();
     }
 
     @Override
     public void initComponent() {
-        super.initComponent();
         CeylonRuntime.registerIntellijApiModules();
-
     }
 
     @NotNull
