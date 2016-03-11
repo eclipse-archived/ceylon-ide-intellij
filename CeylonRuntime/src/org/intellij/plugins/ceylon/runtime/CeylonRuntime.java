@@ -166,7 +166,7 @@ public class CeylonRuntime extends PluginCeylonStartup implements ApplicationLoa
     }
 
     @Override
-    public void beforeApplicationLoaded(Application application) {
+    public void beforeApplicationLoaded(Application application, String configPath) {
         super.initComponent();
     }
 }

@@ -14,7 +14,7 @@ import java.io.File;
 public class IdePluginCeylonStartup extends PluginCeylonStartup implements ApplicationLoadListener {
 
     @Override
-    public void beforeApplicationLoaded(Application application) {
+    public void beforeApplicationLoaded(Application application, String configPath) {
         super.initComponent();
     }
 
