@@ -14,7 +14,6 @@ import com.intellij.codeInsight.template {
     Expression,
     TemplateResult=Result,
     TextResult,
-    TemplateBuilderImpl,
     TemplateEditingAdapter,
     Template
 }
