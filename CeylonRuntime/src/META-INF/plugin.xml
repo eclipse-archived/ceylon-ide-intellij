@@ -12,8 +12,8 @@
         Bundles Ceylon 1.2.0
     </change-notes>
 
-    <!-- We need IJ 16 because of https://youtrack.jetbrains.com/issue/IDEA-132606 -->
-    <idea-version since-build="145"/>
+    <!-- To be compatible with Android Studio 1.5 -->
+    <idea-version since-build="141"/>
 
     <depends>com.intellij.modules.lang</depends>
 

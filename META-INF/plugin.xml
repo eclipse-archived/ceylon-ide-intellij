@@ -10,8 +10,8 @@
         See https://github.com/ceylon/ceylon-ide-intellij/wiki/Features
     </change-notes>
 
-    <!-- We need IJ 16 because of https://youtrack.jetbrains.com/issue/IDEA-132606 -->
-    <idea-version since-build="145"/>
+    <!-- To be compatible with Android Studio 1.5 -->
+    <idea-version since-build="141"/>
 
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.ceylon.runtime</depends>
@@ -132,7 +132,6 @@
         <usageTypeProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonUsageTypeProvider"/>
         <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi$IdentifierPsi"
                                  implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
-        <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonTargetElementEvaluator"/>
         <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.GotoTargetRenderer"/>
         <java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>
@@ -150,7 +149,6 @@
         <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonJsRunConfigurationType"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationProducer"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonJsRunConfigurationProducer"/>
-        <runLineMarkerContributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.runner.CeylonRunLineMarkerContributor"/>
         <debugger.javaDebugAware implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonDebugAware"/>
         <debugger.positionManagerFactory implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonPositionManagerFactory"/>
         <debugger.nodeRenderer implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonNodeRenderer"/>
