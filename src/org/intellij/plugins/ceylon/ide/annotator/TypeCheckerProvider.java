@@ -2,9 +2,13 @@ package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.facet.FacetManager;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.module.ModuleUtil;
@@ -29,14 +33,15 @@ import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.ProgressIndicatorMonitor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaPlatformUtils_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
+import org.intellij.plugins.ceylon.runtime.CeylonRuntime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,10 +121,10 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     "Preparing typechecker for module " + module.getName()) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
+                    setupCeylonLanguageSrc();
+
                     ceylonProject.parseCeylonModel(new ProgressIndicatorMonitor(ProgressIndicatorMonitor.wrap_, indicator));
                     typeChecker = ceylonProject.getTypechecker();
-
-                    setupCeylonLanguageSrc();
 
                     ApplicationManager.getApplication().runReadAction(new Runnable() {
                         @Override
@@ -230,14 +235,33 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         );
     }
 
+    @Nullable
+    private File findCeylonLanguageArchive() {
+        PluginId pluginId = PluginManager.getPluginByClassName(CeylonRuntime.class.getName());
+        IdeaPluginDescriptor descriptor = PluginManager.getPlugin(pluginId);
+        File lib = new File(descriptor.getPath(), "lib");
+
+        if (lib.isDirectory()) {
+            File[] files = lib.listFiles();
+            if (files != null) {
+                for (File child : files) {
+                    if (child.getName().startsWith("ceylon.language-")) {
+                        return child;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private void setupCeylonLanguageSrc() {
-        if (typeChecker != null) {
+        final File car = findCeylonLanguageArchive();
+
+        if (car != null) {
             ApplicationManager.getApplication().invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     AccessToken lock = ApplicationManager.getApplication().acquireWriteActionLock(TypeCheckerProvider.class);
-                    IdeaModule languageModule = (IdeaModule) typeChecker.getPhasedUnits()
-                            .getModuleManager().getModules().getLanguageModule();
 
                     ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
 
@@ -249,7 +273,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     }
                     Library.ModifiableModel modifiableModel = lib.getModifiableModel();
                     try {
-                        String srcFile = "jar://" + languageModule.getArtifact().getCanonicalPath() + "!/";
+                        String srcFile = "jar://" + car.getCanonicalPath() + "!/";
                         modifiableModel.addRoot(VirtualFileManager.getInstance().findFileByUrl(srcFile), OrderRootType.CLASSES);
 
                         modifiableModel.commit();
@@ -264,6 +288,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             }, ModalityState.any());
 
             DumbService.getInstance(module.getProject()).waitForSmartMode();
+        } else {
+            Logger.getInstance(TypeCheckerProvider.class).error("Could not locate ceylon.language.car");
         }
     }
 
