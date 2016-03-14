@@ -6,9 +6,9 @@
       <root url="jar://$CEYLON_DIST_REPO$/org/antlr/antlr/2.7.7/org.antlr.antlr-2.7.7.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/antlr/runtime/3.4/org.antlr.runtime-3.4.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/com/github/rjeschke/txtmark/0.13/com.github.rjeschke.txtmark-0.13.jar!/" />
-      <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/typechecker/1.2.2/com.redhat.ceylon.typechecker-1.2.2.jar!/" />
-      <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/compiler/js/1.2.2/com.redhat.ceylon.compiler.js-1.2.2.jar!/" />
-      <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/compiler/java/1.2.2/com.redhat.ceylon.compiler.java-1.2.2.jar!/" />
+      <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/typechecker/1.2.3/com.redhat.ceylon.typechecker-1.2.3.jar!/" />
+      <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/compiler/js/1.2.3/com.redhat.ceylon.compiler.js-1.2.3.jar!/" />
+      <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/compiler/java/1.2.3/com.redhat.ceylon.compiler.java-1.2.3.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/jboss/logmanager/2.0.3.Final/org.jboss.logmanager-2.0.3.Final.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/apache/httpcomponents/httpcore/4.3.2/org.apache.httpcomponents.httpcore-4.3.2.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/apache/commons/codec/1.8/org.apache.commons.codec-1.8.jar!/" />
@@ -17,7 +17,7 @@
       <root url="jar://$CEYLON_DIST_REPO$/com/redhat/ceylon/maven-support/2.0/com.redhat.ceylon.maven-support-2.0.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/org/apache/commons/logging/1.1.1/org.apache.commons.logging-1.1.1.jar!/" />
       <root url="jar://$CEYLON_DIST_REPO$/com/github/lookfirst/sardine/5.1/com.github.lookfirst.sardine-5.1.jar!/" />
-      <root url="jar://$CEYLON_DIST_REPO$/ceylon/runtime/1.2.2/ceylon.runtime-1.2.2.jar!/" />
+      <root url="jar://$CEYLON_DIST_REPO$/ceylon/runtime/1.2.3/ceylon.runtime-1.2.3.jar!/" />
       <root url="jar://$CEYLON_DIST_LIB$/ceylon-bootstrap.jar!/" />
     </CLASSES>
     <JAVADOC />

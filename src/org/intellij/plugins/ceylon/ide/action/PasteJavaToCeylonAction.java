@@ -80,8 +80,6 @@ public class PasteJavaToCeylonAction extends AnAction {
 
         JavaToCeylonConverter converter = new JavaToCeylonConverter(out,
                 ideConfig.getConverterConfig().getTransformGetters(),
-                ideConfig.getConverterConfig().getUseVariableInParameters(),
-                ideConfig.getConverterConfig().getUseVariableInLocals(),
                 ideConfig.getConverterConfig().getUseValues(),
                 scopeTree);
 

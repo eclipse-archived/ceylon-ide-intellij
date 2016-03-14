@@ -34,11 +34,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.2/com.redhat.ceylon.ide.common-1.2.2.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.3/com.redhat.ceylon.ide.common-1.2.3.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.2/com.redhat.ceylon.ide.common-1.2.2.src!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.3/com.redhat.ceylon.ide.common-1.2.3.src!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -54,7 +54,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.2.2/ceylon.collection-1.2.2.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.2.3/ceylon.collection-1.2.3.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -63,7 +63,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.2.2/ceylon.interop.java-1.2.2.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.2.3/ceylon.interop.java-1.2.3.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -81,7 +81,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.2/ceylon.tool.converter.java2ceylon-1.2.2.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.3/ceylon.tool.converter.java2ceylon-1.2.3.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -102,6 +102,17 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Ceylon Stuff">
+        <CLASSES>
+          <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonRuntime/lib/ceylon.language-1.2.2.car!/" />
+          <root url="jar://$USER_HOME$/.ceylon/cache/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar!/" />
+          <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonIDEA/classes/repo/com/github/rjeschke/txtmark/0.13/com.github.rjeschke.txtmark-0.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
