@@ -6,8 +6,9 @@ This is an attempt at adding (awesome) support for the Ceylon programming langua
 
 # Requirements
 
-This plugin is being written using IntelliJ 14/15. It will work on both Community and Ultimate editions.
-We do not guarantee that this plugin will work with previous versions of IntelliJ (13 and below), as we may use APIs that were introduced in version 14.
+This plugin is being written using IntelliJ 2016.1. It will work on both Community and Ultimate editions.
+
+We have a [dedicated branch](https://github.com/ceylon/ceylon-ide-intellij/tree/141.x-compat) for older versions of IntelliJ (14/15) *and* the current version of Android Studio (1.5.1), which is based on IntelliJ 14.1. Please note that these older versions of the IntelliJ platform have slightly different APIs, which means a few things may not work as expected. In particular, they contain [a bug that is critical](https://youtrack.jetbrains.com/issue/IDEA-132606) to the correct loading of Ceylon classes, which has been fixed in IntelliJ 2016.1. We'll try to backport a fix on this branch for better user experience.
 
 We embed most of the raw Ceylon installation in the plugin, so you won't necessarily have to download Ceylon separately. You may need a local repository though.
 
@@ -25,7 +26,7 @@ You can either install the Ceylon IDE for IntelliJ from there, or build it from 
 
 ## Common pre-requisites
 
-- a _Community_ or _Ultimate_ version of **[IntelliJ 14/15](http://www.jetbrains.com/idea/download/)**
+- a _Community_ or _Ultimate_ version of **[IntelliJ 2016.1](http://www.jetbrains.com/idea/download/)**
 - **OSX users**: this plugin needs a JRE 7+, but IntelliJ 14 requires a JDK 6 by default. To run Ceylon IDE, you can either:
   - download IntelliJ with a [custom JDK bundled](https://confluence.jetbrains.com/display/IntelliJIDEA/Previous+IntelliJ+IDEA+Releases)
   - download the standard version, install it, then modify `Info.plist` to [force a recent version of Java](https://intellij-support.jetbrains.com/hc/en-us/articles/206827547-Selecting-the-JDK-version-the-IDE-will-run-under)
@@ -50,7 +51,7 @@ After installing both plugins and restarting IntelliJ IDEA, you should have the 
 
 If you want to use the current version, or debug/hack this plugin, you will need to build it from sources:
 
-1. Make sure you are using **IntelliJ 15** (support for IntelliJ 14 is planned at runtime, but the compilation involves features that are only in 15)
+1. Make sure you are using **IntelliJ 2016.1** (support for IntelliJ 14/15 and Android Studio is planned in a [separate branch](https://github.com/ceylon/ceylon-ide-intellij/tree/141.x-compat))
 
 2. A clone of https://github.com/JetBrains/intellij-community is highly recommended for hacking since you will likely have to debug code from the IntelliJ platform
 
@@ -66,7 +67,7 @@ If you want to use the current version, or debug/hack this plugin, you will need
     - `ant setup-sdk setup-ide` (this will create sibling projects such as: `../ceylon-sdk`, `../ceylon-ide-common`, etc)
 
 5. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and add the following line:
-    - `ideaRoot=/Applications/IntelliJ IDEA 15 CE.app/Contents/` (change the path to point to your local IntelliJ installation)
+    - `ideaRoot=/Applications/IntelliJ IDEA 2016.1 CE.app/Contents/` (change the path to point to your local IntelliJ installation)
 
 7. Build a full Ceylon distribution locally (see [here](https://github.com/ceylon/ceylon-dist/blob/master/README.md#building-the-distribution) for more details):
     - In the `../ceylon/dist` directory run : `ant clean-all dist sdk intellij`
