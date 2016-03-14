@@ -18,33 +18,13 @@
     </target>
 
     <path id="ceylon.runtime">
-        <pathelement path="${ceylon.repo.dir}/org/tautua/markdownpapers/core/1.2.7/org.tautua.markdownpapers.core-1.2.7.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/antlr/stringtemplate/3.2.1/org.antlr.stringtemplate-3.2.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/jboss/logmanager/2.0.3.Final/org.jboss.logmanager-2.0.3.Final.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/antlr/antlr/2.7.7/org.antlr.antlr-2.7.7.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/apache/httpcomponents/httpcore/4.3.2/org.apache.httpcomponents.httpcore-4.3.2.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/jboss/modules/1.4.4.Final/org.jboss.modules-1.4.4.Final.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/antlr/runtime/3.4/org.antlr.runtime-3.4.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/apache/commons/codec/1.8/org.apache.commons.codec-1.8.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/jboss/jandex/2.0.0.Final/org.jboss.jandex-2.0.0.Final.jar" />
-        <pathelement path="${ceylon.repo.dir}/net/minidev/json-smart/1.1.1/net.minidev.json-smart-1.1.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/apache/httpcomponents/httpclient/4.3.2/org.apache.httpcomponents.httpclient-4.3.2.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/apache/commons/logging/1.1.1/org.apache.commons.logging-1.1.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/github/rjeschke/txtmark/0.13/com.github.rjeschke.txtmark-0.13.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/github/lookfirst/sardine/5.1/com.github.lookfirst.sardine-5.1.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/maven-support/2.0/com.redhat.ceylon.maven-support-2.0.jar" />
-
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/common/1.2.2/com.redhat.ceylon.common-1.2.2.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/compiler/js/1.2.2/com.redhat.ceylon.compiler.js-1.2.2.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/compiler/java/1.2.2/com.redhat.ceylon.compiler.java-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/jboss/modules/1.4.4.Final/org.jboss.modules-1.4.4.Final.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/jboss/jandex/2.0.0.Final/org.jboss.jandex-2.0.0.Final.jar" />
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/module-resolver/1.2.2/com.redhat.ceylon.module-resolver-1.2.2.jar" />
-        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/typechecker/1.2.2/com.redhat.ceylon.typechecker-1.2.2.jar" />
-        <pathelement path="${ceylon.repo.dir}/ceylon/runtime/1.2.2/ceylon.runtime-1.2.2.jar" />
         <pathelement path="${ceylon.repo.dir}/ceylon/language/1.2.2/ceylon.language-1.2.2.car" />
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/model/1.2.2/com.redhat.ceylon.model-1.2.2.jar" />
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/langtools/classfile/1.2.2/com.redhat.ceylon.langtools.classfile-1.2.2.jar" />
-
-        <pathelement path="${projects.base.dir}/ceylon/dist/dist/lib/ceylon-bootstrap.jar" />
     </path>
 
     <path id="compile.runtime.classpath">
@@ -58,6 +38,28 @@
         <pathelement path="${build.dir}/runtime"/>
 
         <path refid="dist.classpath"/>
+
+
+        <pathelement path="${ceylon.repo.dir}/org/tautua/markdownpapers/core/1.2.7/org.tautua.markdownpapers.core-1.2.7.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/antlr/stringtemplate/3.2.1/org.antlr.stringtemplate-3.2.1.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/jboss/logmanager/2.0.3.Final/org.jboss.logmanager-2.0.3.Final.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/antlr/antlr/2.7.7/org.antlr.antlr-2.7.7.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/apache/httpcomponents/httpcore/4.3.2/org.apache.httpcomponents.httpcore-4.3.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/antlr/runtime/3.4/org.antlr.runtime-3.4.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/apache/commons/codec/1.8/org.apache.commons.codec-1.8.jar" />
+        <pathelement path="${ceylon.repo.dir}/net/minidev/json-smart/1.1.1/net.minidev.json-smart-1.1.1.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/apache/httpcomponents/httpclient/4.3.2/org.apache.httpcomponents.httpclient-4.3.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/org/apache/commons/logging/1.1.1/org.apache.commons.logging-1.1.1.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/github/rjeschke/txtmark/0.13/com.github.rjeschke.txtmark-0.13.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/github/lookfirst/sardine/5.1/com.github.lookfirst.sardine-5.1.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/maven-support/2.0/com.redhat.ceylon.maven-support-2.0.jar" />
+
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/compiler/js/1.2.2/com.redhat.ceylon.compiler.js-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/compiler/java/1.2.2/com.redhat.ceylon.compiler.java-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/typechecker/1.2.2/com.redhat.ceylon.typechecker-1.2.2.jar" />
+        <pathelement path="${ceylon.repo.dir}/ceylon/runtime/1.2.2/ceylon.runtime-1.2.2.jar" />
+
+        <pathelement path="${projects.base.dir}/ceylon/dist/dist/lib/ceylon-bootstrap.jar" />
     </path>
 
     <path id="dist.classpath">
@@ -69,7 +71,7 @@
         <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.2.2/ceylon.interop.java-1.2.2.car" />
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.2.2/ceylon.tool.converter.java2ceylon-1.2.2.car" />
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar" />
-    </path>
+   </path>
 
     <target name="build-runtime">
         <mkdir dir="${build.dir}/CeylonRuntime/lib"/>
