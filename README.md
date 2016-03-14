@@ -37,12 +37,12 @@ _This is the **simplest way** to install the Ceyon IDEA IntelliJ plugin._
 
 Inside the Intellij IDEA environment, follow the instructions [there](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html) in order to add the following URL :
 
-** IntelliJ 2016.1 and later: **
+**IntelliJ 2016.1 and later:**
 ```
 http://downloads.ceylon-lang.org/ide/intellij/development/updatePlugins.xml
 ```
 
-** IntelliJ 14/15 and Android Studio 1.5: **
+**IntelliJ 14/15 and Android Studio 1.5:**
 ```
 http://downloads.ceylon-lang.org/ide/intellij/development/legacy/updatePlugins.xml
 ```
