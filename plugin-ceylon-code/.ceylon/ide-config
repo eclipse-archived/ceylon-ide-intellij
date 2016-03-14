@@ -1,6 +1,6 @@
 
 [project]
-compile-jvm=false
+compile-jvm=true
 compile-js=false
 system-repository=
 source-attachments=.ceylon/attachments.properties
