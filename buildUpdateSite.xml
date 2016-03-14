@@ -16,10 +16,26 @@
         <xmlproperty file="CeylonRuntime/src/META-INF/plugin.xml" prefix="CeylonRuntime"/>
         <xmlproperty file="META-INF/plugin.xml" prefix="CeylonIDEA"/>
         <echoxml file="${updatePluginsFile}">
-            <plugins>
-                <plugin id="${CeylonRuntime.idea-plugin.id}" url="./CeylonRuntime.zip" version="${CeylonRuntime.idea-plugin.version}"/>
-                <plugin id="${CeylonIDEA.idea-plugin.id}" url="./CeylonIDEA.zip" version="${CeylonIDEA.idea-plugin.version}"/>
-            </plugins>
+            <plugin-repository>
+                <ff>"Custom Languages"</ff>
+                <category name="Custom Languages">
+                    <idea-plugin>
+                        <id>${CeylonRuntime.idea-plugin.id}</id>
+                        <name>${CeylonRuntime.idea-plugin.name}</name>
+                        <version>${CeylonRuntime.idea-plugin.version}</version>
+                        <idea-version since-build="${CeylonRuntime.idea-plugin.idea-version(since-build)}"/>
+                        <downloadUrl>./CeylonRuntime.zip</downloadUrl>
+                    </idea-plugin>
+                    <idea-plugin>
+                        <id>${CeylonIDEA.idea-plugin.id}</id>
+                        <name>${CeylonIDEA.idea-plugin.name}</name>
+                        <version>${CeylonIDEA.idea-plugin.version}</version>
+                        <idea-version since-build="${CeylonIDEA.idea-plugin.idea-version(since-build)}"/>
+                        <depends>${CeylonRuntime.idea-plugin.id}</depends>
+                        <downloadUrl>./CeylonIDEA.zip</downloadUrl>
+                    </idea-plugin>
+                </category>
+            </plugin-repository>
         </echoxml>
     </target>
 </project>
