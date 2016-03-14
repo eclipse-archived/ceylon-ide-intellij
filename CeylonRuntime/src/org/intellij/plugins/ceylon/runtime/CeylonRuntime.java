@@ -169,4 +169,9 @@ public class CeylonRuntime extends PluginCeylonStartup implements ApplicationLoa
     public void beforeApplicationLoaded(Application application) {
         super.initComponent();
     }
+
+    // For IntelliJ 15
+    public void beforeApplicationLoaded(Application application, String configPath) {
+        super.initComponent();
+    }
 }

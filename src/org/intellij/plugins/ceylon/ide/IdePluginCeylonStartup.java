@@ -24,6 +24,11 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup implements Appli
         super.initComponent();
     }
 
+    // For IntelliJ 15
+    public void beforeApplicationLoaded(Application application, String configPath) {
+        super.initComponent();
+    }
+
     @Override
     public void initComponent() {
         CeylonRuntime.registerIntellijApiModules();
