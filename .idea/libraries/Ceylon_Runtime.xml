@@ -21,6 +21,10 @@
       <root url="file://$PROJECT_DIR$/../ceylon/cmr/webdav/src/main/java" />
       <root url="file://$PROJECT_DIR$/../ceylon/cmr/testsuite/src/test/java" />
       <root url="file://$PROJECT_DIR$/../ceylon/model/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon/language/runtime" />
+      <root url="file://$PROJECT_DIR$/../ceylon/language/template" />
+      <root url="file://$PROJECT_DIR$/../ceylon/language/test" />
+      <root url="file://$PROJECT_DIR$/../ceylon/language/test-jvm" />
     </SOURCES>
   </library>
 </component>
