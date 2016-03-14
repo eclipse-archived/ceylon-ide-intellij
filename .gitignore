@@ -14,3 +14,5 @@ grammar/build
 plugin-ceylon-code/test-resources/modules
 out
 ant-build
+.idea/inspectionProfiles
+.idea/shelf
