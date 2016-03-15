@@ -48,6 +48,7 @@ import java.util {
     ArrayList
 }
 
+// TODO investigate why psi.containingFile is sometimes null
 class PSIClass(shared PsiClass psi)
         extends PSIAnnotatedMirror(psi)
         satisfies IdeClassMirror {
@@ -124,8 +125,7 @@ class PSIClass(shared PsiClass psi)
                then mirror<TypeMirror,PsiClassType>(psi.extendsListTypes, PSIType)
                else mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType);
     
-    shared actual Boolean javaSource
-            => psi.containingFile.name.endsWith(".java");
+    javaSource => psi.containingFile?.name?.endsWith(".java") else false;
     
     shared actual Boolean loadedFromSource => javaSource;
     
@@ -166,13 +166,14 @@ class PSIClass(shared PsiClass psi)
             => mirror<TypeParameterMirror,PsiTypeParameter>
                 (psi.typeParameters, PSITypeParameter);
     
-    shared actual String fileName => psi.containingFile.name;
+    fileName => psi.containingFile?.name else "<unknown>";
     
-    shared actual String fullPath => 
-            let (p = psi.containingFile.virtualFile.canonicalPath)
-            if (exists i = p.firstInclusion("!/"))
-            then p.spanFrom(i + 2)
-            else p;
+    fullPath => if (exists f = psi.containingFile)
+                then let (p = f.virtualFile.canonicalPath)
+                    if (exists i = p.firstInclusion("!/"))
+                    then p.spanFrom(i + 2)
+                    else p
+                else "<unknown>";
     
     shared actual Boolean isBinary => psi is ClsClassImpl;
     
