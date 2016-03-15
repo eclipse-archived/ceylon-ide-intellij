@@ -70,6 +70,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return "package";
         } else if (element instanceof CeylonPsi.ModuleDescriptorPsi) {
             return "module";
+        } else if (element instanceof CeylonPsi.VariablePsi) {
+            return "variable";
         }
 
         throw new UnsupportedOperationException(element.toString());
