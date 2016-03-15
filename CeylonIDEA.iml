@@ -107,16 +107,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Ceylon Stuff">
-        <CLASSES>
-          <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonRuntime/lib/ceylon.language-1.2.2.car!/" />
-          <root url="jar://$USER_HOME$/.ceylon/cache/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar!/" />
-          <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonIDEA/classes/repo/com/github/rjeschke/txtmark/0.13/com.github.rjeschke.txtmark-0.13.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
   </component>
 </module>
