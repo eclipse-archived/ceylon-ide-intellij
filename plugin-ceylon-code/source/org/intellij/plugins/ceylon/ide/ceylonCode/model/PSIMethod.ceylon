@@ -13,7 +13,6 @@ import com.intellij.psi.search.searches {
 import com.redhat.ceylon.model.loader.mirror {
     MethodMirror,
     TypeParameterMirror,
-    ClassMirror,
     VariableMirror,
     TypeMirror
 }
@@ -65,40 +64,36 @@ class PSIMethod(shared PsiMethod psi)
     
     shared Boolean isOverloading => lazyIsOverloading else (lazyIsOverloading = computedIsOverloading);
     
-    shared actual Boolean abstract =>
+    abstract =>
         psi.hasModifierProperty(\iABSTRACT)
         || psi.containingClass.\iinterface;
     
-    shared actual Boolean constructor => psi.constructor;
+    constructor => psi.constructor;
     
-    shared actual Boolean declaredVoid => psi.returnType == PsiType.\iVOID;
+    declaredVoid => psi.returnType == PsiType.\iVOID;
     
-    shared actual Boolean default
-            => if (is PsiAnnotationMethod psi)
+    default => if (is PsiAnnotationMethod psi)
                then psi.defaultValue exists
                else false;
     
-    shared actual Boolean defaultAccess
-            => !(public || protected || psi.hasModifierProperty(\iPRIVATE));
+    defaultAccess => !(public || protected || psi.hasModifierProperty(\iPRIVATE));
     
-    shared actual ClassMirror enclosingClass => PSIClass(psi.containingClass);
+    enclosingClass => PSIClass(psi.containingClass);
     
-    shared actual Boolean final => psi.hasModifierProperty(\iFINAL);
+    final => psi.hasModifierProperty(\iFINAL);
     
-    shared actual List<VariableMirror> parameters
-            => mirror<VariableMirror,PsiParameter>
-                (psi.parameterList.parameters, PSIVariable);
+    parameters => mirror<VariableMirror,PsiParameter>(psi.parameterList.parameters, PSIVariable);
     
-    shared actual Boolean protected => psi.hasModifierProperty(\iPROTECTED);
+    protected => psi.hasModifierProperty(\iPROTECTED);
     
-    shared actual Boolean public => psi.hasModifierProperty(\iPUBLIC);
+    public => psi.hasModifierProperty(\iPUBLIC);
     
     shared actual TypeMirror? returnType
             => if (exists t = psi.returnType) then PSIType(t) else null;
     
-    shared actual Boolean static => psi.hasModifierProperty(\iSTATIC);
+    static => psi.hasModifierProperty(\iSTATIC);
     
-    shared actual Boolean staticInit => false;
+    staticInit => false;
     
     shared actual List<TypeParameterMirror> typeParameters {
         value result = ArrayList<TypeParameterMirror>();
@@ -110,8 +105,9 @@ class PSIMethod(shared PsiMethod psi)
         return result;
     }
     
-    shared actual Boolean variadic => psi.varArgs;
+    variadic => psi.varArgs;
 
     string => "PSIMethod[``name``]";
     
+    defaultMethod => psi.hasModifierProperty(PsiModifier.\iDEFAULT);   
 }
