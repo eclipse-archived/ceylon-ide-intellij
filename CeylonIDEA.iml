@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PLUGIN_MODULE" version="4">
   <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" manifest="file://$MODULE_DIR$/META-INF/plugin.xml" />
-  <component name="FacetManager">
-    <facet type="ceylon" name="Ceylon">
-      <configuration>
-        <option name="compileForJvm" value="false" />
-        <option name="compileToJs" value="false" />
-        <option name="systemRepository" value="" />
-        Do not edit, modify .config/ide-config instead
-      </configuration>
-    </facet>
-  </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -18,9 +8,6 @@
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/testdata" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/source" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/gen" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/ant-build" />
     </content>
     <content url="file://$CEYLON_DIST_REPO$">
@@ -107,5 +94,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="plugin-ceylon-code" />
   </component>
 </module>

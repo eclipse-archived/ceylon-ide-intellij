@@ -7,6 +7,7 @@
       <module fileurl="file://$PROJECT_DIR$/grammar/Grammar.iml" filepath="$PROJECT_DIR$/grammar/Grammar.iml" />
       <module fileurl="file://$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" filepath="$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/compiler/compiler.iml" filepath="$PROJECT_DIR$/compiler/compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugin-ceylon-code/plugin-ceylon-code.iml" filepath="$PROJECT_DIR$/plugin-ceylon-code/plugin-ceylon-code.iml" />
     </modules>
   </component>
 </project>
