@@ -60,6 +60,11 @@
         <action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction" id="Ceylon.PasteAsCeylon" text="Paste Java as Ceylon">
             <add-to-group group-id="CutCopyPasteGroup" anchor="last"/>
         </action>
+        <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.AddBootstrapFilesAction"
+                id="AddBootstrapFilesAction"
+                text="Create Ceylon Bootstrap Files">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
     </actions>
 
     <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
@@ -136,8 +141,8 @@
         <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonTargetElementEvaluator"/>
         <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.GotoTargetRenderer"/>
-        <java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>
-        <java.shortNamesCache implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonShortNamesCache"/>
+        <!--<java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>-->
+        <!--<java.shortNamesCache implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonShortNamesCache"/>-->
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
