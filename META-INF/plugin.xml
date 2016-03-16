@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.intellij.plugins.ceylon.ide</id>
     <name>Ceylon IDE</name>
-    <version>1.2.2-0</version>
+    <version>1.2.3</version>
     <vendor email="bastien.jansen [at] gmx.com">Bastien Jansen</vendor>
 
     <description>Provides support for the Ceylon programming language</description>
