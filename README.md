@@ -10,7 +10,7 @@ This plugin is being written using IntelliJ 2016.1. It will work on both Communi
 
 We have a [dedicated branch](https://github.com/ceylon/ceylon-ide-intellij/tree/141.x-compat) for older versions of IntelliJ (14/15) *and* the current version of Android Studio (1.5.1), which is based on IntelliJ 14.1. Please note that these older versions of the IntelliJ platform have slightly different APIs, which means a few things may not work as expected. In particular, they contain [a bug that is critical](https://youtrack.jetbrains.com/issue/IDEA-132606) to the correct loading of Ceylon classes, which has been fixed in IntelliJ 2016.1. We'll try to backport a fix on this branch for better user experience.
 
-We embed most of the raw Ceylon installation in the plugin, so you won't necessarily have to download Ceylon separately. You may need a local repository though.
+We embed a full Ceylon distribution in the plugin, so you won't necessarily have to download Ceylon separately. You may need a local repository though.
 
 # Features
 
@@ -85,9 +85,8 @@ If you want to use the current version, or debug/hack this plugin, you will need
 
 8. Open the project `ceylon-ide-intellij` in IDEA. You might be requested to enter the value of 2 path variables (see next point).
 
-9. In `Settings > Build, Execution, Deployment > Path Variable`, you should add 2 path variables :
-    - `̀CEYLON_DIST_LIB` should point to `../ceylon/dist/dist/lib`
-    - `̀CEYLON_DIST_REPO` should point to `../ceylon/dist/dist/repo`
+9. In `Settings > Build, Execution, Deployment > Path Variable`, you should add a variabla named
+`̀CEYLON_DIST` that points to `../ceylon/dist/dist`.
 
 10. In the IDE's `Preferences > File Types`, under `Recognized File Types`, register `*.car` as `Archive files`
 

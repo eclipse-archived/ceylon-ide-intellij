@@ -10,8 +10,8 @@
       <sourceFolder url="file://$MODULE_DIR$/testdata" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/ant-build" />
     </content>
-    <content url="file://$CEYLON_DIST_REPO$">
-      <sourceFolder url="file://$CEYLON_DIST_REPO$" isTestSource="false" packagePrefix="repo" />
+    <content url="file://$CEYLON_DIST$">
+      <sourceFolder url="file://$CEYLON_DIST$" isTestSource="false" packagePrefix="embeddedDist" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

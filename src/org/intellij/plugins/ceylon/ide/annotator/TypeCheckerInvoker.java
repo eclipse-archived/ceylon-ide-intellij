@@ -169,4 +169,9 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
     public File getEmbeddedCeylonRepository() {
         return IdePluginCeylonStartup.getEmbeddedCeylonRepository();
     }
+
+    @Override
+    public File getEmbeddedCeylonDist() {
+        return IdePluginCeylonStartup.getEmbeddedCeylonDist();
+    }
 }

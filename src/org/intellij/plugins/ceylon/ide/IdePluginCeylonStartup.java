@@ -75,10 +75,21 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup implements Appli
 
     @NotNull
     public static File getEmbeddedCeylonRepository() {
+        File repoDir = new File(getEmbeddedCeylonDist(), "repo");
+
+        if (repoDir.isDirectory()) {
+            return repoDir;
+        }
+
+        throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
+    }
+
+    @NotNull
+    public static File getEmbeddedCeylonDist() {
         File pluginClassesDir = new File(PathUtil.getJarPathForClass(IdePluginCeylonStartup.class));
 
         if (pluginClassesDir.isDirectory()) {
-            File ceylonRepoDir = new File(pluginClassesDir, "repo");
+            File ceylonRepoDir = new File(pluginClassesDir, "embeddedDist");
             if (ceylonRepoDir.exists()) {
                 return ceylonRepoDir;
             }

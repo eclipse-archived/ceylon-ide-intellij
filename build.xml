@@ -121,8 +121,9 @@
         <copy todir="${build.dir}/CeylonIDEA/classes">
             <fileset dir="${basedir}/resources"/>
         </copy>
-        <copy todir="${build.dir}/CeylonIDEA/classes">
-            <fileset dir="${projects.base.dir}/ceylon/dist/dist" includes="repo/**"/>
+        <mkdir dir="${build.dir}/CeylonIDEA/classes/embeddedDist"/>
+        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist">
+            <fileset dir="${projects.base.dir}/ceylon/dist/dist" includes="**"/>
         </copy>
 
         <copy todir="${build.dir}/CeylonIDEA">
