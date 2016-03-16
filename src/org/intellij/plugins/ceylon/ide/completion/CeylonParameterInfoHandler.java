@@ -92,11 +92,8 @@ public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPs
 
     @Override
     public void updateParameterInfo(@NotNull CeylonPsi.ArgumentListPsi parameterListPsi, @NotNull UpdateParameterInfoContext context) {
-        PsiElement[] children = parameterListPsi.getChildren();
-        if (children.length == 1) {
-            int index = ParameterInfoUtils.getCurrentParameterIndex(children[0].getNode(), context.getOffset(), TokenTypes.COMMA.getTokenType());
-            context.setCurrentParameter(index);
-        }
+        int index = ParameterInfoUtils.getCurrentParameterIndex(parameterListPsi.getNode(), context.getOffset(), TokenTypes.COMMA.getTokenType());
+        context.setCurrentParameter(index);
     }
 
     @Nullable
@@ -123,7 +120,10 @@ public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPs
         if (fun.getFirstParameterList().getParameters().size() > 0) {
             for (Parameter param : fun.getFirstParameterList().getParameters()) {
                 String paramLabel = getParameterLabel(param, ((Declaration) fun).getUnit());
-                paramLabel = highlight(paramLabel, context.getParameterOwner().getProject()).replace('<', '≤').replace('>', '≥');
+                paramLabel = highlight(paramLabel, context.getParameterOwner().getProject())
+                        .replace('<', '≤').replace('>', '≥')
+                        .replace("&lt;", "<").replace("&gt;", ">")
+                        .replace("->", "→");
                 if (i == context.getCurrentParameterIndex()) {
                     highlightOffsetStart = builder.length();
                     highlightOffsetEnd = builder.length() + paramLabel.length();
