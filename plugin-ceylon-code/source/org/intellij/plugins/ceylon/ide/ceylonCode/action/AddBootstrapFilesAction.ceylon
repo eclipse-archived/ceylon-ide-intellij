@@ -19,11 +19,9 @@ import com.intellij.openapi.extensions {
 import com.intellij.openapi.ui {
     Messages
 }
-import com.redhat.ceylon.ide.common.model {
-    versionsAvailableForBoostrap
-}
 import com.redhat.ceylon.ide.common.util {
-    messages
+    messages,
+    versionsAvailableForBoostrap
 }
 
 import javax.swing {
