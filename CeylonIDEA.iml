@@ -94,6 +94,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="plugin-ceylon-code" />
   </component>
 </module>
