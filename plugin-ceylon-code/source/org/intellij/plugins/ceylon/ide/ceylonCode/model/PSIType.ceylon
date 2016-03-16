@@ -16,7 +16,8 @@ import com.intellij.psi.impl.source {
 import com.redhat.ceylon.model.loader.mirror {
     TypeMirror,
     TypeParameterMirror,
-    ClassMirror
+    ClassMirror,
+    TypeKind
 }
 
 import java.lang {
@@ -27,10 +28,6 @@ import java.util {
     Collections,
     IdentityHashMap,
     Map
-}
-
-import javax.lang.model.type {
-    TypeKind
 }
 
 class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
