@@ -95,7 +95,7 @@ Return doWithLock<Return>(Return() callback) {
     }
 }
 
-Return doWithIndex<Return>(Project p, Return() callback) {
+shared Return doWithIndex<Return>(Project p, Return() callback) {
 
     value ref = Ref<Return>();
     value runnable = object satisfies Runnable {

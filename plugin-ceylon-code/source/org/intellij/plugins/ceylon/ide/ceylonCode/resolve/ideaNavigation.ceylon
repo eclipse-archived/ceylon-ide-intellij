@@ -12,7 +12,11 @@ import com.intellij.openapi.vfs {
 import com.intellij.psi {
     PsiManager,
     PsiNameIdentifierOwner,
-    PsiFile
+    PsiFile,
+    JavaPsiFacade
+}
+import com.intellij.psi.search {
+    GlobalSearchScope
 }
 import com.intellij.psi.util {
     PsiTreeUtil
@@ -31,6 +35,9 @@ import java.lang {
     Integer
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    doWithIndex
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
@@ -49,8 +56,17 @@ shared class IdeaNavigation(Project project)
     }
     
     shared actual PsiNameIdentifierOwner? gotoJavaNode(Declaration declaration) {
-        print("TODO gotoJavaNode");
-        return null;
+        value qn = declaration.qualifiedNameString.replace("::", ".");
+
+        return doWithIndex(project, () {
+            value facade = JavaPsiFacade.getInstance(project);
+            value scope = GlobalSearchScope.allScope(project);
+
+            if (exists psi = facade.findClass(qn, scope)) {
+                return psi;
+            }
+            return null;
+        });
     }
     
     shared actual PsiNameIdentifierOwner? gotoLocation(Path? path, 
@@ -67,6 +83,4 @@ shared class IdeaNavigation(Project project)
         
         return null;
     }
-    
-    
 }
