@@ -106,7 +106,7 @@ shared class PSIClass(shared PsiClass psi)
     getCacheKey(Module mod) 
             => cacheKey else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
     
-    innerClass => PsiUtil.isInnerClass(psi);
+    innerClass => psi.containingClass exists;
     
     \iinterface => psi.\iinterface;
     
