@@ -51,6 +51,7 @@
           <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonIDEA/classes/embeddedDist/repo/com/redhat/ceylon/model/1.2.3/com.redhat.ceylon.model-1.2.3.jar!/" />
           <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonIDEA/classes/embeddedDist/repo/com/redhat/ceylon/compiler/java/1.2.3/com.redhat.ceylon.compiler.java-1.2.3.jar!/" />
           <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonIDEA/classes/embeddedDist/repo/com/github/rjeschke/txtmark/0.13/com.github.rjeschke.txtmark-0.13.jar!/" />
+          <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonIDEA/classes/embeddedDist/repo/com/redhat/ceylon/cli/1.2.3/com.redhat.ceylon.cli-1.2.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
