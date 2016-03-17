@@ -74,13 +74,16 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
         String name = element.getName();
         PsiElement prevSibling = element.getPrevSibling();
 
+        ASTNode firstChildNode = element.getNode().getFirstChildNode();
+
         if (!(element.getParent() instanceof CeylonPsi.ImportPathPsi)
-                && StringUtil.isNotEmpty(name) && name.charAt(0) < 'z' && prevSibling != null
+                && firstChildNode != null
+                && firstChildNode.getElementType() == CeylonTokens.LIDENTIFIER
+                && prevSibling != null
                 && prevSibling.getNode().getElementType() == CeylonTokens.MEMBER_OP) {
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.setTextAttributes(ceylonHighlightingColors.getMember());
         }
-        ASTNode firstChildNode = element.getNode().getFirstChildNode();
         if (firstChildNode != null && firstChildNode.getElementType() == CeylonTokens.AIDENTIFIER) {
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.setTextAttributes(ceylonHighlightingColors.getAnnotation());
