@@ -75,9 +75,6 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
     shared actual variable Type? type = null;
     shared actual variable Boolean getter = false;
 
-    shared actual String toString(Node node)
-            => document.getText(TextRange.from(node.startIndex.intValue(), node.stopIndex.intValue() - node.startIndex.intValue() + 1));
-
     shared actual EditorData? editorData => object satisfies EditorData {
         shared actual List<CommonToken> tokens => file.tokens;
         shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
