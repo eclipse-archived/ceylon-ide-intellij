@@ -49,7 +49,7 @@ import java.util {
 }
 
 // TODO investigate why psi.containingFile is sometimes null
-class PSIClass(shared PsiClass psi)
+shared class PSIClass(shared PsiClass psi)
         extends PSIAnnotatedMirror(psi)
         satisfies IdeClassMirror {
     

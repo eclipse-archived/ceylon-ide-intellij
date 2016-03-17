@@ -22,7 +22,7 @@ import java.util {
     ArrayList
 }
 
-class PSIMethod(shared PsiMethod psi)
+shared class PSIMethod(shared PsiMethod psi)
         extends PSIAnnotatedMirror(psi)
         satisfies MethodMirror {
     
