@@ -32,7 +32,6 @@ import com.redhat.ceylon.model.loader.mirror {
     ClassMirror,
     TypeParameterMirror,
     FieldMirror,
-    PackageMirror,
     TypeMirror,
     MethodMirror
 }
@@ -61,40 +60,32 @@ shared class PSIClass(shared PsiClass psi)
         );
     }
     
-    shared actual Boolean abstract => PsiUtil.isAbstractClass(psi);
+    abstract => PsiUtil.isAbstractClass(psi);
     
-    shared actual Boolean annotationType => psi.annotationType;
+    annotationType => psi.annotationType;
     
-    shared actual Boolean anonymous => psi is PsiAnonymousClass;
+    anonymous => psi is PsiAnonymousClass;
     
-    shared actual Boolean ceylonToplevelAttribute
-            => !innerClass && hasAnnotation(Annotations.attribute);
+    ceylonToplevelAttribute => !innerClass && hasAnnotation(Annotations.attribute);
     
-    shared actual Boolean ceylonToplevelMethod
-            => !innerClass && hasAnnotation(Annotations.method);
+    ceylonToplevelMethod => !innerClass && hasAnnotation(Annotations.method);
     
-    shared actual Boolean ceylonToplevelObject
-            => !innerClass && hasAnnotation(Annotations.\iobject);
+    ceylonToplevelObject => !innerClass && hasAnnotation(Annotations.\iobject);
     
-    shared actual Boolean defaultAccess
-            => let (private = psi.hasModifierProperty(PsiModifier.\iPRIVATE)) 
-                !(public || protected || private);
+    defaultAccess => let (private = psi.hasModifierProperty(PsiModifier.\iPRIVATE)) 
+                     !(public || protected || private);
     
-    shared actual List<FieldMirror> directFields
-            => mirror<FieldMirror,PsiField>(psi.fields, PSIField);
+    directFields => mirror<FieldMirror,PsiField>(psi.fields, PSIField);
     
-    shared actual List<ClassMirror> directInnerClasses
-            => mirror<ClassMirror,PsiClass>(psi.innerClasses, PSIClass);
+    directInnerClasses => mirror<ClassMirror,PsiClass>(psi.innerClasses, PSIClass);
     
-    shared actual List<MethodMirror> directMethods {
-        return doWithLock(() {
+    directMethods => doWithLock(() {
             value result = ArrayList<MethodMirror>();
             psi.methods.array.coalesced.each((m) {
                 result.add(PSIMethod(m));
             });
             return result;
         });
-    }
     
     shared actual ClassMirror? enclosingClass =>
             if (exists outerClass = getContextOfType(psi, javaClass<PsiClass>()))
@@ -106,48 +97,41 @@ shared class PSIClass(shared PsiClass psi)
             then PSIMethod(outerMeth)
             else null;
     
-    shared actual Boolean enum => psi.enum;
+    enum => psi.enum;
     
-    shared actual Boolean final
-            => psi.hasModifierProperty(PsiModifier.\iFINAL);
+    final => psi.hasModifierProperty(PsiModifier.\iFINAL);
     
-    shared actual String flatName => psi.qualifiedName else "";
+    flatName => psi.qualifiedName else "";
    
-    shared actual String getCacheKey(Module mod) 
+    getCacheKey(Module mod) 
             => cacheKey else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
     
-    shared actual Boolean innerClass => PsiUtil.isInnerClass(psi);
+    innerClass => PsiUtil.isInnerClass(psi);
     
-    shared actual Boolean \iinterface => psi.\iinterface;
+    \iinterface => psi.\iinterface;
     
-    shared actual List<TypeMirror> interfaces
-            => if (psi.\iinterface)
-               then mirror<TypeMirror,PsiClassType>(psi.extendsListTypes, PSIType)
-               else mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType);
+    interfaces => if (psi.\iinterface)
+                  then mirror<TypeMirror,PsiClassType>(psi.extendsListTypes, PSIType)
+                  else mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType);
     
     javaSource => psi.containingFile?.name?.endsWith(".java") else false;
     
-    shared actual Boolean loadedFromSource => javaSource;
+    loadedFromSource => javaSource;
     
-    shared actual Boolean localClass
-            => PsiUtil.isLocalClass(psi)
-               || hasAnnotation(Annotations.localContainer);
+    localClass => PsiUtil.isLocalClass(psi) || hasAnnotation(Annotations.localContainer);
     
-    shared actual PackageMirror \ipackage => PSIPackage(psi);
+    \ipackage => PSIPackage(psi);
      
-    shared actual Boolean protected
-             => psi.hasModifierProperty(PsiModifier.\iPROTECTED);
+    protected => psi.hasModifierProperty(PsiModifier.\iPROTECTED);
     
-    shared actual Boolean public
-            => psi.hasModifierProperty(PsiModifier.\iPUBLIC);
+    public => psi.hasModifierProperty(PsiModifier.\iPUBLIC);
     
-    shared actual String qualifiedName => 
+    qualifiedName => 
             if (is PsiTypeParameter psi)
             then \ipackage.qualifiedName + "." + name
             else (psi.qualifiedName else "");
     
-    shared actual Boolean static
-            => psi.hasModifierProperty(PsiModifier.\iSTATIC);
+    static => psi.hasModifierProperty(PsiModifier.\iSTATIC);
     
     shared actual TypeMirror? superclass {
         if (psi.\iinterface || qualifiedName == "java.lang.Object") {
@@ -162,9 +146,7 @@ shared class PSIClass(shared PsiClass psi)
         });
     }
     
-    shared actual List<TypeParameterMirror> typeParameters
-            => mirror<TypeParameterMirror,PsiTypeParameter>
-                (psi.typeParameters, PSITypeParameter);
+    typeParameters => mirror<TypeParameterMirror,PsiTypeParameter>(psi.typeParameters, PSITypeParameter);
     
     fileName => psi.containingFile?.name else "<unknown>";
     
@@ -175,9 +157,9 @@ shared class PSIClass(shared PsiClass psi)
                     else p
                 else "<unknown>";
     
-    shared actual Boolean isBinary => psi is ClsClassImpl;
+    isBinary => psi is ClsClassImpl;
     
-    shared actual Boolean isCeylon => hasAnnotation(Annotations.ceylon);
+    isCeylon => hasAnnotation(Annotations.ceylon);
     
 }
 

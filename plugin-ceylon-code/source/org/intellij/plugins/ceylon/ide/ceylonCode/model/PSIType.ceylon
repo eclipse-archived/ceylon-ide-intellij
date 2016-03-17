@@ -29,6 +29,9 @@ import java.util {
     IdentityHashMap,
     Map
 }
+import com.redhat.ceylon.ide.common.model {
+    unknownClassMirror
+}
 
 class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         = IdentityHashMap<PsiType,PSIType?>(), PSIType? enclosing = null)
@@ -47,7 +50,7 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
             => if (is PsiClassType psi,
                    exists cls = doWithLock(() => psi.resolve() else null))
                then PSIClass(cls)
-               else null;
+               else unknownClassMirror;
 
     TypeKind primitiveKind(PsiPrimitiveType psi) {
         return if (psi == PsiType.\iBOOLEAN) then TypeKind.\iBOOLEAN
