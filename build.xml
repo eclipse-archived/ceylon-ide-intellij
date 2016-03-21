@@ -20,7 +20,6 @@
     <path id="ceylon.runtime">
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/common/1.2.3/com.redhat.ceylon.common-1.2.3.jar" />
         <pathelement path="${ceylon.repo.dir}/org/jboss/modules/1.4.4.Final/org.jboss.modules-1.4.4.Final.jar" />
-        <pathelement path="${ceylon.repo.dir}/org/jboss/jandex/2.0.0.Final/org.jboss.jandex-2.0.0.Final.jar" />
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/module-resolver/1.2.3/com.redhat.ceylon.module-resolver-1.2.3.jar" />
         <pathelement path="${ceylon.repo.dir}/ceylon/language/1.2.3/ceylon.language-1.2.3.car" />
         <pathelement path="${ceylon.repo.dir}/com/redhat/ceylon/model/1.2.3/com.redhat.ceylon.model-1.2.3.jar" />

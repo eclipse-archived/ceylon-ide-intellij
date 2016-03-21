@@ -71,7 +71,6 @@ public class CeylonBuilder extends ModuleLevelBuilder {
 
     private static final String[] searchedArchives = {
             "org.antlr.runtime",
-            "org.jboss.jandex",
             "org.jboss.modules",
             "com.github.rjeschke.txtmark",
             "com.redhat.ceylon.compiler.java",
