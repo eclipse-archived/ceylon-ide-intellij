@@ -75,7 +75,12 @@ shared class PSIClass(shared PsiClass psi)
     defaultAccess => let (private = psi.hasModifierProperty(PsiModifier.\iPRIVATE)) 
                      !(public || protected || private);
     
-    directFields => mirror<FieldMirror,PsiField>(psi.fields, PSIField);
+    directFields => mirror<FieldMirror,PsiField>(
+        psi.fields.iterable.coalesced.filter(
+            (f) => !f.hasModifierProperty(PsiModifier.\iPRIVATE) // TODO !f.synthetic?
+        ),
+        PSIField
+    );
     
     directInnerClasses => mirror<ClassMirror,PsiClass>(psi.innerClasses, PSIClass);
     
@@ -163,10 +168,11 @@ shared class PSIClass(shared PsiClass psi)
     
 }
 
-List<Out> mirror<Out,In>(ObjectArray<In> array, Out transform(In val)) {
-    value result = ArrayList<Out>(array.size);
+List<Out> mirror<Out,In>(ObjectArray<In>|{In*} array, Out transform(In val)) given In satisfies Object {
+    value it = if (is ObjectArray<In> array) then array.iterable.coalesced else array;
+    value result = ArrayList<Out>(it.size);
     
-    array.array.coalesced.each(
+    it.coalesced.each(
         (v) => result.add(transform(v))
     );
     
