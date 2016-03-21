@@ -72,6 +72,10 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return "module";
         } else if (element instanceof CeylonPsi.VariablePsi) {
             return "variable";
+        } else if (element instanceof CeylonPsi.AttributeGetterDefinitionPsi) {
+            return "getter";
+        } else if (element instanceof CeylonPsi.AttributeSetterDefinitionPsi) {
+            return "setter";
         }
 
         throw new UnsupportedOperationException(element.toString());
