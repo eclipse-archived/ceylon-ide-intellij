@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    CeylonIterable
+    CeylonIterable,
+    javaClass
 }
 
 import com.intellij.openapi.application {
@@ -18,7 +19,8 @@ import com.intellij.openapi.\imodule {
     ModuleManager
 }
 import com.intellij.openapi.roots {
-    ModuleRootManager
+    ModuleRootManager,
+    OrderRootType
 }
 import com.intellij.openapi.ui {
     Messages
@@ -28,7 +30,8 @@ import com.intellij.openapi.vfs {
     VfsUtil,
     VirtualFileManager,
     VirtualFileVisitor,
-    VfsUtilCore
+    VfsUtilCore,
+    JarFileSystem
 }
 import com.redhat.ceylon.compiler.typechecker.context {
     Context
@@ -78,6 +81,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 import org.jetbrains.jps.model.java {
     JavaSourceRootType,
     JavaResourceRootType
+}
+import com.intellij.openapi.externalSystem.service.project {
+    IdeModifiableModelsProviderImpl
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -280,4 +286,38 @@ shared class IdeaCeylonProject(ideArtifact, model)
                     return IdeaModuleSourceMapper(context, moduleManager);
                 }
             };
+    
+    value libraryName => "Ceylon dependencies";
+    
+    shared void addLibrary(String jarFile, Boolean clear = false) {
+        value lock = ApplicationManager.application.acquireWriteActionLock(javaClass<IdeaCeylonProject>());
+        value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
+        value lib = provider.getLibraryByName(libraryName) else provider.createLibrary(libraryName);
+        value model = lib.modifiableModel;
+        
+        try {
+            if (clear) {
+                for (url in model.getUrls(OrderRootType.\iCLASSES)) {
+                    model.removeRoot(url.string, OrderRootType.\iCLASSES);
+                }
+            }
+
+            value srcFile = VirtualFileManager.instance
+                .findFileByUrl(JarFileSystem.\iPROTOCOL_PREFIX + jarFile + JarFileSystem.\iJAR_SEPARATOR);
+            
+            model.addRoot(srcFile, OrderRootType.\iCLASSES);
+            
+            value mrm = provider.getModifiableRootModel(ideArtifact);
+            if (!exists entry = mrm.findLibraryOrderEntry(lib)) {
+                mrm.addLibraryEntry(lib);
+            }
+            
+            model.commit();
+            provider.commit();
+        } catch (e) {
+            model.dispose();
+        } finally {
+            lock.finish();
+        }
+    }
 }
