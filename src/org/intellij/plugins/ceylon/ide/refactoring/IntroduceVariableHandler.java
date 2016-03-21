@@ -48,7 +48,7 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
 
         IdeaExtractValueRefactoring refacto = new IdeaExtractValueRefactoring(ceylonFile, editor.getDocument(), node);
 
-        String name = nodes_.get_().nameProposals(node)[0];
+        String name = nodes_.get_().nameProposals(node).getFirst().toString();
         refacto.setNewName(name);
         final DefaultRegion newIdentifier = refacto.extractInFile(project, file);
 
