@@ -20,7 +20,8 @@ import com.intellij.openapi.util {
     TextRange
 }
 import com.intellij.psi {
-    PsiFile
+    PsiFile,
+    PsiDocumentManager
 }
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
@@ -33,8 +34,7 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
 import com.redhat.ceylon.ide.common.refactoring {
-    ExtractValueRefactoring,
-    DefaultRegion
+    ExtractValueRefactoring
 }
 import com.redhat.ceylon.model.typechecker.model {
     Type
@@ -62,9 +62,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     VirtualFileVirtualFile
 }
+import java.lang {
+    JString=String
+}
 
 shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node)
-        satisfies ExtractValueRefactoring<CeylonFile, LookupElement, Document, InsertEdit, TextEdit, TextChange>
+        satisfies ExtractValueRefactoring<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange>
                 & IdeaDocumentChanges {
 
     shared actual List<PhasedUnit> getAllUnits() => ArrayList<PhasedUnit>();
@@ -75,7 +78,7 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
     shared actual variable Type? type = null;
     shared actual variable Boolean getter = false;
 
-    shared actual List<DefaultRegion> dupeRegions => nothing; // TODO
+    shared actual List<TextRange> dupeRegions => ArrayList<TextRange>();
 
     shared actual EditorData? editorData => object satisfies EditorData {
         shared actual List<CommonToken> tokens => file.tokens;
@@ -88,22 +91,31 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
     shared variable actual String? internalNewName = "";
     shared actual variable Boolean explicitType = false;
 
-    shared actual variable DefaultRegion? typeRegion = null;
-    shared actual variable DefaultRegion? decRegion = null;
-    shared actual variable DefaultRegion? refRegion = null;
+    shared actual variable TextRange? typeRegion = null;
+    shared actual variable TextRange? decRegion = null;
+    shared actual variable TextRange? refRegion = null;
 
-    shared actual DefaultRegion newRegion(Integer start, Integer length) => DefaultRegion(start, length);
+    shared actual TextRange newRegion(Integer start, Integer length) => TextRange.from(start, length);
 
     shared actual IdeaImportProposals importProposals => ideaImportProposals;
 
-    shared DefaultRegion? extractInFile(Project myProject, PsiFile file) {
+    shared TextRange? extractInFile(Project myProject, PsiFile file) {
         TextChange tfc = TextChange(document);
         build(tfc);
 
-        return object extends WriteCommandAction<DefaultRegion?>(myProject, file) {
-            shared actual void run(Result<DefaultRegion?> result) {
+        return object extends WriteCommandAction<TextRange?>(myProject, file) {
+            shared actual void run(Result<TextRange?> result) {
                 tfc.apply();
 
+                if (exists reg = decRegion) {
+                    value newId = document.getText(reg);
+                    for (dupe in dupeRegions) {
+                        document.replaceString(dupe.startOffset, dupe.endOffset, JString(newId));
+                    }
+                }
+
+                PsiDocumentManager.getInstance(project).commitAllDocuments();
+                
                 result.setResult(decRegion);
             }
         }.execute().resultObject;
