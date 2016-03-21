@@ -34,8 +34,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.ProgressIndicatorMonitor;
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform.ideaPlatformServices_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaPlatformUtils_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.intellij.plugins.ceylon.runtime.CeylonRuntime;
 import org.jetbrains.annotations.NotNull;
@@ -114,7 +114,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             return; // the module was just created, moduleAdded() will typecheck again
         }
         if (typeChecker == null) {
-            ideaPlatformUtils_.get_().register();
+            ideaPlatformServices_.get_().register();
             final IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
 
             ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(),
