@@ -106,7 +106,7 @@ shared class PSIClass(shared PsiClass psi)
     getCacheKey(Module mod) 
             => cacheKey else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
     
-    innerClass => psi.containingClass exists;
+    innerClass => psi.containingClass exists || hasAnnotation(Annotations.container);
     
     \iinterface => psi.\iinterface;
     

@@ -32,6 +32,12 @@ import java.util {
 import com.redhat.ceylon.ide.common.model {
     unknownClassMirror
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    ideaPlatformUtils
+}
+import com.redhat.ceylon.ide.common.platform {
+    Status
+}
 
 class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         = IdentityHashMap<PsiType,PSIType?>(), PSIType? enclosing = null)
@@ -146,6 +152,10 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
                 // TODO not cool, we got an incorrect qualified name
                 if (sb.string.contains(".impl"),
                     exists cls = pkg.findClassByShortName(sb.string.replace(".impl", "$impl"), psi.resolveScope).array.first) {
+                    return cls.qualifiedName;
+                }
+                if (exists cls = pkg.findClassByShortName(sb.string.replaceLast(".", "$"), psi.resolveScope).array.first) {
+                    ideaPlatformUtils.log(Status._ERROR, cls.qualifiedName);
                     return cls.qualifiedName;
                 }
                 return null;
