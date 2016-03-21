@@ -26,7 +26,9 @@ import com.redhat.ceylon.ide.common.open {
     AbstractNavigation
 }
 import com.redhat.ceylon.ide.common.util {
-    Path,
+    Path
+}
+import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }

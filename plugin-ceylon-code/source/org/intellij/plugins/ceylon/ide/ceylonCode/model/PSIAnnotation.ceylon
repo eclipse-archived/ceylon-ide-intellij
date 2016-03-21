@@ -23,7 +23,7 @@ import com.intellij.psi {
     PsiReferenceExpression,
     PsiClassObjectAccessExpression
 }
-import com.redhat.ceylon.ide.common.util {
+import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }

@@ -1,4 +1,4 @@
-import com.redhat.ceylon.ide.common.util {
+import com.redhat.ceylon.ide.common.platform {
     IdePlatformUtils,
     Status
 }

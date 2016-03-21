@@ -5,7 +5,7 @@ import com.intellij.psi {
 import com.redhat.ceylon.model.loader.mirror {
     PackageMirror
 }
-import com.redhat.ceylon.ide.common.util {
+import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }

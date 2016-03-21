@@ -75,6 +75,8 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
     shared actual variable Type? type = null;
     shared actual variable Boolean getter = false;
 
+    shared actual List<DefaultRegion> dupeRegions => nothing; // TODO
+
     shared actual EditorData? editorData => object satisfies EditorData {
         shared actual List<CommonToken> tokens => file.tokens;
         shared actual Tree.CompilationUnit rootNode => file.compilationUnit;

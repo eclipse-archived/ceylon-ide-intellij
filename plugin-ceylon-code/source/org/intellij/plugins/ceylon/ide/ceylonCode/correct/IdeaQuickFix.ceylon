@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    CeylonList,
     javaClass
 }
 
@@ -22,6 +21,9 @@ import com.intellij.openapi.vfs {
     VirtualFileManager,
     VirtualFile
 }
+import com.intellij.psi {
+    PsiManager
+}
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
@@ -31,6 +33,9 @@ import com.redhat.ceylon.ide.common.completion {
 import com.redhat.ceylon.ide.common.correct {
     AbstractQuickFix,
     ImportProposals
+}
+import com.redhat.ceylon.ide.common.model {
+    IResourceAware
 }
 import com.redhat.ceylon.ide.common.util {
     Indents
@@ -51,23 +56,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIndents
 }
-import com.redhat.ceylon.ide.common.model {
-    IResourceAware
-}
-import com.intellij.psi {
-    PsiManager
-}
 
 shared interface IdeaQuickFix
         satisfies AbstractQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
         TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     shared actual Integer getTextEditOffset(TextEdit change) => change.start;
-    
-    shared actual List<PhasedUnit> getUnits(Module mod) {
-        value tc = mod.getComponent(javaClass<ITypeCheckerProvider>()).typeChecker;
-        return CeylonList(tc.phasedUnits.phasedUnits);
-    }
     
     shared actual Indents<Document> indents => ideaIndents;
     
