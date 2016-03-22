@@ -62,6 +62,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonCompositeElement
 }
+import com.redhat.ceylon.ide.common.util {
+    nodes
+}
 
 shared class InlineAction() extends InlineActionHandler() {
 
@@ -78,19 +81,30 @@ shared class InlineAction() extends InlineActionHandler() {
     }
 
     shared actual void inlineElement(Project _project, Editor editor, PsiElement element) {
-        if (is CeylonFile file = element.containingFile,
-            is CeylonCompositeElement element,
-            is Tree.Declaration td = element.ceylonNode,
-            is Declaration decl = td.declarationModel) {
+        if (is CeylonFile file = element.containingFile) {
+            value node = nodes.findNode(
+                file.compilationUnit, file.tokens,
+                editor.selectionModel.selectionStart,
+                editor.selectionModel.selectionEnd
+            );
 
-            value change = TextChange(editor.document);
-            IdeaInlineRefactoring(file, td, decl, editor).build(change);
-            
-            object extends WriteCommandAction<Nothing>(_project, file) {
-                shared actual void run(Result<Nothing>? result) {
-                    change.apply(project);
+            if (exists node,
+                is Declaration decl = nodes.getReferencedDeclaration(node)) {
+
+                value change = TextChange(editor.document);
+                value refactoring = IdeaInlineRefactoring(file, node, decl, editor);
+                value dialog = InlineDialog(_project, element, refactoring);
+
+                if (dialog.showAndGet()) {
+                    refactoring.build(change);
+
+                    object extends WriteCommandAction<Nothing>(_project, file) {
+                        shared actual void run(Result<Nothing>? result) {
+                            change.apply(project);
+                        }
+                    }.execute();
                 }
-            }.execute();
+            }
         }
     }
 
@@ -108,11 +122,11 @@ class IdeaInlineRefactoring(CeylonFile file, Node node, Declaration decl, Editor
     class IdeaInlineData() satisfies InlineData {
         shared actual Declaration declaration => decl;
         
-        shared actual Boolean delete => true;
+        shared actual variable Boolean delete = true;
         
         shared actual Document doc => editor.document;
         
-        shared actual Boolean justOne => false;
+        shared actual variable Boolean justOne = false;
         
         shared actual Node node => outer.node;
         
