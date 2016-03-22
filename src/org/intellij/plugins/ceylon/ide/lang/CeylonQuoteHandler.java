@@ -5,6 +5,7 @@ import com.intellij.codeInsight.editorActions.SimpleTokenSetQuoteHandler;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.TokenType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +18,8 @@ public class CeylonQuoteHandler extends SimpleTokenSetQuoteHandler implements Mu
                 CeylonTokens.STRING_INTERP,
                 CeylonTokens.STRING_TEMPLATE,
                 CeylonTokens.VERBATIM_STRING,
-                CeylonTokens.CHAR_LITERAL
+                CeylonTokens.CHAR_LITERAL,
+                TokenType.BAD_CHARACTER // for unclosed CHAR_LITERAL
         );
     }
 
@@ -72,5 +74,11 @@ public class CeylonQuoteHandler extends SimpleTokenSetQuoteHandler implements Mu
             }
         }
         return null;
+    }
+
+    @Override
+    protected boolean isNonClosedLiteral(HighlighterIterator iterator, CharSequence chars) {
+        char nextChar = chars.charAt(iterator.getStart() + 1);
+        return nextChar != '\"' && nextChar != '\'';
     }
 }
