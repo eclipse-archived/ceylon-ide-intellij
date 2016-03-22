@@ -31,6 +31,19 @@ import com.intellij.psi {
 import com.intellij.openapi.util {
     TextRange
 }
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
+}
+import com.intellij.openapi.vfs {
+    VirtualFile,
+    VirtualFileManager
+}
+import com.intellij.openapi.fileEditor {
+    FileDocumentManager
+}
 
 shared alias TextEdit => AliasedAsTextEdit;
 
@@ -53,11 +66,28 @@ shared class ReplaceEdit(shared actual Integer start, Integer length, String str
     shared actual CharArray chars => javaString(str).toCharArray();
 }
 
-shared class TextChange(shared Document document) {
+shared class TextChange(Document|PhasedUnit|CeylonFile input) {
     variable JList<TextEdit> changes = ArrayList<TextEdit>();
+
+    shared Document document;
+    if (is Document input) {
+        document = input;
+    } else {
+        VirtualFile? vfile = if (is PhasedUnit input)
+                             then VirtualFileManager.instance.findFileByUrl("file://" + input.unit.fullPath)
+                             else input.virtualFile;
+
+        assert (exists vfile);
+
+        document = FileDocumentManager.instance.getDocument(vfile);
+    }
 
     shared void addEdit(TextEdit edit) {
         changes.add(edit);
+    }
+    
+    shared void addAll(TextChange change) {
+        changes.addAll(change.changes);
     }
 
     shared void apply(Project? project = null) {

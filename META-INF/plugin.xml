@@ -122,6 +122,7 @@
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonVariableRenameHandler"/>
         <renamePsiElementProcessor implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenamePsiProcessor"/>
         <refactoring.elementListenerProvider implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringListener"/>
+        <inlineActionHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.InlineAction"/>
         <lang.importOptimizer language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonImportOptimizer"/>
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementDescriptionProvider"/>
         <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>

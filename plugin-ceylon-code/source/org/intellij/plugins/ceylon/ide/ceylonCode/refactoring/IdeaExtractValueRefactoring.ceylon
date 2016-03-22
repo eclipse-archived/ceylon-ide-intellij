@@ -37,7 +37,8 @@ import com.redhat.ceylon.ide.common.refactoring {
     ExtractValueRefactoring
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Type
+    Type,
+    Declaration
 }
 
 import java.util {
@@ -80,10 +81,10 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
 
     shared actual List<TextRange> dupeRegions => ArrayList<TextRange>();
 
-    shared actual EditorData? editorData => object satisfies EditorData {
+    shared actual EditorData editorData => object satisfies EditorData {
         shared actual List<CommonToken> tokens => file.tokens;
         shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
-        shared actual Node? node => _node;
+        shared actual Node node => _node;
         shared actual VirtualFile? sourceVirtualFile
                 => VirtualFileVirtualFile(file.virtualFile, ModuleUtil.findModuleForFile(file.virtualFile, file.project));
     };
@@ -120,4 +121,5 @@ shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Nod
             }
         }.execute().resultObject;
     }
+    shared actual Boolean inSameProject(Declaration decl) => true; // TODO
 }

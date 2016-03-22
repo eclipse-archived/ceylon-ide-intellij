@@ -8,9 +8,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.fileEditor {
-    FileDocumentManager
-}
 import com.intellij.openapi.\imodule {
     Module
 }
@@ -18,7 +15,6 @@ import com.intellij.openapi.util {
     TextRange
 }
 import com.intellij.openapi.vfs {
-    VirtualFileManager,
     VirtualFile
 }
 import com.intellij.psi {
@@ -69,21 +65,7 @@ shared interface IdeaQuickFix
             => TextRange.from(start, length);
     
     shared actual TextChange newTextChange(String desc,
-        PhasedUnit|CeylonFile|Document unitOrFile) {
-        
-        if (is Document unitOrFile) {
-            return TextChange(unitOrFile);
-        } else {
-            VirtualFile? vfile = if (is PhasedUnit unitOrFile) 
-                          then VirtualFileManager.instance
-                            .findFileByUrl("file://" + unitOrFile.unit.fullPath)
-                          else unitOrFile.virtualFile;
-    
-            assert (exists vfile);
-            
-            return TextChange(FileDocumentManager.instance.getDocument(vfile));
-        }
-    }
+        PhasedUnit|CeylonFile|Document unitOrFile) => TextChange(unitOrFile);
     
     shared actual IdeCompletionManager<out Anything,LookupElement,Document>
             completionManager => ideaCompletionManager;
