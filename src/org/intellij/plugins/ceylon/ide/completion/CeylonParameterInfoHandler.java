@@ -7,10 +7,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.util.FindNodeVisitor;
 import com.redhat.ceylon.model.typechecker.model.*;
 import com.redhat.ceylon.model.typechecker.util.TypePrinter;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +18,7 @@ import static org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlight_
 
 public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPsi.ArgumentListPsi, Functional> {
 
-    public static final com.intellij.util.Function<String, String> HTMLIZE = new com.intellij.util.Function<String, String>() {
+    private static final com.intellij.util.Function<String, String> HTMLIZE = new com.intellij.util.Function<String, String>() {
         @Override
         public String fun(String s) {
             return s.replace("≤", "<").replace("≥", ">");
@@ -55,12 +53,9 @@ public class CeylonParameterInfoHandler implements ParameterInfoHandler<CeylonPs
         CeylonPsi.ArgumentListPsi args = PsiTreeUtil.getParentOfType(elementAtOffset, CeylonPsi.ArgumentListPsi.class);
 
         if (invocation != null && args != null) {
-            FindNodeVisitor visitor = new FindNodeVisitor(null, invocation.getTextRange().getStartOffset(),
-                    invocation.getTextRange().getEndOffset());
-            ((CeylonFile) context.getFile()).getCompilationUnit().visit(visitor);
-            Node node = visitor.getNode();
+            Node node = invocation.getCeylonNode();
 
-            if (node instanceof Tree.InvocationExpression) {
+            if (node != null) {
                 Tree.Primary primary = ((Tree.InvocationExpression) node).getPrimary();
                 Declaration declaration = ((Tree.InvocationExpression) node).getTypeModel().getDeclaration();
 
