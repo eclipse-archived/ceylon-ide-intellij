@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -47,10 +48,16 @@ public class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonP
 
         for (Node node : bodyChildren) {
             if (node instanceof Tree.Declaration) {
-                StructureViewTreeElement child = getTreeElementForDeclaration((CeylonFile) myClass.getContainingFile(), (Tree.Declaration) node, false);
+                StructureViewTreeElement child = getTreeElementForDeclaration((CeylonFile) myClass.getContainingFile(),
+                        (Tree.Declaration) node, false);
                 if (child != null) {
                     elements.add(child);
                 }
+            } else if (node instanceof Tree.SpecifierStatement) {
+                CeylonPsi.SpecifierStatementPsi spec = PsiTreeUtil.getParentOfType(
+                        myClass.getContainingFile().findElementAt(node.getStartIndex()),
+                        CeylonPsi.SpecifierStatementPsi.class);
+                elements.add(new CeylonSpecifierTreeElement(spec));
             }
         }
 

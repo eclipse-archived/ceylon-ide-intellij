@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPsi> extends PsiTreeElementBase<Decl> implements ColoredItemPresentation, LocationPresentation {
 
@@ -31,20 +32,25 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
     }
 
     @Nullable
-    @Override
-    public String getPresentableText() {
-        return null;
-    }
-
-    @Nullable
     protected String getPresentableParameters() {
         Declaration model = getElement().getCeylonNode().getDeclarationModel();
 
         if (model instanceof Functional) {
-            StringBuilder builder = new StringBuilder("(");
+            return getParametersString(((Functional) model).getParameterLists(), model.getUnit());
+        }
 
-            for (Parameter parameter : ((Functional) model).getFirstParameterList().getParameters()) {
-                builder.append(parameter.getType().asString(model.getUnit())).append(", ");
+        return "";
+    }
+
+    @NotNull
+    static String getParametersString(List<ParameterList> parameterLists, Unit unit) {
+        StringBuilder builder = new StringBuilder();
+
+        for (ParameterList parameterList : parameterLists) {
+            builder.append("(");
+
+            for (Parameter parameter : parameterList.getParameters()) {
+                builder.append(parameter.getType().asString(unit)).append(", ");
             }
 
             if (builder.length() > 1) {
@@ -52,11 +58,9 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
             }
 
             builder.append(")");
-
-            return builder.toString();
         }
 
-        return "";
+        return builder.toString();
     }
 
     @Nullable
