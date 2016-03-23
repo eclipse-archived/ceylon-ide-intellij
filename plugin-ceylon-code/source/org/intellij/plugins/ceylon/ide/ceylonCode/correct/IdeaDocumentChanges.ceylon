@@ -1,48 +1,44 @@
-import com.redhat.ceylon.ide.common.correct {
-    DocumentChanges
-}
-import com.intellij.openapi.editor {
-    Document,
-    AliasedAsTextEdit=TextChange
-}
-import java.lang {
-    CharSequence,
-    CharArray,
-    JString = String
+import ceylon.collection {
+    ArrayList
 }
 import ceylon.interop.java {
     javaString
 }
-import com.intellij.openapi.editor.impl {
-    BulkChangesMerger
+
+import com.intellij.openapi.editor {
+    Document,
+    AliasedAsTextEdit=TextChange
 }
-import java.util {
-    JList = List,
-    ArrayList,
-    Comparator,
-    Collections
+import com.intellij.openapi.fileEditor {
+    FileDocumentManager
 }
 import com.intellij.openapi.project {
     Project
 }
-import com.intellij.psi {
-    PsiDocumentManager
-}
 import com.intellij.openapi.util {
     TextRange
-}
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
     VirtualFileManager
 }
-import com.intellij.openapi.fileEditor {
-    FileDocumentManager
+import com.intellij.psi {
+    PsiDocumentManager
+}
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
+import com.redhat.ceylon.ide.common.correct {
+    DocumentChanges
+}
+
+import java.lang {
+    CharSequence,
+    CharArray
+}
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
 }
 
 shared alias TextEdit => AliasedAsTextEdit;
@@ -67,7 +63,7 @@ shared class ReplaceEdit(shared actual Integer start, Integer length, String str
 }
 
 shared class TextChange(Document|PhasedUnit|CeylonFile input) {
-    variable JList<TextEdit> changes = ArrayList<TextEdit>();
+    value changes = ArrayList<TextEdit>();
 
     shared Document document;
     if (is Document input) {
@@ -91,19 +87,11 @@ shared class TextChange(Document|PhasedUnit|CeylonFile input) {
     }
 
     shared void apply(Project? project = null) {
-        Collections.sort(changes, object satisfies Comparator<TextEdit> {
-            shared actual Integer compare(TextEdit? a, TextEdit? b) {
-                if (exists a, exists b) {
-                    return a.start - b.start;
-                }
-                return 0;
-            }
-            
-            shared actual Boolean equals(Object that) => false;
-        });
-        value chars = javaString(document.text).toCharArray();
-        value newText = BulkChangesMerger.\iINSTANCE.mergeToCharArray(chars, document.textLength, changes);
-        document.setText(JString(newText));
+        value markers = changes.collect((c) => document.createRangeMarker(c.start, c.end));
+        
+        for (change -> marker in zipEntries(changes, markers)) {
+            document.replaceString(marker.startOffset, marker.endOffset, change.text);
+        }
 
         if (exists project) {
             PsiDocumentManager.getInstance(project).commitAllDocuments();
