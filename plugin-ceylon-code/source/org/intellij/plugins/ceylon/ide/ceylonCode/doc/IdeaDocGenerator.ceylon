@@ -37,7 +37,8 @@ import com.redhat.ceylon.ide.common.settings {
     CompletionOptions
 }
 import com.redhat.ceylon.ide.common.typechecker {
-    LocalAnalysisResult
+    LocalAnalysisResult,
+    IdePhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
     FindReferencedNodeVisitor
@@ -92,6 +93,8 @@ String(String, Project) outerHighlight = highlight;
 shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> {
 
     shared class DocParams(PhasedUnit pu, Project p) satisfies LocalAnalysisResult<Document> {
+        assert(is IdePhasedUnit pu);
+
         shared actual Tree.CompilationUnit lastCompilationUnit => pu.compilationUnit;
         shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
         shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
@@ -99,7 +102,7 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
         shared actual Document document => nothing;
         shared actual JList<CommonToken>? tokens => pu.tokens;
         shared actual TypeChecker typeChecker => tc else nothing;
-        shared actual BaseCeylonProject? ceylonProject => nothing;
+        shared actual BaseCeylonProject? ceylonProject => pu.moduleSourceMapper.ceylonProject;
         shared Project ideaProject => p;
         shared actual CompletionOptions options => nothing;
     }
