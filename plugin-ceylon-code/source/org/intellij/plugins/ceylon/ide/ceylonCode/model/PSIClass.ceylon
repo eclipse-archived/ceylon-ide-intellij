@@ -2,6 +2,9 @@ import ceylon.interop.java {
     javaClass
 }
 
+import com.intellij.lang.java {
+    JavaLanguage
+}
 import com.intellij.psi {
     PsiClass,
     PsiModifier,
@@ -9,10 +12,15 @@ import com.intellij.psi {
     PsiMethod,
     PsiTypeParameter,
     PsiField,
-    PsiClassType
+    PsiClassType,
+    PsiManager,
+    PsiNameIdentifierOwner
 }
 import com.intellij.psi.impl.compiled {
     ClsClassImpl
+}
+import com.intellij.psi.impl.light {
+    LightMethodBuilder
 }
 import com.intellij.psi.util {
     PsiUtil,
@@ -86,9 +94,23 @@ shared class PSIClass(shared PsiClass psi)
     
     directMethods => doWithLock(() {
             value result = ArrayList<MethodMirror>();
+            variable value hasCtor = false;
+
             psi.methods.array.coalesced.each((m) {
+                if (m.constructor) {
+                    hasCtor = true;
+                }
                 result.add(PSIMethod(m));
             });
+
+            // unfortunately, IntelliJ does not include implicit default constructors in `psi.methods`
+            if (!hasCtor) {
+                value builder = LightMethodBuilder(PsiManager.getInstance(psi.project),
+                    JavaLanguage.\iINSTANCE,
+                    (psi of PsiNameIdentifierOwner).name
+                ).setConstructor(true);
+                result.add(PSIMethod(builder));
+            }
             return result;
         });
     
