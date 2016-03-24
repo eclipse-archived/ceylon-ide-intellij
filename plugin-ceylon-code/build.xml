@@ -71,6 +71,7 @@
                         verbose="${ceylon.verbosity}"
                         encoding="UTF-8"
                         pack200="true"
+                        fork="true"
                         mavenoverrides="${basedir}/overrides.xml"
                         out="${out.repo}">
             <source value="${basedir}/source"/>
