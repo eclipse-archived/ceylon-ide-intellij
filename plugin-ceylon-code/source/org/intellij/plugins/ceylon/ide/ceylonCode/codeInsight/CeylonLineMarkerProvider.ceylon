@@ -56,8 +56,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
         return decl.ceylonNode.declaration;
     }
     
-    shared actual LineMarkerInfo<PsiElement>?
-    getLineMarkerInfo(PsiElement element) {
+    shared actual LineMarkerInfo<PsiElement>? getLineMarkerInfo(PsiElement element) {
         
         if (is CeylonFile file = element.containingFile) {
             file.ensureTypechecked();
@@ -70,13 +69,13 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             
             value unit = decl.ceylonNode.unit;
             assert(is Declaration parent = refined.container);
-            value text = "Refines " + parent.getName(unit) + "."
-                    + refined.getName(unit);
+            value text = "Refines ``parent.getName(unit)``.``refined.getName(unit)``";
             value tooltip = object satisfies Function<PsiElement, JString> {
                 shared actual JString fun(PsiElement? param) => javaString(text);
             };
-            
-            return LineMarkerInfo(element of CeylonCompositeElement, element.textRange, ideaIcons.refinement,
+            value icon = refined.formal then ideaIcons.refinement else ideaIcons.extendedType;
+
+            return LineMarkerInfo(element of CeylonCompositeElement, element.textRange, icon,
                 Pass.\iUPDATE_ALL, tooltip, NavigationHandler(refined),
                 GutterIconRenderer.Alignment.\iLEFT);
         }
