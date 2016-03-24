@@ -11,6 +11,9 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.extensions {
     Extensions
 }
+import com.intellij.openapi.externalSystem.service.project {
+    IdeModifiableModelsProviderImpl
+}
 import com.intellij.openapi.fileEditor {
     FileEditorManagerListener
 }
@@ -48,12 +51,6 @@ import com.redhat.ceylon.ide.common.model.parsing {
 import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitorChild
 }
-import com.redhat.ceylon.ide.common.vfs {
-    FolderVirtualFile
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Package
-}
 import com.redhat.ceylon.model.typechecker.util {
     TCModManager=ModuleManager
 }
@@ -66,24 +63,16 @@ import java.lang {
     Void,
     System
 }
-import java.lang.ref {
-    WeakReference
-}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerInvoker
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    vfsKeychain,
-    IdeaVirtualFolder,
     FileWatcher
 }
 import org.jetbrains.jps.model.java {
     JavaSourceRootType,
     JavaResourceRootType
-}
-import com.intellij.openapi.externalSystem.service.project {
-    IdeModifiableModelsProviderImpl
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -206,19 +195,6 @@ shared class IdeaCeylonProject(ideArtifact, model)
     shared actual {Module*} referencingNativeProjects(Module mod)
             => CeylonIterable(ModuleManager.getInstance(mod.project)
                 .getModuleDependentModules(mod));
-    
-    shared actual void setPackageForNativeFolder(VirtualFile folder, WeakReference<Package> p) {
-        folder.putUserData(vfsKeychain.findOrCreate<Package>(ideaModule), p.get());
-    }
-    
-    shared actual void setRootForNativeFolder(VirtualFile folder, WeakReference<FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>> root) {
-        assert(is IdeaVirtualFolder r = root.get());
-        folder.putUserData(vfsKeychain.findOrCreate<IdeaVirtualFolder>(ideaModule), r);
-    }
-    
-    shared actual void setRootIsForSource(VirtualFile rootFolder, Boolean isSource) {
-        rootFolder.putUserData(vfsKeychain.findOrCreate<Boolean>(ideaModule), isSource);
-    }
     
     late FileWatcher watcher;
     

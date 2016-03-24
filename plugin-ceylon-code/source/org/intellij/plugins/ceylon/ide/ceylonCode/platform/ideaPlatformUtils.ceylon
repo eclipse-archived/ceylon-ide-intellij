@@ -2,16 +2,15 @@ import com.intellij.openapi.diagnostic {
     Logger
 }
 import com.redhat.ceylon.ide.common.platform {
-    IdePlatformUtils,
-    Status
+    Status,
+    IdeUtils
 }
 
 import java.lang {
     RuntimeException
 }
 
-
-shared object ideaPlatformUtils satisfies IdePlatformUtils {
+shared object ideaPlatformUtils satisfies IdeUtils {
     
     value logger = Logger.getInstance("ideaPlatformUtils");
     

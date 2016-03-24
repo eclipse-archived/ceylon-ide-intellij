@@ -22,9 +22,6 @@ import com.redhat.ceylon.ide.common.vfs {
     FolderVirtualFile,
     ResourceVirtualFile
 }
-import com.redhat.ceylon.model.typechecker.model {
-    Package
-}
 
 import java.util {
     List,
@@ -67,9 +64,6 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     ceylonProject => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod);
     
     nativeProject => mod;
-    
-    vfs => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).vfs;
-    
 }
 
 shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
@@ -111,15 +105,7 @@ shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
     
     ceylonProject => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod);
     
-    ceylonPackage => folder.getUserData(vfsKeychain.findOrCreate<Package>(mod));
-    
-    isSource => folder.getUserData(vfsKeychain.findOrCreate<Boolean>(mod));
-    
-    rootFolder => folder.getUserData(vfsKeychain.findOrCreate<IdeaVirtualFolder>(mod));
-    
     nativeProject => mod;
-    
-    vfs => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).vfs;
 }
 
 shared object vfsKeychain {

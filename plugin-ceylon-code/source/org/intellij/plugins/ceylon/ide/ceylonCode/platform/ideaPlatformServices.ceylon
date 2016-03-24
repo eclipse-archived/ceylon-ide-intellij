@@ -3,7 +3,8 @@ import com.redhat.ceylon.ide.common.util {
 }
 import com.redhat.ceylon.ide.common.platform {
     ModelServices,
-    PlatformServices
+    PlatformServices,
+    VfsServices
 }
 import com.redhat.ceylon.ide.common.correct {
     ImportProposals
@@ -23,4 +24,8 @@ shared object ideaPlatformServices satisfies PlatformServices {
     shared actual ImportProposals<IFile,ICompletionProposal,IDocument,InsertEdit,TextEdit,TextChange> 
     importProposals<IFile, ICompletionProposal, IDocument, InsertEdit, TextEdit, TextChange>()
             => unsafeCast<ImportProposals<IFile,ICompletionProposal,IDocument,InsertEdit,TextEdit,TextChange>>(ideaImportProposals);
+
+    shared actual VfsServices<NativeProject,NativeResource,NativeFolder,NativeFile> vfs<NativeProject, NativeResource, NativeFolder, NativeFile>()
+            => unsafeCast<VfsServices<NativeProject,NativeResource,NativeFolder,NativeFile>>(ideaVfsServices);
+    
 }
