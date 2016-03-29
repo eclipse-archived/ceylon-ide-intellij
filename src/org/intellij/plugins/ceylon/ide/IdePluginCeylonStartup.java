@@ -4,7 +4,6 @@ import com.intellij.diagnostic.PluginException;
 import com.intellij.ide.ApplicationLoadListener;
 import com.intellij.ide.plugins.cl.PluginClassLoader;
 import com.intellij.openapi.application.Application;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.util.PathUtil;
 import org.intellij.plugins.ceylon.runtime.CeylonRuntime;
@@ -44,7 +43,6 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup implements Appli
         String[] suffixes = {".car", ".jar"};
         visitDirectory(getEmbeddedCeylonRepository(), archives, suffixes);
 
-        Logger.getInstance(IdePluginCeylonStartup.class).warn(archives.toString());
         return archives.toArray(new File[archives.size()]);
     }
 
