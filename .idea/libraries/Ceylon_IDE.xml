@@ -14,11 +14,11 @@
       <root url="jar://$CEYLON_DIST$/repo/org/apache/commons/codec/1.8/org.apache.commons.codec-1.8.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/net/minidev/json-smart/1.1.1/net.minidev.json-smart-1.1.1.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/org/apache/httpcomponents/httpclient/4.3.2/org.apache.httpcomponents.httpclient-4.3.2.jar!/" />
-      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/maven-support/2.0/com.redhat.ceylon.maven-support-2.0.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/org/apache/commons/logging/1.1.1/org.apache.commons.logging-1.1.1.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/com/github/lookfirst/sardine/5.1/com.github.lookfirst.sardine-5.1.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/ceylon/runtime/1.2.3/ceylon.runtime-1.2.3.jar!/" />
       <root url="jar://$CEYLON_DIST$/lib/ceylon-bootstrap.jar!/" />
+      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/cli/1.2.3/com.redhat.ceylon.cli-1.2.3.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

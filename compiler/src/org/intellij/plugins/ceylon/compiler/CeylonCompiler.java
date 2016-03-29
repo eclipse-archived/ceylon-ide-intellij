@@ -183,7 +183,7 @@ public class CeylonCompiler {
         File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonCompiler.class));
 
         if (pluginClassesDir.isDirectory()) {
-            File ceylonRepoDir = new File(pluginClassesDir, "repo");
+            File ceylonRepoDir = new File(new File(pluginClassesDir, "embeddedDist"), "repo");
             if (ceylonRepoDir.exists()) {
                 return ceylonRepoDir.getAbsolutePath();
             }
