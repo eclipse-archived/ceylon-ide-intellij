@@ -32,7 +32,7 @@ shared object ideaRefineFormalMembersQuickFix
         satisfies RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges & IdeaQuickFix {
     
-     shared actual Character getDocChar(Document doc, Integer offset)
+     getDocChar(Document doc, Integer offset)
             => doc.getText(TextRange.from(offset, 1)).first else ' ';
     
     shared actual void newRefineFormalMembersProposal(IdeaQuickFixData data, String desc) {

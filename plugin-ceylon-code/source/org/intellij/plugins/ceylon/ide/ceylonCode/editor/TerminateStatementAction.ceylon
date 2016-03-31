@@ -90,7 +90,7 @@ shared class TerminateStatementAction()
         return true;
     }
     
-    shared actual Character getChar(Document doc, Integer offset)
+    getChar(Document doc, Integer offset)
             => doc.text[offset] else ' ';
     
     
