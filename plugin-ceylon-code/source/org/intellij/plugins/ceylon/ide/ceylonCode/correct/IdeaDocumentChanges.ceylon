@@ -56,7 +56,7 @@ shared class DeleteEdit(shared actual Integer start, Integer length) satisfies A
     shared actual CharArray chars => javaString("").toCharArray();
 }
 
-shared class ReplaceEdit(shared actual Integer start, Integer length, String str) satisfies AliasedAsTextEdit {
+shared class ReplaceEdit(shared actual Integer start, Integer length, shared String str) satisfies AliasedAsTextEdit {
     shared actual Integer end => start + length;
     shared actual CharSequence text => javaString(str);
     shared actual CharArray chars => javaString(str).toCharArray();
@@ -120,8 +120,11 @@ shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertE
     shared actual void addEditToChange(TextChange change, TextEdit edit)
             => change.addEdit(edit);
 
-    shared actual String getInsertedText(InsertEdit edit)
-            => edit.str;
+    shared actual String getInsertedText(TextEdit edit)
+            => switch(edit)
+               case(is InsertEdit) edit.str
+               case(is ReplaceEdit) edit.str
+               else "";
     
     shared actual Boolean hasChildren(TextChange change)
             => change.hasChildren;

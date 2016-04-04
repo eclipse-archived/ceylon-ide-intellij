@@ -1,16 +1,21 @@
-import com.redhat.ceylon.ide.common.util {
-    unsafeCast
+import com.redhat.ceylon.ide.common.correct {
+    ImportProposals
 }
 import com.redhat.ceylon.ide.common.platform {
     ModelServices,
     PlatformServices,
     VfsServices
 }
-import com.redhat.ceylon.ide.common.correct {
-    ImportProposals
+import com.redhat.ceylon.ide.common.util {
+    unsafeCast,
+    Indents
 }
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     ideaImportProposals
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIndents
 }
 
 shared object ideaPlatformServices satisfies PlatformServices {
@@ -27,5 +32,7 @@ shared object ideaPlatformServices satisfies PlatformServices {
 
     shared actual VfsServices<NativeProject,NativeResource,NativeFolder,NativeFile> vfs<NativeProject, NativeResource, NativeFolder, NativeFile>()
             => unsafeCast<VfsServices<NativeProject,NativeResource,NativeFolder,NativeFile>>(ideaVfsServices);
-    
+
+    shared actual Indents<IDocument> indents<IDocument>()
+            => unsafeCast<Indents<IDocument>>(ideaIndents);
 }
