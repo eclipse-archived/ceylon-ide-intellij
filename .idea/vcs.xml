@@ -7,6 +7,10 @@
           <option name="issueRegexp" value="#(\d+)" />
           <option name="linkRegexp" value="https://github.com/ceylon/ceylon-ide-intellij/issues/$1" />
         </IssueNavigationLink>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="([\w-]+/[\w-]+)#(\d+)" />
+          <option name="linkRegexp" value="https://github.com/$1/issues/$2" />
+        </IssueNavigationLink>
       </list>
     </option>
   </component>
