@@ -201,9 +201,7 @@ class IdeaChangeParameterRefactoring(CeylonFile file, Editor editor, IdeaCeylonP
     addChangeToChange(TextChange change, TextChange tc) => change.addAll(tc);
 
 
-    editorData = object satisfies ChangeParametersData {
-        shared actual Declaration declaration => outer.declaration;
-
+    editorData = object satisfies EditorData {
         shared actual Node node => outer.node;
 
         shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
@@ -375,6 +373,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
                 myTypeEditor.addDocumentListener(mySignatureUpdater);
                 myTypeEditor.setPreferredWidth(table.width / 2);
                 myTypeEditor.addDocumentListener(RowEditorChangeListener(0));
+                myTypeEditor.setEnabled(item.parameter.param.position == -1);
                 add(createLabeledPanel("Type:", myTypeEditor), javaString(BorderLayout.\iWEST));
 
                 myNameEditor = EditorTextField(item.parameter.name, project, fileType);
