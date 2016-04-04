@@ -29,7 +29,8 @@ import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
 import com.redhat.ceylon.ide.common.correct {
-    DocumentChanges
+    DocumentChanges,
+    CommonDocument
 }
 
 import java.lang {
@@ -144,4 +145,8 @@ shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertE
                     doc.getLineStartOffset(line),
                     doc.getLineEndOffset(line)
                ));
+}
+
+shared class DocumentWrapper(Document doc) satisfies CommonDocument {
+    getLineOfOffset(Integer offset) => doc.getLineNumber(offset);
 }
