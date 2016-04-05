@@ -19,6 +19,10 @@ import com.intellij.openapi.editor {
     Document,
     Editor
 }
+import com.intellij.openapi.editor.event {
+    DocumentListener,
+    DocumentEvent
+}
 import com.intellij.openapi.\imodule {
     ModuleUtil
 }
@@ -97,8 +101,11 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.awt {
-    BorderLayout,
     GridLayout
+}
+import java.awt.event {
+    ActionListener,
+    ActionEvent
 }
 import java.lang {
     ObjectArray,
@@ -134,14 +141,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
-}
-import java.awt.event {
-    ActionListener,
-    ActionEvent
-}
-import com.intellij.openapi.editor.event {
-    DocumentListener,
-    DocumentEvent
 }
 
 shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
