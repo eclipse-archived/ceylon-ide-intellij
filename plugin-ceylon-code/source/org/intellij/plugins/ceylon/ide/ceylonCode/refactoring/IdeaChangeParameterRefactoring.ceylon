@@ -26,7 +26,8 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.openapi.ui {
-    DialogWrapper
+    DialogWrapper,
+    ValidationInfo
 }
 import com.intellij.psi {
     PsiElement,
@@ -70,7 +71,8 @@ import com.intellij.util.ui.table {
     JBTableRow
 }
 import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
+    PhasedUnit,
+    TypecheckerUnit
 }
 import com.redhat.ceylon.compiler.typechecker.io {
     VirtualFile
@@ -81,7 +83,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.refactoring {
     ChangeParametersRefactoring,
-    getDeclarationForChangeParameters
+    getDeclarationForChangeParameters,
+    parseTypeExpression
 }
 import com.redhat.ceylon.ide.common.typechecker {
     AnyProjectPhasedUnit
@@ -94,10 +97,12 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.awt {
-    BorderLayout
+    BorderLayout,
+    GridLayout
 }
 import java.lang {
-    ObjectArray
+    ObjectArray,
+    JString=String
 }
 import java.util {
     List,
@@ -107,7 +112,8 @@ import java.util {
 
 import javax.swing {
     JComponent,
-    JTable
+    JTable,
+    JCheckBox
 }
 
 import org.antlr.runtime {
@@ -128,6 +134,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
+}
+import java.awt.event {
+    ActionListener,
+    ActionEvent
+}
+import com.intellij.openapi.editor.event {
+    DocumentListener,
+    DocumentEvent
 }
 
 shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
@@ -241,6 +255,8 @@ class MyParameterInfo(shared IdeaChangeParameterRefactoring.Param param) satisfi
     typeText => param.model.type.asString();
 
     shared actual variable Boolean useAnySingleVariable = false;
+
+    shared variable String? typeError = null;
 }
 
 class MyMethodDescriptor(params, project) satisfies MethodDescriptor<MyParameterInfo, Object> {
@@ -307,6 +323,34 @@ class MyParameterTableModel(IdeaChangeParameterRefactoring.ParameterList params,
             params.moveUp(oldIndex);
         }
     }
+
+    shared actual void setValueAtWithoutUpdate(Object? aValue, Integer rowIndex, Integer columnIndex) {
+        super.setValueAtWithoutUpdate(aValue, rowIndex, columnIndex);
+
+        if (columnIndex == 0,
+            is JString aValue,
+            is TypecheckerUnit u = params.declaration.unit) {
+
+            assert(exists param = params.parameters.get(rowIndex));
+            value item = getItem(rowIndex);
+
+            // TODO parse additional imports taken from item.typeCodeFragment
+            switch (result = parseTypeExpression(aValue.string, u, params.declaration.scope))
+            case (is String) {
+                item.parameter.typeError = result;
+            }
+            else {
+                item.parameter.typeError = null;
+                param.model.model.type = result;
+            }
+        }
+    }
+//
+//    String buildCodeFragment(String type, MyParameterTableModelItem item) {
+//        if (is PsiTypeCodeFragmentImpl frag = item.typeCodeFragment) {
+//            frag.importsToString()
+//        }
+//    }
 }
 
 class MyParameterTableModelItem(MyParameterInfo param, Project project)
@@ -339,13 +383,25 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
 
     fileType => CeylonFileType.\iINSTANCE;
 
+    shared actual ValidationInfo? doValidate() {
+        for (item in myParametersTableModel.items) {
+            if (exists error = item.parameter.typeError) {
+                return ValidationInfo(error);
+            }
+        }
+        return super.doValidate();
+    }
+
+    postponeValidation() => false;
+
     shared actual String? validateAndCommitData() => null;
 
     listTableViewSupported => true;
 
     shared actual JComponent getRowPresentation(ParameterTableModelItemBase<MyParameterInfo> item, Boolean selected, Boolean focused) {
         value param = item.parameter.param;
-        value text = param.model.type.asString() + " " + param.name;
+        value text = param.model.type.asString() + " " + param.name
+            + (if (exists a = param.defaultArgs) then " = " + a else "");
 
         return JBListTable.createEditorTextFieldPresentation(project, CeylonFileType.\iINSTANCE,
             text, selected, focused);
@@ -355,11 +411,15 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
         => object extends JBTableRowEditor() {
             late variable EditorTextField myTypeEditor;
             late variable EditorTextField myNameEditor;
+            late variable JCheckBox myDefaultedCb;
+            late variable EditorTextField myDefaultArgEditor;
 
             shared actual ObjectArray<JComponent> focusableComponents
                     => createJavaObjectArray<JComponent>({
                         myTypeEditor.focusTarget,
-                        myNameEditor.focusTarget
+                        myNameEditor.focusTarget,
+                        myDefaultedCb,
+                        myDefaultArgEditor.focusTarget
                     });
 
             shared actual JComponent preferredFocusedComponent {
@@ -367,19 +427,44 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
             }
 
             shared actual void prepareEditor(JTable tbl, Integer row) {
-                this.layout = BorderLayout();
+                this.layout = GridLayout(2, 2);
                 value doc = PsiDocumentManager.getInstance(project).getDocument(item.typeCodeFragment);
                 myTypeEditor = EditorTextField(doc, project, fileType);
                 myTypeEditor.addDocumentListener(mySignatureUpdater);
                 myTypeEditor.setPreferredWidth(table.width / 2);
                 myTypeEditor.addDocumentListener(RowEditorChangeListener(0));
                 myTypeEditor.setEnabled(item.parameter.param.position == -1);
-                add(createLabeledPanel("Type:", myTypeEditor), javaString(BorderLayout.\iWEST));
+                add(createLabeledPanel("Type:", myTypeEditor));
 
                 myNameEditor = EditorTextField(item.parameter.name, project, fileType);
                 myTypeEditor.addDocumentListener(mySignatureUpdater);
                 myNameEditor.addDocumentListener(RowEditorChangeListener(1));
-                add(createLabeledPanel("Name:", myNameEditor), javaString(BorderLayout.\iCENTER));
+                add(createLabeledPanel("Name:", myNameEditor));
+
+                myDefaultedCb = JCheckBox("Use default arg", item.parameter.param.defaulted);
+                myDefaultedCb.addActionListener(object satisfies ActionListener {
+                    shared actual void actionPerformed(ActionEvent e) {
+                        item.parameter.param.defaulted = myDefaultedCb.selected;
+                        updateSignature();
+                    }
+                });
+                add(createLabeledPanel("Defaulted:", myDefaultedCb));
+
+                myDefaultArgEditor = EditorTextField(item.parameter.param.defaultArgs else "", project, fileType);
+                myDefaultArgEditor.addDocumentListener(mySignatureUpdater);
+                myDefaultArgEditor.addDocumentListener(object satisfies DocumentListener {
+                    shared actual void beforeDocumentChange(DocumentEvent? event) {}
+
+                    shared actual void documentChanged(DocumentEvent? event) {
+                        item.parameter.param.defaultArgs =
+                            if (myDefaultArgEditor.text.empty)
+                            then null
+                            else myDefaultArgEditor.text;
+                        updateSignature();
+                    }
+
+                });
+                add(createLabeledPanel("Default arg:", myDefaultArgEditor));
             }
 
             shared actual JBTableRow \ivalue {
