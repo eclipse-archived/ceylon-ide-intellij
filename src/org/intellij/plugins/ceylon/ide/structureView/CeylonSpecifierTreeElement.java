@@ -39,7 +39,8 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
 
     @Override
     public Icon getIcon(boolean open) {
-        return ideaIcons_.get_().forDeclaration(getElement().getCeylonNode().getDeclaration());
+        TypedDeclaration decl = getElement().getCeylonNode().getDeclaration();
+        return decl == null ? null : ideaIcons_.get_().forDeclaration(decl);
     }
 
     @Nullable
@@ -47,6 +48,9 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
     public String getPresentableText() {
         Tree.SpecifierStatement node = getElement().getCeylonNode();
         TypedDeclaration declaration = node.getDeclaration();
+        if (declaration == null) {
+            return "<unknown> (" + getElement().getText() + ")";
+        }
         StringBuilder builder = new StringBuilder(declaration.getName());
 
         if (declaration instanceof Functional) {
