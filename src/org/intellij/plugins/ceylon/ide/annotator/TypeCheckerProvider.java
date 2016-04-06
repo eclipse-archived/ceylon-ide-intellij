@@ -123,13 +123,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     ceylonProject.parseCeylonModel(mon);
                     typeChecker = ceylonProject.getTypechecker();
 
-                    ApplicationManager.getApplication().runReadAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            mon.subTask("Typechecking sources files...");
-                            fullTypeCheck();
-                        }
-                    });
+                    mon.subTask("Typechecking sources files...");
+                    fullTypeCheck();
 
                     isReady = true;
 

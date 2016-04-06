@@ -83,14 +83,18 @@ shared class PSIClass(shared PsiClass psi)
     defaultAccess => let (private = psi.hasModifierProperty(PsiModifier.\iPRIVATE)) 
                      !(public || protected || private);
     
-    directFields => mirror<FieldMirror,PsiField>(
-        psi.fields.iterable.coalesced.filter(
-            (f) => !f.hasModifierProperty(PsiModifier.\iPRIVATE) // TODO !f.synthetic?
-        ),
-        PSIField
+    directFields => doWithLock(() =>
+        mirror<FieldMirror,PsiField>(
+            psi.fields.iterable.coalesced.filter(
+                (f) => !f.hasModifierProperty(PsiModifier.\iPRIVATE) // TODO !f.synthetic?
+            ),
+            PSIField
+        )
     );
     
-    directInnerClasses => mirror<ClassMirror,PsiClass>(psi.innerClasses, PSIClass);
+    directInnerClasses => doWithLock(() =>
+        mirror<ClassMirror,PsiClass>(psi.innerClasses, PSIClass)
+    );
     
     directMethods => doWithLock(() {
             value result = ArrayList<MethodMirror>();
@@ -128,18 +132,20 @@ shared class PSIClass(shared PsiClass psi)
     
     final => psi.hasModifierProperty(PsiModifier.\iFINAL);
     
-    flatName => psi.qualifiedName else "";
+    flatName => doWithLock(() => psi.qualifiedName else "");
    
     getCacheKey(Module mod) 
             => cacheKey else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
     
     innerClass => psi.containingClass exists || hasAnnotation(Annotations.container);
-    
+
     \iinterface => psi.\iinterface;
     
-    interfaces => if (psi.\iinterface)
-                  then mirror<TypeMirror,PsiClassType>(psi.extendsListTypes, PSIType)
-                  else mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType);
+    interfaces => doWithLock(() =>
+        if (psi.\iinterface)
+        then mirror<TypeMirror,PsiClassType>(psi.extendsListTypes, PSIType)
+        else mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType)
+    );
     
     javaSource => psi.containingFile?.name?.endsWith(".java") else false;
     
@@ -156,7 +162,7 @@ shared class PSIClass(shared PsiClass psi)
     qualifiedName => 
             if (is PsiTypeParameter psi)
             then \ipackage.qualifiedName + "." + name
-            else (psi.qualifiedName else "");
+            else (doWithLock(() => psi.qualifiedName else ""));
     
     static => psi.hasModifierProperty(PsiModifier.\iSTATIC);
     
@@ -173,7 +179,9 @@ shared class PSIClass(shared PsiClass psi)
         });
     }
     
-    typeParameters => mirror<TypeParameterMirror,PsiTypeParameter>(psi.typeParameters, PSITypeParameter);
+    typeParameters => doWithLock(() =>
+        mirror<TypeParameterMirror,PsiTypeParameter>(psi.typeParameters, PSITypeParameter)
+    );
     
     fileName => psi.containingFile?.name else "<unknown>";
     

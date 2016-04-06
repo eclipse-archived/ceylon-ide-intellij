@@ -78,10 +78,8 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             value p = cp.ideArtifact;
             value name = packageName + "." + className;
             value scope = p.getModuleScope(true);
-            PsiClass? cls = JavaPsiFacade.getInstance(p.project)
-                    .findClass(name, scope);
-            
-            return cls exists;
+            value facade = JavaPsiFacade.getInstance(p.project);
+            return doWithLock(() => facade.findClass(name, scope) exists);
         }
         
         return false;

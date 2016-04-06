@@ -155,7 +155,6 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
                     return cls.qualifiedName;
                 }
                 if (exists cls = pkg.findClassByShortName(sb.string.replaceLast(".", "$"), psi.resolveScope).array.first) {
-                    ideaPlatformUtils.log(Status._ERROR, cls.qualifiedName);
                     return cls.qualifiedName;
                 }
                 return null;
@@ -170,7 +169,7 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
     }
 
     shared actual String qualifiedName
-            => cachedQualifiedName else (cachedQualifiedName = computedQualifiedName);
+            => cachedQualifiedName else (cachedQualifiedName = doWithLock(() => computedQualifiedName));
     
     // TODO
     shared actual TypeMirror? qualifyingType => null; //enclosing;
@@ -181,7 +180,7 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
     
     ObjectArray<PsiType>? getTypeArguments(PsiType type) {
         return switch(type)
-        case (is PsiClassType) type.parameters
+        case (is PsiClassType) doWithLock(() => type.parameters)
         else null;
     }
 

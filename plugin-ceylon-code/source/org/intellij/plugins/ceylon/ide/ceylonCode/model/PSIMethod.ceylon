@@ -27,7 +27,7 @@ shared class PSIMethod(shared PsiMethod psi)
         satisfies MethodMirror {
     
     Boolean classIs(String cls) {
-        return psi.containingClass.qualifiedName == cls;
+        return doWithLock(() => psi.containingClass.qualifiedName == cls);
     }
     
     variable Boolean? lazyIsOverriding = null;
@@ -66,7 +66,7 @@ shared class PSIMethod(shared PsiMethod psi)
     
     abstract =>
         psi.hasModifierProperty(\iABSTRACT)
-        || psi.containingClass.\iinterface;
+        || doWithLock(() => psi.containingClass.\iinterface);
     
     constructor => psi.constructor;
     
@@ -78,18 +78,20 @@ shared class PSIMethod(shared PsiMethod psi)
     
     defaultAccess => !(public || protected || psi.hasModifierProperty(\iPRIVATE));
     
-    enclosingClass => PSIClass(psi.containingClass);
+    enclosingClass => PSIClass(doWithLock(() => psi.containingClass));
     
     final => psi.hasModifierProperty(\iFINAL);
     
-    parameters => mirror<VariableMirror,PsiParameter>(psi.parameterList.parameters, PSIVariable);
+    parameters => doWithLock(() =>
+        mirror<VariableMirror,PsiParameter>(psi.parameterList.parameters, PSIVariable)
+    );
     
     protected => psi.hasModifierProperty(\iPROTECTED);
     
     public => psi.hasModifierProperty(\iPUBLIC);
     
     shared actual TypeMirror? returnType
-            => if (exists t = psi.returnType) then PSIType(t) else null;
+            => doWithLock(() => if (exists t = psi.returnType) then PSIType(t) else null);
     
     static => psi.hasModifierProperty(\iSTATIC);
     
