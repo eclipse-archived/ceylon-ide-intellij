@@ -2,16 +2,14 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.resolve;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiNameIdentifierOwner;
-import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.*;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
+import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import com.redhat.ceylon.model.typechecker.model.Unit;
+import com.redhat.ceylon.model.typechecker.model.Value;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -29,7 +27,14 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
     @Override
     public PsiElement resolve() {
         if (myElement.getParent() instanceof CeylonPsi.DeclarationPsi) {
-            return null;
+            Tree.Declaration node = ((CeylonPsi.DeclarationPsi) myElement.getParent()).getCeylonNode();
+
+            if (node.getDeclarationModel() instanceof TypedDeclaration
+                    && ((TypedDeclaration) node.getDeclarationModel()).getOriginalDeclaration() != null) {
+                // we need to resolve the original declaration
+            } else {
+                return null;
+            }
         }
 
         if (((CeylonFile) myElement.getContainingFile()).ensureTypechecked() == null) {
@@ -57,9 +62,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             return resolveDeclaration(declaration, myElement.getProject());
         }
 
-        FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
-        compilationUnit.visit(visitor);
-        Tree.StatementOrArgument declarationNode = visitor.getDeclarationNode();
+        Node declarationNode = nodes_.get_().getReferencedNode(declaration);
 
         if (declarationNode != null) {
             return CeylonTreeUtil.findPsiElement(declarationNode, containingFile);
@@ -76,5 +79,24 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
     @Override
     public Object[] getVariants() {
         return PsiElement.EMPTY_ARRAY;
+    }
+
+    // Make constructor references equivalent to their containing class
+    @Override
+    public boolean isReferenceTo(PsiElement element) {
+        PsiElement resolved = resolve();
+        if (getElement().getManager().areElementsEquivalent(resolved, element)) {
+            return true;
+        }
+        if (resolved instanceof PsiMethod && ((PsiMethod) resolved).isConstructor()) {
+            PsiClass parent = ((PsiMethod) resolved).getContainingClass();
+            return getElement().getManager().areElementsEquivalent(parent, element);
+        }
+        if (element instanceof PsiMethod && ((PsiMethod) element).isConstructor()) {
+            PsiClass parent = ((PsiMethod) element).getContainingClass();
+            return getElement().getManager().areElementsEquivalent(resolved, parent);
+        }
+
+        return false;
     }
 }

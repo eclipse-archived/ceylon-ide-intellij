@@ -4,7 +4,6 @@ import com.intellij.diagnostic.PluginException;
 import com.intellij.ide.ApplicationLoadListener;
 import com.intellij.ide.plugins.cl.PluginClassLoader;
 import com.intellij.openapi.application.Application;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.util.PathUtil;
 import org.intellij.plugins.ceylon.runtime.CeylonRuntime;
@@ -49,7 +48,6 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup implements Appli
         String[] suffixes = {".car", ".jar"};
         visitDirectory(getEmbeddedCeylonRepository(), archives, suffixes);
 
-        Logger.getInstance(IdePluginCeylonStartup.class).warn(archives.toString());
         return archives.toArray(new File[archives.size()]);
     }
 
@@ -67,7 +65,10 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup implements Appli
                                 exists = true;
                             }
                         }
-                        if (!exists) {
+                        // We reload module-resolver because JS and Aether resolvers are in
+                        // the child classpath, so we want them to be visible from
+                        // com.redhat.ceylon.cmr.impl.Configuration.class.getClassLoader()
+                        if (!exists || child.getName().startsWith("com.redhat.ceylon.module-resolver")) {
                             output.add(child);
                         }
                     }
@@ -80,10 +81,21 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup implements Appli
 
     @NotNull
     public static File getEmbeddedCeylonRepository() {
+        File repoDir = new File(getEmbeddedCeylonDist(), "repo");
+
+        if (repoDir.isDirectory()) {
+            return repoDir;
+        }
+
+        throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
+    }
+
+    @NotNull
+    public static File getEmbeddedCeylonDist() {
         File pluginClassesDir = new File(PathUtil.getJarPathForClass(IdePluginCeylonStartup.class));
 
         if (pluginClassesDir.isDirectory()) {
-            File ceylonRepoDir = new File(pluginClassesDir, "repo");
+            File ceylonRepoDir = new File(pluginClassesDir, "embeddedDist");
             if (ceylonRepoDir.exists()) {
                 return ceylonRepoDir;
             }

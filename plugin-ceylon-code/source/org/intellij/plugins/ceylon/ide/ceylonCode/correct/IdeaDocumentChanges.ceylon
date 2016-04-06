@@ -1,35 +1,45 @@
-import com.redhat.ceylon.ide.common.correct {
-    DocumentChanges
-}
-import com.intellij.openapi.editor {
-    Document,
-    AliasedAsTextEdit=TextChange
-}
-import java.lang {
-    CharSequence,
-    CharArray,
-    JString = String
+import ceylon.collection {
+    ArrayList
 }
 import ceylon.interop.java {
     javaString
 }
-import com.intellij.openapi.editor.impl {
-    BulkChangesMerger
+
+import com.intellij.openapi.editor {
+    Document,
+    AliasedAsTextEdit=TextChange
 }
-import java.util {
-    JList = List,
-    ArrayList,
-    Comparator,
-    Collections
+import com.intellij.openapi.fileEditor {
+    FileDocumentManager
 }
 import com.intellij.openapi.project {
     Project
 }
+import com.intellij.openapi.util {
+    TextRange
+}
+import com.intellij.openapi.vfs {
+    VirtualFile,
+    VirtualFileManager
+}
 import com.intellij.psi {
     PsiDocumentManager
 }
-import com.intellij.openapi.util {
-    TextRange
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
+import com.redhat.ceylon.ide.common.correct {
+    DocumentChanges,
+    CommonDocument
+}
+
+import java.lang {
+    CharSequence,
+    CharArray
+}
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
 }
 
 shared alias TextEdit => AliasedAsTextEdit;
@@ -47,33 +57,42 @@ shared class DeleteEdit(shared actual Integer start, Integer length) satisfies A
     shared actual CharArray chars => javaString("").toCharArray();
 }
 
-shared class ReplaceEdit(shared actual Integer start, Integer length, String str) satisfies AliasedAsTextEdit {
+shared class ReplaceEdit(shared actual Integer start, Integer length, shared String str) satisfies AliasedAsTextEdit {
     shared actual Integer end => start + length;
     shared actual CharSequence text => javaString(str);
     shared actual CharArray chars => javaString(str).toCharArray();
 }
 
-shared class TextChange(shared Document document) {
-    variable JList<TextEdit> changes = ArrayList<TextEdit>();
+shared class TextChange(Document|PhasedUnit|CeylonFile input) {
+    value changes = ArrayList<TextEdit>();
+
+    shared Document document;
+    if (is Document input) {
+        document = input;
+    } else {
+        VirtualFile? vfile = if (is PhasedUnit input)
+                             then VirtualFileManager.instance.findFileByUrl("file://" + input.unit.fullPath)
+                             else input.virtualFile;
+
+        assert (exists vfile);
+
+        document = FileDocumentManager.instance.getDocument(vfile);
+    }
 
     shared void addEdit(TextEdit edit) {
         changes.add(edit);
     }
+    
+    shared void addAll(TextChange change) {
+        changes.addAll(change.changes);
+    }
 
     shared void apply(Project? project = null) {
-        Collections.sort(changes, object satisfies Comparator<TextEdit> {
-            shared actual Integer compare(TextEdit? a, TextEdit? b) {
-                if (exists a, exists b) {
-                    return a.start - b.start;
-                }
-                return 0;
-            }
-            
-            shared actual Boolean equals(Object that) => false;
-        });
-        value chars = javaString(document.text).toCharArray();
-        value newText = BulkChangesMerger.\iINSTANCE.mergeToCharArray(chars, document.textLength, changes);
-        document.setText(JString(newText));
+        value markers = changes.collect((c) => document.createRangeMarker(c.start, c.end));
+        
+        for (change -> marker in zipEntries(changes, markers)) {
+            document.replaceString(marker.startOffset, marker.endOffset, change.text);
+        }
 
         if (exists project) {
             PsiDocumentManager.getInstance(project).commitAllDocuments();
@@ -102,8 +121,11 @@ shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertE
     shared actual void addEditToChange(TextChange change, TextEdit edit)
             => change.addEdit(edit);
 
-    shared actual String getInsertedText(InsertEdit edit)
-            => edit.str;
+    shared actual String getInsertedText(TextEdit edit)
+            => switch(edit)
+               case(is InsertEdit) edit.str
+               case(is ReplaceEdit) edit.str
+               else "";
     
     shared actual Boolean hasChildren(TextChange change)
             => change.hasChildren;
@@ -123,4 +145,8 @@ shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertE
                     doc.getLineStartOffset(line),
                     doc.getLineEndOffset(line)
                ));
+}
+
+shared class DocumentWrapper(Document doc) satisfies CommonDocument {
+    getLineOfOffset(Integer offset) => doc.getLineNumber(offset);
 }

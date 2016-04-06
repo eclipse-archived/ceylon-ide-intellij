@@ -13,7 +13,7 @@ class PSIField(PsiField psi)
         extends PSIAnnotatedMirror(psi)
         satisfies FieldMirror {
     
-    shared actual TypeMirror type = PSIType(psi.type);
+    shared actual TypeMirror type = PSIType(doWithLock(() => psi.type));
     
     shared actual Boolean defaultAccess =>
             let (private = psi.hasModifierProperty(\iPRIVATE))

@@ -11,7 +11,7 @@ import com.redhat.ceylon.ide.common.model {
 import com.redhat.ceylon.compiler.typechecker.context {
     Context
 }
-import com.redhat.ceylon.ide.common.util {
+import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }

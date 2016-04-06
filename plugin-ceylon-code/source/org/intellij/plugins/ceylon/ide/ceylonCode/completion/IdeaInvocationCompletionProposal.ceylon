@@ -64,8 +64,8 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     String? greyText = " (``declaration.container.qualifiedNameString``)";
     
     String? returnType {
-        if (is TypedDeclaration declaration) {
-            return declaration.type.asString();
+        if (is TypedDeclaration declaration, exists type = declaration.type) {
+            return type.asString();
         }
         
         return null;

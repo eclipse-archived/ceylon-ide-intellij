@@ -37,7 +37,8 @@ import com.redhat.ceylon.ide.common.settings {
     CompletionOptions
 }
 import com.redhat.ceylon.ide.common.typechecker {
-    LocalAnalysisResult
+    LocalAnalysisResult,
+    IdePhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
     FindReferencedNodeVisitor
@@ -89,17 +90,19 @@ String psiProtocol = "psi_element://";
 
 String(String, Project) outerHighlight = highlight;
 
-shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> {
+shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator<Document> {
 
     shared class DocParams(PhasedUnit pu, Project p) satisfies LocalAnalysisResult<Document> {
+        assert(is IdePhasedUnit pu);
+
         shared actual Tree.CompilationUnit lastCompilationUnit => pu.compilationUnit;
         shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
         shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
         shared actual PhasedUnit lastPhasedUnit => pu;
         shared actual Document document => nothing;
         shared actual JList<CommonToken>? tokens => pu.tokens;
-        shared actual TypeChecker typeChecker => tc else nothing;
-        shared actual BaseCeylonProject? ceylonProject => nothing;
+        shared actual TypeChecker typeChecker => tc;
+        shared actual BaseCeylonProject? ceylonProject => pu.moduleSourceMapper.ceylonProject;
         shared Project ideaProject => p;
         shared actual CompletionOptions options => nothing;
     }
@@ -252,15 +255,15 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
             return "&lt;unknown&gt;";
         }
         
-        shared actual String amp() => "&amp;";
-        shared actual String lt() => "&lt;";
-        shared actual String gt() => "&gt";
+        amp() => "&amp;";
+        lt() => "&lt;";
+        gt() => "&gt";
     }
 
     shared actual TypePrinter printer = MyPrinter(true);
-    shared actual TypePrinter verbosePrinter => MyPrinter(false);
+    shared actual TypePrinter verbosePrinter = MyPrinter(false);
 
-    shared actual Boolean showMembers => false;
+    showMembers => false;
     
     shared actual void appendPageProlog(StringBuilder builder) {
         value css = `module`.resourceByPath("ceylondoc.css");
@@ -272,14 +275,14 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
         builder.append("</body></html>");
     }
     
-    shared actual String getUnitName(Unit u) => u.filename;
+    getUnitName(Unit u) => u.filename;
     
-    shared actual String? getLiveValue(Declaration dec, Unit unit) => null;
+    getLiveValue(Declaration dec, Unit unit) => null;
     
     shared actual Node? getReferencedNode(Declaration dec) {
         value relPath = dec.unit.relativePath;
 
-        if (exists tc, exists unit = tc.getPhasedUnitFromRelativePath(relPath)) {
+        if (exists unit = tc.getPhasedUnitFromRelativePath(relPath)) {
             value visitor = FindReferencedNodeVisitor(dec);
             unit.compilationUnit.visit(visitor);
             return visitor.declarationNode;
@@ -288,16 +291,10 @@ shared class IdeaDocGenerator(TypeChecker? tc) satisfies DocGenerator<Document> 
         return null;
     }
     
-    shared actual PhasedUnit? getPhasedUnit(Unit u) {
-        if (exists tc) { 
-            return tc.getPhasedUnitFromRelativePath(u.relativePath);
-        }
-        
-        return null;
-    }
+    getPhasedUnit(Unit u) => tc.getPhasedUnitFromRelativePath(u.relativePath);
     
     shared actual AbstractModuleImportUtil<out Anything,out Anything,out Anything,out Anything,out Anything,out Anything> moduleImportUtil
             => ideaModuleImportUtils;
     
-    shared actual Boolean supportsQuickAssists => true;
+    supportsQuickAssists => true;
 }

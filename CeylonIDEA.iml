@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PLUGIN_MODULE" version="4">
   <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" manifest="file://$MODULE_DIR$/META-INF/plugin.xml" />
-  <component name="FacetManager">
-    <facet type="ceylon" name="Ceylon">
-      <configuration>
-        <option name="compileForJvm" value="false" />
-        <option name="compileToJs" value="false" />
-        <option name="systemRepository" value="" />
-        Do not edit, modify .config/ide-config instead
-      </configuration>
-    </facet>
-  </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -18,13 +8,10 @@
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/testdata" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/source" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/gen" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/plugin-ceylon-code/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/ant-build" />
     </content>
-    <content url="file://$CEYLON_DIST_REPO$">
-      <sourceFolder url="file://$CEYLON_DIST_REPO$" isTestSource="false" packagePrefix="repo" />
+    <content url="file://$CEYLON_DIST$">
+      <sourceFolder url="file://$CEYLON_DIST$" isTestSource="false" packagePrefix="embeddedDist" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -102,17 +89,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Ceylon Stuff">
-        <CLASSES>
-          <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonRuntime/lib/ceylon.language-1.2.2.car!/" />
-          <root url="jar://$USER_HOME$/.ceylon/cache/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar!/" />
-          <root url="jar://$APPLICATION_PLUGINS_DIR$/CeylonIDEA/classes/repo/com/github/rjeschke/txtmark/0.13/com.github.rjeschke.txtmark-0.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

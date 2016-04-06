@@ -10,26 +10,18 @@
 <project name="Generate Grammar-related Sources" default="generateSources" basedir=".">
     <property name="base.path" location="../../ceylon/lib"/>
 
-    <property file="../../ceylon/common-build.properties"/>
-    <property file="../../ceylon/lib/build.properties"/>
-
     <!-- Set build directories for all formats. -->
     <property name="build.dir" value="${basedir}/build"/>
     <property name="build.dist" value="../../ceylon/dist/dist"/>
-    <property name="build.dist.repo" value="${build.dist}/repo"/>
+    <property name="ceylon.repo.dir" value="${build.dist}/repo"/>
     <property name="build.classes" location="${build.dir}/classes"/>
+
+    <property file="../../ceylon/common-build.properties"/>
+    <property file="../../ceylon/lib/build.properties"/>
 
     <property name="src" location="src"/>
     <property name="gensrc" location="gensrc"/>
     <property name="gen" location="gen"/>
-
-    <!-- Local repository -->
-    <property name="ceylon.typechecker.dir" value="com/redhat/ceylon/typechecker/${module.com.redhat.ceylon.typechecker.version}"/>
-    <property name="ceylon.typechecker.jar" value="${ceylon.typechecker.dir}/com.redhat.ceylon.typechecker-${module.com.redhat.ceylon.typechecker.version}.jar"/>
-    <property name="ceylon.typechecker.lib" value="${build.dist.repo}/${ceylon.typechecker.jar}"/>
-    <property name="ceylon.model.dir" value="com/redhat/ceylon/model/${module.com.redhat.ceylon.model.version}"/>
-    <property name="ceylon.model.jar" value="${ceylon.model.dir}/com.redhat.ceylon.model-${module.com.redhat.ceylon.model.version}.jar"/>
-    <property name="ceylon.model.lib" value="${build.dist.repo}/${ceylon.model.jar}"/>
 
     <!-- ANTLR -->
     <property name="antlr.src" location="Ceylon.g"/>

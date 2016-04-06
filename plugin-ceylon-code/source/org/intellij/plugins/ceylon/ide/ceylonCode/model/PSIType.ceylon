@@ -16,7 +16,8 @@ import com.intellij.psi.impl.source {
 import com.redhat.ceylon.model.loader.mirror {
     TypeMirror,
     TypeParameterMirror,
-    ClassMirror
+    ClassMirror,
+    TypeKind
 }
 
 import java.lang {
@@ -28,9 +29,14 @@ import java.util {
     IdentityHashMap,
     Map
 }
-
-import javax.lang.model.type {
-    TypeKind
+import com.redhat.ceylon.ide.common.model {
+    unknownClassMirror
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    ideaPlatformUtils
+}
+import com.redhat.ceylon.ide.common.platform {
+    Status
 }
 
 class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
@@ -50,7 +56,7 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
             => if (is PsiClassType psi,
                    exists cls = doWithLock(() => psi.resolve() else null))
                then PSIClass(cls)
-               else null;
+               else unknownClassMirror;
 
     TypeKind primitiveKind(PsiPrimitiveType psi) {
         return if (psi == PsiType.\iBOOLEAN) then TypeKind.\iBOOLEAN
@@ -148,6 +154,9 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
                     exists cls = pkg.findClassByShortName(sb.string.replace(".impl", "$impl"), psi.resolveScope).array.first) {
                     return cls.qualifiedName;
                 }
+                if (exists cls = pkg.findClassByShortName(sb.string.replaceLast(".", "$"), psi.resolveScope).array.first) {
+                    return cls.qualifiedName;
+                }
                 return null;
             });
             
@@ -160,7 +169,7 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
     }
 
     shared actual String qualifiedName
-            => cachedQualifiedName else (cachedQualifiedName = computedQualifiedName);
+            => cachedQualifiedName else (cachedQualifiedName = doWithLock(() => computedQualifiedName));
     
     // TODO
     shared actual TypeMirror? qualifyingType => null; //enclosing;
@@ -171,7 +180,7 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
     
     ObjectArray<PsiType>? getTypeArguments(PsiType type) {
         return switch(type)
-        case (is PsiClassType) type.parameters
+        case (is PsiClassType) doWithLock(() => type.parameters)
         else null;
     }
 

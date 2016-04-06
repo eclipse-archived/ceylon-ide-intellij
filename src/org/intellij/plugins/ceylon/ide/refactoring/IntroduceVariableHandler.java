@@ -9,6 +9,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pass;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -16,7 +17,6 @@ import com.intellij.refactoring.IntroduceTargetChooser;
 import com.intellij.refactoring.RefactoringActionHandler;
 import com.intellij.util.Function;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.refactoring.FindContainingExpressionsVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
@@ -48,9 +48,9 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
 
         IdeaExtractValueRefactoring refacto = new IdeaExtractValueRefactoring(ceylonFile, editor.getDocument(), node);
 
-        String name = nodes_.get_().nameProposals(node)[0];
+        String name = nodes_.get_().nameProposals(node).getFirst().toString();
         refacto.setNewName(name);
-        final DefaultRegion newIdentifier = refacto.extractInFile(project, file);
+        final TextRange newIdentifier = refacto.extractInFile(project, file);
 
         if (newIdentifier != null) {
             new WriteCommandAction(project, file) {
@@ -61,7 +61,7 @@ public class IntroduceVariableHandler implements RefactoringActionHandler {
                     // Workaround: replace the whole document with the same content to force a reparse, then typecheck. Ugh.
                     ceylonFile.forceReparse();
 
-                    PsiElement identifierElement = file.findElementAt((int) newIdentifier.getStart());
+                    PsiElement identifierElement = file.findElementAt(newIdentifier.getStartOffset());
 
                     if (identifierElement == null) {
                         return;

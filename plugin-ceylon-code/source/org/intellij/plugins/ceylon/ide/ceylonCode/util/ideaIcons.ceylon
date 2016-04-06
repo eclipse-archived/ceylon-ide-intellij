@@ -48,8 +48,8 @@ shared object ideaIcons {
     shared Icon annotations => AllIcons.Gutter.\iExtAnnotation;
     shared Icon constructors => AllIcons.Nodes.\iClassInitializer;
     
-    shared Icon refinement => AllIcons.General.\iImplementingMethod;
-    shared Icon extendedType => AllIcons.General.\iOverridingMethod;
+    shared Icon refinement => AllIcons.Gutter.\iImplementingMethod;
+    shared Icon extendedType => AllIcons.Gutter.\iOverridingMethod;
     shared Icon satisfiedTypes => AllIcons.General.\iImplementingMethod;
     shared Icon types => IconLoader.getIcon("/icons/ceylonTypes.png");
     

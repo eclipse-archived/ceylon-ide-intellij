@@ -1,18 +1,32 @@
 package org.intellij.plugins.ceylon.ide.debugger;
 
+import ceylon.language.Entry;
+import ceylon.language.Integer;
 import com.intellij.debugger.NoDataException;
 import com.intellij.debugger.PositionManager;
 import com.intellij.debugger.SourcePosition;
 import com.intellij.debugger.engine.DebugProcess;
+import com.intellij.debugger.engine.requests.RequestManagerImpl;
 import com.intellij.debugger.requests.ClassPrepareRequestor;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
+import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
+import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
+import com.redhat.ceylon.model.typechecker.model.Interface;
+import com.redhat.ceylon.model.typechecker.model.Module;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.Location;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.request.ClassPrepareRequest;
+import com.sun.jdi.request.EventRequest;
+import com.sun.jdi.request.EventRequestManager;
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct.DocumentWrapper;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
@@ -22,12 +36,15 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.intellij.psi.util.PsiTreeUtil.getParentOfType;
+import static com.redhat.ceylon.ide.common.debug.getFirstValidLocation_.getFirstValidLocation;
+import static com.redhat.ceylon.ide.common.util.toJavaIterable_.toJavaIterable;
+import static org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil.getDeclaringFile;
 
-public class CeylonPositionManager implements PositionManager {
+class CeylonPositionManager implements PositionManager {
 
     private DebugProcess process;
 
-    public CeylonPositionManager(DebugProcess process) {
+    CeylonPositionManager(DebugProcess process) {
         this.process = process;
     }
 
@@ -38,34 +55,48 @@ public class CeylonPositionManager implements PositionManager {
             throw NoDataException.INSTANCE;
         }
 
-        PsiFile psiFile = getPsiFileByLocation(process.getProject(), location);
-        if (psiFile == null) throw NoDataException.INSTANCE;
+        IdeaCeylonProjects projects = process.getProject().getComponent(IdeaCeylonProjects.class);
 
+        if (projects != null) {
+            TypeDescriptor td = TypeDescriptor.klass(IdeaCeylonProject.class);
+            for (CeylonProject p : toJavaIterable(td, projects.getCeylonProjects())) {
+                try {
+                    PhasedUnit pu = p.getTypechecker().getPhasedUnitFromRelativePath(location.sourcePath());
+                    if (pu != null) {
+                        PsiFile file = getDeclaringFile(pu.getUnit(), process.getProject());
+
+                        if (file != null) {
+                            return toSourcePosition(location, file);
+                        }
+                    }
+
+                    for (Module mod : p.getModules().getTypecheckerModules().getListOfModules()) {
+                        if (mod instanceof IdeaModule) {
+                            ExternalPhasedUnit epu = ((IdeaModule) mod).getPhasedUnitFromRelativePath(location.sourcePath());
+                            if (epu != null) {
+                                PsiFile file = getDeclaringFile(epu.getUnit(), process.getProject());
+
+                                if (file != null) {
+                                    return toSourcePosition(location, file);
+                                }
+                            }
+                        }
+                    }
+                } catch (AbsentInformationException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        throw NoDataException.INSTANCE;
+    }
+
+    private SourcePosition toSourcePosition(Location location, PsiFile file) throws NoDataException {
         int lineNumber = calcLineIndex(location);
         if (lineNumber < 0) {
             throw NoDataException.INSTANCE;
         }
-        return SourcePosition.createFromLine(psiFile, lineNumber);
-    }
-
-    @Nullable
-    private PsiFile getPsiFileByLocation(final Project project, final Location location) {
-        if (location == null) return null;
-
-        final ReferenceType refType = location.declaringType();
-        if (refType == null) return null;
-
-        try {
-            for (PsiFile file : FilenameIndex.getFilesByName(project, refType.sourceName(), GlobalSearchScope.projectScope(project))) {
-                if (file instanceof CeylonFile) {
-                    return file;
-                }
-            }
-        } catch (AbsentInformationException e) {
-            // intentionally empty
-        }
-
-        return null;
+        return SourcePosition.createFromLine(file, lineNumber);
     }
 
     private int calcLineIndex(Location location) {
@@ -106,9 +137,21 @@ public class CeylonPositionManager implements PositionManager {
     @Override
     public ClassPrepareRequest createPrepareRequest(@NotNull ClassPrepareRequestor requestor, @NotNull SourcePosition position) throws NoDataException {
         checkCeylonFile(position);
-        String cls = findClassBySourcePosition(position);
 
-        return cls == null ? null : process.getRequestsManager().createClassPrepareRequest(requestor, cls);
+        CeylonFile file = (CeylonFile) position.getFile();
+        Entry<? extends Integer, ? extends Node> location = getFirstValidLocation(file.getCompilationUnit(),
+                new DocumentWrapper(file.getViewProvider().getDocument()), position.getLine() + 1);
+
+        if (location != null) {
+            EventRequestManager rm = ((RequestManagerImpl) process.getRequestsManager()).getVMRequestManager();
+            ClassPrepareRequest req = rm.createClassPrepareRequest();
+            req.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
+            req.addSourceNameFilter(position.getFile().getName());
+            ((RequestManagerImpl) process.getRequestsManager()).registerRequestInternal(requestor, req);
+
+            return req;
+        }
+        return null;
     }
 
     private void checkCeylonFile(@NotNull SourcePosition position) throws NoDataException {
@@ -132,8 +175,12 @@ public class CeylonPositionManager implements PositionManager {
         }
 
         if (declaration != null && declaration.getCeylonNode().getDeclarationModel() != null) {
-            String cls = declaration.getCeylonNode().getDeclarationModel().getQualifiedNameString().replace("::", ".") + (useUnderscoreSuffix ? "_" : "");
+            Declaration model = declaration.getCeylonNode().getDeclarationModel();
+            String cls = model.getQualifiedNameString().replace("::", ".") + (useUnderscoreSuffix ? "_" : "");
 
+            if (model instanceof Interface) {
+                cls += "$impl";
+            }
             System.out.println(String.format("Source position %s:%d => %s", position.getFile().getName(), position.getLine(), cls));
             return cls;
         }

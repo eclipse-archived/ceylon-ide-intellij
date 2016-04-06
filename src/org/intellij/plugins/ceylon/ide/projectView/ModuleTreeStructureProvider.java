@@ -9,6 +9,7 @@ import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
 import com.intellij.ide.projectView.impl.nodes.PsiFileNode;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.SourceFolder;
@@ -26,7 +27,7 @@ import java.util.*;
 /**
  * Wraps ceylon modules in a special node, and shows the default module as such.
  */
-public class ModuleTreeStructureProvider implements TreeStructureProvider {
+public class ModuleTreeStructureProvider implements TreeStructureProvider, DumbAware {
 
     @NotNull
     @Override

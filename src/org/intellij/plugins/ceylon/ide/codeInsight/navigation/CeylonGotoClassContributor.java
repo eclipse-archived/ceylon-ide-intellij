@@ -8,8 +8,8 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.MultiMap;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Function;
@@ -44,12 +44,17 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonProjects.getProject(module);
 
-            TypeChecker tc = ceylonProject.getTypechecker();
-            if (tc == null) {
+            if (ceylonProject == null) {
                 continue;
             }
 
-            for (com.redhat.ceylon.model.typechecker.model.Module m : tc.getContext().getModules().getListOfModules()) {
+            CeylonProject.Modules modules = ceylonProject.getModules();
+
+            if (modules == null) {
+                continue;
+            }
+
+            for (com.redhat.ceylon.model.typechecker.model.Module m : modules.getTypecheckerModules().getListOfModules()) {
                 if (m instanceof IdeaModule) {
                     if (!includeNonProjectItems && !((IdeaModule) m).getIsProjectModule()) {
                         continue;

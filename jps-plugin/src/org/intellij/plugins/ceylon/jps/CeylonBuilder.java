@@ -71,7 +71,6 @@ public class CeylonBuilder extends ModuleLevelBuilder {
 
     private static final String[] searchedArchives = {
             "org.antlr.runtime",
-            "org.jboss.jandex",
             "org.jboss.modules",
             "com.github.rjeschke.txtmark",
             "com.redhat.ceylon.compiler.java",
@@ -80,6 +79,7 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             "com.redhat.ceylon.typechecker",
             "com.redhat.ceylon.model",
             "com.redhat.ceylon.common",
+            "com.redhat.ceylon.cli",
             "ceylon.language"
     };
 
@@ -115,7 +115,7 @@ public class CeylonBuilder extends ModuleLevelBuilder {
         List<URL> classpath = new ArrayList<>();
         classpath.add(pluginClassesDir.toURI().toURL());
 
-        File ceylonRepoDir = new File(pluginClassesDir, "repo");
+        File ceylonRepoDir = new File(new File(pluginClassesDir, "embeddedDist"), "repo");
         if (! ceylonRepoDir.exists()) {
             throw new IOException("The Ceylon IDEA plugin 'classes' directory doesn't contain the embedded Ceylon repository.");
         }

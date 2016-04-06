@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.lang.model.type.TypeKind;
+import com.redhat.ceylon.model.loader.mirror.TypeKind;
 import java.util.Collections;
 import java.util.List;
 

@@ -23,7 +23,7 @@ import com.intellij.psi {
     PsiReferenceExpression,
     PsiClassObjectAccessExpression
 }
-import com.redhat.ceylon.ide.common.util {
+import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
@@ -59,7 +59,7 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
         } else if (is PsiLiteralExpression v) {
             // TODO this is super ultra ugly, but we can't get the type associated
             // to a PsiArrayInitializerMemberValue, and IJ parses shorts as ints :(
-            if (psi.qualifiedName == "com.redhat.ceylon.compiler.java.metadata.AnnotationInstantiation",
+            if (doWithLock(() => psi.qualifiedName) == "com.redhat.ceylon.compiler.java.metadata.AnnotationInstantiation",
                 paramName == "arguments") {
 
                 return JShort(v.text);
@@ -95,7 +95,7 @@ Return doWithLock<Return>(Return() callback) {
     }
 }
 
-Return doWithIndex<Return>(Project p, Return() callback) {
+shared Return doWithIndex<Return>(Project p, Return() callback) {
 
     value ref = Ref<Return>();
     value runnable = object satisfies Runnable {

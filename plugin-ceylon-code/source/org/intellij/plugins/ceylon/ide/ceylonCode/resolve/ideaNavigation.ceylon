@@ -12,7 +12,12 @@ import com.intellij.openapi.vfs {
 import com.intellij.psi {
     PsiManager,
     PsiNameIdentifierOwner,
-    PsiFile
+    PsiFile,
+    JavaPsiFacade,
+    PsiClass
+}
+import com.intellij.psi.search {
+    GlobalSearchScope
 }
 import com.intellij.psi.util {
     PsiTreeUtil
@@ -23,14 +28,31 @@ import com.redhat.ceylon.ide.common.open {
 import com.redhat.ceylon.ide.common.util {
     Path
 }
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
+}
+import com.redhat.ceylon.model.loader.model {
+    JavaBeanValue,
+    LazyClass,
+    LazyInterface,
+    JavaMethod
+}
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    ClassOrInterface,
+    Value
 }
 
 import java.lang {
     Integer
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    doWithIndex,
+    PSIClass,
+    PSIMethod
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
@@ -43,14 +65,51 @@ shared class IdeaNavigation(Project project)
     shared actual PsiNameIdentifierOwner? gotoFile(VirtualFile file, 
         Integer offset, Integer length) {
         
-        assert(is PsiFile psiFile = PsiManager.getInstance(project).findFile(file));
-        return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(),
-            javaClass<PsiNameIdentifierOwner>(), false);
+        if (is PsiFile psiFile = PsiManager.getInstance(project).findFile(file)) {
+            return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(),
+               javaClass<PsiNameIdentifierOwner>(), false);
+        }
+        platformUtils.log(Status._WARNING, "Can't navigate to file " + file.canonicalPath);
+        return null;
     }
     
     shared actual PsiNameIdentifierOwner? gotoJavaNode(Declaration declaration) {
-        print("TODO gotoJavaNode");
+        if (is LazyClass declaration) {
+            if (is PSIMethod meth = declaration.constructor) {
+                return meth.psi;
+            }
+            if (is PSIClass cls = declaration.classMirror) {
+                return cls.psi;
+            }
+        } else if (is LazyInterface declaration, is PSIClass cls = declaration.classMirror) {
+            return cls.psi;
+        } else if (is JavaMethod declaration, is PSIMethod meth = declaration.mirror) {
+            return meth.psi;
+        } else if (is JavaBeanValue declaration, is PSIMethod meth = declaration.mirror) {
+            return meth.psi;
+        } else if (is Value declaration) {
+            if (is ClassOrInterface container = declaration.container,
+                exists cls = getJavaClass(container)) {
+
+                return cls.findFieldByName(declaration.name, true);
+            }
+        }
+        
         return null;
+    }
+    
+    PsiClass? getJavaClass(ClassOrInterface cls) {
+        value qn = cls.qualifiedNameString.replace("::", ".");
+
+        return doWithIndex(project, () {
+            value facade = JavaPsiFacade.getInstance(project);
+            value scope = GlobalSearchScope.allScope(project);
+
+            if (exists psi = facade.findClass(qn, scope)) {
+                return psi;
+            }
+            return null;
+        });
     }
     
     shared actual PsiNameIdentifierOwner? gotoLocation(Path? path, 
@@ -67,6 +126,4 @@ shared class IdeaNavigation(Project project)
         
         return null;
     }
-    
-    
 }

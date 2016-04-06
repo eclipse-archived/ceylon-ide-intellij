@@ -14,4 +14,5 @@ public interface ITypeCheckerInvoker {
     PhasedUnit typecheck(CeylonFile ceylonFile);
 
     File getEmbeddedCeylonRepository();
+    File getEmbeddedCeylonDist();
 }

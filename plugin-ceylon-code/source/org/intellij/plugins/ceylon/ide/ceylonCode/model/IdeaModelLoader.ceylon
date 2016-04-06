@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.application {
     ApplicationManager,
     ModalityState
@@ -9,20 +5,8 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.\imodule {
     IJModule=Module
 }
-import com.intellij.openapi.roots {
-    ModuleRootManager,
-    OrderRootType
-}
-import com.intellij.openapi.roots.libraries {
-    Library
-}
-import com.intellij.openapi.util {
-    Disposer
-}
 import com.intellij.openapi.vfs {
-    VirtualFile,
-    VirtualFileManager,
-    JarFileSystem
+    VirtualFile
 }
 import com.intellij.psi {
     JavaPsiFacade,
@@ -62,39 +46,13 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
 
     shared actual void addModuleToClasspathInternal(ArtifactResult? artifact) {
         if (exists artifact,
-            exists vfile = VirtualFileManager.instance.findFileByUrl(
-                VirtualFileManager.constructUrl(JarFileSystem.\iPROTOCOL, 
-                    artifact.artifact().absolutePath) + JarFileSystem.\iJAR_SEPARATOR
-            ),
-            exists mod = ideaModuleManager.ceylonProject?.ideArtifact) {
+            is IdeaCeylonProject project = ideaModuleManager.ceylonProject) {
             
             // TODO everytime we add a jar, it's indexed, which is slowing down
             // the process
             ApplicationManager.application.invokeAndWait(object satisfies Runnable {
                 shared actual void run() {
-                    value lock = ApplicationManager.application.acquireWriteActionLock(javaClass<IdeaModelLoader>());        
-                    
-                    try {
-                        value model = ModuleRootManager.getInstance(mod).modifiableModel;
-                        value lib = model.moduleLibraryTable.getLibraryByName("Ceylon Stuff")
-                        else model.moduleLibraryTable.createLibrary("Ceylon Stuff");
-                        
-                        Library.ModifiableModel libModel = lib.modifiableModel;
-                        
-                        if (libModel.getUrls(OrderRootType.\iCLASSES).array.coalesced
-                            .find((name) => name.string == vfile.url) exists) {
-                            
-                            Disposer.dispose(libModel);
-                            model.dispose();
-                        } else {
-                            libModel.addRoot(vfile, OrderRootType.\iCLASSES);
-                        
-                            libModel.commit();
-                            model.commit();
-                        } 
-                    } finally {
-                        lock.finish();
-                    }
+                    project.addLibrary(artifact.artifact().absolutePath);
                 }
             }, ModalityState.any());
         }
@@ -120,10 +78,8 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             value p = cp.ideArtifact;
             value name = packageName + "." + className;
             value scope = p.getModuleScope(true);
-            PsiClass? cls = JavaPsiFacade.getInstance(p.project)
-                    .findClass(name, scope);
-            
-            return cls exists;
+            value facade = JavaPsiFacade.getInstance(p.project);
+            return doWithLock(() => facade.findClass(name, scope) exists);
         }
         
         return false;

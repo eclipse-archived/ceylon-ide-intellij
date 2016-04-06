@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.intellij.plugins.ceylon.ide</id>
     <name>Ceylon IDE</name>
-    <version>1.2.2-0</version>
+    <version>1.2.3</version>
     <vendor email="bastien.jansen [at] gmx.com">Bastien Jansen</vendor>
 
     <description>Provides support for the Ceylon programming language</description>
@@ -60,6 +60,11 @@
         <action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction" id="Ceylon.PasteAsCeylon" text="Paste Java as Ceylon">
             <add-to-group group-id="CutCopyPasteGroup" anchor="last"/>
         </action>
+        <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.AddBootstrapFilesAction"
+                id="AddBootstrapFilesAction"
+                text="Create Ceylon Bootstrap Files">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
     </actions>
 
     <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
@@ -117,6 +122,7 @@
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonVariableRenameHandler"/>
         <renamePsiElementProcessor implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenamePsiProcessor"/>
         <refactoring.elementListenerProvider implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringListener"/>
+        <inlineActionHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.InlineAction"/>
         <lang.importOptimizer language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonImportOptimizer"/>
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementDescriptionProvider"/>
         <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>
@@ -135,8 +141,8 @@
                                  implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
         <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.GotoTargetRenderer"/>
-        <java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>
-        <java.shortNamesCache implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonShortNamesCache"/>
+        <!--<java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>-->
+        <!--<java.shortNamesCache implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonShortNamesCache"/>-->
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
         <!-- TODO <usageTypeProvider implementation=""/>-->
 

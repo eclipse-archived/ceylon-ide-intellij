@@ -48,9 +48,7 @@ shared object ideaModuleImportUtils
         extends AbstractModuleImportUtil<CeylonFile,IJModule,Document,InsertEdit,TextEdit,TextChange>()
         satisfies IdeaDocumentChanges {
     
-    shared actual Character getChar(Document doc, Integer offset) {
-        return doc.getText(TextRange.from(offset, 1)).first else ' ';
-    }
+    getChar(Document doc, Integer offset) => doc.getText(TextRange.from(offset, 1)).first else ' ';
     
     shared actual Integer getEditOffset(TextChange change) => 0;
     
