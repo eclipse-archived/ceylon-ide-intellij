@@ -25,9 +25,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by david on 16/01/15.
- */
 public abstract class PluginCeylonStartup implements ApplicationComponent {
 
     private PluginClassLoader getClassLoader(Class<? extends PluginCeylonStartup> startupClass) {
@@ -42,17 +39,17 @@ public abstract class PluginCeylonStartup implements ApplicationComponent {
         return getClassLoader(getClass());
     }
 
-    public IdeaPluginDescriptor getPluginDescriptor(Class<? extends PluginCeylonStartup> startupClass) {
+    private IdeaPluginDescriptor getPluginDescriptor(Class<? extends PluginCeylonStartup> startupClass) {
         PluginId pluginId = PluginManager.getPluginByClassName(startupClass.getName());
         return PluginManager.getPlugin(pluginId);
     }
 
-    public File getArchiveDirectory() {
+    private File getArchiveDirectory() {
         IdeaPluginDescriptor pluginDescriptor = getPluginDescriptor(getClass());
         return getArchiveDirectory(pluginDescriptor);
     }
 
-    public File getArchiveDirectory(IdeaPluginDescriptor pluginDescriptor) {
+    private File getArchiveDirectory(IdeaPluginDescriptor pluginDescriptor) {
         final File pluginDirectory = pluginDescriptor.getPath();
         return new File(pluginDirectory, "lib");
     }
@@ -65,27 +62,7 @@ public abstract class PluginCeylonStartup implements ApplicationComponent {
         return new File[0];
     }
 
-    public File[] getArchives(FilenameFilter fileNameFilter) {
-        IdeaPluginDescriptor pluginDescriptor = getPluginDescriptor(getClass());
-        return getArchives(pluginDescriptor, fileNameFilter);
-    }
-
-    public File[] getAllArchives(IdeaPluginDescriptor pluginDescriptor) {
-        return getArchives(pluginDescriptor, new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return StringUtil.endsWithIgnoreCase(name, ".car") ||
-                        StringUtil.endsWithIgnoreCase(name, ".jar");
-            }
-        });
-    }
-
-    public File[] getAllArchives() {
-        IdeaPluginDescriptor pluginDescriptor = getPluginDescriptor(getClass());
-        return getAllArchives(pluginDescriptor);
-    }
-
-    public File[] getCeylonArchives(IdeaPluginDescriptor pluginDescriptor) {
+    private File[] getCeylonArchives(IdeaPluginDescriptor pluginDescriptor) {
         final File archiveDirectory = getArchiveDirectory(pluginDescriptor);
         if (archiveDirectory.exists()) {
             return archiveDirectory.listFiles(new FilenameFilter() {
@@ -105,12 +82,12 @@ public abstract class PluginCeylonStartup implements ApplicationComponent {
 
     private static final Pattern moduleArchivePattern = Pattern.compile("(.+)-([^\\-]+)\\.(j|J|c|C)ar");
 
-    public ArtifactContext[] getModuleArtifacts() {
+    private ArtifactContext[] getModuleArtifacts() {
         IdeaPluginDescriptor pluginDescriptor = getPluginDescriptor(getClass());
         return getModuleArtifacts(pluginDescriptor);
     }
 
-    public ArtifactContext[] getModuleArtifacts(final IdeaPluginDescriptor pluginDescriptor) {
+    private ArtifactContext[] getModuleArtifacts(final IdeaPluginDescriptor pluginDescriptor) {
         final Map<String, ArtifactContext> artifacts = new HashMap<>();
         File[] modulesArchives = getArchives(pluginDescriptor, new FilenameFilter() {
             @Override
@@ -154,7 +131,7 @@ public abstract class PluginCeylonStartup implements ApplicationComponent {
 
         StructureBuilder structureBuilder = new FileContentStore(getArchiveDirectory());
         FlatRepository flatRepository = new FlatRepository(structureBuilder.createRoot());
-        RepositoryManagerBuilder builder = new RepositoryManagerBuilder(getArchiveDirectory(), new CMRJULLogger(), true, (int) Constants.DEFAULT_TIMEOUT, Proxy.NO_PROXY);
+        RepositoryManagerBuilder builder = new RepositoryManagerBuilder(getArchiveDirectory(), new CMRJULLogger(), true, Constants.DEFAULT_TIMEOUT, Proxy.NO_PROXY);
         builder.addRepository(flatRepository);
         RepositoryManager repoManager = builder.buildRepository();
 
