@@ -60,7 +60,10 @@ public class IdePluginCeylonStartup extends PluginCeylonStartup implements Appli
                                 exists = true;
                             }
                         }
-                        if (!exists) {
+                        // We reload module-resolver because JS and Aether resolvers are in
+                        // the child classpath, so we want them to be visible from
+                        // com.redhat.ceylon.cmr.impl.Configuration.class.getClassLoader()
+                        if (!exists || child.getName().startsWith("com.redhat.ceylon.module-resolver")) {
                             output.add(child);
                         }
                     }
