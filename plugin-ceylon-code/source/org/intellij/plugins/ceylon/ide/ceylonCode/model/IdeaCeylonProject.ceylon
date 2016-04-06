@@ -11,9 +11,6 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.extensions {
     Extensions
 }
-import com.intellij.openapi.externalSystem.service.project {
-    IdeModifiableModelsProviderImpl
-}
 import com.intellij.openapi.fileEditor {
     FileEditorManagerListener
 }
@@ -73,6 +70,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 import org.jetbrains.jps.model.java {
     JavaSourceRootType,
     JavaResourceRootType
+}
+import com.intellij.openapi.roots.impl.libraries {
+    ProjectLibraryTable
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -267,8 +267,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared void addLibrary(String jarFile, Boolean clear = false) {
         value lock = ApplicationManager.application.acquireWriteActionLock(javaClass<IdeaCeylonProject>());
-        value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
-        value lib = provider.getLibraryByName(libraryName) else provider.createLibrary(libraryName);
+        value mm = ProjectLibraryTable.getInstance(ideArtifact.project).modifiableModel;
+        value lib = mm.getLibraryByName(libraryName) else mm.createLibrary(libraryName);
         value model = lib.modifiableModel;
         
         try {
@@ -283,13 +283,14 @@ shared class IdeaCeylonProject(ideArtifact, model)
             
             model.addRoot(srcFile, OrderRootType.\iCLASSES);
             
-            value mrm = provider.getModifiableRootModel(ideArtifact);
+            value mrm = ModuleRootManager.getInstance(ideArtifact).modifiableModel;
             if (!exists entry = mrm.findLibraryOrderEntry(lib)) {
                 mrm.addLibraryEntry(lib);
             }
             
             model.commit();
-            provider.commit();
+            mrm.commit();
+            mm.commit();
         } catch (e) {
             model.dispose();
         } finally {

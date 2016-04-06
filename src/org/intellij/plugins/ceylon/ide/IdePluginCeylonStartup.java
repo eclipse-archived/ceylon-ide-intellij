@@ -18,12 +18,11 @@ import java.util.List;
 
 public class IdePluginCeylonStartup extends PluginCeylonStartup implements ApplicationLoadListener {
 
-    @Override
+    // For IntelliJ 15
     public void beforeApplicationLoaded(Application application) {
         super.initComponent();
     }
 
-    // For IntelliJ 15
     public void beforeApplicationLoaded(Application application, String configPath) {
         super.initComponent();
     }
