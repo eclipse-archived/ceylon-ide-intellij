@@ -22,6 +22,9 @@ shared object ideaPlatformUtils satisfies IdeUtils {
         case (Status._INFO) {
             logger.info(message, e);
         }
+        case (Status._DEBUG) {
+            logger.debug(message, e);
+        }
         case (Status._ERROR) {
             logger.error(message, e);
         }
