@@ -11,7 +11,7 @@ import com.redhat.ceylon.model.loader.mirror {
     AnnotationMirror
 }
 
-class PSIAnnotatedMirror(PsiModifierListOwner&PsiNamedElement psi)
+shared class PSIAnnotatedMirror(PsiModifierListOwner&PsiNamedElement psi)
         satisfies AnnotatedMirror {
     
     value annotations = HashMap<String,AnnotationMirror>();
