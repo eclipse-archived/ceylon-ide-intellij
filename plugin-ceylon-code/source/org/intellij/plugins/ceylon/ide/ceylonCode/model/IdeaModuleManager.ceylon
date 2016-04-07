@@ -53,7 +53,7 @@ shared class IdeaModuleManager(
         }
         assert (is IdeaCeylonProject ceylonProject);
         value mod = ceylonProject.ideaModule;
-        value modulePath = moduleName.replace(".", "/");
+        value modulePath = moduleName.replace(".", "/") + "/module.ceylon";
 
         return ModuleRootManager.getInstance(mod)
                 .sourceRoots.array.coalesced
