@@ -151,4 +151,9 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     }
 
     shared actual Boolean typeExists(PsiClass type) => true;
+
+    shared actual String? alternateJdkModuleSpec
+        => if (is IdeaCeylonProject project = ideaModuleManager.ceylonProject, project.isAndroid)
+           then "android/23" // TODO read the version from the Gradle model
+           else null;
 }

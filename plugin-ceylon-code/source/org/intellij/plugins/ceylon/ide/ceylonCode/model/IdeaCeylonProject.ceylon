@@ -74,6 +74,9 @@ import org.jetbrains.jps.model.java {
 import com.intellij.openapi.roots.impl.libraries {
     ProjectLibraryTable
 }
+import com.intellij.facet {
+    FacetManager
+}
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
@@ -296,5 +299,15 @@ shared class IdeaCeylonProject(ideArtifact, model)
         } finally {
             lock.finish();
         }
+    }
+
+    shared Boolean isAndroid {
+        for (f in FacetManager.getInstance(ideaModule).allFacets) {
+            if (f.type.id.string == "android-gradle") {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
