@@ -15,10 +15,7 @@ import com.redhat.ceylon.compiler.typechecker.analyzer.Warning;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.RecognitionError;
-import com.redhat.ceylon.compiler.typechecker.tree.Message;
-import com.redhat.ceylon.compiler.typechecker.tree.Node;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
+import com.redhat.ceylon.compiler.typechecker.tree.*;
 import com.redhat.ceylon.ide.common.model.BaseCeylonProject;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import org.antlr.runtime.CommonToken;
@@ -59,7 +56,7 @@ class CeylonTypeCheckerVisitor extends Visitor {
     @Override
     public void visitAny(Node that) {
         for (Message error : new ArrayList<>(that.getErrors())) {
-            int crlfCountDiff = 0; //SystemInfo.isWindows ? (error.getLine() - 1) * 2 : 0;
+            int crlfCountDiff = 0;
             if (that.getStartIndex() == null || that.getEndIndex() == null) {
                 continue;
             }
@@ -99,7 +96,7 @@ class CeylonTypeCheckerVisitor extends Visitor {
             }
 
             Annotation annotation;
-            if (error instanceof AnalysisError || error instanceof RecognitionError) {
+            if (error instanceof AnalysisError || error instanceof RecognitionError || error instanceof UnexpectedError) {
                 annotation = annotationHolder.createErrorAnnotation(range, error.getMessage());
 
                 if (ArrayUtils.contains(UNRESOLVED_REFERENCE_CODES, error.getCode())) {
