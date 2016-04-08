@@ -90,7 +90,9 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             }
         } else if (path.isFile()) {
             for (String searchedArchive : searchedArchives) {
-                if (path.getName().matches("^" + Pattern.quote(searchedArchive) + "-.+\\.(j|c)ar$")) {
+                // TODO this is fragile (we have several modules that start with com.redhat.ceylon.module-resolver)
+                if (path.getName().matches("^" + Pattern.quote(searchedArchive) + "-.+\\.(j|c)ar$")
+                        && !filesToAddToClasspath.containsKey(searchedArchive)) {
                     filesToAddToClasspath.put(searchedArchive, path);
                     break;
                 }
