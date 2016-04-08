@@ -28,7 +28,7 @@ git checkout master || exit -1
 sed -i '' -e "s/<version>${oldRtVersion}/<version>${version}/" CeylonRuntime/src/META-INF/plugin.xml
 sed -i '' -e "s/<version>${oldVersion}/<version>${version}/" META-INF/plugin.xml
 
-ant clean build -DideaRoot="/Applications/IntelliJ IDEA 16 CE EAP.app/Contents/" || exit -1
+ant clean build -DideaRoot="/Applications/IntelliJ IDEA CE.app/Contents/" || exit -1
 ant -f buildUpdateSite.xml -Dartifact.output.path="out/installation-packages"
 
 sed -i '' -e "s/<version>${version}/<version>${oldRtVersion}/" CeylonRuntime/src/META-INF/plugin.xml
