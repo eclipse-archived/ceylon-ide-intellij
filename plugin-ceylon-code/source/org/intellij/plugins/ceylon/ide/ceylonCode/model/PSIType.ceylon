@@ -8,7 +8,8 @@ import com.intellij.psi {
     PsiClassType,
     PsiTypeParameter,
     PsiClass,
-    JavaPsiFacade
+    JavaPsiFacade,
+    PsiNameHelper
 }
 import com.intellij.psi.impl.source {
     PsiClassReferenceType
@@ -114,11 +115,7 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
     }
     
     String computedQualifiedName {
-        value canonicalText = 
-                let (t = psi.canonicalText)
-                if (exists i = t.firstOccurrence('<'))
-                then t.spanTo(i - 1)
-                else t;
+        value canonicalText = PsiNameHelper.getQualifiedClassName(psi.canonicalText, false);
 
         if (is PsiClassReferenceType psi) {
             if (exists cls = findClass(canonicalText)) {

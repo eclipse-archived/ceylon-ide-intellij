@@ -112,7 +112,7 @@ shared class PSIClass(shared PsiClass psi)
                 value builder = LightMethodBuilder(PsiManager.getInstance(psi.project),
                     JavaLanguage.\iINSTANCE,
                     (psi of PsiNameIdentifierOwner).name
-                ).setConstructor(true);
+                ).addModifier("public").setConstructor(true);
                 result.add(PSIMethod(builder));
             }
             return result;
