@@ -333,6 +333,12 @@ public class CeylonPsiImpl {
         @Override public Tree.InitializerParameter getCeylonNode() { return (Tree.InitializerParameter) super.getCeylonNode(); }
     }
 
+    public static class PatternParameterPsiImpl extends ParameterPsiImpl
+            implements CeylonPsi.PatternParameterPsi {
+        public PatternParameterPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.PatternParameter getCeylonNode() { return (Tree.PatternParameter) super.getCeylonNode(); }
+    }
+
     public static class TypeParameterListPsiImpl extends CeylonCompositeElementImpl
             implements CeylonPsi.TypeParameterListPsi {
         public TypeParameterListPsiImpl(ASTNode astNode) { super(astNode); }
@@ -811,6 +817,12 @@ public class CeylonPsiImpl {
             implements CeylonPsi.IsCasePsi {
         public IsCasePsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.IsCase getCeylonNode() { return (Tree.IsCase) super.getCeylonNode(); }
+    }
+
+    public static class PatternCasePsiImpl extends CaseItemPsiImpl
+            implements CeylonPsi.PatternCasePsi {
+        public PatternCasePsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.PatternCase getCeylonNode() { return (Tree.PatternCase) super.getCeylonNode(); }
     }
 
     public static class SatisfiesCasePsiImpl extends CaseItemPsiImpl

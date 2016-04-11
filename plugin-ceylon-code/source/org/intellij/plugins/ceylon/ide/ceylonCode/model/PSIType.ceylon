@@ -14,6 +14,9 @@ import com.intellij.psi {
 import com.intellij.psi.impl.source {
     PsiClassReferenceType
 }
+import com.redhat.ceylon.ide.common.model {
+    unknownClassMirror
+}
 import com.redhat.ceylon.model.loader.mirror {
     TypeMirror,
     TypeParameterMirror,
@@ -29,15 +32,6 @@ import java.util {
     Collections,
     IdentityHashMap,
     Map
-}
-import com.redhat.ceylon.ide.common.model {
-    unknownClassMirror
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    ideaPlatformUtils
-}
-import com.redhat.ceylon.ide.common.platform {
-    Status
 }
 
 class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes

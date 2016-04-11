@@ -107,6 +107,8 @@ public class CeylonPsiFactory {
             return new FunctionalParameterDeclarationPsiImpl(node);
         } else if (type == INITIALIZER_PARAMETER) {
             return new InitializerParameterPsiImpl(node);
+        } else if (type == PATTERN_PARAMETER) {
+            return new PatternParameterPsiImpl(node);
         } else if (type == TYPE_PARAMETER_LIST) {
             return new TypeParameterListPsiImpl(node);
         } else if (type == TYPE_PARAMETER_DECLARATION) {
@@ -245,6 +247,8 @@ public class CeylonPsiFactory {
             return new MatchCasePsiImpl(node);
         } else if (type == IS_CASE) {
             return new IsCasePsiImpl(node);
+        } else if (type == PATTERN_CASE) {
+            return new PatternCasePsiImpl(node);
         } else if (type == SATISFIES_CASE) {
             return new SatisfiesCasePsiImpl(node);
         } else if (type == TRY_CATCH_STATEMENT) {

@@ -1,5 +1,7 @@
 package org.intellij.plugins.ceylon.ide.refactoring;
 
+import com.intellij.openapi.application.Result;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -25,7 +27,12 @@ public class CeylonVariableRenameHandler extends VariableInplaceRenameHandler {
                 super.finish(success);
 
                 if (success && file instanceof CeylonFile) {
-                    ((CeylonFile) file).forceReparse();
+                    new WriteCommandAction(myProject, file) {
+                        @Override
+                        protected void run(@NotNull Result result) throws Throwable {
+                            ((CeylonFile) file).forceReparse();
+                        }
+                    }.execute();
                 }
             }
         };

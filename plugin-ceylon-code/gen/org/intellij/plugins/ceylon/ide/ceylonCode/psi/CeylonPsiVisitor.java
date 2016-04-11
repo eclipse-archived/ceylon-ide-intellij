@@ -127,6 +127,8 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
             visitFunctionalParameterDeclarationPsi((FunctionalParameterDeclarationPsi) element);
         } else if (element instanceof InitializerParameterPsi) {
             visitInitializerParameterPsi((InitializerParameterPsi) element);
+        } else if (element instanceof PatternParameterPsi) {
+            visitPatternParameterPsi((PatternParameterPsi) element);
         } else if (element instanceof TypeParameterListPsi) {
             visitTypeParameterListPsi((TypeParameterListPsi) element);
         } else if (element instanceof TypeParameterDeclarationPsi) {
@@ -287,6 +289,8 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
             visitMatchCasePsi((MatchCasePsi) element);
         } else if (element instanceof IsCasePsi) {
             visitIsCasePsi((IsCasePsi) element);
+        } else if (element instanceof PatternCasePsi) {
+            visitPatternCasePsi((PatternCasePsi) element);
         } else if (element instanceof SatisfiesCasePsi) {
             visitSatisfiesCasePsi((SatisfiesCasePsi) element);
         } else if (element instanceof TryCatchStatementPsi) {
@@ -788,6 +792,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitTryClausePsi(@NotNull TryClausePsi element) { visitControlClausePsi(element); }
     public void visitTryCatchStatementPsi(@NotNull TryCatchStatementPsi element) { visitControlStatementPsi(element); }
     public void visitSatisfiesCasePsi(@NotNull SatisfiesCasePsi element) { visitCaseItemPsi(element); }
+    public void visitPatternCasePsi(@NotNull PatternCasePsi element) { visitCaseItemPsi(element); }
     public void visitIsCasePsi(@NotNull IsCasePsi element) { visitCaseItemPsi(element); }
     public void visitMatchCasePsi(@NotNull MatchCasePsi element) { visitCaseItemPsi(element); }
     public void visitCaseItemPsi(@NotNull CaseItemPsi element) {}
@@ -868,6 +873,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitTypeVariancePsi(@NotNull TypeVariancePsi element) {}
     public void visitTypeParameterDeclarationPsi(@NotNull TypeParameterDeclarationPsi element) { visitDeclarationPsi(element); }
     public void visitTypeParameterListPsi(@NotNull TypeParameterListPsi element) {}
+    public void visitPatternParameterPsi(@NotNull PatternParameterPsi element) { visitParameterPsi(element); }
     public void visitInitializerParameterPsi(@NotNull InitializerParameterPsi element) { visitParameterPsi(element); }
     public void visitFunctionalParameterDeclarationPsi(@NotNull FunctionalParameterDeclarationPsi element) { visitParameterDeclarationPsi(element); }
     public void visitValueParameterDeclarationPsi(@NotNull ValueParameterDeclarationPsi element) { visitParameterDeclarationPsi(element); }

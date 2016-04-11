@@ -221,6 +221,10 @@ public class CeylonPsi {
         @Override Tree.InitializerParameter getCeylonNode();
     }
 
+    public static interface PatternParameterPsi extends ParameterPsi {
+        @Override Tree.PatternParameter getCeylonNode();
+    }
+
     public static interface TypeParameterListPsi extends CeylonCompositeElement {
         @Override Tree.TypeParameterList getCeylonNode();
     }
@@ -539,6 +543,10 @@ public class CeylonPsi {
 
     public static interface IsCasePsi extends CaseItemPsi {
         @Override Tree.IsCase getCeylonNode();
+    }
+
+    public static interface PatternCasePsi extends CaseItemPsi {
+        @Override Tree.PatternCase getCeylonNode();
     }
 
     public static interface SatisfiesCasePsi extends CaseItemPsi {
