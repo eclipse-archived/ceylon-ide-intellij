@@ -7,12 +7,16 @@ import com.intellij.psi {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonPsi
+    CeylonPsi {
+        AttributeDeclarationPsi,
+        SpecifierStatementPsi,
+        VariablePsi
+    }
 }
 
 shared class CeylonReadWriteAccessDetector() extends ReadWriteAccessDetector() {
     shared actual Access getExpressionAccess(PsiElement psiElement) {
-        return (psiElement.parent is CeylonPsi.AttributeDeclarationPsi
+        return (psiElement.parent is AttributeDeclarationPsi|VariablePsi
              || psiElement.parent.parent is CeylonPsi.SpecifierStatementPsi)
                 then Access.\iWrite else Access.\iRead;
      }
@@ -24,11 +28,17 @@ shared class CeylonReadWriteAccessDetector() extends ReadWriteAccessDetector() {
     }
     
     shared actual Boolean isDeclarationWriteAccess(PsiElement psiElement) {
-        return if (is CeylonPsi.AttributeDeclarationPsi psiElement)
-               then psiElement.ceylonNode.specifierOrInitializerExpression exists
-               else false;
+        if (is AttributeDeclarationPsi psiElement) {
+            return psiElement.ceylonNode.specifierOrInitializerExpression exists;
+        }
+        else if (is VariablePsi psiElement) {
+            return psiElement.ceylonNode.specifierExpression exists;
+        }
+        else {
+            return false;
+        }
     }
     
     shared actual Boolean isReadWriteAccessible(PsiElement psiElement)
-            => psiElement is CeylonPsi.AttributeDeclarationPsi;
+            => psiElement is AttributeDeclarationPsi|VariablePsi;
 }
