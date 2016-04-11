@@ -58,6 +58,7 @@ public interface CeylonTypes {
     IElementType VALUE_PARAMETER_DECLARATION = new CeylonElementType("VALUE_PARAMETER_DECLARATION");
     IElementType FUNCTIONAL_PARAMETER_DECLARATION = new CeylonElementType("FUNCTIONAL_PARAMETER_DECLARATION");
     IElementType INITIALIZER_PARAMETER = new CeylonElementType("INITIALIZER_PARAMETER");
+    IElementType PATTERN_PARAMETER = new CeylonElementType("PATTERN_PARAMETER");
     IElementType TYPE_PARAMETER_LIST = new CeylonElementType("TYPE_PARAMETER_LIST");
     IElementType TYPE_PARAMETER_DECLARATION = new CeylonElementType("TYPE_PARAMETER_DECLARATION");
     IElementType TYPE_VARIANCE = new CeylonElementType("TYPE_VARIANCE");
@@ -138,6 +139,7 @@ public interface CeylonTypes {
     IElementType CASE_ITEM = new CeylonElementType("CASE_ITEM");
     IElementType MATCH_CASE = new CeylonElementType("MATCH_CASE");
     IElementType IS_CASE = new CeylonElementType("IS_CASE");
+    IElementType PATTERN_CASE = new CeylonElementType("PATTERN_CASE");
     IElementType SATISFIES_CASE = new CeylonElementType("SATISFIES_CASE");
     IElementType TRY_CATCH_STATEMENT = new CeylonElementType("TRY_CATCH_STATEMENT");
     IElementType TRY_CLAUSE = new CeylonElementType("TRY_CLAUSE");

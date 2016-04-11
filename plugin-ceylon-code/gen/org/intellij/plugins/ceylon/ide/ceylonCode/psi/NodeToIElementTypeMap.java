@@ -69,6 +69,7 @@ public class NodeToIElementTypeMap {
         map.put(CustomTree.ValueParameterDeclaration.class, CeylonTypes.VALUE_PARAMETER_DECLARATION);
         map.put(CustomTree.FunctionalParameterDeclaration.class, CeylonTypes.FUNCTIONAL_PARAMETER_DECLARATION);
         map.put(CustomTree.InitializerParameter.class, CeylonTypes.INITIALIZER_PARAMETER);
+        map.put(CustomTree.PatternParameter.class, CeylonTypes.PATTERN_PARAMETER);
         map.put(CustomTree.TypeParameterList.class, CeylonTypes.TYPE_PARAMETER_LIST);
         map.put(CustomTree.TypeParameterDeclaration.class, CeylonTypes.TYPE_PARAMETER_DECLARATION);
         map.put(CustomTree.TypeVariance.class, CeylonTypes.TYPE_VARIANCE);
@@ -149,6 +150,7 @@ public class NodeToIElementTypeMap {
         map.put(CustomTree.CaseItem.class, CeylonTypes.CASE_ITEM);
         map.put(CustomTree.MatchCase.class, CeylonTypes.MATCH_CASE);
         map.put(CustomTree.IsCase.class, CeylonTypes.IS_CASE);
+        map.put(CustomTree.PatternCase.class, CeylonTypes.PATTERN_CASE);
         map.put(CustomTree.SatisfiesCase.class, CeylonTypes.SATISFIES_CASE);
         map.put(CustomTree.TryCatchStatement.class, CeylonTypes.TRY_CATCH_STATEMENT);
         map.put(CustomTree.TryClause.class, CeylonTypes.TRY_CLAUSE);

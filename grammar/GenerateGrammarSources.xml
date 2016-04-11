@@ -99,7 +99,7 @@
 
     <target name="tree" depends="treegen"
             description="Generate the tree builder code">
-        <property name="NodesFile" location="../../ceylon/typechecker/Ceylon.nodes"/>
+        <property name="NodesFile" location="../../ceylon/typechecker/antlr/Ceylon.nodes"/>
         <java classname="com.redhat.ceylon.compiler.typechecker.treegen.GenerateIdeaElements" dir="${basedir}" fork="yes">
             <arg value="${NodesFile}"/>
             <arg path="gen"/>
