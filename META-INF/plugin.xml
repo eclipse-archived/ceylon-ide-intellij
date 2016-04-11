@@ -10,8 +10,8 @@
         See https://github.com/ceylon/ceylon-ide-intellij/wiki/Features
     </change-notes>
 
-    <!-- We need IJ 16 because of https://youtrack.jetbrains.com/issue/IDEA-132606 -->
-    <idea-version since-build="145"/>
+    <!-- Supports IDEA 15+ and Android Studio 2.0+ -->
+    <idea-version since-build="143"/>
 
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.ceylon.runtime</depends>
