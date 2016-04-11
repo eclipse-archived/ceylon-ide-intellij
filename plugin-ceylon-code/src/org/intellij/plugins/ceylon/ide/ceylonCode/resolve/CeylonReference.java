@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.resolve;
 
+import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -9,7 +10,6 @@ import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import com.redhat.ceylon.model.typechecker.model.Unit;
-import com.redhat.ceylon.model.typechecker.model.Value;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -29,10 +29,13 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         if (myElement.getParent() instanceof CeylonPsi.DeclarationPsi) {
             Tree.Declaration node = ((CeylonPsi.DeclarationPsi) myElement.getParent()).getCeylonNode();
 
+            //noinspection StatementWithEmptyBody
             if (node.getDeclarationModel() instanceof TypedDeclaration
                     && ((TypedDeclaration) node.getDeclarationModel()).getOriginalDeclaration() != null) {
                 // we need to resolve the original declaration
-            } else {
+            } else if (ApplicationInfo.getInstance().getBuild().getBaselineVersion() >= 145) {
+                // IntelliJ 15+ can show usages on ctrl-click, if we return null here
+                // For older versions, we have to continue resolving
                 return null;
             }
         }
