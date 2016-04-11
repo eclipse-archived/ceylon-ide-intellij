@@ -311,7 +311,6 @@ class MyParameterTableModel(IdeaChangeParameterRefactoring.ParameterList params,
 
     shared actual void removeRow(Integer index) {
         super.removeRow(index);
-        print("delete ``index``");
         params.delete(index);
     }
 
