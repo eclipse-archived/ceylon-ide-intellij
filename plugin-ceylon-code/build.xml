@@ -5,9 +5,11 @@
     <property name="ceylon.executable" value="${dist.bin.dir}/ceylon" />
     <property name="out.repo" location="modules" />
 
+    <property name="ceylon.repo.dir" location="${user.home}/.ceylon/repo" />
+
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
         <classpath>
-            <pathelement location="${dist.root.dir}/../lib/ant-contrib-1.0b3.jar"/>
+            <pathelement location="${ceylon.root.dir}/lib/ant-contrib-1.0b3.jar"/>
         </classpath>
     </taskdef>
 
@@ -26,6 +28,7 @@
             <repo url="${out.repo}" />
             <repo url="flat:${intellij.repo.dir}"/>
             <repo url="${basedir}/../../ceylon-ide-common/repo"/>
+            <repo url="${ceylon.repo.dir}" />
         </reposet>
     </target>
 
@@ -66,7 +69,7 @@
 		</foreach>
 	</target>
 
-    <target name="build" depends="ceylondefs,copy-intellij-dependencies">
+    <target name="build" depends="ceylondefs">
         <ceylon-compile executable="${ceylon.executable}"
                         verbose="${ceylon.verbosity}"
                         encoding="UTF-8"
