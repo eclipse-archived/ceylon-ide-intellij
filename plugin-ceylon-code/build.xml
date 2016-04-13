@@ -69,7 +69,7 @@
 		</foreach>
 	</target>
 
-    <target name="build" depends="ceylondefs">
+    <target name="build" depends="ceylondefs,copy-intellij-dependencies">
         <ceylon-compile executable="${ceylon.executable}"
                         verbose="${ceylon.verbosity}"
                         encoding="UTF-8"
