@@ -8,7 +8,8 @@ import com.intellij.openapi.command {
     WriteCommandAction
 }
 import com.intellij.openapi.editor {
-    Document
+    Document,
+    Editor
 }
 import com.intellij.openapi.\imodule {
     ModuleUtil
@@ -21,7 +22,8 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiFile,
-    PsiDocumentManager
+    PsiDocumentManager,
+    PsiElement
 }
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
@@ -58,7 +60,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     ideaImportProposals
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
+    CeylonFile,
+    CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     VirtualFileVirtualFile
@@ -66,8 +69,26 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 import java.lang {
     JString=String
 }
+import com.redhat.ceylon.ide.common.util {
+    nodes
+}
 
-shared class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node)
+shared class ExtractValueHandler() extends AbstractExtractHandler() {
+
+    shared actual TextRange? extract(Project project, Editor editor, PsiFile file, PsiElement val) {
+        assert(is CeylonFile file);
+        assert(is CeylonPsi.TermPsi val);
+        value node = val.ceylonNode;
+
+        value refacto = IdeaExtractValueRefactoring(file, editor.document, node);
+        value name = nodes.nameProposals(node).first;
+        refacto.newName = name;
+
+        return refacto.extractInFile(project, file);
+    }
+}
+
+class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node)
         satisfies ExtractValueRefactoring<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange>
                 & IdeaDocumentChanges {
 

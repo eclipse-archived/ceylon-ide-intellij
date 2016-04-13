@@ -14,6 +14,7 @@
         <add module="com.intellij.openapi" version="current" shared="false"/>
         <filter>
             <exclude path="com/intellij/util/containers/*"/>
+            <exclude path="com/intellij/codeInsight/highlighting/*"/>
         </filter>
     </module>
 </overrides>
