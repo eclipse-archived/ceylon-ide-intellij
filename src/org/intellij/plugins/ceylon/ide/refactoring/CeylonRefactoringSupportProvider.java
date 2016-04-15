@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.refactoring.RefactoringActionHandler;
 import com.intellij.refactoring.changeSignature.ChangeSignatureHandler;
 import org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonChangeSignatureHandler;
+import org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.ExtractFunctionHandler;
 import org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.ExtractValueHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,5 +26,10 @@ public class CeylonRefactoringSupportProvider extends RefactoringSupportProvider
     @Override
     public RefactoringActionHandler getIntroduceVariableHandler() {
         return new ExtractValueHandler();
+    }
+
+    @Override
+    public RefactoringActionHandler getExtractMethodHandler() {
+        return new ExtractFunctionHandler();
     }
 }
