@@ -92,6 +92,8 @@ class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node
         satisfies ExtractValueRefactoring<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange>
                 & IdeaDocumentChanges {
 
+    editorPhasedUnit => file.phasedUnit;
+
     shared actual List<PhasedUnit> getAllUnits() => ArrayList<PhasedUnit>();
     shared actual Boolean searchInFile(PhasedUnit pu) => false;
     shared actual Boolean searchInEditor() => false;
