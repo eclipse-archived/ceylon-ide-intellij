@@ -257,7 +257,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator<Document> {
         
         amp() => "&amp;";
         lt() => "&lt;";
-        gt() => "&gt";
+        gt() => "&gt;";
     }
 
     shared actual TypePrinter printer = MyPrinter(true);
