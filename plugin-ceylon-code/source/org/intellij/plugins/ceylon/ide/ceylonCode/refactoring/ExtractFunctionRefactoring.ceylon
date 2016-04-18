@@ -28,7 +28,8 @@ import java.lang {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     DocumentWrapper,
-    IdeaTextChange
+    IdeaTextChange,
+    IdeaCompositeChange
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
@@ -52,13 +53,19 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
             file.phasedUnit.unitFile
         );
 
-        if (exists refacto,
-            is IdeaTextChange change = refacto.build()) {
+        if (exists refacto) {
 
             return object extends WriteCommandAction<TextRange?>(myProject, file) {
                 shared actual void run(Result<TextRange?> result) {
 
-                    change.apply(myProject);
+                    switch (change = refacto.build())
+                    case (is IdeaTextChange) {
+                        change.apply(myProject);
+                    }
+                    case (is IdeaCompositeChange) {
+                        change.applyChanges(myProject);
+                    }
+                    else {}
 
                     if (exists reg = refacto.decRegion) {
                         value range = TextRange.from(reg.start, reg.length);

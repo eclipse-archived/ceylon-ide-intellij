@@ -17,7 +17,8 @@ import com.redhat.ceylon.ide.common.util {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     ideaImportProposals,
-    IdeaTextChange
+    IdeaTextChange,
+    IdeaCompositeChange
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIndents
@@ -42,4 +43,6 @@ shared object ideaPlatformServices satisfies PlatformServices {
             => unsafeCast<Indents<IDocument>>(ideaIndents);
 
     createTextChange(String desc, CommonDocument|PhasedUnit input) => IdeaTextChange(input);
+
+    createCompositeChange(String desc) => IdeaCompositeChange();
 }

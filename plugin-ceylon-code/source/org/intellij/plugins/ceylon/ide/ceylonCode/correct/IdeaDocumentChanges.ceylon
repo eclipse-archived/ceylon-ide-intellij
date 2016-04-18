@@ -34,7 +34,8 @@ import com.redhat.ceylon.ide.common.correct {
 }
 import com.redhat.ceylon.ide.common.platform {
     PlatformTextChange=TextChange,
-    PlatformTextEdit=TextEdit
+    PlatformTextEdit=TextEdit,
+    CompositeChange
 }
 
 import java.lang {
@@ -184,12 +185,6 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
         doc = FileDocumentManager.instance.getDocument(vfile);
     }
 
-    shared actual void addChangesFrom(PlatformTextChange other) {
-        if (is IdeaTextChange other) {
-            changes.addAll(other.changes);
-        }
-    }
-
     addEdit(PlatformTextEdit edit) => changes.add(edit);
 
     shared actual CommonDocument document = DocumentWrapper(doc);
@@ -211,4 +206,16 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
             PsiDocumentManager.getInstance(project).commitAllDocuments();
         }
     }
+}
+
+shared class IdeaCompositeChange() satisfies CompositeChange {
+
+    value changes = ArrayList<PlatformTextChange>();
+
+    addTextChange(PlatformTextChange change) => changes.add(change);
+
+    hasChildren => !changes.empty;
+
+    shared void applyChanges(Project myProject)
+            => changes.narrow<IdeaTextChange>().map((_) => _.apply(myProject));
 }
