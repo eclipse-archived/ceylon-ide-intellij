@@ -151,25 +151,25 @@
         <property name="updatePluginsFile" location="${basedir}/out/installation-packages/updatePlugins.xml"/>
 
         <delete dir="${updatePluginsFile}"/>
-        <xmlproperty file="${build.dir}/runtime/META-INF/plugin.xml" prefix="CeylonRuntime"/>
+        <!--<xmlproperty file="${build.dir}/runtime/META-INF/plugin.xml" prefix="CeylonRuntime"/>-->
         <xmlproperty file="${build.dir}/CeylonIDEA/META-INF/plugin.xml" prefix="CeylonIDEA"/>
         <echoxml file="${updatePluginsFile}">
             <plugin-repository>
                 <ff>"Custom Languages"</ff>
                 <category name="Custom Languages">
-                    <idea-plugin>
-                        <id>${CeylonRuntime.idea-plugin.id}</id>
-                        <name>${CeylonRuntime.idea-plugin.name}</name>
-                        <version>${CeylonRuntime.idea-plugin.version}</version>
-                        <idea-version since-build="${CeylonRuntime.idea-plugin.idea-version(since-build)}"/>
-                        <downloadUrl>./CeylonRuntime.zip</downloadUrl>
-                    </idea-plugin>
+                    <!--<idea-plugin>-->
+                        <!--<id>${CeylonRuntime.idea-plugin.id}</id>-->
+                        <!--<name>${CeylonRuntime.idea-plugin.name}</name>-->
+                        <!--<version>${CeylonRuntime.idea-plugin.version}</version>-->
+                        <!--<idea-version since-build="${CeylonRuntime.idea-plugin.idea-version(since-build)}"/>-->
+                        <!--<downloadUrl>./CeylonRuntime.zip</downloadUrl>-->
+                    <!--</idea-plugin>-->
                     <idea-plugin>
                         <id>${CeylonIDEA.idea-plugin.id}</id>
                         <name>${CeylonIDEA.idea-plugin.name}</name>
                         <version>${CeylonIDEA.idea-plugin.version}</version>
                         <idea-version since-build="${CeylonIDEA.idea-plugin.idea-version(since-build)}"/>
-                        <depends>${CeylonRuntime.idea-plugin.id}</depends>
+                        <!--<depends>${CeylonRuntime.idea-plugin.id}</depends>-->
                         <downloadUrl>./CeylonIDEA.zip</downloadUrl>
                     </idea-plugin>
                 </category>
@@ -184,7 +184,6 @@
              dir="${basedir}/plugin-ceylon-code"
              inheritall="false">
         </ant>
-        <antcall target="build-runtime"/>
         <antcall target="build-ide"/>
         <antcall target="generate-update-site"/>
     </target>

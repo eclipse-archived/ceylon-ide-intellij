@@ -16,8 +16,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ceylon-jps-plugin" />
-    <orderEntry type="module" module-name="CeylonRuntime" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon IDE" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon Runtime" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>

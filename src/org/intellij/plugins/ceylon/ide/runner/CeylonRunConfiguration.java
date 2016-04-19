@@ -21,7 +21,7 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.redhat.ceylon.common.Backend;
 import org.apache.commons.lang.ObjectUtils;
-import org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup;
+import org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,7 +71,7 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
                 Sdk projectJdk = getProjectSdk();
                 JavaParameters params = new JavaParameters();
                 params.setJdk(projectJdk);
-                final String repoDir = IdePluginCeylonStartup.getEmbeddedCeylonRepository().getAbsolutePath();
+                final String repoDir = CeylonIdePlugin.getEmbeddedCeylonRepository().getAbsolutePath();
                 params.getVMParametersList().add("-Dceylon.system.repo=" + repoDir);
 
                 params.setMainClass("com.redhat.ceylon.launcher.Bootstrap");
