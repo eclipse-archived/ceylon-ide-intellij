@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ceylon-ide-intellij" default="help" basedir="." xmlns:if="ant:if">
+<project name="ceylon-ide-intellij" default="help" basedir=".">
 
     <tstamp>
         <format property="NOW" pattern="yyyyMMddHHmm" />
     </tstamp>
 
+    <property name="ceylon.root.dir" value="${basedir}/../ceylon" />
     <property file="${basedir}/plugin-ceylon-code/build.properties"/>
     <property name="projects.base.dir" value="${basedir}/.." />
     <property name="build.dir" value="${basedir}/ant-build" />
@@ -81,6 +82,10 @@
         <copy todir="${build.dir}/runtime">
             <fileset dir="${basedir}/CeylonRuntime/src" includes="META-INF/**"/>
         </copy>
+        <replace file="${build.dir}/runtime/META-INF/plugin.xml"
+                 value="${module.com.redhat.ceylon.ide.intellij.version}-${NOW}">
+            <replacetoken>$pluginVersion$</replacetoken>
+        </replace>
         <jar destfile="${build.dir}/CeylonRuntime/lib/CeylonRuntime.jar"
              basedir="${build.dir}/runtime"/>
         <copy todir="${build.dir}/CeylonRuntime/lib" flatten="true">
@@ -126,6 +131,10 @@
         <copy todir="${build.dir}/CeylonIDEA">
             <fileset dir="${basedir}" includes="META-INF/**"/>
         </copy>
+        <replace file="${build.dir}/CeylonIDEA/META-INF/plugin.xml"
+                 value="${module.com.redhat.ceylon.ide.intellij.version}-${NOW}">
+            <replacetoken>$pluginVersion$</replacetoken>
+        </replace>
         <copy todir="${build.dir}/CeylonIDEA/lib" flatten="true">
            <path refid="dist.classpath"/>
         </copy>
@@ -138,6 +147,36 @@
              basedir="${build.dir}" includes="CeylonIDEA/**"/>
     </target>
 
+    <target name="generate-update-site">
+        <property name="updatePluginsFile" location="${basedir}/out/installation-packages/updatePlugins.xml"/>
+
+        <delete dir="${updatePluginsFile}"/>
+        <xmlproperty file="${build.dir}/runtime/META-INF/plugin.xml" prefix="CeylonRuntime"/>
+        <xmlproperty file="${build.dir}/CeylonIDEA/META-INF/plugin.xml" prefix="CeylonIDEA"/>
+        <echoxml file="${updatePluginsFile}">
+            <plugin-repository>
+                <ff>"Custom Languages"</ff>
+                <category name="Custom Languages">
+                    <idea-plugin>
+                        <id>${CeylonRuntime.idea-plugin.id}</id>
+                        <name>${CeylonRuntime.idea-plugin.name}</name>
+                        <version>${CeylonRuntime.idea-plugin.version}</version>
+                        <idea-version since-build="${CeylonRuntime.idea-plugin.idea-version(since-build)}"/>
+                        <downloadUrl>./CeylonRuntime.zip</downloadUrl>
+                    </idea-plugin>
+                    <idea-plugin>
+                        <id>${CeylonIDEA.idea-plugin.id}</id>
+                        <name>${CeylonIDEA.idea-plugin.name}</name>
+                        <version>${CeylonIDEA.idea-plugin.version}</version>
+                        <idea-version since-build="${CeylonIDEA.idea-plugin.idea-version(since-build)}"/>
+                        <depends>${CeylonRuntime.idea-plugin.id}</depends>
+                        <downloadUrl>./CeylonIDEA.zip</downloadUrl>
+                    </idea-plugin>
+                </category>
+            </plugin-repository>
+        </echoxml>
+    </target>
+
     <target name="build"
             description="Builds the IDE plugin">
         <ant antfile="${basedir}/plugin-ceylon-code/build.xml"
@@ -147,6 +186,7 @@
         </ant>
         <antcall target="build-runtime"/>
         <antcall target="build-ide"/>
+        <antcall target="generate-update-site"/>
     </target>
 
     <target name="clean"
