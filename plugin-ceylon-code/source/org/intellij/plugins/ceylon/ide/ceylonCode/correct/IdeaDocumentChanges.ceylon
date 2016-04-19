@@ -107,7 +107,7 @@ shared class TextChange(Document|PhasedUnit|CeylonFile input) {
     shared Boolean hasChildren => !changes.empty;
 }
 
-shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertEdit, TextEdit, TextChange> {
+shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertEdit, AliasedAsTextEdit, TextChange> {
     shared actual void initMultiEditChange(TextChange importChange) {
     }
 
