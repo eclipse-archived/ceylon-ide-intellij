@@ -1,4 +1,6 @@
-Ceylon IDE for IntelliJ [![Join the chat at https://gitter.im/ceylon/ceylon-ide-intellij](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ceylon/ceylon-ide-intellij)
+Ceylon IDE for IntelliJ 
+[![Join the chat at https://gitter.im/ceylon/ceylon-ide-intellij](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ceylon/ceylon-ide-intellij)
+[![Build Status](https://ci-ceylon.rhcloud.com/buildStatus/icon?job=ceylon.formatter)](https://ci-ceylon.rhcloud.com/job/ceylon.formatter)
 =======================
 # Status
 
@@ -37,12 +39,18 @@ _This is the **simplest way** to install the Ceyon IDEA IntelliJ plugin._
 
 Inside the Intellij IDEA environment, follow the instructions [there](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html) in order to add the following URL :
 
-**IntelliJ 2016.1 and later:**
+**IntelliJ 15/2016.1+ and Android Studio 2.0+:**
+Preview builds:
 ```
 http://downloads.ceylon-lang.org/ide/intellij/development/updatePlugins.xml
 ```
 
-**IntelliJ 14/15 and Android Studio 1.5:**
+Nightly builds:
+```
+https://ci-ceylon.rhcloud.com/job/ceylon-ide-intellij/ws/out/installation-packages/updatePlugins.xml
+```
+
+**IntelliJ 14 and Android Studio 1.5:**
 ```
 http://downloads.ceylon-lang.org/ide/intellij/development/legacy/updatePlugins.xml
 ```
