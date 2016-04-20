@@ -39,8 +39,6 @@ public class CeylonIdePlugin implements ApplicationLoadListener {
                 e.printStackTrace();
             }
         }
-
-        new CeylonIdeMetamodelEnricher().initComponent();
     }
 
     @Nullable
