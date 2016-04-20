@@ -6,7 +6,8 @@ import com.intellij.codeInsight.lookup {
     LookupElement
 }
 import com.intellij.openapi.editor {
-    Document
+    Document,
+    AliasedAsTextEdit=TextChange
 }
 import com.intellij.openapi.\imodule {
     Module
@@ -54,7 +55,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 shared interface IdeaQuickFix
-        satisfies AbstractQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
+        satisfies AbstractQuickFix<CeylonFile,Document,InsertEdit,AliasedAsTextEdit,
         TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
     
     shared actual Integer getTextEditOffset(TextEdit change) => change.start;

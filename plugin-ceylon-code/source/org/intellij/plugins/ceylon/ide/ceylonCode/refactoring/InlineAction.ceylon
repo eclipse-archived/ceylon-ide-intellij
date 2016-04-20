@@ -115,6 +115,8 @@ class IdeaInlineRefactoring(CeylonFile file, Node node, Declaration decl, Editor
         satisfies InlineRefactoring<LookupElement,Document,InsertEdit,TextEdit,TextChange,TextChange>
                 & IdeaDocumentChanges {
 
+    editorPhasedUnit => file.phasedUnit;
+
     shared actual void addChangeToChange(TextChange change, TextChange tc) {
         change.addAll(tc);
     }

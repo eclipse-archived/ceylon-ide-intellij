@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    CeylonIterable,
     javaClass
 }
 
@@ -15,8 +14,7 @@ import com.intellij.openapi.fileEditor {
     FileEditorManagerListener
 }
 import com.intellij.openapi.\imodule {
-    Module,
-    ModuleManager
+    Module
 }
 import com.intellij.openapi.roots {
     ModuleRootManager,
@@ -29,8 +27,6 @@ import com.intellij.openapi.vfs {
     VirtualFile,
     VfsUtil,
     VirtualFileManager,
-    VirtualFileVisitor,
-    VfsUtilCore,
     JarFileSystem
 }
 import com.redhat.ceylon.compiler.typechecker.context {
@@ -41,9 +37,6 @@ import com.redhat.ceylon.compiler.typechecker.util {
 }
 import com.redhat.ceylon.ide.common.model {
     CeylonProject
-}
-import com.redhat.ceylon.ide.common.model.parsing {
-    RootFolderScanner
 }
 import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitorChild
@@ -67,10 +60,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     FileWatcher
 }
-import org.jetbrains.jps.model.java {
-    JavaSourceRootType,
-    JavaResourceRootType
-}
 import com.intellij.openapi.roots.impl.libraries {
     ProjectLibraryTable
 }
@@ -80,7 +69,7 @@ import com.intellij.facet {
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
-    
+
     shared actual Module ideArtifact;
     shared actual IdeaCeylonProjects model;
     shared actual String name => ideArtifact.name;
@@ -106,7 +95,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
         throw Exception("Couldn't get module root for ``path``");
     }
 
-    VirtualFile moduleRoot
+    shared VirtualFile moduleRoot
             => let (defaultRoot = getDefaultRoot())
                     if (exists contentsRoot = ModuleRootManager
                             .getInstance(ideaModule)?.contentRoots,
@@ -187,18 +176,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared actual Boolean compileToJs
             => ideConfiguration.compileToJs else false;
-    
-    // TODO check if the module is open?
-    shared actual Boolean nativeProjectIsAccessible => true;
-    
-    shared actual {Module*} referencedNativeProjects(Module mod)
-            => ModuleRootManager.getInstance(mod)
-                .dependencies.array.coalesced;
-    
-    shared actual {Module*} referencingNativeProjects(Module mod)
-            => CeylonIterable(ModuleManager.getInstance(mod.project)
-                .getModuleDependentModules(mod));
-    
+
     late FileWatcher watcher;
     
     shared void setupFileWatcher() {
@@ -229,28 +207,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
         String pluginRepoPath = ext.embeddedCeylonRepository.absolutePath;
         return repoPath.replace("${user.home}", userHomePath).replace("${ceylon.repo}", pluginRepoPath);
     }
-    
-    shared actual {VirtualFile*} resourceNativeFolders {
-        value roots = ModuleRootManager.getInstance(ideaModule)
-                ?.getSourceRoots(JavaResourceRootType.\iRESOURCE);
-        
-        return if (exists roots) then CeylonIterable(roots) else empty;
-    }
-    
-    shared actual {VirtualFile*} sourceNativeFolders {
-        value roots = ModuleRootManager.getInstance(ideaModule)
-                ?.getSourceRoots(JavaSourceRootType.\iSOURCE);
-        
-        return if (exists roots) then CeylonIterable(roots) else empty;
-    }
-    
-    shared actual void scanRootFolder(RootFolderScanner<Module,VirtualFile,VirtualFile,VirtualFile> scanner) {
-        VfsUtilCore.visitChildrenRecursively(scanner.nativeRootDir, 
-            object extends VirtualFileVisitor<Nothing>() {
-                visitFile(VirtualFile file) => scanner.visitNativeResource(file);
-            }
-        );
-    }
+
     shared actual void completeCeylonModelParsing(BaseProgressMonitorChild monitor) {}
     
     shared actual ModuleManagerFactory moduleManagerFactory => 

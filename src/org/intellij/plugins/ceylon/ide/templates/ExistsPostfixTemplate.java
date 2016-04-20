@@ -103,6 +103,10 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
         Module module = ModuleUtil.findModuleForFile(virtualFile, ceylonFile.getProject());
         TypeChecker typeChecker = module.getComponent(ITypeCheckerProvider.class).getTypeChecker();
 
+        if (typeChecker == null) {
+            // the typechecker was not correctly initialized, there's nothing we can do
+            return false;
+        }
         // FIXME I'd prefer having an up-to-date CompilationUnit in CeylonFile instead of having to retrieve another one
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(
                 new VirtualFileVirtualFile(virtualFile, module));

@@ -166,7 +166,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider, DumbA
         }
     }
 
-    private static class ModuleTreeNode extends ProjectViewNode<PsiDirectory> {
+    private static class ModuleTreeNode extends ProjectViewNode<String> {
 
         List<AbstractTreeNode> children = new ArrayList<>();
         @Nullable
@@ -174,7 +174,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider, DumbA
         private final String moduleName;
 
         public ModuleTreeNode(Project parent, @Nullable PsiDirectory directory, String moduleName) {
-            super(parent, directory, ViewSettings.DEFAULT);
+            super(parent, moduleName, ViewSettings.DEFAULT);
             this.directory = directory;
             this.moduleName = moduleName;
         }

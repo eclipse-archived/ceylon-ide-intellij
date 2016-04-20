@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CeylonIDEA.iml" filepath="$PROJECT_DIR$/CeylonIDEA.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CeylonRuntime/CeylonRuntime.iml" filepath="$PROJECT_DIR$/CeylonRuntime/CeylonRuntime.iml" />
       <module fileurl="file://$PROJECT_DIR$/grammar/Grammar.iml" filepath="$PROJECT_DIR$/grammar/Grammar.iml" />
       <module fileurl="file://$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" filepath="$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/compiler/compiler.iml" filepath="$PROJECT_DIR$/compiler/compiler.iml" />

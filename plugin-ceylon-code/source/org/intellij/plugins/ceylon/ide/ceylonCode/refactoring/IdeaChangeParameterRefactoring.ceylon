@@ -90,9 +90,6 @@ import com.redhat.ceylon.ide.common.refactoring {
     getDeclarationForChangeParameters,
     parseTypeExpression
 }
-import com.redhat.ceylon.ide.common.typechecker {
-    AnyProjectPhasedUnit
-}
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
@@ -211,6 +208,8 @@ class IdeaChangeParameterRefactoring(CeylonFile file, Editor editor, IdeaCeylonP
         satisfies ChangeParametersRefactoring<Document,InsertEdit,TextEdit,TextChange,TextChange>
                 & IdeaDocumentChanges {
 
+    editorPhasedUnit => file.phasedUnit;
+
     addChangeToChange(TextChange change, TextChange tc) => change.addAll(tc);
 
 
@@ -232,7 +231,7 @@ class IdeaChangeParameterRefactoring(CeylonFile file, Editor editor, IdeaCeylonP
 
     newDocChange() => TextChange(file.viewProvider.document);
 
-    newTextChange(AnyProjectPhasedUnit pu) => TextChange(pu);
+    newFileChange(PhasedUnit pu) => TextChange(pu);
 
     searchInEditor() => true;
 

@@ -2,12 +2,8 @@ package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.facet.FacetManager;
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.module.ModuleUtil;
@@ -32,7 +28,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.ProgressIndicato
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform.ideaPlatformServices_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
-import org.intellij.plugins.ceylon.runtime.CeylonRuntime;
+import org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.intellij.openapi.application.ApplicationManager.getApplication;
 
 public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvider {
 
@@ -128,7 +126,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
                     isReady = true;
 
-                    ApplicationManager.getApplication().invokeLater(new Runnable() {
+                    getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
@@ -228,30 +226,11 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         );
     }
 
-    @Nullable
-    private File findCeylonLanguageArchive() {
-        PluginId pluginId = PluginManager.getPluginByClassName(CeylonRuntime.class.getName());
-        IdeaPluginDescriptor descriptor = PluginManager.getPlugin(pluginId);
-        File lib = new File(descriptor.getPath(), "lib");
-
-        if (lib.isDirectory()) {
-            File[] files = lib.listFiles();
-            if (files != null) {
-                for (File child : files) {
-                    if (child.getName().startsWith("ceylon.language-")) {
-                        return child;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     private void setupCeylonLanguageSrc(final IdeaCeylonProject ceylonProject) {
-        final File car = findCeylonLanguageArchive();
+        final File car = CeylonIdePlugin.getCeylonLanguageArchive();
 
         if (car != null) {
-            ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+            getApplication().invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     String path;

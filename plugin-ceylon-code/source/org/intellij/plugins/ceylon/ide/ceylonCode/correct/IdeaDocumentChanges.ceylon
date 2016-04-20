@@ -32,6 +32,11 @@ import com.redhat.ceylon.ide.common.correct {
     DocumentChanges,
     CommonDocument
 }
+import com.redhat.ceylon.ide.common.platform {
+    PlatformTextChange=TextChange,
+    PlatformTextEdit=TextEdit,
+    CompositeChange
+}
 
 import java.lang {
     CharSequence,
@@ -102,7 +107,7 @@ shared class TextChange(Document|PhasedUnit|CeylonFile input) {
     shared Boolean hasChildren => !changes.empty;
 }
 
-shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertEdit, TextEdit, TextChange> {
+shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertEdit, AliasedAsTextEdit, TextChange> {
     shared actual void initMultiEditChange(TextChange importChange) {
     }
 
@@ -147,6 +152,70 @@ shared interface IdeaDocumentChanges satisfies DocumentChanges<Document, InsertE
                ));
 }
 
-shared class DocumentWrapper(Document doc) satisfies CommonDocument {
+shared class DocumentWrapper(shared Document doc) satisfies CommonDocument {
     getLineOfOffset(Integer offset) => doc.getLineNumber(offset);
+
+    getLineContent(Integer line)
+            => getText(doc.getLineStartOffset(line), doc.getLineEndOffset(line));
+
+    getLineEndOffset(Integer line) => doc.getLineEndOffset(line);
+
+    getLineStartOffset(Integer line) => doc.getLineStartOffset(line);
+
+    getText(Integer offset, Integer length) => doc.getText(TextRange(offset, length));
+
+    getDefaultLineDelimiter() => "\n";
+}
+
+shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfies PlatformTextChange {
+
+    value changes = ArrayList<PlatformTextEdit>();
+
+    shared Document doc;
+    if (is CommonDocument input) {
+        assert (is DocumentWrapper input);
+        doc = input.doc;
+    } else {
+        VirtualFile? vfile = if (is PhasedUnit input)
+        then VirtualFileManager.instance.findFileByUrl("file://" + input.unit.fullPath)
+        else input.virtualFile;
+
+        assert (exists vfile);
+
+        doc = FileDocumentManager.instance.getDocument(vfile);
+    }
+
+    addEdit(PlatformTextEdit edit) => changes.add(edit);
+
+    shared actual CommonDocument document = DocumentWrapper(doc);
+
+    hasEdits => !changes.empty;
+
+    shared actual void initMultiEdit() {}
+
+    shared void apply(Project? project = null) {
+        value markers = changes.collect(
+            (c) => doc.createRangeMarker(c.start, c.start + c.length)
+        );
+
+        for (change -> marker in zipEntries(changes, markers)) {
+            doc.replaceString(marker.startOffset, marker.endOffset, javaString(change.text));
+        }
+
+        if (exists project) {
+            PsiDocumentManager.getInstance(project).commitAllDocuments();
+        }
+    }
+}
+
+shared class IdeaCompositeChange() satisfies CompositeChange {
+
+    value changes = ArrayList<PlatformTextChange>();
+
+    addTextChange(PlatformTextChange change) => changes.add(change);
+
+    hasChildren => !changes.empty;
+
+    shared void applyChanges(Project myProject)
+            => changes.narrow<IdeaTextChange>().map((_) => _.apply(myProject));
 }

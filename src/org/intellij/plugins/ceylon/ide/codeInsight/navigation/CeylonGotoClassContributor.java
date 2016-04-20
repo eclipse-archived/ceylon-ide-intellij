@@ -10,9 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.MultiMap;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
-import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
-import com.redhat.ceylon.model.typechecker.model.Function;
 import com.redhat.ceylon.model.typechecker.model.Package;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
@@ -30,6 +28,7 @@ import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference
 
 public class CeylonGotoClassContributor implements GotoClassContributor {
 
+    private static final Logger LOGGER = Logger.getInstance(CeylonGotoClassContributor.class);
     private MultiMap<String, Declaration> declarationMap = MultiMap.createSet();
 
     @NotNull
@@ -65,10 +64,7 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
                             if (declaration.getName() == null) {
                                 continue;
                             }
-                            if (declaration instanceof ClassOrInterface) {
-                                declarationMap.putValue(declaration.getName(), declaration);
-                            }
-                            if (declaration instanceof Function) {
+                            if (includeDeclaration((IdeaModule) m, declaration)) {
                                 declarationMap.putValue(declaration.getName(), declaration);
                             }
                         }
@@ -77,9 +73,46 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
             }
         }
 
-        System.out.println("getNames in " + (System.nanoTime() - nano) + "ns");
+        LOGGER.debug("getNames in " + (System.nanoTime() - nano) + "ns");
+
         Set<String> names = declarationMap.keySet();
         return names.toArray(new String[names.size()]);
+    }
+
+    // TODO copied from Eclipse's OpenDeclarationDialog
+    private boolean includeDeclaration(IdeaModule module,
+                                       Declaration dec) {
+        try {
+            boolean visibleFromSourceModules;
+            if (dec.isToplevel()) {
+                visibleFromSourceModules =
+                        dec.isShared() ||
+                                module.getIsProjectModule();
+            }
+            else {
+                visibleFromSourceModules = dec.isShared();
+            }
+            return visibleFromSourceModules &&
+                    isPresentable(dec) /*&&
+                    !isFiltered(dec)*/;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean isPresentable(Declaration d) {
+        String name = d.getName();
+        return name!=null &&
+                !d.isAnonymous() &&
+                !isOverloadedVersion(d);
+    }
+
+    private boolean isOverloadedVersion(Declaration decl) {
+        return decl!=null &&
+                (decl.isOverloaded() &&
+                        !decl.isAbstraction());
     }
 
     @NotNull
@@ -91,7 +124,7 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
             for (Declaration decl : declarationMap.get(name)) {
                 PsiElement resolved = resolveDeclaration(decl, project);
                 if (resolved == null) {
-                    System.out.println("Resolved null: " + decl);
+                    LOGGER.warn("Resolved null: " + decl);
                 } else {
                     elements.add((NavigationItem) resolved);
                 }
@@ -115,7 +148,7 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
             }
             return node.getIdentifier().getText();
         } else if (item instanceof CeylonCompositeElement) {
-            Logger.getInstance(CeylonGotoClassContributor.class).error("Couldn't get qualified name for item " + item.getClass().getName());
+            LOGGER.error("Couldn't get qualified name for item " + item.getClass().getName());
         }
 
         return null;

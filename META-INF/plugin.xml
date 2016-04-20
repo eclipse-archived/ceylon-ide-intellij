@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.intellij.plugins.ceylon.ide</id>
     <name>Ceylon IDE</name>
-    <version>1.2.3</version>
+    <version>$pluginVersion$</version>
     <vendor email="bastien.jansen [at] gmx.com">Bastien Jansen</vendor>
 
     <description>Provides support for the Ceylon programming language</description>
@@ -14,13 +14,6 @@
     <idea-version since-build="141"/>
 
     <depends>com.intellij.modules.lang</depends>
-    <depends>org.intellij.plugins.ceylon.runtime</depends>
-
-    <application-components>
-        <component>
-            <implementation-class>org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup</implementation-class>
-        </component>
-    </application-components>
 
     <project-components>
         <component>
@@ -77,7 +70,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <ApplicationLoadListener implementation="org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup"/>
+        <ApplicationLoadListener implementation="org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin"/>
         <lang.documentationProvider implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonDocProvider" language="Ceylon"/>
 
         <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.CeylonFileTypeFactory"/>
