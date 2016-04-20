@@ -124,6 +124,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     mon.subTask("Typechecking sources files...");
                     fullTypeCheck();
 
+                    ceylonProject.setupFileWatcher();
+
                     isReady = true;
 
                     getApplication().invokeLater(new Runnable() {
@@ -201,6 +203,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
         isReady = false;
         if (ceylonModel != null) {
+            ((IdeaCeylonProject) ceylonModel.getProject(module)).shutdownFileWatcher();
             ceylonModel.removeProject(module);
         }
     }
