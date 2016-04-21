@@ -29,13 +29,13 @@ import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
 import com.redhat.ceylon.ide.common.correct {
-    DocumentChanges,
-    CommonDocument
+    DocumentChanges
 }
 import com.redhat.ceylon.ide.common.platform {
     PlatformTextChange=TextChange,
     PlatformTextEdit=TextEdit,
-    CompositeChange
+    DefaultCompositeChange,
+    CommonDocument
 }
 
 import java.lang {
@@ -208,13 +208,7 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
     }
 }
 
-shared class IdeaCompositeChange() satisfies CompositeChange {
-
-    value changes = ArrayList<PlatformTextChange>();
-
-    addTextChange(PlatformTextChange change) => changes.add(change);
-
-    hasChildren => !changes.empty;
+shared class IdeaCompositeChange() extends DefaultCompositeChange("") {
 
     shared void applyChanges(Project myProject)
             => changes.narrow<IdeaTextChange>().map((_) => _.apply(myProject));
