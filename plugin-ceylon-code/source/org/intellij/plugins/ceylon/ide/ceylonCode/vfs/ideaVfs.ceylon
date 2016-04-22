@@ -138,4 +138,10 @@ shared object vfsKeychain {
     
     class MyKey<T>(String name, shared Module mod) extends Key<T>(name) {
     }
+
+    alias AnyMyKey => MyKey<in Nothing>;
+
+    shared void clear(Module mod) {
+        keys.removeWhere((key) => if (is AnyMyKey key) then key.mod == mod else false);
+    }
 }

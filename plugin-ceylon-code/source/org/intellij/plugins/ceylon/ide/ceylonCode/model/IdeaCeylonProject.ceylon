@@ -64,7 +64,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerInvoker
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    FileWatcher
+    FileWatcher,
+    vfsKeychain
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -265,5 +266,11 @@ shared class IdeaCeylonProject(ideArtifact, model)
         }
 
         return false;
+    }
+
+    shared void beforeDelete() {
+        shutdownFileWatcher();
+        sourceNativeFolders.each(removeFolderFromModel);
+        vfsKeychain.clear(ideaModule);
     }
 }

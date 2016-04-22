@@ -88,6 +88,15 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
     @Override
     public void disposeComponent() {
+        isReady = false;
+        if (ceylonModel != null) {
+            IdeaCeylonProject project = (IdeaCeylonProject) ceylonModel.getProject(module);
+            if (project != null) {
+                project.beforeDelete();
+            }
+            ceylonModel.removeProject(module);
+        }
+
         typeChecker = null;
         ceylonModel = null;
         module = null;
@@ -199,13 +208,6 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
     @Override
     public void projectClosed() {
-        typeChecker = null;
-
-        isReady = false;
-        if (ceylonModel != null) {
-            ((IdeaCeylonProject) ceylonModel.getProject(module)).shutdownFileWatcher();
-            ceylonModel.removeProject(module);
-        }
     }
 
     @Override
