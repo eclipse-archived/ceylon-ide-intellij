@@ -111,7 +111,8 @@ import java.lang {
 import java.util {
     List,
     Set,
-    JArrayList=ArrayList
+    JArrayList=ArrayList,
+    Collections
 }
 
 import javax.swing {
@@ -225,7 +226,7 @@ class IdeaChangeParameterRefactoring(CeylonFile file, Editor editor, IdeaCeylonP
 
     shared actual Boolean enabled => true;
 
-    shared actual List<PhasedUnit> getAllUnits() => project.typechecker?.phasedUnits?.phasedUnits else nothing;
+    getAllUnits() => project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>();
 
     shared actual Boolean inSameProject(Declaration decl) => true;
 
