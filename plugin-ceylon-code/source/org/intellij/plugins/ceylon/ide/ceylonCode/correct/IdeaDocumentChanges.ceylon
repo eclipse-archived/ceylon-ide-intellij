@@ -156,13 +156,13 @@ shared class DocumentWrapper(shared Document doc) satisfies CommonDocument {
     getLineOfOffset(Integer offset) => doc.getLineNumber(offset);
 
     getLineContent(Integer line)
-            => getText(doc.getLineStartOffset(line), doc.getLineEndOffset(line));
+            => doc.getText(TextRange(doc.getLineStartOffset(line), doc.getLineEndOffset(line)));
 
     getLineEndOffset(Integer line) => doc.getLineEndOffset(line);
 
     getLineStartOffset(Integer line) => doc.getLineStartOffset(line);
 
-    getText(Integer offset, Integer length) => doc.getText(TextRange(offset, length));
+    getText(Integer offset, Integer length) => doc.getText(TextRange.from(offset, length));
 
     getDefaultLineDelimiter() => "\n";
 }
