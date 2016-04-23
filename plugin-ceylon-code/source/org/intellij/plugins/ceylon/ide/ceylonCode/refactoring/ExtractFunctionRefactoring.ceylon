@@ -60,7 +60,7 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
 
                     switch (change = refacto.build())
                     case (is IdeaTextChange) {
-                        change.apply(myProject);
+                        change.applyOnProject(myProject);
                     }
                     case (is IdeaCompositeChange) {
                         change.applyChanges(myProject);

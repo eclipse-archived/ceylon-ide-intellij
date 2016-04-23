@@ -20,9 +20,6 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 import com.redhat.ceylon.ide.common.editor {
     AbstractTerminateStatementAction
 }
-import com.redhat.ceylon.ide.common.platform {
-    TextChange
-}
 import com.redhat.ceylon.ide.common.util {
     unsafeCast
 }
@@ -37,19 +34,12 @@ import org.antlr.runtime {
     CommonTokenStream
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper,
-    IdeaTextChange
+    DocumentWrapper
 }
 
 shared class TerminateStatementAction()
         extends SmartEnterProcessor()
         satisfies AbstractTerminateStatementAction<DocumentWrapper> {
-    
-    shared actual void applyChange(TextChange change) {
-        if (is IdeaTextChange change) {
-            change.apply();
-        }
-    }
 
     shared actual [Tree.CompilationUnit, List<CommonToken>] parse(DocumentWrapper doc) {
         value stream = ANTLRStringStream(doc.doc.text);

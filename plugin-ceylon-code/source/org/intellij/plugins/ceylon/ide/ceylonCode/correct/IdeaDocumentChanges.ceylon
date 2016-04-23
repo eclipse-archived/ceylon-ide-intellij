@@ -193,7 +193,9 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
 
     shared actual void initMultiEdit() {}
 
-    shared void apply(Project? project = null) {
+    shared actual void apply() => applyOnProject();
+
+    shared void applyOnProject(Project? project = null) {
         value markers = changes.collect(
             (c) => doc.createRangeMarker(c.start, c.start + c.length)
         );
@@ -211,5 +213,5 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
 shared class IdeaCompositeChange() extends DefaultCompositeChange("") {
 
     shared void applyChanges(Project myProject)
-            => changes.narrow<IdeaTextChange>().map((_) => _.apply(myProject));
+            => changes.narrow<IdeaTextChange>().map((_) => _.applyOnProject(myProject));
 }
