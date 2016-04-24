@@ -37,25 +37,26 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     DocumentWrapper
 }
 
-shared class TerminateStatementAction()
-        extends SmartEnterProcessor()
-        satisfies AbstractTerminateStatementAction<DocumentWrapper> {
+shared class TerminateStatementAction() extends SmartEnterProcessor() {
 
-    shared actual [Tree.CompilationUnit, List<CommonToken>] parse(DocumentWrapper doc) {
-        value stream = ANTLRStringStream(doc.doc.text);
-        value lexer = CeylonLexer(stream);
-        value tokenStream = CommonTokenStream(lexer);
-        value parser = CeylonParser(tokenStream);
-        value cu = parser.compilationUnit();
-        value toks = unsafeCast<List<CommonToken>>(tokenStream.tokens);
-        
-        return [cu, toks];
-    }
-    
     shared actual Boolean process(Project? project, Editor editor, PsiFile? psiFile) {
         value line = editor.document.getLineNumber(editor.caretModel.offset);
+        value handler = object extends AbstractTerminateStatementAction<DocumentWrapper>() {
+            shared actual [Tree.CompilationUnit, List<CommonToken>] parse(DocumentWrapper doc) {
+                value stream = ANTLRStringStream(doc.doc.text);
+                value lexer = CeylonLexer(stream);
+                value tokenStream = CommonTokenStream(lexer);
+                value parser = CeylonParser(tokenStream);
+                value cu = parser.compilationUnit();
+                value toks = unsafeCast<List<CommonToken>>(tokenStream.tokens);
 
-        terminateStatement(DocumentWrapper(editor.document), line);
+                return [cu, toks];
+            }
+        };
+
+        if (exists reg = handler.terminateStatement(DocumentWrapper(editor.document), line)) {
+            editor.caretModel.moveToOffset(reg.start);
+        }
         
         return true;
     }
