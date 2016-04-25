@@ -90,13 +90,8 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
             @NotNull
             private String getBootstrapJarPath() {
-                PluginId runtimePluginId = PluginManager.getPluginByClassName("org.intellij.plugins.ceylon.ide.IdePluginCeylonStartup");
-                assert runtimePluginId != null;
-                IdeaPluginDescriptor runtimePlugin = PluginManager.getPlugin(runtimePluginId);
-                assert runtimePlugin != null;
-                String runtimePluginPath = runtimePlugin.getPath().getAbsolutePath();
-                File bootstrapJar = new File(runtimePluginPath,
-                        FileUtil.join("classes", "embeddedDist", "lib", "ceylon-bootstrap.jar"));
+                File bootstrapJar = new File(CeylonIdePlugin.getEmbeddedCeylonDist(),
+                        FileUtil.join("lib", "ceylon-bootstrap.jar"));
                 assert bootstrapJar.exists() && !bootstrapJar.isDirectory();
                 return bootstrapJar.getAbsolutePath();
             }
