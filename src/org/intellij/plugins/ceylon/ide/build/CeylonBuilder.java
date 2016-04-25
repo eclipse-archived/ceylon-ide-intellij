@@ -28,6 +28,6 @@ public class CeylonBuilder implements CompileTask {
                 }
             }
         }
-        return false;
+        return true;
     }
 }
