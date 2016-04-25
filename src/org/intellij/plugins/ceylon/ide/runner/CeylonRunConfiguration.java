@@ -4,9 +4,6 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -34,7 +31,7 @@ import java.util.LinkedHashSet;
 /**
  * Run configuration for Ceylon files.
  */
-public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule> {
+class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule> {
 
     private String ceylonModule;
 
@@ -43,7 +40,7 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
     private Backend backend = Backend.Java;
 
-    public CeylonRunConfiguration(String name, RunConfigurationModule configurationModule, ConfigurationFactory factory) {
+    CeylonRunConfiguration(String name, RunConfigurationModule configurationModule, ConfigurationFactory factory) {
         super(name, configurationModule, factory);
     }
 
@@ -148,19 +145,19 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         return ProjectRootManager.getInstance(getConfigurationModule().getProject()).getProjectSdk();
     }
 
-    public void setTopLevelNameFull(String topLevelNameFull) {
+    void setTopLevelNameFull(String topLevelNameFull) {
         this.topLevelNameFull = topLevelNameFull;
     }
 
-    public String getTopLevelNameFull() {
+    String getTopLevelNameFull() {
         return topLevelNameFull;
     }
 
-    public String getCeylonModule() {
+    String getCeylonModule() {
         return ceylonModule;
     }
 
-    public String getCeylonModuleOrDft() {
+    private String getCeylonModuleOrDft() {
         return isDefaultModule() ? "default" : ceylonModule;
     }
 
@@ -168,15 +165,15 @@ public class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         return ceylonModule == null || ceylonModule.isEmpty();
     }
 
-    public void setCeylonModule(String ceylonModule) {
+    void setCeylonModule(String ceylonModule) {
         this.ceylonModule = ceylonModule;
     }
 
-    public Backend getBackend() {
+    Backend getBackend() {
         return backend;
     }
 
-    public void setBackend(Backend backend) {
+    void setBackend(Backend backend) {
         if (backend == null) {
             backend = Backend.Java;
         }
