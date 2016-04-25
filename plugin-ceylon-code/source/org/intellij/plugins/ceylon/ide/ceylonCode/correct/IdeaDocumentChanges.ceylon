@@ -213,5 +213,5 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
 shared class IdeaCompositeChange() extends DefaultCompositeChange("") {
 
     shared void applyChanges(Project myProject)
-            => changes.narrow<IdeaTextChange>().map((_) => _.applyOnProject(myProject));
+            => changes.narrow<IdeaTextChange>().each((_) => _.applyOnProject(myProject));
 }

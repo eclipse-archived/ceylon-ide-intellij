@@ -2,7 +2,8 @@ import ceylon.interop.java {
     javaClass,
     createJavaObjectArray,
     createJavaStringArray,
-    javaString
+    javaString,
+    CeylonIterable
 }
 
 import com.intellij.openapi.actionSystem {
@@ -16,7 +17,6 @@ import com.intellij.openapi.command {
     WriteCommandAction
 }
 import com.intellij.openapi.editor {
-    Document,
     Editor
 }
 import com.intellij.openapi.editor.event {
@@ -78,12 +78,8 @@ import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit,
     TypecheckerUnit
 }
-import com.redhat.ceylon.compiler.typechecker.io {
-    VirtualFile
-}
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Node,
-    Tree
+    Node
 }
 import com.redhat.ceylon.ide.common.refactoring {
     ChangeParametersRefactoring,
@@ -94,7 +90,8 @@ import com.redhat.ceylon.ide.common.util {
     nodes
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    Functional
 }
 
 import java.awt {
@@ -121,14 +118,9 @@ import javax.swing {
     JCheckBox
 }
 
-import org.antlr.runtime {
-    CommonToken
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    InsertEdit,
-    TextEdit,
-    TextChange,
-    IdeaDocumentChanges
+    DocumentWrapper,
+    IdeaCompositeChange
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonFileType
@@ -139,6 +131,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    AnyProjectPhasedUnit
 }
 
 shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
@@ -179,15 +174,13 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
                 if (exists params = refacto.computeParameters()) {
                     value dialog = object extends ChangeParameterDialog(params, _project) {
                         shared actual void invokeRefactoring(BaseRefactoringProcessor? processor) {
-                            value chg = TextChange(editor.document);
-                            refacto.build([chg, params]);
-
-                            object extends WriteCommandAction<Nothing>(_project) {
-                                shared actual void run(Result<Nothing>? result) {
-                                    chg.apply(project);
-                                }
-
-                            }.execute();
+                            if (is IdeaCompositeChange chg = refacto.build(params)) {
+                                object extends WriteCommandAction<Nothing>(_project) {
+                                    shared actual void run(Result<Nothing>? result) {
+                                        chg.applyChanges(project);
+                                    }
+                                }.execute();
+                            }
 
                             close(DialogWrapper.\iOK_EXIT_CODE);
                         }
@@ -206,37 +199,15 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
 
 class IdeaChangeParameterRefactoring(CeylonFile file, Editor editor, IdeaCeylonProject project,
         Node node, Declaration declaration)
-        satisfies ChangeParametersRefactoring<Document,InsertEdit,TextEdit,TextChange,TextChange>
-                & IdeaDocumentChanges {
+        extends ChangeParametersRefactoring(node, file.compilationUnit, file.tokens,
+        DocumentWrapper(editor.document), file.phasedUnit,
+        CeylonIterable(project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>())) {
 
-    editorPhasedUnit => file.phasedUnit;
-
-    addChangeToChange(TextChange change, TextChange tc) => change.addAll(tc);
-
-
-    editorData = object satisfies EditorData {
-        shared actual Node node => outer.node;
-
-        shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
-
-        shared actual VirtualFile? sourceVirtualFile => null;
-
-        shared actual List<CommonToken> tokens => file.tokens;
-    };
-
-    shared actual Boolean enabled => true;
-
-    getAllUnits() => project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>();
-
-    shared actual Boolean inSameProject(Declaration decl) => true;
-
-    newDocChange() => TextChange(file.viewProvider.document);
-
-    newFileChange(PhasedUnit pu) => TextChange(pu);
+    shared actual Boolean inSameProject(Functional&Declaration declaration) => true;
 
     searchInEditor() => true;
 
-    searchInFile(PhasedUnit pu) => true;
+    searchInFile(PhasedUnit pu) => pu is AnyProjectPhasedUnit;
 
 }
 
