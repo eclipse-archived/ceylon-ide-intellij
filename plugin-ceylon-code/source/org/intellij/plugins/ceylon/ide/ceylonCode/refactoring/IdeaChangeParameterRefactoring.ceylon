@@ -78,13 +78,12 @@ import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit,
     TypecheckerUnit
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Node
-}
 import com.redhat.ceylon.ide.common.refactoring {
     ChangeParametersRefactoring,
-    getDeclarationForChangeParameters,
     parseTypeExpression
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    AnyProjectPhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -132,9 +131,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import com.redhat.ceylon.ide.common.typechecker {
-    AnyProjectPhasedUnit
-}
 
 shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
     shared actual PsiElement? findTargetMember(PsiFile file, Editor editor) {
@@ -144,8 +140,7 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
     shared actual PsiElement? findTargetMember(PsiElement? element) {
         if (exists element,
             is CeylonFile file = element.containingFile,
-            exists node = nodes.findNode(file.compilationUnit, file.tokens, element.textOffset),
-            exists d = getDeclarationForChangeParameters(node, file.compilationUnit)) {
+            exists node = nodes.findNode(file.compilationUnit, file.tokens, element.textOffset)) {
 
             return element;
         }
@@ -166,12 +161,12 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
             value projects = _project.getComponent(javaClass<IdeaCeylonProjects>());
 
             if (exists mod = ModuleUtil.findModuleForFile(file.virtualFile, _project),
-                is IdeaCeylonProject ceylonProject = projects.getProject(mod),
-                exists node = nodes.findNode(file.compilationUnit, file.tokens, editor.selectionModel.selectionStart, editor.selectionModel.selectionEnd),
-                exists decl = getDeclarationForChangeParameters(node, file.compilationUnit)) {
+                is IdeaCeylonProject ceylonProject = projects.getProject(mod)) {
 
-                value refacto = IdeaChangeParameterRefactoring(file, editor, ceylonProject, node, decl);
-                if (exists params = refacto.computeParameters()) {
+                value refacto = IdeaChangeParameterRefactoring(file, editor, ceylonProject);
+                if (refacto.enabled,
+                    exists params = refacto.computeParameters()) {
+
                     value dialog = object extends ChangeParameterDialog(params, _project) {
                         shared actual void invokeRefactoring(BaseRefactoringProcessor? processor) {
                             if (is IdeaCompositeChange chg = refacto.build(params)) {
@@ -197,11 +192,19 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
 
 }
 
-class IdeaChangeParameterRefactoring(CeylonFile file, Editor editor, IdeaCeylonProject project,
-        Node node, Declaration declaration)
-        extends ChangeParametersRefactoring(node, file.compilationUnit, file.tokens,
-        DocumentWrapper(editor.document), file.phasedUnit,
-        CeylonIterable(project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>())) {
+class IdeaChangeParameterRefactoring(
+    CeylonFile file,
+    Editor editor,
+    IdeaCeylonProject project
+) extends ChangeParametersRefactoring(
+    file.compilationUnit,
+    editor.selectionModel.selectionStart,
+    editor.selectionModel.selectionEnd,
+    file.tokens,
+    DocumentWrapper(editor.document),
+    file.phasedUnit,
+    CeylonIterable(project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>())
+) {
 
     shared actual Boolean inSameProject(Functional&Declaration declaration) => true;
 
