@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
+import com.intellij.codeInsight.completion.CompletionInitializationContext;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.diagnostic.Logger;
@@ -101,7 +102,8 @@ public class IdeaCeylonParser extends IStubFileElementType {
                 dump(root, "");
             }
 
-            if (file.getOriginalFile() instanceof CeylonFile) {
+            if (file.getOriginalFile() instanceof CeylonFile
+                    && !file.getText().contains(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED)) {
                 CeylonFile orig = (CeylonFile) file.getOriginalFile();
                 orig.setRootNode(cu);
                 orig.setTokens(stream.getTokens());
