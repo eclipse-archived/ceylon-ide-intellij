@@ -35,7 +35,9 @@
           <root url="jar://$MODULE_DIR$/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.2.0/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.car!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/plugin-ceylon-code/src" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
