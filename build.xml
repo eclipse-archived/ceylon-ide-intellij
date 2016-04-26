@@ -52,6 +52,7 @@
         <pathelement path="${dist.repo.dir}/com/github/lookfirst/sardine/5.1/com.github.lookfirst.sardine-5.1.jar" />
         <pathelement path="${dist.repo.dir}/com/redhat/ceylon/maven-support/2.0/com.redhat.ceylon.maven-support-2.0.jar" />
 
+        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/cli/1.2.3/com.redhat.ceylon.cli-1.2.3.jar" />
         <pathelement path="${dist.repo.dir}/com/redhat/ceylon/compiler/js/1.2.3/com.redhat.ceylon.compiler.js-1.2.3.jar" />
         <pathelement path="${dist.repo.dir}/com/redhat/ceylon/compiler/java/1.2.3/com.redhat.ceylon.compiler.java-1.2.3.jar" />
         <pathelement path="${dist.repo.dir}/com/redhat/ceylon/typechecker/1.2.3/com.redhat.ceylon.typechecker-1.2.3.jar" />

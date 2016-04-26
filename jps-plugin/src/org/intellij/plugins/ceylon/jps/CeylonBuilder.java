@@ -1,39 +1,51 @@
 package org.intellij.plugins.ceylon.jps;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathUtil;
+import com.redhat.ceylon.common.config.CeylonConfig;
+import com.redhat.ceylon.common.config.CeylonConfigFinder;
+import com.redhat.ceylon.common.config.Repositories;
 import org.intellij.plugins.ceylon.compiler.CeylonCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
+import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
 import org.jetbrains.jps.builders.FileProcessor;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
+import org.jetbrains.jps.incremental.fs.FilesDelta;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
+import org.jetbrains.jps.model.java.JavaResourceRootType;
+import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModule;
+import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
+import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
-/**
- * TODO
- */
-public class CeylonBuilder extends ModuleLevelBuilder {
+class CeylonBuilder extends ModuleLevelBuilder {
 
     private static final String BUILDER_NAME = "ceylon";
 
-    protected CeylonBuilder() {
-        super(BuilderCategory.TRANSLATOR);
+    CeylonBuilder() {
+        // We need to be called before the Java compiler
+        super(BuilderCategory.SOURCE_PROCESSOR);
     }
 
     @Override
-    public ExitCode build(final CompileContext context, ModuleChunk chunk, DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder, OutputConsumer outputConsumer) throws ProjectBuildException, IOException {
+    public List<String> getCompilableFileExtensions() {
+        return Arrays.asList("java", "ceylon");
+    }
+
+    @Override
+    public ExitCode build(final CompileContext context, ModuleChunk chunk,
+                          DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder,
+                          OutputConsumer outputConsumer) throws ProjectBuildException, IOException {
 
         final Map<JpsModule, Boolean> compileForJvm = new HashMap<>();
         for (JpsModule module : chunk.getModules()) {
@@ -46,13 +58,18 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             }
         }
 
+        if (compileForJvm.isEmpty()) {
+            return ExitCode.NOTHING_DONE;
+        }
+
         try {
             final List<String> filesToBuild = new ArrayList<>();
 
             dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
                 @Override
                 public boolean apply(ModuleBuildTarget target, File file, JavaSourceRootDescriptor root) throws IOException {
-                    if (Boolean.TRUE.equals(compileForJvm.get(target.getModule())) && file.getName().endsWith(".ceylon")) {
+                    if (Boolean.TRUE.equals(compileForJvm.get(target.getModule()))
+                            && (file.getName().endsWith(".ceylon") || file.getName().endsWith(".java"))) {
                         String path = file.getAbsolutePath();
                         filesToBuild.add(path);
                     }
@@ -67,6 +84,112 @@ public class CeylonBuilder extends ModuleLevelBuilder {
             e.printStackTrace();
             return ExitCode.ABORT;
         }
+    }
+
+    /**
+     * Creates a list of options to pass to CeyloncTool.
+     *
+     * @param chunk the module chunk being built
+     * @return a list of options for CeyloncTool
+     */
+    private List<String> buildOptions(ModuleChunk chunk) {
+        List<String> options = new ArrayList<>();
+
+        StringBuilder srcPath = new StringBuilder();
+        StringBuilder resourcePath = new StringBuilder();
+
+        for (JpsModule module : chunk.getModules()) {
+            for (JpsModuleSourceRoot sourceRoot : module.getSourceRoots()) {
+                JpsModuleSourceRootType<?> expectedSrcRootType;
+                JpsModuleSourceRootType<?> expectedResourceRootType;
+
+                if (chunk.containsTests()) {
+                    expectedSrcRootType = JavaSourceRootType.SOURCE;
+                    expectedResourceRootType = JavaResourceRootType.RESOURCE;
+                } else {
+                    expectedSrcRootType = JavaSourceRootType.TEST_SOURCE;
+                    expectedResourceRootType = JavaResourceRootType.TEST_RESOURCE;
+                }
+
+                if (sourceRoot.getRootType() == expectedSrcRootType) {
+                    if (!(srcPath.length() == 0)) {
+                        srcPath.append(File.pathSeparator);
+                    }
+                    srcPath.append(sourceRoot.getFile().getAbsolutePath());
+                }
+                if (sourceRoot.getRootType() == expectedResourceRootType) {
+                    if (!(resourcePath.length() == 0)) {
+                        resourcePath.append(File.pathSeparator);
+                    }
+                    resourcePath.append(sourceRoot.getFile().getAbsolutePath());
+                }
+            }
+        }
+
+        JpsCeylonModuleExtension facet = chunk.representativeTarget().getModule().getContainer()
+                .getChild(JpsCeylonModuleExtension.KIND);
+        options.add("-src");
+        options.add(srcPath.toString());
+
+        if (resourcePath.length() > 0) {
+            options.add("-res");
+            options.add(resourcePath.toString());
+        }
+
+        options.add("-g:lines,vars,source");
+
+        File outputDir = chunk.representativeTarget().getOutputDir();
+        if (outputDir != null) {
+            options.add("-out");
+            options.add(outputDir.getAbsolutePath());
+        } else {
+            throw new IllegalArgumentException("Can't detect compiler output path");
+        }
+
+        options.add("-sysrep");
+        if (StringUtil.isNotEmpty(facet.getProperties().getSystemRepository())) {
+            options.add(facet.getProperties().getSystemRepository());
+        } else {
+            options.add(getSystemRepoPath());
+        }
+
+        // TODO we should find where chunk.representativeTarget().getModule() is located instead
+        JpsModuleSourceRoot root = chunk.representativeTarget().getModule().getSourceRoots().get(0);
+        if (root != null) {
+            options.add("-cwd");
+            options.add(root.getFile().getParentFile().getAbsolutePath());
+
+            try {
+                CeylonConfig ceylonConfig = CeylonConfigFinder.loadLocalConfig(root.getFile());
+                Repositories repositories = Repositories.withConfig(ceylonConfig);
+
+                for (Repositories.Repository[] repo : repositories.getRepositories().values()) {
+                    if (repo != null) {
+                        for (Repositories.Repository r : repo) {
+                            options.add("-rep");
+                            options.add(r.getUrl());
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return options;
+    }
+
+    private String getSystemRepoPath() {
+        File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonCompiler.class));
+
+        if (pluginClassesDir.isDirectory()) {
+            File ceylonRepoDir = new File(new File(pluginClassesDir, "embeddedDist"), "repo");
+            if (ceylonRepoDir.exists()) {
+                return ceylonRepoDir.getAbsolutePath();
+            }
+        }
+
+        throw new RuntimeException("Embedded Ceylon system repo not found");
     }
 
     private static final String[] searchedArchives = {
@@ -146,15 +269,37 @@ public class CeylonBuilder extends ModuleLevelBuilder {
         );
 
         try {
+            List<String> options = buildOptions(chunk);
             Class<?> compilerClass = Class.forName("org.intellij.plugins.ceylon.compiler.CeylonCompiler", true, loader);
             Object compiler = compilerClass.newInstance();
-            compilerClass.getMethod("compile", CompileContext.class, ModuleChunk.class, List.class).invoke(compiler, ctx, chunk, filesToBuild);
+            compilerClass
+                    .getMethod("compile", CompileContext.class, ModuleChunk.class, List.class, List.class)
+                    .invoke(compiler, ctx, chunk, filesToBuild, options);
+
+            removeCompiledFilesFromContext(ctx, chunk, filesToBuild);
         } catch (ReflectiveOperationException e) {
             ctx.processMessage(new CompilerMessage(BUILDER_NAME, e));
             return ExitCode.ABORT;
         }
 
         return ExitCode.OK;
+    }
+
+    // Remove Java files from the list of files to process because we already compiled them
+    private void removeCompiledFilesFromContext(CompileContext ctx, ModuleChunk chunk, List<String> filesToBuild) {
+        FilesDelta delta = ctx.getProjectDescriptor().fsState
+                .getEffectiveFilesDelta(ctx, chunk.representativeTarget());
+        for (Map.Entry<BuildRootDescriptor, Set<File>> entry : delta.getSourcesToRecompile().entrySet()) {
+            if (entry.getKey().getTarget() != chunk.representativeTarget()) {
+                continue;
+            }
+            Iterator<File> it = entry.getValue().iterator();
+            while (it.hasNext()) {
+                if (filesToBuild.contains(it.next().getAbsolutePath())) {
+                    it.remove();
+                }
+            }
+        }
     }
 
     @NotNull

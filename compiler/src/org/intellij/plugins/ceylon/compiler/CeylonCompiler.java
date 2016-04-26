@@ -1,40 +1,41 @@
 package org.intellij.plugins.ceylon.compiler;
 
-import com.intellij.openapi.application.PathManager;
-import com.intellij.util.PathUtil;
-import com.redhat.ceylon.common.Versions;
+import com.redhat.ceylon.common.Backend;
+import com.redhat.ceylon.common.tools.ModuleWildcardsHelper;
 import com.redhat.ceylon.compiler.java.launcher.Main;
 import com.redhat.ceylon.compiler.java.tools.CeylonLog;
 import com.redhat.ceylon.compiler.java.tools.CeyloncTaskImpl;
 import com.redhat.ceylon.compiler.java.tools.CeyloncTool;
-import com.redhat.ceylon.langtools.source.util.TaskEvent;
-import com.redhat.ceylon.langtools.source.util.TaskListener;
-import org.jetbrains.jps.ModuleChunk;
-import org.jetbrains.jps.incremental.CompileContext;
-import org.jetbrains.jps.incremental.messages.ProgressMessage;
-import org.jetbrains.jps.javac.PlainMessageDiagnostic;
-import org.jetbrains.jps.model.module.JpsModule;
-import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
-
 import com.redhat.ceylon.javax.tools.Diagnostic;
 import com.redhat.ceylon.javax.tools.DiagnosticListener;
 import com.redhat.ceylon.javax.tools.JavaFileObject;
+import com.redhat.ceylon.langtools.source.util.TaskEvent;
+import com.redhat.ceylon.langtools.source.util.TaskListener;
+import com.redhat.ceylon.langtools.tools.javac.util.Context;
+import org.jetbrains.jps.ModuleChunk;
+import org.jetbrains.jps.incremental.CompileContext;
+import org.jetbrains.jps.incremental.messages.ProgressMessage;
+import org.jetbrains.jps.model.module.JpsModule;
+import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * TODO
- */
 @SuppressWarnings("UnusedDeclaration")
 public class CeylonCompiler {
 
-    public void compile(final CompileContext ctx, ModuleChunk chunk, List<String> filesToBuild) throws MalformedURLException {
+    public void compile(final CompileContext ctx,
+                        ModuleChunk chunk,
+                        List<String> filesToBuild,
+                        List<String> options)
+            throws MalformedURLException {
+
         PrintWriter printWriter = new PrintWriter(System.out);
-        List<String> options = buildOptions(chunk);
 
         CeyloncTool compiler;
         try {
@@ -46,7 +47,7 @@ public class CeylonCompiler {
 
         CompileErrorReporter errorReporter = new CompileErrorReporter(ctx);
 
-        final com.redhat.ceylon.langtools.tools.javac.util.Context context = new com.redhat.ceylon.langtools.tools.javac.util.Context();
+        final Context context = new Context();
         context.put(com.redhat.ceylon.langtools.tools.javac.util.Log.outKey, printWriter);
         context.put(DiagnosticListener.class, errorReporter);
         CeylonLog.preRegister(context);
@@ -56,12 +57,14 @@ public class CeylonCompiler {
         // TODO
 //        computeCompilerClasspath(project, javaProject, options);
 
-        Iterable<? extends JavaFileObject> compilationUnits =
-                fileManager.getJavaFileObjectsFromStrings(filesToBuild);
+//        Iterable<? extends JavaFileObject> compilationUnits =
+//                fileManager.getJavaFileObjectsFromStrings(filesToBuild);
+        List<String> classnames = ModuleWildcardsHelper.expandWildcards(getSourceRoots(chunk),
+                Collections.singletonList("*"), Backend.Java);
 
         CeyloncTaskImpl task = compiler.getTask(printWriter,
-                fileManager, errorReporter, options, null,
-                compilationUnits);
+                fileManager, errorReporter, options, classnames,
+                Collections.<JavaFileObject>emptyList());
 
         task.setTaskListener(new TaskListener() {
             @Override
@@ -84,111 +87,73 @@ public class CeylonCompiler {
         }
         if (!success) {
             final Main.ExitState exitState = task.getExitState();
-            errorReporter.report(new Diagnostic<JavaFileObject>() {
-                @Override
-                public Kind getKind() {
-                    return Kind.ERROR;
-                }
-
-                @Override
-                public JavaFileObject getSource() {
-                    return null;
-                }
-
-                @Override
-                public long getPosition() {
-                    return 0;
-                }
-
-                @Override
-                public long getStartPosition() {
-                    return 0;
-                }
-
-                @Override
-                public long getEndPosition() {
-                    return 0;
-                }
-
-                @Override
-                public long getLineNumber() {
-                    return 0;
-                }
-
-                @Override
-                public long getColumnNumber() {
-                    return 0;
-                }
-
-                @Override
-                public String getCode() {
-                    return null;
-                }
-
-                @Override
-                public String getMessage(Locale locale) {
-                    return exitState.abortingException == null ? "Unknown error" : exitState.abortingException.toString();
-                }
-            });
+            errorReporter.report(new JavaFileObjectDiagnostic(exitState));
             errorReporter.failed();
         }
     }
 
-    /**
-     * Creates a list of options to pass to CeyloncTool.
-     *
-     * @param chunk the module chunk being built
-     * @return a list of options for CeyloncTool
-     */
-    private List<String> buildOptions(ModuleChunk chunk) {
-        List<String> options = new ArrayList<>();
-
-        StringBuilder srcPath = new StringBuilder();
+    List<File> getSourceRoots(ModuleChunk chunk) {
+        List<File> roots = new ArrayList<>();
 
         for (JpsModule module : chunk.getModules()) {
             for (JpsModuleSourceRoot sourceRoot : module.getSourceRoots()) {
-                if (!(srcPath.length() == 0)) {
-                    srcPath.append(File.pathSeparator);
-                }
-                srcPath.append(sourceRoot.getFile().getAbsolutePath());
+                roots.add(sourceRoot.getFile());
             }
         }
 
-        options.add("-src");
-        options.add(srcPath.toString());
-
-        options.add("-g:lines,vars,source");
-
-        File outputDir = chunk.representativeTarget().getOutputDir();
-        if (outputDir != null) {
-            options.add("-out");
-            options.add(outputDir.getAbsolutePath());
-        } else {
-            throw new IllegalArgumentException("Can't detect compiler output path");
-        }
-
-        options.add("-sysrep"); // FIXME should take the repo configured in the facet, if present
-        options.add(getSystemRepoPath());
-
-        String pathToCeylonc = PathManager.getJarPathForClass(CeyloncTool.class);
-        File pathToJars = new File(pathToCeylonc).getParentFile();
-
-        options.add("-classpath");
-        options.add(new File(pathToJars, "ceylon.language-" + Versions.CEYLON_VERSION_NUMBER + ".car").getAbsolutePath());
-
-        return options;
+        return roots;
     }
 
-    private String getSystemRepoPath() {
-        File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonCompiler.class));
+    private static class JavaFileObjectDiagnostic implements Diagnostic<JavaFileObject> {
+        private final Main.ExitState exitState;
 
-        if (pluginClassesDir.isDirectory()) {
-            File ceylonRepoDir = new File(new File(pluginClassesDir, "embeddedDist"), "repo");
-            if (ceylonRepoDir.exists()) {
-                return ceylonRepoDir.getAbsolutePath();
-            }
+        JavaFileObjectDiagnostic(Main.ExitState exitState) {
+            this.exitState = exitState;
         }
 
-        throw new RuntimeException("Embedded Ceylon system repo not found");
+        @Override
+        public Kind getKind() {
+            return Kind.ERROR;
+        }
+
+        @Override
+        public JavaFileObject getSource() {
+            return null;
+        }
+
+        @Override
+        public long getPosition() {
+            return 0;
+        }
+
+        @Override
+        public long getStartPosition() {
+            return 0;
+        }
+
+        @Override
+        public long getEndPosition() {
+            return 0;
+        }
+
+        @Override
+        public long getLineNumber() {
+            return 0;
+        }
+
+        @Override
+        public long getColumnNumber() {
+            return 0;
+        }
+
+        @Override
+        public String getCode() {
+            return null;
+        }
+
+        @Override
+        public String getMessage(Locale locale) {
+            return exitState.abortingException == null ? "Unknown error" : exitState.abortingException.toString();
+        }
     }
 }
