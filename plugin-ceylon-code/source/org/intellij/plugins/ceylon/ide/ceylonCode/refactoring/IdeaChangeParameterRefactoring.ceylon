@@ -86,7 +86,8 @@ import com.redhat.ceylon.ide.common.typechecker {
     AnyProjectPhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
-    nodes
+    nodes,
+    escaping
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
@@ -360,6 +361,9 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
         for (item in myParametersTableModel.items) {
             if (exists error = item.parameter.typeError) {
                 return ValidationInfo(error);
+            }
+            if (item.parameter.name in escaping.keywords) {
+                return ValidationInfo("``item.parameter.name`` is a reserved keyword");
             }
         }
         return super.doValidate();
