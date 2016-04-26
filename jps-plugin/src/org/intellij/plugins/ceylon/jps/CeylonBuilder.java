@@ -104,11 +104,11 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 JpsModuleSourceRootType<?> expectedResourceRootType;
 
                 if (chunk.containsTests()) {
-                    expectedSrcRootType = JavaSourceRootType.SOURCE;
-                    expectedResourceRootType = JavaResourceRootType.RESOURCE;
-                } else {
                     expectedSrcRootType = JavaSourceRootType.TEST_SOURCE;
                     expectedResourceRootType = JavaResourceRootType.TEST_RESOURCE;
+                } else {
+                    expectedSrcRootType = JavaSourceRootType.SOURCE;
+                    expectedResourceRootType = JavaResourceRootType.RESOURCE;
                 }
 
                 if (sourceRoot.getRootType() == expectedSrcRootType) {
