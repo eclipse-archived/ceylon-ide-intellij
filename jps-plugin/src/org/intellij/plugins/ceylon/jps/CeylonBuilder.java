@@ -8,7 +8,6 @@ import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
 import com.redhat.ceylon.compiler.java.runtime.tools.*;
 import com.redhat.ceylon.compiler.java.runtime.tools.Compiler;
-import org.intellij.plugins.ceylon.compiler.CeylonCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
@@ -243,7 +242,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
     }
 
     private String getSystemRepoPath() {
-        File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonCompiler.class));
+        File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonBuilder.class));
 
         if (pluginClassesDir.isDirectory()) {
             File ceylonRepoDir = new File(new File(pluginClassesDir, "embeddedDist"), "repo");
