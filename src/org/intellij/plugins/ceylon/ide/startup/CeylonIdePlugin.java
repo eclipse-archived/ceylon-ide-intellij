@@ -113,16 +113,23 @@ public class CeylonIdePlugin implements ApplicationLoadListener {
 
     @NotNull
     public static File getEmbeddedCeylonDist() {
-        File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonIdePlugin.class));
-
-        if (pluginClassesDir.isDirectory()) {
-            File ceylonRepoDir = new File(pluginClassesDir, "embeddedDist");
-            if (ceylonRepoDir.exists()) {
-                return ceylonRepoDir;
-            }
+        File ceylonRepoDir = new File(getClassesDir(), "embeddedDist");
+        if (ceylonRepoDir.exists()) {
+            return ceylonRepoDir;
         }
 
         throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
+    }
+
+    @NotNull
+    public static File getClassesDir() {
+        File pluginClassesDir = new File(PathUtil.getJarPathForClass(CeylonIdePlugin.class));
+
+        if (pluginClassesDir.isDirectory()) {
+            return pluginClassesDir;
+        }
+
+        throw new PluginException("Plugin's 'classes' directory not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
     }
 
     /**
