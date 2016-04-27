@@ -9,6 +9,7 @@
       <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/typechecker/1.2.3/com.redhat.ceylon.typechecker-1.2.3.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/compiler/js/1.2.3/com.redhat.ceylon.compiler.js-1.2.3.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/compiler/java/1.2.3/com.redhat.ceylon.compiler.java-1.2.3.jar!/" />
+      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/tool/provider/1.2.3/com.redhat.ceylon.tool.provider-1.2.3.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/org/jboss/logmanager/2.0.3.Final/org.jboss.logmanager-2.0.3.Final.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/org/apache/httpcomponents/httpcore/4.3.2/org.apache.httpcomponents.httpcore-4.3.2.jar!/" />
       <root url="jar://$CEYLON_DIST$/repo/org/apache/commons/codec/1.8/org.apache.commons.codec-1.8.jar!/" />
@@ -33,6 +34,8 @@
       <root url="file://$PROJECT_DIR$/../ceylon/runtime/testsuite/src/test/java" />
       <root url="file://$PROJECT_DIR$/../ceylon/compiler-js/src/main/java" />
       <root url="file://$PROJECT_DIR$/../ceylon/langtools-classfile/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon/tool-provider/src" />
+      <root url="file://$PROJECT_DIR$/../ceylon/cli/src" />
     </SOURCES>
   </library>
 </component>

@@ -144,9 +144,19 @@
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
-        <compileServer.plugin classpath=".;./classes/;../classes/embeddedDist/repo/com/redhat/ceylon/common/1.2.3/com.redhat.ceylon.common-1.2.3.jar"/>
-        <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonBuilder" execute="AFTER"/>
-        <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonJsBuilder" execute="AFTER"/>
+        <compileServer.plugin
+                classpath="../classes/embeddedDist/repo/com/redhat/ceylon/common/1.2.3/com.redhat.ceylon.common-1.2.3.jar;
+                ;../classes/embeddedDist/repo/com/redhat/ceylon/tool/provider/1.2.3/com.redhat.ceylon.tool.provider-1.2.3.jar;
+                ;../classes/embeddedDist/repo/com/redhat/ceylon/compiler/java/1.2.3/com.redhat.ceylon.compiler.java-1.2.3.jar;
+                ;../classes/embeddedDist/repo/com/redhat/ceylon/model/1.2.3/com.redhat.ceylon.model-1.2.3.jar;
+                ;../classes/embeddedDist/repo/com/redhat/ceylon/cli/1.2.3/com.redhat.ceylon.cli-1.2.3.jar;
+                ;../classes/embeddedDist/repo/com/redhat/ceylon/module-resolver/1.2.3/com.redhat.ceylon.module-resolver-1.2.3.jar;
+                ;../classes/embeddedDist/repo/com/redhat/ceylon/typechecker/1.2.3/com.redhat.ceylon.typechecker-1.2.3.jar;
+                ;../classes/embeddedDist/repo/org/antlr/runtime/3.4/org.antlr.runtime-3.4.jar;
+                ;../classes/embeddedDist/repo/com/redhat/ceylon/compiler/js/1.2.3/com.redhat.ceylon.compiler.js-1.2.3.jar"/>
+
+        <!--<compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonBuilder" execute="AFTER"/>-->
+        <!--<compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonJsBuilder" execute="AFTER"/>-->
 
         <moduleService serviceInterface="org.intellij.plugins.ceylon.ide.repo.RepositoryManager" serviceImplementation="org.intellij.plugins.ceylon.ide.repo.RepositoryManagerImpl"/>
 
