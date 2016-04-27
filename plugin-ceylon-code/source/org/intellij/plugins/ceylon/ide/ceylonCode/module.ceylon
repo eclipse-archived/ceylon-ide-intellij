@@ -1,7 +1,7 @@
 "Default documentation for module `org.intellij.plugins.ceylon.ide.ceylonCode`."
 
 native("jvm")
-module org.intellij.plugins.ceylon.ide.ceylonCode "1.2.0" {
+module org.intellij.plugins.ceylon.ide.ceylonCode "current" {
     shared import java.base "7";
     shared import com.redhat.ceylon.ide.common "1.2.3";
     shared import com.intellij.openapi "current";

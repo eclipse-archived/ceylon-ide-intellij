@@ -62,7 +62,7 @@
     </path>
 
     <path id="dist.classpath">
-        <pathelement path="${basedir}/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/1.2.0/org.intellij.plugins.ceylon.ide.ceylonCode-1.2.0.car" />
+        <pathelement path="${basedir}/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/current/org.intellij.plugins.ceylon.ide.ceylonCode-current.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.2.3/com.redhat.ceylon.ide.common-1.2.3.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar" />
