@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.jps;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathUtil;
@@ -26,6 +27,7 @@ import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 
 import static com.redhat.ceylon.common.config.DefaultToolOptions.*;
@@ -35,6 +37,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
     private static final String BUILDER_NAME = "ceylon";
     private final Backend backend;
+    private static final Logger logger = Logger.getInstance(CeylonBuilder.class);
 
     CeylonBuilder(Backend backend, BuilderCategory category) {
         super(category);
@@ -103,16 +106,26 @@ class CeylonBuilder extends ModuleLevelBuilder {
         Compiler compiler = CeylonToolProvider.getCompiler(backend);
         CompilerOptions options = buildOptions(chunk);
 
+        String message;
         if (options.getModules().isEmpty()) {
-            ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.INFO,
-                    "No Ceylon module to build for " + backend.name() + " backend."));
-            return ExitCode.NOTHING_DONE;
+            message = "No Ceylon module to build for " + backend.name() + " backend.";
         } else {
-            ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.INFO,
-                    "Building modules " + options.getModules()));
+            message = "Building modules " + options.getModules();
         }
 
-        compiler.compile(options, new CompilationListener() {
+        ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.INFO,
+                message));
+        logger.info(message);
+
+        if (options.getModules().isEmpty()) {
+            logger.info("Nothing done");
+            return ExitCode.NOTHING_DONE;
+        }
+
+        CompileContextWriter writer = new CompileContextWriter(ctx);
+        options.setOutWriter(writer);
+
+        boolean compileResult = compiler.compile(options, new CompilationListener() {
             @Override
             public void error(File file, long line, long column, String message) {
                 ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR,
@@ -132,7 +145,17 @@ class CeylonBuilder extends ModuleLevelBuilder {
             }
         });
 
+        writer.close();
+
+        if (!compileResult) {
+            logger.error("Compiler returned false!", (Throwable) null);
+            ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR,
+                    "An unknown error occurred in the " + backend.name() + " backend. " +
+                            "See previous messages for more information."));
+        }
+
         if (backend == Backend.Java) {
+            logger.info("Removing Java files that were already compiled from the context");
             removeCompiledJavaFilesFromContext(ctx, chunk, filesToBuild);
         }
 
@@ -258,18 +281,24 @@ class CeylonBuilder extends ModuleLevelBuilder {
     private void removeCompiledJavaFilesFromContext(CompileContext ctx, ModuleChunk chunk, List<String> filesToBuild) {
         FilesDelta delta = ctx.getProjectDescriptor().fsState
                 .getEffectiveFilesDelta(ctx, chunk.representativeTarget());
-        for (Map.Entry<BuildRootDescriptor, Set<File>> entry : delta.getSourcesToRecompile().entrySet()) {
-            if (entry.getKey().getTarget() != chunk.representativeTarget()) {
-                continue;
-            }
-            Iterator<File> it = entry.getValue().iterator();
-            while (it.hasNext()) {
-                File file = it.next();
-                if (filesToBuild.contains(file.getAbsolutePath())
-                        && file.getName().endsWith(".java")) {
-                    it.remove();
+        try {
+            delta.lockData();
+
+            for (Map.Entry<BuildRootDescriptor, Set<File>> entry : delta.getSourcesToRecompile().entrySet()) {
+                if (entry.getKey().getTarget() != chunk.representativeTarget()) {
+                    continue;
+                }
+                Iterator<File> it = entry.getValue().iterator();
+                while (it.hasNext()) {
+                    File file = it.next();
+                    if (filesToBuild.contains(file.getAbsolutePath())
+                            && file.getName().endsWith(".java")) {
+                        it.remove();
+                    }
                 }
             }
+        } finally {
+            delta.unlockData();
         }
     }
 
@@ -277,5 +306,68 @@ class CeylonBuilder extends ModuleLevelBuilder {
     @Override
     public String getPresentableName() {
         return "Ceylon compiler";
+    }
+
+    private static class CompileContextWriter extends Writer {
+        private final CompileContext ctx;
+        private String previousLine;
+
+        CompileContextWriter(CompileContext ctx) {
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void write(@NotNull char[] cbuf, int off, int len) throws IOException {
+            String line = new String(cbuf, off, len);
+            if (StringUtil.isEmptyOrSpaces(line)) {
+                return;
+            }
+            if (line.endsWith("\n")) {
+                line = line.substring(0, line.length() - 1); // remove \n
+            }
+            logger.info(line);
+            BuildMessage.Kind kind = BuildMessage.Kind.INFO;
+            BuildMessage.Kind previousKind = BuildMessage.Kind.INFO;
+
+            if (line.startsWith("An exception has occurred in the compiler")
+                    || line.startsWith("\n\nAn input/output error occurred.")
+                    || line.startsWith("\n\nAn annotation processor threw an uncaught exception.")) {
+
+                kind = BuildMessage.Kind.ERROR;
+            }
+            if (line.startsWith("\tat ") || line.startsWith("\t... ")) {
+                kind = BuildMessage.Kind.ERROR;
+                previousKind = BuildMessage.Kind.ERROR;
+            }
+
+            if (previousLine != null) {
+                log(previousLine, previousKind);
+                previousLine = null;
+            }
+
+            if (kind == BuildMessage.Kind.INFO) {
+                previousLine = line;
+            } else {
+                log(line, kind);
+            }
+        }
+
+        private void log(String msg, BuildMessage.Kind kind) {
+            ctx.processMessage(new CompilerMessage(
+                    BUILDER_NAME,
+                    kind,
+                    msg
+            ));
+        }
+
+        @Override
+        public void flush() throws IOException {}
+
+        @Override
+        public void close() throws IOException {
+            if (previousLine != null) {
+                log(previousLine, BuildMessage.Kind.INFO);
+            }
+        }
     }
 }

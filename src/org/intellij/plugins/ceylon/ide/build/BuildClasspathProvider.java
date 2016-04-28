@@ -22,11 +22,13 @@ public class BuildClasspathProvider extends BuildProcessParametersProvider {
             "net.minidev.json-smart",
             "com.redhat.ceylon.model",
             "com.redhat.ceylon.common",
+            "com.github.rjeschke.txtmark",
             "com.redhat.ceylon.typechecker",
             "com.redhat.ceylon.compiler.js",
             "com.redhat.ceylon.compiler.java",
             "com.redhat.ceylon.tool.provider",
             "com.redhat.ceylon.module-resolver",
+            "com.redhat.ceylon.langtools.classfile",
             "com.redhat.ceylon.module-resolver-javascript"
     );
 
@@ -56,6 +58,9 @@ public class BuildClasspathProvider extends BuildProcessParametersProvider {
                     break;
                 case "org.antlr.runtime":
                     version = "3.4";
+                    break;
+                case "com.github.rjeschke.txtmark":
+                    version = "0.13";
                     break;
                 default:
                     version = Versions.CEYLON_VERSION_NUMBER;
