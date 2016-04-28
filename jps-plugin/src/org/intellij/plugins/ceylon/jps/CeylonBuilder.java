@@ -134,7 +134,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
             @Override
             public void warning(File file, long line, long column, String message) {
-                ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR,
+                ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.WARNING,
                         message, file.getAbsolutePath(), -1, -1, -1, line, column));
             }
 
