@@ -56,6 +56,15 @@ class CeylonBuilder extends ModuleLevelBuilder {
                           DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder,
                           OutputConsumer outputConsumer) throws ProjectBuildException, IOException {
 
+        JpsCeylonGlobalSettings settings = JpsCeylonGlobalSettings.INSTANCE;
+        if (settings == null) {
+            context.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR,
+                    "Could not read settings from JpsCeylonGlobalSettings.INSTANCE"));
+            return ExitCode.ABORT;
+        } else if (!settings.isUseOutProcessBuild()) {
+            return ExitCode.NOTHING_DONE;
+        }
+
         final Map<JpsModule, Boolean> compileForBackend = new HashMap<>();
         for (JpsModule module : chunk.getModules()) {
             JpsCeylonModuleExtension facet = module.getContainer().getChild(JpsCeylonModuleExtension.KIND);
@@ -110,7 +119,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
         if (options.getModules().isEmpty()) {
             message = "No Ceylon module to build for " + backend.name() + " backend.";
         } else {
-            message = "Building modules " + options.getModules();
+            message = "Building modules " + options.getModules() + " using the " + backend.name() + " backend.";
         }
 
         ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.INFO,
@@ -305,7 +314,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
     @NotNull
     @Override
     public String getPresentableName() {
-        return "Ceylon compiler";
+        return "Ceylon " + backend.name() + " compiler";
     }
 
     private static class CompileContextWriter extends Writer {
