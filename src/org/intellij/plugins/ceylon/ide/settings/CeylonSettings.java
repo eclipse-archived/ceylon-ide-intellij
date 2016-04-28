@@ -24,9 +24,10 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
     }
 
     static class CeylonOptions {
-        public String defaultTargetVm = "jvm";
-        public String defaultSourceFolder = "source";
-        public String defaultResourceFolder = "resource";
+        private String defaultTargetVm = "jvm";
+        private String defaultSourceFolder = "source";
+        private String defaultResourceFolder = "resource";
+        private boolean useOutProcessBuild = true;
     }
 
     public static CeylonSettings getInstance() {
@@ -50,6 +51,10 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
         return myOptions.defaultResourceFolder;
     }
 
+    public boolean isUseOutProcessBuild() {
+        return myOptions.useOutProcessBuild;
+    }
+
     public void setDefaultTargetVm(String defaultTargetVm) {
         myOptions.defaultTargetVm = defaultTargetVm;
     }
@@ -60,5 +65,9 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
 
     public void setDefaultResourceFolder(String defaultResourceFolder) {
         myOptions.defaultResourceFolder = defaultResourceFolder;
+    }
+
+    public void setUseOutProcessBuild(boolean useOutProcessBuild) {
+        myOptions.useOutProcessBuild = useOutProcessBuild;
     }
 }

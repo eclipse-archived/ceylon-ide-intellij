@@ -16,7 +16,7 @@
           <text value="Preferences relating to Ceylon development."/>
         </properties>
       </component>
-      <grid id="e4ada" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e4ada" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
@@ -118,6 +118,14 @@
             </constraints>
             <properties>
               <text value="&lt;html&gt;See &lt;a href=&quot;preferences.Ceylon.editor.completion&quot;&gt;Completion&lt;/a&gt; for preferences related to content completion.&lt;/html&gt;"/>
+            </properties>
+          </component>
+          <component id="2d2a3" class="javax.swing.JLabel" binding="compilerLink">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="&lt;html&gt;See &lt;a href=&quot;preferences.Ceylon.compiler&quot;&gt;Compiler&lt;/a&gt; for preferences related to the compiler.&lt;/html&gt;"/>
             </properties>
           </component>
         </children>
