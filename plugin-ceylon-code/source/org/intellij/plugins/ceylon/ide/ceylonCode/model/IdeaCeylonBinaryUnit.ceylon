@@ -2,7 +2,8 @@ import com.intellij.openapi.\imodule {
     Module
 }
 import com.intellij.psi {
-    PsiClass
+    PsiClass,
+    PsiMethod
 }
 import com.redhat.ceylon.ide.common.model {
     CeylonBinaryUnit
@@ -17,7 +18,7 @@ shared class IdeaCeylonBinaryUnit(
     String relativePath,
     String fullPath,
     Package pkg)
-        extends CeylonBinaryUnit<Module,PsiClass,PsiClass>(
+        extends CeylonBinaryUnit<Module,PsiClass,PsiClass|PsiMethod>(
     cls, filename, relativePath, fullPath, pkg)
         satisfies IdeaJavaModelAware {
     

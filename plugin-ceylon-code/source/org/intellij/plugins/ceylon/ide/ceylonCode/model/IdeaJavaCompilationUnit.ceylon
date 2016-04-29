@@ -5,7 +5,8 @@ import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.intellij.psi {
-    PsiClass
+    PsiClass,
+    PsiMethod
 }
 import com.redhat.ceylon.ide.common.model {
     JavaCompilationUnit
@@ -21,7 +22,7 @@ class IdeaJavaCompilationUnit(
     String relativePath,
     String fullPath,
     Package pkg)
-        extends JavaCompilationUnit<Module,VirtualFile,VirtualFile,PsiClass,PsiClass>
+        extends JavaCompilationUnit<Module,VirtualFile,VirtualFile,PsiClass,PsiClass|PsiMethod>
         (cls, filename, relativePath, fullPath, pkg)
         satisfies IdeaJavaModelAware {
     

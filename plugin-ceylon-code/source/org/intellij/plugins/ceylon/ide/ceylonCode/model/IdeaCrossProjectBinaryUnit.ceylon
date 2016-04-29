@@ -5,7 +5,8 @@ import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.intellij.psi {
-    PsiClass
+    PsiClass,
+    PsiMethod
 }
 import com.redhat.ceylon.ide.common.model {
     CrossProjectBinaryUnit
@@ -19,7 +20,7 @@ class IdeaCrossProjectBinaryUnit(PsiClass cls,
     String relativePath,
     String fullPath,
     Package pkg)
-        extends CrossProjectBinaryUnit<Module,VirtualFile,VirtualFile,VirtualFile,PsiClass,PsiClass>
+        extends CrossProjectBinaryUnit<Module,VirtualFile,VirtualFile,VirtualFile,PsiClass,PsiClass|PsiMethod>
         (cls, filename, relativePath, fullPath, pkg)
         satisfies IdeaJavaModelAware {
     
