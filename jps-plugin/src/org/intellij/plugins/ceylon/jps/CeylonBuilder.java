@@ -98,7 +98,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 }
             });
 
-            return compile(context, chunk, filesToBuild);
+            return compile(context, chunk, filesToBuild, settings);
         } catch (Exception e) {
             context.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR, "Could not launch compiler"));
             context.processMessage(new CompilerMessage(BUILDER_NAME, e));
@@ -107,7 +107,11 @@ class CeylonBuilder extends ModuleLevelBuilder {
         }
     }
 
-    private ExitCode compile(final CompileContext ctx, ModuleChunk chunk, List<String> filesToBuild) throws IOException {
+    private ExitCode compile(final CompileContext ctx,
+                             ModuleChunk chunk,
+                             List<String> filesToBuild,
+                             JpsCeylonGlobalSettings settings) throws IOException {
+
         if (filesToBuild.isEmpty()) {
             return ExitCode.NOTHING_DONE;
         }
@@ -133,6 +137,12 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
         CompileContextWriter writer = new CompileContextWriter(ctx);
         options.setOutWriter(writer);
+        if (settings.isMakeCompilerVerbose()) {
+            options.setVerbose(true);
+            if (!StringUtil.isEmptyOrSpaces(settings.getVerbosityLevel())) {
+                options.setVerboseCategory(settings.getVerbosityLevel());
+            }
+        }
 
         boolean compileResult = compiler.compile(options, new CompilationListener() {
             @Override
