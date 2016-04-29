@@ -15,7 +15,6 @@ import com.redhat.ceylon.model.typechecker.model {
     Package
 }
 
-// TODO should not restrict to PsiClass (can also be a PsiMethod)
 class IdeaJavaClassFile(
     PsiClass cls,
     String filename,
