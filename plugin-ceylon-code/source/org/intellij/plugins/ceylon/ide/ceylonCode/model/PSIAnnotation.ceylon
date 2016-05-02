@@ -5,16 +5,6 @@ import ceylon.interop.java {
     javaString
 }
 
-import com.intellij.openapi.application {
-    ApplicationManager
-}
-import com.intellij.openapi.project {
-    DumbService,
-    Project
-}
-import com.intellij.openapi.util {
-    Ref
-}
 import com.intellij.psi {
     PsiAnnotation,
     PsiLiteralExpression,
@@ -32,8 +22,7 @@ import com.redhat.ceylon.model.loader.mirror {
 }
 
 import java.lang {
-    JShort=Short,
-    Runnable
+    JShort=Short
 }
 import java.util {
     ArrayList
@@ -84,25 +73,4 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
     shared actual Object? getValue(String name) => values.get(name);
     
     shared actual Object? \ivalue => getValue("value");
-}
-
-Return doWithLock<Return>(Return() callback) {
-    value lock = ApplicationManager.application.acquireReadActionLock();
-    try {
-        return callback();
-    } finally {
-        lock.finish();
-    }
-}
-
-shared Return doWithIndex<Return>(Project p, Return() callback) {
-
-    value ref = Ref<Return>();
-    value runnable = object satisfies Runnable {
-        shared actual void run() => ref.set(callback());
-    };
-    
-    DumbService.getInstance(p).runReadActionInSmartMode(runnable);
-
-    return ref.get();
 }
