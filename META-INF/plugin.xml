@@ -111,9 +111,14 @@
         <completion.contributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonCompletionContributor"/>
         <codeInsight.parameterInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonParameterInfoHandler"/>
 
-        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass" implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner"
                                   implementationClass="org.intellij.plugins.ceylon.ide.presentation.DeclarationPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationNavigationItem"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationPresentationProvider"/>
+        <moduleRendererFactory implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationModuleRendererFactory"/>
+        
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonVariableRenameHandler"/>
         <renamePsiElementProcessor implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenamePsiProcessor"/>

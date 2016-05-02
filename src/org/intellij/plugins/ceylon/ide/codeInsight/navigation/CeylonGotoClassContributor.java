@@ -6,12 +6,13 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.MultiMap;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
+import com.redhat.ceylon.ide.common.model.JavaUnit;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Package;
+import org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationNavigationItem;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
@@ -23,8 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference.resolveDeclaration;
 
 public class CeylonGotoClassContributor implements GotoClassContributor {
 
@@ -64,7 +63,8 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
                             if (declaration.getName() == null) {
                                 continue;
                             }
-                            if (includeDeclaration((IdeaModule) m, declaration)) {
+                            if (!(declaration.getUnit() instanceof JavaUnit)
+                                    && includeDeclaration((IdeaModule) m, declaration)) {
                                 declarationMap.putValue(declaration.getName(), declaration);
                             }
                         }
@@ -122,12 +122,7 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
             Set<NavigationItem> elements = new HashSet<>();
 
             for (Declaration decl : declarationMap.get(name)) {
-                PsiElement resolved = resolveDeclaration(decl, project);
-                if (resolved == null) {
-                    LOGGER.warn("Resolved null: " + decl);
-                } else {
-                    elements.add((NavigationItem) resolved);
-                }
+                elements.add(new DeclarationNavigationItem(decl, project));
             }
 
             return elements.toArray(new NavigationItem[elements.size()]);
