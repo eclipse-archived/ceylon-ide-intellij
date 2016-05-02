@@ -29,7 +29,7 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
     private JTextField compilationUnit;
     private JPanel headerPane;
 
-    public CreateCeylonModuleWizard(@NotNull Project project, @NotNull TypeChecker typeChecker) {
+    public CreateCeylonModuleWizard(@NotNull Project project, @Nullable TypeChecker typeChecker) {
         super(project, true);
         this.typeChecker = typeChecker;
 

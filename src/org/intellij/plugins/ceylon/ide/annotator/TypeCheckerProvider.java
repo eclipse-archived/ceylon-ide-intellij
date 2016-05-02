@@ -45,6 +45,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     private TypeChecker typeChecker;
     private IdeaCeylonProjects ceylonModel;
     private boolean isReady;
+    private boolean isPreparingTc;
 
     public TypeCheckerProvider(Module module) {
         this.module = module;
@@ -116,7 +117,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         if (ceylonModel == null) {
             return; // the module was just created, moduleAdded() will typecheck again
         }
-        if (typeChecker == null) {
+        if (typeChecker == null && !isPreparingTc) {
+            isPreparingTc = true;
             ideaPlatformServices_.get_().register();
             final IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
 
@@ -136,6 +138,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
                     ceylonProject.setupFileWatcher();
 
                     isReady = true;
+                    isPreparingTc = false;
 
                     getApplication().invokeLater(new Runnable() {
                         @Override
