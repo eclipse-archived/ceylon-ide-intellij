@@ -2,6 +2,9 @@ import com.github.rjeschke.txtmark {
     Processor,
     Configuration
 }
+import com.intellij.codeInsight.javadoc {
+    JavaDocInfoGenerator
+}
 import com.intellij.openapi.editor {
     Document
 }
@@ -10,6 +13,13 @@ import com.intellij.openapi.editor.colors {
 }
 import com.intellij.openapi.project {
     Project
+}
+import com.intellij.psi.impl.compiled {
+    ClsClassImpl,
+    ClsMethodImpl
+}
+import com.intellij.psi.javadoc {
+    PsiDocComment
 }
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
@@ -30,8 +40,7 @@ import com.redhat.ceylon.ide.common.imports {
     AbstractModuleImportUtil
 }
 import com.redhat.ceylon.ide.common.model {
-    BaseCeylonProject,
-    IJavaModelAware
+    BaseCeylonProject
 }
 import com.redhat.ceylon.ide.common.settings {
     CompletionOptions
@@ -60,6 +69,9 @@ import com.redhat.ceylon.model.typechecker.util {
 import java.awt {
     Font
 }
+import java.lang {
+    JStringBuilder=StringBuilder
+}
 import java.util {
     JList=List
 }
@@ -79,11 +91,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
 import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
     ideaModuleImportUtils
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    IdeaJavaModelAware
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
-}
-import com.intellij.psi {
-    PsiDocCommentOwner
 }
 
 String psiProtocol = "psi_element://";
@@ -106,11 +118,11 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator<Document> {
         shared Project ideaProject => p;
         shared actual CompletionOptions options => nothing;
     }
-    
+
     String hexColor(Integer red, Integer green, Integer blue) {
         return "#" + formatInteger(red, 16).padLeading(2, '0') + formatInteger(green, 16).padLeading(2, '0') + formatInteger(blue, 16).padLeading(2, '0');
     }
-    
+
     TextAttributesKey getAttributes(Colors color) {
         switch (color)
         case (Colors.strings) { return ceylonHighlightingColors.strings; }
@@ -127,10 +139,10 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator<Document> {
         value color = "color:``hexColor(attributes.foregroundColor.red, attributes.foregroundColor.green, attributes.foregroundColor.blue)``";
         value bold = if (attributes.fontType.and(Font.\iBOLD) != 0) then "font-weight: bold" else "";
         value italic = if (attributes.fontType.and(Font.\iITALIC) != 0) then "font-size: italic" else "";
-        
+
         return "<code style='``color``; ``bold``; ``italic``'>``what else "<error>"``</code>";
     }
-    
+
     Icon? getIconUrl(Icons|Referenceable thing) {
         if (is Declaration thing) {
             return ideaIcons.forDeclaration(thing);
@@ -162,31 +174,48 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator<Document> {
                 else null;
         }
     }
-    
+
     shared actual void addIconAndText(StringBuilder builder, Icons|Referenceable icon, String text) {
         value iconUrl = getIconUrl(icon);
-        
+
         if (exists iconUrl) {
             builder.append("<div style='background: url(" + iconUrl.string + ") left 10px no-repeat; padding-left: 16px'>");
         } else {
             builder.append("<div>");
         }
-        
+
         builder.append(text).append("</div>");
     }
-    
+
+    void appendDocSection(StringBuilder buffer, PsiDocComment doc) {
+        value generator = JavaDocInfoGenerator(doc.project, doc);
+        value builder = JStringBuilder();
+        generator.generateCommonSection(builder, doc);
+        buffer.append(builder.string);
+    }
+
     shared actual void appendJavadoc(Declaration model, StringBuilder buffer) {
         value declaration = if (is Function model, model.annotation)
                             then model.typeDeclaration
                             else model;
 
-        if (is IJavaModelAware<out Anything,out Anything,out PsiDocCommentOwner> unit = declaration.unit,
+        if (is IdeaJavaModelAware unit = declaration.unit,
             exists javaEl = unit.toJavaElement(declaration)) {
 
-            buffer.append(javaEl.docComment.text);
+            if (exists doc = javaEl.docComment) {
+                appendDocSection(buffer, doc);
+            } else if (is ClsClassImpl javaEl,
+                       exists source = javaEl.sourceMirrorClass,
+                       exists doc = source.docComment) {
+                appendDocSection(buffer, doc);
+            } else if (is ClsMethodImpl javaEl,
+                       exists source = javaEl.sourceMirrorMethod,
+                       exists doc = source.docComment) {
+                appendDocSection(buffer, doc);
+            }
         }
     }
-        
+
     shared actual String highlight(String text, LocalAnalysisResult<Document> cmp) {
         assert (is DocParams cmp);
         return outerHighlight(text, cmp.ideaProject);

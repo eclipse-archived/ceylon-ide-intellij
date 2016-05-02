@@ -25,18 +25,13 @@ shared class IdeaCeylonProjects(IdeaProject ideProject)
 
     componentName => "CeylonProjects";
 
-    shared actual void disposeComponent() {
-        ceylonProjects.each((p) {
-            assert(is IdeaCeylonProject p);
-            p.shutdownFileWatcher();
-        });
-        clearProjects();
-    }
+    shared actual void disposeComponent() {}
 
     shared actual void initComponent() {
     }
 
     shared actual void projectClosed() {
+        ceylonProjects.narrow<IdeaCeylonProject>().each((p) => p.beforeDelete());
         clearProjects();
     }
 

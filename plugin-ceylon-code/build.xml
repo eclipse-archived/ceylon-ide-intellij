@@ -1,4 +1,4 @@
-<project name="Gather Intellij Dependencies" basedir="." default="copy-intellij-dependencies">
+<project name="ceylon-ide-intellij (Ceylon code)" basedir="." default="build">
 
     <property file="build.properties" />
     <property name="ceylon.verbosity" value="false" />

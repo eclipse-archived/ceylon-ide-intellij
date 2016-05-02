@@ -26,6 +26,7 @@ public class CeylonConfigurable extends BaseConfigurable {
     private JLabel editorLink;
     private JLabel completionLink;
     private JButton restoreDefaultsButton;
+    private JLabel compilerLink;
     private ButtonGroup targetVM;
 
     public CeylonConfigurable() {
@@ -121,7 +122,7 @@ public class CeylonConfigurable extends BaseConfigurable {
             }
         };
 
-        List<JLabel> links = Arrays.asList(editorLink, completionLink);
+        List<JLabel> links = Arrays.asList(editorLink, completionLink, compilerLink);
 
         for (JLabel link : links) {
             link.addMouseListener(listener);
@@ -129,7 +130,7 @@ public class CeylonConfigurable extends BaseConfigurable {
         }
     }
 
-    public static void selectConfigurable(String id) {
+    static void selectConfigurable(String id) {
         DataContext context = DataManager.getInstance().getDataContextFromFocus().getResult();
         if (context != null) {
             Settings settings = Settings.KEY.getData(context);

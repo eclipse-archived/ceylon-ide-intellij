@@ -17,6 +17,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Message;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,9 @@ public class CeylonJsBuilder implements CompileTask {
 
     @Override
     public boolean execute(CompileContext context) {
+        if (CeylonSettings.getInstance().isUseOutProcessBuild()) {
+            return true;
+        }
         IdeaCeylonProjects projects = context.getProject().getComponent(IdeaCeylonProjects.class);
 
         if (projects == null) {
@@ -43,26 +47,27 @@ public class CeylonJsBuilder implements CompileTask {
 
         for (Module module : context.getCompileScope().getAffectedModules()) {
             IdeaCeylonProject project = (IdeaCeylonProject) projects.getProject(module);
-            Collection<VirtualFile> files = filesByModule.get(module);
-            List<File> jsFiles = new ArrayList<>();
 
-            ITypeCheckerProvider provider = module.getComponent(ITypeCheckerProvider.class);
-            if (provider == null) {
-                continue;
-            }
-            TypeChecker tc = provider.getTypeChecker();
-            if (tc == null) {
-                continue;
-            }
+            if (project != null && project.getCompileToJs()) {
+                Collection<VirtualFile> files = filesByModule.get(module);
+                List<File> jsFiles = new ArrayList<>();
 
-            for (VirtualFile file : files) {
-                if ((file.getExtension().equals("ceylon") || file.getExtension().equals("js"))
-                        && isNative(file, context, module, tc, Backend.JavaScript)) {
-                    jsFiles.add(new File(file.getPath()));
+                ITypeCheckerProvider provider = module.getComponent(ITypeCheckerProvider.class);
+                if (provider == null) {
+                    continue;
                 }
-            }
+                TypeChecker tc = provider.getTypeChecker();
+                if (tc == null) {
+                    continue;
+                }
 
-            if (project != null && project.getIdeConfiguration().getCompileToJs().booleanValue()) {
+                for (VirtualFile file : files) {
+                    if ((file.getExtension().equals("ceylon") || file.getExtension().equals("js"))
+                            && isNative(file, context, module, tc, Backend.JavaScript)) {
+                        jsFiles.add(new File(file.getPath()));
+                    }
+                }
+
                 if (!compileJs(context, module, jsFiles, project, tc)) {
                     return false;
                 }

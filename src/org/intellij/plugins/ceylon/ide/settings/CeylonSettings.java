@@ -23,10 +23,14 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
         myOptions = state;
     }
 
+    @SuppressWarnings("WeakerAccess")
     static class CeylonOptions {
         public String defaultTargetVm = "jvm";
         public String defaultSourceFolder = "source";
         public String defaultResourceFolder = "resource";
+        public boolean useOutProcessBuild = true;
+        public boolean makeCompilerVerbose = false;
+        public String verbosityLevel = "";
     }
 
     public static CeylonSettings getInstance() {
@@ -50,6 +54,18 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
         return myOptions.defaultResourceFolder;
     }
 
+    public boolean isUseOutProcessBuild() {
+        return myOptions.useOutProcessBuild;
+    }
+
+    public boolean isCompilerVerbose() {
+        return myOptions.makeCompilerVerbose;
+    }
+
+    public String getVerbosityLevel() {
+        return myOptions.verbosityLevel;
+    }
+
     public void setDefaultTargetVm(String defaultTargetVm) {
         myOptions.defaultTargetVm = defaultTargetVm;
     }
@@ -60,5 +76,17 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
 
     public void setDefaultResourceFolder(String defaultResourceFolder) {
         myOptions.defaultResourceFolder = defaultResourceFolder;
+    }
+
+    public void setUseOutProcessBuild(boolean useOutProcessBuild) {
+        myOptions.useOutProcessBuild = useOutProcessBuild;
+    }
+
+    public void setCompilerVerbose(boolean verbose) {
+        myOptions.makeCompilerVerbose = verbose;
+    }
+
+    public void setVerbosityLevel(String verbosityLevel) {
+        myOptions.verbosityLevel = verbosityLevel;
     }
 }

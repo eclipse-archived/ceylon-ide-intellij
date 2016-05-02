@@ -71,6 +71,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     
     shared actual Boolean isAvailable(Project project, Editor editor, PsiFile psiFile) {
         available = false;
+        callback = noop;
 
         if (is CeylonFile psiFile,
             is ModifiablePhasedUnit<out Anything,out Anything,out Anything,out Anything> u=psiFile.phasedUnit) {

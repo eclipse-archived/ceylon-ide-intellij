@@ -66,6 +66,9 @@
                 text="Create Ceylon Bootstrap Files">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
+        <action id="ParticlesToggleAction"
+                class="org.intellij.plugins.ceylon.ide.action.ParticlesToggleAction"
+                text="I like ponies"/>
     </actions>
 
     <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
@@ -116,9 +119,14 @@
         <completion.contributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonCompletionContributor"/>
         <codeInsight.parameterInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonParameterInfoHandler"/>
 
-        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass" implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner"
                                   implementationClass="org.intellij.plugins.ceylon.ide.presentation.DeclarationPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationNavigationItem"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationPresentationProvider"/>
+        <moduleRendererFactory implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationModuleRendererFactory"/>
+        
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonVariableRenameHandler"/>
         <renamePsiElementProcessor implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenamePsiProcessor"/>
@@ -130,6 +138,7 @@
         <codeInsight.lineMarkerProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonLineMarkerProvider"/>
         <lang.smartEnterProcessor language="Ceylon"
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.editor.TerminateStatementAction"/>
+        <editorTypedHandler order="first" implementationClass="org.intellij.plugins.ceylon.ide.editor.Particles"/>
 
         <projectStructureDetector implementation="org.intellij.plugins.ceylon.ide.project.CeylonProjectStructureDetector"/>
         <facetType implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetType"/>
@@ -147,10 +156,11 @@
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
         <!-- TODO <usageTypeProvider implementation=""/>-->
 
-        <compileServer.plugin classpath=".;./classes/"/>
+        <buildProcess.parametersProvider
+                implementation="org.intellij.plugins.ceylon.ide.build.BuildClasspathProvider"/>
+        <compileServer.plugin classpath=""/>
+        <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonBuilder" execute="BEFORE"/>
         <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonJsBuilder" execute="AFTER"/>
-
-        <moduleService serviceInterface="org.intellij.plugins.ceylon.ide.repo.RepositoryManager" serviceImplementation="org.intellij.plugins.ceylon.ide.repo.RepositoryManagerImpl"/>
 
         <!-- Run/Debug -->
         <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationType"/>
@@ -172,6 +182,8 @@
         </applicationConfigurable>
         <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.settings.CompletionSettings"/>
         <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.settings.CeylonSettings"/>
+        <projectConfigurable instance="org.intellij.plugins.ceylon.ide.settings.CompilerConfigurable" id="preferences.Ceylon.compiler"
+                             displayName="Ceylon Compiler" parentId="project.propCompiler"/>
 
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertThenElseToIfElseIntention</className>

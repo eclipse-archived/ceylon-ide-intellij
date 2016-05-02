@@ -29,13 +29,13 @@ import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
 import com.redhat.ceylon.ide.common.correct {
-    DocumentChanges,
-    CommonDocument
+    DocumentChanges
 }
 import com.redhat.ceylon.ide.common.platform {
     PlatformTextChange=TextChange,
     PlatformTextEdit=TextEdit,
-    CompositeChange
+    DefaultCompositeChange,
+    CommonDocument
 }
 
 import java.lang {
@@ -156,13 +156,13 @@ shared class DocumentWrapper(shared Document doc) satisfies CommonDocument {
     getLineOfOffset(Integer offset) => doc.getLineNumber(offset);
 
     getLineContent(Integer line)
-            => getText(doc.getLineStartOffset(line), doc.getLineEndOffset(line));
+            => doc.getText(TextRange(doc.getLineStartOffset(line), doc.getLineEndOffset(line)));
 
     getLineEndOffset(Integer line) => doc.getLineEndOffset(line);
 
     getLineStartOffset(Integer line) => doc.getLineStartOffset(line);
 
-    getText(Integer offset, Integer length) => doc.getText(TextRange(offset, length));
+    getText(Integer offset, Integer length) => doc.getText(TextRange.from(offset, length));
 
     getDefaultLineDelimiter() => "\n";
 }
@@ -193,7 +193,9 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
 
     shared actual void initMultiEdit() {}
 
-    shared void apply(Project? project = null) {
+    shared actual void apply() => applyOnProject();
+
+    shared void applyOnProject(Project? project = null) {
         value markers = changes.collect(
             (c) => doc.createRangeMarker(c.start, c.start + c.length)
         );
@@ -208,14 +210,8 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
     }
 }
 
-shared class IdeaCompositeChange() satisfies CompositeChange {
-
-    value changes = ArrayList<PlatformTextChange>();
-
-    addTextChange(PlatformTextChange change) => changes.add(change);
-
-    hasChildren => !changes.empty;
+shared class IdeaCompositeChange() extends DefaultCompositeChange("") {
 
     shared void applyChanges(Project myProject)
-            => changes.narrow<IdeaTextChange>().map((_) => _.apply(myProject));
+            => changes.narrow<IdeaTextChange>().each((_) => _.applyOnProject(myProject));
 }

@@ -2,7 +2,8 @@ import ceylon.interop.java {
     javaClass,
     createJavaObjectArray,
     createJavaStringArray,
-    javaString
+    javaString,
+    CeylonIterable
 }
 
 import com.intellij.openapi.actionSystem {
@@ -16,7 +17,6 @@ import com.intellij.openapi.command {
     WriteCommandAction
 }
 import com.intellij.openapi.editor {
-    Document,
     Editor
 }
 import com.intellij.openapi.editor.event {
@@ -78,23 +78,20 @@ import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit,
     TypecheckerUnit
 }
-import com.redhat.ceylon.compiler.typechecker.io {
-    VirtualFile
-}
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Node,
-    Tree
-}
 import com.redhat.ceylon.ide.common.refactoring {
     ChangeParametersRefactoring,
-    getDeclarationForChangeParameters,
     parseTypeExpression
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    AnyProjectPhasedUnit
+}
 import com.redhat.ceylon.ide.common.util {
-    nodes
+    nodes,
+    escaping
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    Functional
 }
 
 import java.awt {
@@ -111,7 +108,8 @@ import java.lang {
 import java.util {
     List,
     Set,
-    JArrayList=ArrayList
+    JArrayList=ArrayList,
+    Collections
 }
 
 import javax.swing {
@@ -120,14 +118,9 @@ import javax.swing {
     JCheckBox
 }
 
-import org.antlr.runtime {
-    CommonToken
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    InsertEdit,
-    TextEdit,
-    TextChange,
-    IdeaDocumentChanges
+    DocumentWrapper,
+    IdeaCompositeChange
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonFileType
@@ -148,8 +141,7 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
     shared actual PsiElement? findTargetMember(PsiElement? element) {
         if (exists element,
             is CeylonFile file = element.containingFile,
-            exists node = nodes.findNode(file.compilationUnit, file.tokens, element.textOffset),
-            exists d = getDeclarationForChangeParameters(node, file.compilationUnit)) {
+            exists node = nodes.findNode(file.compilationUnit, file.tokens, element.textOffset)) {
 
             return element;
         }
@@ -170,23 +162,21 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
             value projects = _project.getComponent(javaClass<IdeaCeylonProjects>());
 
             if (exists mod = ModuleUtil.findModuleForFile(file.virtualFile, _project),
-                is IdeaCeylonProject ceylonProject = projects.getProject(mod),
-                exists node = nodes.findNode(file.compilationUnit, file.tokens, editor.selectionModel.selectionStart, editor.selectionModel.selectionEnd),
-                exists decl = getDeclarationForChangeParameters(node, file.compilationUnit)) {
+                is IdeaCeylonProject ceylonProject = projects.getProject(mod)) {
 
-                value refacto = IdeaChangeParameterRefactoring(file, editor, ceylonProject, node, decl);
-                if (exists params = refacto.computeParameters()) {
+                value refacto = IdeaChangeParameterRefactoring(file, editor, ceylonProject);
+                if (refacto.enabled,
+                    exists params = refacto.computeParameters()) {
+
                     value dialog = object extends ChangeParameterDialog(params, _project) {
                         shared actual void invokeRefactoring(BaseRefactoringProcessor? processor) {
-                            value chg = TextChange(editor.document);
-                            refacto.build([chg, params]);
-
-                            object extends WriteCommandAction<Nothing>(_project) {
-                                shared actual void run(Result<Nothing>? result) {
-                                    chg.apply(project);
-                                }
-
-                            }.execute();
+                            if (is IdeaCompositeChange chg = refacto.build(params)) {
+                                object extends WriteCommandAction<Nothing>(_project) {
+                                    shared actual void run(Result<Nothing>? result) {
+                                        chg.applyChanges(project);
+                                    }
+                                }.execute();
+                            }
 
                             close(DialogWrapper.\iOK_EXIT_CODE);
                         }
@@ -203,39 +193,25 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
 
 }
 
-class IdeaChangeParameterRefactoring(CeylonFile file, Editor editor, IdeaCeylonProject project,
-        Node node, Declaration declaration)
-        satisfies ChangeParametersRefactoring<Document,InsertEdit,TextEdit,TextChange,TextChange>
-                & IdeaDocumentChanges {
+class IdeaChangeParameterRefactoring(
+    CeylonFile file,
+    Editor editor,
+    IdeaCeylonProject project
+) extends ChangeParametersRefactoring(
+    file.compilationUnit,
+    editor.selectionModel.selectionStart,
+    editor.selectionModel.selectionEnd,
+    file.tokens,
+    DocumentWrapper(editor.document),
+    file.phasedUnit,
+    CeylonIterable(project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>())
+) {
 
-    editorPhasedUnit => file.phasedUnit;
-
-    addChangeToChange(TextChange change, TextChange tc) => change.addAll(tc);
-
-
-    editorData = object satisfies EditorData {
-        shared actual Node node => outer.node;
-
-        shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
-
-        shared actual VirtualFile? sourceVirtualFile => null;
-
-        shared actual List<CommonToken> tokens => file.tokens;
-    };
-
-    shared actual Boolean enabled => true;
-
-    shared actual List<PhasedUnit> getAllUnits() => project.typechecker?.phasedUnits?.phasedUnits else nothing;
-
-    shared actual Boolean inSameProject(Declaration decl) => true;
-
-    newDocChange() => TextChange(file.viewProvider.document);
-
-    newFileChange(PhasedUnit pu) => TextChange(pu);
+    shared actual Boolean inSameProject(Functional&Declaration declaration) => true;
 
     searchInEditor() => true;
 
-    searchInFile(PhasedUnit pu) => true;
+    searchInFile(PhasedUnit pu) => pu is AnyProjectPhasedUnit;
 
 }
 
@@ -385,6 +361,9 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
         for (item in myParametersTableModel.items) {
             if (exists error = item.parameter.typeError) {
                 return ValidationInfo(error);
+            }
+            if (item.parameter.name in escaping.keywords) {
+                return ValidationInfo("``item.parameter.name`` is a reserved keyword");
             }
         }
         return super.doValidate();

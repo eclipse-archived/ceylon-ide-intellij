@@ -12,9 +12,6 @@ import com.redhat.ceylon.ide.common.completion {
     CommonCompletionProposal
 }
 
-import java.lang {
-    Character
-}
 import com.intellij.codeInsight.lookup {
     LookupElementBuilder,
     LookupElement

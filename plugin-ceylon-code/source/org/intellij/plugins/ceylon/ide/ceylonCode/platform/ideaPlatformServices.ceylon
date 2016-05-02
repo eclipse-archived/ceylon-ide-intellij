@@ -2,13 +2,13 @@ import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
 import com.redhat.ceylon.ide.common.correct {
-    ImportProposals,
-    CommonDocument
+    ImportProposals
 }
 import com.redhat.ceylon.ide.common.platform {
     ModelServices,
     PlatformServices,
-    VfsServices
+    VfsServices,
+    CommonDocument
 }
 import com.redhat.ceylon.ide.common.util {
     unsafeCast,

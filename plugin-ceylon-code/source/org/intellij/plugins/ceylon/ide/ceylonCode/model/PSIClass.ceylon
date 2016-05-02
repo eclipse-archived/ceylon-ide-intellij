@@ -62,12 +62,12 @@ shared class PSIClass(shared PsiClass psi)
     
     variable String? cacheKey = null;
     
-    Boolean hasAnnotation(Annotations annotation) {
-        return psi.modifierList.annotations.array.coalesced.any(
-            (ann) =>ann.qualifiedName == annotation.klazz.canonicalName
-        );
-    }
-    
+    Boolean hasAnnotation(Annotations annotation)
+        => doWithLock(()
+            => psi.modifierList.annotations.array.coalesced.any(
+                (ann) =>ann.qualifiedName == annotation.klazz.canonicalName
+            ));
+
     abstract => PsiUtil.isAbstractClass(psi);
     
     annotationType => psi.annotationType;
