@@ -89,7 +89,7 @@ public class Particles extends TypedActionHandlerBase implements Disposable {
             JFrame win = WindowManager.getInstance().getFrame(DataKeys.PROJECT.getData(dataContext));
 
             if (editor instanceof EditorImpl) {
-                EditorImpl.CaretRectangle[] locations = ((EditorImpl) editor).getCaretLocations(false);
+                EditorImpl.CaretRectangle[] locations = ((EditorImpl) editor).getCaretLocations();
 
                 if (locations != null) {
                     for (EditorImpl.CaretRectangle rect : locations) {

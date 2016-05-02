@@ -16,7 +16,6 @@ import org.jetbrains.jps.builders.DirtyFilesHolder;
 import org.jetbrains.jps.builders.FileProcessor;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
-import org.jetbrains.jps.incremental.fs.FilesDelta;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.model.java.JavaResourceRootType;
@@ -298,26 +297,21 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
     // Remove Java files from the list of files to process because we already compiled them
     private void removeCompiledJavaFilesFromContext(CompileContext ctx, ModuleChunk chunk, List<String> filesToBuild) {
-        FilesDelta delta = ctx.getProjectDescriptor().fsState
-                .getEffectiveFilesDelta(ctx, chunk.representativeTarget());
-        try {
-            delta.lockData();
+        Map<BuildRootDescriptor, Set<File>> delta = ctx.getProjectDescriptor().fsState
+                .getSourcesToRecompile(ctx, chunk.representativeTarget());
 
-            for (Map.Entry<BuildRootDescriptor, Set<File>> entry : delta.getSourcesToRecompile().entrySet()) {
-                if (entry.getKey().getTarget() != chunk.representativeTarget()) {
-                    continue;
-                }
-                Iterator<File> it = entry.getValue().iterator();
-                while (it.hasNext()) {
-                    File file = it.next();
-                    if (filesToBuild.contains(file.getAbsolutePath())
-                            && file.getName().endsWith(".java")) {
-                        it.remove();
-                    }
+        for (Map.Entry<BuildRootDescriptor, Set<File>> entry : delta.entrySet()) {
+            if (entry.getKey().getTarget() != chunk.representativeTarget()) {
+                continue;
+            }
+            Iterator<File> it = entry.getValue().iterator();
+            while (it.hasNext()) {
+                File file = it.next();
+                if (filesToBuild.contains(file.getAbsolutePath())
+                        && file.getName().endsWith(".java")) {
+                    it.remove();
                 }
             }
-        } finally {
-            delta.unlockData();
         }
     }
 

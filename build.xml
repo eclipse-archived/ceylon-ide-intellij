@@ -129,7 +129,7 @@
                         <id>${CeylonIDEA.idea-plugin.id}</id>
                         <name>${CeylonIDEA.idea-plugin.name}</name>
                         <version>${CeylonIDEA.idea-plugin.version}</version>
-                        <idea-version since-build="${CeylonIDEA.idea-plugin.idea-version(since-build)}"/>
+                        <idea-version since-build="${CeylonIDEA.idea-plugin.idea-version(since-build)}" until-build="${CeylonIDEA.idea-plugin.idea-version(until-build)}"/>
                         <downloadUrl>./CeylonIDEA.zip</downloadUrl>
                     </idea-plugin>
                 </category>

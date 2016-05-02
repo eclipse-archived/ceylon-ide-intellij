@@ -11,7 +11,7 @@
     </change-notes>
 
     <!-- To be compatible with Android Studio 1.5 -->
-    <idea-version since-build="141"/>
+    <idea-version since-build="141" until-build="145"/>
 
     <depends>com.intellij.modules.lang</depends>
 
