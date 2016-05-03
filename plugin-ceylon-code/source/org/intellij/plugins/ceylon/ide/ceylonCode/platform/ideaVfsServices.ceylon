@@ -85,7 +85,10 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
         => VfsUtilCore.getRelativePath(resource, sourceDir)
             .split(VfsUtilCore.\iVFS_SEPARATOR_CHAR.equals).sequence();
 
-    findChild(VirtualFile parent, Path path) => parent.findChild(path.string);
+    findChild(VirtualFile|Module parent, Path path) => 
+            if (is VirtualFile parent)
+            then parent.findChild(path.string)
+            else parent.moduleFile?.parent?.findChild(path.string);
 
     fromJavaFile(File javaFile, Module project) => VfsUtil.findFileByIoFile(javaFile, true);
 
@@ -96,12 +99,12 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
 
     getVirtualFilePathString(VirtualFile resource) => resource.canonicalPath;
 
-    getProjectRelativePath(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> project)
+    getProjectRelativePath(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>|Module project)
         => if (exists path = getProjectRelativePathString(resource, project))
            then Path(path)
            else null;
 
-    getProjectRelativePathString(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> project)
+    getProjectRelativePathString(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>|Module project)
         => if (is IdeaCeylonProject project)
            then VfsUtil.getRelativePath(resource, project.moduleRoot)
            else null;
