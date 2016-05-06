@@ -14,31 +14,42 @@ import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.redhat.ceylon.ide.common.model {
-    CeylonProjects
+    CeylonProjects,
+    ModelListenerAdapter
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    ideaPlatformServices
+}
+import com.redhat.ceylon.ide.common.util {
+    unsafeCast
 }
 
-shared class IdeaCeylonProjects(IdeaProject ideProject)
+shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
         extends CeylonProjects<IdeaModule,VirtualFile,VirtualFile,VirtualFile>()
         satisfies ProjectComponent {
+    ideaPlatformServices.register();
+    
+    object ceylonProjectCleaner satisfies ModelListenerAdapter<IdeaModule,VirtualFile,VirtualFile,VirtualFile> {
+        ceylonProjectRemoved(CeylonProjectAlias ceylonProject) =>
+                unsafeCast<IdeaCeylonProject>(ceylonProject).clean();
+    }
     
     newNativeProject(IdeaModule ideArtifact) => IdeaCeylonProject(ideArtifact, this);
 
     componentName => "CeylonProjects";
 
-    shared actual void disposeComponent() {}
+    initComponent() => addModelListener(ceylonProjectCleaner);
+    disposeComponent() => removeModelListener(ceylonProjectCleaner);
 
-    shared actual void initComponent() {
-    }
 
     shared actual void projectClosed() {
-        ceylonProjects.narrow<IdeaCeylonProject>().each((p) => p.beforeDelete());
         clearProjects();
     }
 
     shared actual void projectOpened() {
 
         // Do not treat .ceylon files as resources, otherwise they are copied in the output directory during compilation
-        value compilerConfiguration = CompilerConfiguration.getInstance(ideProject);
+        value compilerConfiguration = CompilerConfiguration.getInstance(ideaProject);
         if (compilerConfiguration.isResourceFile("lol.ceylon")) {
             compilerConfiguration.addResourceFilePattern("!?*.ceylon");
         }

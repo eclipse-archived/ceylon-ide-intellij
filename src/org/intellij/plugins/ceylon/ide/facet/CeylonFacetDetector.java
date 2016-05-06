@@ -55,7 +55,6 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
         TypeCheckerProvider tcp = (TypeCheckerProvider) facet.getModule().getComponent(ITypeCheckerProvider.class);
         if (tcp != null) {
             tcp.moduleAdded();
-            tcp.typecheck();
         }
     }
 }

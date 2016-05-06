@@ -10,9 +10,11 @@ import com.redhat.ceylon.compiler.typechecker.io.impl.Helper;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
+import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.ide.common.typechecker.EditedPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
+import com.redhat.ceylon.ide.common.util.SingleSourceUnitPackage;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
@@ -51,6 +53,11 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
                 ceylonFile.getVirtualFile(), ceylonFile.getProject());
         VirtualFileVirtualFile sourceCodeVirtualFile
                 = new VirtualFileVirtualFile(ceylonFile.getVirtualFile(), module);
+        CeylonProject ceylonProject = sourceCodeVirtualFile.getCeylonProject();
+        if (ceylonProject != null&& ! ceylonProject.getTypechecked()) {
+            return null;
+        }
+            
         PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
         Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
 
@@ -68,11 +75,11 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
             pkg = phasedUnit.getPackage();
         }
         String relativePath = Helper.computeRelativePath(sourceCodeVirtualFile, srcDir);
-
+/*
         if (typeChecker.getPhasedUnitFromRelativePath(relativePath) != null) {
             typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(relativePath);
         }
-
+*/
         ProjectPhasedUnit projectPu = null;
         if (phasedUnit instanceof EditedPhasedUnit) {
             projectPu = ((EditedPhasedUnit) phasedUnit).getOriginalPhasedUnit();
@@ -80,12 +87,14 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
             projectPu = (ProjectPhasedUnit) phasedUnit;
         }
 
+        SingleSourceUnitPackage singleSourceUnitPackage = new SingleSourceUnitPackage(pkg, sourceCodeVirtualFile.getPath());
+        
         phasedUnit = new EditedPhasedUnit<>(
                 TypeDescriptor.klass(com.intellij.openapi.module.Module.class),
                 TypeDescriptor.klass(com.intellij.openapi.vfs.VirtualFile.class),
                 TypeDescriptor.klass(com.intellij.openapi.vfs.VirtualFile.class),
                 TypeDescriptor.klass(com.intellij.openapi.vfs.VirtualFile.class),
-                sourceCodeVirtualFile, srcDir, cu, pkg,
+                sourceCodeVirtualFile, srcDir, cu, singleSourceUnitPackage,
                 typeChecker.getPhasedUnits().getModuleManager(),
                 typeChecker.getPhasedUnits().getModuleSourceMapper(),
                 typeChecker,
@@ -107,8 +116,10 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
         phasedUnit.analyseUsage();
         phasedUnit.analyseFlow();
 
+/*        
         typeChecker.getPhasedUnits().addPhasedUnit(phasedUnit.getUnitFile(), phasedUnit);
-
+*/
+        
         ceylonFile.setPhasedUnit(phasedUnit);
 
         return phasedUnit;

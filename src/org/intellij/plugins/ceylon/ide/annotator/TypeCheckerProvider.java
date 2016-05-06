@@ -1,55 +1,66 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
-import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
-import com.intellij.facet.FacetManager;
-import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleComponent;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.DumbService;
-import com.intellij.openapi.startup.StartupManager;
-import com.intellij.psi.PsiElement;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
-import com.redhat.ceylon.compiler.typechecker.context.PhasedUnits;
-import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
-import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
-import com.redhat.ceylon.ide.common.platform.Status;
-import com.redhat.ceylon.ide.common.platform.platformUtils_;
-import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.ProgressIndicatorMonitor;
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform.ideaPlatformServices_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
-import org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.intellij.openapi.application.ApplicationManager.getApplication;
+import com.intellij.facet.FacetManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleComponent;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.psi.PsiElement;
+import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 
 public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvider {
 
     private Module module;
-    private TypeChecker typeChecker;
     private IdeaCeylonProjects ceylonModel;
-    private boolean isReady;
-    private boolean isPreparingTc;
 
-    public TypeCheckerProvider(Module module) {
+    public TypeCheckerProvider(Module module, IdeaCeylonProjects ceylonModel) {
         this.module = module;
+        this.ceylonModel = ceylonModel;
     }
+
+    @NotNull
+    @Override
+    public String getComponentName() {
+        return "TypeCheckerProvider";
+    }
+
+    @Override
+    public void initComponent() {
+    }
+
+    @Override
+    public void disposeComponent() {
+        ceylonModel.removeProject(module);
+
+        ceylonModel = null;
+        module = null;
+    }
+    
+    @Override
+    public void projectOpened() {
+    }
+
+    @Override
+    public void projectClosed() {
+    }
+
+    @Override
+    public void moduleAdded() {
+        if (FacetManager.getInstance(module).getFacetByType(CeylonFacet.ID) == null) {
+            return;
+        }
+
+        ceylonModel.addProject(module);
+    }
+
 
     @Nullable
     public static TypeChecker getFor(PsiElement element) {
@@ -68,195 +79,25 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
             if (module != null) {
                 ITypeCheckerProvider provider = module.getComponent(ITypeCheckerProvider.class);
-
-                if (((TypeCheckerProvider) provider).isReady) {
-                    return provider.getTypeChecker();
-                }
+                return provider.getTypeChecker();
             }
         }
 
         return null;
     }
 
-    @Override
-    public void initComponent() {
+    @Nullable
+    public IdeaCeylonProject getCeylonProject() {
+        return (IdeaCeylonProject) ceylonModel.getProject(module);
     }
 
+    @Nullable
     @Override
     public TypeChecker getTypeChecker() {
-        return typeChecker;
-    }
-
-    @Override
-    public void disposeComponent() {
-        isReady = false;
-        if (ceylonModel != null) {
-            IdeaCeylonProject project = (IdeaCeylonProject) ceylonModel.getProject(module);
-            if (project != null) {
-                project.beforeDelete();
-            }
-            ceylonModel.removeProject(module);
+        IdeaCeylonProject ceylonProject = getCeylonProject();
+        if (ceylonProject == null) {
+            return null;
         }
-
-        typeChecker = null;
-        ceylonModel = null;
-        module = null;
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "TypeCheckerProvider";
-    }
-
-    @Override
-    public void projectOpened() {
-    }
-
-    public void typecheck() {
-        if (ceylonModel == null) {
-            return; // the module was just created, moduleAdded() will typecheck again
-        }
-        if (typeChecker == null && !isPreparingTc) {
-            isPreparingTc = true;
-            ideaPlatformServices_.get_().register();
-            final IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
-
-            ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(),
-                    "Preparing typechecker for module " + module.getName()) {
-                @Override
-                public void run(@NotNull ProgressIndicator indicator) {
-                    setupCeylonLanguageSrc(ceylonProject);
-
-                    final ProgressIndicatorMonitor mon = new ProgressIndicatorMonitor(ProgressIndicatorMonitor.wrap_, indicator);
-                    ceylonProject.parseCeylonModel(mon);
-                    typeChecker = ceylonProject.getTypechecker();
-
-                    mon.subTask("Typechecking sources files...");
-                    fullTypeCheck();
-
-                    ceylonProject.setupFileWatcher();
-
-                    isReady = true;
-                    isPreparingTc = false;
-
-                    getApplication().invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
-                        }
-                    });
-                }
-            });
-        } else {
-            DaemonCodeAnalyzer.getInstance(module.getProject()).restart();
-        }
-    }
-
-    private void fullTypeCheck() {
-        List<PhasedUnit> phasedUnitsOfDependencies = new ArrayList<>();
-
-        for (PhasedUnits phasedUnits : typeChecker.getPhasedUnitsOfDependencies()) {
-            for (PhasedUnit pu : phasedUnits.getPhasedUnits()) {
-                phasedUnitsOfDependencies.add(pu);
-            }
-        }
-
-        for (PhasedUnit pu : phasedUnitsOfDependencies) {
-            pu.scanDeclarations();
-        }
-
-        for (PhasedUnit pu : phasedUnitsOfDependencies) {
-            pu.scanTypeDeclarations();
-        }
-
-        for (PhasedUnit pu : phasedUnitsOfDependencies) {
-            pu.analyseTypes();
-        }
-
-        BaseIdeModuleManager mm = (BaseIdeModuleManager) typeChecker.getPhasedUnits().getModuleManager();
-        BaseIdeModelLoader loader = mm.getModelLoader();
-        loader.loadPackage(loader.getLanguageModule(), "com.redhat.ceylon.compiler.java.metadata", true);
-        loader.loadPackage(loader.getLanguageModule(), "ceylon.language", true);
-        loader.loadPackage(loader.getLanguageModule(), "ceylon.language.descriptor", true);
-        loader.loadPackageDescriptors();
-
-        List<PhasedUnit> phasedUnits = typeChecker.getPhasedUnits().getPhasedUnits();
-        for (PhasedUnit pu : phasedUnits) {
-            if (!pu.isDeclarationsScanned()) {
-                pu.validateTree();
-                pu.scanDeclarations();
-            }
-        }
-        for (PhasedUnit pu : phasedUnits) {
-            if (!pu.isTypeDeclarationsScanned()) {
-                pu.scanTypeDeclarations();
-            }
-        }
-        for (PhasedUnit pu : phasedUnits) {
-            if (!pu.isRefinementValidated()) {
-                pu.validateRefinement();
-            }
-        }
-        for (PhasedUnit pu : phasedUnits) {
-            if (!pu.isFullyTyped()) {
-                pu.analyseTypes();
-                pu.analyseUsage();
-            }
-        }
-        for (PhasedUnit pu : phasedUnits) {
-            pu.analyseFlow();
-        }
-    }
-
-    @Override
-    public void projectClosed() {
-    }
-
-    @Override
-    public void moduleAdded() {
-        if (FacetManager.getInstance(module).getFacetByType(CeylonFacet.ID) == null) {
-            return;
-        }
-
-        if (ceylonModel == null) {
-            ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
-        }
-        ceylonModel.addProject(module);
-
-        StartupManager.getInstance(module.getProject()).runWhenProjectIsInitialized(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        typecheck();
-                    }
-                }
-        );
-    }
-
-    private void setupCeylonLanguageSrc(final IdeaCeylonProject ceylonProject) {
-        final File car = CeylonIdePlugin.getCeylonLanguageArchive();
-
-        if (car != null) {
-            getApplication().invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    String path;
-                    try {
-                        path = car.getCanonicalPath();
-                    } catch (IOException e) {
-                        platformUtils_.get_().log(Status.getStatus$_ERROR(),
-                                "Can't add ceylon language to classpath", e);
-                        return;
-                    }
-
-                    ceylonProject.addLibrary(path, true);
-                }
-            }, ModalityState.any());
-
-            DumbService.getInstance(module.getProject()).waitForSmartMode();
-        } else {
-            Logger.getInstance(TypeCheckerProvider.class).error("Could not locate ceylon.language.car");
-        }
+        return ceylonProject.getTypechecker();
     }
 }

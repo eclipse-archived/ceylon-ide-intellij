@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    JavaRunnable
 }
 
 import com.intellij.facet {
@@ -8,7 +9,10 @@ import com.intellij.facet {
 import com.intellij.openapi.application {
     WriteAction,
     Result,
-    ApplicationManager
+    ApplicationManager {
+        application
+    },
+    ModalityState
 }
 import com.intellij.openapi.extensions {
     Extensions
@@ -16,11 +20,13 @@ import com.intellij.openapi.extensions {
 import com.intellij.openapi.externalSystem.service.project {
     IdeModifiableModelsProviderImpl
 }
-import com.intellij.openapi.fileEditor {
-    FileEditorManagerListener
-}
 import com.intellij.openapi.\imodule {
     Module
+}
+import com.intellij.openapi.project {
+    DumbService {
+        dumbService=getInstance
+    }
 }
 import com.intellij.openapi.roots {
     ModuleRootManager,
@@ -35,6 +41,12 @@ import com.intellij.openapi.vfs {
     VirtualFileManager,
     JarFileSystem
 }
+import com.redhat.ceylon.cmr.api {
+    ArtifactContext
+}
+import com.redhat.ceylon.compiler.typechecker {
+    TypeChecker
+}
 import com.redhat.ceylon.compiler.typechecker.context {
     Context
 }
@@ -42,7 +54,12 @@ import com.redhat.ceylon.compiler.typechecker.util {
     ModuleManagerFactory
 }
 import com.redhat.ceylon.ide.common.model {
-    CeylonProject
+    CeylonProject,
+    BuildHook
+}
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
 }
 import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitorChild
@@ -64,13 +81,50 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerInvoker
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    FileWatcher,
     vfsKeychain
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
+    variable Boolean languageModuleAdded = false;
 
+    object addModuleArchiveHook 
+            satisfies BuildHook<Module, VirtualFile, VirtualFile, VirtualFile> {
+        
+        shared actual void beforeClasspathResolution(CeylonProjectBuildAlias build, CeylonProjectBuildAlias.State state) {
+            if (! languageModuleAdded) {
+                String moduleName = "ceylon.language";
+                String moduleVersion = TypeChecker.\iLANGUAGE_MODULE_VERSION;
+                if (exists languageModuleArtifact = 
+                        repositoryManager.getArtifact(
+                            ArtifactContext(moduleName, moduleVersion, ArtifactContext.\iCAR))) {
+                    application.invokeAndWait(JavaRunnable(() {
+                            String path;
+                            try {
+                                path = languageModuleArtifact.canonicalPath;
+                            } catch (IOException e) {
+                                platformUtils.log(Status._ERROR,
+                                    "Can't add ceylon language to classpath", e);
+                                return;
+                            }
+                            
+                            addLibrary(path, true);
+                        }), ModalityState.any());
+                    
+                    dumbService(model.ideaProject).waitForSmartMode();
+                    languageModuleAdded = true;
+                } else {
+                    platformUtils.log(Status._ERROR, "Could not locate ceylon.language.car");
+                }
+            }
+        }
+        
+        shared actual void repositoryManagerReset(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject) {
+            languageModuleAdded = false;
+        }
+    }
+    
+    
     shared actual Module ideArtifact;
     shared actual IdeaCeylonProjects model;
     shared actual String name => ideArtifact.name;
@@ -90,7 +144,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                     .findFileByUrl("file://``parentPath``");
         }
 
-        if (ApplicationManager.application.unitTestMode) {
+        if (application.unitTestMode) {
             return ideaModule.project.baseDir;
         }
         throw Exception("Couldn't get module root for ``path``");
@@ -178,19 +232,6 @@ shared class IdeaCeylonProject(ideArtifact, model)
     shared actual Boolean compileToJs
             => ideConfiguration.compileToJs else false;
     
-    late FileWatcher watcher;
-    
-    shared void setupFileWatcher() {
-        watcher = FileWatcher(this);
-        VirtualFileManager.instance.addVirtualFileListener(watcher);
-        ideArtifact.project.messageBus.connect()
-                .subscribe(FileEditorManagerListener.\iFILE_EDITOR_MANAGER, watcher);
-    }
-    
-    shared void shutdownFileWatcher() {
-        VirtualFileManager.instance.removeVirtualFileListener(watcher);
-    }
-    
     shared actual void createOverridesProblemMarker(Exception ex, File absoluteFile, Integer overridesLine, Integer overridesColumn) {
         // TODO
     }
@@ -227,7 +268,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     value libraryName => "Ceylon dependencies";
     
     shared void addLibrary(String jarFile, Boolean clear = false) {
-        value lock = ApplicationManager.application.acquireWriteActionLock(javaClass<IdeaCeylonProject>());
+        value lock = application.acquireWriteActionLock(javaClass<IdeaCeylonProject>());
         value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
         value lib = provider.getLibraryByName(libraryName) else provider.createLibrary(libraryName);
         value model = lib.modifiableModel;
@@ -268,9 +309,10 @@ shared class IdeaCeylonProject(ideArtifact, model)
         return false;
     }
 
-    shared void beforeDelete() {
-        shutdownFileWatcher();
+    shared void clean() {
         sourceNativeFolders.each(removeFolderFromModel);
         vfsKeychain.clear(ideaModule);
     }
+    
+    buildHooks => { addModuleArchiveHook };
 }

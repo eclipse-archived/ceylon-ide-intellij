@@ -88,7 +88,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     shared actual ClassMirror? buildClassMirrorInternal(String name) {
         assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
         
-        return doWithIndex(project, () {
+        return doWithIndex(project, () => doWithLock(() {
             if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) { 
                 value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
                 value facade = JavaPsiFacade.getInstance(m.project);
@@ -98,7 +98,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                 }
             }
             return null;
-        });
+        }));
     }
     
     shared actual PsiClass getJavaClassRoot(ClassMirror classMirror) {
