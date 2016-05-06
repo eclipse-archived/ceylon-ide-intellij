@@ -18,4 +18,8 @@
             <exclude path="com/intellij/openapi/editor/*"/>
         </filter>
     </module>
+
+    <module module="org.intellij.groovy">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+    </module>
 </overrides>

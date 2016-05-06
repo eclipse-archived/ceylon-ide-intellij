@@ -57,7 +57,30 @@
     <target name="importModule">
 		<propertycopy name="moduleName" from="moduleToImport.${moduleToImport}" />
 		<echo>${moduleName}</echo>
-		<copy file="${ideaRoot}/lib/${moduleToImport}" tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+        <if>
+            <available file="${ideaRoot}/lib/${moduleToImport}"/>
+            <then>
+                <copy file="${ideaRoot}/lib/${moduleToImport}"
+                      tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+            </then>
+            <elseif>
+                <available file="${ideaRoot}/plugins/gradle/lib/${moduleToImport}"/>
+                <then>
+                    <copy file="${ideaRoot}/plugins/gradle/lib/${moduleToImport}"
+                          tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+                </then>
+            </elseif>
+            <elseif>
+                <available file="${ideaRoot}/plugins/Groovy/lib/${moduleToImport}"/>
+                <then>
+                    <copy file="${ideaRoot}/plugins/Groovy/lib/${moduleToImport}"
+                          tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+                </then>
+            </elseif>
+            <else>
+                <fail message="Failed to find required dependency '${moduleToImport}' in IntelliJ installation"/>
+            </else>
+        </if>
 	</target>
 	
 	<target name="copy-intellij-dependencies">

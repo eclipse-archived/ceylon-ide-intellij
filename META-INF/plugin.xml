@@ -14,6 +14,10 @@
     <idea-version since-build="143"/>
 
     <depends>com.intellij.modules.lang</depends>
+    <depends optional="true" config-file="plugin-studio.xml">com.intellij.modules.androidstudio</depends>
+    <depends optional="true">org.jetbrains.plugins.gradle</depends>
+    <depends optional="true">org.intellij.groovy</depends>
+    <depends optional="true">org.jetbrains.android</depends>
 
     <project-components>
         <component>
@@ -69,6 +73,7 @@
     <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
     <extensionPoints>
         <extensionPoint name="typecheckerInvoker" interface="org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker"/>
+        <extensionPoint name="androidStudioSupport" interface="org.intellij.plugins.ceylon.ide.ceylonCode.integrations.studio.AndroidStudioSupport"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="org.intellij.plugins.ceylon.ide">

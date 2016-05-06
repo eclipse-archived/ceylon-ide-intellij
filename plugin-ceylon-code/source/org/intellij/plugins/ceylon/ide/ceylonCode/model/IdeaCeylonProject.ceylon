@@ -88,14 +88,14 @@ shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
     variable Boolean languageModuleAdded = false;
 
-    object addModuleArchiveHook 
+    object addModuleArchiveHook
             satisfies BuildHook<Module, VirtualFile, VirtualFile, VirtualFile> {
-        
+
         shared actual void beforeClasspathResolution(CeylonProjectBuildAlias build, CeylonProjectBuildAlias.State state) {
             if (! languageModuleAdded) {
                 String moduleName = "ceylon.language";
                 String moduleVersion = TypeChecker.\iLANGUAGE_MODULE_VERSION;
-                if (exists languageModuleArtifact = 
+                if (exists languageModuleArtifact =
                         repositoryManager.getArtifact(
                             ArtifactContext(moduleName, moduleVersion, ArtifactContext.\iCAR))) {
                     application.invokeAndWait(JavaRunnable(() {
@@ -107,10 +107,10 @@ shared class IdeaCeylonProject(ideArtifact, model)
                                     "Can't add ceylon language to classpath", e);
                                 return;
                             }
-                            
+
                             addLibrary(path, true);
                         }), ModalityState.any());
-                    
+
                     dumbService(model.ideaProject).waitForSmartMode();
                     languageModuleAdded = true;
                 } else {
@@ -118,13 +118,13 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             }
         }
-        
+
         shared actual void repositoryManagerReset(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject) {
             languageModuleAdded = false;
         }
     }
-    
-    
+
+
     shared actual Module ideArtifact;
     shared actual IdeaCeylonProjects model;
     shared actual String name => ideArtifact.name;
@@ -233,7 +233,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared actual Boolean compileToJs
             => ideConfiguration.compileToJs else false;
-    
+
     shared actual void createOverridesProblemMarker(Exception ex, File absoluteFile, Integer overridesLine, Integer overridesColumn) {
         // TODO
     }
@@ -311,10 +311,31 @@ shared class IdeaCeylonProject(ideArtifact, model)
         return false;
     }
 
+    value srcPath => "src/main/ceylon";
+    value repoPath => "./build/intermediates/ceylon-android/repository";
+
+    shared void setupForAndroid(String jdkProvider) {
+        if (!configuration.projectSourceDirectories.contains(srcPath)) {
+            configuration.projectSourceDirectories = {
+                srcPath,
+                *configuration.projectSourceDirectories
+            };
+        }
+
+        if (!configuration.projectLocalRepos.contains(repoPath)) {
+            configuration.projectLocalRepos = {
+                repoPath,
+                *configuration.projectLocalRepos
+            };
+        }
+
+        configuration.projectJdkProvider = jdkProvider;
+    }
+
     shared void clean() {
         sourceNativeFolders.each(removeFolderFromModel);
         vfsKeychain.clear(ideaModule);
     }
-    
+
     buildHooks => { addModuleArchiveHook };
 }

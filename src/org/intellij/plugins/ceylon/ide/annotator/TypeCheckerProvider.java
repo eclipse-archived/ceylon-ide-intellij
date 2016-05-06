@@ -1,20 +1,21 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
+import com.intellij.facet.FacetManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleComponent;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
+import com.intellij.psi.PsiElement;
+import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
+import org.intellij.plugins.ceylon.ide.facet.CeylonFacetConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.intellij.facet.FacetManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleComponent;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.psi.PsiElement;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 
 public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvider {
 
@@ -37,13 +38,38 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     }
 
     @Override
+    public void addFacetToModule(Module module, @Nullable String jdkProvider) {
+        if (ceylonModel == null) {
+            ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
+            ceylonModel.addProject(module);
+        }
+
+        IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
+
+        ceylonProject.$setupForAndroid(jdkProvider);
+
+        ceylonProject.getConfiguration().save();
+
+        CeylonFacet facet = CeylonFacet.forModule(module);
+        if (facet == null) {
+            facet = FacetManager.getInstance(module)
+                    .addFacet(CeylonFacet.getFacetType(),
+                            CeylonFacet.getFacetType().getPresentableName(), null);
+            facet.getConfiguration().setModule(module);
+        }
+
+        ModulesConfigurator.showFacetSettingsDialog(facet, CeylonFacetConfiguration.COMPILATION_TAB);
+
+    }
+
+    @Override
     public void disposeComponent() {
         ceylonModel.removeProject(module);
 
         ceylonModel = null;
         module = null;
     }
-    
+
     @Override
     public void projectOpened() {
     }
