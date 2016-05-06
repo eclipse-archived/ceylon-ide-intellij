@@ -16,7 +16,7 @@ import com.intellij.openapi.project {
     DumbService
 }
 
-Return doWithLock<Return>(Return() callback) {
+shared Return doWithLock<Return>(Return() callback) {
     value lock = ApplicationManager.application.acquireReadActionLock();
     try {
         value ref = Ref<Return>();
