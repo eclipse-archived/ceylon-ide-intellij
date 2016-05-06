@@ -1,6 +1,15 @@
+import ceylon.interop.java {
+    CeylonIterable
+}
+
 import com.intellij.openapi.\imodule {
     Module,
     ModuleManager
+}
+import com.intellij.openapi.roots {
+    ModuleRootManager {
+        moduleRootManager=getInstance
+    }
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
@@ -8,28 +17,25 @@ import com.intellij.openapi.vfs {
     VirtualFileVisitor,
     VfsUtil
 }
-import com.redhat.ceylon.ide.common.platform {
-    ModelServices
-}
 import com.redhat.ceylon.ide.common.model {
     EditedSourceFile,
     ProjectSourceFile,
-    CrossProjectSourceFile,
-    CeylonProject
+    CrossProjectSourceFile
+}
+import com.redhat.ceylon.ide.common.model.parsing {
+    RootFolderScanner
+}
+import com.redhat.ceylon.ide.common.platform {
+    ModelServices
 }
 import com.redhat.ceylon.ide.common.typechecker {
     EditedPhasedUnit,
     ProjectPhasedUnit,
     CrossProjectPhasedUnit
 }
-import com.redhat.ceylon.ide.common.model.parsing {
-    RootFolderScanner
-}
-import com.intellij.openapi.roots {
-    ModuleRootManager
-}
-import ceylon.interop.java {
-    CeylonIterable
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    doWithLock
 }
 import org.jetbrains.jps.model.java {
     JavaResourceRootType,
@@ -46,31 +52,27 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
     newProjectSourceFile(ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile> phasedUnit)
             => ProjectSourceFile(phasedUnit);
 
-    shared actual Boolean isResourceContainedInProject(VirtualFile resource, IdeProject ceylonProject) {
-        for (root in ModuleRootManager.getInstance(ceylonProject.ideArtifact).sourceRoots) {
-            if (VfsUtil.isAncestor(root, resource, true)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // TODO : review this to use : ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(virtualFile);
+    shared actual Boolean isResourceContainedInProject(VirtualFile resource, CeylonProjectAlias ceylonProject) =>
+            doWithLock(() => 
+                moduleRootManager(ceylonProject.ideArtifact)
+                    .sourceRoots.array.coalesced.any((root) 
+                            => VfsUtil.isAncestor(root, resource, true)));
 
 
     // TODO check if the module is open?
     nativeProjectIsAccessible(Module nativeProject) => true;
 
     referencedNativeProjects(Module mod)
-            => ModuleRootManager.getInstance(mod).dependencies.array.coalesced;
+            => doWithLock(() => moduleRootManager(mod).dependencies.array.coalesced);
 
     referencingNativeProjects(Module mod)
-            => CeylonIterable(ModuleManager.getInstance(mod.project)
-                    .getModuleDependentModules(mod));
+            => CeylonIterable(doWithLock(() => ModuleManager.getInstance(mod.project)
+                    .getModuleDependentModules(mod)));
 
-    shared alias IdeProject => CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>;
-
-    shared actual {VirtualFile*} resourceNativeFolders(IdeProject ceylonProject) {
-        value roots = ModuleRootManager.getInstance(ceylonProject.ideArtifact)
-            ?.getSourceRoots(JavaResourceRootType.\iRESOURCE);
+    shared actual {VirtualFile*} resourceNativeFolders(CeylonProjectAlias ceylonProject) {
+        value roots = doWithLock(() => moduleRootManager(ceylonProject.ideArtifact)
+            ?.getSourceRoots(JavaResourceRootType.\iRESOURCE));
 
         return if (exists roots) then CeylonIterable(roots) else empty;
     }
@@ -82,9 +84,9 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
             }
         );
 
-    shared actual {VirtualFile*} sourceNativeFolders(IdeProject ceylonProject) {
-        value roots = ModuleRootManager.getInstance(ceylonProject.ideArtifact)
-            ?.getSourceRoots(JavaSourceRootType.\iSOURCE);
+    shared actual {VirtualFile*} sourceNativeFolders(CeylonProjectAlias ceylonProject) {
+        value roots = doWithLock(() => moduleRootManager(ceylonProject.ideArtifact)
+            ?.getSourceRoots(JavaSourceRootType.\iSOURCE));
 
         return if (exists roots) then CeylonIterable(roots) else empty;
     }
