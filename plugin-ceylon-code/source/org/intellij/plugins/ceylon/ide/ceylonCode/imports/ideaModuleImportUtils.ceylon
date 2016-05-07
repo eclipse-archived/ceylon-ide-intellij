@@ -11,9 +11,6 @@ import com.intellij.openapi.\imodule {
 import com.intellij.openapi.util {
     TextRange
 }
-import com.redhat.ceylon.compiler.typechecker.context {
-    TypecheckerUnit
-}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
@@ -24,7 +21,8 @@ import com.redhat.ceylon.ide.common.util {
     Indents
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Module
+    Module,
+    Unit
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
@@ -52,7 +50,7 @@ shared object ideaModuleImportUtils
     
     shared actual Integer getEditOffset(TextChange change) => 0;
     
-    shared actual [CeylonFile, Tree.CompilationUnit, TypecheckerUnit]
+    shared actual [CeylonFile, Tree.CompilationUnit, Unit]
     getUnit(IJModule ijModule, Module mod) {
         value tc = ijModule.getComponent(javaClass<ITypeCheckerProvider>()).typeChecker;
         value pu = tc.getPhasedUnitFromRelativePath(mod.unit.relativePath);
@@ -72,7 +70,7 @@ shared object ideaModuleImportUtils
         change.apply();
     }
     
-    shared actual void gotoLocation(TypecheckerUnit unit, Integer offset,
+    shared actual void gotoLocation(Unit unit, Integer offset,
         Integer length) {
         
         // TODO?
