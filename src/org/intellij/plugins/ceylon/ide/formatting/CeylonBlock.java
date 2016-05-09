@@ -18,12 +18,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class CeylonBlock implements Block {
+class CeylonBlock implements Block {
     private final ASTNode node;
     private final Indent indent;
 
-    public static final ChildAttributes NORMAL_INDENT_CHILDATTR = new ChildAttributes(Indent.getNormalIndent(), null);
-    public static final ChildAttributes NO_INDENT_CHILDATTR = new ChildAttributes(Indent.getNoneIndent(), null);
+    private static final ChildAttributes NORMAL_INDENT_CHILDATTR = new ChildAttributes(Indent.getNormalIndent(), null);
+    private static final ChildAttributes NO_INDENT_CHILDATTR = new ChildAttributes(Indent.getNoneIndent(), null);
 
     private static final Spacing NO_SPACING = Spacing.createSpacing(0, 0, 0, false, 0);
     private static final Spacing NO_SPACE_ALLOW_NEWLINE = Spacing.createSpacing(0, 0, 0, true, 0);
@@ -38,7 +38,8 @@ public class CeylonBlock implements Block {
     private static final List<IElementType> LARGER_OP = Arrays.asList(CeylonTypes.LARGER_OP, CeylonTokens.LARGER_OP);
     private static final List<IElementType> INDENT_CHILDREN_NORMAL = Arrays.asList(
             CeylonTypes.IMPORT_MODULE_LIST, CeylonTypes.BLOCK, CeylonTypes.CLASS_BODY, CeylonTypes.INTERFACE_BODY,
-            CeylonTypes.NAMED_ARGUMENT_LIST, CeylonTypes.SEQUENCED_ARGUMENT, CeylonTypes.IMPORT_MEMBER_OR_TYPE_LIST
+            CeylonTypes.NAMED_ARGUMENT_LIST, CeylonTypes.SEQUENCED_ARGUMENT, CeylonTypes.IMPORT_MEMBER_OR_TYPE_LIST,
+            CeylonTypes.CONDITION_LIST
     );
     private static final List<IElementType> INDENT_CHILDREN_NONE = Arrays.asList(
             CeylonStubTypes.CEYLON_FILE, CeylonTypes.COMPILATION_UNIT,
@@ -47,7 +48,8 @@ public class CeylonBlock implements Block {
             CeylonTypes.IF_STATEMENT, CeylonTypes.ELSE_CLAUSE
     );
     private static final List<IElementType> INDENT_CHILDREN_CONTINUE = Arrays.asList(
-            CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES
+            CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES,
+            CeylonTypes.LAZY_SPECIFIER_EXPRESSION
     );
 
     private static final Collection<IElementType> TYPES_REQUIRING_NO_LEFT_SPACING = Arrays.asList(
@@ -80,7 +82,7 @@ public class CeylonBlock implements Block {
     );
     private static final Collection<IElementType> COMMENTS = Arrays.asList(CeylonTokens.LINE_COMMENT, CeylonTokens.MULTI_COMMENT);
 
-    public CeylonBlock(ASTNode node, Indent indent) {
+    CeylonBlock(ASTNode node, Indent indent) {
 //        System.out.printf("Indent for %s: %s%n", node.getElementType(), indent);
         this.node = node;
         this.indent = indent;
@@ -259,7 +261,7 @@ public class CeylonBlock implements Block {
 
     @Override
     public boolean isIncomplete() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;
     }
 
     @Override
