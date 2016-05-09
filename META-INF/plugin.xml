@@ -108,7 +108,7 @@
 
         <defaultLiveTemplatesProvider implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplatesProvider"/>
         <liveTemplateContext implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplateContext"/>
-        <codeInsight.template.postfixTemplateProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.templates.CeylonPostfixTemplateProvider"/>
+        <!--<codeInsight.template.postfixTemplateProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.templates.CeylonPostfixTemplateProvider"/>-->
 
         <psi.classFileDecompiler implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler"/>
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes"/>
