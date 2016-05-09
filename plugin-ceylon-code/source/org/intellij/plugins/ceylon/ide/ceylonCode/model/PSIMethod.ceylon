@@ -73,7 +73,7 @@ shared class PSIMethod(shared PsiMethod psi)
     declaredVoid => psi.returnType == PsiType.\iVOID;
     
     default => if (is PsiAnnotationMethod psi)
-               then psi.defaultValue exists
+               then doWithLock(() => psi.defaultValue exists)
                else false;
     
     defaultAccess => !(public || protected || psi.hasModifierProperty(\iPRIVATE));
