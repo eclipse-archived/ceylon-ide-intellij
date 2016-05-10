@@ -91,25 +91,28 @@ shared class IdeaCeylonProject(ideArtifact, model)
     object addModuleArchiveHook
             satisfies BuildHook<Module, VirtualFile, VirtualFile, VirtualFile> {
 
+        File? findLanguageCar() {
+            String moduleName = "ceylon.language";
+            String moduleVersion = TypeChecker.\iLANGUAGE_MODULE_VERSION;
+
+            return repositoryManager.getArtifact(
+                ArtifactContext(moduleName, moduleVersion, ArtifactContext.\iCAR)
+            );
+        }
+
         shared actual void beforeClasspathResolution(CeylonProjectBuildAlias build, CeylonProjectBuildAlias.State state) {
             if (! languageModuleAdded) {
-                String moduleName = "ceylon.language";
-                String moduleVersion = TypeChecker.\iLANGUAGE_MODULE_VERSION;
-                if (exists languageModuleArtifact =
-                        repositoryManager.getArtifact(
-                            ArtifactContext(moduleName, moduleVersion, ArtifactContext.\iCAR))) {
-                    application.invokeAndWait(JavaRunnable(() {
-                            String path;
-                            try {
-                                path = languageModuleArtifact.canonicalPath;
-                            } catch (IOException e) {
-                                platformUtils.log(Status._ERROR,
-                                    "Can't add ceylon language to classpath", e);
-                                return;
-                            }
-
+                if (exists languageModuleArtifact = findLanguageCar()) {
+                    value runnable = JavaRunnable(() {
+                        try {
+                            value path = languageModuleArtifact.canonicalPath;
                             addLibrary(path, true);
-                        }), ModalityState.any());
+                        } catch (IOException e) {
+                            platformUtils.log(Status._ERROR,
+                                "Can't add ceylon language to classpath", e);
+                        }
+                    });
+                    application.invokeAndWait(runnable, ModalityState.any());
 
                     dumbService(model.ideaProject).waitForSmartMode();
                     languageModuleAdded = true;
