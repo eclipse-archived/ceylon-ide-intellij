@@ -132,7 +132,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     shared actual IdeaCeylonProjects model;
     shared actual String name => ideArtifact.name;
 
-    shared actual Boolean loadBinariesFirst => false;
+    shared actual Boolean loadBinariesFirst => true;
             
     shared Module ideaModule => ideArtifact;
 
