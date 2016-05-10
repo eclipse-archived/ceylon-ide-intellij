@@ -61,7 +61,10 @@ import com.redhat.ceylon.ide.common.model {
     ModelAliases,
     ModelListenerAdapter
 }
-
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
+}
 import java.util {
     Timer,
     TimerTask
@@ -79,7 +82,7 @@ shared class CeylonModelManager(model)
     & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
     & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;
-    shared variable Integer typecheckingPeriod = 10000;
+    shared variable Integer typecheckingPeriod = 1000;
     variable value typecheckingPlanned = false;
     variable value ideaProjectReady = false;
     value timer = Timer(true);
@@ -117,6 +120,33 @@ shared class CeylonModelManager(model)
         
     }
     
+    object timerTask extends TimerTask() { 
+        void catchAnyThrowable(void run()) {
+            try {
+                run();
+            } catch(Throwable t) {
+                platformUtils.log {
+                    status = Status._ERROR;
+                    value message {
+                        variable value msg = "Ceylon Model Update task submission failed";
+                        if (! t is Exception) {
+                            msg += " with error : `` t ``";
+                        }
+                        return msg;
+                    }
+                    e = if (is Exception t) then t else null;
+                };
+            }
+        }
+        run () => catchAnyThrowable { 
+            run() => application.invokeAndWait( JavaRunnable { 
+                run () => catchAnyThrowable { 
+                    run() => startBuild(); 
+                }; 
+            }, ModalityState.\iNON_MODAL); 
+        }; 
+    }
+    
     /***************************************************************************
       ModelListenerAdapter implementations
      ***************************************************************************/
@@ -144,12 +174,7 @@ shared class CeylonModelManager(model)
             startupManager(model.ideaProject)
                 .runWhenProjectIsInitialized(JavaRunnable(() {
                     ideaProjectReady = true;
-                    timer.schedule(object extends TimerTask() { run () 
-                        => application.invokeAndWait(
-                            JavaRunnable (() 
-                                => startBuild()), 
-                            ModalityState.\iNON_MODAL);
-                    }, 0, typecheckingPeriod);
+                    timer.schedule(timerTask, 0, typecheckingPeriod);
                 }));
 
     shared actual void projectClosed() {
