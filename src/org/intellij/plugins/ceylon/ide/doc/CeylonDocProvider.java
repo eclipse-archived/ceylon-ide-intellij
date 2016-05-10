@@ -137,7 +137,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             return null;
         }
         final Tree.CompilationUnit cu = ((CeylonFile) context.getContainingFile()).getCompilationUnit();
-        PhasedUnit pu = tc.getPhasedUnitFromRelativePath(cu.getUnit().getRelativePath());
+        final PhasedUnit pu = tc.getPhasedUnitFromRelativePath(cu.getUnit().getRelativePath());
 
         if (link.startsWith("stp:")) {
             int offset = Integer.parseInt(link.substring(4));
@@ -154,7 +154,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                     @Override
                     protected void run(@NotNull Result result) throws Throwable {
                         Document doc = context.getContainingFile().getViewProvider().getDocument();
-                        IdeaQuickFixData data = new IdeaQuickFixData(null, doc, cu, node, null, null, null);
+                        IdeaQuickFixData data = new IdeaQuickFixData(null, doc, cu, pu, node, null, null, null);
                         ideaSpecifyTypeQuickFix_.get_().createProposal((Tree.Type) node, data);
                     }
                 }.execute();
