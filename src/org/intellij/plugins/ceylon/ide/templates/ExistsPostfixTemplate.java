@@ -26,6 +26,8 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.util.FindNodeVisitor;
 import com.redhat.ceylon.model.typechecker.model.Type;
+import com.redhat.ceylon.model.typechecker.model.Unit;
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -124,7 +126,11 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
             model = ((Tree.Term) node).getTypeModel();
         }
 
-        return node.getUnit().isOptionalType(model);
+        Unit unit = node.getUnit();
+        if (unit == null) {
+            return false;
+        }
+        return unit.isOptionalType(model);
     }
 
     public ExistsPostfixTemplate() {
