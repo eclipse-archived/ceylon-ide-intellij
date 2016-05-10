@@ -1,17 +1,11 @@
 import com.intellij.lang {
     ImportOptimizer
 }
-import com.intellij.openapi.editor {
-    Document
-}
 import com.intellij.psi {
     PsiFile
 }
 import com.redhat.ceylon.ide.common.imports {
     AbstractImportsCleaner
-}
-import com.redhat.ceylon.ide.common.util {
-    Indents
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration
@@ -22,37 +16,24 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    InsertEdit,
-    TextEdit,
-    TextChange,
-    IdeaDocumentChanges
+    DocumentWrapper
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIndents
-}
 
 shared class CeylonImportOptimizer()
-        satisfies AbstractImportsCleaner<Document, InsertEdit, TextEdit, TextChange>
-                & IdeaDocumentChanges
-                & ImportOptimizer {
-    
-    shared actual Indents<Document> indents => ideaIndents;
+        satisfies AbstractImportsCleaner & ImportOptimizer {
     
     shared actual Runnable processFile(PsiFile psiFile) {
         value doc = psiFile.viewProvider.document;
-        value change = TextChange(doc);
-        
+
         assert(is CeylonFile psiFile);
         value cu = psiFile.compilationUnit;
         
         return object satisfies Runnable {
             shared actual void run() {
-                if (cleanImports(cu, doc, change)) {
-                    change.apply();
-                }
+                cleanImports(cu, DocumentWrapper(doc));
             }
         };
     }
