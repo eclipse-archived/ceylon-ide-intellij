@@ -87,8 +87,8 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
 
     findChild(VirtualFile|Module parent, Path path) => 
             if (is VirtualFile parent)
-            then parent.findChild(path.string)
-            else parent.moduleFile?.parent?.findChild(path.string);
+            then parent.findFileByRelativePath(path.string)
+            else parent.moduleFile?.parent?.findFileByRelativePath(path.string);
 
     fromJavaFile(File javaFile, Module project) => VfsUtil.findFileByIoFile(javaFile, true);
 
