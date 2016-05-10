@@ -103,6 +103,7 @@
 
         <copy todir="${build.dir}/CeylonIDEA">
             <fileset dir="${basedir}" includes="META-INF/**"/>
+            <fileset dir="${basedir}/plugin-ceylon-code" includes="IdeaModuleToImport.properties"/>
         </copy>
         <replace file="${build.dir}/CeylonIDEA/META-INF/plugin.xml"
                  value="${module.com.redhat.ceylon.ide.intellij.version}-${NOW}">

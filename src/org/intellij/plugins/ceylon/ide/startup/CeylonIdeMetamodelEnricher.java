@@ -10,7 +10,9 @@ import com.redhat.ceylon.model.cmr.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import static org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin.getEmbeddedCeylonRepository;
 
@@ -68,6 +71,7 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void registerIntellijApiModules() {
         ApplicationInfo applicationInfo = ApplicationInfo.getInstance();
         ClassLoader cl = applicationInfo.getClass().getClassLoader();
@@ -85,16 +89,36 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
             e.printStackTrace();
         }
 
+        File importedIdeaModulesFile = new File(CeylonIdePlugin.getClassesDir().getParentFile(), "IdeaModuleToImport.properties");
+        if (! importedIdeaModulesFile.exists()) {
+            throw new RuntimeException("The file 'IdeaModuleToImport.properties' was not found at the root of the Ceylon  IDE plugin folder.\n"
+                    + "The Ceylon IDE plugin will not work propertly.");
+        }
+        Properties importedIdeaModules = new Properties();
+        try {
+            importedIdeaModules.load(new FileReader(importedIdeaModulesFile));
+        } catch(IOException ioe) {
+            throw new RuntimeException("The file 'IdeaModuleToImport.properties' at the root of the Ceylon  IDE plugin folder could not be parsed.\n"
+                    + "The Ceylon IDE plugin will not work propertly.", ioe);
+        }
+        
         for (final URL url : urls) {
-            final String fileName = url.getFile();
-            if (fileName.endsWith("openapi.jar") ||
-                    fileName.endsWith("util.jar") ||
-                    fileName.endsWith("annotations.jar") ||
-                    fileName.endsWith("extensions.jar")) {
+            File file;
+            try {
+                file = new File(url.toURI());
+            } catch(URISyntaxException e) {
+                file = new File(url.getPath());
+            }
+            if (!file.exists()) {
+                continue;
+            }
+            final String fileName = file.getName();
+            final String moduleName = importedIdeaModules.getProperty(fileName);
+            if (moduleName != null) {
                 ArtifactResult artifactResult = new ArtifactResult() {
                     @Override
                     public String name() {
-                        return fileName.replaceAll("\\.jar$", "");
+                        return moduleName;
                     }
 
                     @Override
