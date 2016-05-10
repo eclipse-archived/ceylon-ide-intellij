@@ -99,9 +99,9 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
                             value imports = HashSet<Declaration>();
                             ideaImportProposals.importType(imports, type, data.rootNode);
                             if (!imports.empty) {
-                                value change = newTextChange("Import type", data.doc);
+                                value change = newTextChange("Import type", data.nativeDoc);
                                 initMultiEditChange(change);
-                                ideaImportProposals.applyImports(change, imports, data.rootNode, data.doc);
+                                ideaImportProposals.applyImports(change, imports, data.rootNode, data.nativeDoc);
                                 change.apply(ctx.project);
                             }
                         }

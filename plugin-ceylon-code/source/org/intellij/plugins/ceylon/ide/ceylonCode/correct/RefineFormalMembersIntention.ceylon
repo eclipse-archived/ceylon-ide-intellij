@@ -33,7 +33,7 @@ shared class RefineFormalMembersIntention()
     
     shared actual void newRefineFormalMembersProposal(IdeaQuickFixData data, String desc) {
         if (exists editor = data.editor,
-            exists change = refineFormalMembers(data, data.doc, editor.caretModel.offset)) {
+            exists change = refineFormalMembers(data, data.nativeDoc, editor.caretModel.offset)) {
             makeAvailable(desc, change, null);
         }
     }

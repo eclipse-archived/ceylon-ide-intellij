@@ -52,11 +52,11 @@ shared interface IdeaSpecifyTypeQuickFix
                 change = null;
                 image = ideaIcons.correction;
                 callback = (project, editor, file) {
-                    specifyType(data.doc, type, true, cu, infType);
+                    specifyType(data.nativeDoc, type, true, cu, infType);
                 };
             };
         } else {
-            specifyType(data.doc, type, true, cu, infType);
+            specifyType(data.nativeDoc, type, true, cu, infType);
         }
     }
         
@@ -75,7 +75,7 @@ shared class IdeaSpecifyTypeIntention()
     shared actual void newSpecifyTypeProposal(String desc, Tree.Type type, 
         Tree.CompilationUnit cu, Type infType, IdeaQuickFixData data)
             => makeAvailable(desc, null, null, (project, editor, file) {
-                    specifyType(data.doc, type, true, cu, infType);
+                    specifyType(data.nativeDoc, type, true, cu, infType);
                 }
             );
 

@@ -31,6 +31,6 @@ shared class AddThrowsAnnotationIntention()
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
         
-        addThrowsAnnotationProposal(data, file, data.doc, statement);
+        addThrowsAnnotationProposal(data, file, data.nativeDoc, statement);
     }
 }

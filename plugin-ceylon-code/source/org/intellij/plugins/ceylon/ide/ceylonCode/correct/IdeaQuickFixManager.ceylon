@@ -63,6 +63,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 import com.redhat.ceylon.ide.common.model {
     BaseCeylonProject
 }
+import com.redhat.ceylon.ide.common.refactoring {
+    DefaultRegion
+}
+import com.redhat.ceylon.ide.common.platform {
+    PlatformTextChange=TextChange
+}
 
 shared object ideaQuickFixManager
         extends IdeQuickFixManager<Document,InsertEdit,TextEdit,TextChange,TextRange,Module,CeylonFile,LookupElement,IdeaQuickFixData,IdeaLinkedMode>() {
@@ -114,7 +120,7 @@ shared object ideaQuickFixManager
     }
 }
 
-class CustomIntention(Integer position, String desc, TextChange? change, TextRange? selection = null, Icon? image = null,
+class CustomIntention(Integer position, String desc, <TextChange|PlatformTextChange>? change, TextRange? selection = null, Icon? image = null,
     Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop)
         extends BaseIntentionAction()
         satisfies Iconable & Comparable<IntentionAction> {
@@ -123,8 +129,10 @@ class CustomIntention(Integer position, String desc, TextChange? change, TextRan
     variable Project? project = null;
     
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
-        if (exists change) {
+        if (is TextChange change) {
             change.apply(project);
+        } else if (is IdeaTextChange change) {
+            change.applyOnProject(project);
         }
         if (exists selection) {
             editor.selectionModel.setSelection(selection.startOffset, selection.endOffset);
@@ -159,7 +167,9 @@ class CustomIntention(Integer position, String desc, TextChange? change, TextRan
     }
 }
 
-shared class IdeaQuickFixData(Message message, shared Document doc,
+shared class IdeaQuickFixData(
+    Message message,
+    shared Document nativeDoc,
     shared actual Tree.CompilationUnit rootNode,
     shared actual Node node,
     shared actual Module project,
@@ -172,7 +182,7 @@ shared class IdeaQuickFixData(Message message, shared Document doc,
     problemOffset => annotation?.startOffset else 0;
     problemLength => (annotation?.endOffset else 0) - problemOffset;
     
-    shared void registerFix(String desc, TextChange? change, TextRange? selection = null, Icon? image = null,
+    shared void registerFix(String desc, <TextChange|PlatformTextChange>? change, TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
         
         assert (exists annotation);
@@ -180,5 +190,17 @@ shared class IdeaQuickFixData(Message message, shared Document doc,
         IntentionAction intention = CustomIntention(position, desc, change,
             selection, image, qualifiedNameIsPath, callback);
         annotation.registerFix(intention);
+    }
+
+    doc = DocumentWrapper(nativeDoc);
+
+    shared actual void addQuickFix(String desc, PlatformTextChange change, DefaultRegion? selection) {
+        value range = if (exists selection)
+                      then TextRange.from(selection.start, selection.length)
+                      else null;
+
+        if (is IdeaTextChange change) {
+            registerFix(desc, change, range, ideaIcons.correction);
+        }
     }
 }

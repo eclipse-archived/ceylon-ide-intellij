@@ -40,7 +40,7 @@ shared class AddAnnotationIntention()
         
         // TODO this method can potentially generate more than one proposal, which
         // means we should have more than one intention :/
-        addContextualAnnotationProposals(data, decl, data.doc, offset);
+        addContextualAnnotationProposals(data, decl, data.nativeDoc, offset);
     }
     
     moduleImportUtil => ideaModuleImportUtils;

@@ -30,6 +30,6 @@ shared class ConvertIfElseToThenElseIntention()
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
         
-        addConvertToThenElseProposal(data, file, data.doc, statement);
+        addConvertToThenElseProposal(data, file, data.nativeDoc, statement);
     }
 }
