@@ -4,9 +4,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -35,7 +32,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 object ideaCreateQuickFix
-        satisfies CreateQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
+        satisfies CreateQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
                 & IdeaQuickFix & IdeaDocumentChanges {
     
     shared actual void newCreateQuickFix(IdeaQuickFixData data, String desc, Scope scope, Unit unit,
@@ -49,6 +46,6 @@ object ideaCreateQuickFix
         data.registerFix(desc, change, selection, icon);
     }
     
-    shared actual CreateParameterQuickFix<CeylonFile,Module,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> createParameterQuickFix
+    shared actual CreateParameterQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> createParameterQuickFix
             => ideaCreateParameterQuickFix;
 }

@@ -145,7 +145,7 @@ shared class ErrorsVisitor(AnnotationHolder annotationHolder, CeylonFile file) e
             exists node = nodes.findNode(pu.compilationUnit, null, range.startOffset, range.endOffset)) {
 
             value data = IdeaQuickFixData(error, file.viewProvider.document, pu.compilationUnit,
-                node, mod, annotation, project);
+                pu, node, mod, annotation, project);
 
             try {
                 ideaQuickFixManager.addQuickFixes(data, tc, file);

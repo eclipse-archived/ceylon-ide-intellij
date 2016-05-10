@@ -4,9 +4,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -38,7 +35,7 @@ shared object ideaSpecifyTypeQuickFix satisfies IdeaSpecifyTypeQuickFix { }
 
 shared interface IdeaSpecifyTypeQuickFix
         satisfies SpecifyTypeQuickFix<CeylonFile,Document,InsertEdit,TextEdit,
-            TextChange,TextRange,Module,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
+            TextChange,TextRange,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
                 & IdeaLinkedModeSupport
                 & IdeaDocumentChanges
                 & IdeaQuickFix {

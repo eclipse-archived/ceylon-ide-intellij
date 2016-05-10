@@ -4,9 +4,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -20,21 +17,21 @@ import com.redhat.ceylon.ide.common.correct {
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
 }
-
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
-}
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
+}
+
 shared abstract class MiscIntention()
         extends AbstractIntention()
-        satisfies MiscQuickFixes<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+        satisfies MiscQuickFixes<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
     
-    convertToBlockQuickFix => object satisfies ConvertToBlockQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+    convertToBlockQuickFix => object satisfies ConvertToBlockQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
             & IdeaDocumentChanges
             & IdeaQuickFix {
 
@@ -44,7 +41,7 @@ shared abstract class MiscIntention()
         }
     };
     
-    convertToSpecifierQuickFix => object satisfies ConvertToSpecifierQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+    convertToSpecifierQuickFix => object satisfies ConvertToSpecifierQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
             & IdeaDocumentChanges
             & IdeaQuickFix {
 
@@ -54,7 +51,7 @@ shared abstract class MiscIntention()
         }
     };
     
-    convertToGetterQuickFix => object satisfies ConvertToGetterQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+    convertToGetterQuickFix => object satisfies ConvertToGetterQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
             & IdeaDocumentChanges
             & IdeaQuickFix {
 
@@ -64,7 +61,7 @@ shared abstract class MiscIntention()
         }
     };   
     
-    fillInQuickFix => object satisfies FillInArgumentNameQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+    fillInQuickFix => object satisfies FillInArgumentNameQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
             & IdeaDocumentChanges
             & IdeaQuickFix {
         

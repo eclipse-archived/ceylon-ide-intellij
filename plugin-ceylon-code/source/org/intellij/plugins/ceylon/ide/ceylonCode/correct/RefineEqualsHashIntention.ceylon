@@ -4,9 +4,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -20,7 +17,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class RefineEqualsHashIntention() 
         extends GenericIntention()
-        satisfies RefineEqualsHashQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {    
+        satisfies RefineEqualsHashQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Refine equals() and/or hash";
     

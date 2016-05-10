@@ -14,8 +14,7 @@ import com.intellij.openapi.editor {
     AliasedAsTextEdit=TextChange
 }
 import com.intellij.openapi.\imodule {
-    ModuleUtil,
-    Module
+    ModuleUtil
 }
 import com.intellij.openapi.project {
     Project
@@ -93,7 +92,9 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                 value data = object extends IdeaQuickFixData(
                     dummyMsg, 
                     psiFile.viewProvider.document,
-                    psiFile.compilationUnit, _node,
+                    psiFile.compilationUnit,
+                    psiFile.phasedUnit,
+                    _node,
                     mod,
                     null,
                     pr,
@@ -138,7 +139,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
 abstract shared class GenericIntention() 
         extends AbstractIntention()
-        satisfies GenericQuickFix<CeylonFile,Document,InsertEdit,AliasedAsTextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> 
+        satisfies GenericQuickFix<CeylonFile,Document,InsertEdit,AliasedAsTextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
     

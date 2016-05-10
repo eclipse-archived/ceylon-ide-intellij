@@ -4,9 +4,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -26,7 +23,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class ReverseOperatorIntention()
         extends GenericIntention()
-        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
+        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Reverse operator";
     
@@ -39,7 +36,7 @@ shared class ReverseOperatorIntention()
 
 shared class InvertOperatorIntention()
         extends GenericIntention()
-        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
+        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Invert operator";
     
@@ -52,7 +49,7 @@ shared class InvertOperatorIntention()
 
 shared class SwapBinaryOperandsIntention()
         extends GenericIntention()
-        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
+        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Swap binary operands";
     
@@ -65,7 +62,7 @@ shared class SwapBinaryOperandsIntention()
 
 shared class ParenthesesIntention()
         extends GenericIntention()
-        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
+        satisfies OperatorQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Add/remove parentheses";
     

@@ -4,14 +4,14 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
 import com.redhat.ceylon.ide.common.correct {
     AddInitializerQuickFix
+}
+import com.redhat.ceylon.ide.common.refactoring {
+    DefaultRegion
 }
 import com.redhat.ceylon.model.typechecker.model {
     TypedDeclaration
@@ -23,12 +23,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
-import com.redhat.ceylon.ide.common.refactoring {
-    DefaultRegion
-}
 
 object ideaAddInitializerQuickFix
-        satisfies AddInitializerQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+        satisfies AddInitializerQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
     

@@ -4,9 +4,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -20,7 +17,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class ConvertStringToVerbatimIntention()
         extends GenericIntention()
-        satisfies ConvertStringQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {    
+        satisfies ConvertStringQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Convert string to verbatim";
     
@@ -30,7 +27,7 @@ shared class ConvertStringToVerbatimIntention()
 
 shared class ConvertVerbatimToStringIntention()
         extends GenericIntention()
-        satisfies ConvertStringQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {    
+        satisfies ConvertStringQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Convert verbatim to string";
     
@@ -40,7 +37,7 @@ shared class ConvertVerbatimToStringIntention()
 
 shared class ConvertToInterpolationIntention()
         extends GenericIntention()
-        satisfies ConvertStringQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {    
+        satisfies ConvertStringQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Convert concatenation to interpolation";
     
@@ -50,7 +47,7 @@ shared class ConvertToInterpolationIntention()
 
 shared class ConvertToConcatenationIntention()
         extends GenericIntention()
-        satisfies ConvertStringQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {    
+        satisfies ConvertStringQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     familyName => "Convert interpolation to concatenation";
     

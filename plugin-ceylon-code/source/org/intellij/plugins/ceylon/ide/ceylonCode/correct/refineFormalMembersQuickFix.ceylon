@@ -5,9 +5,6 @@ import com.intellij.openapi.editor {
     Editor,
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.project {
     Project
 }
@@ -29,7 +26,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 shared object ideaRefineFormalMembersQuickFix 
-        satisfies RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement>
+        satisfies RefineFormalMembersQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
                 & IdeaDocumentChanges & IdeaQuickFix {
     
      getDocChar(Document doc, Integer offset)

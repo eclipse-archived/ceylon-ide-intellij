@@ -9,9 +9,6 @@ import com.intellij.openapi.editor {
     Document,
     AliasedAsTextEdit=TextChange
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -56,7 +53,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 shared interface IdeaQuickFix
         satisfies AbstractQuickFix<CeylonFile,Document,InsertEdit,AliasedAsTextEdit,
-        TextChange,TextRange,Module,IdeaQuickFixData,LookupElement> {
+        TextChange,TextRange,IdeaQuickFixData,LookupElement> {
     
     shared actual Integer getTextEditOffset(TextEdit change) => change.start;
     

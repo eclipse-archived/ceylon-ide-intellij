@@ -4,8 +4,8 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.\imodule {
-    Module
+import com.intellij.openapi.project {
+    Project
 }
 import com.intellij.openapi.util {
     TextRange
@@ -28,13 +28,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import com.intellij.openapi.project {
-    Project
-}
 
 shared class ConvertToClassIntention()
         extends AbstractIntention()
-        satisfies ConvertToClassQuickFix<Module,IdeaQuickFixData>
+        satisfies ConvertToClassQuickFix<IdeaQuickFixData>
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
     
@@ -59,7 +56,7 @@ shared class ConvertToClassIntention()
 }
 
 class ConvertToClassProposal(Project project)
-        satisfies AbstractConvertToClassProposal<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement,IdeaLinkedMode> 
+        satisfies AbstractConvertToClassProposal<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
                 & IdeaDocumentChanges
                 & IdeaQuickFix
                 & IdeaLinkedModeSupport {

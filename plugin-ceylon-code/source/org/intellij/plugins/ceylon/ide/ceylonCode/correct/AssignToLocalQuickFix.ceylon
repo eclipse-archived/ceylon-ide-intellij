@@ -1,3 +1,7 @@
+import com.intellij.codeInsight.completion {
+    InsertHandler,
+    InsertionContext
+}
 import com.intellij.codeInsight.lookup {
     LookupElement,
     LookupElementBuilder
@@ -5,9 +9,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document,
     Editor
-}
-import com.intellij.openapi.\imodule {
-    Module
 }
 import com.intellij.openapi.project {
     Project
@@ -25,6 +26,10 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration
 }
 
+import java.util {
+    HashSet
+}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
     IdeaLinkedModeSupport,
     IdeaLinkedMode
@@ -35,16 +40,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
-import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
-}
-import java.util {
-    HashSet
-}
 
 object ideaAssignToLocalQuickFix
-        satisfies AssignToLocalQuickFix<CeylonFile,Module,IdeaQuickFixData>
+        satisfies AssignToLocalQuickFix<CeylonFile,IdeaQuickFixData>
                 & IdeaDocumentChanges
                 & IdeaQuickFix {
 
@@ -62,7 +60,7 @@ object ideaAssignToLocalQuickFix
 }
 
 class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFile f)
-        satisfies AssignToLocalProposal<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,Module,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
+        satisfies AssignToLocalProposal<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
                 & IdeaQuickFix
                 & IdeaDocumentChanges
                 & IdeaLinkedModeSupport {

@@ -5,9 +5,6 @@ import com.intellij.openapi.editor {
     Document,
     Editor
 }
-import com.intellij.openapi.\imodule {
-    Module
-}
 import com.intellij.openapi.project {
     Project
 }
@@ -36,7 +33,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 object ideaDeclareLocalQuickFix 
-        satisfies DeclareLocalQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,IdeaLinkedMode,LookupElement,Module,IdeaQuickFixData,TextRange>
+        satisfies DeclareLocalQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,IdeaLinkedMode,LookupElement,IdeaQuickFixData,TextRange>
                 & IdeaDocumentChanges
                 & IdeaQuickFix
                 & IdeaLinkedModeSupport {

@@ -1,11 +1,12 @@
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
-}
 import com.redhat.ceylon.ide.common.correct {
     convertForToWhileQuickFix
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
+}
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
 }
 
 shared class ConvertForToWhileIntention() extends AbstractIntention() {

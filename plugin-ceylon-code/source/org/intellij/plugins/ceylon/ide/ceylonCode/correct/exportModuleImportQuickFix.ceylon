@@ -1,39 +1,40 @@
-import com.redhat.ceylon.ide.common.correct {
-    ExportModuleImportQuickFix
-}
-import com.intellij.openapi.util {
-    TextRange
-}
-import com.intellij.openapi.\imodule {
-    Module
+import com.intellij.codeInsight.lookup {
+    LookupElement
 }
 import com.intellij.openapi.editor {
     Document,
     Editor
 }
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Unit
+import com.intellij.openapi.\imodule {
+    Module
 }
 import com.intellij.openapi.project {
     Project
 }
+import com.intellij.openapi.util {
+    TextRange
+}
 import com.intellij.psi {
     PsiFile
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+import com.redhat.ceylon.ide.common.correct {
+    ExportModuleImportQuickFix
 }
 import com.redhat.ceylon.ide.common.imports {
     AbstractModuleImportUtil
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Unit
+}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
     ideaModuleImportUtils
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
 }
 
 object ideaExportModuleImportQuickFix

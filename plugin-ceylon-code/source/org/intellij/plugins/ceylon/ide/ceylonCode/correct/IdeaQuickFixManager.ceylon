@@ -27,6 +27,9 @@ import com.intellij.openapi.util {
 import com.intellij.psi {
     PsiFile
 }
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Message,
     Node,
@@ -35,6 +38,15 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 import com.redhat.ceylon.ide.common.correct {
     IdeQuickFixManager,
     QuickFixData
+}
+import com.redhat.ceylon.ide.common.model {
+    BaseCeylonProject
+}
+import com.redhat.ceylon.ide.common.platform {
+    PlatformTextChange=TextChange
+}
+import com.redhat.ceylon.ide.common.refactoring {
+    DefaultRegion
 }
 
 import java.lang {
@@ -59,15 +71,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
-}
-import com.redhat.ceylon.ide.common.model {
-    BaseCeylonProject
-}
-import com.redhat.ceylon.ide.common.refactoring {
-    DefaultRegion
-}
-import com.redhat.ceylon.ide.common.platform {
-    PlatformTextChange=TextChange
 }
 
 shared object ideaQuickFixManager
@@ -115,7 +118,7 @@ shared object ideaQuickFixManager
     
     shared actual void addCreateTypeParameterProposal<Data>(Data data,
         Tree.BaseType bt, String brokenName)
-            given Data satisfies QuickFixData<Module> {
+            given Data satisfies QuickFixData {
         // TODO
     }
 }
@@ -171,12 +174,13 @@ shared class IdeaQuickFixData(
     Message message,
     shared Document nativeDoc,
     shared actual Tree.CompilationUnit rootNode,
+    shared actual PhasedUnit phasedUnit,
     shared actual Node node,
-    shared actual Module project,
+    shared Module project,
     shared Annotation? annotation,
     shared actual BaseCeylonProject ceylonProject,
     shared variable Editor? editor = null
-) satisfies QuickFixData<Module> {
+) satisfies QuickFixData {
     
     errorCode => message.code;
     problemOffset => annotation?.startOffset else 0;
