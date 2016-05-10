@@ -5,6 +5,9 @@ import ceylon.interop.java {
 import com.intellij.codeInsight.intention.impl {
     BaseIntentionAction
 }
+import com.intellij.codeInsight.lookup {
+    LookupElement
+}
 import com.intellij.openapi.editor {
     Editor,
     Document,
@@ -26,8 +29,17 @@ import com.intellij.psi {
 import com.redhat.ceylon.compiler.typechecker.analyzer {
     UsageWarning
 }
+import com.redhat.ceylon.ide.common.correct {
+    GenericQuickFix
+}
+import com.redhat.ceylon.ide.common.platform {
+    PlatformTextChange=TextChange
+}
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    ModifiablePhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -39,19 +51,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import com.redhat.ceylon.ide.common.correct {
-    GenericQuickFix
-}
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
-import com.redhat.ceylon.ide.common.typechecker {
-    ModifiablePhasedUnit
-}
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
-    variable TextChange? change = null;
+    variable <TextChange|IdeaTextChange>? change = null;
     variable TextRange? selection = null;
     variable Boolean available = false;
     variable Anything(Project, Editor, PsiFile) callback = noop;
@@ -59,8 +62,10 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     value dummyMsg = UsageWarning(null, null, null);
     
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
-        if (exists chg = change) {
+        if (is TextChange chg = change) {
             chg.apply(project);
+        } else if (is IdeaTextChange chg = change) {
+            chg.applyOnProject(project);
         }
         if (exists sel = selection) {
             editor.selectionModel.setSelection(sel.startOffset, sel.endOffset);
@@ -69,31 +74,37 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
         callback(project, editor, psiFile);
     }
     
-    shared actual Boolean isAvailable(Project project, Editor editor, PsiFile psiFile) {
+    shared actual Boolean isAvailable(Project project, Editor _editor, PsiFile psiFile) {
         available = false;
         callback = noop;
 
         if (is CeylonFile psiFile,
             is ModifiablePhasedUnit<out Anything,out Anything,out Anything,out Anything> u=psiFile.phasedUnit) {
             psiFile.ensureTypechecked();
-            value offset = editor.caretModel.offset;
-            value node = nodes.findNode(psiFile.compilationUnit, 
+            value offset = _editor.caretModel.offset;
+            value _node = nodes.findNode(psiFile.compilationUnit,
                 psiFile.tokens, offset);
             
             value mod = ModuleUtil.findModuleForFile(psiFile.virtualFile, project);
             
-            if (exists node,
+            if (exists _node,
                 exists pr = project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod)) {
                 
-                value data = IdeaQuickFixData(
+                value data = object extends IdeaQuickFixData(
                     dummyMsg, 
                     psiFile.viewProvider.document,
-                    psiFile.compilationUnit, node,
+                    psiFile.compilationUnit, _node,
                     mod,
                     null,
                     pr,
-                    editor
-                );
+                    _editor
+                ) {
+                    shared actual void addQuickFix(String desc, PlatformTextChange change, DefaultRegion? selection) {
+                        if (is IdeaTextChange change) {
+                            makeAvailable(desc, change, selection);
+                        }
+                    }
+                };
 
                 try {
                     checkAvailable(data, psiFile, offset);
@@ -108,7 +119,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     
     shared formal void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset);
     
-    shared void makeAvailable(String desc, TextChange? change = null,
+    shared void makeAvailable(String desc, <TextChange|IdeaTextChange>? change = null,
         DefaultRegion? sel = null, 
         Anything callback(Project p, Editor e, PsiFile f) => noop) {
         

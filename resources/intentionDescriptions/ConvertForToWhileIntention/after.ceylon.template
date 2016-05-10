@@ -1,0 +1,5 @@
+void run() {
+    value it = [1, 2, 3].iterator();
+    while (!is Finished i = it.next()) {
+    }
+}

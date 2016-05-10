@@ -194,7 +194,7 @@ shared class IdeaQuickFixData(
 
     doc = DocumentWrapper(nativeDoc);
 
-    shared actual void addQuickFix(String desc, PlatformTextChange change, DefaultRegion? selection) {
+    shared actual default void addQuickFix(String desc, PlatformTextChange change, DefaultRegion? selection) {
         value range = if (exists selection)
                       then TextRange.from(selection.start, selection.length)
                       else null;

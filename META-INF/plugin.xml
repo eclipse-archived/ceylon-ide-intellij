@@ -220,6 +220,10 @@
             <category>Ceylon/Control flow</category>
         </intentionAction>
         <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertForToWhileIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ReverseOperatorIntention</className>
             <category>Ceylon/Operators</category>
         </intentionAction>
