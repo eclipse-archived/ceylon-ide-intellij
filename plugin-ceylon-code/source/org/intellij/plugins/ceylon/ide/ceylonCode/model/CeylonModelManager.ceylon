@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    JavaRunnable,
-    synchronize
+    JavaRunnable
 }
 
 import com.intellij.codeInsight.daemon {
@@ -27,7 +26,9 @@ import com.intellij.openapi.\imodule {
     Module
 }
 import com.intellij.openapi.progress {
-    ProgressManager,
+    ProgressManager {
+        progressManager=instance
+    },
     Task {
         Backgroundable
     },
@@ -56,18 +57,21 @@ import com.intellij.openapi.vfs {
 import com.intellij.testFramework {
     LightVirtualFile
 }
+import com.intellij.util.concurrency {
+    QueueProcessor,
+    AppExecutorUtil
+}
 import com.redhat.ceylon.ide.common.model {
     ChangeAware,
     ModelAliases,
     ModelListenerAdapter
 }
-import com.redhat.ceylon.ide.common.platform {
-    platformUtils,
-    Status
-}
+
 import java.util {
-    Timer,
-    TimerTask
+    Timer
+}
+import java.util.concurrent {
+    TimeUnit
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
@@ -82,69 +86,56 @@ shared class CeylonModelManager(model)
     & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
     & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;
-    shared variable Integer typecheckingPeriod = 1000;
-    variable value typecheckingPlanned = false;
+    shared variable Integer typecheckingPeriod = 5;
+    shared variable Boolean periodicTypecheckingEnabled = true;
     variable value ideaProjectReady = false;
-    value timer = Timer(true);
-
+    value queueProcessor = QueueProcessor.createRunnableQueueProcessor();
+    
     componentName => "CeylonModelManager";
     
-    object buildBackgroundTask extends Backgroundable(
-        model.ideaProject, 
-        "ceylon model update", 
-        true, 
-        PerformInBackgroundOption.\iALWAYS_BACKGROUND) {
-        
-        run(ProgressIndicator progressIndicator) => synchronize(this, () {
-            typecheckingPlanned = false;
-            value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
-            value ticks = model.ceylonProjectNumber * 1000;
-            try (progress = monitor.Progress(ticks, "Updating Ceylon Model")) {
-                for (ceylonProject in model.ceylonProjectsInTopologicalOrder) {
-                    ceylonProject.build.performBuild(progress.newChild(1000));
-                }
-            }
-            application.invokeLater(JavaRunnable(() =>
-                DaemonCodeAnalyzer.getInstance(model.ideaProject).restart()));
-        });
-    }
-
     shared void startBuild() {
-        if (ideaProjectReady
-            && !typecheckingPlanned
-                && model.ceylonProjects.any((ceylonProject) 
-            => ceylonProject.build.somethingToDo)) {
-            typecheckingPlanned = true;
-            ProgressManager.instance.run(buildBackgroundTask);
-        }
-        
-    }
-    
-    object timerTask extends TimerTask() { 
-        void catchAnyThrowable(void run()) {
-            try {
-                run();
-            } catch(Throwable t) {
-                platformUtils.log {
-                    status = Status._ERROR;
-                    value message {
-                        variable value msg = "Ceylon Model Update task submission failed";
-                        if (! t is Exception) {
-                            msg += " with error : `` t ``";
-                        }
-                        return msg;
-                    }
-                    e = if (is Exception t) then t else null;
-                };
+        void reschedule() {
+            if (periodicTypecheckingEnabled,
+                ! queueProcessor.hasPendingItemsToProcess()) {
+                AppExecutorUtil.appScheduledExecutorService.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.\iSECONDS);
             }
         }
-        run () => catchAnyThrowable { 
-            run() => application.invokeAndWait( JavaRunnable { 
-                run () => catchAnyThrowable { 
-                    run() => startBuild(); 
-                }; 
-            }, ModalityState.\iNON_MODAL); 
-        }; 
+        if (ideaProjectReady) {
+            queueProcessor.add(JavaRunnable { 
+                void run () {
+                    if (model.ceylonProjects.any((ceylonProject) 
+                        => ceylonProject.build.somethingToDo)) {
+                        application.invokeAndWait(JavaRunnable {
+                            run() => progressManager.run(object extends Backgroundable(
+                                model.ideaProject, 
+                                "ceylon model update", 
+                                true, 
+                                PerformInBackgroundOption.\iALWAYS_BACKGROUND) {
+                                
+                                shared actual void run(ProgressIndicator progressIndicator) {
+                                    value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
+                                    value ticks = model.ceylonProjectNumber * 1000;
+                                    try (progress = monitor.Progress(ticks, "Updating Ceylon Model")) {
+                                        for (ceylonProject in model.ceylonProjectsInTopologicalOrder) {
+                                            ceylonProject.build.performBuild(progress.newChild(1000));
+                                        }
+                                    }
+                                    application.invokeAndWait(JavaRunnable(() =>
+                                        DaemonCodeAnalyzer.getInstance(model.ideaProject).restart()), ModalityState.\iNON_MODAL);
+                                }
+                                
+                                shared actual void onFinished() {
+                                    queueProcessor.dismissLastTasks(1);
+                                    reschedule();
+                                }
+                            });
+                        }, ModalityState.any());
+                    }
+                }
+            });
+        } else {
+            reschedule();
+        }
     }
     
     /***************************************************************************
@@ -174,12 +165,11 @@ shared class CeylonModelManager(model)
             startupManager(model.ideaProject)
                 .runWhenProjectIsInitialized(JavaRunnable(() {
                     ideaProjectReady = true;
-                    timer.schedule(timerTask, 0, typecheckingPeriod);
+                    startBuild();
                 }));
 
     shared actual void projectClosed() {
         ideaProjectReady = false;
-        timer.cancel();
     }
 
     /***************************************************************************
