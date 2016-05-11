@@ -89,7 +89,7 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
             e.printStackTrace();
         }
 
-        File importedIdeaModulesFile = new File(CeylonIdePlugin.getClassesDir().getParentFile(), "IdeaModuleToImport.properties");
+        File importedIdeaModulesFile = new File(CeylonIdePlugin.getClassesDir(), "IdeaModuleToImport.properties");
         if (! importedIdeaModulesFile.exists()) {
             throw new RuntimeException("The file 'IdeaModuleToImport.properties' was not found at the root of the Ceylon  IDE plugin folder.\n"
                     + "The Ceylon IDE plugin will not work propertly.");

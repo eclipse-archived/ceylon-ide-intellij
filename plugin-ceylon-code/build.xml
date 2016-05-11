@@ -39,7 +39,7 @@
     <!-- Local repository -->
     <property name="intellij.repo.dir" location="${basedir}/intellij-repository" />
     
-	<loadproperties srcfile="IdeaModuleToImport.properties" prefix="moduleToImport."/>
+	<loadproperties srcfile="${basedir}/../resources/IdeaModuleToImport.properties" prefix="moduleToImport."/>
 	<propertyselector property="modulesToImport"
 	                         delimiter=","
 	                         match="moduleToImport\.(.*)"
