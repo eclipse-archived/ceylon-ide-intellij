@@ -39,6 +39,8 @@
         <group text="Ceylon" icon="/icons/ceylon.png" popup="true">
             <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.ResetModelAction"
                     id="Ceylon.ResetModel" text="Reset Ceylon model"/>
+            <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.ToggleModelUpdateAction"
+                    id="Ceylon.ToggleAutoUpdate" text="Disable automatic update of model"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
         <action id="Ceylon.AddCeylonModule" class="org.intellij.plugins.ceylon.ide.action.CeylonAddModuleAction" text="Ceylon _Module" description="Add a new Ceylon module">
