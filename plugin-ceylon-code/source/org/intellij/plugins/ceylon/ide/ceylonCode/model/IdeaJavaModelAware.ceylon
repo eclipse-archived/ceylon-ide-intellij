@@ -23,7 +23,7 @@ shared interface IdeaJavaModelAware
     satisfies IJavaModelAware<Module, PsiClass, PsiClass|PsiMethod> {
 
         shared actual Module javaClassRootToNativeProject(PsiClass javaClassRoot)
-            => nothing;
+            => nothing; // TODO : this has to be implemented
 
         shared actual PsiClass|PsiMethod? toJavaElement(Declaration ceylonDeclaration, BaseProgressMonitor? monitor)
             => if (is LazyClass cls = ceylonDeclaration,
