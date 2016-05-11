@@ -67,9 +67,6 @@ import com.redhat.ceylon.ide.common.model {
     ModelListenerAdapter
 }
 
-import java.util {
-    Timer
-}
 import java.util.concurrent {
     TimeUnit
 }
@@ -87,22 +84,35 @@ shared class CeylonModelManager(model)
     & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;
     shared variable Integer typecheckingPeriod = 5;
-    shared variable Boolean periodicTypecheckingEnabled = true;
+    variable value periodicTypecheckingEnabled_ = true;
     variable value ideaProjectReady = false;
     value queueProcessor = QueueProcessor.createRunnableQueueProcessor();
+
+    shared Boolean periodicTypecheckingEnabled => periodicTypecheckingEnabled_;
+    assign periodicTypecheckingEnabled {
+        variable value needsRestart = false;
+        if (periodicTypecheckingEnabled && 
+            !periodicTypecheckingEnabled_) {
+            needsRestart = true;
+        }
+        periodicTypecheckingEnabled_ = periodicTypecheckingEnabled;
+        if (needsRestart) {
+            startBuild(); 
+        }
+    }
     
     componentName => "CeylonModelManager";
     
     shared void startBuild() {
-        void reschedule() {
-            if (periodicTypecheckingEnabled,
-                ! queueProcessor.hasPendingItemsToProcess()) {
-                AppExecutorUtil.appScheduledExecutorService.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.\iSECONDS);
-            }
-        }
         if (ideaProjectReady) {
             queueProcessor.add(JavaRunnable { 
                 void run () {
+                    void reschedule() {
+                        if (periodicTypecheckingEnabled,
+                            ! queueProcessor.hasPendingItemsToProcess()) {
+                            AppExecutorUtil.appScheduledExecutorService.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.\iSECONDS);
+                        }
+                    }
                     if (model.ceylonProjects.any((ceylonProject) 
                         => ceylonProject.build.somethingToDo)) {
                         application.invokeAndWait(JavaRunnable {
@@ -130,11 +140,11 @@ shared class CeylonModelManager(model)
                                 }
                             });
                         }, ModalityState.any());
+                    } else {
+                        reschedule();
                     }
                 }
             });
-        } else {
-            reschedule();
         }
     }
     
