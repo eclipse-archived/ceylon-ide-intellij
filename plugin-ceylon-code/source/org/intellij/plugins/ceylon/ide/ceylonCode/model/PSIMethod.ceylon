@@ -21,6 +21,9 @@ import java.util {
     List,
     ArrayList
 }
+import com.intellij.psi.util {
+    MethodSignatureUtil
+}
 
 shared class PSIMethod(shared PsiMethod psi)
         extends PSIAnnotatedMirror(psi)
@@ -53,10 +56,9 @@ shared class PSIMethod(shared PsiMethod psi)
         if (classIs("ceylon.language.Exception")) {
             return false;
         } else {
-            value overloads = doWithLock(
-                () => psi.containingClass.findMethodsByName(psi.name, true)
+            return doWithLock(
+                () => MethodSignatureUtil.hasOverloads(psi)
             );
-            return overloads.size > 1;
         }
     }
     
