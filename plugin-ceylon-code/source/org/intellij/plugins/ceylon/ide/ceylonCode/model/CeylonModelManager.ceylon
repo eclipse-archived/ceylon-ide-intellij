@@ -5,6 +5,9 @@ import ceylon.interop.java {
 import com.intellij.codeInsight.daemon {
     DaemonCodeAnalyzer
 }
+import com.intellij.concurrency {
+    JobScheduler
+}
 import com.intellij.openapi.application {
     ApplicationManager {
         application
@@ -58,8 +61,7 @@ import com.intellij.testFramework {
     LightVirtualFile
 }
 import com.intellij.util.concurrency {
-    QueueProcessor,
-    AppExecutorUtil
+    QueueProcessor
 }
 import com.redhat.ceylon.ide.common.model {
     ChangeAware,
@@ -91,37 +93,37 @@ shared class CeylonModelManager(model)
     shared Boolean periodicTypecheckingEnabled => periodicTypecheckingEnabled_;
     assign periodicTypecheckingEnabled {
         variable value needsRestart = false;
-        if (periodicTypecheckingEnabled && 
+        if (periodicTypecheckingEnabled &&
             !periodicTypecheckingEnabled_) {
             needsRestart = true;
         }
         periodicTypecheckingEnabled_ = periodicTypecheckingEnabled;
         if (needsRestart) {
-            startBuild(); 
+            startBuild();
         }
     }
-    
+
     componentName => "CeylonModelManager";
     
     shared void startBuild() {
         if (ideaProjectReady) {
-            queueProcessor.add(JavaRunnable { 
+            queueProcessor.add(JavaRunnable {
                 void run () {
                     void reschedule() {
                         if (periodicTypecheckingEnabled,
                             ! queueProcessor.hasPendingItemsToProcess()) {
-                            AppExecutorUtil.appScheduledExecutorService.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.\iSECONDS);
+                            JobScheduler.scheduler.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.\iSECONDS);
                         }
                     }
-                    if (model.ceylonProjects.any((ceylonProject) 
+                    if (model.ceylonProjects.any((ceylonProject)
                         => ceylonProject.build.somethingToDo)) {
                         application.invokeAndWait(JavaRunnable {
                             run() => progressManager.run(object extends Backgroundable(
-                                model.ideaProject, 
-                                "ceylon model update", 
-                                true, 
+                                model.ideaProject,
+                                "ceylon model update",
+                                true,
                                 PerformInBackgroundOption.\iALWAYS_BACKGROUND) {
-                                
+
                                 shared actual void run(ProgressIndicator progressIndicator) {
                                     value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
                                     value ticks = model.ceylonProjectNumber * 1000;
@@ -133,8 +135,8 @@ shared class CeylonModelManager(model)
                                     application.invokeAndWait(JavaRunnable(() =>
                                         DaemonCodeAnalyzer.getInstance(model.ideaProject).restart()), ModalityState.\iNON_MODAL);
                                 }
-                                
-                                shared actual void onFinished() {
+
+                                shared actual void onSuccess() {
                                     queueProcessor.dismissLastTasks(1);
                                     reschedule();
                                 }
