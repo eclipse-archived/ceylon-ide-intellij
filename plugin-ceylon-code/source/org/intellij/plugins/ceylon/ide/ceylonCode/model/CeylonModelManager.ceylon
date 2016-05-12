@@ -146,19 +146,22 @@ shared class CeylonModelManager(model)
                                         }
                                     }
                                     application.invokeAndWait(JavaRunnable(() =>
-                                        DaemonCodeAnalyzer.getInstance(model.ideaProject).restart()), ModalityState.\iNON_MODAL);
+                                        DaemonCodeAnalyzer.getInstance(model.ideaProject).restart()), ModalityState.any());
                                 }
-                                shared actual void onFinished() {
+                                shared actual void onSuccess() {
+                                    bakgroundBuildLatch.countDown();
+                                }
+                                shared actual void onCancel() {
                                     bakgroundBuildLatch.countDown();
                                 }
                             });
                         }, ModalityState.any());
-                        if (! bakgroundBuildLatch.await(1, TimeUnit.\iMINUTES)) {
+                        if (! bakgroundBuildLatch.await(30, TimeUnit.\iMINUTES)) {
                             periodicTypecheckingEnabled = false;
                             Notifications.Bus.notify(Notification(
                                 "Ceylon Model Update",
-                                "Ceylon Model Update too long",
-                                "The Ceylon model update task took longer than 1 minute. To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                                "Ceylon Model Update stalled",
+                                "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
                                  You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
                                 NotificationType.\iWARNING));
                         }
