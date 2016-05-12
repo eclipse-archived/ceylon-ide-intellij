@@ -52,6 +52,7 @@ class CeylonProblemsList(Project project) extends SimpleToolWindowPanel(false, t
 
     value myTree = JTree();
     late ProblemsModel model;
+    late ProblemsTreeBuilder builder;
 
     shared actual variable String name = "";
 
@@ -65,7 +66,7 @@ class CeylonProblemsList(Project project) extends SimpleToolWindowPanel(false, t
         myTree.cellRenderer = NodeRenderer();
         EditSourceOnDoubleClickHandler.install(myTree);
 
-        value builder = ProblemsTreeBuilder(myTree, treeModel, project);
+        builder = ProblemsTreeBuilder(myTree, treeModel, project);
         builder.initRootNode();
 
         model = ProblemsModel();
@@ -76,8 +77,7 @@ class CeylonProblemsList(Project project) extends SimpleToolWindowPanel(false, t
         {SourceMsg*}? backendMessages, {ProjectMsg*}? projectMessages) {
 
         model.updateProblems(project, frontendMessages, backendMessages, projectMessages);
-
-        // TODO refresh the list of problems
+        builder.queueUpdate();
     }
 
     shared actual Object? getData(String dataId) {
