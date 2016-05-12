@@ -1,30 +1,34 @@
-import com.intellij.openapi.application {
-    ApplicationManager
+import ceylon.interop.java {
+    JavaRunnable
 }
 
-import com.intellij.openapi.progress {
-    ProgressManager
+import com.intellij.openapi.application {
+    ApplicationManager {
+        application
+    }
 }
-import java.lang {
-    Runnable
+import com.intellij.openapi.progress {
+    ProgressManager {
+        progressManager=instance
+    }
+}
+import com.intellij.openapi.project {
+    Project,
+    DumbService {
+        dumbService=getInstance
+    }
 }
 import com.intellij.openapi.util {
     Ref
 }
-import com.intellij.openapi.project {
-    Project,
-    DumbService
-}
 
 shared Return doWithLock<Return>(Return() callback) {
-    value lock = ApplicationManager.application.acquireReadActionLock();
+    value lock = application.acquireReadActionLock();
     try {
         value ref = Ref<Return>();
 
-        ProgressManager.instance.executeNonCancelableSection(object satisfies Runnable {
-            shared actual void run() {
-                ref.set(callback());
-            }
+        progressManager.executeNonCancelableSection(JavaRunnable{
+            run() => ref.set(callback());
         });
 
         return ref.get();
@@ -36,11 +40,10 @@ shared Return doWithLock<Return>(Return() callback) {
 shared Return doWithIndex<Return>(Project p, Return() callback) {
 
     value ref = Ref<Return>();
-    value runnable = object satisfies Runnable {
-        shared actual void run() => ref.set(callback());
+    value runnable = JavaRunnable {
+        run() => ref.set(callback());
     };
-
-    DumbService.getInstance(p).runReadActionInSmartMode(runnable);
+    dumbService(p).runReadActionInSmartMode(runnable);
 
     return ref.get();
 }

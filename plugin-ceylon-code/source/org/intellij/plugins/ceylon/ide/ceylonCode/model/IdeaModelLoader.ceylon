@@ -1,6 +1,13 @@
 import com.intellij.openapi.application {
-    ApplicationManager,
+    ApplicationManager {
+        application
+    },
     ModalityState
+}
+import com.intellij.openapi.project {
+    DumbService {
+        dumbService=getInstance
+    }
 }
 import com.intellij.openapi.\imodule {
     IJModule=Module
@@ -9,7 +16,9 @@ import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.intellij.psi {
-    JavaPsiFacade,
+    JavaPsiFacade {
+        javaPsiFacade = getInstance
+    },
     PsiClass,
     PsiNamedElement
 }
@@ -38,6 +47,12 @@ import com.redhat.ceylon.model.typechecker.model {
 import java.lang {
     Runnable
 }
+import ceylon.interop.java {
+    JavaRunnable
+}
+import com.intellij.util.indexing {
+    UnindexedFilesUpdater
+}
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     IdeaModuleSourceMapper ideaModuleSourceMapper, Modules modules)
@@ -50,7 +65,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             
             // TODO everytime we add a jar, it's indexed, which is slowing down
             // the process
-            ApplicationManager.application.invokeAndWait(object satisfies Runnable {
+            application.invokeAndWait(object satisfies Runnable {
                 shared actual void run() {
                     project.addLibrary(artifact.artifact().absolutePath);
                 }
@@ -68,18 +83,31 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         return method.isOverriding;
     }
 
-    // TODO something like ModelLoaderNameEnvironment
+
+    void updateIndexIfnecessary() =>
+            resetJavaModelSourceIfNecessary(JavaRunnable { 
+                run() => application.invokeAndWait(JavaRunnable { 
+                    void run() { 
+                        assert (exists project = 
+                            ideaModuleManager.ceylonProject?.ideArtifact?.project);
+                        dumbService(project).queueTask(UnindexedFilesUpdater(project, false));
+                    }
+                }, ModalityState.\iNON_MODAL);
+    });
+
     shared actual Boolean moduleContainsClass(BaseIdeModule ideModule,
         String packageName, String className) {
         
         assert(is IdeaModule ideModule);
         
-        if (exists cp = ideModule.ceylonProject) {
-            value p = cp.ideArtifact;
+        if (exists ceylonProject = ideModule.ceylonProject) {
+            updateIndexIfnecessary();
+            value ideaModule = ceylonProject.ideArtifact;
             value name = packageName + "." + className;
-            value scope = p.getModuleScope(true);
-            value facade = JavaPsiFacade.getInstance(p.project);
-            return doWithLock(() => facade.findClass(name, scope) exists);
+            value scope = ideaModule.getModuleScope(true);
+            value facade = javaPsiFacade(ideaModule.project);
+            return doWithIndex(ideaModule.project, () => doWithLock(() 
+                => facade.findClass(name, scope) exists));
         }
         
         return false;
@@ -88,10 +116,11 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     shared actual ClassMirror? buildClassMirrorInternal(String name) {
         assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
         
+        updateIndexIfnecessary();
         return doWithIndex(project, () => doWithLock(() {
             if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) { 
                 value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
-                value facade = JavaPsiFacade.getInstance(m.project);
+                value facade = javaPsiFacade(m.project);
                 
                 if (exists psi = facade.findClass(name, scope)) {
                     return PSIClass(psi);
@@ -131,7 +160,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         assert(exists mod = ideModule.ceylonProject?.ideArtifact);
         assert(exists project = mod.project);
 
-        value facade = JavaPsiFacade.getInstance(project);
+        value facade = javaPsiFacade(project);
         
         shared actual Boolean packageExists(String quotedPackageName) 
             => doWithLock(() => facade.findPackage(quotedPackageName) exists);
