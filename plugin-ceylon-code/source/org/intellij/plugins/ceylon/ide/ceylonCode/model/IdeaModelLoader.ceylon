@@ -139,7 +139,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         shared actual {PsiClass*}? packageMembers(String quotedPackageName)
             => doWithLock(() {
                 if (exists pkg = facade.findPackage(quotedPackageName)) {
-                    value classes = pkg.getClasses(GlobalSearchScope.moduleScope(mod));
+                    value classes = pkg.getClasses(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(mod));
                     
                     return classes.iterable.coalesced;
                 }
