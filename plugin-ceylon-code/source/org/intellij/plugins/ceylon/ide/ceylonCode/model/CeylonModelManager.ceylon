@@ -9,7 +9,6 @@ import com.intellij.concurrency {
     JobScheduler
 }
 import com.intellij.notification {
-    Notifications,
     Notification,
     NotificationType
 }
@@ -41,7 +40,8 @@ import com.intellij.openapi.progress {
         Backgroundable
     },
     ProgressIndicator,
-    PerformInBackgroundOption
+    PerformInBackgroundOption,
+    ProcessCanceledException
 }
 import com.intellij.openapi.roots {
     ProjectRootManager {
@@ -144,9 +144,21 @@ shared class CeylonModelManager(model)
                                         for (ceylonProject in model.ceylonProjectsInTopologicalOrder) {
                                             ceylonProject.build.performBuild(progress.newChild(1000));
                                         }
+                                        application.invokeAndWait(JavaRunnable(() =>
+                                            DaemonCodeAnalyzer.getInstance(model.ideaProject).restart()), ModalityState.any());
+                                    } catch(Throwable t) {
+                                        if (is ProcessCanceledException t) {
+                                            throw t;
+                                        } else {
+                                            periodicTypecheckingEnabled = false;
+                                            Notification(
+                                                "Ceylon Model Update",
+                                                "Ceylon Model Update failed",
+                                                "The Ceylon model update triggered an unexpected exception (``t``). To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                                                 You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
+                                                NotificationType.\iWARNING).notify(model.ideaProject);
+                                        }
                                     }
-                                    application.invokeAndWait(JavaRunnable(() =>
-                                        DaemonCodeAnalyzer.getInstance(model.ideaProject).restart()), ModalityState.any());
                                 }
                                 shared actual void onSuccess() {
                                     bakgroundBuildLatch.countDown();
@@ -158,12 +170,12 @@ shared class CeylonModelManager(model)
                         }, ModalityState.any());
                         if (! bakgroundBuildLatch.await(30, TimeUnit.\iMINUTES)) {
                             periodicTypecheckingEnabled = false;
-                            Notifications.Bus.notify(Notification(
+                            Notification(
                                 "Ceylon Model Update",
                                 "Ceylon Model Update stalled",
                                 "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
                                  You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                                NotificationType.\iWARNING));
+                                NotificationType.\iWARNING).notify(model.ideaProject);
                         }
                         reschedule();
                     } else {
