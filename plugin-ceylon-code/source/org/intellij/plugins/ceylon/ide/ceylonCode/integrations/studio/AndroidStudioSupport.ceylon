@@ -36,7 +36,7 @@ import java.io {
 import java.lang {
     Runnable,
     ReflectiveOperationException,
-    Boolean
+    JBoolean=Boolean
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
@@ -66,7 +66,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     shared ExtensionPointName<AndroidStudioSupport> epName
         = create<AndroidStudioSupport>("org.intellij.plugins.ceylon.ide.androidStudioSupport");
 
-    value sourceSet = "main.java.srcDirs += 'src/main/ceylon'";
+    value sourceSet = "main.java.srcDirs += 'src/main/ceylon'\n";
     value applyCeylonPlugin = "apply plugin: 'com.athaydes.ceylon'";
     value applyCeylonAndroidPlugin = "apply plugin: 'com.redhat.ceylon.gradle.android'";
 
@@ -77,13 +77,15 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
 
         CommandProcessor.instance.executeCommand(object satisfies Runnable {
             shared actual void run() {
-                object extends WriteCommandAction<Nothing>(mod.project) {
-                    shared actual void run(Result<Nothing> result) {
-                        updateGradleModel(mod);
+                value modified = object extends WriteCommandAction<Boolean>(mod.project) {
+                    shared actual void run(Result<Boolean> result) {
+                        result.setResult(updateGradleModel(mod));
                     }
                 }.execute();
 
-                syncGradleProject(mod);
+                if (modified.resultObject) {
+                    syncGradleProject(mod);
+                }
 
                 object extends WriteCommandAction<Nothing>(mod.project) {
                     shared actual void run(Result<Nothing> result) {
@@ -94,20 +96,34 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
         }, "Configure Ceylon", null);
     }
 
-    void updateGradleModel(Module mod) {
+    Boolean updateGradleModel(Module mod) {
+        variable Boolean wasModified = false;
+
         if (exists buildFile = findGradleBuild(mod)) {
             value androidBlock = groovyFileManipulator.getAndroidBlock(buildFile);
             value sourceSets = groovyFileManipulator.getSourceSetsBlock(androidBlock);
-            groovyFileManipulator.addLastExpressionInBlockIfNeeded(sourceSet, sourceSets);
+            wasModified ||= groovyFileManipulator.addLastExpressionInBlockIfNeeded(sourceSet, sourceSets);
 
-            groovyFileManipulator.configureRepository(buildFile);
+            VfsUtil.createDirectoryIfMissing(mod.moduleFile.parent, "src/main/ceylon");
 
-            groovyFileManipulator.addApplyDirective(buildFile, applyCeylonAndroidPlugin);
-            groovyFileManipulator.addApplyDirective(buildFile, applyCeylonPlugin);
+            if (exists version = groovyFileManipulator.findModuleName(buildFile)) {
+                value ceylonBlock = groovyFileManipulator.getCeylonBlock(buildFile);
+                wasModified ||= groovyFileManipulator.addLastExpressionInBlockIfNeeded(
+                    "module \"``version``\"", ceylonBlock);
+            }
 
-            CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(buildFile);
-            OpenFileAction.openFile(buildFile.virtualFile, mod.project);
+            wasModified ||= groovyFileManipulator.configureRepository(buildFile);
+
+            wasModified ||= groovyFileManipulator.addApplyDirective(buildFile, applyCeylonAndroidPlugin);
+            wasModified ||= groovyFileManipulator.addApplyDirective(buildFile, applyCeylonPlugin);
+
+            if (wasModified) {
+                CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(buildFile);
+                OpenFileAction.openFile(buildFile.virtualFile, mod.project);
+            }
         }
+
+        return wasModified;
     }
 
     GroovyFile? findGradleBuild(Module mod) {
@@ -144,7 +160,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
 
             for (m in cls.declaredMethods) {
                 if (m.name == "syncProjectSynchronously") {
-                    m.invoke(instance, mod.project, Boolean.\iTRUE, null);
+                    m.invoke(instance, mod.project, JBoolean.\iTRUE, null);
                 }
             }
         } catch (ReflectiveOperationException exception) {

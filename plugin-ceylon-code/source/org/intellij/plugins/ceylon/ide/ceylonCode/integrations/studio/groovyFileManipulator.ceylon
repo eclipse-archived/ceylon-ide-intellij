@@ -24,6 +24,9 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions {
     GrApplicationStatement,
     GrMethodCall
 }
+import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.literals {
+    GrLiteral
+}
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.path {
     GrMethodCallExpression
 }
@@ -33,9 +36,8 @@ import org.jetbrains.plugins.groovy.lang.psi.api.util {
 
 // Mainly adapted from org.jetbrains.kotlin.idea.configuration.KotlinWithGradleConfigurator
 object groovyFileManipulator {
-    value mavenBintray = "url \"http://dl.bintray.com/fromage/maven\"\n";
-    value ceylonAndroidDep = "classpath 'com.redhat.ceylon.gradle:android:0.0.3'";
-
+    value ceylonAndroidDep = "classpath 'com.redhat.ceylon.gradle:android:0.0.4'\n";
+    value repositoryName = "jcenter()\n";
 
     shared GrClosableBlock getAndroidBlock(GroovyFile buildFile)
         => getBlockOrCreate(buildFile, "android");
@@ -43,23 +45,22 @@ object groovyFileManipulator {
     shared GrClosableBlock getSourceSetsBlock(GrStatementOwner parent)
         => getBlockOrCreate(parent, "sourceSets");
 
+    shared GrClosableBlock getCeylonBlock(GrStatementOwner parent)
+        => getBlockOrCreate(parent, "ceylon");
+
     shared Boolean addLastExpressionInBlockIfNeeded(String text, GrClosableBlock block)
         => addExpressionInBlockIfNeeded(text, block, false);
 
     shared Boolean addApplyDirective(GroovyFile file, String applyPluginDirective) {
-        variable Boolean wasModified = false;
-
         if (!containsDirective(file.text, applyPluginDirective)) {
             value apply = GroovyPsiElementFactory.getInstance(file.project)
                 .createExpressionFromText(javaString(applyPluginDirective));
 
             if (exists applyStatement = getApplyStatement(file)) {
                 file.addAfter(apply, applyStatement);
-                wasModified = true;
             } else {
                 if (exists buildScript = getBlockByName(file, "buildscript")) {
                     file.addAfter(apply, buildScript.parent);
-                    wasModified = true;
                 } else {
                     value statements = file.statements;
                     if (statements.size > 0) {
@@ -67,25 +68,29 @@ object groovyFileManipulator {
                     } else {
                         file.addAfter(apply, file.firstChild);
                     }
-                    wasModified = true;
                 }
             }
+
+            return true;
         }
 
-        return wasModified;
+        return false;
     }
 
-    shared void configureRepository(GroovyFile file) {
-        value buildScriptBlock = getBlockOrCreate(file, "buildscript");
+    shared Boolean configureRepository(GroovyFile file) {
+        value buildScriptBlock = getBlockOrCreate(file, "buildscript", true);
         value repositoriesBlock = getRepositoriesBlock(buildScriptBlock);
-        value mavenBlock = getBlockOrCreate(repositoriesBlock, "maven");
 
-        if (!isRepositoryConfigured(mavenBlock)) {
-            addLastExpressionInBlockIfNeeded(mavenBintray, mavenBlock);
+        variable Boolean wasModified = false;
+
+        if (!isRepositoryConfigured(repositoriesBlock)) {
+            wasModified ||= addLastExpressionInBlockIfNeeded(repositoryName, repositoriesBlock);
         }
 
         GrClosableBlock dependenciesBlock = getDependenciesBlock(buildScriptBlock);
-        addExpressionInBlockIfNeeded(ceylonAndroidDep, dependenciesBlock, false);
+        wasModified ||=addExpressionInBlockIfNeeded(ceylonAndroidDep, dependenciesBlock, false);
+
+        return wasModified;
     }
 
     shared String? findAndroidVersion(GroovyFile file) {
@@ -94,6 +99,37 @@ object groovyFileManipulator {
             exists arg = call.argumentList.allArguments.get(0)) {
 
             return arg.text;
+        }
+
+        return null;
+    }
+
+    shared String? findModuleName(GroovyFile file) {
+        if (exists blck = getBlockByName(file, "android"),
+            exists blck2 = getBlockByName(blck, "defaultConfig")) {
+
+            String? name;
+            String? version;
+
+            if (exists call = getCallExpressionByName(blck2, "applicationId"),
+                is GrLiteral arg = call.argumentList.allArguments.get(0)) {
+
+                name = arg.text[1..arg.text.size - 2];
+            } else {
+                name = null;
+            }
+
+            if (exists call = getCallExpressionByName(blck2, "versionName"),
+                is GrLiteral arg = call.argumentList.allArguments.get(0)) {
+
+                version = arg.text[1..arg.text.size - 2];
+            } else {
+                version = null;
+            }
+
+            if (exists name, exists version) {
+                return name + "/" + version;
+            }
         }
 
         return null;
@@ -111,17 +147,21 @@ object groovyFileManipulator {
         return null;
     }
 
-    GrClosableBlock getBlockOrCreate(GrStatementOwner parent, String name) {
+    GrClosableBlock getBlockOrCreate(GrStatementOwner parent, String name, Boolean first = false) {
         if (exists block = getBlockByName(parent, name)) {
             return block;
         } else {
             value factory = GroovyPsiElementFactory.getInstance(parent.project);
-            value newBlock = factory.createExpressionFromText(javaString(name + "{\n}\n"));
+            value indents = if (is GroovyFile parent) then "" else "    ";
+            value newBlock = factory.createExpressionFromText(
+                javaString(name + "{\n" + indents + "}\n"));
             value statements = parent.statements;
+            value add = if (first) then parent.addBefore else parent.addAfter;
+
             if (statements.size > 0) {
-                parent.addAfter(newBlock, statements.get(statements.size - 1));
+                add(newBlock, first then statements.get(0) else statements.get(statements.size - 1));
             } else {
-                parent.addAfter(newBlock, parent.firstChild);
+                add(newBlock, parent.firstChild);
             }
 
             if (exists block = getBlockByName(parent, name)) {
@@ -168,17 +208,14 @@ object groovyFileManipulator {
         return true;
     }
 
-    GrClosableBlock getRepositoriesBlock(GrStatementOwner file) {
-        return getBlockOrCreate(file, "repositories");
-    }
+    GrClosableBlock getRepositoriesBlock(GrStatementOwner file)
+            => getBlockOrCreate(file, "repositories");
 
-    GrClosableBlock getDependenciesBlock(GrStatementOwner file) {
-        return getBlockOrCreate(file, "dependencies");
-    }
+    GrClosableBlock getDependenciesBlock(GrStatementOwner file)
+            => getBlockOrCreate(file, "dependencies");
 
-    Boolean isRepositoryConfigured(GrClosableBlock repositoriesBlock) {
-        return repositoriesBlock.text.contains(mavenBintray);
-    }
+    Boolean isRepositoryConfigured(GrClosableBlock repositoriesBlock)
+            => repositoriesBlock.text.contains(repositoryName);
 
     Boolean containsDirective(String fileText, String directive) {
         return fileText.contains(directive)
