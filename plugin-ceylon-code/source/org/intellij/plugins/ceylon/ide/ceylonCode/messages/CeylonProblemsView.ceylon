@@ -10,7 +10,8 @@ import com.intellij.ide.impl {
     ContentManagerWatcher
 }
 import com.intellij.openapi.application {
-    ApplicationManager
+    ApplicationManager,
+    ModalityState
 }
 import com.intellij.openapi.components {
     ServiceManager
@@ -116,7 +117,7 @@ shared class CeylonProblemsViewImpl(project, startupManager, toolWindowManager)
         }
 
         if (initialized) {
-            ApplicationManager.application.invokeLater(JavaRunnable(func));
+            ApplicationManager.application.invokeLater(JavaRunnable(func), ModalityState.any());
         } else {
             myPostponedRunnables.add(func);
         }
