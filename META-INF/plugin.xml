@@ -194,6 +194,10 @@
         <projectConfigurable instance="org.intellij.plugins.ceylon.ide.settings.CompilerConfigurable" id="preferences.Ceylon.compiler"
                              displayName="Ceylon Compiler" parentId="project.propCompiler"/>
 
+        <projectService id="CeylonProblemsView"
+                        serviceInterface="org.intellij.plugins.ceylon.ide.ceylonCode.messages.CeylonProblemsView"
+                        serviceImplementation="org.intellij.plugins.ceylon.ide.ceylonCode.messages.CeylonProblemsViewImpl"/>
+
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertThenElseToIfElseIntention</className>
             <category>Ceylon/Control flow</category>

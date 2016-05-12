@@ -16,6 +16,7 @@
             <exclude path="com/intellij/util/containers/*"/>
             <exclude path="com/intellij/codeInsight/highlighting/*"/>
             <exclude path="com/intellij/openapi/editor/*"/>
+            <exclude path="com/intellij/openapi/progress/*"/>
         </filter>
     </module>
 

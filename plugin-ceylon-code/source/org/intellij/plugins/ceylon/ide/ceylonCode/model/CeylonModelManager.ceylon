@@ -79,6 +79,11 @@ import java.util.concurrent {
     CountDownLatch
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
+    getCeylonProblemsView,
+    SourceMsg,
+    ProjectMsg
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     ProgressIndicatorMonitor
 }
@@ -172,7 +177,16 @@ shared class CeylonModelManager(model)
     
     ceylonProjectAdded(CeylonProjectAlias ceylonProject) =>
             startBuild();
-    
+
+    shared actual void buildMessagesChanged(CeylonProjectAlias project, {SourceMsg*}? frontendMessages,
+        {SourceMsg*}? backendMessages, {ProjectMsg*}? projectMessages) {
+
+        assert(is IdeaCeylonProject project);
+
+        getCeylonProblemsView(model.ideaProject).updateMessages(project,
+            frontendMessages, backendMessages, projectMessages);
+    }
+
     /***************************************************************************
       ProjectComponent implementations
      ***************************************************************************/
