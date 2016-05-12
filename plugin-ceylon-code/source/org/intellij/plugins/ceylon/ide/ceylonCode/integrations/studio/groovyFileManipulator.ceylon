@@ -36,19 +36,20 @@ import org.jetbrains.plugins.groovy.lang.psi.api.util {
 
 // Mainly adapted from org.jetbrains.kotlin.idea.configuration.KotlinWithGradleConfigurator
 object groovyFileManipulator {
+    value sourceSet = "main.java.srcDirs += 'src/main/ceylon'\n";
     value ceylonAndroidDep = "classpath 'com.redhat.ceylon.gradle:android:0.0.4'\n";
     value repositoryName = "jcenter()\n";
 
-    shared GrClosableBlock getAndroidBlock(GroovyFile buildFile)
+    GrClosableBlock getAndroidBlock(GroovyFile buildFile)
         => getBlockOrCreate(buildFile, "android");
 
-    shared GrClosableBlock getSourceSetsBlock(GrStatementOwner parent)
+    GrClosableBlock getSourceSetsBlock(GrStatementOwner parent)
         => getBlockOrCreate(parent, "sourceSets");
 
-    shared GrClosableBlock getCeylonBlock(GrStatementOwner parent)
+    GrClosableBlock getCeylonBlock(GrStatementOwner parent)
         => getBlockOrCreate(parent, "ceylon");
 
-    shared Boolean addLastExpressionInBlockIfNeeded(String text, GrClosableBlock block)
+    Boolean addLastExpressionInBlockIfNeeded(String text, GrClosableBlock block)
         => addExpressionInBlockIfNeeded(text, block, false);
 
     shared Boolean addApplyDirective(GroovyFile file, String applyPluginDirective) {
@@ -93,6 +94,30 @@ object groovyFileManipulator {
         return wasModified;
     }
 
+    shared Boolean configureSourceSet(GroovyFile buildFile) {
+        value androidBlock = getAndroidBlock(buildFile);
+        value sourceSets = getSourceSetsBlock(androidBlock);
+
+        return addLastExpressionInBlockIfNeeded(sourceSet, sourceSets);
+    }
+
+    shared Boolean configureLint(GroovyFile buildFile) {
+        value androidBlock = getAndroidBlock(buildFile);
+        value lintOptions = getBlockOrCreate(androidBlock, "lintOptions");
+
+        return addLastExpressionInBlockIfNeeded("disable 'InvalidPackage'", lintOptions);
+    }
+
+    shared Boolean configureCeylonModule(GroovyFile buildFile) {
+        if (exists version = findModuleName(buildFile)) {
+            value ceylonBlock = getCeylonBlock(buildFile);
+            return addLastExpressionInBlockIfNeeded(
+               "module \"``version``\"", ceylonBlock);
+        }
+
+        return false;
+    }
+
     shared String? findAndroidVersion(GroovyFile file) {
         if (exists blck = getBlockByName(file, "android"),
             exists call = getCallExpressionByName(blck, "compileSdkVersion"),
@@ -104,7 +129,7 @@ object groovyFileManipulator {
         return null;
     }
 
-    shared String? findModuleName(GroovyFile file) {
+    String? findModuleName(GroovyFile file) {
         if (exists blck = getBlockByName(file, "android"),
             exists blck2 = getBlockByName(blck, "defaultConfig")) {
 

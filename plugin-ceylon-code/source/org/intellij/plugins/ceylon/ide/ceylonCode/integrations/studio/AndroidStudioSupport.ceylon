@@ -66,7 +66,6 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     shared ExtensionPointName<AndroidStudioSupport> epName
         = create<AndroidStudioSupport>("org.intellij.plugins.ceylon.ide.androidStudioSupport");
 
-    value sourceSet = "main.java.srcDirs += 'src/main/ceylon'\n";
     value applyCeylonPlugin = "apply plugin: 'com.athaydes.ceylon'";
     value applyCeylonAndroidPlugin = "apply plugin: 'com.redhat.ceylon.gradle.android'";
 
@@ -100,20 +99,12 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
         variable Boolean wasModified = false;
 
         if (exists buildFile = findGradleBuild(mod)) {
-            value androidBlock = groovyFileManipulator.getAndroidBlock(buildFile);
-            value sourceSets = groovyFileManipulator.getSourceSetsBlock(androidBlock);
-            wasModified ||= groovyFileManipulator.addLastExpressionInBlockIfNeeded(sourceSet, sourceSets);
-
             VfsUtil.createDirectoryIfMissing(mod.moduleFile.parent, "src/main/ceylon");
 
-            if (exists version = groovyFileManipulator.findModuleName(buildFile)) {
-                value ceylonBlock = groovyFileManipulator.getCeylonBlock(buildFile);
-                wasModified ||= groovyFileManipulator.addLastExpressionInBlockIfNeeded(
-                    "module \"``version``\"", ceylonBlock);
-            }
-
+            wasModified ||= groovyFileManipulator.configureSourceSet(buildFile);
+            wasModified ||= groovyFileManipulator.configureLint(buildFile);
+            wasModified ||= groovyFileManipulator.configureCeylonModule(buildFile);
             wasModified ||= groovyFileManipulator.configureRepository(buildFile);
-
             wasModified ||= groovyFileManipulator.addApplyDirective(buildFile, applyCeylonAndroidPlugin);
             wasModified ||= groovyFileManipulator.addApplyDirective(buildFile, applyCeylonPlugin);
 
