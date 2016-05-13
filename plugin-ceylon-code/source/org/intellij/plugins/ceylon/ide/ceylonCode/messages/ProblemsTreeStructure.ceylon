@@ -22,5 +22,5 @@ class ProblemsTreeStructure(Project project, ProblemsModel model) extends Abstra
 
     providers => Collections.emptyList<TreeStructureProvider>();
 
-    shared actual Object rootElement => rootNode;
+    rootElement => rootNode;
 }

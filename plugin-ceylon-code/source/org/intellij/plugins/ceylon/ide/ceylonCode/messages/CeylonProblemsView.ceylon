@@ -68,7 +68,7 @@ shared class CeylonProblemsViewImpl(project, startupManager, toolWindowManager)
         myToolWindow = toolWindowManager.registerToolWindow(
             toolWindowId,
             false,
-            ToolWindowAnchor.\iBOTTOM,
+            ToolWindowAnchor.bottom,
             project,
             false
         );

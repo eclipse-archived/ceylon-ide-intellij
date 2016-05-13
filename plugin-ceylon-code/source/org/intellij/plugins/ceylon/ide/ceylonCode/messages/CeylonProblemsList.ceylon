@@ -58,7 +58,7 @@ class CeylonProblemsList(Project project) extends SimpleToolWindowPanel(false, t
 
     shared void setup() {
         this.layout = BorderLayout();
-        add(JScrollPane(myTree), javaString(BorderLayout.\iCENTER));
+        add(JScrollPane(myTree), javaString(BorderLayout.center));
         myTree.rootVisible = false;
 
         value treeModel = DefaultTreeModel(DefaultMutableTreeNode());
@@ -81,7 +81,7 @@ class CeylonProblemsList(Project project) extends SimpleToolWindowPanel(false, t
     }
 
     shared actual Object? getData(String dataId) {
-        if (CommonDataKeys.\iNAVIGATABLE.\iis(dataId),
+        if (CommonDataKeys.navigatable.\iis(dataId),
             exists path = myTree.selectionPath,
             is DefaultMutableTreeNode node = path.lastPathComponent,
             is ProblemNode userObject = node.userObject) {
