@@ -87,6 +87,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     ProgressIndicatorMonitor
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    ideaPlatformUtils
+}
 
 shared class CeylonModelManager(model) 
         satisfies ProjectComponent
@@ -151,12 +154,24 @@ shared class CeylonModelManager(model)
                                             throw t;
                                         } else {
                                             periodicTypecheckingEnabled = false;
+
+                                            String message;
+                                            if (is Exception t,
+                                                ideaPlatformUtils.isOperationCanceledException(t),
+                                                !t.message.empty) {
+
+                                                message = t.message;
+                                            } else {
+                                                message = "The Ceylon model update triggered an unexpected exception (``t``)";
+                                            }
+
                                             Notification(
                                                 "Ceylon Model Update",
                                                 "Ceylon Model Update failed",
-                                                "The Ceylon model update triggered an unexpected exception (``t``). To avoid performance issues the automatic update of the Ceylon model has been disabled.
-                                                 You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                                                NotificationType.\iWARNING).notify(model.ideaProject);
+                                                message + ". To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                                                           You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
+                                                NotificationType.\iWARNING
+                                            ).notify(model.ideaProject);
                                         }
                                     }
                                 }
