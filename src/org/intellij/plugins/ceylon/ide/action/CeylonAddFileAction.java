@@ -1,32 +1,26 @@
 package org.intellij.plugins.ceylon.ide.action;
 
-import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.apache.commons.lang.StringUtils;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Properties;
 
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 
 public class CeylonAddFileAction extends CeylonAddingFilesAction {
 
     @Override
-    protected void createFiles(final AnActionEvent e, TypeChecker typeChecker, VirtualFile srcRoot,
+    protected void createFiles(final AnActionEvent e, IdeaCeylonProject project, VirtualFile srcRoot,
                                String eventPackage, final PsiDirectory srcRootDir) {
         final VirtualFile eventDir = findEventDir(e);
         String input = Messages.showInputDialog(e.getProject(),
@@ -46,23 +40,8 @@ public class CeylonAddFileAction extends CeylonAddingFilesAction {
 
                 @Override
                 public void run() {
-                    FileTemplateManager templateManager = FileTemplateManager.getInstance(e.getProject());
-
-                    Properties variables = new Properties();
-                    variables.put("IS_CLASS", Boolean.toString(Character.isUpperCase(fileName.charAt(0))));
-                    variables.put("UNIT_NAME", unitName);
-
-                    try {
-                        PsiElement file = FileTemplateUtil.createFromTemplate(
-                                templateManager.getInternalTemplate("unit.ceylon"),
-                                fileName, variables, subdirectory);
-                        if (file instanceof PsiFile) {
-                            ((PsiFile) file).navigate(true);
-                        }
-                    } catch (Exception e1) {
-                        Logger.getInstance(CeylonAddModuleAction.class)
-                                .error("Can't create file from template", e1);
-                    }
+                    boolean isClass = Character.isUpperCase(fileName.charAt(0));
+                    ceylonFileFactory.createUnit(subdirectory, unitName, fileName, isClass);
                 }
             });
         }

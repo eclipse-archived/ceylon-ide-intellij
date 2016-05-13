@@ -4,9 +4,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.JBColor;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import org.apache.commons.lang.StringUtils;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ import static java.util.Arrays.asList;
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 
 public class CreateCeylonModuleWizard extends DialogWrapper {
-    private final TypeChecker typeChecker;
+    private final IdeaCeylonProject project;
     private JPanel contentPane;
     private JTextField moduleName;
     private JTextField moduleVersion;
@@ -29,9 +29,9 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
     private JTextField compilationUnit;
     private JPanel headerPane;
 
-    public CreateCeylonModuleWizard(@NotNull Project project, @Nullable TypeChecker typeChecker) {
+    public CreateCeylonModuleWizard(@NotNull Project project, @Nullable IdeaCeylonProject ceylonProject) {
         super(project, true);
-        this.typeChecker = typeChecker;
+        this.project = ceylonProject;
 
         setTitle(message("ceylon.module.wizard.title"));
         headerPane.setBackground(JBColor.WHITE);
@@ -64,11 +64,11 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
         Set<Module> modules;
 
         // Might not be a Ceylon project yet
-        if (typeChecker == null) {
+        if (project == null) {
             return false;
         }
-        if (all(asList(typeChecker, typeChecker.getContext(), typeChecker.getContext().getModules(),
-                modules = typeChecker.getContext().getModules().getListOfModules()),
+        if (all(asList(project, project.getModules(), project.getModules().getTypecheckerModules(),
+                modules = project.getModules().getTypecheckerModules().getListOfModules()),
                 notNull())) {
             for (Module module : modules) {
                 if (module.getNameAsString().equals(moduleName)) {

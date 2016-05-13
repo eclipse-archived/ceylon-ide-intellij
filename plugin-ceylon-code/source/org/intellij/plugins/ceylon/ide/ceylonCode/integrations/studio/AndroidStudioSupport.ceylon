@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaClass,
-    javaString
+    javaClass
 }
 
 import com.intellij.codeInsight {
@@ -8,14 +7,6 @@ import com.intellij.codeInsight {
 }
 import com.intellij.ide.actions {
     OpenFileAction
-}
-import com.intellij.ide.fileTemplates {
-    FileTemplateUtil {
-        createFromTemplate
-    },
-    FileTemplateManager {
-        fileTemplateManager=getInstance
-    }
 }
 import com.intellij.notification {
     Notifications,
@@ -37,6 +28,9 @@ import com.intellij.openapi.extensions {
 import com.intellij.openapi.\imodule {
     Module
 }
+import com.intellij.openapi.project {
+    Project
+}
 import com.intellij.openapi.vfs {
     VfsUtil,
     VirtualFileVisitor,
@@ -46,7 +40,8 @@ import com.intellij.psi {
     PsiManager
 }
 import com.redhat.ceylon.common {
-    Constants
+    Constants,
+    Backend
 }
 
 import java.io {
@@ -55,12 +50,7 @@ import java.io {
 import java.lang {
     Runnable,
     ReflectiveOperationException,
-    JBoolean=Boolean,
-    JString=String
-}
-import java.util {
-    Arrays,
-    HashMap
+    JBoolean=Boolean
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
@@ -70,14 +60,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
     IdeaCeylonProject
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    ceylonFileFactory
+}
 import org.jetbrains.plugins.gradle.util {
     GradleConstants
 }
 import org.jetbrains.plugins.groovy.lang.psi {
     GroovyFile
-}
-import com.intellij.openapi.project {
-    Project
 }
 
 shared interface AndroidStudioSupport {
@@ -138,29 +128,15 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             exists modName = groovyFileManipulator.findModuleName(buildFile)) {
 
             value dir = VfsUtil.createDirectoryIfMissing(src, modName[0].replace(".", "/"));
-            value tplManager = fileTemplateManager(mod.project);
-            value props = HashMap<JString, Object>();
             value psiDir = PsiManager.getInstance(mod.project).findDirectory(dir);
 
-            // TODO refactor with CeylonAddFileAction
-            props.put(javaString("NATIVE"), javaString("native(\"jvm\")"));
-            props.put(javaString("MODULE_NAME"), javaString(modName[0]));
-            props.put(javaString("MODULE_VERSION"), javaString(modName[1]));
-            props.put(javaString("IMPORTS"), Arrays.asList(
-                javaString("java.base \"7\""),
-                javaString("android \"``groovyFileManipulator.findAndroidVersion(buildFile) else "23"``\""),
-                javaString("\"com.android.support.appcompat-v7\" \"23.2.1\"") // TODO take version from build.gradle?
-            ));
+            ceylonFileFactory.createModuleDescriptor(psiDir, modName[0], modName[1], Backend.java, {
+                "java.base \"7\"",
+                "android \"``groovyFileManipulator.findAndroidVersion(buildFile) else "23"``\"",
+                "\"com.android.support.appcompat-v7\" \"23.2.1\""
+            });
 
-            createFromTemplate(
-                tplManager.getInternalTemplate("module.ceylon"),
-                "module.ceylon", props, psiDir, null
-            );
-
-            createFromTemplate(
-                tplManager.getInternalTemplate("MainActivity.ceylon"),
-                "MainActivity.ceylon", null, psiDir
-            );
+            ceylonFileFactory.createFileFromTemplate(psiDir, "MainActivity.ceylon");
 
             return true;
         }
