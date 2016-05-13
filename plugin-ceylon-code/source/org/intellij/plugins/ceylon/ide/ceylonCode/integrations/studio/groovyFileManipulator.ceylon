@@ -112,7 +112,7 @@ object groovyFileManipulator {
         if (exists version = findModuleName(buildFile)) {
             value ceylonBlock = getCeylonBlock(buildFile);
             return addLastExpressionInBlockIfNeeded(
-               "module \"``version``\"", ceylonBlock);
+               "module \"``version[0] + "/" + version[1]``\"", ceylonBlock);
         }
 
         return false;
@@ -129,7 +129,7 @@ object groovyFileManipulator {
         return null;
     }
 
-    String? findModuleName(GroovyFile file) {
+    shared [String,String]? findModuleName(GroovyFile file) {
         if (exists blck = getBlockByName(file, "android"),
             exists blck2 = getBlockByName(blck, "defaultConfig")) {
 
@@ -153,7 +153,7 @@ object groovyFileManipulator {
             }
 
             if (exists name, exists version) {
-                return name + "/" + version;
+                return [name, version];
             }
         }
 

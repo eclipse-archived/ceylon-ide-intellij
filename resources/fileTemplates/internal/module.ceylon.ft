@@ -1,4 +1,8 @@
 "Default documentation for module `${MODULE_NAME}`."
 
+${NATIVE}
 module ${MODULE_NAME} "${MODULE_VERSION}" {
+#foreach ($IMPORT in $IMPORTS)
+    import ${IMPORT};
+#end
 }

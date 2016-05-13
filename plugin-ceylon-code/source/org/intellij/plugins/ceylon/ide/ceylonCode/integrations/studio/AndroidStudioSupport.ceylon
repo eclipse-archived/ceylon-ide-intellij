@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    javaString
 }
 
 import com.intellij.codeInsight {
@@ -7,6 +8,19 @@ import com.intellij.codeInsight {
 }
 import com.intellij.ide.actions {
     OpenFileAction
+}
+import com.intellij.ide.fileTemplates {
+    FileTemplateUtil {
+        createFromTemplate
+    },
+    FileTemplateManager {
+        fileTemplateManager=getInstance
+    }
+}
+import com.intellij.notification {
+    Notifications,
+    Notification,
+    NotificationType
 }
 import com.intellij.openapi.application {
     Result
@@ -24,10 +38,15 @@ import com.intellij.openapi.\imodule {
     Module
 }
 import com.intellij.openapi.vfs {
-    VfsUtil
+    VfsUtil,
+    VirtualFileVisitor,
+    VirtualFile
 }
 import com.intellij.psi {
     PsiManager
+}
+import com.redhat.ceylon.common {
+    Constants
 }
 
 import java.io {
@@ -36,9 +55,17 @@ import java.io {
 import java.lang {
     Runnable,
     ReflectiveOperationException,
-    JBoolean=Boolean
+    JBoolean=Boolean,
+    JString=String
+}
+import java.util {
+    Arrays,
+    HashMap
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode {
+    ITypeCheckerProvider
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
     IdeaCeylonProject
@@ -49,13 +76,8 @@ import org.jetbrains.plugins.gradle.util {
 import org.jetbrains.plugins.groovy.lang.psi {
     GroovyFile
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode {
-    ITypeCheckerProvider
-}
-import com.intellij.notification {
-    Notifications,
-    Notification,
-    NotificationType
+import com.intellij.openapi.project {
+    Project
 }
 
 shared interface AndroidStudioSupport {
@@ -78,12 +100,15 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             shared actual void run() {
                 value modified = object extends WriteCommandAction<Boolean>(mod.project) {
                     shared actual void run(Result<Boolean> result) {
-                        result.setResult(updateGradleModel(mod));
+                        variable value modified = updateGradleModel(mod);
+                        modified ||= addCeylonModule(mod);
+                        result.setResult(modified);
                     }
                 }.execute();
 
                 if (modified.resultObject) {
                     syncGradleProject(mod);
+                    buildGradleProject(mod);
                 }
 
                 object extends WriteCommandAction<Nothing>(mod.project) {
@@ -93,6 +118,53 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                 }.execute();
             }
         }, "Configure Ceylon", null);
+    }
+
+    Boolean addCeylonModule(Module mod) {
+        value src = VfsUtil.findRelativeFile(mod.moduleFile.parent, "src", "main", "ceylon");
+
+        variable value hasModule = false;
+        VfsUtil.visitChildrenRecursively(src, object extends VirtualFileVisitor<Boolean>() {
+            shared actual Boolean visitFile(VirtualFile file) {
+                if (file.name == Constants.moduleDescriptor) {
+                    hasModule = true;
+                }
+                return true;
+            }
+        });
+
+        if (!hasModule,
+            exists buildFile = findGradleBuild(mod),
+            exists modName = groovyFileManipulator.findModuleName(buildFile)) {
+
+            value dir = VfsUtil.createDirectoryIfMissing(src, modName[0].replace(".", "/"));
+            value tplManager = fileTemplateManager(mod.project);
+            value props = HashMap<JString, Object>();
+            value psiDir = PsiManager.getInstance(mod.project).findDirectory(dir);
+
+            // TODO refactor with CeylonAddFileAction
+            props.put(javaString("NATIVE"), javaString("native(\"jvm\")"));
+            props.put(javaString("MODULE_NAME"), javaString(modName[0]));
+            props.put(javaString("MODULE_VERSION"), javaString(modName[1]));
+            props.put(javaString("IMPORTS"), Arrays.asList(
+                javaString("java.base \"7\""),
+                javaString("android \"``groovyFileManipulator.findAndroidVersion(buildFile) else "23"``\""),
+                javaString("\"com.android.support.appcompat-v7\" \"23.2.1\"") // TODO take version from build.gradle?
+            ));
+
+            createFromTemplate(
+                tplManager.getInternalTemplate("module.ceylon"),
+                "module.ceylon", props, psiDir, null
+            );
+
+            createFromTemplate(
+                tplManager.getInternalTemplate("MainActivity.ceylon"),
+                "MainActivity.ceylon", null, psiDir
+            );
+
+            return true;
+        }
+        return false;
     }
 
     Boolean updateGradleModel(Module mod) {
@@ -155,8 +227,31 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                 }
             }
         } catch (ReflectiveOperationException exception) {
+            exception.printStackTrace();
             Notifications.Bus.notify(Notification("ceylon", "Configure Ceylon",
                 "The gradle project could not be synced automatically, please sync it manually "
+                + "to apply changes.",
+                NotificationType.\iERROR
+            ));
+        }
+    }
+
+    void buildGradleProject(Module mod) {
+        value cl = javaClass<AndroidStudioSupport>().classLoader;
+
+        try {
+            value cls = cl.loadClass("com.android.tools.idea.gradle.invoker.GradleInvoker");
+            value instance = cls.getDeclaredMethod("getInstance", javaClass<Project>()).invoke(null, mod.project);
+
+            for (m in cls.declaredMethods) {
+                if (m.name == "rebuild") {
+                    m.invoke(instance);
+                }
+            }
+        } catch (ReflectiveOperationException exception) {
+            exception.printStackTrace();
+            Notifications.Bus.notify(Notification("ceylon", "Configure Ceylon",
+                "The gradle project could not be built automatically, please build it manually "
                 + "to apply changes.",
                 NotificationType.\iERROR
             ));
