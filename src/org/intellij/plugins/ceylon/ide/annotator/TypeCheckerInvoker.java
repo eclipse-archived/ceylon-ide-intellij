@@ -2,7 +2,6 @@ package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.redhat.ceylon.compiler.java.language.AbstractCallable;
 import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
@@ -12,7 +11,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.BaseCeylonProject;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
 import com.redhat.ceylon.ide.common.model.BaseIdeModuleManager;
-import com.redhat.ceylon.ide.common.model.CeylonProject;
+import com.redhat.ceylon.ide.common.model.BaseIdeModuleSourceMapper;
 import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.typechecker.EditedPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
@@ -168,7 +167,7 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
                               TypeDescriptor.klass(com.intellij.openapi.vfs.VirtualFile.class),
                               sourceCodeVirtualFile, srcDir, cu, singleSourceUnitPackage,
                               typeChecker.getPhasedUnits().getModuleManager(),
-                              typeChecker.getPhasedUnits().getModuleSourceMapper(),
+                              (BaseIdeModuleSourceMapper) typeChecker.getPhasedUnits().getModuleSourceMapper(),
                               typeChecker,
                               ceylonFile.getTokens(),
                               projectPu);
