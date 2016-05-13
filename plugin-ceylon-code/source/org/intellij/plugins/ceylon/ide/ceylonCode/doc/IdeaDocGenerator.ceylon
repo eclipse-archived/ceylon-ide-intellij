@@ -114,7 +114,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator<Document> {
         shared actual Document document => nothing;
         shared actual JList<CommonToken>? tokens => pu.tokens;
         shared actual TypeChecker typeChecker => tc;
-        shared actual BaseCeylonProject? ceylonProject => pu.moduleSourceMapper.ceylonProject;
+        shared actual BaseCeylonProject? ceylonProject => pu.moduleSourceMapper?.ceylonProject;
         shared Project ideaProject => p;
         shared actual CompletionOptions options => nothing;
     }
