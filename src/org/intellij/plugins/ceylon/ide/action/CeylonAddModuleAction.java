@@ -15,13 +15,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.intellij.plugins.ceylon.ide.wizard.CreateCeylonModuleWizard;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
 public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
     @Override
-    protected void createFiles(final AnActionEvent e, final IdeaCeylonProject project,
+    protected void createFiles(final AnActionEvent e, @Nullable  final IdeaCeylonProject project,
                                final VirtualFile srcRoot, final String eventPackage,
                                final PsiDirectory srcRootDir) {
 
@@ -46,7 +47,9 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
                     try {
                         Backend backend;
-                        if (project.getCompileToJs() && !project.getCompileToJava()) {
+                        if (project == null) {
+                            backend = null;
+                        } else if (project.getCompileToJs() && !project.getCompileToJava()) {
                             backend = Backend.JavaScript;
                         } else if (!project.getCompileToJs() && project.getCompileToJava()) {
                             backend = Backend.Java;
