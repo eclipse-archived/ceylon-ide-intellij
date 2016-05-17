@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    JavaRunnable
+}
+
 import com.intellij.codeInsight.intention {
     IntentionAction
 }
@@ -10,6 +14,12 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.lang.annotation {
     Annotation
 }
+import com.intellij.openapi.application {
+    Result
+}
+import com.intellij.openapi.command {
+    WriteCommandAction
+}
 import com.intellij.openapi.editor {
     Document,
     Editor
@@ -17,8 +27,15 @@ import com.intellij.openapi.editor {
 import com.intellij.openapi.\imodule {
     Module
 }
+import com.intellij.openapi.progress {
+    ProgressManager,
+    PerformInBackgroundOption
+}
 import com.intellij.openapi.project {
     Project
+}
+import com.intellij.openapi.ui.popup {
+    JBPopupFactory
 }
 import com.intellij.openapi.util {
     TextRange,
@@ -26,6 +43,12 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiFile
+}
+import com.intellij.ui.components {
+    JBList
+}
+import com.intellij.util {
+    NotNullFunction
 }
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
@@ -37,7 +60,9 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.correct {
     IdeQuickFixManager,
-    QuickFixData
+    QuickFixData,
+    exportModuleImportQuickFix,
+    addModuleImportQuickFix
 }
 import com.redhat.ceylon.ide.common.model {
     BaseCeylonProject
@@ -51,18 +76,22 @@ import com.redhat.ceylon.ide.common.refactoring {
 import com.redhat.ceylon.model.typechecker.model {
     Unit,
     Scope,
-    Type
+    Type,
+    Referenceable
 }
 
 import java.lang {
     Comparable
 }
 import java.util {
-    Collection
+    Collection,
+    ArrayList
 }
 
 import javax.swing {
-    Icon
+    Icon,
+    JComponent,
+    JLabel
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
@@ -79,10 +108,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 shared object ideaQuickFixManager
-        extends IdeQuickFixManager<Document,InsertEdit,TextEdit,TextChange,TextRange,Module,CeylonFile,LookupElement,IdeaQuickFixData,IdeaLinkedMode>() {
+        extends IdeQuickFixManager<Document,InsertEdit,TextEdit,TextChange,TextRange,CeylonFile,LookupElement,IdeaQuickFixData,IdeaLinkedMode>() {
     
-    addAnnotations => ideaAddRemoveAnnotationQuickFix;
-    removeAnnotations => ideaAddRemoveAnnotationQuickFix;
     importProposals => ideaImportProposals;
     createQuickFix => ideaCreateQuickFix;
     createEnumQuickFix => ideaCreateEnumQuickFix;
@@ -90,10 +117,8 @@ shared object ideaQuickFixManager
     declareLocalQuickFix => ideaDeclareLocalQuickFix;
     refineFormalMembersQuickFix => ideaRefineFormalMembersQuickFix;
     specifyTypeQuickFix => ideaSpecifyTypeQuickFix;
-    exportModuleImportQuickFix => ideaExportModuleImportQuickFix;
     changeTypeQuickFix => ideaChangeTypeQuickFix;
     addSatisfiesQuickFix => ideaAddSatisfiesQuickFix;
-    addModuleImportQuickFix => ideaAddModuleImportQuickFix;
     assignToLocalQuickFix => ideaAssignToLocalQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
@@ -168,7 +193,8 @@ shared class IdeaQuickFixData(
     shared actual BaseCeylonProject ceylonProject,
     shared variable Editor? editor = null
 ) satisfies QuickFixData {
-    
+
+    useLazyFixes => true;
     errorCode => message.code;
     problemOffset => annotation?.startOffset else 0;
     problemLength => (annotation?.endOffset else 0) - problemOffset;
@@ -185,7 +211,31 @@ shared class IdeaQuickFixData(
 
     document = DocumentWrapper(nativeDoc);
 
-    shared actual default void addQuickFix(String desc, PlatformTextChange change,
+    value candidateModules = ArrayList<[Unit, String, String, String]>();
+
+    void showImportModulesPopup(Editor editor) {
+        value list = JBList(candidateModules);
+        list.installCellRenderer(object satisfies NotNullFunction<[Unit, String, String, String], JComponent> {
+            fun([Unit, String, String, String] tuple) => JLabel(tuple[1]);
+        });
+
+        JBPopupFactory.instance
+            .createListPopupBuilder(list)
+            .setTitle("Choose module to import")
+            .setItemChoosenCallback(JavaRunnable(void () {
+                if (exists val = candidateModules.get(list.selectedIndex)) {
+                    object extends WriteCommandAction<Nothing>(editor.project) {
+                        run(Result<Nothing>? result)
+                                => addModuleImportQuickFix.applyChanges(outer, val[0], val[2], val[3]);
+                    }.execute();
+                }
+            }))
+            .createPopup()
+            .showInBestPositionFor(editor);
+    }
+
+    shared actual default void addQuickFix(String desc,
+        PlatformTextChange|Anything() change,
         DefaultRegion? selection, Boolean qualifiedNameIsPath) {
         value range = if (exists selection)
                       then TextRange.from(selection.start, selection.length)
@@ -193,6 +243,23 @@ shared class IdeaQuickFixData(
 
         if (is IdeaTextChange change) {
             registerFix(desc, change, range, ideaIcons.correction);
+        } else if (is Anything() change) {
+            registerFix(desc, null, null, ideaIcons.correction, false, (p, e, f) {
+                candidateModules.clear();
+
+                ProgressManager.instance.runProcessWithProgressAsynchronously(
+                    project.project,
+                    "Querying module repositories",
+                    JavaRunnable(change),
+                    JavaRunnable(void () {
+                        if (!candidateModules.empty) {
+                            showImportModulesPopup(e);
+                        }
+                    }),
+                    null,
+                    PerformInBackgroundOption.alwaysBackground
+                );
+            });
         }
     }
 
@@ -237,4 +304,26 @@ shared class IdeaQuickFixData(
         }
     }
 
+    shared actual void addAnnotationProposal(Referenceable declaration, String text,
+        String description, PlatformTextChange change, DefaultRegion? selection) {
+
+        if (is IdeaTextChange change) {
+            value range = if (exists selection) then TextRange.from(selection.start, selection.length) else null;
+            registerFix(description, change, range, ideaIcons.correction);
+        }
+    }
+
+    shared actual void addExportModuleImportProposal(Unit u, String description,
+        String name, String version) {
+
+        registerFix(description, null, null, ideaIcons.modules, false,
+            void (Project project, Editor editor, PsiFile psiFile) {
+                exportModuleImportQuickFix.applyChanges(this, u, name);
+            }
+        );
+    }
+
+    shared actual void addModuleImportProposal(Unit u, String description, String name, String version) {
+        candidateModules.add([u, description, name, version]);
+    }
 }

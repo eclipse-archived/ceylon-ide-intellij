@@ -174,7 +174,7 @@ shared class DocumentWrapper(shared Document doc) satisfies CommonDocument {
 
 shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfies PlatformTextChange {
 
-    value changes = ArrayList<PlatformTextEdit>();
+    value edits = ArrayList<PlatformTextEdit>();
 
     shared Document doc;
     if (is CommonDocument input) {
@@ -190,22 +190,22 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
         doc = FileDocumentManager.instance.getDocument(vfile);
     }
 
-    addEdit(PlatformTextEdit edit) => changes.add(edit);
+    addEdit(PlatformTextEdit edit) => edits.add(edit);
 
     shared actual CommonDocument document = DocumentWrapper(doc);
 
-    hasEdits => !changes.empty;
+    hasEdits => !edits.empty;
 
     shared actual void initMultiEdit() {}
 
     shared actual void apply() => applyOnProject();
 
     shared void applyOnProject(Project? project = null) {
-        value markers = changes.collect(
+        value markers = edits.collect(
             (c) => doc.createRangeMarker(c.start, c.start + c.length)
         );
 
-        for (change -> marker in zipEntries(changes, markers)) {
+        for (change -> marker in zipEntries(edits, markers)) {
             doc.replaceString(marker.startOffset, marker.endOffset, javaString(change.text));
         }
 
@@ -213,6 +213,8 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
             PsiDocumentManager.getInstance(project).commitAllDocuments();
         }
     }
+
+    offset => if (exists e = edits.first) then e.start else 0;
 }
 
 shared class IdeaCompositeChange() extends DefaultCompositeChange("") {

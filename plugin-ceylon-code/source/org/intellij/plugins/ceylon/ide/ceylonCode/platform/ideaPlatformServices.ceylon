@@ -14,6 +14,9 @@ import com.redhat.ceylon.ide.common.util {
     unsafeCast,
     Indents
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Unit
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     ideaImportProposals,
@@ -45,4 +48,9 @@ shared object ideaPlatformServices satisfies PlatformServices {
     createTextChange(String desc, CommonDocument|PhasedUnit input) => IdeaTextChange(input);
 
     createCompositeChange(String desc) => IdeaCompositeChange();
+
+    shared actual void gotoLocation(Unit unit, Integer offset, Integer length) {
+        // TODO
+    }
+
 }

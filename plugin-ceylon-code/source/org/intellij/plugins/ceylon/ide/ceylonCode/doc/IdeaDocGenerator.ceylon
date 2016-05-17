@@ -36,9 +36,6 @@ import com.redhat.ceylon.ide.common.doc {
     Colors,
     Icons
 }
-import com.redhat.ceylon.ide.common.imports {
-    AbstractModuleImportUtil
-}
 import com.redhat.ceylon.ide.common.model {
     BaseCeylonProject
 }
@@ -87,9 +84,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     ceylonHighlightingColors,
     highlight,
     textAttributes
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.imports {
-    ideaModuleImportUtils
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaJavaModelAware
@@ -321,9 +315,6 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator<Document> {
     }
     
     getPhasedUnit(Unit u) => tc.getPhasedUnitFromRelativePath(u.relativePath);
-    
-    shared actual AbstractModuleImportUtil<out Anything,out Anything,out Anything,out Anything,out Anything,out Anything> moduleImportUtil
-            => ideaModuleImportUtils;
     
     supportsQuickAssists => true;
 }
