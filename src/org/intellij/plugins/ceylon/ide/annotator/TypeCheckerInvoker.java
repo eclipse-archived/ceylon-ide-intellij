@@ -170,7 +170,9 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
                               (BaseIdeModuleSourceMapper) typeChecker.getPhasedUnits().getModuleSourceMapper(),
                               typeChecker,
                               ceylonFile.getTokens(),
-                              projectPu);
+                              projectPu,
+                              module,
+                              ceylonFile.getVirtualFile());
 
                       BaseIdeModelLoader loader = ((BaseIdeModuleManager) typeChecker.getPhasedUnits()
                               .getModuleManager()).getModelLoader();

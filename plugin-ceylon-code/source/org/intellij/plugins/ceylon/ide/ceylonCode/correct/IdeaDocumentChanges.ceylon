@@ -164,7 +164,12 @@ shared class DocumentWrapper(shared Document doc) satisfies CommonDocument {
 
     getText(Integer offset, Integer length) => doc.getText(TextRange.from(offset, length));
 
-    getDefaultLineDelimiter() => "\n";
+    defaultLineDelimiter => "\n";
+
+    indentSpaces => 4;
+
+    indentWithSpaces => true;
+
 }
 
 shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfies PlatformTextChange {

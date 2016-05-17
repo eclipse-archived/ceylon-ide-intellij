@@ -48,6 +48,11 @@ import com.redhat.ceylon.ide.common.platform {
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Unit,
+    Scope,
+    Type
+}
 
 import java.lang {
     Comparable
@@ -86,27 +91,9 @@ shared object ideaQuickFixManager
     refineFormalMembersQuickFix => ideaRefineFormalMembersQuickFix;
     specifyTypeQuickFix => ideaSpecifyTypeQuickFix;
     exportModuleImportQuickFix => ideaExportModuleImportQuickFix;
-    addPunctuationQuickFix => ideaAddPunctuationQuickFix;
-    addParameterListQuickFix => ideaAddParameterListQuickFix;
-    addParameterQuickFix => ideaAddParameterQuickFix;
-    addInitializerQuickFix => ideaAddInitializerQuickFix;
-    addConstructorQuickFix => ideaAddConstructorQuickFix;
-    changeDeclarationQuickFix => ideaChangeDeclarationQuickFix;
-    fixAliasQuickFix => ideaFixAliasQuickFix;
-    appendMemberReferenceQuickFix => ideaAppendMemberReferenceQuickFix;
     changeTypeQuickFix => ideaChangeTypeQuickFix;
     addSatisfiesQuickFix => ideaAddSatisfiesQuickFix;
-    addSpreadToVariadicParameterQuickFix => ideaAddSpreadToVariadicParameterQuickFix;
-    addTypeParameterQuickFix => ideaAddTypeParameterQuickFix;
-    shadowReferenceQuickFix => ideaShadowReferenceQuickFix;
-    changeInitialCaseQuickFix => ideaChangeInitialCaseQuickFix;
-    fixMultilineStringIndentationQuickFix => ideaFixMultilineStringIndentationQuickFix;
     addModuleImportQuickFix => ideaAddModuleImportQuickFix;
-    renameDescriptorQuickFix => ideaRenameDescriptorQuickFix;
-    changeRefiningTypeQuickType => ideaChangeRefiningTypeQuickType;
-    switchQuickFix => ideaSwitchQuickFix;
-    changeToQuickFix => ideaChangeToQuickFix;
-    addNamedArgumentQuickFix => ideaAddNamedArgumentQuickFix;
     assignToLocalQuickFix => ideaAssignToLocalQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
@@ -196,9 +183,10 @@ shared class IdeaQuickFixData(
         annotation.registerFix(intention);
     }
 
-    doc = DocumentWrapper(nativeDoc);
+    document = DocumentWrapper(nativeDoc);
 
-    shared actual default void addQuickFix(String desc, PlatformTextChange change, DefaultRegion? selection) {
+    shared actual default void addQuickFix(String desc, PlatformTextChange change,
+        DefaultRegion? selection, Boolean qualifiedNameIsPath) {
         value range = if (exists selection)
                       then TextRange.from(selection.start, selection.length)
                       else null;
@@ -207,4 +195,46 @@ shared class IdeaQuickFixData(
             registerFix(desc, change, range, ideaIcons.correction);
         }
     }
+
+    shared actual void addInitializerQuickFix(String description, PlatformTextChange change,
+        DefaultRegion selection, Unit unit, Scope scope, Type? type) {
+
+        if (is IdeaTextChange change) {
+            value range = TextRange.from(selection.start, selection.length);
+            void callback(Project project, Editor editor, PsiFile file) {
+                IdeaInitializer().addInitializer(editor.document,
+                    selection,
+                    type,
+                    unit,
+                    scope
+                );
+            }
+            registerFix(description, change, range, ideaIcons.correction, false, callback);
+        }
+    }
+    shared actual void addParameterQuickFix(String description, PlatformTextChange change,
+        DefaultRegion selection, Unit unit, Scope scope, Type? type, Integer exitPos) {
+
+        if (is IdeaTextChange change) {
+            value range = TextRange.from(selection.start, selection.length);
+            void callback(Project project, Editor editor, PsiFile file) {
+                IdeaInitializer().addInitializer(editor.document,
+                    selection,
+                    type,
+                    unit,
+                    scope
+                );
+            }
+            registerFix(description, change, range, ideaIcons.correction, false, callback);
+        }
+    }
+    shared actual void addParameterListQuickFix(String description, PlatformTextChange change,
+        DefaultRegion selection) {
+
+        if (is IdeaTextChange change) {
+            value range = TextRange.from(selection.start, selection.length);
+            registerFix(description, change, range, ideaIcons.correction);
+        }
+    }
+
 }

@@ -100,7 +100,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     pr,
                     _editor
                 ) {
-                    shared actual void addQuickFix(String desc, PlatformTextChange change, DefaultRegion? selection) {
+                    shared actual void addQuickFix(String desc, PlatformTextChange change,
+                        DefaultRegion? selection, Boolean ignored) {
                         if (is IdeaTextChange change) {
                             makeAvailable(desc, change, selection);
                         }

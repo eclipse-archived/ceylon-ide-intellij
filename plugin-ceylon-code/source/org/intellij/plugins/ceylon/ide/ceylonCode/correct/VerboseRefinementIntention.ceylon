@@ -1,14 +1,5 @@
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
-import com.intellij.openapi.editor {
-    Document
-}
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.redhat.ceylon.ide.common.correct {
-    VerboseRefinementQuickFix
+    verboseRefinementQuickFix
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -18,26 +9,22 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
-shared class VerboseRefinementIntention()
-        extends GenericIntention()
-        satisfies VerboseRefinementQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
+shared class VerboseRefinementIntention() extends AbstractIntention() {
     
     familyName => "Convert refinement to verbose form";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
-        addVerboseRefinementProposal(data, file, statement);
+        verboseRefinementQuickFix.addVerboseRefinementProposal(data, statement);
     }
 }
 
-shared class ShortcutRefinementIntention()
-        extends GenericIntention()
-        satisfies VerboseRefinementQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
+shared class ShortcutRefinementIntention() extends AbstractIntention() {
     
     familyName => "Convert refinement to shortcut form";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
-        addShortcutRefinementProposal(data, file, statement);
+        verboseRefinementQuickFix.addShortcutRefinementProposal(data, statement);
     }
 }

@@ -1,14 +1,5 @@
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
-import com.intellij.openapi.editor {
-    Document
-}
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.redhat.ceylon.ide.common.correct {
-    ExpandTypeQuickFix
+    expandTypeQuickFix
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -18,9 +9,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
-shared class ExpandTypeIntention()
-        extends GenericIntention()
-        satisfies ExpandTypeQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
+shared class ExpandTypeIntention() extends AbstractIntention() {
     
     familyName => "Expand type abbreviation";
     
@@ -30,8 +19,8 @@ shared class ExpandTypeIntention()
         if (exists ed = data.editor) {
             value start = ed.selectionModel.selectionStart;
             value end = ed.selectionModel.selectionEnd;
-            
-            addExpandTypeProposal(data, file, statement, start, end);
+
+            expandTypeQuickFix.addExpandTypeProposal(data, statement, start, end);
         }
     }
 }
