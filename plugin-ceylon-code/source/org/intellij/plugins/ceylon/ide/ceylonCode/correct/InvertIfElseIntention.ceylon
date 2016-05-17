@@ -1,5 +1,5 @@
 import com.redhat.ceylon.ide.common.correct {
-    convertThenElseToIfElse
+    invertIfElseQuickFix
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -9,13 +9,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
-shared class ConvertThenElseToIfElseIntention() extends AbstractIntention() {
+shared class InvertIfElseIntention() extends AbstractIntention() {
     
-    familyName => "Convert if/then/else to statement";
+    familyName => "Invert if/then/else expression";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
 
-        convertThenElseToIfElse.addConvertToIfElseProposal(data, statement);
+        invertIfElseQuickFix.addInvertIfElseProposal(data, statement);
     }
 }

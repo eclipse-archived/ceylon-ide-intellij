@@ -16,6 +16,6 @@ shared class ConvertIfElseToThenElseIntention() extends AbstractIntention() {
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
 
-        convertIfElseToThenElseQuickFix.addConvertToThenElseProposal(data, data.document, statement);
+        convertIfElseToThenElseQuickFix.addConvertToThenElseProposal(data, statement);
     }
 }

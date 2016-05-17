@@ -1,0 +1,3 @@
+void func() {
+    value result = if (true) then "a" else "b";
+}
