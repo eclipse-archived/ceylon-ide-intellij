@@ -170,6 +170,7 @@ shared class DocumentWrapper(shared Document doc) satisfies CommonDocument {
 
     indentWithSpaces => true;
 
+    size => doc.textLength;
 }
 
 shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfies PlatformTextChange {

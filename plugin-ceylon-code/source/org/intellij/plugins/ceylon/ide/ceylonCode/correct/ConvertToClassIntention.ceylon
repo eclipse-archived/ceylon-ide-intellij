@@ -7,15 +7,12 @@ import com.intellij.openapi.editor {
 import com.intellij.openapi.project {
     Project
 }
-import com.intellij.openapi.util {
-    TextRange
-}
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
-}
 import com.redhat.ceylon.ide.common.correct {
-    ConvertToClassQuickFix,
+    convertToClassQuickFix,
     AbstractConvertToClassProposal
+}
+import com.redhat.ceylon.ide.common.platform {
+    CommonDocument
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -29,39 +26,22 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
-shared class ConvertToClassIntention()
-        extends AbstractIntention()
-        satisfies ConvertToClassQuickFix<IdeaQuickFixData>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+shared class ConvertToClassIntention() extends AbstractIntention() {
     
     familyName => "Convert object to class";
-    
-    shared actual void newProposal(IdeaQuickFixData data, String desc,
-        Tree.ObjectDefinition def) {
-        
-        makeAvailable { 
-            desc = desc;
-            callback = (p, e, f) {
-                ConvertToClassProposal(p).applyChanges(f.viewProvider.document, def);
-            };
-        };
-    }
-    
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value decl = nodes.findDeclaration(data.rootNode, data.node);
-        
-        addConvertToClassProposal(data, decl);
+
+        convertToClassQuickFix.addConvertToClassProposal(data, decl);
     }
 }
 
 class ConvertToClassProposal(Project project)
-        satisfies AbstractConvertToClassProposal<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
-                & IdeaDocumentChanges
-                & IdeaQuickFix
+        satisfies AbstractConvertToClassProposal<LookupElement,Document,IdeaLinkedMode>
                 & IdeaLinkedModeSupport {
-    
-    shared actual void performChange(TextChange change) {
-        change.apply(project);
+
+    shared actual Document getNativeDocument(CommonDocument doc) {
+        assert(is DocumentWrapper doc);
+        return doc.doc;
     }
 }

@@ -50,6 +50,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import com.redhat.ceylon.ide.common.doc {
+    Icons
+}
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
@@ -101,10 +107,17 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     _editor
                 ) {
                     shared actual void addQuickFix(String desc, PlatformTextChange|Anything() change,
-                        DefaultRegion? selection, Boolean ignored) {
+                        DefaultRegion? selection, Boolean ignored, Icons? icon) {
                         if (is IdeaTextChange change) {
                             makeAvailable(desc, change, selection);
                         }
+                    }
+
+                    shared actual void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {
+                        makeAvailable("", null, null, (p, e, f) {
+                                value document = DocumentWrapper(f.viewProvider.document);
+                                ConvertToClassProposal(p).applyChanges(document, declaration);
+                        });
                     }
                 };
 

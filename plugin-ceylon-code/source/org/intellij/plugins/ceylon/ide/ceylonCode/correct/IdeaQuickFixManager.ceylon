@@ -77,7 +77,9 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit,
     Scope,
     Type,
-    Referenceable
+    Referenceable,
+    Declaration,
+    TypeDeclaration
 }
 
 import java.lang {
@@ -106,19 +108,17 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import com.redhat.ceylon.ide.common.doc {
+    Icons
+}
 
 shared object ideaQuickFixManager
         extends IdeQuickFixManager<Document,InsertEdit,TextEdit,TextChange,TextRange,CeylonFile,LookupElement,IdeaQuickFixData,IdeaLinkedMode>() {
     
     importProposals => ideaImportProposals;
-    createQuickFix => ideaCreateQuickFix;
-    createEnumQuickFix => ideaCreateEnumQuickFix;
-    changeReferenceQuickFix => ideaChangeReferenceQuickFix;
     declareLocalQuickFix => ideaDeclareLocalQuickFix;
     refineFormalMembersQuickFix => ideaRefineFormalMembersQuickFix;
     specifyTypeQuickFix => ideaSpecifyTypeQuickFix;
-    changeTypeQuickFix => ideaChangeTypeQuickFix;
-    addSatisfiesQuickFix => ideaAddSatisfiesQuickFix;
     assignToLocalQuickFix => ideaAssignToLocalQuickFix;
     
     shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
@@ -234,12 +234,15 @@ shared class IdeaQuickFixData(
             .showInBestPositionFor(editor);
     }
 
+    TextRange? toRange(DefaultRegion? region)
+            => if (exists region)
+               then TextRange.from(region.start, region.length)
+               else null;
+
     shared actual default void addQuickFix(String desc,
         PlatformTextChange|Anything() change,
-        DefaultRegion? selection, Boolean qualifiedNameIsPath) {
-        value range = if (exists selection)
-                      then TextRange.from(selection.start, selection.length)
-                      else null;
+        DefaultRegion? selection, Boolean qualifiedNameIsPath, Icons? icon) {
+        value range = toRange(selection);
 
         if (is IdeaTextChange change) {
             registerFix(desc, change, range, ideaIcons.correction);
@@ -267,7 +270,7 @@ shared class IdeaQuickFixData(
         DefaultRegion selection, Unit unit, Scope scope, Type? type) {
 
         if (is IdeaTextChange change) {
-            value range = TextRange.from(selection.start, selection.length);
+            value range = toRange(selection);
             void callback(Project project, Editor editor, PsiFile file) {
                 IdeaInitializer().addInitializer(editor.document,
                     selection,
@@ -283,7 +286,7 @@ shared class IdeaQuickFixData(
         DefaultRegion selection, Unit unit, Scope scope, Type? type, Integer exitPos) {
 
         if (is IdeaTextChange change) {
-            value range = TextRange.from(selection.start, selection.length);
+            value range = toRange(selection);
             void callback(Project project, Editor editor, PsiFile file) {
                 IdeaInitializer().addInitializer(editor.document,
                     selection,
@@ -299,7 +302,7 @@ shared class IdeaQuickFixData(
         DefaultRegion selection) {
 
         if (is IdeaTextChange change) {
-            value range = TextRange.from(selection.start, selection.length);
+            value range = toRange(selection);
             registerFix(description, change, range, ideaIcons.correction);
         }
     }
@@ -308,7 +311,7 @@ shared class IdeaQuickFixData(
         String description, PlatformTextChange change, DefaultRegion? selection) {
 
         if (is IdeaTextChange change) {
-            value range = if (exists selection) then TextRange.from(selection.start, selection.length) else null;
+            value range = toRange(selection);
             registerFix(description, change, range, ideaIcons.correction);
         }
     }
@@ -323,7 +326,24 @@ shared class IdeaQuickFixData(
         );
     }
 
-    shared actual void addModuleImportProposal(Unit u, String description, String name, String version) {
-        candidateModules.add([u, description, name, version]);
-    }
+    addModuleImportProposal(Unit u, String description, String name, String version)
+            => candidateModules.add([u, description, name, version]);
+
+    addChangeTypeProposal(String description, PlatformTextChange change, DefaultRegion selection, Unit unit)
+            => registerFix(description, change, TextRange.from(selection.start, selection.length), ideaIcons.correction);
+
+    shared actual default void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {}
+
+    addCreateParameterProposal(String description, Declaration dec,
+        Type? type, DefaultRegion selection, Icons image, PlatformTextChange change, Integer exitPos)
+            => registerFix(description, change, toRange(selection), ideaIcons.addCorrection);
+
+    addCreateQuickFix(String description, Scope scope, Unit unit, Type? returnType,
+        Icons image, PlatformTextChange change, Integer exitPos, DefaultRegion selection)
+            => registerFix(description, change, toRange(selection)); // TODO icon
+
+    addSatisfiesProposal(TypeDeclaration typeParam, String description,
+        String missingSatisfiedTypeText, PlatformTextChange change, DefaultRegion? selection)
+            => registerFix(description, change, toRange(selection), ideaIcons.addCorrection);
+
 }
