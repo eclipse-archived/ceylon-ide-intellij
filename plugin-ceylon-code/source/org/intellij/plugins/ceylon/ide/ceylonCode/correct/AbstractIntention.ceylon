@@ -5,13 +5,8 @@ import ceylon.interop.java {
 import com.intellij.codeInsight.intention.impl {
     BaseIntentionAction
 }
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
 import com.intellij.openapi.editor {
-    Editor,
-    Document,
-    AliasedAsTextEdit=TextChange
+    Editor
 }
 import com.intellij.openapi.\imodule {
     ModuleUtil
@@ -28,8 +23,11 @@ import com.intellij.psi {
 import com.redhat.ceylon.compiler.typechecker.analyzer {
     UsageWarning
 }
-import com.redhat.ceylon.ide.common.correct {
-    GenericQuickFix
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
+import com.redhat.ceylon.ide.common.doc {
+    Icons
 }
 import com.redhat.ceylon.ide.common.platform {
     PlatformTextChange=TextChange
@@ -43,6 +41,9 @@ import com.redhat.ceylon.ide.common.typechecker {
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Type
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
@@ -50,16 +51,16 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import com.redhat.ceylon.ide.common.doc {
-    Icons
+import com.redhat.ceylon.ide.common.correct {
+    refineFormalMembersQuickFix
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
+import javax.swing {
+    Icon
 }
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
-    variable <TextChange|IdeaTextChange>? change = null;
+    variable IdeaTextChange? change = null;
     variable TextRange? selection = null;
     variable Boolean available = false;
     variable Anything(Project, Editor, PsiFile) callback = noop;
@@ -67,9 +68,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     value dummyMsg = UsageWarning(null, null, null);
     
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
-        if (is TextChange chg = change) {
-            chg.apply(project);
-        } else if (is IdeaTextChange chg = change) {
+        if (is IdeaTextChange chg = change) {
             chg.applyOnProject(project);
         }
         if (exists sel = selection) {
@@ -113,11 +112,37 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                         }
                     }
 
+                    shared actual void registerFix(String desc, PlatformTextChange? change,
+                        TextRange? selection, Icon? image, Boolean qualifiedNameIsPath,
+                        Anything callback(Project project, Editor editor, PsiFile psiFile)) {
+
+                        if (is IdeaTextChange change) {
+                            value sel = if (exists selection)
+                                        then DefaultRegion(selection.startOffset, selection.length)
+                                        else null;
+                            makeAvailable(desc, change, sel, callback);
+                        }
+                    }
+
                     shared actual void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {
-                        makeAvailable("", null, null, (p, e, f) {
+                        makeAvailable(description, null, null, (p, e, f) {
                                 value document = DocumentWrapper(f.viewProvider.document);
                                 ConvertToClassProposal(p).applyChanges(document, declaration);
                         });
+                    }
+                    
+                    shared actual void addSpecifyTypeProposal(String description, Tree.Type type, Tree.CompilationUnit cu, Type infType) {
+                        makeAvailable(description, null, null, (project, editor, file) {
+                                ideaSpecifyTypeQuickFix.specifyType(document, type, true, cu, infType);
+                            }
+                        );
+                    }
+                    
+                    shared actual void addRefineFormalMembersProposal(String description) {
+                        if (exists e = editor,
+                            is IdeaTextChange change = refineFormalMembersQuickFix.refineFormalMembers(this, e.caretModel.offset)) {
+                            makeAvailable(description, change);
+                        }
                     }
                 };
 
@@ -134,7 +159,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     
     shared formal void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset);
     
-    shared void makeAvailable(String desc, <TextChange|IdeaTextChange>? change = null,
+    shared void makeAvailable(String desc, IdeaTextChange? change = null,
         DefaultRegion? sel = null, 
         Anything callback(Project p, Editor e, PsiFile f) => noop) {
         
@@ -149,15 +174,4 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             selection = null;
         }
     }
-}
-
-abstract shared class GenericIntention() 
-        extends AbstractIntention()
-        satisfies GenericQuickFix<CeylonFile,Document,InsertEdit,AliasedAsTextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
-    
-    newProposal(IdeaQuickFixData data, String desc, TextChange change, DefaultRegion? region)
-            => makeAvailable(desc, change, region);
-
 }

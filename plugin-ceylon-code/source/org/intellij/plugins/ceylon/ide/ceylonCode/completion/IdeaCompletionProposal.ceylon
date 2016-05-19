@@ -2,8 +2,13 @@ import ceylon.interop.java {
     javaString
 }
 
-import com.intellij.openapi.editor {
-    Document
+import com.intellij.codeInsight.completion {
+    InsertHandler,
+    InsertionContext
+}
+import com.intellij.codeInsight.lookup {
+    LookupElementBuilder,
+    LookupElement
 }
 import com.intellij.openapi.util {
     TextRange
@@ -11,41 +16,29 @@ import com.intellij.openapi.util {
 import com.redhat.ceylon.ide.common.completion {
     CommonCompletionProposal
 }
-
-import com.intellij.codeInsight.lookup {
-    LookupElementBuilder,
-    LookupElement
+import com.redhat.ceylon.ide.common.platform {
+    CommonDocument
 }
+
 import javax.swing {
     Icon
 }
-import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
+    DocumentWrapper
 }
 
-shared interface IdeaCompletionProposal satisfies CommonCompletionProposal<Document,TextRange> {
+shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
     
-    shared actual Character getDocChar(Document doc, Integer offset)
-            => Character(doc.getText(TextRange.from(offset, 1)).first else ' ');
-    
-    shared actual Integer getDocLength(Document doc) => doc.textLength;
-    
-    shared actual String getDocSpan(Document doc, Integer start, Integer length)
-            => doc.getText(TextRange.from(start, length));
-    
-    shared actual TextRange newRegion(Integer start, Integer length) => TextRange.from(start, length);
-    shared actual Integer getRegionStart(TextRange region) => region.startOffset;
-    shared actual Integer getRegionLength(TextRange region) => region.length;
-    
-    shared actual void replaceInDoc(Document doc, Integer start, Integer length, String newText) {
-        doc.replaceString(start, start + length, javaString(newText));
+    shared actual void replaceInDoc(CommonDocument doc, Integer start, Integer length, String newText) {
+        assert(is DocumentWrapper doc);
+        doc.doc.replaceString(start, start + length, javaString(newText));
     }
     
     shared void adjustSelection(CompletionData data) {
-        TextRange selection = getSelectionInternal(data.document);
-        data.editor.selectionModel.setSelection(selection.startOffset, selection.endOffset);
-        data.editor.caretModel.moveToOffset(selection.endOffset);
+        value selection = getSelectionInternal(DocumentWrapper(data.document));
+        data.editor.selectionModel.setSelection(selection.start, selection.end);
+        data.editor.caretModel.moveToOffset(selection.end);
     }
     
     shared actual String completionMode => "insert";

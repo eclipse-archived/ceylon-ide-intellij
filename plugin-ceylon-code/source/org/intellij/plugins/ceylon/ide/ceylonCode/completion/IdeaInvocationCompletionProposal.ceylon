@@ -14,17 +14,11 @@ import com.intellij.openapi.command {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.intellij.psi {
     PsiDocumentManager
 }
 import com.redhat.ceylon.ide.common.completion {
     InvocationCompletionProposal
-}
-import com.redhat.ceylon.ide.common.correct {
-    ImportProposals
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
@@ -37,14 +31,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    InsertEdit,
-    TextEdit,
-    TextChange,
-    IdeaDocumentChanges,
-    ideaImportProposals
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
+    DocumentWrapper
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
@@ -53,10 +40,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
     Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
     Boolean inherited, Boolean qualified, Declaration? qualifyingValue, CompletionData data)
-        extends InvocationCompletionProposal<CompletionData,LookupElement,CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
+        extends InvocationCompletionProposal<CompletionData,LookupElement,Document,IdeaLinkedMode>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
     positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue, ideaCompletionManager)
-        satisfies IdeaDocumentChanges
-                & IdeaCompletionProposal
+        satisfies IdeaCompletionProposal
                 & IdeaLinkedModeSupport {
     
     shared actual variable Boolean toggleOverwrite = false;
@@ -75,11 +61,11 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                replaceInDoc(data.document, offset, text.size - prefix.size, "");
+                value platformDoc = DocumentWrapper(data.document);
+                replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
                 PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);
                 
-                value change = TextChange(data.document);
-                createChange(change, data.document);
+                value change = createChange(platformDoc);
                 
                 object extends WriteCommandAction<DefaultRegion?>(data.editor.project, data.file) {
                     shared actual void run(Result<DefaultRegion?> result) {
@@ -88,7 +74,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 }.execute();
                 
                 adjustSelection(data);
-                activeLinkedMode(data.document, data);
+                activeLinkedMode(platformDoc, data);
             }
         }
     , null, [declaration, text])
@@ -100,9 +86,6 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         
         lm.buildTemplate(data.editor);
     }
-    
-    shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
-            => ideaImportProposals;
     
     shared actual LookupElement newNestedCompletionProposal(Declaration dec, Declaration? qualifier, Integer loc, Integer index, Boolean basic, String op) {
         value desc = getNestedCompletionText(op, data.lastCompilationUnit.unit, dec, qualifier, basic, true);

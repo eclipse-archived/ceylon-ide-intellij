@@ -148,7 +148,7 @@ shared class ErrorsVisitor(AnnotationHolder annotationHolder, CeylonFile file) e
                 pu, node, mod, annotation, project);
 
             try {
-                ideaQuickFixManager.addQuickFixes(data, tc, file);
+                ideaQuickFixManager.addQuickFixes(data, tc);
             } catch (Exception|AssertionError e) {
                 e.printStackTrace();
             }

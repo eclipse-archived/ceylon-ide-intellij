@@ -9,7 +9,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
-shared class SplitIfStatementIntention() extends GenericIntention() {
+shared class SplitIfStatementIntention() extends AbstractIntention() {
     
     familyName => "Split if statement";
     

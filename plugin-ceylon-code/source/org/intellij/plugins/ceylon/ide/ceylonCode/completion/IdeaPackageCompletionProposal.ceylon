@@ -9,9 +9,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Document
 }
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.redhat.ceylon.cmr.api {
     ModuleVersionDetails,
     ModuleSearchResult
@@ -20,8 +17,8 @@ import com.redhat.ceylon.ide.common.completion {
     ImportedModulePackageProposal,
     PackageCompletionProposal
 }
-import com.redhat.ceylon.ide.common.correct {
-    ImportProposals
+import com.redhat.ceylon.ide.common.refactoring {
+    DefaultRegion
 }
 import com.redhat.ceylon.model.typechecker.model {
     Package,
@@ -30,14 +27,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    InsertEdit,
-    TextEdit,
-    TextChange,
-    IdeaDocumentChanges,
-    ideaImportProposals
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
+    DocumentWrapper
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
@@ -45,10 +35,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
                 String fullPackageName, CompletionData data, Package candidate)
-        extends ImportedModulePackageProposal<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaLinkedMode,CompletionData>
+        extends ImportedModulePackageProposal<LookupElement,Document,IdeaLinkedMode,CompletionData>
         (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate, data)
-        satisfies IdeaDocumentChanges
-                & IdeaCompletionProposal
+        satisfies IdeaCompletionProposal
                 & IdeaLinkedModeSupport {
 
     shared actual variable Boolean toggleOverwrite = false;
@@ -57,15 +46,16 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                replaceInDoc(data.document, offset, text.size - prefix.size, "");
+                value platformDoc = DocumentWrapper(data.document);
+                replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
                 
-                applyInternal(data.document);
+                applyInternal(platformDoc);
                 adjustSelection(data);
             }
         }
     );
     
-    shared actual LookupElement newPackageMemberCompletionProposal(Declaration d, TextRange selection, IdeaLinkedMode lm) {
+    shared actual LookupElement newPackageMemberCompletionProposal(Declaration d, DefaultRegion selection, IdeaLinkedMode lm) {
         return LookupElementBuilder.create(d.name)
             .withIcon(ideaIcons.forDeclaration(d));
     }
@@ -75,18 +65,14 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
         
         lm.buildTemplate(data.editor);
     }
-    
-    shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals 
-            => ideaImportProposals;
 }
 
 class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
     String fullPackageName, CompletionData data, ModuleVersionDetails version, Unit unit,
     ModuleSearchResult.ModuleDetails md)
-        extends PackageCompletionProposal<CeylonFile, LookupElement, Document, InsertEdit, TextEdit, TextChange, TextRange, IdeaLinkedMode>
+        extends PackageCompletionProposal< LookupElement,Document,IdeaLinkedMode>
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
-        satisfies IdeaDocumentChanges
-                & IdeaCompletionProposal
+        satisfies IdeaCompletionProposal
                 & IdeaLinkedModeSupport {
 
     shared LookupElement lookupElement => newLookup(description, text, ideaIcons.modules,
@@ -97,18 +83,14 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
                 //    data.lastPhasedUnit.\ipackage.\imodule,
                 //    version.\imodule,
                 //    version.version);
-
-                value selection = getSelectionInternal(ctx.document);
-                ctx.editor.selectionModel.setSelection(selection.startOffset,
-                    selection.endOffset);
-                ctx.editor.caretModel.moveToOffset(selection.endOffset); 
+                value platformDoc = DocumentWrapper(data.document);
+                value selection = getSelectionInternal(platformDoc);
+                ctx.editor.selectionModel.setSelection(selection.start, selection.end);
+                ctx.editor.caretModel.moveToOffset(selection.end); 
             }
         }
     );
 
-    shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals
-            => ideaImportProposals;
-    
     shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber, Integer exitPosition) {
         lm.buildTemplate(data.editor);
     }

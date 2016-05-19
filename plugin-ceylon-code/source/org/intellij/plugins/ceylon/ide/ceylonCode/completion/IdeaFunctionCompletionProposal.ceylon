@@ -11,20 +11,11 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.command {
     WriteCommandAction
 }
-import com.intellij.openapi.editor {
-    Document
-}
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.intellij.psi {
     PsiDocumentManager
 }
 import com.redhat.ceylon.ide.common.completion {
     FunctionCompletionProposal
-}
-import com.redhat.ceylon.ide.common.correct {
-    ImportProposals
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
@@ -34,14 +25,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    InsertEdit,
-    TextEdit,
-    TextChange,
-    IdeaDocumentChanges,
-    ideaImportProposals
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
+    DocumentWrapper
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
@@ -49,9 +33,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaFunctionCompletionProposal
         (Integer _offset, String prefix, String desc, String text, Declaration decl, CompletionData data)
-        extends FunctionCompletionProposal<LookupElement, CeylonFile, Document, InsertEdit, TextEdit, TextChange, TextRange>
-        (_offset, prefix, desc, text, decl, data.lastCompilationUnit)
-        satisfies IdeaDocumentChanges & IdeaCompletionProposal {
+        extends FunctionCompletionProposal(_offset, prefix, desc, text, decl, data.lastCompilationUnit)
+        satisfies IdeaCompletionProposal {
 
     shared actual variable Boolean toggleOverwrite = false;
     
@@ -61,12 +44,12 @@ class IdeaFunctionCompletionProposal
             // Undo IntelliJ's completion
             value startOfTextToErase = offset;
             value lengthBeforeCaret = data.editor.caretModel.offset - startOfTextToErase; 
-            replaceInDoc(data.document, startOfTextToErase, lengthBeforeCaret, "");
+            value platformDoc = DocumentWrapper(data.document);
+            replaceInDoc(platformDoc, startOfTextToErase, lengthBeforeCaret, "");
             
             PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);
             
-            value change = TextChange(data.document);
-            createChange(change, data.document);
+            value change = createChange(platformDoc);
             
             object extends WriteCommandAction<DefaultRegion?>(data.editor.project, data.file) {
                 shared actual void run(Result<DefaultRegion?> result) {
@@ -77,7 +60,4 @@ class IdeaFunctionCompletionProposal
             adjustSelection(data);
         }
     });
- 
-    shared actual ImportProposals<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange> importProposals 
-            => ideaImportProposals;
 }

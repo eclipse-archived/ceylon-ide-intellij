@@ -13,12 +13,10 @@ import com.intellij.openapi.editor {
 import com.intellij.openapi.project {
     Project
 }
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.redhat.ceylon.ide.common.correct {
     AssignToLocalQuickFix,
-    AssignToLocalProposal
+    AssignToLocalProposal,
+    importProposals
 }
 import com.redhat.ceylon.model.typechecker.model {
     Type,
@@ -42,9 +40,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 object ideaAssignToLocalQuickFix
-        satisfies AssignToLocalQuickFix<CeylonFile,IdeaQuickFixData>
-                & IdeaDocumentChanges
-                & IdeaQuickFix {
+        satisfies AssignToLocalQuickFix<IdeaQuickFixData> {
 
     shared actual void newProposal(IdeaQuickFixData data, String desc) {
         data.registerFix { 
@@ -60,9 +56,7 @@ object ideaAssignToLocalQuickFix
 }
 
 class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFile f)
-        satisfies AssignToLocalProposal<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement,IdeaLinkedMode>
-                & IdeaQuickFix
-                & IdeaDocumentChanges
+        satisfies AssignToLocalProposal<Document,LookupElement,IdeaLinkedMode>
                 & IdeaLinkedModeSupport {
     
     shared actual variable Integer currentOffset = e.caretModel.offset;
@@ -76,8 +70,8 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
     shared actual variable Type? type = null;
     
     shared void perform() {
-        if (exists change = performInitialChange(data, f, currentOffset)) {
-            change.apply(p);
+        if (exists change = performInitialChange(data, currentOffset)) {
+            change.apply();
         }
         if (exists lm = addLinkedPositions(e.document, f.phasedUnit.unit)) {
             installLinkedMode(e.document, lm, this, 0, 0);
@@ -95,12 +89,12 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
                         shared actual void handleInsert(InsertionContext ctx, LookupElement el) {
                             // TODO abstract that
                             value imports = HashSet<Declaration>();
-                            ideaImportProposals.importType(imports, type, data.rootNode);
+                            importProposals.importType(imports, type, data.rootNode);
                             if (!imports.empty) {
-                                value change = newTextChange("Import type", data.nativeDoc);
-                                initMultiEditChange(change);
-                                ideaImportProposals.applyImports(change, imports, data.rootNode, data.nativeDoc);
-                                change.apply(ctx.project);
+                                value change = IdeaTextChange(data.document);
+                                change.initMultiEdit();
+                                importProposals.applyImports(change, imports, data.rootNode, data.document);
+                                change.apply();
                             }
                         }
                     });

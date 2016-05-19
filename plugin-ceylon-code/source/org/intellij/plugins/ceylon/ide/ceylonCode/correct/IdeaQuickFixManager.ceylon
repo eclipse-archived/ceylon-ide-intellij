@@ -62,7 +62,11 @@ import com.redhat.ceylon.ide.common.correct {
     IdeQuickFixManager,
     QuickFixData,
     exportModuleImportQuickFix,
-    addModuleImportQuickFix
+    addModuleImportQuickFix,
+    refineFormalMembersQuickFix
+}
+import com.redhat.ceylon.ide.common.doc {
+    Icons
 }
 import com.redhat.ceylon.ide.common.model {
     BaseCeylonProject
@@ -97,33 +101,30 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaLinkedMode
+    IdeaLinkedMode,
+    ideaCompletionManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlightProposal
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
-import com.redhat.ceylon.ide.common.doc {
-    Icons
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
 }
 
 shared object ideaQuickFixManager
-        extends IdeQuickFixManager<Document,InsertEdit,TextEdit,TextChange,TextRange,CeylonFile,LookupElement,IdeaQuickFixData,IdeaLinkedMode>() {
+        extends IdeQuickFixManager<Document,LookupElement,IdeaLinkedMode,IdeaQuickFixData>() {
     
-    importProposals => ideaImportProposals;
     declareLocalQuickFix => ideaDeclareLocalQuickFix;
-    refineFormalMembersQuickFix => ideaRefineFormalMembersQuickFix;
     specifyTypeQuickFix => ideaSpecifyTypeQuickFix;
     assignToLocalQuickFix => ideaAssignToLocalQuickFix;
     
-    shared actual void addImportProposals(Collection<LookupElement> proposals, IdeaQuickFixData data) {
+    shared actual void addImportProposals(Collection<LookupElement> proposals, QuickFixData data) {
+        assert(is IdeaQuickFixData data);
         for (proposal in proposals) {
-            assert (is TextChange change = proposal.\iobject);
+            assert (is PlatformTextChange change = proposal.\iobject);
             data.registerFix(proposal.lookupString, change, null, ideaIcons.singleImport, true);
         }
     }
@@ -135,7 +136,7 @@ shared object ideaQuickFixManager
     }
 }
 
-class CustomIntention(Integer position, String desc, <TextChange|PlatformTextChange>? change, TextRange? selection = null, Icon? image = null,
+class CustomIntention(Integer position, String desc, PlatformTextChange? change, TextRange? selection = null, Icon? image = null,
     Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop)
         extends BaseIntentionAction()
         satisfies Iconable & Comparable<IntentionAction> {
@@ -144,9 +145,7 @@ class CustomIntention(Integer position, String desc, <TextChange|PlatformTextCha
     variable Project? project = null;
     
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
-        if (is TextChange change) {
-            change.apply(project);
-        } else if (is IdeaTextChange change) {
+        if (is IdeaTextChange change) {
             change.applyOnProject(project);
         }
         if (exists selection) {
@@ -199,7 +198,7 @@ shared class IdeaQuickFixData(
     problemOffset => annotation?.startOffset else 0;
     problemLength => (annotation?.endOffset else 0) - problemOffset;
     
-    shared void registerFix(String desc, <TextChange|PlatformTextChange>? change, TextRange? selection = null, Icon? image = null,
+    shared default void registerFix(String desc, PlatformTextChange? change, TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
         
         assert (exists annotation);
@@ -346,4 +345,58 @@ shared class IdeaQuickFixData(
         String missingSatisfiedTypeText, PlatformTextChange change, DefaultRegion? selection)
             => registerFix(description, change, toRange(selection), ideaIcons.addCorrection);
 
+    shared actual void addDeclareLocalProposal(String description, 
+        PlatformTextChange change, Tree.Term term, Tree.BaseMemberExpression bme) {
+        
+        value callback = void (Project project, Editor editor, PsiFile psiFile) {
+            ideaDeclareLocalQuickFix.enableLinkedMode(this, term, nativeDoc, ideaCompletionManager);
+        };
+        
+        registerFix { 
+            desc = description; 
+            change = change; 
+            callback = callback; 
+            image = ideaIcons.correction; 
+        };
+    }
+    
+    shared actual void addRefineEqualsHashProposal(String description, PlatformTextChange change) {
+        registerFix(description, null, null, ideaIcons.refinement, false, 
+            void (Project project, Editor editor, PsiFile psiFile) {
+                assert(is CeylonFile psiFile);
+                
+                if (exists change = refineFormalMembersQuickFix.refineFormalMembers(this, editor.caretModel.offset)) {
+                    change.apply();
+                }
+            }
+        );
+    }
+    
+    shared actual default void addRefineFormalMembersProposal(String description) {
+        registerFix { 
+            desc = description; 
+            change = null; 
+            callback = (p, e, f) {
+                refineFormalMembersQuickFix.refineFormalMembers(this, e.selectionModel.selectionStart); 
+            };
+            image = ideaIcons.correction; 
+        };        
+    }
+    
+    shared actual default void addSpecifyTypeProposal(String description, 
+        Tree.Type type, Tree.CompilationUnit cu, Type infType) {
+        
+        if (exists ann = annotation) {
+            registerFix {
+                desc = description;
+                change = null;
+                image = ideaIcons.correction;
+                callback = (project, editor, file) {
+                    ideaSpecifyTypeQuickFix.specifyType(document, type, true, cu, infType);
+                };
+            };
+        } else {
+            ideaSpecifyTypeQuickFix.specifyType(document, type, true, cu, infType);
+        }
+    }
 }

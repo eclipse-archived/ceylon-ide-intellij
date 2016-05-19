@@ -1,26 +1,15 @@
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
-import com.intellij.openapi.editor {
-    Document
-}
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.redhat.ceylon.ide.common.correct {
-    RefineEqualsHashQuickFix
+    refineEqualsHashQuickFix
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
-shared class RefineEqualsHashIntention() 
-        extends GenericIntention()
-        satisfies RefineEqualsHashQuickFix<CeylonFile,Document,InsertEdit,TextEdit,TextChange,TextRange,IdeaQuickFixData,LookupElement> {
+shared class RefineEqualsHashIntention() extends AbstractIntention() {
     
     familyName => "Refine equals() and/or hash";
     
     checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset)
-            => addRefineEqualsHashProposal(data, file, offset);
+            => refineEqualsHashQuickFix.addRefineEqualsHashProposal(data, offset);
 }

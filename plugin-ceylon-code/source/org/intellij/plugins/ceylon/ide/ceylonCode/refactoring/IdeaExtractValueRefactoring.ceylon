@@ -1,6 +1,3 @@
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
 import com.intellij.openapi.application {
     Result
 }
@@ -38,11 +35,17 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 import com.redhat.ceylon.ide.common.refactoring {
     ExtractValueRefactoring
 }
+import com.redhat.ceylon.ide.common.util {
+    nodes
+}
 import com.redhat.ceylon.model.typechecker.model {
     Type,
     Declaration
 }
 
+import java.lang {
+    JString=String
+}
 import java.util {
     List,
     ArrayList
@@ -52,12 +55,8 @@ import org.antlr.runtime {
     CommonToken
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    IdeaDocumentChanges,
-    InsertEdit,
-    TextEdit,
-    TextChange,
-    IdeaImportProposals,
-    ideaImportProposals
+    IdeaTextChange,
+    DocumentWrapper
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
@@ -65,12 +64,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     VirtualFileVirtualFile
-}
-import java.lang {
-    JString=String
-}
-import com.redhat.ceylon.ide.common.util {
-    nodes
 }
 
 shared class ExtractValueHandler() extends AbstractExtractHandler() {
@@ -89,8 +82,7 @@ shared class ExtractValueHandler() extends AbstractExtractHandler() {
 }
 
 class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node)
-        satisfies ExtractValueRefactoring<CeylonFile,LookupElement,Document,InsertEdit,TextEdit,TextChange,TextRange>
-                & IdeaDocumentChanges {
+        satisfies ExtractValueRefactoring<TextRange> {
 
     editorPhasedUnit => file.phasedUnit;
 
@@ -121,10 +113,8 @@ class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node
 
     shared actual TextRange newRegion(Integer start, Integer length) => TextRange.from(start, length);
 
-    shared actual IdeaImportProposals importProposals => ideaImportProposals;
-
     shared TextRange? extractInFile(Project myProject, PsiFile file) {
-        TextChange tfc = TextChange(document);
+        value tfc = IdeaTextChange(DocumentWrapper(document));
         build(tfc);
 
         return object extends WriteCommandAction<TextRange?>(myProject, file) {

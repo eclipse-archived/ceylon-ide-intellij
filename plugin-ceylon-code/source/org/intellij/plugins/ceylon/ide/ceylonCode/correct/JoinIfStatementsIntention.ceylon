@@ -9,7 +9,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
-shared class JoinIfStatementsIntention() extends GenericIntention() {
+shared class JoinIfStatementsIntention() extends AbstractIntention() {
     
     familyName => "Join if statements";
     
