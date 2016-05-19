@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
@@ -22,9 +25,7 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
@@ -40,7 +41,7 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = DocumentWrapper(data.document);
+                value platformDoc = IdeaDocument(data.document);
                 if (exists node) {
                     value start = offset;
                     value nodeText = platformDoc.getText(node.startIndex.intValue(), node.distance.intValue());

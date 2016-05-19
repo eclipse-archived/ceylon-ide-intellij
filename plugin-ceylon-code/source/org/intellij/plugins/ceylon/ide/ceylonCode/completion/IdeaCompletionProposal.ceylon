@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import ceylon.interop.java {
     javaString
 }
@@ -24,19 +27,17 @@ import javax.swing {
     Icon
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper
-}
+
 
 shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
     
     shared actual void replaceInDoc(CommonDocument doc, Integer start, Integer length, String newText) {
-        assert(is DocumentWrapper doc);
-        doc.doc.replaceString(start, start + length, javaString(newText));
+        assert(is IdeaDocument doc);
+        doc.nativeDocument.replaceString(start, start + length, javaString(newText));
     }
     
     shared void adjustSelection(CompletionData data) {
-        value selection = getSelectionInternal(DocumentWrapper(data.document));
+        value selection = getSelectionInternal(IdeaDocument(data.document));
         data.editor.selectionModel.setSelection(selection.start, selection.end);
         data.editor.caretModel.moveToOffset(selection.end);
     }

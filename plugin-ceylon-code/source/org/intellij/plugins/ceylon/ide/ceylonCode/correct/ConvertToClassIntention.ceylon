@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
@@ -41,7 +44,7 @@ class ConvertToClassProposal(Project project)
                 & IdeaLinkedModeSupport {
 
     shared actual Document getNativeDocument(CommonDocument doc) {
-        assert(is DocumentWrapper doc);
-        return doc.doc;
+        assert(is IdeaDocument doc);
+        return doc.nativeDocument;
     }
 }

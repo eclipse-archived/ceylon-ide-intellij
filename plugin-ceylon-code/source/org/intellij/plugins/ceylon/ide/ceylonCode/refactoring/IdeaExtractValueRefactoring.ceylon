@@ -1,3 +1,7 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument,
+    IdeaTextChange
+}
 import com.intellij.openapi.application {
     Result
 }
@@ -54,10 +58,7 @@ import java.util {
 import org.antlr.runtime {
     CommonToken
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    IdeaTextChange,
-    DocumentWrapper
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsi
@@ -114,7 +115,7 @@ class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node
     shared actual TextRange newRegion(Integer start, Integer length) => TextRange.from(start, length);
 
     shared TextRange? extractInFile(Project myProject, PsiFile file) {
-        value tfc = IdeaTextChange(DocumentWrapper(document));
+        value tfc = IdeaTextChange(IdeaDocument(document));
         build(tfc);
 
         return object extends WriteCommandAction<TextRange?>(myProject, file) {

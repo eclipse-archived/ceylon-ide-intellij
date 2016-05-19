@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import com.intellij.codeInsight.completion {
     InsertionContext,
     InsertHandler
@@ -26,9 +29,7 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
@@ -46,7 +47,7 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = DocumentWrapper(data.document);
+                value platformDoc = IdeaDocument(data.document);
                 replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
                 
                 applyInternal(platformDoc);
@@ -83,7 +84,7 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
                 //    data.lastPhasedUnit.\ipackage.\imodule,
                 //    version.\imodule,
                 //    version.version);
-                value platformDoc = DocumentWrapper(data.document);
+                value platformDoc = IdeaDocument(data.document);
                 value selection = getSelectionInternal(platformDoc);
                 ctx.editor.selectionModel.setSelection(selection.start, selection.end);
                 ctx.editor.caretModel.moveToOffset(selection.end); 

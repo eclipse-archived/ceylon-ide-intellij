@@ -26,8 +26,8 @@ import java.lang {
     JString=String
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper,
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument,
     IdeaTextChange,
     IdeaCompositeChange
 }
@@ -43,7 +43,7 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
         assert(is CeylonPsi.TermPsi val);
 
         value refacto = createExtractFunctionRefactoring(
-            DocumentWrapper(editor.document),
+            IdeaDocument(editor.document),
             val.textRange.startOffset,
             val.textRange.endOffset,
             file.compilationUnit,

@@ -118,16 +118,16 @@ import javax.swing {
     JCheckBox
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper,
-    IdeaCompositeChange
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonFileType
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
     IdeaCeylonProjects
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument,
+    IdeaCompositeChange
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
@@ -202,7 +202,7 @@ class IdeaChangeParameterRefactoring(
     editor.selectionModel.selectionStart,
     editor.selectionModel.selectionEnd,
     file.tokens,
-    DocumentWrapper(editor.document),
+    IdeaDocument(editor.document),
     file.phasedUnit,
     CeylonIterable(project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>())
 ) {

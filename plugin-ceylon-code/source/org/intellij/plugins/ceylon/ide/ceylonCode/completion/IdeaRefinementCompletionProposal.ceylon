@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
@@ -29,9 +32,7 @@ import com.redhat.ceylon.model.typechecker.model {
     Scope
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
@@ -48,7 +49,7 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = DocumentWrapper(data.document);
+                value platformDoc = IdeaDocument(data.document);
                 replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
                 PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);
                 

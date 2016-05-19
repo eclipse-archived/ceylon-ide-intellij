@@ -1,63 +1,36 @@
-import ceylon.collection {
-    ArrayList
-}
-import ceylon.interop.java {
-    javaString
-}
-
-import com.intellij.openapi.editor {
-    Document
-}
-import com.intellij.openapi.fileEditor {
-    FileDocumentManager
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
 }
 import com.intellij.openapi.project {
     Project
 }
-import com.intellij.openapi.util {
-    TextRange
+import ceylon.interop.java {
+    javaString
+}
+import com.intellij.openapi.editor {
+    Document
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
     VirtualFileManager
 }
-import com.intellij.psi {
-    PsiDocumentManager
-}
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
-}
 import com.redhat.ceylon.ide.common.platform {
-    PlatformTextChange=TextChange,
+    CommonDocument,
     PlatformTextEdit=TextEdit,
-    DefaultCompositeChange,
-    CommonDocument
+    PlatformTextChange=TextChange,
+    DefaultCompositeChange
 }
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-
-
-shared class DocumentWrapper(shared Document doc) satisfies CommonDocument {
-    getLineOfOffset(Integer offset) => doc.getLineNumber(offset);
-
-    getLineContent(Integer line)
-            => doc.getText(TextRange(doc.getLineStartOffset(line), doc.getLineEndOffset(line)));
-
-    getLineEndOffset(Integer line) => doc.getLineEndOffset(line);
-
-    getLineStartOffset(Integer line) => doc.getLineStartOffset(line);
-
-    getText(Integer offset, Integer length) => doc.getText(TextRange.from(offset, length));
-
-    defaultLineDelimiter => "\n";
-
-    indentSpaces => 4;
-
-    indentWithSpaces => true;
-
-    size => doc.textLength;
+import com.intellij.psi {
+    PsiDocumentManager
+}
+import ceylon.collection {
+    ArrayList
+}
+import com.intellij.openapi.fileEditor {
+    FileDocumentManager
 }
 
 shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfies PlatformTextChange {
@@ -66,8 +39,8 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
 
     shared Document doc;
     if (is CommonDocument input) {
-        assert (is DocumentWrapper input);
-        doc = input.doc;
+        assert (is IdeaDocument input);
+        doc = input.nativeDocument;
     } else {
         VirtualFile? vfile = if (is PhasedUnit input)
         then VirtualFileManager.instance.findFileByUrl("file://" + input.unit.fullPath)
@@ -80,7 +53,7 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
 
     addEdit(PlatformTextEdit edit) => edits.add(edit);
 
-    shared actual CommonDocument document = DocumentWrapper(doc);
+    shared actual CommonDocument document = IdeaDocument(doc);
 
     hasEdits => !edits.empty;
 
@@ -107,7 +80,7 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
 }
 
 shared class IdeaCompositeChange() extends DefaultCompositeChange("") {
-
+    
     shared void applyChanges(Project myProject)
             => changes.narrow<IdeaTextChange>().each((_) => _.applyOnProject(myProject));
 }

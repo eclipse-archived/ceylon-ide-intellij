@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
@@ -32,8 +35,8 @@ shared interface IdeaSpecifyTypeQuickFix
     completionManager => ideaCompletionManager;
     
     shared actual Document getNativeDocument(CommonDocument doc) {
-        assert(is DocumentWrapper doc);
-        return doc.doc;
+        assert(is IdeaDocument doc);
+        return doc.nativeDocument;
     }
 }
 

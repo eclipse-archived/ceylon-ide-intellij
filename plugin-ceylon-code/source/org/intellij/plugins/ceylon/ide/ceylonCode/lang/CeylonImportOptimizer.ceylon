@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import com.intellij.lang {
     ImportOptimizer
 }
@@ -15,9 +18,7 @@ import java.lang {
     Runnable
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
@@ -33,7 +34,7 @@ shared class CeylonImportOptimizer()
         
         return object satisfies Runnable {
             shared actual void run() {
-                cleanImports(cu, DocumentWrapper(doc));
+                cleanImports(cu, IdeaDocument(doc));
             }
         };
     }

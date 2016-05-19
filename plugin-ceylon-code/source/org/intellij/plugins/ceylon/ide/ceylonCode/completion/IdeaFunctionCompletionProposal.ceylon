@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
@@ -24,9 +27,7 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
@@ -44,7 +45,7 @@ class IdeaFunctionCompletionProposal
             // Undo IntelliJ's completion
             value startOfTextToErase = offset;
             value lengthBeforeCaret = data.editor.caretModel.offset - startOfTextToErase; 
-            value platformDoc = DocumentWrapper(data.document);
+            value platformDoc = IdeaDocument(data.document);
             replaceInDoc(platformDoc, startOfTextToErase, lengthBeforeCaret, "");
             
             PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);

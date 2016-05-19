@@ -1,3 +1,7 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument,
+    IdeaTextChange
+}
 import ceylon.interop.java {
     javaClass
 }
@@ -126,7 +130,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
                     shared actual void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {
                         makeAvailable(description, null, null, (p, e, f) {
-                                value document = DocumentWrapper(f.viewProvider.document);
+                                value document = IdeaDocument(f.viewProvider.document);
                                 ConvertToClassProposal(p).applyChanges(document, declaration);
                         });
                     }

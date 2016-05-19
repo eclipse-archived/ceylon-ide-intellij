@@ -23,10 +23,10 @@ import com.sun.jdi.ReferenceType;
 import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequest;
 import com.sun.jdi.request.EventRequestManager;
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct.DocumentWrapper;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaModule;
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform.IdeaDocument;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
@@ -140,7 +140,7 @@ class CeylonPositionManager implements PositionManager {
 
         CeylonFile file = (CeylonFile) position.getFile();
         Entry<? extends Integer, ? extends Node> location = getFirstValidLocation(file.getCompilationUnit(),
-                new DocumentWrapper(file.getViewProvider().getDocument()), position.getLine() + 1);
+                new IdeaDocument(file.getViewProvider().getDocument()), position.getLine() + 1);
 
         if (location != null) {
             EventRequestManager rm = ((RequestManagerImpl) process.getRequestsManager()).getVMRequestManager();

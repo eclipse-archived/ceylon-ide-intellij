@@ -1,3 +1,7 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument,
+    IdeaTextChange
+}
 import ceylon.interop.java {
     JavaRunnable
 }
@@ -208,7 +212,7 @@ shared class IdeaQuickFixData(
         annotation.registerFix(intention);
     }
 
-    document = DocumentWrapper(nativeDoc);
+    document = IdeaDocument(nativeDoc);
 
     value candidateModules = ArrayList<[Unit, String, String, String]>();
 

@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaTextChange
+}
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext

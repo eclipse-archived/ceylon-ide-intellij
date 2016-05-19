@@ -15,10 +15,6 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    IdeaTextChange,
-    IdeaCompositeChange
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIndents
 }

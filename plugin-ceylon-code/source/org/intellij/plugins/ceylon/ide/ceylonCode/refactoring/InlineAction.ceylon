@@ -51,12 +51,12 @@ import java.util {
 import org.antlr.runtime {
     CommonToken
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper,
-    IdeaCompositeChange
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonLanguage
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument,
+    IdeaCompositeChange
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
@@ -118,7 +118,7 @@ class IdeaInlineRefactoring(CeylonFile file, Node node, Declaration decl, Editor
         
         shared actual variable Boolean delete = true;
         
-        shared actual CommonDocument doc = DocumentWrapper(editor.document);
+        shared actual CommonDocument doc = IdeaDocument(editor.document);
         
         shared actual variable Boolean justOne = false;
         

@@ -1,3 +1,6 @@
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import com.intellij.codeInsight.editorActions.smartEnter {
     SmartEnterProcessor
 }
@@ -33,17 +36,15 @@ import org.antlr.runtime {
     ANTLRStringStream,
     CommonTokenStream
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    DocumentWrapper
-}
+
 
 shared class TerminateStatementAction() extends SmartEnterProcessor() {
 
     shared actual Boolean process(Project? project, Editor editor, PsiFile? psiFile) {
         value line = editor.document.getLineNumber(editor.caretModel.offset);
-        value handler = object extends AbstractTerminateStatementAction<DocumentWrapper>() {
-            shared actual [Tree.CompilationUnit, List<CommonToken>] parse(DocumentWrapper doc) {
-                value stream = ANTLRStringStream(doc.doc.text);
+        value handler = object extends AbstractTerminateStatementAction<IdeaDocument>() {
+            shared actual [Tree.CompilationUnit, List<CommonToken>] parse(IdeaDocument doc) {
+                value stream = ANTLRStringStream(doc.nativeDocument.text);
                 value lexer = CeylonLexer(stream);
                 value tokenStream = CommonTokenStream(lexer);
                 value parser = CeylonParser(tokenStream);
@@ -54,7 +55,7 @@ shared class TerminateStatementAction() extends SmartEnterProcessor() {
             }
         };
 
-        if (exists reg = handler.terminateStatement(DocumentWrapper(editor.document), line)) {
+        if (exists reg = handler.terminateStatement(IdeaDocument(editor.document), line)) {
             editor.caretModel.moveToOffset(reg.start);
         }
         
