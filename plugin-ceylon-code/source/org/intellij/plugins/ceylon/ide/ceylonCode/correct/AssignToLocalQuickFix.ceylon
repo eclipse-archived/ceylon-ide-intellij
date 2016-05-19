@@ -1,6 +1,3 @@
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    IdeaTextChange
-}
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
@@ -17,7 +14,6 @@ import com.intellij.openapi.project {
     Project
 }
 import com.redhat.ceylon.ide.common.correct {
-    AssignToLocalQuickFix,
     AssignToLocalProposal,
     importProposals
 }
@@ -35,27 +31,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
     IdeaLinkedModeSupport,
     IdeaLinkedMode
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaTextChange
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
-}
-
-object ideaAssignToLocalQuickFix
-        satisfies AssignToLocalQuickFix<IdeaQuickFixData> {
-
-    shared actual void newProposal(IdeaQuickFixData data, String desc) {
-        data.registerFix { 
-            desc = desc;
-            change = null;
-            callback = (p, e, f) {
-                if(is CeylonFile f) {
-                    AssignToLocalElement(data, p, e, f).perform();
-                }
-            };
-        };
-    }
 }
 
 class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFile f)

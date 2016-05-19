@@ -43,9 +43,6 @@ import com.redhat.ceylon.ide.common.settings {
 import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
-import com.redhat.ceylon.ide.common.util {
-    Indents
-}
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     Unit,
@@ -72,8 +69,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons,
-    ideaIndents
+    ideaIcons
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
 }
 
 shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Editor editor,
@@ -85,6 +84,7 @@ shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Edit
     shared actual Document document => editor.document;
     shared actual JList<CommonToken>? tokens => lastPhasedUnit.tokens;
     shared actual BaseCeylonProject? ceylonProject => null;// TODO
+    shared actual IdeaDocument commonDocument = IdeaDocument(document);
 }
 
 shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,LookupElement,Document>() {
@@ -115,8 +115,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     }
     
     shared actual List<Pattern> proposalFilters => empty;
-    shared actual Indents<Document> indents => ideaIndents;
-    
+
     shared actual LookupElement newParametersCompletionProposal(Integer offset,
         String prefix, String desc, String text, JList<Type> argTypes, Node node, Unit unit) {
 

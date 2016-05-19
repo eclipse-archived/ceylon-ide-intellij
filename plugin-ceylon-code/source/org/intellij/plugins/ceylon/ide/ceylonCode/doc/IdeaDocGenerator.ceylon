@@ -91,6 +91,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import com.redhat.ceylon.ide.common.platform {
+    CommonDocument
+}
 
 String psiProtocol = "psi_element://";
 
@@ -111,6 +114,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator<Document> {
         shared actual BaseCeylonProject? ceylonProject => pu.moduleSourceMapper?.ceylonProject;
         shared Project ideaProject => p;
         shared actual CompletionOptions options => nothing;
+        shared actual CommonDocument commonDocument => nothing;
     }
 
     String hexColor(Integer red, Integer green, Integer blue) {

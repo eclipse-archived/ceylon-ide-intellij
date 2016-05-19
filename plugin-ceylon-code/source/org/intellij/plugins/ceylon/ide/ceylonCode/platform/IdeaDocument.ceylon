@@ -1,14 +1,11 @@
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.intellij.openapi.editor {
     Document
 }
+import com.intellij.openapi.util {
+    TextRange
+}
 import com.redhat.ceylon.ide.common.platform {
     CommonDocument
-}
-import com.intellij.psi.codeStyle {
-    CodeStyleSettings
 }
 
 shared class IdeaDocument(shared Document nativeDocument) satisfies CommonDocument {
@@ -26,11 +23,6 @@ shared class IdeaDocument(shared Document nativeDocument) satisfies CommonDocume
             => nativeDocument.getText(TextRange.from(offset, length));
 
     defaultLineDelimiter => "\n";
-
-    // TODO take the settings from the current project
-    indentSpaces => CodeStyleSettings().indentOptions.indentSize;
-
-    indentWithSpaces => true;
 
     size => nativeDocument.textLength;
 }

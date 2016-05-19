@@ -8,15 +8,13 @@ import com.redhat.ceylon.ide.common.platform {
     CommonDocument
 }
 import com.redhat.ceylon.ide.common.util {
-    unsafeCast,
-    Indents
+    unsafeCast
 }
 import com.redhat.ceylon.model.typechecker.model {
     Unit
 }
-
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIndents
+import com.intellij.psi.codeStyle {
+    CodeStyleSettings
 }
 
 shared object ideaPlatformServices satisfies PlatformServices {
@@ -30,9 +28,6 @@ shared object ideaPlatformServices satisfies PlatformServices {
     shared actual VfsServices<NativeProject,NativeResource,NativeFolder,NativeFile> vfs<NativeProject, NativeResource, NativeFolder, NativeFile>()
             => unsafeCast<VfsServices<NativeProject,NativeResource,NativeFolder,NativeFile>>(ideaVfsServices);
 
-    shared actual Indents<IDocument> indents<IDocument>()
-            => unsafeCast<Indents<IDocument>>(ideaIndents);
-
     createTextChange(String desc, CommonDocument|PhasedUnit input) => IdeaTextChange(input);
 
     createCompositeChange(String desc) => IdeaCompositeChange();
@@ -40,5 +35,9 @@ shared object ideaPlatformServices satisfies PlatformServices {
     shared actual void gotoLocation(Unit unit, Integer offset, Integer length) {
         // TODO
     }
-
+    
+    // TODO take the settings from the current project
+    indentSpaces => CodeStyleSettings().indentOptions.indentSize;
+    
+    indentWithSpaces => true;
 }

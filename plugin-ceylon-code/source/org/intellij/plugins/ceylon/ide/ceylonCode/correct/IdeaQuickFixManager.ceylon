@@ -1,7 +1,3 @@
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    IdeaDocument,
-    IdeaTextChange
-}
 import ceylon.interop.java {
     JavaRunnable
 }
@@ -94,7 +90,6 @@ import java.lang {
     Comparable
 }
 import java.util {
-    Collection,
     ArrayList
 }
 
@@ -111,11 +106,15 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlightProposal
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument,
+    IdeaTextChange
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    ideaIcons
 }
 
 shared object ideaQuickFixManager
@@ -123,21 +122,6 @@ shared object ideaQuickFixManager
     
     declareLocalQuickFix => ideaDeclareLocalQuickFix;
     specifyTypeQuickFix => ideaSpecifyTypeQuickFix;
-    assignToLocalQuickFix => ideaAssignToLocalQuickFix;
-    
-    shared actual void addImportProposals(Collection<LookupElement> proposals, QuickFixData data) {
-        assert(is IdeaQuickFixData data);
-        for (proposal in proposals) {
-            assert (is PlatformTextChange change = proposal.\iobject);
-            data.registerFix(proposal.lookupString, change, null, ideaIcons.singleImport, true);
-        }
-    }
-    
-    shared actual void addCreateTypeParameterProposal<Data>(Data data,
-        Tree.BaseType bt, String brokenName)
-            given Data satisfies QuickFixData {
-        // TODO
-    }
 }
 
 class CustomIntention(Integer position, String desc, PlatformTextChange? change, TextRange? selection = null, Icon? image = null,
@@ -201,6 +185,9 @@ shared class IdeaQuickFixData(
     errorCode => message.code;
     problemOffset => annotation?.startOffset else 0;
     problemLength => (annotation?.endOffset else 0) - problemOffset;
+    editorSelection => if (exists e = editor)
+                       then DefaultRegion(e.selectionModel.selectionStart, e.selectionModel.selectionEnd)
+                       else DefaultRegion(0);
     
     shared default void registerFix(String desc, PlatformTextChange? change, TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
@@ -403,4 +390,17 @@ shared class IdeaQuickFixData(
             ideaSpecifyTypeQuickFix.specifyType(document, type, true, cu, infType);
         }
     }
+    
+    shared actual void addAssignToLocalProposal(String description) {
+        registerFix { 
+            desc = description;
+            change = null;
+            callback = (p, e, f) {
+                if(is CeylonFile f) {
+                    AssignToLocalElement(this, p, e, f).perform();
+                }
+            };
+        };
+    }
+    
 }
