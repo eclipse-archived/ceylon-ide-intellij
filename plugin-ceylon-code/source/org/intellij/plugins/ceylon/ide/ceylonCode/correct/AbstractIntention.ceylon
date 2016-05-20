@@ -57,7 +57,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import com.redhat.ceylon.ide.common.correct {
     refineFormalMembersQuickFix,
-    specifyTypeQuickFix
+    specifyTypeQuickFix,
+    QuickFixKind
 }
 import javax.swing {
     Icon
@@ -114,7 +115,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     _editor
                 ) {
                     shared actual void addQuickFix(String desc, PlatformTextChange|Anything() change,
-                        DefaultRegion? selection, Boolean ignored, Icons? icon) {
+                        DefaultRegion? selection, Boolean ignored, Icons? icon, QuickFixKind kind) {
                         if (is IdeaTextChange change) {
                             makeAvailable(desc, change, selection);
                         }

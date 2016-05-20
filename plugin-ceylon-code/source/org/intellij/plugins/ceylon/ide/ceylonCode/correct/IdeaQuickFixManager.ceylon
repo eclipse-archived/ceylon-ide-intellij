@@ -61,7 +61,8 @@ import com.redhat.ceylon.ide.common.correct {
     addModuleImportQuickFix,
     refineFormalMembersQuickFix,
     declareLocalQuickFix,
-    specifyTypeQuickFix
+    specifyTypeQuickFix,
+    QuickFixKind
 }
 import com.redhat.ceylon.ide.common.doc {
     Icons
@@ -221,7 +222,8 @@ shared class IdeaQuickFixData(
 
     shared actual default void addQuickFix(String desc,
         PlatformTextChange|Anything() change,
-        DefaultRegion? selection, Boolean qualifiedNameIsPath, Icons? icon) {
+        DefaultRegion? selection, Boolean qualifiedNameIsPath, Icons? icon,
+        QuickFixKind kind) {
         value range = toRange(selection);
 
         if (is IdeaTextChange change) {
@@ -276,14 +278,6 @@ shared class IdeaQuickFixData(
                 );
             }
             registerFix(description, change, range, ideaIcons.correction, false, callback);
-        }
-    }
-    shared actual void addParameterListQuickFix(String description, PlatformTextChange change,
-        DefaultRegion selection) {
-
-        if (is IdeaTextChange change) {
-            value range = toRange(selection);
-            registerFix(description, change, range, ideaIcons.correction);
         }
     }
 
