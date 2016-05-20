@@ -1,3 +1,6 @@
+import com.intellij.psi.codeStyle {
+    CodeStyleSettings
+}
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
@@ -5,16 +8,14 @@ import com.redhat.ceylon.ide.common.platform {
     ModelServices,
     PlatformServices,
     VfsServices,
-    CommonDocument
+    CommonDocument,
+    NoopLinkedMode
 }
 import com.redhat.ceylon.ide.common.util {
     unsafeCast
 }
 import com.redhat.ceylon.model.typechecker.model {
     Unit
-}
-import com.intellij.psi.codeStyle {
-    CodeStyleSettings
 }
 
 shared object ideaPlatformServices satisfies PlatformServices {
@@ -40,4 +41,9 @@ shared object ideaPlatformServices satisfies PlatformServices {
     indentSpaces => CodeStyleSettings().indentOptions.indentSize;
     
     indentWithSpaces => true;
+
+    createLinkedMode(CommonDocument document)
+            => if (is IdeaDocument document)
+               then IdeaLinkedMode(document)
+               else NoopLinkedMode(document);
 }

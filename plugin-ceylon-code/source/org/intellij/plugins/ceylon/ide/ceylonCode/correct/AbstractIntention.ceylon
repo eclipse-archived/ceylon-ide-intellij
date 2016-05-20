@@ -56,10 +56,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import com.redhat.ceylon.ide.common.correct {
-    refineFormalMembersQuickFix
+    refineFormalMembersQuickFix,
+    specifyTypeQuickFix
 }
 import javax.swing {
     Icon
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
+    ideaCompletionManager
 }
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
@@ -137,7 +141,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     
                     shared actual void addSpecifyTypeProposal(String description, Tree.Type type, Tree.CompilationUnit cu, Type infType) {
                         makeAvailable(description, null, null, (project, editor, file) {
-                                ideaSpecifyTypeQuickFix.specifyType(document, type, true, cu, infType);
+                                specifyTypeQuickFix.specifyType(document, type, true, cu, infType,
+                                    nativeDoc, ideaCompletionManager);
                             }
                         );
                     }

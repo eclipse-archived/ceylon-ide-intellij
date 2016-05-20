@@ -45,14 +45,16 @@ import org.antlr.runtime {
     CommonToken
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    IdeaQuickFixData,
-    ideaQuickFixManager
+    IdeaQuickFixData
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
+}
+import com.redhat.ceylon.ide.common.correct {
+    ideQuickFixManager
 }
 
 
@@ -148,7 +150,7 @@ shared class ErrorsVisitor(AnnotationHolder annotationHolder, CeylonFile file) e
                 pu, node, mod, annotation, project);
 
             try {
-                ideaQuickFixManager.addQuickFixes(data, tc);
+                ideQuickFixManager.addQuickFixes(data, tc);
             } catch (Exception|AssertionError e) {
                 e.printStackTrace();
             }

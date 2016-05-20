@@ -8,9 +8,6 @@ import com.intellij.codeInsight.intention {
 import com.intellij.codeInsight.intention.impl {
     BaseIntentionAction
 }
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
 import com.intellij.lang.annotation {
     Annotation
 }
@@ -59,11 +56,12 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
 import com.redhat.ceylon.ide.common.correct {
-    IdeQuickFixManager,
     QuickFixData,
     exportModuleImportQuickFix,
     addModuleImportQuickFix,
-    refineFormalMembersQuickFix
+    refineFormalMembersQuickFix,
+    declareLocalQuickFix,
+    specifyTypeQuickFix
 }
 import com.redhat.ceylon.ide.common.doc {
     Icons
@@ -100,7 +98,6 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaLinkedMode,
     ideaCompletionManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
@@ -115,13 +112,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
-}
-
-shared object ideaQuickFixManager
-        extends IdeQuickFixManager<Document,LookupElement,IdeaLinkedMode,IdeaQuickFixData>() {
-    
-    declareLocalQuickFix => ideaDeclareLocalQuickFix;
-    specifyTypeQuickFix => ideaSpecifyTypeQuickFix;
 }
 
 class CustomIntention(Integer position, String desc, PlatformTextChange? change, TextRange? selection = null, Icon? image = null,
@@ -340,7 +330,7 @@ shared class IdeaQuickFixData(
         PlatformTextChange change, Tree.Term term, Tree.BaseMemberExpression bme) {
         
         value callback = void (Project project, Editor editor, PsiFile psiFile) {
-            ideaDeclareLocalQuickFix.enableLinkedMode(this, term, nativeDoc, ideaCompletionManager);
+            declareLocalQuickFix.enableLinkedMode(this, term, nativeDoc, ideaCompletionManager);
         };
         
         registerFix { 
@@ -383,11 +373,13 @@ shared class IdeaQuickFixData(
                 change = null;
                 image = ideaIcons.correction;
                 callback = (project, editor, file) {
-                    ideaSpecifyTypeQuickFix.specifyType(document, type, true, cu, infType);
+                    specifyTypeQuickFix.specifyType(document, type, true, cu, infType,
+                        nativeDoc, ideaCompletionManager);
                 };
             };
         } else {
-            ideaSpecifyTypeQuickFix.specifyType(document, type, true, cu, infType);
+            specifyTypeQuickFix.specifyType(document, type, true, cu, infType,
+                nativeDoc, ideaCompletionManager);
         }
     }
     
