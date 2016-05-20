@@ -283,6 +283,14 @@
             <category>Ceylon/Syntax</category>
         </intentionAction>
         <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertToNamedArgumentsIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertToPositionalArgumentsIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AssignToFieldIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>
