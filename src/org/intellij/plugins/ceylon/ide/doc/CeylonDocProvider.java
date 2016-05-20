@@ -24,12 +24,12 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.correct.specifyTypeQuickFix_;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct.ideaSpecifyTypeQuickFix_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeyLightClass;
@@ -155,7 +155,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                     protected void run(@NotNull Result result) throws Throwable {
                         Document doc = context.getContainingFile().getViewProvider().getDocument();
                         IdeaQuickFixData data = new IdeaQuickFixData(null, doc, cu, pu, node, null, null, null);
-                        ideaSpecifyTypeQuickFix_.get_().createProposal((Tree.Type) node, data);
+                        specifyTypeQuickFix_.get_().createProposal((Tree.Type) node, data);
                     }
                 }.execute();
                 return context; // whatever value, we just want to avoid other providers being called
