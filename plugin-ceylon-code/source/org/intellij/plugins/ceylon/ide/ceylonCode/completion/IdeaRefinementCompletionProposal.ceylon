@@ -11,9 +11,6 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.command {
     WriteCommandAction
 }
-import com.intellij.openapi.editor {
-    Document
-}
 import com.intellij.psi {
     PsiDocumentManager
 }
@@ -38,8 +35,7 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType)
         extends RefinementCompletionProposal<LookupElement>
         (offset, prefix, pr, desc, text, data, dec, scope, fullType, explicitReturnType) 
-        satisfies IdeaCompletionProposal
-                & IdeaLinkedModeSupport {
+        satisfies IdeaCompletionProposal {
 
     shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.forDeclaration(dec),
         object satisfies InsertHandler<LookupElement> {
@@ -62,10 +58,6 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
             }
         }
     );
-
-    shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber, Integer exitPosition) {
-        lm.buildTemplate(data.editor);
-    }
     
     shared actual LookupElement newNestedCompletionProposal(Declaration dec, Integer loc) {
         value unit = data.lastCompilationUnit.unit;

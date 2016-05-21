@@ -6,9 +6,6 @@ import com.intellij.codeInsight.lookup {
     LookupElement,
     LookupElementBuilder
 }
-import com.intellij.openapi.editor {
-    Document
-}
 import com.intellij.psi {
     PsiDocumentManager
 }
@@ -22,7 +19,6 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration
 }
 
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
@@ -31,8 +27,7 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
     String text, Declaration declaration, CompletionData data, Node? node)
         extends ControlStructureProposal<LookupElement>
         (offset, prefix, desc, text, node, declaration, data)
-        satisfies IdeaCompletionProposal
-                & IdeaLinkedModeSupport {
+        satisfies IdeaCompletionProposal {
 
     shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.correction,
         object satisfies InsertHandler<LookupElement> {
@@ -54,12 +49,6 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         }
     , null, [declaration, text]);
         
-    shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber,
-        Integer exitPosition) {
-        
-        // TODO go to exitPosition once we exit linked mode
-        lm.buildTemplate(data.editor);
-    }
     
     shared actual LookupElement newNameCompletion(String? name)
             => LookupElementBuilder.create(name);

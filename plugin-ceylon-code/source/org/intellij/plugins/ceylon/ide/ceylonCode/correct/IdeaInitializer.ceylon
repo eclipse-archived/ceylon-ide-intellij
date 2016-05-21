@@ -2,9 +2,6 @@ import com.intellij.codeInsight.lookup {
     LookupElement,
     LookupElementBuilder
 }
-import com.intellij.openapi.editor {
-    Document
-}
 import com.redhat.ceylon.ide.common.completion {
     getProposedName,
     appendPositionalArgs
@@ -17,17 +14,12 @@ import com.redhat.ceylon.model.typechecker.model {
     Functional
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaLinkedMode,
-    IdeaLinkedModeSupport
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
 
 class IdeaInitializer()
-        satisfies AbstractInitializerQuickFix<IdeaLinkedMode,Document,LookupElement>
-                & IdeaLinkedModeSupport {
+        satisfies AbstractInitializerQuickFix<LookupElement> {
 
     shared actual LookupElement newNestedCompletionProposal(Declaration dec, 
         Integer offset) => LookupElementBuilder.create(getText(dec, false))

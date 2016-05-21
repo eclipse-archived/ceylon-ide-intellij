@@ -7,7 +7,6 @@ import com.intellij.codeInsight.lookup {
     LookupElementBuilder
 }
 import com.intellij.openapi.editor {
-    Document,
     Editor
 }
 import com.intellij.openapi.project {
@@ -27,12 +26,10 @@ import java.util {
     HashSet
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaLinkedModeSupport,
-    IdeaLinkedMode
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    IdeaTextChange
+    IdeaTextChange,
+    IdeaLinkedMode,
+    IdeaDocument
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
@@ -42,8 +39,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFile f)
-        satisfies AssignToLocalProposal<Document,LookupElement,IdeaLinkedMode>
-                & IdeaLinkedModeSupport {
+        satisfies AssignToLocalProposal<LookupElement> {
     
     shared actual variable Integer currentOffset = e.caretModel.offset;
     
@@ -59,9 +55,11 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
         if (exists change = performInitialChange(data, currentOffset)) {
             change.apply();
         }
-        if (exists lm = addLinkedPositions(e.document, f.phasedUnit.unit)) {
-            installLinkedMode(e.document, lm, this, 0, 0);
-        }
+        assert(is IdeaDocument doc = data.document);
+        value lm = IdeaLinkedMode(doc);
+        addLinkedPositions(lm, f.phasedUnit.unit);
+        // TODO can't we do that in ide-common?
+        lm.install(this, 0, 0);
     }
     
     shared actual LookupElement[] toProposals(<String|Type>[] types, 

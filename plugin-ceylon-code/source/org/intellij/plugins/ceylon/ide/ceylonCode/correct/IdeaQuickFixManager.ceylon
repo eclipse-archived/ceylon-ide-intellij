@@ -256,7 +256,7 @@ shared class IdeaQuickFixData(
         if (is IdeaTextChange change) {
             value range = toRange(selection);
             void callback(Project project, Editor editor, PsiFile file) {
-                IdeaInitializer().addInitializer(editor.document,
+                IdeaInitializer().addInitializer(IdeaDocument(editor.document),
                     selection,
                     type,
                     unit,
@@ -272,7 +272,7 @@ shared class IdeaQuickFixData(
         if (is IdeaTextChange change) {
             value range = toRange(selection);
             void callback(Project project, Editor editor, PsiFile file) {
-                IdeaInitializer().addInitializer(editor.document,
+                IdeaInitializer().addInitializer(IdeaDocument(editor.document),
                     selection,
                     type,
                     unit,

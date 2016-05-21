@@ -5,9 +5,6 @@ import com.intellij.codeInsight.completion {
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
-import com.intellij.openapi.editor {
-    Document
-}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -38,8 +35,7 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         String name, Node node, CompletionData data) 
         extends ModuleProposal<LookupElement>
         (offset, prefix, len, versioned, mod, withBody, version, name, node, data)
-        satisfies IdeaCompletionProposal
-                & IdeaLinkedModeSupport {
+        satisfies IdeaCompletionProposal {
    
     shared LookupElement lookupElement => newLookup(versioned, versioned.spanFrom(len),
        ideaIcons.modules, object satisfies InsertHandler<LookupElement> {
@@ -54,10 +50,6 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
            }
         }
     );
-    
-    shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber, Integer exitPosition) {
-        lm.buildTemplate(data.editor);
-    }
     
     shared actual LookupElement newModuleProposal(ModuleVersionDetails d, DefaultRegion selection, LinkedMode lm)
             => newLookup(d.version, d.version, null, null, TextRange.from(selection.start, selection.length)); // TODO icon

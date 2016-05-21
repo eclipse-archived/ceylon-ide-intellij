@@ -6,9 +6,6 @@ import com.intellij.codeInsight.lookup {
     LookupElement,
     LookupElementBuilder
 }
-import com.intellij.openapi.editor {
-    Document
-}
 import com.redhat.ceylon.cmr.api {
     ModuleVersionDetails,
     ModuleSearchResult
@@ -16,6 +13,9 @@ import com.redhat.ceylon.cmr.api {
 import com.redhat.ceylon.ide.common.completion {
     ImportedModulePackageProposal,
     PackageCompletionProposal
+}
+import com.redhat.ceylon.ide.common.platform {
+    LinkedMode
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
@@ -29,16 +29,12 @@ import com.redhat.ceylon.model.typechecker.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
-import com.redhat.ceylon.ide.common.platform {
-    LinkedMode
-}
 
 class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
                 String fullPackageName, CompletionData data, Package candidate)
         extends ImportedModulePackageProposal<LookupElement>
         (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate, data)
-        satisfies IdeaCompletionProposal
-                & IdeaLinkedModeSupport {
+        satisfies IdeaCompletionProposal {
 
     shared actual variable Boolean toggleOverwrite = false;
     
@@ -59,12 +55,6 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
         return LookupElementBuilder.create(d.name)
             .withIcon(ideaIcons.forDeclaration(d));
     }
-    
-    shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber,
-        Integer exitPosition) {
-        
-        lm.buildTemplate(data.editor);
-    }
 }
 
 class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
@@ -72,8 +62,7 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
     ModuleSearchResult.ModuleDetails md)
         extends PackageCompletionProposal
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
-        satisfies IdeaCompletionProposal
-                & IdeaLinkedModeSupport {
+        satisfies IdeaCompletionProposal {
 
     shared LookupElement lookupElement => newLookup(description, text, ideaIcons.modules,
         object satisfies InsertHandler<LookupElement> {
@@ -89,10 +78,6 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
             }
         }
     );
-
-    shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber, Integer exitPosition) {
-        lm.buildTemplate(data.editor);
-    }
     
     shared actual Boolean toggleOverwrite => false;
 }

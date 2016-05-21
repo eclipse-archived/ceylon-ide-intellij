@@ -60,6 +60,7 @@ shared class IdeaLinkedMode(IdeaDocument document) extends LinkedMode(document) 
         }
     }
 
+    // TODO maybe we should take the editor from QuickFixData?
     shared actual void install(Object owner, Integer exitSeqNumber, Integer exitPosition) {
         value editors = EditorFactory.instance.getEditors(document.nativeDocument);
         if (editors.size > 0) {

@@ -11,9 +11,6 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.command {
     WriteCommandAction
 }
-import com.intellij.openapi.editor {
-    Document
-}
 import com.intellij.psi {
     PsiDocumentManager
 }
@@ -39,8 +36,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     Boolean inherited, Boolean qualified, Declaration? qualifyingValue, CompletionData data)
         extends InvocationCompletionProposal<LookupElement>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
     positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue, ideaCompletionManager)
-        satisfies IdeaCompletionProposal
-                & IdeaLinkedModeSupport {
+        satisfies IdeaCompletionProposal {
     
     shared actual variable Boolean toggleOverwrite = false;
     
@@ -77,12 +73,6 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     , null, [declaration, text])
             .withTailText(greyText, true)
             .withTypeText(returnType);
-    
-    shared actual void installLinkedMode(Document doc, IdeaLinkedMode lm, Object owner, Integer exitSeqNumber,
-        Integer exitPosition) {
-        
-        lm.buildTemplate(data.editor);
-    }
     
     shared actual LookupElement newNestedCompletionProposal(Declaration dec, Declaration? qualifier, Integer loc, Integer index, Boolean basic, String op) {
         value desc = getNestedCompletionText(op, data.lastCompilationUnit.unit, dec, qualifier, basic, true);
