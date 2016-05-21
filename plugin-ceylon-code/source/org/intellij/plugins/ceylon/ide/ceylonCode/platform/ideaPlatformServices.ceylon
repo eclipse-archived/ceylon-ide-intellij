@@ -15,7 +15,14 @@ import com.redhat.ceylon.ide.common.util {
     unsafeCast
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Unit
+    Unit,
+    Type
+}
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
+    ideaCompletionManager
 }
 
 shared object ideaPlatformServices satisfies PlatformServices {
@@ -46,4 +53,15 @@ shared object ideaPlatformServices satisfies PlatformServices {
             => if (is IdeaDocument document)
                then IdeaLinkedMode(document)
                else NoopLinkedMode(document);
+
+    // TODO this method is temporary, until completionManager becomes an object in ide-common!
+    shared actual Anything getTypeProposals(CommonDocument document,
+        Integer offset, Integer length, Type infType,
+        Tree.CompilationUnit rootNode, String? kind) {
+
+        assert(is IdeaDocument document);
+        return ideaCompletionManager.getTypeProposals(document.nativeDocument, offset,
+            length, infType, rootNode, kind);
+    }
+
 }

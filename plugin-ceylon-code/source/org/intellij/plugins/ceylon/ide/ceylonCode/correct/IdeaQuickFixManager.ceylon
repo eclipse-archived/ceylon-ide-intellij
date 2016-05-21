@@ -57,12 +57,10 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.correct {
     QuickFixData,
-    exportModuleImportQuickFix,
-    addModuleImportQuickFix,
-    refineFormalMembersQuickFix,
     declareLocalQuickFix,
-    specifyTypeQuickFix,
-    QuickFixKind
+    asyncModuleImport,
+    QuickFixKind,
+    addModuleImport
 }
 import com.redhat.ceylon.ide.common.doc {
     Icons
@@ -80,9 +78,7 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit,
     Scope,
     Type,
-    Referenceable,
-    Declaration,
-    TypeDeclaration
+    Declaration
 }
 
 import java.lang {
@@ -115,7 +111,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
 
-class CustomIntention(Integer position, String desc, PlatformTextChange? change, TextRange? selection = null, Icon? image = null,
+class CustomIntention(Integer position, String desc, <PlatformTextChange|Anything()>? change, TextRange? selection = null, Icon? image = null,
     Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop)
         extends BaseIntentionAction()
         satisfies Iconable & Comparable<IntentionAction> {
@@ -126,6 +122,8 @@ class CustomIntention(Integer position, String desc, PlatformTextChange? change,
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
         if (is IdeaTextChange change) {
             change.applyOnProject(project);
+        } else if (is Anything() change) {
+            change();
         }
         if (exists selection) {
             editor.selectionModel.setSelection(selection.startOffset, selection.endOffset);
@@ -180,7 +178,7 @@ shared class IdeaQuickFixData(
                        then DefaultRegion(e.selectionModel.selectionStart, e.selectionModel.selectionEnd)
                        else DefaultRegion(0);
     
-    shared default void registerFix(String desc, PlatformTextChange? change, TextRange? selection = null, Icon? image = null,
+    shared default void registerFix(String desc, <PlatformTextChange|Anything()>? change, TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
         
         assert (exists annotation);
@@ -192,22 +190,21 @@ shared class IdeaQuickFixData(
 
     document = IdeaDocument(nativeDoc);
 
-    value candidateModules = ArrayList<[Unit, String, String, String]>();
+    value candidateModules = ArrayList<[String, Icon, Anything()]>();
 
     void showImportModulesPopup(Editor editor) {
         value list = JBList(candidateModules);
-        list.installCellRenderer(object satisfies NotNullFunction<[Unit, String, String, String], JComponent> {
-            fun([Unit, String, String, String] tuple) => JLabel(tuple[1]);
+        list.installCellRenderer(object satisfies NotNullFunction<[String, Icon, Anything()], JComponent> {
+            fun([String, Icon, Anything()] tuple) => JLabel(tuple[0], tuple[1], JLabel.leading);
         });
 
         JBPopupFactory.instance
             .createListPopupBuilder(list)
             .setTitle("Choose module to import")
             .setItemChoosenCallback(JavaRunnable(void () {
-                if (exists val = candidateModules.get(list.selectedIndex)) {
+                if (exists tuple = candidateModules.get(list.selectedIndex)) {
                     object extends WriteCommandAction<Nothing>(editor.project) {
-                        run(Result<Nothing>? result)
-                                => addModuleImportQuickFix.applyChanges(outer, val[0], val[2], val[3]);
+                        run(Result<Nothing>? result) => tuple[2]();
                     }.execute();
                 }
             }))
@@ -229,22 +226,27 @@ shared class IdeaQuickFixData(
         if (is IdeaTextChange change) {
             registerFix(desc, change, range, ideaIcons.correction);
         } else if (is Anything() change) {
-            registerFix(desc, null, null, ideaIcons.correction, false, (p, e, f) {
-                candidateModules.clear();
-
-                ProgressManager.instance.runProcessWithProgressAsynchronously(
-                    project.project,
-                    "Querying module repositories",
-                    JavaRunnable(change),
-                    JavaRunnable(void () {
-                        if (!candidateModules.empty) {
-                            showImportModulesPopup(e);
-                        }
-                    }),
-                    null,
-                    PerformInBackgroundOption.alwaysBackground
-                );
-            });
+            if (kind == asyncModuleImport) {
+                candidateModules.add([desc, ideaIcons.imports, change]);
+            } else if (kind == addModuleImport) {
+                registerFix(desc, null, range, ideaIcons.correction, false, (p, e, f) {
+                    candidateModules.clear();
+                    ProgressManager.instance.runProcessWithProgressAsynchronously(
+                        project.project,
+                        "Querying module repositories",
+                        JavaRunnable(change),
+                        JavaRunnable(void () {
+                            if (!candidateModules.empty) {
+                                showImportModulesPopup(e);
+                            }
+                        }),
+                        null,
+                        PerformInBackgroundOption.alwaysBackground
+                    );
+                });
+            } else {
+                registerFix(desc, change, range, ideaIcons.correction);
+            }
         }
     }
 
@@ -281,28 +283,6 @@ shared class IdeaQuickFixData(
         }
     }
 
-    shared actual void addAnnotationProposal(Referenceable declaration, String text,
-        String description, PlatformTextChange change, DefaultRegion? selection) {
-
-        if (is IdeaTextChange change) {
-            value range = toRange(selection);
-            registerFix(description, change, range, ideaIcons.correction);
-        }
-    }
-
-    shared actual void addExportModuleImportProposal(Unit u, String description,
-        String name, String version) {
-
-        registerFix(description, null, null, ideaIcons.modules, false,
-            void (Project project, Editor editor, PsiFile psiFile) {
-                exportModuleImportQuickFix.applyChanges(this, u, name);
-            }
-        );
-    }
-
-    addModuleImportProposal(Unit u, String description, String name, String version)
-            => candidateModules.add([u, description, name, version]);
-
     addChangeTypeProposal(String description, PlatformTextChange change, DefaultRegion selection, Unit unit)
             => registerFix(description, change, TextRange.from(selection.start, selection.length), ideaIcons.correction);
 
@@ -315,10 +295,6 @@ shared class IdeaQuickFixData(
     addCreateQuickFix(String description, Scope scope, Unit unit, Type? returnType,
         Icons image, PlatformTextChange change, Integer exitPos, DefaultRegion selection)
             => registerFix(description, change, toRange(selection)); // TODO icon
-
-    addSatisfiesProposal(TypeDeclaration typeParam, String description,
-        String missingSatisfiedTypeText, PlatformTextChange change, DefaultRegion? selection)
-            => registerFix(description, change, toRange(selection), ideaIcons.addCorrection);
 
     shared actual void addDeclareLocalProposal(String description, 
         PlatformTextChange change, Tree.Term term, Tree.BaseMemberExpression bme) {
@@ -334,49 +310,7 @@ shared class IdeaQuickFixData(
             image = ideaIcons.correction; 
         };
     }
-    
-    shared actual void addRefineEqualsHashProposal(String description, PlatformTextChange change) {
-        registerFix(description, null, null, ideaIcons.refinement, false, 
-            void (Project project, Editor editor, PsiFile psiFile) {
-                assert(is CeylonFile psiFile);
-                
-                if (exists change = refineFormalMembersQuickFix.refineFormalMembers(this, editor.caretModel.offset)) {
-                    change.apply();
-                }
-            }
-        );
-    }
-    
-    shared actual default void addRefineFormalMembersProposal(String description) {
-        registerFix { 
-            desc = description; 
-            change = null; 
-            callback = (p, e, f) {
-                refineFormalMembersQuickFix.refineFormalMembers(this, e.selectionModel.selectionStart); 
-            };
-            image = ideaIcons.correction; 
-        };        
-    }
-    
-    shared actual default void addSpecifyTypeProposal(String description, 
-        Tree.Type type, Tree.CompilationUnit cu, Type infType) {
-        
-        if (exists ann = annotation) {
-            registerFix {
-                desc = description;
-                change = null;
-                image = ideaIcons.correction;
-                callback = (project, editor, file) {
-                    specifyTypeQuickFix.specifyType(document, type, true, cu, infType,
-                        nativeDoc, ideaCompletionManager);
-                };
-            };
-        } else {
-            specifyTypeQuickFix.specifyType(document, type, true, cu, infType,
-                nativeDoc, ideaCompletionManager);
-        }
-    }
-    
+
     shared actual void addAssignToLocalProposal(String description) {
         registerFix { 
             desc = description;
