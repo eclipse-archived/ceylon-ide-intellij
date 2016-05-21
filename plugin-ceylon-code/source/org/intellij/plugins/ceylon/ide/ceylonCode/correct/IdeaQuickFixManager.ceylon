@@ -300,7 +300,7 @@ shared class IdeaQuickFixData(
         PlatformTextChange change, Tree.Term term, Tree.BaseMemberExpression bme) {
         
         value callback = void (Project project, Editor editor, PsiFile psiFile) {
-            declareLocalQuickFix.enableLinkedMode(this, term, nativeDoc, ideaCompletionManager);
+            declareLocalQuickFix.enableLinkedMode(this, term, ideaCompletionManager);
         };
         
         registerFix { 

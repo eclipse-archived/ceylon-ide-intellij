@@ -60,7 +60,7 @@ shared object ideaPlatformServices satisfies PlatformServices {
         Tree.CompilationUnit rootNode, String? kind) {
 
         assert(is IdeaDocument document);
-        return ideaCompletionManager.getTypeProposals(document.nativeDocument, offset,
+        return ideaCompletionManager.getTypeProposals(document, offset,
             length, infType, rootNode, kind);
     }
 

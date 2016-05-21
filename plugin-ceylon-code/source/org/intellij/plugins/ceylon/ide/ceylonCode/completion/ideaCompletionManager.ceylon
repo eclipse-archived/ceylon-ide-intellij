@@ -7,7 +7,6 @@ import com.intellij.codeInsight.lookup {
     LookupElement
 }
 import com.intellij.openapi.editor {
-    Document,
     Editor
 }
 import com.intellij.openapi.util {
@@ -65,29 +64,28 @@ import org.antlr.runtime {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     DummyProgressMonitor
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    IdeaDocument
-}
 
 shared class CompletionData(shared actual PhasedUnit lastPhasedUnit, shared Editor editor,
         shared actual TypeChecker typeChecker, shared CeylonFile file, shared actual CompletionOptions options)
-        satisfies LocalAnalysisResult<Document> {
+        satisfies LocalAnalysisResult {
     shared actual Tree.CompilationUnit lastCompilationUnit => lastPhasedUnit.compilationUnit;
     shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
     shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
-    shared actual Document document => editor.document;
     shared actual JList<CommonToken>? tokens => lastPhasedUnit.tokens;
     shared actual BaseCeylonProject? ceylonProject => null;// TODO
-    shared actual IdeaDocument commonDocument = IdeaDocument(document);
+    shared actual IdeaDocument commonDocument = IdeaDocument(editor.document);
 }
 
-shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,LookupElement,Document>() {
+shared object ideaCompletionManager extends IdeCompletionManager<LookupElement>() {
     
     shared void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result,
             PhasedUnit pu, TypeChecker tc, CompletionOptions options) {
@@ -122,24 +120,23 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         return newLookup(prefix + desc, prefix + text, ideaIcons.correction);
     }
     
-    shared actual String getDocumentSubstring(Document doc, Integer start, Integer length)
-            => doc.getText(TextRange.from(start, length));
-    
     shared actual LookupElement newInvocationCompletion(Integer offset, String prefix,
-        String desc, String text, Declaration dec, Reference? pr, Scope scope, CompletionData data,
+        String desc, String text, Declaration dec, Reference? pr, Scope scope, LocalAnalysisResult data,
         Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation, 
         Boolean inherited, Boolean qualified, Declaration? qualifyingDec) {
         
+        assert(is CompletionData data);
         return IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
             includeDefaulted, positionalInvocation, namedInvocation, 
             inherited, qualified, qualifyingDec, data).lookupElement;
     }
 
     shared actual LookupElement newRefinementCompletionProposal(Integer offset, String prefix,
-        Reference? pr, String desc, String text, CompletionData data,
+        Reference? pr, String desc, String text, LocalAnalysisResult data,
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType) {
         
         assert(exists pr);
+        assert(is CompletionData data);
         return IdeaRefinementCompletionProposal(offset, prefix, pr, desc, text,
             data, dec, scope, fullType, explicitReturnType).lookupElement;
     }
@@ -169,7 +166,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     
     shared actual LookupElement newBasicCompletionProposal(Integer offset,
         String prefix, String text, String escapedText, Declaration decl,
-        CompletionData data) {
+        LocalAnalysisResult data) {
 
         return newLookup(escapedText, text, ideaIcons.forDeclaration(decl));
     }
@@ -178,7 +175,7 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
         return newLookup(desc, text, ideaIcons.packages);
     }
     
-    shared actual LookupElement newCurrentPackageProposal(Integer offset, String prefix, String packageName, CompletionData data) {
+    shared actual LookupElement newCurrentPackageProposal(Integer offset, String prefix, String packageName, LocalAnalysisResult data) {
         value icon = isModuleDescriptor(data.lastCompilationUnit) 
                      then ideaIcons.modules
                      else ideaIcons.packages;
@@ -188,26 +185,29 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
 
     shared actual LookupElement newImportedModulePackageProposal(Integer offset, String prefix,
         String memberPackageSubname, Boolean withBody,
-        String fullPackageName, CompletionData data,
+        String fullPackageName, LocalAnalysisResult data,
         Package candidate) {
         
+        assert(is CompletionData data);
         return IdeaImportedModulePackageProposal(offset, prefix, memberPackageSubname,
             withBody, fullPackageName, data, candidate).lookupElement;
     }
     
     shared actual LookupElement newQueriedModulePackageProposal(Integer offset, String prefix,
         String memberPackageSubname, Boolean withBody,
-        String fullPackageName, CompletionData data,
+        String fullPackageName, LocalAnalysisResult data,
         ModuleVersionDetails version, Unit unit, ModuleSearchResult.ModuleDetails md) {
      
+        assert(is CompletionData data);
         return IdeaQueriedModulePackageProposal(offset, prefix, memberPackageSubname, withBody,
             fullPackageName, data, version, unit, md).lookupElement;
     }       
     
     shared actual LookupElement newModuleProposal(Integer offset, String prefix, Integer len, 
         String versioned, ModuleSearchResult.ModuleDetails mod, Boolean withBody,
-        ModuleVersionDetails version, String name, Node node, CompletionData data) {
+        ModuleVersionDetails version, String name, Node node, LocalAnalysisResult data) {
         
+        assert(is CompletionData data);
         return IdeaModuleCompletionProposal(offset, prefix, len, versioned,
             mod, withBody, version, name, node, data).lookupElement;
     }
@@ -228,19 +228,20 @@ shared object ideaCompletionManager extends IdeCompletionManager<CompletionData,
     // Not supported in IntelliJ (see CeylonParameterInfoHandler instead)
     suppressWarnings("expressionTypeNothing")
     shared actual LookupElement newParameterInfo(Integer offset, Declaration dec, 
-        Reference producedReference, Scope scope, CompletionData data, Boolean namedInvocation) => nothing;
+        Reference producedReference, Scope scope, LocalAnalysisResult data, Boolean namedInvocation) => nothing;
 
     shared actual LookupElement newFunctionCompletionProposal(Integer offset, String prefix,
-        String desc, String text, Declaration dec, Unit unit, CompletionData data) {
+        String desc, String text, Declaration dec, Unit unit, LocalAnalysisResult data) {
         
+        assert(is CompletionData data);
         return IdeaFunctionCompletionProposal(offset, prefix, desc, text, dec, data).lookupElement;
     }
 
     shared actual LookupElement newControlStructureCompletionProposal(Integer offset,
         String prefix, String desc, String text, Declaration dec,
-        CompletionData data, Node? node) {
+        LocalAnalysisResult data, Node? node) {
 
-
+        assert(is CompletionData data);
         return IdeaControlStructureProposal(offset, prefix, desc, text, 
             dec, data, node).lookupElement;
     }

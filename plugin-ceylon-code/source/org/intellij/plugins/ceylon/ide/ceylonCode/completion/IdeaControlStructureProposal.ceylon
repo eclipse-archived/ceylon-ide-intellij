@@ -1,6 +1,3 @@
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    IdeaDocument
-}
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
@@ -32,7 +29,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
     String text, Declaration declaration, CompletionData data, Node? node)
-        extends ControlStructureProposal<CompletionData,LookupElement,Document,IdeaLinkedMode>
+        extends ControlStructureProposal<LookupElement>
         (offset, prefix, desc, text, node, declaration, data)
         satisfies IdeaCompletionProposal
                 & IdeaLinkedModeSupport {
@@ -41,14 +38,14 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = IdeaDocument(data.document);
+                value platformDoc = data.commonDocument;
                 if (exists node) {
                     value start = offset;
                     value nodeText = platformDoc.getText(node.startIndex.intValue(), node.distance.intValue());
                     value len = text.size - (prefix.size - nodeText.size) + 1; 
 
                     replaceInDoc(platformDoc, start, len, "");
-                    PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);
+                    PsiDocumentManager.getInstance(data.editor.project).commitDocument(platformDoc.nativeDocument);
                 }
                 
                 applyInternal(platformDoc);

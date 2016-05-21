@@ -37,7 +37,7 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
     }
     
     shared void adjustSelection(CompletionData data) {
-        value selection = getSelectionInternal(IdeaDocument(data.document));
+        value selection = getSelectionInternal(data.commonDocument);
         data.editor.selectionModel.setSelection(selection.start, selection.end);
         data.editor.caretModel.moveToOffset(selection.end);
     }

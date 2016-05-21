@@ -1,6 +1,3 @@
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    IdeaDocument
-}
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
@@ -33,7 +30,6 @@ import com.redhat.ceylon.model.typechecker.model {
     TypedDeclaration
 }
 
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
@@ -41,7 +37,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
     Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
     Boolean inherited, Boolean qualified, Declaration? qualifyingValue, CompletionData data)
-        extends InvocationCompletionProposal<CompletionData,LookupElement,Document,IdeaLinkedMode>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
+        extends InvocationCompletionProposal<LookupElement>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
     positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue, ideaCompletionManager)
         satisfies IdeaCompletionProposal
                 & IdeaLinkedModeSupport {
@@ -62,9 +58,9 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = IdeaDocument(data.document);
+                value platformDoc = data.commonDocument;
                 replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
-                PsiDocumentManager.getInstance(data.editor.project).commitDocument(data.document);
+                PsiDocumentManager.getInstance(data.editor.project).commitDocument(platformDoc.nativeDocument);
                 
                 value change = createChange(platformDoc);
                 
