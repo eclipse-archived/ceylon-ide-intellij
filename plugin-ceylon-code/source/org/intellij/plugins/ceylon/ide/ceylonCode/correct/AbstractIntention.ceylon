@@ -27,7 +27,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
 import com.redhat.ceylon.ide.common.correct {
-    QuickFixKind
+    QuickFixKind,
+    convertToClassQuickFix
 }
 import com.redhat.ceylon.ide.common.doc {
     Icons
@@ -131,7 +132,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     shared actual void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {
                         makeAvailable(description, null, null, (p, e, f) {
                                 value document = IdeaDocument(f.viewProvider.document);
-                                ConvertToClassProposal(p).applyChanges(document, declaration);
+                                convertToClassQuickFix.applyChanges(document, declaration);
                         });
                     }
                 };

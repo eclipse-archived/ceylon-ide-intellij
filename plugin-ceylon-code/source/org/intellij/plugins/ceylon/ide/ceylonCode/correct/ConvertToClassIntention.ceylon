@@ -1,9 +1,5 @@
-import com.intellij.openapi.project {
-    Project
-}
 import com.redhat.ceylon.ide.common.correct {
-    convertToClassQuickFix,
-    AbstractConvertToClassProposal
+    convertToClassQuickFix
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -21,9 +17,4 @@ shared class ConvertToClassIntention() extends AbstractIntention() {
 
         convertToClassQuickFix.addConvertToClassProposal(data, decl);
     }
-}
-
-class ConvertToClassProposal(Project project)
-        satisfies AbstractConvertToClassProposal {
-
 }
