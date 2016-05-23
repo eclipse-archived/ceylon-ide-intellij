@@ -1,10 +1,8 @@
 import ceylon.interop.java {
-    JavaRunnable
+    JavaRunnable,
+    CeylonIterable
 }
 
-import com.intellij.codeInsight.daemon {
-    DaemonCodeAnalyzer
-}
 import com.intellij.concurrency {
     JobScheduler
 }
@@ -21,10 +19,12 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.components {
     ProjectComponent
 }
+import com.intellij.openapi.editor {
+    Document
+}
 import com.intellij.openapi.fileEditor {
-    FileEditorManager,
-    FileDocumentManager {
-        fileDocumentManager=instance
+    FileEditorManager {
+        fileEditorManager=getInstance
     },
     FileEditorManagerEvent,
     FileEditorManagerListener
@@ -43,10 +43,8 @@ import com.intellij.openapi.progress {
     PerformInBackgroundOption,
     ProcessCanceledException
 }
-import com.intellij.openapi.roots {
-    ProjectRootManager {
-        projectRootManager=getInstance
-    }
+import com.intellij.openapi.project {
+    ProjectCoreUtil
 }
 import com.intellij.openapi.startup {
     StartupManager {
@@ -62,11 +60,23 @@ import com.intellij.openapi.vfs {
     VirtualFileCopyEvent,
     VirtualFileManager
 }
+import com.intellij.psi {
+    PsiFile
+}
+import com.intellij.psi.impl {
+    PsiDocumentTransactionListener
+}
 import com.intellij.testFramework {
     LightVirtualFile
 }
+import com.intellij.util {
+    FileContentUtilCore
+}
 import com.intellij.util.concurrency {
     QueueProcessor
+}
+import com.intellij.util.messages {
+    MessageBusConnection
 }
 import com.redhat.ceylon.ide.common.model {
     ChangeAware,
@@ -74,11 +84,25 @@ import com.redhat.ceylon.ide.common.model {
     ModelListenerAdapter
 }
 
+import java.lang {
+    Runnable,
+    InterruptedException
+}
+import java.util {
+    JHashSet=HashSet
+}
 import java.util.concurrent {
     TimeUnit,
-    CountDownLatch
+    CountDownLatch,
+    LinkedBlockingQueue,
+    Future
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    CeylonFileType {
+        ceylonFileType=\iINSTANCE
+    }
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
     getCeylonProblemsView,
     SourceMsg,
@@ -95,6 +119,7 @@ shared class CeylonModelManager(model)
         satisfies ProjectComponent
         & VirtualFileListener
         & FileEditorManagerListener
+        & PsiDocumentTransactionListener
         & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile>
         & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
         & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
@@ -102,7 +127,35 @@ shared class CeylonModelManager(model)
     shared variable Integer typecheckingPeriod = 5;
     variable value periodicTypecheckingEnabled_ = true;
     variable value ideaProjectReady = false;
-    value queueProcessor = QueueProcessor.createRunnableQueueProcessor();
+    
+    value modelUpdateQueueProcessor = QueueProcessor.createRunnableQueueProcessor();
+    value accumulatedChanges = LinkedBlockingQueue<NativeResourceChange>();
+    variable Future<out Anything>? submitChangesFuture = null;
+    object submitChangesTask satisfies Runnable { 
+        shared actual void run() {
+            variable NativeResourceChange? firstChange = null;
+            try {
+                 firstChange = accumulatedChanges.take();
+            } catch(InterruptedException ie) {
+            }
+            value changeSet = JHashSet<NativeResourceChange>();
+            if (exists first=firstChange) {
+                changeSet.add(first);
+            }
+            accumulatedChanges.drainTo(changeSet);
+            print("Submitting ``changeSet.size()`` changes to the model");
+            model.fileTreeChanged(CeylonIterable(changeSet));
+            if (ideaProjectReady) {
+                scheduleSubmitChanges();
+            }
+        }
+    }
+
+    late MessageBusConnection busConnection;
+    
+    void scheduleSubmitChanges() {
+        submitChangesFuture = application.executeOnPooledThread(submitChangesTask);
+    }
     
     shared Boolean periodicTypecheckingEnabled => periodicTypecheckingEnabled_;
     assign periodicTypecheckingEnabled {
@@ -121,12 +174,12 @@ shared class CeylonModelManager(model)
     
     shared void startBuild() {
         if (ideaProjectReady) {
-            queueProcessor.add(JavaRunnable {
+            modelUpdateQueueProcessor.add(JavaRunnable {
                 void run () {
-                    queueProcessor.dismissLastTasks(1);
+                    modelUpdateQueueProcessor.dismissLastTasks(1);
                     void reschedule() {
                         if (periodicTypecheckingEnabled,
-                            ! queueProcessor.hasPendingItemsToProcess()) {
+                            ! modelUpdateQueueProcessor.hasPendingItemsToProcess()) {
                             JobScheduler.scheduler.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.\iSECONDS);
                         }
                     }
@@ -144,11 +197,18 @@ shared class CeylonModelManager(model)
                                     value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
                                     value ticks = model.ceylonProjectNumber * 1000;
                                     try (progress = monitor.Progress(ticks, "Updating Ceylon Model")) {
-                                        for (ceylonProject in model.ceylonProjectsInTopologicalOrder) {
-                                            ceylonProject.build.performBuild(progress.newChild(1000));
-                                        }
-                                        application.invokeAndWait(JavaRunnable(() =>
-                                            DaemonCodeAnalyzer.getInstance(model.ideaProject).restart()), ModalityState.any());
+                                        concurrencyManager.withUpToDateIndexes(() {
+                                            for (ceylonProject in model.ceylonProjectsInTopologicalOrder) {
+                                                ceylonProject.build.performBuild(progress.newChild(1000));
+                                            }
+                                        });
+                                        application.invokeLater(JavaRunnable {
+                                            void run() {
+                                                FileContentUtilCore.reparseFiles(*fileEditorManager(model.ideaProject)
+                                                .openFiles.array.coalesced
+                                                .filter((file) => file.fileType == ceylonFileType));
+                                            }
+                                        }, ModalityState.any());
                                     } catch(Throwable t) {
                                         if (is ProcessCanceledException t) {
                                             throw t;
@@ -222,14 +282,17 @@ shared class CeylonModelManager(model)
      ***************************************************************************/
     
     shared actual void disposeComponent() {
+        busConnection.disconnect();
         VirtualFileManager.instance.removeVirtualFileListener(this);
         model.removeModelListener(this);
+        submitChangesFuture?.cancel(true);
     }
     
     shared actual void initComponent() {
+        busConnection = model.ideaProject.messageBus.connect();
+        busConnection.subscribe(FileEditorManagerListener.\iFILE_EDITOR_MANAGER, this);
+        busConnection.subscribe(PsiDocumentTransactionListener.\iTOPIC, this);
         VirtualFileManager.instance.addVirtualFileListener(this);
-        model.ideaProject.messageBus.connect()
-                .subscribe(FileEditorManagerListener.\iFILE_EDITOR_MANAGER, this);
         model.addModelListener(this);
     }
     
@@ -238,6 +301,7 @@ shared class CeylonModelManager(model)
             .runWhenProjectIsInitialized(JavaRunnable(() {
         ideaProjectReady = true;
         startBuild();
+        scheduleSubmitChanges();
     }));
     
     shared actual void projectClosed() {
@@ -254,12 +318,25 @@ shared class CeylonModelManager(model)
     beforeFileMovement(VirtualFileMoveEvent evt) => noop();
     beforePropertyChange(VirtualFilePropertyEvent evt) => noop();
     
+    void notifyChanges({NativeResourceChange*} changes) {
+        for (change in changes) {
+            if (! accumulatedChanges.offer(change)) {
+                model.ceylonProjects*.build*.requestFullBuild();
+                break;
+            }
+        }
+    }
+    
+    void notifyFileContenChange(VirtualFile file) {
+        if (! ProjectCoreUtil.isProjectOrWorkspaceFile(file)) {
+            notifyChanges { NativeFileContentChange(file) };
+        }
+    }
+
     shared actual void contentsChanged(VirtualFileEvent evt) {
         value file = evt.file;
         if (! file.directory) {
-            model.fileTreeChanged({
-                NativeFileContentChange(file)
-            });
+            notifyFileContenChange(file);
         }
     }
     
@@ -267,20 +344,20 @@ shared class CeylonModelManager(model)
     
     shared actual void fileCreated(VirtualFileEvent evt) {
         value file = evt.file;
-        model.fileTreeChanged({
+        notifyChanges {
             if (file.directory)
             then NativeFolderAddition(file)
             else NativeFileAddition(file)
-        });
+        };
     }
     
     shared actual void fileDeleted(VirtualFileEvent evt) {
         value file = evt.file;
-        model.fileTreeChanged({
+        notifyChanges {
             if (file.directory)
             then NativeFolderRemoval(file, null)
             else NativeFileRemoval(file, null)
-        });
+        };
     }
     
     shared actual void fileMoved(VirtualFileMoveEvent evt) {
@@ -291,7 +368,7 @@ shared class CeylonModelManager(model)
             directory => file.directory;
         };
         
-        model.fileTreeChanged(
+        notifyChanges(
             if (file.directory)
             then { NativeFolderRemoval(file, oldFile), NativeFolderAddition(file) }
             else { NativeFileRemoval(file, oldFile), NativeFileAddition(file) }
@@ -299,7 +376,17 @@ shared class CeylonModelManager(model)
     }
     
     shared actual void propertyChanged(VirtualFilePropertyEvent evt) {
-        // TODO Manage the file rename !
+        // TODO: Also manage the file rename
+        noop();
+    }
+
+    transactionStarted(Document doc, PsiFile file) => noop();
+
+    shared actual void transactionCompleted(Document document, PsiFile file) {
+        value virtualFile = file.virtualFile;
+        if (! file.directory) {
+            notifyFileContenChange(virtualFile);
+        }
     }
     
     /***************************************************************************
@@ -308,38 +395,13 @@ shared class CeylonModelManager(model)
        - triggers the typechecking when switching editors
      ***************************************************************************/
     
-    fileClosed(FileEditorManager manager, VirtualFile file) => save(file);
+    fileClosed(FileEditorManager manager, VirtualFile file) => startBuild();
     
     fileOpened(FileEditorManager manager, VirtualFile file) => noop();
     
-    shared actual void selectionChanged(FileEditorManagerEvent evt) {
-        if (exists oldFile = evt.oldFile,
-            exists newFile = evt.newFile) {
-            save(oldFile);
-            // TODO: if the fileChange event is already triggered and managed (=> synchronous) then
-            // we could schedule a Build. Knowing that scheduling it again does nothing it the first one is not started.
-            startBuild();
-        }
-    }
-    
-    void save(VirtualFile file) {
-        assert(!file.directory);
-        if (exists ceylonProject = ceylonProjectForFile(file),
-            ceylonProject.isCeylon(file),
-            ceylonProject.isFileInSourceFolder(file),
-            exists doc = fileDocumentManager.getCachedDocument(file)) {
-            
-            // Will trigger contentsChanged(), which will call the typechecker
-            fileDocumentManager.saveDocument(doc);
-        }
-    }
+    shared actual void selectionChanged(FileEditorManagerEvent evt) => startBuild();
     
     /***************************************************************************
       Utility functions
      ***************************************************************************/
-    
-    CeylonProjectAlias? ceylonProjectForFile(VirtualFile? file) =>
-            if (exists file) 
-    then model.getProject(projectRootManager(model.ideaProject).fileIndex.getModuleForFile(file))
-    else null;
 }
