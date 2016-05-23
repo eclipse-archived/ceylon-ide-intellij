@@ -9,6 +9,9 @@ import com.redhat.ceylon.ide.common.platform {
 import java.lang {
     RuntimeException
 }
+import com.intellij.openapi.progress {
+    ProcessCanceledException
+}
 
 shared object ideaPlatformUtils satisfies IdeUtils {
     
@@ -33,8 +36,7 @@ shared object ideaPlatformUtils satisfies IdeUtils {
         }
     }
     
-    newOperationCanceledException(String message)
-            => OperationCanceledException(message);
+    newOperationCanceledException(String message) => ProcessCanceledException(OperationCanceledException(message));
     
     isOperationCanceledException(Exception exception)
             => exception is OperationCanceledException;
