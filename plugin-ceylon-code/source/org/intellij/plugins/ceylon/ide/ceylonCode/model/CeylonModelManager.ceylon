@@ -8,7 +8,9 @@ import com.intellij.concurrency {
 }
 import com.intellij.notification {
     Notification,
-    NotificationType
+    NotificationType {
+        warning
+    }
 }
 import com.intellij.openapi.application {
     ApplicationManager {
@@ -24,10 +26,12 @@ import com.intellij.openapi.editor {
 }
 import com.intellij.openapi.fileEditor {
     FileEditorManager {
-        fileEditorManager=getInstance
+        fileEditorManagerInstance=getInstance
     },
     FileEditorManagerEvent,
-    FileEditorManagerListener
+    FileEditorManagerListener {
+        fileEditorManagerTopic = fileEditorManager
+    }
 }
 import com.intellij.openapi.\imodule {
     Module
@@ -44,7 +48,9 @@ import com.intellij.openapi.progress {
     ProcessCanceledException
 }
 import com.intellij.openapi.project {
-    ProjectCoreUtil
+    ProjectCoreUtil {
+        isProjectOrWorkspaceFile
+    }
 }
 import com.intellij.openapi.startup {
     StartupManager {
@@ -64,13 +70,17 @@ import com.intellij.psi {
     PsiFile
 }
 import com.intellij.psi.impl {
-    PsiDocumentTransactionListener
+    PsiDocumentTransactionListener {
+        psiDocumentTransactionTopic = topic
+    }
 }
 import com.intellij.testFramework {
     LightVirtualFile
 }
 import com.intellij.util {
-    FileContentUtilCore
+    FileContentUtilCore {
+        reparseFiles
+    }
 }
 import com.intellij.util.concurrency {
     QueueProcessor
@@ -180,7 +190,7 @@ shared class CeylonModelManager(model)
                     void reschedule() {
                         if (periodicTypecheckingEnabled,
                             ! modelUpdateQueueProcessor.hasPendingItemsToProcess()) {
-                            JobScheduler.scheduler.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.\iSECONDS);
+                            JobScheduler.scheduler.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.seconds);
                         }
                     }
                     if (model.ceylonProjects.any((ceylonProject)
@@ -204,7 +214,7 @@ shared class CeylonModelManager(model)
                                         });
                                         application.invokeLater(JavaRunnable {
                                             void run() {
-                                                FileContentUtilCore.reparseFiles(*fileEditorManager(model.ideaProject)
+                                                reparseFiles(*fileEditorManagerInstance(model.ideaProject)
                                                 .openFiles.array.coalesced
                                                 .filter((file) => file.fileType == ceylonFileType));
                                             }
@@ -230,7 +240,7 @@ shared class CeylonModelManager(model)
                                                 "Ceylon Model Update failed",
                                                 message + ". To avoid performance issues the automatic update of the Ceylon model has been disabled.
                                                            You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                                                NotificationType.\iWARNING
+                                                warning
                                             ).notify(model.ideaProject);
                                         }
                                     }
@@ -243,14 +253,14 @@ shared class CeylonModelManager(model)
                                 }
                             });
                         }, ModalityState.any());
-                        if (! bakgroundBuildLatch.await(30, TimeUnit.\iMINUTES)) {
+                        if (! bakgroundBuildLatch.await(30, TimeUnit.minutes)) {
                             periodicTypecheckingEnabled = false;
                             Notification(
                                 "Ceylon Model Update",
                                 "Ceylon Model Update stalled",
                                 "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
                                  You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                                NotificationType.\iWARNING).notify(model.ideaProject);
+                                warning).notify(model.ideaProject);
                         }
                         reschedule();
                     } else {
@@ -290,8 +300,8 @@ shared class CeylonModelManager(model)
     
     shared actual void initComponent() {
         busConnection = model.ideaProject.messageBus.connect();
-        busConnection.subscribe(FileEditorManagerListener.\iFILE_EDITOR_MANAGER, this);
-        busConnection.subscribe(PsiDocumentTransactionListener.\iTOPIC, this);
+        busConnection.subscribe(fileEditorManagerTopic, this);
+        busConnection.subscribe(psiDocumentTransactionTopic, this);
         VirtualFileManager.instance.addVirtualFileListener(this);
         model.addModelListener(this);
     }
@@ -328,7 +338,7 @@ shared class CeylonModelManager(model)
     }
     
     void notifyFileContenChange(VirtualFile file) {
-        if (! ProjectCoreUtil.isProjectOrWorkspaceFile(file)) {
+        if (! isProjectOrWorkspaceFile(file)) {
             notifyChanges { NativeFileContentChange(file) };
         }
     }
