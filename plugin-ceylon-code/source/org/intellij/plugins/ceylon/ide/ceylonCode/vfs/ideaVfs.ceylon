@@ -2,7 +2,8 @@ import ceylon.collection {
     ArrayList
 }
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    javaString
 }
 
 import com.intellij.openapi.\imodule {
@@ -14,6 +15,10 @@ import com.intellij.openapi.util {
 import com.intellij.openapi.vfs {
     VirtualFile
 }
+import com.intellij.psi {
+    PsiManager,
+    PsiDocumentManager
+}
 import com.redhat.ceylon.ide.common.util {
     synchronize
 }
@@ -23,13 +28,17 @@ import com.redhat.ceylon.ide.common.vfs {
     ResourceVirtualFile
 }
 
+import java.io {
+    ByteArrayInputStream
+}
 import java.util {
     List,
     JArrayList=ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
+    IdeaCeylonProjects,
+    doWithLock
 }
 
 shared alias IdeaResource => ResourceVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>;
@@ -54,7 +63,7 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     
     hash => file.hash;
     
-    inputStream => file.inputStream;
+    inputStream => doWithLock(() => ByteArrayInputStream(javaString(PsiDocumentManager.getInstance(mod.project).getLastCommittedDocument(PsiManager.getInstance(mod.project).findFile(file)).text).getBytes(file.charset.string)));
     
     name => file.name;
     path => file.canonicalPath;
