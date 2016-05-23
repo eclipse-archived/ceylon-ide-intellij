@@ -25,12 +25,12 @@ import com.intellij.psi.util {
 import com.redhat.ceylon.ide.common.open {
     AbstractNavigation
 }
-import com.redhat.ceylon.ide.common.util {
-    Path
-}
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
+}
+import com.redhat.ceylon.ide.common.util {
+    Path
 }
 import com.redhat.ceylon.model.loader.model {
     JavaBeanValue,
@@ -49,9 +49,9 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    doWithIndex,
     PSIClass,
-    PSIMethod
+    PSIMethod,
+    concurrencyManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
@@ -101,15 +101,17 @@ shared class IdeaNavigation(Project project)
     PsiClass? getJavaClass(ClassOrInterface cls) {
         value qn = cls.qualifiedNameString.replace("::", ".");
 
-        return doWithIndex(project, () {
-            value facade = JavaPsiFacade.getInstance(project);
-            value scope = GlobalSearchScope.allScope(project);
-
-            if (exists psi = facade.findClass(qn, scope)) {
-                return psi;
-            }
-            return null;
-        });
+        return concurrencyManager.withAlternateResolution {
+            func() => concurrencyManager.needIndexes(project, () {
+                value facade = JavaPsiFacade.getInstance(project);
+                value scope = GlobalSearchScope.allScope(project);
+    
+                if (exists psi = facade.findClass(qn, scope)) {
+                    return psi;
+                }
+                return null;
+            });
+        };
     }
     
     shared actual PsiNameIdentifierOwner? gotoLocation(Path? path, 
