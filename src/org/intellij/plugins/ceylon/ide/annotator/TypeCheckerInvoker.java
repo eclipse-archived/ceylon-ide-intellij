@@ -1,12 +1,25 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.IdeaVirtualFolder;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
+import org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin;
+
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.io.VirtualFile;
-import com.redhat.ceylon.compiler.typechecker.io.impl.Helper;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.BaseCeylonProject;
 import com.redhat.ceylon.ide.common.model.BaseIdeModelLoader;
@@ -21,19 +34,6 @@ import com.redhat.ceylon.model.typechecker.model.Module;
 import com.redhat.ceylon.model.typechecker.model.Modules;
 import com.redhat.ceylon.model.typechecker.model.Package;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
-import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.IdeaVirtualFolder;
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
-import org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 public class TypeCheckerInvoker implements ITypeCheckerInvoker {
     /*
@@ -114,6 +114,7 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
         }
     }
     
+    @SuppressWarnings("rawtypes")
     private static PhasedUnit invokeTypeChecker(final CeylonFile ceylonFile, final TypeChecker typeChecker) {
         final com.intellij.openapi.module.Module module = ModuleUtil.findModuleForFile(
                 ceylonFile.getVirtualFile(), ceylonFile.getProject());
@@ -125,9 +126,10 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
         }
          
         return doWithSourceModel(ceylonProject, true,
-                20,
+                0,
                 new Callable<PhasedUnit>() {
-                  @Override
+                  @SuppressWarnings("unchecked")
+                @Override
                   public PhasedUnit call() {
                       PhasedUnit phasedUnit = typeChecker.getPhasedUnit(sourceCodeVirtualFile);
                       Tree.CompilationUnit cu = ceylonFile.getCompilationUnit();
@@ -145,12 +147,7 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
                           srcDir = (IdeaVirtualFolder) phasedUnit.getSrcDir();
                           pkg = phasedUnit.getPackage();
                       }
-                      String relativePath = Helper.computeRelativePath(sourceCodeVirtualFile, srcDir);
-              /*
-                      if (typeChecker.getPhasedUnitFromRelativePath(relativePath) != null) {
-                          typeChecker.getPhasedUnits().removePhasedUnitForRelativePath(relativePath);
-                      }
-              */
+                    
                       ProjectPhasedUnit projectPu = null;
                       if (phasedUnit instanceof EditedPhasedUnit) {
                           projectPu = ((EditedPhasedUnit) phasedUnit).getOriginalPhasedUnit();
