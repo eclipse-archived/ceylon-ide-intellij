@@ -139,7 +139,8 @@ class IdeaInlineRefactoring(CeylonFile file, Node node, Declaration decl, Editor
     
     shared actual Boolean searchInEditor() => true;
     
-    shared actual Boolean searchInFile(PhasedUnit pu) => true;
+    shared actual Boolean searchInFile(PhasedUnit pu)
+            => pu.unit != editorPhasedUnit.unit;
 
     shared actual Boolean inSameProject(Declaration decl) => true; // TODO
 }
