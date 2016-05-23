@@ -21,7 +21,8 @@ import com.intellij.openapi.externalSystem.service.project {
     IdeModifiableModelsProviderImpl
 }
 import com.intellij.openapi.\imodule {
-    Module
+    Module,
+    ModuleUtil
 }
 import com.intellij.openapi.project {
     DumbService {
@@ -82,6 +83,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     vfsKeychain
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -341,4 +345,16 @@ shared class IdeaCeylonProject(ideArtifact, model)
     }
 
     buildHooks => { addModuleArchiveHook };
+}
+
+shared IdeaCeylonProject? findProjectForFile(CeylonFile file) {
+    
+    if (exists projects = file.project.getComponent(javaClass<IdeaCeylonProjects>()),
+        exists mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project),
+        is IdeaCeylonProject project = projects.getProject(mod)) {
+        
+        return project;
+    }
+    
+    return null;
 }

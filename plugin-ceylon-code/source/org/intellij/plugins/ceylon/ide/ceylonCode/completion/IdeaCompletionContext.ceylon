@@ -53,7 +53,12 @@ shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfi
     
     shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder();
     
-    shared actual TypeChecker typeChecker => ceylonProject?.typechecker else nothing;
+    shared actual TypeChecker typeChecker {
+        if (exists tc = ceylonProject?.typechecker) {
+            return tc;
+        }
+        throw Exception("Can't find typechecker");
+    }
 }
 
 shared class IdeaProposalsHolder() satisfies ProposalsHolder {

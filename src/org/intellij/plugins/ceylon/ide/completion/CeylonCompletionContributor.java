@@ -1,26 +1,23 @@
 package org.intellij.plugins.ceylon.ide.completion;
 
-import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementWeigher;
+import com.intellij.codeInsight.completion.CompletionContributor;
+import com.intellij.codeInsight.completion.CompletionInitializationContext;
+import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.util.ProcessingContext;
-import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.ide.common.settings.CompletionOptions;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.ceylonCode.completion.ideaCompletionManager_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion.IdeaCompletionProvider;
 import org.intellij.plugins.ceylon.ide.settings.CompletionSettings;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class CeylonCompletionContributor extends CompletionContributor {
 
     public CeylonCompletionContributor() {
-        extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new MyCompletionProvider());
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new IdeaCompletionProvider() {
+            @Override
+            public CompletionOptions getOptions() {
+                return CompletionSettings.getInstance().getOptions();
+            }
+        });
     }
 
     @Override
@@ -28,40 +25,4 @@ public class CeylonCompletionContributor extends CompletionContributor {
         super.beforeCompletion(context);
         context.setDummyIdentifier(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED);
     }
-
-    private static class MyCompletionProvider extends CompletionProvider<CompletionParameters> {
-        @Override
-        protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-
-            CompletionSorter sorter = CompletionService.getCompletionService()
-                    .emptySorter()
-                    .weigh(new LookupElementWeigher("keepInitialOrderWeigher", false, false) {
-                        int i = 0;
-
-                        @Nullable
-                        @Override
-                        public Comparable weigh(@NotNull LookupElement element) {
-                            i++;
-                            return i;
-                        }
-                    });
-            result = result.withRelevanceSorter(sorter);
-
-            if (parameters.getPosition() instanceof LeafPsiElement && ((LeafPsiElement) parameters.getPosition()).getElementType() == CeylonTokens.ASTRING_LITERAL) {
-                result = result.withPrefixMatcher("");
-            }
-            PsiElement element = parameters.getOriginalPosition();
-
-            if (element != null) {
-                CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
-                PhasedUnit phasedUnit = ceylonFile.ensureTypechecked();
-                if (phasedUnit != null) {
-                    CompletionOptions options = CompletionSettings.getInstance().getOptions();
-                    ideaCompletionManager_.get_().addCompletions(parameters, context, result,
-                            phasedUnit, TypeCheckerProvider.getFor(element), options);
-                }
-            }
-        }
-    }
-
 }
