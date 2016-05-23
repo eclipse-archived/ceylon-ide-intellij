@@ -1,30 +1,9 @@
-import ceylon.interop.java {
-    javaClass
-}
-import ceylon.language {
-    AssertionError
+import ceylon.collection {
+    LinkedList
 }
 
-import com.intellij.codeInspection {
-    ProblemHighlightType
-}
-import com.intellij.lang.annotation {
-    Annotation,
-    AnnotationHolder
-}
-import com.intellij.openapi.application {
-    ApplicationManager
-}
-import com.intellij.openapi.\imodule {
-    ModuleUtil
-}
 import com.intellij.openapi.util {
     TextRange
-}
-import com.redhat.ceylon.compiler.typechecker.analyzer {
-    AnalysisError,
-    UsageWarning,
-    Warning
 }
 import com.redhat.ceylon.compiler.typechecker.parser {
     CeylonLexer,
@@ -32,9 +11,6 @@ import com.redhat.ceylon.compiler.typechecker.parser {
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     ...
-}
-import com.redhat.ceylon.ide.common.util {
-    nodes
 }
 
 import java.util {
@@ -44,27 +20,16 @@ import java.util {
 import org.antlr.runtime {
     CommonToken
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    IdeaQuickFixData
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import com.redhat.ceylon.ide.common.correct {
-    ideQuickFixManager
-}
-
 
 "A visitor that visits a compilation unit returned by
- [[com.redhat.ceylon.compiler.typechecker.parser::CeylonParser]] to highlight errors and
-  warnings using an [[AnnotationHolder]]."
-shared class ErrorsVisitor(AnnotationHolder annotationHolder, CeylonFile file) extends Visitor() {
+ [[com.redhat.ceylon.compiler.typechecker.parser::CeylonParser]] to gather errors and
+  warnings."
+shared class ErrorsVisitor(Tree.CompilationUnit compilationUnit, CeylonFile file) extends Visitor() {
 
-    value unresolvedReferenceCodes = [ 100, 102 ];
-    value unusedCodes = [ Warning.unusedDeclaration.string, Warning.unusedImport.string ];
+    value messages = LinkedList<[Message, TextRange?]>();
 
     shared actual void visitAny(Node that) {
         for (Message error in ArrayList(that.errors)) {
@@ -105,28 +70,7 @@ shared class ErrorsVisitor(AnnotationHolder annotationHolder, CeylonFile file) e
                     }
                 }
 
-                Annotation annotation;
-                if (error is AnalysisError|RecognitionError|UnexpectedError) {
-                    annotation = annotationHolder.createErrorAnnotation(range, error.message);
-                    if (unresolvedReferenceCodes.contains(error.code)) {
-                        annotation.highlightType = ProblemHighlightType.\iLIKE_UNKNOWN_SYMBOL;
-                    }
-                } else if (is UsageWarning error) {
-                    annotation = annotationHolder.createWarningAnnotation(range, error.message);
-                    if (unusedCodes.contains(error.warningName)) {
-                        annotation.highlightType = ProblemHighlightType.\iLIKE_UNUSED_SYMBOL;
-                    } else {
-                        annotation.highlightType = ProblemHighlightType.\iGENERIC_ERROR_OR_WARNING;
-                    }
-                } else {
-                    annotation = annotationHolder.createInfoAnnotation(range, error.message);
-                }
-
-                if (exists r = range,
-                    !ApplicationManager.application.unitTestMode) {
-
-                    addQuickFixes(r, error, annotation);
-                }
+                messages.add([error, range]);
             }
         }
         super.visitAny(that);
@@ -135,25 +79,9 @@ shared class ErrorsVisitor(AnnotationHolder annotationHolder, CeylonFile file) e
     shared actual void handleException(Exception e, Node that) {
         e.printStackTrace();
     }
-
-    void addQuickFixes(TextRange range, Message error, Annotation annotation) {
-        assert (is CeylonFile file = annotationHolder.currentAnnotationSession.file);
-        value mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project);
-        value pu = file.phasedUnit;
-
-        if (is IdeaCeylonProjects projects = file.project.getComponent(javaClass<IdeaCeylonProjects>()),
-            exists project = projects.getProject(mod),
-            exists tc = project.typechecker,
-            exists node = nodes.findNode(pu.compilationUnit, null, range.startOffset, range.endOffset)) {
-
-            value data = IdeaQuickFixData(error, file.viewProvider.document, pu.compilationUnit,
-                pu, node, mod, annotation, project);
-
-            try {
-                ideQuickFixManager.addQuickFixes(data, tc);
-            } catch (Exception|AssertionError e) {
-                e.printStackTrace();
-            }
-        }
+    
+    shared {[Message, TextRange?]*} extractMessages() {
+        compilationUnit.visit(this);
+        return messages;
     }
 }

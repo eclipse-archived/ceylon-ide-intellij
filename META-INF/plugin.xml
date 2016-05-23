@@ -96,7 +96,7 @@
 
         <lang.syntaxHighlighterFactory key="Ceylon" language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonHighlighterFactory"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonSyntaxAnnotator"/>
-        <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.annotator.CeylonTypeCheckerAnnotator"/>
+        <externalAnnotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonFileHighlightFilter"/>
         <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonColorSettingsPage"/>
         <additionalTextAttributes scheme="Default" file="colorSchemes/CeylonDefault.xml"/>
