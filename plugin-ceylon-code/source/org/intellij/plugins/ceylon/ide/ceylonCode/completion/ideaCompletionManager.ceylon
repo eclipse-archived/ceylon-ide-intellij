@@ -88,12 +88,17 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
         assert(is CeylonFile ceylonFile = element.containingFile);
         value project = findProjectForFile(ceylonFile);
         value params = IdeaCompletionContext(ceylonFile, parameters.editor, project, options);
-        value line = doc.getLineNumber(element.textOffset);
-        
-        value monitor = DummyProgressMonitor.wrap("");
-        value returnedParamInfo = true; // The parameters tooltip has nothing to do with code completion, so we bypass it
-        completionManager.getContentProposals(pu.compilationUnit, params, 
-            parameters.editor.caretModel.offset, line, isSecondLevel, monitor, returnedParamInfo);
+
+        completionManager.getContentProposals {
+            typecheckedRootNode = pu.compilationUnit;
+            ctx = params;
+            offset = parameters.editor.caretModel.offset;
+            line = doc.getLineNumber(element.textOffset);
+            secondLevel = isSecondLevel;
+            monitor = DummyProgressMonitor.wrap("");
+            // The parameters tooltip has nothing to do with code completion, so we bypass it
+            returnedParamInfo = true;
+        };
         
         CustomLookupCellRenderer.install(parameters.editor.project);
         
