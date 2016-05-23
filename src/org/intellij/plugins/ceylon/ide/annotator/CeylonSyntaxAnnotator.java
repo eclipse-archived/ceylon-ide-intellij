@@ -1,17 +1,17 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.lang.annotation.Annotation;
-import com.intellij.lang.annotation.AnnotationHolder;
-import com.intellij.lang.annotation.Annotator;
-import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiVisitor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.jetbrains.annotations.NotNull;
+
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.lang.annotation.Annotator;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
 
 public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator {
     private AnnotationHolder annotationHolder;
@@ -71,7 +71,6 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
     public void visitIdentifierPsi(@NotNull CeylonPsi.IdentifierPsi element) {
         super.visitIdentifierPsi(element);
 
-        String name = element.getName();
         PsiElement prevSibling = element.getPrevSibling();
 
         ASTNode firstChildNode = element.getNode().getFirstChildNode();
