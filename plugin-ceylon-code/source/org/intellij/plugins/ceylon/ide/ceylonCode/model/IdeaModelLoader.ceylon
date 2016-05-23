@@ -1,29 +1,36 @@
+import ceylon.interop.java {
+    JavaRunnable
+}
+
 import com.intellij.openapi.application {
     ApplicationManager {
         application
     },
     ModalityState
 }
+import com.intellij.openapi.\imodule {
+    IJModule=Module
+}
 import com.intellij.openapi.project {
     DumbService {
         dumbService=getInstance
     }
-}
-import com.intellij.openapi.\imodule {
-    IJModule=Module
 }
 import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.intellij.psi {
     JavaPsiFacade {
-        javaPsiFacade = getInstance
+        javaPsiFacade=getInstance
     },
     PsiClass,
     PsiNamedElement
 }
 import com.intellij.psi.search {
     GlobalSearchScope
+}
+import com.intellij.util.indexing {
+    UnindexedFilesUpdater
 }
 import com.redhat.ceylon.ide.common.model {
     IdeModelLoader,
@@ -46,12 +53,6 @@ import com.redhat.ceylon.model.typechecker.model {
 
 import java.lang {
     Runnable
-}
-import ceylon.interop.java {
-    JavaRunnable
-}
-import com.intellij.util.indexing {
-    UnindexedFilesUpdater
 }
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
@@ -84,8 +85,17 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     }
 
 
-    void updateIndexIfnecessary() =>
-            resetJavaModelSourceIfNecessary(JavaRunnable { 
+    void updateIndexIfnecessary() {
+        if (application.readAccessAllowed) {
+            // We are in a UI or command action, 
+            // and starting the index task (and waiting for its end) 
+            // could produce a deadlock
+            // The only place where the indexes should be up-to-date 
+            // is the central model update that should never hold a 
+            // read lock
+            return;
+        }
+        resetJavaModelSourceIfNecessary(JavaRunnable { 
                 run() => application.invokeAndWait(JavaRunnable { 
                     void run() { 
                         assert (exists project = 
@@ -93,7 +103,8 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                         dumbService(project).queueTask(UnindexedFilesUpdater(project, false));
                     }
                 }, ModalityState.\iNON_MODAL);
-    });
+        });
+    }
 
     shared actual Boolean moduleContainsClass(BaseIdeModule ideModule,
         String packageName, String className) {
@@ -106,7 +117,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             value name = packageName + "." + className;
             value scope = ideaModule.getModuleScope(true);
             value facade = javaPsiFacade(ideaModule.project);
-            return doWithIndex(ideaModule.project, () => doWithLock(() 
+            return concurrencyManager.needIndexes(ideaModule.project, () => doWithLock(() 
                 => facade.findClass(name, scope) exists));
         }
         
@@ -117,7 +128,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
         
         updateIndexIfnecessary();
-        return doWithIndex(project, () => doWithLock(() {
+        return concurrencyManager.needIndexes(project, () => doWithLock(() {
             if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) { 
                 value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
                 value facade = javaPsiFacade(m.project);
