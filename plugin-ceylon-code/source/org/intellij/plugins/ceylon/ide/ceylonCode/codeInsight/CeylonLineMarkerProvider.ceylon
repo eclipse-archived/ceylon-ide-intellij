@@ -35,6 +35,9 @@ import java.lang {
     JString=String
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    concurrencyManager
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
     CeylonFile,
@@ -59,7 +62,8 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
     shared actual LineMarkerInfo<PsiElement>? getLineMarkerInfo(PsiElement element) {
         
         if (is CeylonFile file = element.containingFile) {
-            file.ensureTypechecked();
+            concurrencyManager.withAlternateResolution(void () {
+                file.ensureTypechecked(); });
         }
         if (is CeylonPsi.IdentifierPsi|CeylonPsi.SpecifierStatementPsi element,
             exists decl = findParentDeclaration(element),
