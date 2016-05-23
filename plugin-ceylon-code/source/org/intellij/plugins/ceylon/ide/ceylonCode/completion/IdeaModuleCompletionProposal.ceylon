@@ -16,7 +16,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
 import com.redhat.ceylon.ide.common.completion {
-    ModuleProposal
+    ModuleProposal,
+    ProposalsHolder
 }
 import com.redhat.ceylon.ide.common.platform {
     LinkedMode
@@ -32,9 +33,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 class IdeaModuleCompletionProposal(Integer offset, String prefix,
         Integer len, String versioned, ModuleSearchResult.ModuleDetails mod,
         Boolean withBody, ModuleVersionDetails version, 
-        String name, Node node, CompletionData data) 
-        extends ModuleProposal<LookupElement>
-        (offset, prefix, len, versioned, mod, withBody, version, name, node, data)
+        String name, Node node, IdeaCompletionContext ctx) 
+        extends ModuleProposal
+        (offset, prefix, len, versioned, mod, withBody, version, name, node, ctx)
         satisfies IdeaCompletionProposal {
    
     shared LookupElement lookupElement => newLookup(versioned, versioned.spanFrom(len),
@@ -43,7 +44,7 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
                LookupElement? t) {
                
                // Undo IntelliJ's completion
-               value platformDoc = data.commonDocument;
+               value platformDoc = ctx.commonDocument;
                replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
                
                applyInternal(platformDoc);
@@ -51,8 +52,12 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         }
     );
     
-    shared actual LookupElement newModuleProposal(ModuleVersionDetails d, DefaultRegion selection, LinkedMode lm)
-            => newLookup(d.version, d.version, null, null, TextRange.from(selection.start, selection.length)); // TODO icon
+    shared actual void newModuleProposal(ProposalsHolder proposals, ModuleVersionDetails d, DefaultRegion selection, LinkedMode lm) {
+        if (is IdeaProposalsHolder proposals) {
+            // TODO icon
+            proposals.add(newLookup(d.version, d.version, null, null, TextRange.from(selection.start, selection.length)));
+        }
+    }
     
     shared actual Boolean toggleOverwrite => false;
 }

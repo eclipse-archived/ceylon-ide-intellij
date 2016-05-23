@@ -12,7 +12,8 @@ import com.redhat.ceylon.cmr.api {
 }
 import com.redhat.ceylon.ide.common.completion {
     ImportedModulePackageProposal,
-    PackageCompletionProposal
+    PackageCompletionProposal,
+    ProposalsHolder
 }
 import com.redhat.ceylon.ide.common.platform {
     LinkedMode
@@ -31,9 +32,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
-                String fullPackageName, CompletionData data, Package candidate)
-        extends ImportedModulePackageProposal<LookupElement>
-        (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate, data)
+                String fullPackageName, IdeaCompletionContext ctx, Package candidate)
+        extends ImportedModulePackageProposal
+        (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate, ctx)
         satisfies IdeaCompletionProposal {
 
     shared actual variable Boolean toggleOverwrite = false;
@@ -42,23 +43,24 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = data.commonDocument;
+                value platformDoc = ctx.commonDocument;
                 replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
                 
                 applyInternal(platformDoc);
-                adjustSelection(data);
+                adjustSelection(ctx);
             }
         }
     );
     
-    shared actual LookupElement newPackageMemberCompletionProposal(Declaration d, DefaultRegion selection, LinkedMode lm) {
-        return LookupElementBuilder.create(d.name)
-            .withIcon(ideaIcons.forDeclaration(d));
+    shared actual void newPackageMemberCompletionProposal(ProposalsHolder proposals, Declaration d, DefaultRegion selection, LinkedMode lm) {
+        if (is IdeaProposalsHolder proposals) {
+             proposals.add(LookupElementBuilder.create(d.name).withIcon(ideaIcons.forDeclaration(d)));
+        }
     }
 }
 
 class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
-    String fullPackageName, CompletionData data, ModuleVersionDetails version, Unit unit,
+    String fullPackageName, IdeaCompletionContext completionCtx, ModuleVersionDetails version, Unit unit,
     ModuleSearchResult.ModuleDetails md)
         extends PackageCompletionProposal
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
@@ -72,7 +74,7 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
                 //    data.lastPhasedUnit.\ipackage.\imodule,
                 //    version.\imodule,
                 //    version.version);
-                value selection = getSelectionInternal(data.commonDocument);
+                value selection = getSelectionInternal(completionCtx.commonDocument);
                 ctx.editor.selectionModel.setSelection(selection.start, selection.end);
                 ctx.editor.caretModel.moveToOffset(selection.end); 
             }

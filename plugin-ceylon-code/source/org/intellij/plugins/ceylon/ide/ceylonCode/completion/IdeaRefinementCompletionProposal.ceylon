@@ -15,7 +15,8 @@ import com.intellij.psi {
     PsiDocumentManager
 }
 import com.redhat.ceylon.ide.common.completion {
-    RefinementCompletionProposal
+    RefinementCompletionProposal,
+    ProposalsHolder
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
@@ -31,44 +32,51 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference pr,
-        String desc, String text, CompletionData data,
+        String desc, String text, IdeaCompletionContext ctx,
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType)
-        extends RefinementCompletionProposal<LookupElement>
-        (offset, prefix, pr, desc, text, data, dec, scope, fullType, explicitReturnType) 
+        extends RefinementCompletionProposal
+        (offset, prefix, pr, desc, text, ctx, dec, scope, fullType, explicitReturnType) 
         satisfies IdeaCompletionProposal {
 
     shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.forDeclaration(dec),
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = data.commonDocument;
+                value platformDoc = ctx.commonDocument;
                 replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
-                PsiDocumentManager.getInstance(data.editor.project).commitDocument(platformDoc.nativeDocument);
+                PsiDocumentManager.getInstance(ctx.editor.project).commitDocument(platformDoc.nativeDocument);
                 
                 value change = createChange(platformDoc);
                 
-                object extends WriteCommandAction<DefaultRegion?>(data.editor.project, data.file) {
+                object extends WriteCommandAction<DefaultRegion?>(ctx.editor.project, ctx.file) {
                     shared actual void run(Result<DefaultRegion?> result) {
                         change.apply();
                     }
                 }.execute();
                 
-                adjustSelection(data);
+                adjustSelection(ctx);
                 enterLinkedMode(platformDoc);
             }
         }
     );
     
-    shared actual LookupElement newNestedCompletionProposal(Declaration dec, Integer loc) {
-        value unit = data.lastCompilationUnit.unit;
+    shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
+        Declaration dec, Integer loc) {
+        value unit = ctx.lastCompilationUnit.unit;
         value name = getNestedCompletionText(false, unit, dec);
         value desc = getNestedCompletionText(true, unit, dec);
         
-        return newLookup(desc, name, ideaIcons.forDeclaration(dec));
+        if (is IdeaProposalsHolder proposals) {
+            proposals.add(newLookup(desc, name, ideaIcons.forDeclaration(dec)));
+        }
     }
     
-    shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc) {
-        return newLookup(val, val, ideaIcons.correction);
+    shared actual void newNestedLiteralCompletionProposal(ProposalsHolder proposals,
+        String val, Integer loc) {
+        
+        if (is IdeaProposalsHolder proposals) {
+            proposals.add(newLookup(val, val, ideaIcons.correction));
+        }
     }
     
     shared actual Boolean toggleOverwrite => false;

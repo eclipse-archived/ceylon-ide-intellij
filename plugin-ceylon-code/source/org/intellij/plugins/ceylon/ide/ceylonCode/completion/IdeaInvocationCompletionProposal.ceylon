@@ -15,7 +15,8 @@ import com.intellij.psi {
     PsiDocumentManager
 }
 import com.redhat.ceylon.ide.common.completion {
-    InvocationCompletionProposal
+    InvocationCompletionProposal,
+    ProposalsHolder
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
@@ -33,9 +34,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
     Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
-    Boolean inherited, Boolean qualified, Declaration? qualifyingValue, CompletionData data)
-        extends InvocationCompletionProposal<LookupElement>(offset, prefix, desc, text, declaration, producedReference, scope, data.lastCompilationUnit, includeDefaulted,
-    positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue, ideaCompletionManager)
+    Boolean inherited, Boolean qualified, Declaration? qualifyingValue, IdeaCompletionContext ctx)
+        extends InvocationCompletionProposal(offset, prefix, desc, text, declaration, producedReference, scope, ctx.lastCompilationUnit, includeDefaulted,
+    positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue)
         satisfies IdeaCompletionProposal {
     
     shared actual variable Boolean toggleOverwrite = false;
@@ -54,32 +55,42 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = data.commonDocument;
+                value platformDoc = ctx.commonDocument;
                 replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
-                PsiDocumentManager.getInstance(data.editor.project).commitDocument(platformDoc.nativeDocument);
+                PsiDocumentManager.getInstance(ctx.editor.project).commitDocument(platformDoc.nativeDocument);
                 
                 value change = createChange(platformDoc);
                 
-                object extends WriteCommandAction<DefaultRegion?>(data.editor.project, data.file) {
+                object extends WriteCommandAction<DefaultRegion?>(ctx.editor.project, ctx.file) {
                     shared actual void run(Result<DefaultRegion?> result) {
                         change.apply();
                     }
                 }.execute();
                 
-                adjustSelection(data);
-                activeLinkedMode(platformDoc, data);
+                adjustSelection(ctx);
+                activeLinkedMode(platformDoc, ctx);
             }
         }
     , null, [declaration, text])
             .withTailText(greyText, true)
             .withTypeText(returnType);
     
-    shared actual LookupElement newNestedCompletionProposal(Declaration dec, Declaration? qualifier, Integer loc, Integer index, Boolean basic, String op) {
-        value desc = getNestedCompletionText(op, data.lastCompilationUnit.unit, dec, qualifier, basic, true);
-        value text = getNestedCompletionText(op, data.lastCompilationUnit.unit, dec, qualifier, basic, false);
-        return newLookup(desc, text, ideaIcons.forDeclaration(dec));
+    shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
+        Declaration dec, Declaration? qualifier, Integer loc, Integer index, Boolean basic, String op) {
+        
+        if (is IdeaProposalsHolder proposals) {
+            value desc = getNestedCompletionText(op, ctx.lastCompilationUnit.unit, dec, qualifier, basic, true);
+            value text = getNestedCompletionText(op, ctx.lastCompilationUnit.unit, dec, qualifier, basic, false);
+            
+            proposals.add(newLookup(desc, text, ideaIcons.forDeclaration(dec)));
+        }
     }
     
-    shared actual LookupElement newNestedLiteralCompletionProposal(String val, Integer loc, Integer index)
-            => newLookup(val, val, ideaIcons.correction);
+    shared actual void newNestedLiteralCompletionProposal(ProposalsHolder proposals,
+        String val, Integer loc, Integer index) {
+        
+        if (is IdeaProposalsHolder proposals) {
+            proposals.add(newLookup(val, val, ideaIcons.correction));
+        }
+    }
 }

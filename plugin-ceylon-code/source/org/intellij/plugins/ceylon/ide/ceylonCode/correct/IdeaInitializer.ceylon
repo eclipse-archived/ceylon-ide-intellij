@@ -1,10 +1,10 @@
 import com.intellij.codeInsight.lookup {
-    LookupElement,
     LookupElementBuilder
 }
 import com.redhat.ceylon.ide.common.completion {
     getProposedName,
-    appendPositionalArgs
+    appendPositionalArgs,
+    ProposalsHolder
 }
 import com.redhat.ceylon.ide.common.correct {
     AbstractInitializerQuickFix
@@ -14,21 +14,36 @@ import com.redhat.ceylon.model.typechecker.model {
     Functional
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
+    IdeaProposalsHolder
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
 
 class IdeaInitializer()
-        satisfies AbstractInitializerQuickFix<LookupElement> {
+        satisfies AbstractInitializerQuickFix {
 
-    shared actual LookupElement newNestedCompletionProposal(Declaration dec, 
-        Integer offset) => LookupElementBuilder.create(getText(dec, false))
-                .withPresentableText(getText(dec, true))
-                .withIcon(ideaIcons.forDeclaration(dec));
+    shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
+        Declaration dec, Integer offset) {
+        
+        if (is IdeaProposalsHolder proposals) {
+            proposals.add(
+                LookupElementBuilder.create(getText(dec, false))
+                        .withPresentableText(getText(dec, true))
+                        .withIcon(ideaIcons.forDeclaration(dec))
+            );
+        }
+    }
 
     
-    shared actual LookupElement newNestedLiteralCompletionProposal(String val, 
-        Integer offset) => LookupElementBuilder.create(val);
+    shared actual void newNestedLiteralCompletionProposal(ProposalsHolder proposals,
+        String val, Integer offset) {
+        
+        if (is IdeaProposalsHolder proposals) {
+            proposals.add(LookupElementBuilder.create(val));
+        }
+    }
     
     String getText(Declaration dec, Boolean description) {
         StringBuilder sb = StringBuilder();

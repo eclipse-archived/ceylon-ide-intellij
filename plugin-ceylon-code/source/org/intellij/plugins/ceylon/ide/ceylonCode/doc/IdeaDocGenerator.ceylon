@@ -39,9 +39,6 @@ import com.redhat.ceylon.ide.common.model {
 import com.redhat.ceylon.ide.common.platform {
     CommonDocument
 }
-import com.redhat.ceylon.ide.common.settings {
-    CompletionOptions
-}
 import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult,
     IdePhasedUnit
@@ -109,7 +106,6 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
         shared actual TypeChecker typeChecker => tc;
         shared actual BaseCeylonProject? ceylonProject => pu.moduleSourceMapper?.ceylonProject;
         shared Project ideaProject => p;
-        shared actual CompletionOptions options => nothing;
         shared actual CommonDocument commonDocument => nothing;
     }
 

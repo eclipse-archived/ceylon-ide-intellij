@@ -36,7 +36,7 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
         doc.nativeDocument.replaceString(start, start + length, javaString(newText));
     }
     
-    shared void adjustSelection(CompletionData data) {
+    shared void adjustSelection(IdeaCompletionContext data) {
         value selection = getSelectionInternal(data.commonDocument);
         data.editor.selectionModel.setSelection(selection.start, selection.end);
         data.editor.caretModel.moveToOffset(selection.end);

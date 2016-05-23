@@ -94,9 +94,6 @@ import javax.swing {
     JLabel
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    ideaCompletionManager
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlightProposal
 }
@@ -300,7 +297,7 @@ shared class IdeaQuickFixData(
         PlatformTextChange change, Tree.Term term, Tree.BaseMemberExpression bme) {
         
         value callback = void (Project project, Editor editor, PsiFile psiFile) {
-            declareLocalQuickFix.enableLinkedMode(this, term, ideaCompletionManager);
+            declareLocalQuickFix.enableLinkedMode(this, term);
         };
         
         registerFix { 

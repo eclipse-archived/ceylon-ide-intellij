@@ -13,7 +13,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
 import com.redhat.ceylon.ide.common.completion {
-    ControlStructureProposal
+    ControlStructureProposal,
+    ProposalsHolder
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration
@@ -24,34 +25,37 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
-    String text, Declaration declaration, CompletionData data, Node? node)
-        extends ControlStructureProposal<LookupElement>
-        (offset, prefix, desc, text, node, declaration, data)
+    String text, Declaration declaration, IdeaCompletionContext ctx, Node? node)
+        extends ControlStructureProposal
+        (offset, prefix, desc, text, node, declaration, ctx)
         satisfies IdeaCompletionProposal {
 
     shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.correction,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
-                value platformDoc = data.commonDocument;
+                value platformDoc = ctx.commonDocument;
                 if (exists node) {
                     value start = offset;
                     value nodeText = platformDoc.getText(node.startIndex.intValue(), node.distance.intValue());
                     value len = text.size - (prefix.size - nodeText.size) + 1; 
 
                     replaceInDoc(platformDoc, start, len, "");
-                    PsiDocumentManager.getInstance(data.editor.project).commitDocument(platformDoc.nativeDocument);
+                    PsiDocumentManager.getInstance(ctx.editor.project).commitDocument(platformDoc.nativeDocument);
                 }
                 
                 applyInternal(platformDoc);
-                adjustSelection(data);
+                adjustSelection(ctx);
             }
         }
     , null, [declaration, text]);
         
     
-    shared actual LookupElement newNameCompletion(String? name)
-            => LookupElementBuilder.create(name);
+    shared actual void newNameCompletion(ProposalsHolder proposals, String? name) {
+        if (is IdeaProposalsHolder proposals) {
+            proposals.add(LookupElementBuilder.create(name));
+        }
+    }
     
     shared actual Boolean toggleOverwrite => false;
 }

@@ -31,6 +31,9 @@ import com.intellij.openapi.util {
 import com.intellij.psi {
     PsiDocumentManager
 }
+import com.redhat.ceylon.ide.common.completion {
+    ProposalsHolder
+}
 import com.redhat.ceylon.ide.common.platform {
     LinkedMode
 }
@@ -40,7 +43,8 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    CustomLookupCellRenderer
+    CustomLookupCellRenderer,
+    IdeaProposalsHolder
 }
 
 shared class IdeaLinkedMode(IdeaDocument document) extends LinkedMode(document) {
@@ -53,10 +57,10 @@ shared class IdeaLinkedMode(IdeaDocument document) extends LinkedMode(document) 
     }
 
     shared actual void addEditableRegion(Integer start, Integer length, Integer exitSeqNumber,
-        Anything proposals) {
+        ProposalsHolder holder) {
 
-        if (is LookupElement[] proposals) {
-            model.addEditableRegion(start, length, proposals);
+        if (is IdeaProposalsHolder holder) {
+            model.addEditableRegion(start, length, holder.proposals.sequence());
         }
     }
 

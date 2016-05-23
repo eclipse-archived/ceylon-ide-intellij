@@ -37,9 +37,15 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import com.redhat.ceylon.ide.common.completion {
+    ProposalsHolder
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
+    IdeaProposalsHolder
+}
 
 class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFile f)
-        satisfies AssignToLocalProposal<LookupElement> {
+        satisfies AssignToLocalProposal {
     
     shared actual variable Integer currentOffset = e.caretModel.offset;
     
@@ -62,12 +68,16 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
         lm.install(this, 0, 0);
     }
     
-    shared actual LookupElement[] toProposals(<String|Type>[] types, 
-        Integer offset, Unit unit) => types.map((type) {
+    shared actual void toProposals(<String|Type>[] types, ProposalsHolder proposals, 
+        Integer offset, Unit unit) {
+        
+        assert(is IdeaProposalsHolder proposals);
+        
+        types.each((type) {
             if (is String type) {
-                return LookupElementBuilder.create(type).withIcon(ideaIcons.correction);
-            }
-            return LookupElementBuilder.create(type.asString(unit))
+                proposals.add(LookupElementBuilder.create(type).withIcon(ideaIcons.correction));
+            } else {
+                value prop = LookupElementBuilder.create(type.asString(unit))
                     .withIcon(ideaIcons.forDeclaration(type.declaration))
                     .withInsertHandler(object satisfies InsertHandler<LookupElement> {
                         shared actual void handleInsert(InsertionContext ctx, LookupElement el) {
@@ -82,10 +92,18 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
                             }
                         }
                     });
-        }).sequence();
+                proposals.add(prop);
+            }
+        });
+    }
 
-    shared actual LookupElement[] toNameProposals(String[] names, Integer offset, Unit unit, Integer seq) =>
-            names.map(
-                (n) => LookupElementBuilder.create(n).withIcon(ideaIcons.local)
-            ).sequence();
+    shared actual void toNameProposals(String[] names, ProposalsHolder proposals, 
+        Integer offset, Unit unit, Integer seq) {
+
+        assert(is IdeaProposalsHolder proposals);
+        
+        names.each(
+            (n) => proposals.add(LookupElementBuilder.create(n).withIcon(ideaIcons.local))
+        );
+    }
 }
