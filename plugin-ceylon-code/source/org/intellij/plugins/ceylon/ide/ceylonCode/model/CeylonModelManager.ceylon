@@ -208,7 +208,9 @@ shared class CeylonModelManager(model)
                                     value ticks = model.ceylonProjectNumber * 1000;
                                     try (progress = monitor.Progress(ticks, "Updating Ceylon Model")) {
                                         concurrencyManager.withUpToDateIndexes(() {
-                                            for (ceylonProject in model.ceylonProjectsInTopologicalOrder) {
+                                            for (ceylonProject in model
+                                                    .ceylonProjectsInTopologicalOrder.sequence()
+                                                    .reversed) {
                                                 ceylonProject.build.performBuild(progress.newChild(1000));
                                             }
                                         });
