@@ -31,7 +31,9 @@ import com.redhat.ceylon.ide.common.platform {
 }
 
 import java.lang {
-    Thread,
+    Thread {
+        currentThread
+    },
     InterruptedException,
     ThreadLocal,
     Runnable
@@ -155,7 +157,11 @@ shared object concurrencyManager {
             if (ds.dumb) {
                 throw IndexNeededWithNoIndexStrategy();
             } else {
-                platformUtils.log(Status._WARNING, noIndexStrategyMessage);
+                value message = "\n".join { 
+                    noIndexStrategyMessage,
+                    "  Stacktrace: ", *currentThread().stackTrace.array.coalesced.map((stackTraceElement) =>
+                    "    ``stackTraceElement``") };
+                platformUtils.log(Status._WARNING, message);
                 return func();
             }
         }
