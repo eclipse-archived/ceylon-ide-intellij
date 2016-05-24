@@ -12,7 +12,9 @@ import com.intellij.openapi.progress {
     ProcessCanceledException
 }
 import com.intellij.openapi.progress.util {
-    ProgressIndicatorUtils
+    ProgressIndicatorUtils {
+        runWithWriteActionPriority        
+    }
 }
 import com.intellij.openapi.project {
     Project,
@@ -31,7 +33,13 @@ import com.redhat.ceylon.ide.common.platform {
 import java.lang {
     Thread,
     InterruptedException,
-    ThreadLocal
+    ThreadLocal,
+    Runnable
+}
+import com.intellij.openapi.application.ex {
+    ApplicationManagerEx {
+        applicationEx
+    }
 }
 
 shared class NoIndexStrategy 
@@ -67,10 +75,18 @@ shared object concurrencyManager {
         if (application.readAccessAllowed) {
             return func();
         } else {
+            Boolean runInReadActionWithWriteActionPriority(Runnable action) {
+                value succeeded = Ref<Boolean>(false);
+                runWithWriteActionPriority(JavaRunnable {
+                    run() => succeeded.set(applicationEx.tryRunReadAction(action));
+                }, EmptyProgressIndicator());
+                return succeeded.get();
+            }
+            
             value ref = Ref<Return>();
-            while(!ProgressIndicatorUtils.runInReadActionWithWriteActionPriority(JavaRunnable {
+            while(!runInReadActionWithWriteActionPriority(JavaRunnable {
                 run() => ref.set(func());
-            }, EmptyProgressIndicator())) {
+            })) {
                 try {
                     Thread.sleep(200);
                 } catch(InterruptedException ie) {
