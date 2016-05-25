@@ -31,8 +31,12 @@ public class CeylonFoldingBuilder extends FoldingBuilderEx {
         if (root instanceof CeylonPsi.BodyPsi) {
             descriptors.add(new FoldingDescriptor(root.getNode(), root.getTextRange()));
         } else if (root instanceof CeylonPsi.ImportListPsi && root.getTextLength() > 0) {
+            int start = root.getTextRange().getStartOffset();
+            if (root.getText().startsWith("import ")) {
+                start += "import ".length();
+            }
             TextRange range = TextRange.create(
-                    root.getTextRange().getStartOffset() + "import ".length(),
+                    start,
                     root.getTextRange().getEndOffset()
             );
             descriptors.add(new FoldingDescriptor(root.getNode(), range));
