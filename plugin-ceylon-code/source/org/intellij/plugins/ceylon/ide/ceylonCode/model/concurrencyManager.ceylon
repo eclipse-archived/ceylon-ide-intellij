@@ -3,18 +3,19 @@ import ceylon.interop.java {
 }
 
 import com.intellij.openapi.application {
-    ApplicationManager {
-        application
+    ApplicationAdapter
+}
+import com.intellij.openapi.application.ex {
+    ApplicationManagerEx {
+        application=applicationEx
     }
 }
 import com.intellij.openapi.progress {
+    ProgressManager {
+        progressManager=instance
+    },
     EmptyProgressIndicator,
     ProcessCanceledException
-}
-import com.intellij.openapi.progress.util {
-    ProgressIndicatorUtils {
-        runWithWriteActionPriority        
-    }
 }
 import com.intellij.openapi.project {
     Project,
@@ -36,12 +37,8 @@ import java.lang {
     },
     InterruptedException,
     ThreadLocal,
-    Runnable
-}
-import com.intellij.openapi.application.ex {
-    ApplicationManagerEx {
-        applicationEx
-    }
+    Runnable,
+    System
 }
 
 shared class NoIndexStrategy 
@@ -71,25 +68,67 @@ shared class IndexNeededWithNoIndexStrategy()
         extends ConcurrencyError(noIndexStrategyMessage) {}
 
 shared object concurrencyManager {
+    value deadLockDetectionTimeoutSeconds = 30;
+    
     value noIndexStrategy_ = ThreadLocal<NoIndexStrategy?>();
 
     shared Return needReadAccess<Return>(Return() func) {
         if (application.readAccessAllowed) {
             return func();
         } else {
+            "This method is copied on 
+             [[com.intellij.openapi.progress.util::ProgressIndicatorUtils.runInReadActionWithWriteActionPriority]]
+             but doesn't fail when a write action is only pending, since this would lead to deadlocks when another read action is
+             preventing a pending write action to acquire its lock"
             Boolean runInReadActionWithWriteActionPriority(Runnable action) {
-                value succeeded = Ref<Boolean>(false);
-                runWithWriteActionPriority(JavaRunnable {
-                    run() => succeeded.set(applicationEx.tryRunReadAction(action));
-                }, EmptyProgressIndicator());
-                return succeeded.get();
+                value progressIndicator = EmptyProgressIndicator();
+                value listener = object extends ApplicationAdapter() {
+                    shared actual void beforeWriteActionStart(Object action) {
+                        if (!progressIndicator.canceled) {
+                            progressIndicator.cancel();
+                        }
+                    }
+                };
+                value succeededWithAddingListener = application.tryRunReadAction(JavaRunnable {
+                    run() => application.addApplicationListener(listener);
+                });
+                if (!succeededWithAddingListener) { // second catch: writeLock.lock() acquisition is in progress or already acquired
+                    if (!progressIndicator.canceled) {
+                        progressIndicator.cancel();
+                    }
+                    return false;
+                }
+                value wasCancelled = Ref<Boolean>();
+                try {
+                    progressManager.runProcess(JavaRunnable {
+                        void run() {
+                            try {
+                                wasCancelled.set(!application.tryRunReadAction(action));
+                            }
+                            catch (ProcessCanceledException ignore) {
+                                wasCancelled.set(true);
+                            }
+                        }
+                    }, progressIndicator);
+                }
+                finally {
+                    application.removeApplicationListener(listener);
+                }
+                Boolean cancelled = wasCancelled.get();
+                return ! cancelled;
             }
             
             value ref = Ref<Return>();
+            
+            value allowedWaitingTime = System.currentTimeMillis() + deadLockDetectionTimeoutSeconds * 1000;
             while(!runInReadActionWithWriteActionPriority(JavaRunnable {
                 run() => ref.set(func());
             })) {
                 try {
+                    if (System.currentTimeMillis() > allowedWaitingTime) {
+                        platformUtils.log(Status._ERROR, "Stopped waiting for read access to avoid a deadlock");
+                        throw ProcessCanceledException();
+                    }
                     Thread.sleep(200);
                 } catch(InterruptedException ie) {
                     if (application.disposeInProgress) {
