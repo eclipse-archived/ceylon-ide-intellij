@@ -137,6 +137,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
     shared actual String name => ideArtifact.name;
 
     shared actual Boolean loadBinariesFirst => true;
+
+    shared actual Boolean loadInterProjectDependenciesFromSourcesFirst => true;
             
     shared Module ideaModule => ideArtifact;
 
