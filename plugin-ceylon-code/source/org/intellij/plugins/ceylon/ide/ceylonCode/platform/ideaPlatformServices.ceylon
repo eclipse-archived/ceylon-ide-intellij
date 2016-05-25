@@ -26,8 +26,8 @@ shared object ideaPlatformServices satisfies PlatformServices {
     shared actual VfsServices<NativeProject,NativeResource,NativeFolder,NativeFile> vfs<NativeProject, NativeResource, NativeFolder, NativeFile>()
             => unsafeCast<VfsServices<NativeProject,NativeResource,NativeFolder,NativeFile>>(ideaVfsServices);
 
-    shared actual void gotoLocation(Unit unit, Integer offset, Integer length) {
-        // TODO
+    shared actual IdeaDocument? gotoLocation(Unit unit, Integer offset, Integer length) {
+        return null;
     }
     
     document => ideaDocumentServices;

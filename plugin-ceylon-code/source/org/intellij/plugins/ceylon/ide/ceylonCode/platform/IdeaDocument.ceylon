@@ -25,4 +25,13 @@ shared class IdeaDocument(shared Document nativeDocument) satisfies CommonDocume
     defaultLineDelimiter => "\n";
 
     size => nativeDocument.textLength;
+
+    shared actual Boolean equals(Object that) {
+        if (is IdeaDocument that) {
+            return nativeDocument==that.nativeDocument;
+        }
+        else {
+            return false;
+        }
+    }
 }

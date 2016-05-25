@@ -1,5 +1,6 @@
 import com.intellij.codeInsight.lookup {
-    LookupElementBuilder
+    LookupElementBuilder,
+    LookupElement
 }
 import com.intellij.openapi.util {
     TextRange
@@ -18,7 +19,8 @@ import com.redhat.ceylon.ide.common.completion {
     ProposalsHolder
 }
 import com.redhat.ceylon.ide.common.platform {
-    CompletionServices
+    CompletionServices,
+    TextChange
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
@@ -35,6 +37,19 @@ import java.util {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
+}
+import com.redhat.ceylon.ide.common.doc {
+    Icons
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaTextChange
+}
+import com.redhat.ceylon.ide.common.refactoring {
+    DefaultRegion
+}
+import com.intellij.codeInsight.completion {
+    InsertHandler,
+    InsertionContext
 }
 
 shared object ideaCompletionServices satisfies CompletionServices {
@@ -206,4 +221,25 @@ shared object ideaCompletionServices satisfies CompletionServices {
     }
     
     createProposalsHolder() => IdeaProposalsHolder();
+    
+    shared actual void addProposal(ProposalsHolder proposals, Icons|Declaration icon,
+        String description, DefaultRegion region, String text, TextChange? change) {
+        
+        if (is IdeaProposalsHolder proposals, is IdeaTextChange? change) {
+            value myIcon = switch(icon)
+            case (is Icons) null
+            else ideaIcons.forDeclaration(icon);
+            
+            value handler = if (exists change)
+            then object satisfies InsertHandler<LookupElement> {
+                shared actual void handleInsert(InsertionContext? context, LookupElement? item) {
+                    change.apply();
+                }
+            }
+            else null;
+            
+            proposals.add(newLookup(description, text, myIcon, handler));
+        }
+    }
+    
 }

@@ -57,7 +57,6 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.correct {
     QuickFixData,
-    declareLocalQuickFix,
     asyncModuleImport,
     QuickFixKind,
     addModuleImport
@@ -73,12 +72,6 @@ import com.redhat.ceylon.ide.common.platform {
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Unit,
-    Scope,
-    Type,
-    Declaration
 }
 
 import java.lang {
@@ -247,66 +240,7 @@ shared class IdeaQuickFixData(
         }
     }
 
-    shared actual void addInitializerQuickFix(String description, PlatformTextChange change,
-        DefaultRegion selection, Unit unit, Scope scope, Type? type) {
-
-        if (is IdeaTextChange change) {
-            value range = toRange(selection);
-            void callback(Project project, Editor editor, PsiFile file) {
-                IdeaInitializer().addInitializer(IdeaDocument(editor.document),
-                    selection,
-                    type,
-                    unit,
-                    scope
-                );
-            }
-            registerFix(description, change, range, ideaIcons.correction, false, callback);
-        }
-    }
-    shared actual void addParameterQuickFix(String description, PlatformTextChange change,
-        DefaultRegion selection, Unit unit, Scope scope, Type? type, Integer exitPos) {
-
-        if (is IdeaTextChange change) {
-            value range = toRange(selection);
-            void callback(Project project, Editor editor, PsiFile file) {
-                IdeaInitializer().addInitializer(IdeaDocument(editor.document),
-                    selection,
-                    type,
-                    unit,
-                    scope
-                );
-            }
-            registerFix(description, change, range, ideaIcons.correction, false, callback);
-        }
-    }
-
-    addChangeTypeProposal(String description, PlatformTextChange change, DefaultRegion selection, Unit unit)
-            => registerFix(description, change, TextRange.from(selection.start, selection.length), ideaIcons.correction);
-
     shared actual default void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {}
-
-    addCreateParameterProposal(String description, Declaration dec,
-        Type? type, DefaultRegion selection, Icons image, PlatformTextChange change, Integer exitPos)
-            => registerFix(description, change, toRange(selection), ideaIcons.addCorrection);
-
-    addCreateQuickFix(String description, Scope scope, Unit unit, Type? returnType,
-        Icons image, PlatformTextChange change, Integer exitPos, DefaultRegion selection)
-            => registerFix(description, change, toRange(selection)); // TODO icon
-
-    shared actual void addDeclareLocalProposal(String description, 
-        PlatformTextChange change, Tree.Term term, Tree.BaseMemberExpression bme) {
-        
-        value callback = void (Project project, Editor editor, PsiFile psiFile) {
-            declareLocalQuickFix.enableLinkedMode(this, term);
-        };
-        
-        registerFix { 
-            desc = description; 
-            change = change; 
-            callback = callback; 
-            image = ideaIcons.correction; 
-        };
-    }
 
     shared actual void addAssignToLocalProposal(String description) {
         registerFix { 
