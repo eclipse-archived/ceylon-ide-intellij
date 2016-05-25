@@ -5,7 +5,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
@@ -41,7 +43,10 @@ public class CeylonAddFileAction extends CeylonAddingFilesAction {
                 @Override
                 public void run() {
                     boolean isClass = Character.isUpperCase(fileName.charAt(0));
-                    ceylonFileFactory.createUnit(subdirectory, unitName, fileName, isClass);
+                    PsiElement unit = ceylonFileFactory.createUnit(subdirectory, unitName, fileName, isClass);
+                    if (unit instanceof Navigatable) {
+                        ((Navigatable) unit).navigate(true);
+                    }
                 }
             });
         }

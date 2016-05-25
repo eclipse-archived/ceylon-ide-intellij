@@ -6,7 +6,9 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
@@ -37,7 +39,11 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
                     PsiDirectory subdirectory = createSubdirectories(packageName, srcRootDirectory, ".");
 
                     if (subdirectory != null) {
-                        ceylonFileFactory.createPackageDescriptor(subdirectory, packageName, true);
+                        PsiElement pack = ceylonFileFactory.createPackageDescriptor(subdirectory, packageName, true);
+
+                        if (pack instanceof Navigatable) {
+                            ((Navigatable) pack).navigate(true);
+                        }
                     } else {
                         Logger.getInstance(CeylonAddModuleAction.class)
                                 .error("Can't create package descriptor: subdirectory is null.");
