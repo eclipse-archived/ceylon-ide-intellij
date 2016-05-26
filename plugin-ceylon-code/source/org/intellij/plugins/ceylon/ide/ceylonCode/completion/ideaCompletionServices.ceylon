@@ -213,6 +213,4 @@ shared object ideaCompletionServices satisfies CompletionServices {
             });
         }
     }
-    
-    
 }

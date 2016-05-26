@@ -1,7 +1,6 @@
 package org.intellij.plugins.ceylon.ide.doc;
 
 import ceylon.language.language_;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.testFramework.LightCodeInsightTestCase;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
@@ -9,7 +8,7 @@ import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.BaseCeylonProject;
-import com.redhat.ceylon.ide.common.settings.CompletionOptions;
+import com.redhat.ceylon.ide.common.platform.CommonDocument;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import org.antlr.runtime.CommonToken;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
@@ -42,7 +41,7 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
         final PhasedUnit pu = tc.getPhasedUnitFromRelativePath(sourceFileName);
         final Tree.CompilationUnit cu = pu.getCompilationUnit();
 
-        LocalAnalysisResult<Document> params = new LocalAnalysisResult<Document>() {
+        LocalAnalysisResult params = new LocalAnalysisResult() {
             @Override
             public Tree.CompilationUnit getLastCompilationUnit() {
                 return cu;
@@ -64,7 +63,7 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
             }
 
             @Override
-            public Document getDocument() {
+            public CommonDocument getCommonDocument() {
                 return null;
             }
 
@@ -80,11 +79,6 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
 
             @Override
             public BaseCeylonProject getCeylonProject() {
-                return null;
-            }
-
-            @Override
-            public CompletionOptions getOptions() {
                 return null;
             }
         };
