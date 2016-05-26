@@ -3,7 +3,8 @@ import com.redhat.ceylon.ide.common.platform {
     PlatformServices,
     VfsServices,
     CommonDocument,
-    NoopLinkedMode
+    NoopLinkedMode,
+    JavaModelServices
 }
 import com.redhat.ceylon.ide.common.util {
     unsafeCast
@@ -20,6 +21,10 @@ shared object ideaPlatformServices satisfies PlatformServices {
     shared actual ModelServices<NativeProject,NativeResource,NativeFolder,NativeFile>
             model<NativeProject, NativeResource, NativeFolder, NativeFile>()
             => unsafeCast<ModelServices<NativeProject,NativeResource,NativeFolder,NativeFile>>(ideaModelServices);
+    
+    shared actual JavaModelServices<JavaClassRoot> 
+            javaModel<JavaClassRoot>()
+            => unsafeCast<JavaModelServices<JavaClassRoot>>(ideaJavaModelServices);
     
     utils() => ideaPlatformUtils;
     

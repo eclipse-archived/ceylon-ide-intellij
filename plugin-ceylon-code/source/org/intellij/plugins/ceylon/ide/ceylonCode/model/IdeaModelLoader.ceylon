@@ -55,6 +55,7 @@ import java.lang {
     Runnable
 }
 
+
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     IdeaModuleSourceMapper ideaModuleSourceMapper, Modules modules)
         extends IdeModelLoader<IJModule,VirtualFile,VirtualFile,VirtualFile,PsiClass,PsiClass>
@@ -140,27 +141,6 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             return null;
         }));
     }
-    
-    shared actual PsiClass getJavaClassRoot(ClassMirror classMirror) {
-        assert(is PSIClass classMirror);
-        return classMirror.psi;
-    }
-    
-    shared actual Unit newCeylonBinaryUnit(PsiClass cls,
-        String relativePath, String fileName, String fullPath, LazyPackage pkg)
-        => IdeaCeylonBinaryUnit(cls, fileName, relativePath, fullPath, pkg);
-    
-    shared actual Unit newCrossProjectBinaryUnit(PsiClass cls,
-        String relativePath, String fileName, String fullPath, LazyPackage pkg)
-            => IdeaCrossProjectBinaryUnit(cls, fileName, relativePath, fullPath, pkg);
-    
-    shared actual Unit newJavaClassFile(PsiClass cls, String relativePath,
-        String fileName, String fullPath, LazyPackage pkg)
-            => IdeaJavaClassFile(cls, fileName, relativePath, fullPath, pkg);
-    
-    shared actual Unit newJavaCompilationUnit(PsiClass cls,
-        String relativePath, String fileName, String fullPath, LazyPackage pkg)
-            => IdeaJavaCompilationUnit(cls, fileName, relativePath, fullPath, pkg);
     
     shared actual String typeName(PsiClass type) => (type of PsiNamedElement).name;
 

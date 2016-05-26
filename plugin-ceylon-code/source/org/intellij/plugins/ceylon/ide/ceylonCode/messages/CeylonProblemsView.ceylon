@@ -107,7 +107,8 @@ shared class CeylonProblemsViewImpl(project, startupManager, toolWindowManager)
                 list.updateErrors(project, frontendMessages, backendMessages, projectMessages);
             }
 
-            if (project.build.messages.empty) {
+            value allErrors = expand { frontendMessages else {}, backendMessages else {}, projectMessages else {} };
+            if (allErrors.empty) {
                 myToolWindow.icon = ideaIcons.problemsViewOk;
             } else if (project.build.messages.find((m) => m.severity == Severity.error) exists) {
                 myToolWindow.icon = ideaIcons.problemsViewErrors;

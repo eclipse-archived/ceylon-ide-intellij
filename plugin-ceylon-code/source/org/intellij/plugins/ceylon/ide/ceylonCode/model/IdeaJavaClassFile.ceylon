@@ -11,16 +11,16 @@ import com.intellij.psi {
 import com.redhat.ceylon.ide.common.model {
     JavaClassFile
 }
-import com.redhat.ceylon.model.typechecker.model {
-    Package
+import com.redhat.ceylon.model.loader.model {
+    LazyPackage
 }
 
-class IdeaJavaClassFile(
+shared class IdeaJavaClassFile(
     PsiClass cls,
     String filename,
     String relativePath,
     String fullPath,
-    Package pkg)
+    LazyPackage pkg)
         extends JavaClassFile<Module,VirtualFile,VirtualFile,PsiClass,PsiClass|PsiMethod>
         (cls, filename, relativePath, fullPath, pkg)
         satisfies IdeaJavaModelAware {

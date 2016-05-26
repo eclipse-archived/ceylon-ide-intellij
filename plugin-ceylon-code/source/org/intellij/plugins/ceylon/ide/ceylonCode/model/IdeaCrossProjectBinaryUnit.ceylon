@@ -15,7 +15,7 @@ import com.redhat.ceylon.model.typechecker.model {
     Package
 }
 
-class IdeaCrossProjectBinaryUnit(PsiClass cls,
+shared class IdeaCrossProjectBinaryUnit(PsiClass cls,
     String filename,
     String relativePath,
     String fullPath,
