@@ -40,6 +40,16 @@ import java.util {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaTextChange
+}
+import com.intellij.codeInsight.completion {
+    InsertHandler,
+    InsertionContext
+}
+import com.intellij.codeInsight.lookup {
+    LookupElement
+}
 
 shared object ideaCompletionServices satisfies CompletionServices {
     
@@ -174,11 +184,33 @@ shared object ideaCompletionServices satisfies CompletionServices {
         }
     }
     
-    shared actual void addProposal(CompletionContext ctx, Integer offset, String prefix, Icons|Declaration icon, String description, String text, ProposalKind kind, TextChange? additionalChange, DefaultRegion? selection) {
+    shared actual void addProposal(CompletionContext ctx, Integer offset, 
+        String prefix, Icons|Declaration icon, String description, String text,
+        ProposalKind kind, TextChange? additionalChange, DefaultRegion? selection) {
         
         if (is IdeaCompletionContext ctx) {
-            // TODO finish that
-            ctx.proposals.add(newLookup(description, text));
+            value myIcon = switch(icon)
+            case (is Icons) null
+            else ideaIcons.forDeclaration(icon);
+            
+            value myRange = if (exists selection)
+            then TextRange.from(selection.start, selection.length)
+            else null;
+            
+            value myHandler = if (is IdeaTextChange additionalChange)
+            then object satisfies InsertHandler<LookupElement> {
+                handleInsert(InsertionContext ic, LookupElement? t)
+                        => additionalChange.apply();
+            }
+            else null;
+            
+            ctx.proposals.add(newLookup {
+                desc = description;
+                text = text;
+                icon = myIcon;
+                selection = myRange;
+                handler = myHandler;
+            });
         }
     }
     
