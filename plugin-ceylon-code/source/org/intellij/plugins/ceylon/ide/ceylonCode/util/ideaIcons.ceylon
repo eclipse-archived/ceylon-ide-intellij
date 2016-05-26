@@ -34,30 +34,30 @@ shared object ideaIcons {
     shared Icon singleImport => IconLoader.getIcon("/icons/ceylonImport.png");
     shared Icon packages => IconLoader.getIcon("/icons/ceylonPackage.png");
     shared Icon modules => IconLoader.getIcon("/icons/ceylonModule.png");
-    shared Icon classes => PlatformIcons.\iCLASS_ICON;
-    shared Icon interfaces => PlatformIcons.\iINTERFACE_ICON;
-    shared Icon objects => AllIcons.Nodes.\iAnonymousClass;
-    shared Icon methods => PlatformIcons.\iMETHOD_ICON;
-    shared Icon attributes = PlatformIcons.\iFIELD_ICON;
-    shared Icon enumerations = PlatformIcons.\iENUM_ICON;
-    shared Icon exceptions = AllIcons.Nodes.\iExceptionClass;
-    shared Icon param => AllIcons.Nodes.\iParameter;
+    shared Icon classes => PlatformIcons.classIcon;
+    shared Icon interfaces => PlatformIcons.interfaceIcon;
+    shared Icon objects => AllIcons.Nodes.anonymousClass;
+    shared Icon methods => PlatformIcons.methodIcon;
+    shared Icon attributes = PlatformIcons.fieldIcon;
+    shared Icon enumerations = PlatformIcons.enumIcon;
+    shared Icon exceptions = AllIcons.Nodes.exceptionClass;
+    shared Icon param => AllIcons.Nodes.parameter;
     shared Icon local => IconLoader.getIcon("/icons/ceylonLocal.png");
-    shared Icon values => AllIcons.Nodes.\iVariable;
-    shared Icon anonymousFunction => AllIcons.Nodes.\iFunction;
-    shared Icon annotations => AllIcons.Gutter.\iExtAnnotation;
-    shared Icon constructors => AllIcons.Nodes.\iClassInitializer;
+    shared Icon values => AllIcons.Nodes.variable;
+    shared Icon anonymousFunction => AllIcons.Nodes.\ifunction;
+    shared Icon annotations => AllIcons.Gutter.extAnnotation;
+    shared Icon constructors => AllIcons.Nodes.classInitializer;
     
-    shared Icon refinement => AllIcons.Gutter.\iImplementingMethod;
-    shared Icon extendedType => AllIcons.Gutter.\iOverridingMethod;
-    shared Icon satisfiedTypes => AllIcons.General.\iImplementingMethod;
+    shared Icon refinement => AllIcons.Gutter.implementingMethod;
+    shared Icon extendedType => AllIcons.Gutter.overridingMethod;
+    shared Icon satisfiedTypes => AllIcons.General.implementingMethod;
     shared Icon types => IconLoader.getIcon("/icons/ceylonTypes.png");
     
     shared Icon surround => IconLoader.getIcon("/icons/ceylonSurround.png");
-    shared Icon correction => AllIcons.Actions.\iRedo;
-    shared Icon addCorrection => AllIcons.General.\iAdd;
-    shared Icon see => AllIcons.Actions.\iShare;
-    shared Icon returns => AllIcons.Actions.\iStepOut;
+    shared Icon correction => AllIcons.Actions.redo;
+    shared Icon addCorrection => AllIcons.General.add;
+    shared Icon see => AllIcons.Actions.share;
+    shared Icon returns => AllIcons.Actions.stepOut;
     
     shared Icon ceylon => IconLoader.getIcon("/icons/ceylon.png");
     shared Icon file => IconLoader.getIcon("/icons/ceylonFile.png");
@@ -99,8 +99,8 @@ shared object ideaIcons {
         Declaration? model = if (is Declaration decl) then decl else decl.declarationModel;
         
         if (exists icon = baseIcon, exists model) {
-            value layer = if (model.shared) then PlatformIcons.\iPUBLIC_ICON
-                                            else PlatformIcons.\iPRIVATE_ICON;
+            value layer = if (model.shared) then PlatformIcons.publicIcon
+                                            else PlatformIcons.privateIcon;
             return createHorizontalIcon(icon, layer);
         }
         
