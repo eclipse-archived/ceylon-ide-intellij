@@ -5,17 +5,13 @@ import com.intellij.openapi.util {
     IconLoader
 }
 import com.intellij.ui {
-    LayeredIcon
+    RowIcon
 }
 import com.intellij.util {
     PlatformIcons
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
-}
-
-import javax.swing {
-    Icon
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
@@ -27,6 +23,10 @@ import com.redhat.ceylon.model.typechecker.model {
     TypeParameter,
     TypeAlias,
     NothingType
+}
+
+import javax.swing {
+    Icon
 }
 
 shared object ideaIcons {
@@ -101,7 +101,7 @@ shared object ideaIcons {
         if (exists icon = baseIcon, exists model) {
             value layer = if (model.shared) then PlatformIcons.\iPUBLIC_ICON
                                             else PlatformIcons.\iPRIVATE_ICON;
-            return LayeredIcon.createHorizontalIcon(icon, layer);
+            return createHorizontalIcon(icon, layer);
         }
         
         if (baseIcon is Null) {
@@ -109,5 +109,11 @@ shared object ideaIcons {
         }
         
         return baseIcon;
+    }
+
+    Icon createHorizontalIcon(Icon *icons) {
+        value icon = RowIcon(icons.size, RowIcon.Alignment.center);
+        icons.indexed.each((idx -> ic) => icon.setIcon(ic, idx));
+        return icon;
     }
 }

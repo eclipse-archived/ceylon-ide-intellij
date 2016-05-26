@@ -2,7 +2,7 @@ package org.intellij.plugins.ceylon.ide.presentation;
 
 import com.intellij.ide.IconProvider;
 import com.intellij.psi.PsiElement;
-import com.intellij.ui.LayeredIcon;
+import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.model.typechecker.util.ModuleManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeyLightClass;
@@ -31,7 +31,10 @@ public class CeylonIconProvider extends IconProvider {
         if (element instanceof CeyLightClass) {
             return ((CeyLightClass) element).isInterface() ? PlatformIcons.INTERFACE_ICON : PlatformIcons.CLASS_ICON;
         } else if (element instanceof CeyLightMethod) {
-            return LayeredIcon.createHorizontalIcon(PlatformIcons.METHOD_ICON, PlatformIcons.PUBLIC_ICON);
+            RowIcon icon = new RowIcon(2, RowIcon.Alignment.CENTER);
+            icon.setIcon(PlatformIcons.METHOD_ICON, 0);
+            icon.setIcon(PlatformIcons.PUBLIC_ICON, 1);
+            return icon;
         }
         return null;
     }
