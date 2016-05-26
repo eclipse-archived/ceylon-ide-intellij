@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.intellij.util.containers.ContainerUtilRt.newArrayList;
+
 public class CeylonGotoClassContributor implements GotoClassContributor {
 
     private static final Logger LOGGER = Logger.getInstance(CeylonGotoClassContributor.class);
@@ -39,6 +41,10 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
 
         IdeaCeylonProjects ceylonProjects = project.getComponent(IdeaCeylonProjects.class);
 
+        if (ceylonProjects == null) {
+            return new String[0];
+        }
+
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonProjects.getProject(module);
 
@@ -52,14 +58,19 @@ public class CeylonGotoClassContributor implements GotoClassContributor {
                 continue;
             }
 
-            for (com.redhat.ceylon.model.typechecker.model.Module m : modules.getTypecheckerModules().getListOfModules()) {
+            // The global model might get updated while we are iterating declarations, so
+            // we should make defensive copies to avoid ConcurrentModificationException
+            Set<com.redhat.ceylon.model.typechecker.model.Module> moduleList =
+                    modules.getTypecheckerModules().getListOfModules();
+
+            for (com.redhat.ceylon.model.typechecker.model.Module m : moduleList) {
                 if (m instanceof IdeaModule) {
                     if (!includeNonProjectItems && !((IdeaModule) m).getIsProjectModule()) {
                         continue;
                     }
 
-                    for (Package pack : m.getPackages()) {
-                        for (Declaration declaration : pack.getMembers()) {
+                    for (Package pack : newArrayList(m.getPackages())) {
+                        for (Declaration declaration : newArrayList(pack.getMembers())) {
                             if (declaration.getName() == null) {
                                 continue;
                             }
