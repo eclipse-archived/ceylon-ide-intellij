@@ -57,12 +57,23 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import com.intellij.openapi.project {
     DumbAware
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    ExternalPhasedUnit
+}
 
 shared class CeylonTypeCheckerAnnotator() 
         extends ExternalAnnotator<CeylonFile?, {[Message, TextRange?]*}?>()
         satisfies DumbAware {
-    shared actual CeylonFile? collectInformation(PsiFile file)
-            => if (is CeylonFile ceylonFile = file) then ceylonFile else null;
+
+    shared actual CeylonFile? collectInformation(PsiFile file) {
+        if (is CeylonFile file,
+            !file.phasedUnit is ExternalPhasedUnit) {
+
+            return file;
+        }
+
+        return null;
+    }
     
     shared actual CeylonFile? collectInformation(PsiFile file, Editor editor, Boolean hasErrors)
             => collectInformation(file);

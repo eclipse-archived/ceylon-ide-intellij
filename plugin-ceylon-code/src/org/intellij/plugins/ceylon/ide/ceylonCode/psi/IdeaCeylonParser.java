@@ -14,6 +14,7 @@ import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl;
 import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IStubFileElementType;
+import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.parser.LexError;
@@ -90,9 +91,9 @@ public class IdeaCeylonParser extends IStubFileElementType {
             AstVisitor visitor = new AstVisitor(file, tokens, verbose);
 
             Tree.CompilationUnit cu = parser.compilationUnit();
-            Tree.CompilationUnit forcedCu = file.getUserData(FORCED_CU_KEY);
-            if (forcedCu != null) {
-                cu = forcedCu;
+            PhasedUnit externalPu = findExternalPhasedUnit(file);
+            if (externalPu != null) {
+                cu = externalPu.getCompilationUnit();
             }
 
             visitor.visit(cu);
@@ -100,6 +101,13 @@ public class IdeaCeylonParser extends IStubFileElementType {
             ASTNode root = visitor.parent;
             if (verbose) {
                 dump(root, "");
+            }
+
+            if (externalPu != null) {
+                file.setPhasedUnit(externalPu);
+                file.setRootNode(externalPu.getCompilationUnit());
+                file.setTokens(externalPu.getTokens());
+                return root;
             }
 
             if (file.getOriginalFile() instanceof CeylonFile
@@ -121,6 +129,13 @@ public class IdeaCeylonParser extends IStubFileElementType {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private PhasedUnit findExternalPhasedUnit(CeylonFile file) {
+        org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects projects =
+                file.getProject().getComponent(org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects.class);
+
+        return projects.findExternalPhasedUnit(file);
     }
 
     // For debugging purposes only

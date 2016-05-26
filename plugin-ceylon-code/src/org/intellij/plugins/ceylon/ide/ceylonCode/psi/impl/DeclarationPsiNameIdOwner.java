@@ -10,11 +10,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ObjectUtils;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.model.typechecker.model.Value;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -61,8 +59,9 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @NotNull
     @Override
     public SearchScope getUseScope() {
-        if (getCeylonNode().getScope() instanceof Value) {
-            return new LocalSearchScope(getContainingFile());
+        if (((CeylonFile) getContainingFile()).getPhasedUnit() instanceof ExternalPhasedUnit) {
+            return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope()
+                    .union(new LocalSearchScope(getContainingFile()));
         }
 
         return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope();
