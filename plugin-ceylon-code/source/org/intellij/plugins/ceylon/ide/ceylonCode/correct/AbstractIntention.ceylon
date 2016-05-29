@@ -60,6 +60,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+    highlightProposal
+}
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
@@ -98,7 +101,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             
             if (exists _node,
                 exists pr = project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod)) {
-                
+
+                value outerProject = project;
                 value data = object extends IdeaQuickFixData(
                     dummyMsg, 
                     psiFile.viewProvider.document,
@@ -113,7 +117,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     shared actual void addQuickFix(String desc, PlatformTextChange|Anything() change,
                         DefaultRegion? selection, Boolean ignored, Icons? icon, QuickFixKind kind) {
                         if (is IdeaTextChange change) {
-                            makeAvailable(desc, change, selection);
+                            makeAvailable(outerProject, desc, change, selection);
                         }
                     }
 
@@ -125,12 +129,12 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                                     then DefaultRegion(selection.startOffset, selection.length)
                                     else null;
                         if (is IdeaTextChange|Anything() change) {
-                            makeAvailable(desc, change, sel, callback);
+                            makeAvailable(outerProject, desc, change, sel, callback);
                         }
                     }
 
                     shared actual void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {
-                        makeAvailable(description, null, null, (p, e, f) {
+                        makeAvailable(outerProject, description, null, null, (p, e, f) {
                                 value document = IdeaDocument(f.viewProvider.document);
                                 convertToClassQuickFix.applyChanges(document, declaration);
                         });
@@ -150,11 +154,11 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     
     shared formal void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset);
     
-    shared void makeAvailable(String desc, <IdeaTextChange|Anything()>? change = null,
+    void makeAvailable(Project p, String desc, <IdeaTextChange|Anything()>? change = null,
         DefaultRegion? sel = null, 
         Anything callback(Project p, Editor e, PsiFile f) => noop) {
         
-        setText(desc);
+        setText(highlightProposal(desc, p));
         available = true;
         this.change = change;
         this.callback = callback;
