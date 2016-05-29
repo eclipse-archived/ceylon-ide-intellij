@@ -18,6 +18,7 @@
             <exclude path="com/intellij/openapi/editor/*"/>
             <include path="com/intellij/openapi/progress/util/*"/>
             <exclude path="com/intellij/openapi/progress/*"/>
+            <exclude path="com/intellij/ui/*"/>
         </filter>
     </module>
 

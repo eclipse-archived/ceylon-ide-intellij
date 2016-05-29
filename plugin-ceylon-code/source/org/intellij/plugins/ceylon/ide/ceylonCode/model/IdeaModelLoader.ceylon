@@ -43,18 +43,13 @@ import com.redhat.ceylon.model.loader.mirror {
     ClassMirror,
     MethodMirror
 }
-import com.redhat.ceylon.model.loader.model {
-    LazyPackage
-}
 import com.redhat.ceylon.model.typechecker.model {
-    Modules,
-    Unit
+    Modules
 }
 
 import java.lang {
     Runnable
 }
-
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     IdeaModuleSourceMapper ideaModuleSourceMapper, Modules modules)
