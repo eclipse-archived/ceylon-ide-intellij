@@ -74,7 +74,11 @@ shared object concurrencyManager {
 
     shared Return needReadAccess<Return>(Return() func) {
         if (application.readAccessAllowed) {
-            return func();
+            value ref = Ref<Return>();
+            ProgressManager.instance.executeNonCancelableSection(JavaRunnable(void () {
+                ref.set(func());
+            }));
+            return ref.get();
         } else {
             "This method is copied on 
              [[com.intellij.openapi.progress.util::ProgressIndicatorUtils.runInReadActionWithWriteActionPriority]]
