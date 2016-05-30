@@ -85,7 +85,10 @@ shared object concurrencyManager {
              but doesn't fail when a write action is only pending, since this would lead to deadlocks when another read action is
              preventing a pending write action to acquire its lock"
             Boolean runInReadActionWithWriteActionPriority(Runnable action) {
-                value progressIndicator = EmptyProgressIndicator();
+                value progressIndicator = object extends EmptyProgressIndicator() {
+                    // hashCode() seems to be quite slow when used in CoreProgressManager.threadsUnderIndicator
+                    hash => 42;
+                };
                 value listener = object extends ApplicationAdapter() {
                     shared actual void beforeWriteActionStart(Object action) {
                         if (!progressIndicator.canceled) {
