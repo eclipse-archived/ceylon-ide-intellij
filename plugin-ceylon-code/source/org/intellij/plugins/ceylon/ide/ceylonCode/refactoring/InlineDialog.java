@@ -9,6 +9,11 @@ public class InlineDialog extends InlineOptionsDialog {
 
     private Object refactoring;
 
+    @Override
+    protected boolean hasPreviewButton() {
+        return false;
+    }
+
     protected InlineDialog(Project project, PsiElement element, Object refactoring) {
         super(project, true, element);
         this.refactoring = refactoring;
