@@ -25,7 +25,6 @@ import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Node,
     Tree
 }
 import com.redhat.ceylon.ide.common.doc {
@@ -42,9 +41,6 @@ import com.redhat.ceylon.ide.common.platform {
 import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult,
     IdePhasedUnit
-}
-import com.redhat.ceylon.ide.common.util {
-    FindReferencedNodeVisitor
 }
 import com.redhat.ceylon.model.typechecker.model {
     Referenceable,
@@ -297,19 +293,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
     getUnitName(Unit u) => u.filename;
     
     getLiveValue(Declaration dec, Unit unit) => null;
-    
-    shared actual Node? getReferencedNode(Declaration dec) {
-        value relPath = dec.unit.relativePath;
 
-        if (exists unit = tc.getPhasedUnitFromRelativePath(relPath)) {
-            value visitor = FindReferencedNodeVisitor(dec);
-            unit.compilationUnit.visit(visitor);
-            return visitor.declarationNode;
-        }
-        
-        return null;
-    }
-    
     getPhasedUnit(Unit u) => tc.getPhasedUnitFromRelativePath(u.relativePath);
     
     supportsQuickAssists => true;
