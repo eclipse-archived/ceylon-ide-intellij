@@ -1,0 +1,3 @@
+class C() {
+    shared Integer a = 1;
+}

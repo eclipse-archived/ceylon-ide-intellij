@@ -1,0 +1,3 @@
+class C() {
+    variable Integer a = 1;
+}

@@ -1,0 +1,4 @@
+abstract class C() {
+    shared default void a() {
+    }
+}

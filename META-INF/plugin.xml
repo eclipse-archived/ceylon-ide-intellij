@@ -303,7 +303,19 @@
             <category>Ceylon/Declaration</category>
         </intentionAction>
         <intentionAction>
-            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddAnnotationIntention</className>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddVariableAnnotationIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddSharedAnnotationIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddDefaultAnnotationIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddFormalAnnotationIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>
         <intentionAction>
