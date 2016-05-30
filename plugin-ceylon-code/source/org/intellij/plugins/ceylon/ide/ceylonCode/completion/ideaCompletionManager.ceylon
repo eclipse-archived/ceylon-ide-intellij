@@ -4,7 +4,8 @@ import com.intellij.codeInsight.completion {
     CompletionProvider,
     CompletionService {
         completionService
-    }
+    },
+    CompletionInitializationContext
 }
 import com.intellij.codeInsight.lookup {
     LookupElementWeigher,
@@ -63,10 +64,19 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
         
         result = result.withRelevanceSorter(sorter);
 
-        if (is LeafPsiElement position = parameters.position,
-            position.elementType == CeylonTokens.astringLiteral) {
-            
-            result = result.withPrefixMatcher("");
+        if (is LeafPsiElement position = parameters.position) {
+            if (position.elementType == CeylonTokens.astringLiteral) {
+                result = result.withPrefixMatcher("");
+            }
+            if (position.elementType == CeylonTokens.pidentifier) {
+                // In case of a package identifier like `ceylon.collection`, we compute a reference
+                // on the whold path, which will lead IntelliJ to create prefixes like `ceylon.col`
+                // whereas completionManager will return things like `collection`, which won't match
+                // the prefix. We thus have to change the prefix to what's after the dot.
+                value prefix = position.text.spanTo(position.text.size
+                    - CompletionInitializationContext.dummyIdentifierTrimmed.size - 1);
+                result = result.withPrefixMatcher(prefix);
+            }
         }
         
         if (exists element = parameters.originalPosition,
