@@ -41,7 +41,7 @@ shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfi
     
     shared actual IdeaDocument commonDocument = IdeaDocument(editor.document);
     
-    lastCompilationUnit => file.compilationUnit;
+    lastCompilationUnit => file.phasedUnit.compilationUnit;
     parsedRootNode => file.compilationUnit;
     lastPhasedUnit => file.phasedUnit;
     tokens => file.tokens;
