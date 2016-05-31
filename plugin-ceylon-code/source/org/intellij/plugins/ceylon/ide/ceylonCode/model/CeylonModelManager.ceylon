@@ -135,7 +135,7 @@ shared class CeylonModelManager(model)
         & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;
     shared variable Integer typecheckingPeriod = 5;
-    variable value periodicTypecheckingEnabled_ = true;
+    variable value periodicTypecheckingEnabled_ = false;
     variable value ideaProjectReady = false;
     
     value modelUpdateQueueProcessor = QueueProcessor.createRunnableQueueProcessor();

@@ -27,10 +27,11 @@ shared class ToggleModelUpdateAction() extends AnAction() {
 
             e.presentation.enabled = true;
 
+            value what = " periodic update of model (every ``modelManager.typecheckingPeriod``s)";
             if (modelManager.periodicTypecheckingEnabled) {
-                e.presentation.text = "Disable automatic update of model";
+                e.presentation.text = "Disable" + what;
             } else {
-                e.presentation.text = "Enable automatic update of model";
+                e.presentation.text = "Enable" + what;
             }
         } else {
             e.presentation.enabled = false;
