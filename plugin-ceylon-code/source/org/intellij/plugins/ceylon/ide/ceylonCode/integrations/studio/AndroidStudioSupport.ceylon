@@ -133,7 +133,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             ceylonFileFactory.createModuleDescriptor(psiDir, modName[0], modName[1], Backend.java, {
                 "java.base \"7\"",
                 "android \"``groovyFileManipulator.findAndroidVersion(buildFile) else "23"``\"",
-                "\"com.android.support.appcompat-v7\" \"23.2.1\""
+                "\"com.android.support.appcompat-v7\" \"23.1.1\""
             });
 
             ceylonFileFactory.createFileFromTemplate(psiDir, "MainActivity.ceylon");

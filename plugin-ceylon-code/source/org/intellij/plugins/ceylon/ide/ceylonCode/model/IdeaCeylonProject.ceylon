@@ -321,12 +321,14 @@ shared class IdeaCeylonProject(ideArtifact, model)
     }
 
     value srcPath => "src/main/ceylon";
+    value otherSrcPath => "build/generated/source/r/debug";
     value repoPath => "./build/intermediates/ceylon-android/repository";
 
     shared void setupForAndroid(String jdkProvider) {
         if (!configuration.projectSourceDirectories.contains(srcPath)) {
             configuration.projectSourceDirectories = {
                 srcPath,
+                otherSrcPath,
                 *configuration.projectSourceDirectories
             };
         }
