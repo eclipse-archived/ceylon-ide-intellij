@@ -40,6 +40,9 @@ import java.lang {
     Runnable,
     System
 }
+import java.util.concurrent { 
+    JCallable = Callable
+}
 
 shared class NoIndexStrategy 
         of useAlternateResolution | 
@@ -252,3 +255,14 @@ shared object concurrencyManager {
 
 shared Return doWithIndex<Return>(Project p, Return() func) => concurrencyManager.needIndexes(p, func);
 shared Return doWithLock<Return>(Return() func) => concurrencyManager.needReadAccess(func);
+
+object concurrencyManagerForJava {
+    shared Anything withAlternateResolution(JCallable<Anything> func)
+            => concurrencyManager.withAlternateResolution(func.call);
+    
+    shared Anything withUpToDateIndexes(JCallable<Anything> func)
+            => concurrencyManager.withUpToDateIndexes(func.call);
+    
+    shared Anything outsideDumbMode(JCallable<Anything> func)
+            => concurrencyManager.outsideDumbMode(func.call);
+}
