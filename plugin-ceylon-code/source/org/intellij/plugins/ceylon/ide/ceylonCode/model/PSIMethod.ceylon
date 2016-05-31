@@ -24,6 +24,9 @@ import java.util {
 import com.intellij.psi.util {
     MethodSignatureUtil
 }
+import com.redhat.ceylon.model.loader {
+    AbstractModelLoader
+}
 
 shared class PSIMethod(shared PsiMethod psi)
         extends PSIAnnotatedMirror(psi)
@@ -56,9 +59,13 @@ shared class PSIMethod(shared PsiMethod psi)
         if (classIs("ceylon.language.Exception")) {
             return false;
         } else {
-            return doWithLock(
-                () => MethodSignatureUtil.hasOverloads(psi)
-            );
+            return doWithLock(() {
+                    return MethodSignatureUtil.getOverloads(psi).iterable.coalesced.filter(
+                        (m) => !m.modifierList.hasModifierProperty("static")
+                            && !m.modifierList.hasModifierProperty("private")
+                            && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
+                    ).size > 1;
+            });
         }
     }
     

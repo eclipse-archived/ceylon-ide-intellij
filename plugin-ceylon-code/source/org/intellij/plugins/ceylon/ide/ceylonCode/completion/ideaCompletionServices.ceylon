@@ -210,6 +210,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 icon = myIcon;
                 selection = myRange;
                 handler = myHandler;
+                obj = description;
             });
         }
     }
