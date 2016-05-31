@@ -61,7 +61,8 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
     public void visitElement(PsiElement element) {
         super.visitElement(element);
 
-        if (element.getNode().getElementType() == CeylonTokens.ASTRING_LITERAL) {
+        if (element.getNode().getElementType() == CeylonTokens.ASTRING_LITERAL
+                || element.getNode().getElementType() == CeylonTokens.AVERBATIM_STRING) {
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.setTextAttributes(ceylonHighlightingColors.getAnnotationString());
         }
