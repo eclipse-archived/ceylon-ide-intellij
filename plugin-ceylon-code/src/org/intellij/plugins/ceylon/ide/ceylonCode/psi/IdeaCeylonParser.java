@@ -41,7 +41,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
 
     // Leaves which will be wrapped in a CeylonCompositeElement, for example to allow refactoring them
     private static final List<IElementType> LEAVES_TO_WRAP = Arrays.asList(CeylonTypes.IDENTIFIER,
-            CeylonTypes.NATURAL_LITERAL, CeylonTypes.FUNCTION_LITERAL);
+            CeylonTypes.NATURAL_LITERAL, CeylonTypes.FUNCTION_LITERAL, CeylonTypes.STRING_LITERAL);
 
     public static final Key<Node> CEYLON_NODE_KEY = new Key<>("CEYLON-SPEC_NODE");
     public static final Key<Tree.CompilationUnit> FORCED_CU_KEY = new Key<>("CEYLON-FORCED_CU");
