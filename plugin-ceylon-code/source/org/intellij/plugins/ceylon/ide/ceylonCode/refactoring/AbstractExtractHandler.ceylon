@@ -110,30 +110,30 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
 
         if (exists newIdentifier = extract(_project, editor, file, val)) {
             object extends WriteCommandAction<Nothing>(_project, file) {
-
                 shared actual void run(Result<Nothing> result) {
                     ceylonFile.forceReparse();
-                    PsiElement? identifierElement = file.findElementAt(newIdentifier.startOffset);
-                    if (! exists identifierElement) {
-                        return;
-                    }
-
-                    assert (is CeylonPsi.DeclarationPsi inserted = identifierElement.parent.parent);
-                    PsiElement? identifier = PsiTreeUtil.getChildOfType(inserted, javaClass<CeylonPsi.IdentifierPsi>());
-                    if (! exists identifier) {
-                        return;
-                    }
-                    editor.caretModel.moveToOffset(identifier.textOffset);
-                    value myDataContext = HashMap<JString,Object>();
-                    myDataContext.put(JString(CommonDataKeys.\iEDITOR.name), editor);
-                    myDataContext.put(JString(CommonDataKeys.\iPSI_FILE.name), file);
-                    myDataContext.put(JString(LangDataKeys.\iPSI_ELEMENT_ARRAY.name), createJavaObjectArray<PsiElement>({ inserted }));
-                    value handler = CeylonVariableRenameHandler();
-                    if (handler.isAvailable(inserted, editor, file)) {
-                        handler.invoke(project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
-                    }
                 }
             }.execute();
+
+            PsiElement? identifierElement = file.findElementAt(newIdentifier.startOffset);
+            if (! exists identifierElement) {
+                return;
+            }
+
+            assert (is CeylonPsi.DeclarationPsi inserted = identifierElement.parent.parent);
+            PsiElement? identifier = PsiTreeUtil.getChildOfType(inserted, javaClass<CeylonPsi.IdentifierPsi>());
+            if (! exists identifier) {
+                return;
+            }
+            editor.caretModel.moveToOffset(identifier.textOffset);
+            value myDataContext = HashMap<JString,Object>();
+            myDataContext.put(JString(CommonDataKeys.\iEDITOR.name), editor);
+            myDataContext.put(JString(CommonDataKeys.\iPSI_FILE.name), file);
+            myDataContext.put(JString(LangDataKeys.\iPSI_ELEMENT_ARRAY.name), createJavaObjectArray<PsiElement>({ inserted }));
+            value handler = CeylonVariableRenameHandler();
+            if (handler.isAvailable(inserted, editor, file)) {
+                handler.invoke(_project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
+            }
         }
     }
 

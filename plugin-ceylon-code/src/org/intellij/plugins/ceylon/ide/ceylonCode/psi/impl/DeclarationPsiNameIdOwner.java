@@ -59,6 +59,10 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @NotNull
     @Override
     public SearchScope getUseScope() {
+        if (getCeylonNode().getScope() instanceof Value
+                && !getCeylonNode().getDeclarationModel().isShared()) {
+            return new LocalSearchScope(getContainingFile());
+        }
         if (((CeylonFile) getContainingFile()).getPhasedUnit() instanceof ExternalPhasedUnit) {
             return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope()
                     .union(new LocalSearchScope(getContainingFile()));
