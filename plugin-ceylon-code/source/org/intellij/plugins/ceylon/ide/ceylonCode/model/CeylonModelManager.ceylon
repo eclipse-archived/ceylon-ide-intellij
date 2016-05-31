@@ -30,7 +30,7 @@ import com.intellij.openapi.fileEditor {
     },
     FileEditorManagerEvent,
     FileEditorManagerListener {
-        fileEditorManagerTopic = fileEditorManager
+        fileEditorManagerTopic=fileEditorManager
     }
 }
 import com.intellij.openapi.\imodule {
@@ -71,7 +71,7 @@ import com.intellij.psi {
 }
 import com.intellij.psi.impl {
     PsiDocumentTransactionListener {
-        psiDocumentTransactionTopic = topic
+        psiDocumentTransactionTopic=topic
     }
 }
 import com.intellij.testFramework {
@@ -93,6 +93,10 @@ import com.redhat.ceylon.ide.common.model {
     ModelAliases,
     ModelListenerAdapter
 }
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
+}
 
 import java.lang {
     Runnable,
@@ -110,7 +114,7 @@ import java.util.concurrent {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonFileType {
-        ceylonFileType=\iINSTANCE
+        ceylonFileType=instance
     }
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
@@ -148,13 +152,24 @@ shared class CeylonModelManager(model)
                  firstChange = accumulatedChanges.take();
             } catch(InterruptedException ie) {
             }
-            value changeSet = JHashSet<NativeResourceChange>();
-            if (exists first=firstChange) {
-                changeSet.add(first);
+            try {
+                value changeSet = JHashSet<NativeResourceChange>();
+                if (exists first=firstChange) {
+                    changeSet.add(first);
+                }
+                accumulatedChanges.drainTo(changeSet);
+                print("Submitting ``changeSet.size()`` changes to the model");
+                model.fileTreeChanged(CeylonIterable(changeSet));
+            } catch(Throwable t) {
+                Exception e;
+                if (is Exception t) {
+                    e = t;
+                } else {
+                    e = Exception(null, t);
+                }
+                platformUtils.log(Status._WARNING, "An exception as thrown during the change submission task", e);
             }
-            accumulatedChanges.drainTo(changeSet);
-            print("Submitting ``changeSet.size()`` changes to the model");
-            model.fileTreeChanged(CeylonIterable(changeSet));
+            
             if (ideaProjectReady) {
                 scheduleSubmitChanges();
             }
@@ -346,9 +361,12 @@ shared class CeylonModelManager(model)
     }
 
     shared actual void contentsChanged(VirtualFileEvent evt) {
-        value file = evt.file;
-        if (! file.directory) {
-            notifyFileContenChange(file);
+        // Don't do anything because we already have this case through the 
+        // Tools -> Ceylon -> Update Ceylon model
+        value virtualFile = evt.file;
+        if (! virtualFile.directory &&
+            ! virtualFile in fileEditorManagerInstance(model.ideaProject).openFiles.array) {
+            notifyFileContenChange(virtualFile);
         }
     }
     
