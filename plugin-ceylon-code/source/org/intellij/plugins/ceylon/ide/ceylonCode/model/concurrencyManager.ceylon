@@ -43,13 +43,17 @@ import java.lang {
 
 shared class NoIndexStrategy 
         of useAlternateResolution | 
-        waitForIndexes {
+        waitForIndexes |
+        ousideDumbMode {
     String str; 
     shared new useAlternateResolution {
         str = "useAlternateResolution";
     }
     shared new waitForIndexes {
         str = "waitForIndexes";
+    }
+    shared new ousideDumbMode {
+        str = "ousideDumbMode";
     }
     string => str;
 }
@@ -59,10 +63,14 @@ shared abstract class ConcurrencyError(String? description=null, Throwable? caus
 shared class CannotWaitForIndexesInReadAccessError() 
         extends ConcurrencyError("Waiting for up-to-date indexes inside a read-allowed section is dead-lock-prone.") {}
 
+shared class DumbModeNotSupported() 
+        extends ConcurrencyError("This code should never be called while Dumb mode is on.") {}
+
 String noIndexStrategyMessage = """Entering in a section that would need indexes, but no strategy has been specified.
                                      The stragtegy used when indexes are unavailable can be specificied by one of the following methods:
                                      - concurrencyManager.withUpToDateIndexes()
-                                     - concurrencyManager.withAlternateResolution()""";
+                                     - concurrencyManager.withAlternateResolution()
+                                     - concurrencyManager.outsideDumbMode()""";
 
 shared class IndexNeededWithNoIndexStrategy() 
         extends ConcurrencyError(noIndexStrategyMessage) {}
@@ -170,13 +178,34 @@ shared object concurrencyManager {
         }
     }
 
-    shared Return withAlternateResolution<Return>(Return() func)
+    
+    "With this strategy applied to [[func()]], all the calls to [[needIndexes()]] 
+     (in descendant functions in the same thread), *while Dumb mode is on*,
+     will *use the alternate resolution* method."
+    see (`function DumbService.withAlternativeResolveEnabled`)
+    shared Return withAlternateResolution<Return>(Return func())
         => withIndexStrategy(NoIndexStrategy.useAlternateResolution, func);
 
-    shared Return withUpToDateIndexes<Return>(Return() func)
+    "With this strategy applied to [[func()]], all the calls to [[needIndexes()]] 
+     (in descendant functions in the same thread), *while Dumb mode is on*,
+     will *wait for up-to-date indices* (the end of the Dumb mode), 
+     unless already in a read-access section (to avoid deadlocks), 
+     in which case a [[CannotWaitForIndexesInReadAccessError]] will be thrown."
+    see (`function DumbService.repeatUntilPassesInSmartMode`)
+    shared Return withUpToDateIndexes<Return>(Return func())
         => withIndexStrategy(NoIndexStrategy.waitForIndexes, func);
 
-    shared Return needIndexes<Return>(Project p, Return() func) {
+    "With this strategy applied to [[func()]], all the calls to [[needIndexes()]] 
+     (in descendant functions in the same thread), are *expected to be called 
+     outside Dumb mode*.
+     If a [[needIndexes()]] is made during dumb mode, this will throw 
+     will wait for up-to-date indices (the end of the Dumb mode), 
+     unless already in a read-access section (to avoid deadlocks), 
+     in which case a [[CannotWaitForIndexesInReadAccessError]] will be thrown."
+    shared Return outsideDumbMode<Return>(Return func())
+            => withIndexStrategy(NoIndexStrategy.ousideDumbMode, func);
+    
+    shared Return needIndexes<Return>(Project p, Return func()) {
         value ds = dumbService(p);
         
         value ref = Ref<Return>();
@@ -198,6 +227,13 @@ shared object concurrencyManager {
             }
             ds.repeatUntilPassesInSmartMode(runnable);
             return ref.get();
+        }
+        case (NoIndexStrategy.ousideDumbMode) {
+            if (ds.dumb) {
+                throw DumbModeNotSupported();
+            } else {
+                return func();
+            }
         }
         case(null) {
             if (ds.dumb) {
