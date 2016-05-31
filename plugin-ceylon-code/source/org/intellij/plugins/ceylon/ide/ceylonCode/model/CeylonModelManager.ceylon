@@ -125,9 +125,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     ProgressIndicatorMonitor
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    ideaPlatformUtils
-}
 
 shared class CeylonModelManager(model) 
         satisfies ProjectComponent
@@ -242,23 +239,15 @@ shared class CeylonModelManager(model)
                                         } else {
                                             periodicTypecheckingEnabled = false;
 
-                                            String message;
-                                            if (is Exception t,
-                                                ideaPlatformUtils.isOperationCanceledException(t),
-                                                !t.message.empty) {
-
-                                                message = t.message;
-                                            } else {
-                                                message = "The Ceylon model update triggered an unexpected exception (``t``)";
-                                            }
-
                                             Notification(
                                                 "Ceylon Model Update",
                                                 "Ceylon Model Update failed",
-                                                message + ". To avoid performance issues the automatic update of the Ceylon model has been disabled.
-                                                           You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
+                                                "The Ceylon model update triggered an unexpected exception: `` t `` that will be reported in the Event View.
+                                                       To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                                                       You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
                                                 warning
                                             ).notify(model.ideaProject);
+                                            throw t;
                                         }
                                     }
                                 }
