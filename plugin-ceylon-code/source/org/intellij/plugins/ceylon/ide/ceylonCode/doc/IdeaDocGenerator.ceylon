@@ -290,8 +290,6 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
         builder.append("</body></html>");
     }
     
-    getUnitName(Unit u) => u.filename;
-    
     getLiveValue(Declaration dec, Unit unit) => null;
 
     supportsQuickAssists => true;
