@@ -82,9 +82,6 @@ import com.redhat.ceylon.ide.common.refactoring {
     ChangeParametersRefactoring,
     parseTypeExpression
 }
-import com.redhat.ceylon.ide.common.typechecker {
-    AnyProjectPhasedUnit
-}
 import com.redhat.ceylon.ide.common.util {
     nodes,
     escaping
@@ -211,7 +208,7 @@ class IdeaChangeParameterRefactoring(
 
     searchInEditor() => true;
 
-    searchInFile(PhasedUnit pu) => pu is AnyProjectPhasedUnit;
+    searchInFile(PhasedUnit pu) => pu.unit != file.phasedUnit.unit;
 
 }
 
