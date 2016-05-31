@@ -10,6 +10,10 @@ import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import com.redhat.ceylon.model.typechecker.model.Unit;
+
+import java.util.concurrent.Callable;
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -40,7 +44,13 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             }
         }
 
-        if (((CeylonFile) myElement.getContainingFile()).ensureTypechecked() == null) {
+        if (ConcurrencyManagerForJava.withAlternateResolution(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                return ((CeylonFile) myElement.getContainingFile()).ensureTypechecked();
+            }
+            
+        }) == null) {
             return null;
         }
 
