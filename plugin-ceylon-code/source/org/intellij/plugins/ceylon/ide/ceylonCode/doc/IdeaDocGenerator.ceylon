@@ -294,7 +294,5 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
     
     getLiveValue(Declaration dec, Unit unit) => null;
 
-    getPhasedUnit(Unit u) => tc.getPhasedUnitFromRelativePath(u.relativePath);
-    
     supportsQuickAssists => true;
 }
