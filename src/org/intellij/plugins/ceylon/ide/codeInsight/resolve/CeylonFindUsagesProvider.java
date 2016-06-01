@@ -3,12 +3,14 @@ package org.intellij.plugins.ceylon.ide.codeInsight.resolve;
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Function;
+import com.redhat.ceylon.model.typechecker.model.Value;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
@@ -19,6 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonFindUsagesProvider implements FindUsagesProvider {
+
+    private Logger logger = Logger.getInstance(CeylonFindUsagesProvider.class);
+
     @Nullable
     @Override
     public WordsScanner getWordsScanner() {
@@ -80,21 +85,26 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return "enumerated type";
         }
 
-        throw new UnsupportedOperationException(element.toString());
+        logger.warn("Can't find type name for class " + element.getClass());
+
+        return "declaration";
     }
 
     @NotNull
     @Override
     public String getDescriptiveName(@NotNull PsiElement element) {
         if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
-            return ((CeylonPsi.AttributeDeclarationPsi) element).getCeylonNode().getDeclarationModel().getQualifiedNameString();
+            Tree.AttributeDeclaration ceylonNode = ((CeylonPsi.AttributeDeclarationPsi) element).getCeylonNode();
+            Value model = ceylonNode.getDeclarationModel();
+            return model == null ? ceylonNode.getText() : model.getQualifiedNameString();
         } else if (element instanceof CeylonPsi.ClassOrInterfacePsi) {
             Tree.Declaration ceylonNode = ((CeylonPsi.ClassOrInterfacePsi) element).getCeylonNode();
             Declaration model = ceylonNode.getDeclarationModel();
             return model == null ? ceylonNode.getIdentifier().getText() : model.getQualifiedNameString();
         } else if (element instanceof CeylonPsi.AnyMethodPsi) {
-            Function model = ((CeylonPsi.AnyMethodPsi) element).getCeylonNode().getDeclarationModel();
-            return model == null ? ((CeylonPsi.AnyMethodPsi) element).getCeylonNode().getIdentifier().getText() : model.getQualifiedNameString();
+            Tree.AnyMethod ceylonNode = ((CeylonPsi.AnyMethodPsi) element).getCeylonNode();
+            Function model = ceylonNode.getDeclarationModel();
+            return model == null ? ceylonNode.getIdentifier().getText() : model.getQualifiedNameString();
         } else if (element instanceof CeylonPsi.ParameterDeclarationPsi) {
             return ((CeylonPsi.ParameterDeclarationPsi) element).getCeylonNode().getTypedDeclaration().getIdentifier().getText();
         } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {
@@ -107,7 +117,12 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return ((CeylonPsi.TypeAliasDeclarationPsi) element).getCeylonNode().getIdentifier().getText();
         }
 
-        throw new UnsupportedOperationException("Descriptive name not implemented for " + element.getClass());
+        logger.warn("Descriptive name not implemented for " + element.getClass());
+
+        if (element instanceof CeylonPsi.IdentifierPsi) {
+            return ((CeylonPsi.IdentifierPsi) element).getCeylonNode().getText();
+        }
+        return "<unknown>";
     }
 
     @NotNull
