@@ -31,6 +31,9 @@ import com.intellij.openapi.fileEditor {
     FileEditorManagerEvent,
     FileEditorManagerListener {
         fileEditorManagerTopic=fileEditorManager
+    },
+    FileDocumentManager {
+        fileDocumentManager=instance
     }
 }
 import com.intellij.openapi.\imodule {
@@ -50,6 +53,11 @@ import com.intellij.openapi.progress {
 import com.intellij.openapi.project {
     ProjectCoreUtil {
         isProjectOrWorkspaceFile
+    }
+}
+import com.intellij.openapi.roots {
+    ProjectRootManager {
+        projectRootManager=getInstance
     }
 }
 import com.intellij.openapi.startup {
@@ -350,11 +358,13 @@ shared class CeylonModelManager(model)
     }
 
     shared actual void contentsChanged(VirtualFileEvent evt) {
-        // Don't do anything because we already have this case through the 
-        // Tools -> Ceylon -> Update Ceylon model
         value virtualFile = evt.file;
         if (! virtualFile.directory &&
-            ! virtualFile in fileEditorManagerInstance(model.ideaProject).openFiles.array) {
+            virtualFile.inLocalFileSystem &&
+            evt.fromRefresh &&
+            projectRootManager(model.ideaProject).fileIndex.isInContent(virtualFile) &&
+            ! projectRootManager(model.ideaProject).fileIndex.isExcluded(virtualFile) &&
+            ! fileDocumentManager.getCachedDocument(virtualFile) exists) {
             notifyFileContenChange(virtualFile);
         }
     }
