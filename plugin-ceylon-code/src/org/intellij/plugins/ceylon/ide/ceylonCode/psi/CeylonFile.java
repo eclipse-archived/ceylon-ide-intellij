@@ -30,8 +30,10 @@ public class CeylonFile extends PsiFileBase {
     }
 
     void setRootNode(Tree.CompilationUnit rootNode) {
-        typechecked = false;
-        this.rootNode = rootNode;
+        synchronized (this) {
+            typechecked = false;
+            this.rootNode = rootNode;
+        }
     }
 
     void setTokens(List<CommonToken> tokens) {
@@ -83,9 +85,7 @@ public class CeylonFile extends PsiFileBase {
     public PhasedUnit ensureTypechecked() {
         synchronized (this) {
             if (!typechecked) {
-                ITypeCheckerInvoker invoker = Extensions.getExtensions(ITypeCheckerInvoker.EP_NAME)[0];
-
-                if (invoker.typecheck(this) != null) {
+                if (doLocalTypecheck_.doLocalTypecheck(this) != null) {
                     typechecked = true;
                     return phasedUnit;
                 }

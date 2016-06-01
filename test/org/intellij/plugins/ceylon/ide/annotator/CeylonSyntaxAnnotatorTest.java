@@ -18,7 +18,7 @@ public class CeylonSyntaxAnnotatorTest extends CeylonCodeInsightTestSupport {
     private void testSyntax(String cuName, boolean checkWarnings, boolean checkInfos, boolean checkWeakWarnings) {
 
         PsiFile[] files = myFixture.configureByFiles("org/intellij/plugins/ceylon/annotator/" + cuName + ".ceylon");
-        TypeCheckerInvoker.invokeTypeChecker((CeylonFile) files[0]);
+        ((CeylonFile) files[0]).ensureTypechecked();
 
         myFixture.checkHighlighting(checkWarnings, checkInfos, checkWeakWarnings);
     }
