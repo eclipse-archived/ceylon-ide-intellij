@@ -9,8 +9,11 @@ import com.intellij.navigation {
     NavigationItem
 }
 import com.intellij.psi {
-    PsiElement,
-    PsiNamedElement
+    PsiElement
+}
+
+import javax.swing {
+    Icon
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
@@ -31,16 +34,16 @@ shared class GotoTargetRenderer() satisfies GotoTargetRendererProvider {
                 then t.presentation?.locationString 
                 else null;
         
-        getElementText(PsiElement t) 
-                => if (is PsiNamedElement t, exists name = t.name)
-                    then name
-                else if (is CeylonPsi.ObjectExpressionPsi t)
-                    then "anonymous in " + t.containingFile.name
+        shared actual String? getElementText(PsiElement t) 
+                => if (is NavigationItem t)
+                    then t.presentation?.presentableText
+                /*else if (is CeylonPsi.ObjectExpressionPsi t)
+                    then "anonymous in " + t.containingFile.name*/
                 else t.containingFile.name;
         
         iconFlags => 0;
         
-        getIcon(PsiElement psiElement) 
+        shared actual Icon? getIcon(PsiElement psiElement) 
                 => if (is CeylonPsi.ObjectExpressionPsi psiElement) 
                 then ideaIcons.objects 
                 else super.getIcon(psiElement);

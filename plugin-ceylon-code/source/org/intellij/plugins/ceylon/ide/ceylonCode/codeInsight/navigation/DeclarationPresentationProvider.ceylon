@@ -10,6 +10,9 @@ import javax.swing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
+import com.redhat.ceylon.model.typechecker.model {
+    ClassOrInterface
+}
 
 shared class DeclarationPresentationProvider()
         satisfies ItemPresentationProvider<DeclarationNavigationItem> {
@@ -19,9 +22,12 @@ shared class DeclarationPresentationProvider()
         shared actual Icon? getIcon(Boolean unused) => ideaIcons.forDeclaration(item.decl);
 
         locationString
-            => let (qName = item.decl.container.qualifiedNameString else "default module")
+            => let (qName = item.decl.container.qualifiedNameString else "default package")
                "(" + qName + ")";
 
-        presentableText => item.decl.name;
+        presentableText 
+                => if (is ClassOrInterface container = item.decl.container) 
+                then container.name + "." + item.decl.name 
+                else item.decl.name;
     };
 }
