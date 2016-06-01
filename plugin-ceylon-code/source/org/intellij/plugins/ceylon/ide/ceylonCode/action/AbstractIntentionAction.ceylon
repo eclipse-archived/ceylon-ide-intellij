@@ -20,14 +20,21 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 "An action that wraps an [[AbstractIntention]]."
 shared abstract class AbstractIntentionAction() extends AnAction() {
     
-    shared actual void update(AnActionEvent evt) { 
-        evt.presentation.enabled = evt.getData(CommonDataKeys.\iPSI_FILE) is CeylonFile;
+    shared actual void update(AnActionEvent evt) {
+        evt.presentation.enabled = false;
+
+        if (exists project = evt.project,
+            exists editor = evt.getData(CommonDataKeys.editor),
+            is CeylonFile psiFile = evt.getData(CommonDataKeys.psiFile)) {
+
+            evt.presentation.enabled = createIntention().isAvailable(project, editor, psiFile);
+        }
     }
     
     shared actual void actionPerformed(AnActionEvent evt) {
         if (exists project = evt.project,
-            exists editor = evt.getData(CommonDataKeys.\iEDITOR),
-            is CeylonFile psiFile = evt.getData(CommonDataKeys.\iPSI_FILE)) {
+            exists editor = evt.getData(CommonDataKeys.editor),
+            is CeylonFile psiFile = evt.getData(CommonDataKeys.psiFile)) {
             
             value intention = createIntention();
             
