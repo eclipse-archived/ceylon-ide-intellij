@@ -13,9 +13,6 @@ import com.redhat.ceylon.compiler.typechecker.context {
 import com.redhat.ceylon.ide.common.model {
     BaseIdeModuleSourceMapper
 }
-import com.redhat.ceylon.ide.common.platform {
-    platformUtils
-}
 import com.redhat.ceylon.ide.common.typechecker {
     ExternalPhasedUnit,
     EditedPhasedUnit,
@@ -28,16 +25,8 @@ import com.redhat.ceylon.model.typechecker.model {
     Package
 }
 
-import java.lang {
-    InterruptedException
-}
-import java.util.concurrent {
-    TimeUnit
-}
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    findProjectForFile,
-    IdeaCeylonProject
+    findProjectForFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     VirtualFileVirtualFile,
@@ -50,7 +39,7 @@ shared PhasedUnit? doLocalTypecheck(CeylonFile file) {
         project.typechecked,
         exists tc = project.typechecker) {
         
-        return doWithSourceModel(project, true, 0, () {
+        return project.withSourceModel(true, () {
             value mod = project.ideArtifact;
             value sourceCodeVirtualFile = VirtualFileVirtualFile(file.virtualFile, mod);
             PhasedUnit? phasedUnit = tc.getPhasedUnit(sourceCodeVirtualFile);
@@ -109,7 +98,7 @@ shared PhasedUnit? doLocalTypecheck(CeylonFile file) {
 
             file.phasedUnit = editedPhasedUnit;
             return editedPhasedUnit;
-        });
+        }, 0);
     } else if (is ExternalPhasedUnit unit = file.phasedUnit) {
         unit.analyseTypes();
         unit.analyseUsage();
@@ -123,45 +112,4 @@ IdeaVirtualFolder? getSourceFolder(CeylonFile sourceFile, Module mod) {
     VirtualFile? root = ProjectRootManager.getInstance(sourceFile.project)
         .fileIndex.getSourceRootForFile(sourceFile.virtualFile);
     return if (exists root) then IdeaVirtualFolder(root, mod) else null;
-}
-
-"Allows synchronizing some code that touches the source-related
- Ceylon model, by setting up the typechecker, creating or 
- typechecking PhasedUnits, etc ...
- 
- It's based on a ReentrantReadWriteLock.
- 
- To avoid deadlock, it always takes a time limit,
- after which the it stops waiting for the source 
- model availability and throw an OperationCanceled Exception"
-Result doWithSourceModel<Result>(IdeaCeylonProject project, Boolean readonly,
-    Integer waitForModelInSeconds, Result() action) {
-    
-    value projectLock = project.sourceModelLock;
-    value sourceModelLock = readonly then projectLock.readLock() else projectLock.writeLock();
-    
-    try {
-        if (sourceModelLock.tryLock(waitForModelInSeconds, TimeUnit.seconds)) {
-            try {
-                return action();
-            } finally {
-                sourceModelLock.unlock();
-            }
-        } else {
-            throw platformUtils.newOperationCanceledException(
-                "The source model "
-                + (readonly then "read" else "write")
-                + " lock of project "
-                + project.string + " could not be acquired within "
-                + waitForModelInSeconds.string + " seconds"
-            );
-        }
-    } catch (InterruptedException ie) {
-        throw platformUtils.newOperationCanceledException(
-            "The thread was interrupted "
-            + "while waiting for the source model "
-            + (readonly then "read" else "write")
-            + " lock of project " + project.string
-        );
-    }
 }
