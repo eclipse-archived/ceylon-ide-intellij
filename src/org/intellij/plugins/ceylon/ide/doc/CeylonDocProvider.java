@@ -35,6 +35,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeyLightClass;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,6 +45,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
+import static org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlight_.highlight;
 import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference.resolveDeclaration;
 
 public class CeylonDocProvider extends AbstractDocumentationProvider {
@@ -57,6 +60,23 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             CeylonTokens.LBRACKET, CeylonTokens.RBRACKET,
             CeylonTokens.LPAREN, CeylonTokens.RPAREN
     );
+
+    private ceylonDeclarationDescriptionProvider_ ceylonDeclarationDescriptionProvider
+            = ceylonDeclarationDescriptionProvider_.get_();
+
+    @Nullable
+    @Override
+    public String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
+        String str = toJavaString(ceylonDeclarationDescriptionProvider.getDescription(element));
+
+        if (str != null) {
+            // font tags are removed in com.intellij.util.ui.UIUtil.getHtmlBody(com.intellij.util.ui.Html),
+            // so we have to do a little trick to keep colors
+            return highlight(str, element.getProject()).replaceAll("<font", "<span").replaceAll("</font>", "</span>");
+        }
+
+        return null;
+    }
 
     @Nullable
     @Override
