@@ -16,9 +16,6 @@ import com.intellij.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
 }
-import javax.swing {
-    Icon
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
@@ -26,35 +23,26 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 shared class GotoTargetRenderer() satisfies GotoTargetRendererProvider {
     
     shared actual PsiElementListCellRenderer<out PsiElement> getRenderer(
-        PsiElement psiElement, GotoTargetHandler.GotoData gotoData) {
-
-        return object extends PsiElementListCellRenderer<PsiElement>() {
-
-            shared actual String? getContainerText(PsiElement t, String string) {
-                if (is NavigationItem t) {
-                    return t.presentation?.locationString;
-                }
-                return null;
-            }
-            
-            shared actual String getElementText(PsiElement t) {
-                if (is PsiNamedElement t, exists name = t.name) {
-                    return name;
-                }
-                if (is CeylonPsi.ObjectExpressionPsi t) {
-                    return "anonymous in " + t.containingFile.name;
-                }
-                return t.containingFile.name;
-            }
-            
-            shared actual Integer iconFlags => 0;
-            
-            shared actual Icon getIcon(PsiElement psiElement) { 
-                if (is CeylonPsi.ObjectExpressionPsi psiElement) {
-                    return ideaIcons.objects;
-                }
-                return super.getIcon(psiElement);
-            }
-        };
-    }
+        PsiElement psiElement, GotoTargetHandler.GotoData gotoData) 
+            => object extends PsiElementListCellRenderer<PsiElement>() {
+        
+        shared actual String? getContainerText(PsiElement t, String string) 
+                => if (is NavigationItem t) 
+                then t.presentation?.locationString 
+                else null;
+        
+        getElementText(PsiElement t) 
+                => if (is PsiNamedElement t, exists name = t.name)
+                    then name
+                else if (is CeylonPsi.ObjectExpressionPsi t)
+                    then "anonymous in " + t.containingFile.name
+                else t.containingFile.name;
+        
+        iconFlags => 0;
+        
+        getIcon(PsiElement psiElement) 
+                => if (is CeylonPsi.ObjectExpressionPsi psiElement) 
+                then ideaIcons.objects 
+                else super.getIcon(psiElement);
+    };
 }
