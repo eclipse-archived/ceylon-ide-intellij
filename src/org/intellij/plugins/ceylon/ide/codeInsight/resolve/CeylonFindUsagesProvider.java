@@ -115,6 +115,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return ((CeylonPsi.ObjectDefinitionPsi) element).getCeylonNode().getIdentifier().getText();
         } else if (element instanceof CeylonPsi.TypeAliasDeclarationPsi) {
             return ((CeylonPsi.TypeAliasDeclarationPsi) element).getCeylonNode().getIdentifier().getText();
+        } else if (element instanceof CeylonPsi.VariablePsi) {
+            return ((CeylonPsi.VariablePsi) element).getCeylonNode().getIdentifier().getText();
         }
 
         logger.warn("Descriptive name not implemented for " + element.getClass());
