@@ -75,7 +75,8 @@ shared class IdeaNavigation(Project project)
     
     shared actual PsiNameIdentifierOwner? gotoJavaNode(Declaration declaration) {
         if (is LazyClass declaration) {
-            if (is PSIMethod meth = declaration.constructor) {
+            if (is PSIMethod meth = declaration.constructor,
+                meth.psi.canNavigate()) {
                 return meth.psi;
             }
             if (is PSIClass cls = declaration.classMirror) {
