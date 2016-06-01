@@ -13,7 +13,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 import com.redhat.ceylon.model.typechecker.model {
     Function,
     ClassOrInterface,
-    ModelUtil
+    ModelUtil,
+    Type
 }
 
 shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProvider {
@@ -62,7 +63,7 @@ object findUsageDescriptionProvider satisfies ElementDescriptionProvider {
                 else {
                     builder.append(", ");
                 }
-                value type = param.type;
+                Type? type = param.type;
                 if (ModelUtil.isTypeUnknown(type)) {
                     builder.append("unknown");
                 }
