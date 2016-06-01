@@ -14,11 +14,13 @@ import com.intellij.psi {
 class PSITypeParameter(PsiTypeParameter psi) satisfies TypeParameterMirror {
     
     shared actual List<TypeMirror> bounds = ArrayList<TypeMirror>();
-    
-    psi.extendsList.referencedTypes.array.coalesced.each(
-        (bound) => bounds.add(PSIType(bound))
-    );
-    
+
+    doWithLock(() {
+        psi.extendsList.referencedTypes.array.coalesced.each(
+            (bound) => bounds.add(PSIType(bound))
+        );
+    });
+
     shared actual String name = (psi of PsiNamedElement).name;
     
     string => "PSITypeParameter[``name``]";    
