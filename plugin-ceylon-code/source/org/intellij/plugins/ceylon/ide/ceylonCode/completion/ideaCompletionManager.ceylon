@@ -40,7 +40,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTokens
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    findProjectForFile
+    findProjectForFile,
+    concurrencyManager
 }
 
 
@@ -79,12 +80,13 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
             }
         }
         
-        if (exists element = parameters.originalPosition,
-            is CeylonFile ceylonFile = element.containingFile,
-            exists pu = ceylonFile.ensureTypechecked()) {
-
-            addCompletionsInternal(parameters, context, result, pu, options);
-        }
+        concurrencyManager.withAlternateResolution(() {
+            if (exists element = parameters.originalPosition,
+                is CeylonFile ceylonFile = element.containingFile,
+                exists pu = ceylonFile.ensureTypechecked()) {
+                addCompletionsInternal(parameters, context, result, pu, options);
+            }
+        });
     }
     
     void addCompletionsInternal(CompletionParameters parameters, 
