@@ -38,4 +38,22 @@ shared class DeclarationNavigationItem(shared Declaration decl, shared Project p
     }
 
     presentation => ItemPresentationProviders.getItemPresentation(this);
+
+    shared actual Boolean equals(Object that) {
+        if (is DeclarationNavigationItem that) {
+            return decl==that.decl &&
+                project==that.project;
+        }
+        else {
+            return false;
+        }
+    }
+
+    shared actual Integer hash {
+        variable value hash = 1;
+        hash = 31*hash + decl.hash;
+        hash = 31*hash + project.hash;
+        return hash;
+    }
+
 }
