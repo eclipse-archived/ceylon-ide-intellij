@@ -23,7 +23,7 @@ shared class ResetModelAction() extends AnAction() {
             }
 
             if (exists man = project.getComponent(javaClass<CeylonModelManager>())) {
-                man.startBuild();
+                man.scheduleModelUpdate(0, true);
             }
         }
     }

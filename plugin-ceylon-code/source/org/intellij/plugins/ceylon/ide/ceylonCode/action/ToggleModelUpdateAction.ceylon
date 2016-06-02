@@ -17,7 +17,7 @@ shared class ToggleModelUpdateAction() extends AnAction() {
     shared actual void actionPerformed(AnActionEvent e) {
         if (exists project = PlatformDataKeys.\iPROJECT.getData(e.dataContext),
             exists modelManager = project.getComponent(javaClass<CeylonModelManager>())) {
-            modelManager.periodicTypecheckingEnabled = ! modelManager.periodicTypecheckingEnabled;
+            modelManager.automaticModelUpdateEnabled = ! modelManager.automaticModelUpdateEnabled;
         }
     }
 
@@ -27,8 +27,8 @@ shared class ToggleModelUpdateAction() extends AnAction() {
 
             e.presentation.enabled = true;
 
-            value what = " periodic update of model (every ``modelManager.typecheckingPeriod``s)";
-            if (modelManager.periodicTypecheckingEnabled) {
+            value what = " automatic update of the Ceylon model (``modelManager.delayBeforeUpdatingAfterChange/1000`` seconds after any change)";
+            if (modelManager.automaticModelUpdateEnabled) {
                 e.presentation.text = "Disable" + what;
             } else {
                 e.presentation.text = "Enable" + what;

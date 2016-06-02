@@ -3,14 +3,14 @@ import ceylon.interop.java {
     CeylonIterable
 }
 
-import com.intellij.concurrency {
-    JobScheduler
-}
 import com.intellij.notification {
     Notification,
     NotificationType {
         warning
     }
+}
+import com.intellij.openapi {
+    Disposable
 }
 import com.intellij.openapi.application {
     ApplicationManager {
@@ -75,7 +75,10 @@ import com.intellij.openapi.vfs {
     VirtualFileManager
 }
 import com.intellij.psi {
-    PsiFile
+    PsiFile,
+    PsiManager {
+        psiManager=getInstance
+    }
 }
 import com.intellij.psi.impl {
     PsiDocumentTransactionListener {
@@ -88,10 +91,8 @@ import com.intellij.testFramework {
 import com.intellij.util {
     FileContentUtilCore {
         reparseFiles
-    }
-}
-import com.intellij.util.concurrency {
-    QueueProcessor
+    },
+    Alarm
 }
 import com.intellij.util.messages {
     MessageBusConnection
@@ -111,7 +112,8 @@ import java.lang {
     InterruptedException
 }
 import java.util {
-    JHashSet=HashSet
+    JHashSet=HashSet,
+    Collections
 }
 import java.util.concurrent {
     TimeUnit,
@@ -133,9 +135,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     ProgressIndicatorMonitor
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
+}
 
 shared class CeylonModelManager(model) 
         satisfies ProjectComponent
+        & Disposable
         & VirtualFileListener
         & FileEditorManagerListener
         & PsiDocumentTransactionListener
@@ -143,18 +149,20 @@ shared class CeylonModelManager(model)
         & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
         & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;
-    shared variable Integer typecheckingPeriod = 5;
-    variable value periodicTypecheckingEnabled_ = false;
+    shared variable Integer delayBeforeUpdatingAfterChange = 4000;
+    variable value automaticModelUpdateEnabled_ = true;
     variable value ideaProjectReady = false;
+    variable Boolean cancelledBecauseOfSyntaxErrors = false;
+    late variable Alarm buildTriggeringAlarm;
     
-    value modelUpdateQueueProcessor = QueueProcessor.createRunnableQueueProcessor();
     value accumulatedChanges = LinkedBlockingQueue<NativeResourceChange>();
     variable Future<out Anything>? submitChangesFuture = null;
+
     object submitChangesTask satisfies Runnable { 
         shared actual void run() {
             variable NativeResourceChange? firstChange = null;
             try {
-                 firstChange = accumulatedChanges.take();
+                firstChange = accumulatedChanges.take();
             } catch(InterruptedException ie) {
             }
             try {
@@ -163,8 +171,11 @@ shared class CeylonModelManager(model)
                     changeSet.add(first);
                 }
                 accumulatedChanges.drainTo(changeSet);
-                print("Submitting ``changeSet.size()`` changes to the model");
-                model.fileTreeChanged(CeylonIterable(changeSet));
+                if (! changeSet.empty) {
+                    platformUtils.log(Status._DEBUG, "Submitting ``changeSet.size()`` changes to the model");
+                    model.fileTreeChanged(CeylonIterable(changeSet));
+                    scheduleModelUpdate();
+                }
             } catch(Throwable t) {
                 Exception e;
                 if (is Exception t) {
@@ -183,105 +194,141 @@ shared class CeylonModelManager(model)
 
     late MessageBusConnection busConnection;
     
+    shared Boolean modelUpdateWasCannceledBecauseOfSyntaxErrors => cancelledBecauseOfSyntaxErrors;
+    
     void scheduleSubmitChanges() {
         submitChangesFuture = application.executeOnPooledThread(submitChangesTask);
     }
     
-    shared Boolean periodicTypecheckingEnabled => periodicTypecheckingEnabled_;
-    assign periodicTypecheckingEnabled {
+    shared Boolean automaticModelUpdateEnabled => automaticModelUpdateEnabled_;
+    assign automaticModelUpdateEnabled {
         variable value needsRestart = false;
-        if (periodicTypecheckingEnabled &&
-            !periodicTypecheckingEnabled_) {
+        if (automaticModelUpdateEnabled &&
+            !automaticModelUpdateEnabled_) {
             needsRestart = true;
         }
-        periodicTypecheckingEnabled_ = periodicTypecheckingEnabled;
+        automaticModelUpdateEnabled_ = automaticModelUpdateEnabled;
         if (needsRestart) {
-            startBuild();
+            scheduleModelUpdate(0);
         }
     }
     
     componentName => "CeylonModelManager";
     
-    shared void startBuild() {
+    shared void scheduleModelUpdate(Integer delay = delayBeforeUpdatingAfterChange, Boolean force = false) {
         if (ideaProjectReady) {
-            modelUpdateQueueProcessor.add(JavaRunnable {
+            buildTriggeringAlarm.cancelAllRequests();
+            buildTriggeringAlarm.addRequest(JavaRunnable {
                 void run () {
-                    modelUpdateQueueProcessor.dismissLastTasks(1);
-                    void reschedule() {
-                        if (periodicTypecheckingEnabled,
-                            ! modelUpdateQueueProcessor.hasPendingItemsToProcess()) {
-                            JobScheduler.scheduler.schedule(JavaRunnable(startBuild), typecheckingPeriod, TimeUnit.seconds);
+                    cancelledBecauseOfSyntaxErrors = false;
+                    buildTriggeringAlarm.cancelAllRequests();
+                    
+                    if (! model.ceylonProjects.any((ceylonProject)
+                        => ceylonProject.build.somethingToDo)) {
+                        return;
+                    }
+
+                    function syntaxErrorsWhenOnlyOneCeylonChange(CeylonProjectAlias ceylonProject) {
+                        value fileChangesToAnalyze = ceylonProject.build.fileChangesToAnalyze;
+                        if (exists firstChange = fileChangesToAnalyze.first) {
+                            if (fileChangesToAnalyze.rest.first exists) {
+                                return null; // more than 1 changes
+                            }
+                            if (is FileVirtualFileContentChange firstChange,
+                                is CeylonFile ceylonFile = concurrencyManager.needReadAccess(() => psiManager(model.ideaProject).findFile(firstChange.resource.nativeResource) else null),
+                                exists cu = ceylonFile.compilationUnit,
+                                ! cu.errors.empty) {
+                                return cu.errors ;
+                            } else {
+                                return null; // other type of change (non-source, non-Ceylon, etc ...)
+                            }
+                        } else {
+                            return Collections.emptyList();
                         }
                     }
-                    if (model.ceylonProjects.any((ceylonProject)
-                        => ceylonProject.build.somethingToDo)) {
-                        value bakgroundBuildLatch = CountDownLatch(1);
-                        application.invokeAndWait(JavaRunnable {
-                            run() => progressManager.run(object extends Backgroundable(
-                                model.ideaProject,
-                                "ceylon model update",
-                                true,
-                                PerformInBackgroundOption.\iALWAYS_BACKGROUND) {
-                                
-                                shared actual void run(ProgressIndicator progressIndicator) {
-                                    value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
-                                    value ticks = model.ceylonProjectNumber * 1000;
-                                    try (progress = monitor.Progress(ticks, "Updating Ceylon Model")) {
-                                        concurrencyManager.withUpToDateIndexes(() {
-                                            for (ceylonProject in model
-                                                    .ceylonProjectsInTopologicalOrder.sequence()
-                                                    .reversed) {
-                                                ceylonProject.build.performBuild(progress.newChild(1000));
-                                            }
-                                        });
-                                        application.invokeLater(JavaRunnable {
-                                            void run() {
-                                                reparseFiles(*fileEditorManagerInstance(model.ideaProject)
-                                                .openFiles.array.coalesced
-                                                .filter((file) => file.fileType == ceylonFileType));
-                                            }
-                                        }, ModalityState.any());
-                                    } catch(Throwable t) {
-                                        if (is ProcessCanceledException t) {
-                                            throw t;
-                                        } else {
-                                            periodicTypecheckingEnabled = false;
-
-                                            Notification(
-                                                "Ceylon Model Update",
-                                                "Ceylon Model Update failed",
-                                                "The Ceylon model update triggered an unexpected exception: `` t `` that will be reported in the Event View.
-                                                       To avoid performance issues the automatic update of the Ceylon model has been disabled.
-                                                       You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                                                warning
-                                            ).notify(model.ideaProject);
-                                            throw t;
+                    
+                    if (! force) {
+                        variable value shouldCancel = false;
+                        for (p in model.ceylonProjects) {
+                            if (exists syntaxErrors = syntaxErrorsWhenOnlyOneCeylonChange(p)) {
+                                if (! syntaxErrors.empty) {
+                                    shouldCancel = true;
+                                }
+                            } else {
+                                shouldCancel = false;
+                                break;
+                            }
+                        }
+                        
+                        if (shouldCancel) {
+                            cancelledBecauseOfSyntaxErrors = true;
+                            return;
+                        }
+                    }
+                    
+                    value bakgroundBuildLatch = CountDownLatch(1);
+                    application.invokeAndWait(JavaRunnable {
+                        run() => progressManager.run(object extends Backgroundable(
+                            model.ideaProject,
+                            "ceylon model update",
+                            true,
+                            PerformInBackgroundOption.\iALWAYS_BACKGROUND) {
+                            
+                            shared actual void run(ProgressIndicator progressIndicator) {
+                                value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
+                                value ticks = model.ceylonProjectNumber * 1000;
+                                try (progress = monitor.Progress(ticks, "Updating Ceylon Model")) {
+                                    concurrencyManager.withUpToDateIndexes(() {
+                                        for (ceylonProject in model
+                                                .ceylonProjectsInTopologicalOrder.sequence()
+                                                .reversed) {
+                                            ceylonProject.build.performBuild(progress.newChild(1000));
                                         }
+                                    });
+                                    application.invokeLater(JavaRunnable {
+                                        void run() {
+                                            reparseFiles(*fileEditorManagerInstance(model.ideaProject)
+                                            .openFiles.array.coalesced
+                                            .filter((file) => file.fileType == ceylonFileType));
+                                        }
+                                    }, ModalityState.any());
+                                } catch(Throwable t) {
+                                    if (is ProcessCanceledException t) {
+                                        throw t;
+                                    } else {
+                                        automaticModelUpdateEnabled = false;
+
+                                        Notification(
+                                            "Ceylon Model Update",
+                                            "Ceylon Model Update failed",
+                                            "The Ceylon model update triggered an unexpected exception: `` t `` that will be reported in the Event View.
+                                                   To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                                                   You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
+                                            warning
+                                        ).notify(model.ideaProject);
+                                        throw t;
                                     }
                                 }
-                                shared actual void onSuccess() {
-                                    bakgroundBuildLatch.countDown();
-                                }
-                                shared actual void onCancel() {
-                                    bakgroundBuildLatch.countDown();
-                                }
-                            });
-                        }, ModalityState.any());
-                        if (! bakgroundBuildLatch.await(30, TimeUnit.minutes)) {
-                            periodicTypecheckingEnabled = false;
-                            Notification(
-                                "Ceylon Model Update",
-                                "Ceylon Model Update stalled",
-                                "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
-                                 You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                                warning).notify(model.ideaProject);
-                        }
-                        reschedule();
-                    } else {
-                        reschedule();
+                            }
+                            shared actual void onSuccess() {
+                                bakgroundBuildLatch.countDown();
+                            }
+                            shared actual void onCancel() {
+                                bakgroundBuildLatch.countDown();
+                            }
+                        });
+                    }, ModalityState.any());
+                    if (! bakgroundBuildLatch.await(5, TimeUnit.minutes)) {
+                        automaticModelUpdateEnabled_ = false;
+                        Notification(
+                            "Ceylon Model Update",
+                            "Ceylon Model Update stalled",
+                            "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                             You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
+                            warning).notify(model.ideaProject);
                     }
                 }
-            });
+            }, delay);
         }
     }
     
@@ -290,7 +337,7 @@ shared class CeylonModelManager(model)
      ***************************************************************************/
     
     ceylonProjectAdded(CeylonProjectAlias ceylonProject) =>
-            startBuild();
+            scheduleModelUpdate(0);
 
     shared actual void buildMessagesChanged(CeylonProjectAlias project, {SourceMsg*}? frontendMessages,
         {SourceMsg*}? backendMessages, {ProjectMsg*}? projectMessages) {
@@ -304,8 +351,11 @@ shared class CeylonModelManager(model)
     /***************************************************************************
       ProjectComponent implementations
      ***************************************************************************/
+
+    shared actual void dispose() {}
     
     shared actual void disposeComponent() {
+        dispose();
         busConnection.disconnect();
         VirtualFileManager.instance.removeVirtualFileListener(this);
         model.removeModelListener(this);
@@ -313,6 +363,7 @@ shared class CeylonModelManager(model)
     }
     
     shared actual void initComponent() {
+        buildTriggeringAlarm = Alarm(Alarm.ThreadToUse.pooledThread, this);
         busConnection = model.ideaProject.messageBus.connect();
         busConnection.subscribe(fileEditorManagerTopic, this);
         busConnection.subscribe(psiDocumentTransactionTopic, this);
@@ -324,7 +375,7 @@ shared class CeylonModelManager(model)
             startupManager(model.ideaProject)
             .runWhenProjectIsInitialized(JavaRunnable(() {
         ideaProjectReady = true;
-        startBuild();
+        scheduleModelUpdate(500);
         scheduleSubmitChanges();
     }));
     
@@ -424,11 +475,11 @@ shared class CeylonModelManager(model)
        - triggers the typechecking when switching editors
      ***************************************************************************/
     
-    fileClosed(FileEditorManager manager, VirtualFile file) => startBuild();
+    fileClosed(FileEditorManager manager, VirtualFile file) => scheduleModelUpdate(0);
     
     fileOpened(FileEditorManager manager, VirtualFile file) => noop();
     
-    shared actual void selectionChanged(FileEditorManagerEvent evt) => startBuild();
+    shared actual void selectionChanged(FileEditorManagerEvent evt) => scheduleModelUpdate(0);
     
     /***************************************************************************
       Utility functions

@@ -19,6 +19,9 @@ import com.intellij.openapi.editor {
 import com.intellij.openapi.\imodule {
     ModuleUtil
 }
+import com.intellij.openapi.project {
+    DumbAware
+}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -37,6 +40,12 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Message,
     UnexpectedError
 }
+import com.redhat.ceylon.ide.common.correct {
+    ideQuickFixManager
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    ExternalPhasedUnit
+}
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
@@ -44,21 +53,13 @@ import com.redhat.ceylon.ide.common.util {
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     IdeaQuickFixData
 }
-import com.redhat.ceylon.ide.common.correct {
-    ideQuickFixManager
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
-    concurrencyManager
+    concurrencyManager,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
-}
-import com.intellij.openapi.project {
-    DumbAware
-}
-import com.redhat.ceylon.ide.common.typechecker {
-    ExternalPhasedUnit
 }
 
 shared class CeylonTypeCheckerAnnotator() 
@@ -85,9 +86,18 @@ shared class CeylonTypeCheckerAnnotator()
                 then ErrorsVisitor(cu, ceylonFile).extractMessages()
                 else null);
     
-    shared actual void apply(PsiFile file, {[Message, TextRange?]*} ceylonMessages, AnnotationHolder holder)
-            => concurrencyManager.withAlternateResolution(()
+    shared actual void apply(PsiFile file, {[Message, TextRange?]*} ceylonMessages, AnnotationHolder holder) {
+        concurrencyManager.withAlternateResolution(()
                 => ceylonMessages.each(([message,range]) => addAnnotation(message, range, holder)));
+        if (is CeylonFile file,
+            exists cu = file.compilationUnit,
+            cu.errors.empty) {
+            value modelManager = file.project.getComponent(javaClass<CeylonModelManager>());
+            if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
+                modelManager.scheduleModelUpdate();
+            }
+        }
+    }
 
     void addAnnotation(Message message, variable TextRange? range, AnnotationHolder annotationHolder) {
         value unresolvedReferenceCodes = [ 100, 102 ];
