@@ -1,7 +1,3 @@
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    IdeaDocument,
-    IdeaTextChange
-}
 import com.intellij.openapi.application {
     Result
 }
@@ -9,7 +5,6 @@ import com.intellij.openapi.command {
     WriteCommandAction
 }
 import com.intellij.openapi.editor {
-    Document,
     Editor
 }
 import com.intellij.openapi.\imodule {
@@ -23,8 +18,7 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiFile,
-    PsiDocumentManager,
-    PsiElement
+    PsiDocumentManager
 }
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
@@ -58,10 +52,12 @@ import java.util {
 import org.antlr.runtime {
     CommonToken
 }
-
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument,
+    IdeaTextChange
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile,
-    CeylonPsi
+    CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     VirtualFileVirtualFile
@@ -69,12 +65,16 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 
 shared class ExtractValueHandler() extends AbstractExtractHandler() {
 
-    shared actual TextRange? extract(Project project, Editor editor, PsiFile file, PsiElement val) {
+    shared actual TextRange? extract(Project project, Editor editor, PsiFile file, TextRange range) {
         assert(is CeylonFile file);
-        assert(is CeylonPsi.TermPsi val);
-        value node = val.ceylonNode;
+        assert(exists node = nodes.findNode {
+            node = file.compilationUnit;
+            tokens = file.tokens;
+            startOffset = range.startOffset;
+            endOffset = range.endOffset;
+        });
 
-        value refacto = IdeaExtractValueRefactoring(file, editor.document, node);
+        value refacto = IdeaExtractValueRefactoring(file, editor, node);
         value name = nodes.nameProposals(node).first;
         refacto.newName = name;
 
@@ -82,7 +82,7 @@ shared class ExtractValueHandler() extends AbstractExtractHandler() {
     }
 }
 
-class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node)
+class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node _node)
         satisfies ExtractValueRefactoring<TextRange> {
 
     editorPhasedUnit => file.phasedUnit;
@@ -115,6 +115,7 @@ class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node
     shared actual TextRange newRegion(Integer start, Integer length) => TextRange.from(start, length);
 
     shared TextRange? extractInFile(Project myProject, PsiFile file) {
+        value document = editor.document;
         value tfc = IdeaTextChange(IdeaDocument(document));
         build(tfc);
 
@@ -123,6 +124,7 @@ class IdeaExtractValueRefactoring(CeylonFile file, Document document, Node _node
                 tfc.apply();
 
                 if (exists reg = decRegion) {
+                    editor.selectionModel.setSelection(reg.startOffset, reg.endOffset);
                     value newId = document.getText(reg);
                     for (dupe in dupeRegions) {
                         document.replaceString(dupe.startOffset, dupe.endOffset, JString(newId));

@@ -1,34 +1,24 @@
-import com.intellij.navigation {
-    GotoClassContributor,
-    NavigationItem
-}
-import java.lang {
-    JString=String,
-    ObjectArray
-}
-import com.intellij.openapi.project {
-    Project
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonPsi
-}
-import com.intellij.openapi.diagnostic {
-    Logger
+import ceylon.collection {
+    ArrayList
 }
 import ceylon.interop.java {
     javaClass,
     createJavaStringArray,
     createJavaObjectArray
 }
-import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+
+import com.intellij.navigation {
+    GotoClassContributor,
+    NavigationItem
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects,
-    IdeaModule
+import com.intellij.openapi.diagnostic {
+    Logger
 }
 import com.intellij.openapi.\imodule {
     ModuleManager
+}
+import com.intellij.openapi.project {
+    Project
 }
 import com.intellij.util.containers {
     ContainerUtil
@@ -36,8 +26,18 @@ import com.intellij.util.containers {
 import com.redhat.ceylon.ide.common.model {
     AnyJavaUnit
 }
-import ceylon.collection {
-    ArrayList
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration
+}
+
+import java.lang {
+    JString=String,
+    ObjectArray
+}
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    IdeaCeylonProjects,
+    IdeaModule
 }
 
 shared class CeylonGotoClassContributor() satisfies GotoClassContributor {
@@ -51,13 +51,11 @@ shared class CeylonGotoClassContributor() satisfies GotoClassContributor {
 
         processDeclarations(project, includeNonProjectItems, (dec) {
             if (dec.name == name) {
-                print(dec);
                 items.add(DeclarationNavigationItem(dec, project));
             }
             return true;
         });
 
-        print("done " + includeNonProjectItems.string);
         return createJavaObjectArray(items);
     }
 

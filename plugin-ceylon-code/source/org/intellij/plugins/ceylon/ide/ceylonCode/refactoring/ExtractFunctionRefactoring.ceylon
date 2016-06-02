@@ -15,7 +15,6 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiFile,
-    PsiElement,
     PsiDocumentManager
 }
 import com.redhat.ceylon.ide.common.refactoring {
@@ -32,20 +31,18 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaCompositeChange
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonPsi,
     CeylonFile
 }
 
 shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
 
-    shared actual TextRange? extract(Project myProject, Editor editor, PsiFile file, PsiElement val) {
+    shared actual TextRange? extract(Project myProject, Editor editor, PsiFile file, TextRange range) {
         assert(is CeylonFile file);
-        assert(is CeylonPsi.TermPsi val);
 
         value refacto = createExtractFunctionRefactoring(
             IdeaDocument(editor.document),
-            val.textRange.startOffset,
-            val.textRange.endOffset,
+            range.startOffset,
+            range.endOffset,
             file.compilationUnit,
             file.tokens,
             null,
@@ -69,6 +66,7 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
 
                     if (exists reg = refacto.decRegion) {
                         value range = TextRange.from(reg.start, reg.length);
+                        editor.selectionModel.setSelection(reg.start, reg.end);
                         value newId = editor.document.getText(range);
 
                         for (dupe in refacto.dupeRegions) {
