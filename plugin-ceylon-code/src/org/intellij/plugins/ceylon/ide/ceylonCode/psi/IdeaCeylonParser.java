@@ -113,7 +113,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
             if (file.getOriginalFile() instanceof CeylonFile
                     && !file.getText().contains(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED)) {
                 CeylonFile orig = (CeylonFile) file.getOriginalFile();
-                orig.setRootNode(cu);
+//                orig.setRootNode(cu);
                 orig.setTokens(stream.getTokens());
             }
 
@@ -203,7 +203,11 @@ public class IdeaCeylonParser extends IStubFileElementType {
             Token token = that.getMainToken();
 
             OrderedChildrenVisitor visitor = new OrderedChildrenVisitor();
-            that.visitChildren(visitor);
+            try {
+                that.visitChildren(visitor);
+            } catch (Exception e) {
+                that.handleException(e, visitor);
+            }
 
             if (that.getToken() != null && visitor.children.isEmpty()) {
                 Token peek = tokens.peek();

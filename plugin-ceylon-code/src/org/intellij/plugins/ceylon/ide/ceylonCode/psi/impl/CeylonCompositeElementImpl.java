@@ -13,12 +13,8 @@ public class CeylonCompositeElementImpl extends ASTWrapperPsiElement implements 
     private Node ceylonNode;
 
     public CeylonCompositeElementImpl(ASTNode node) {
-        this(node, node.getUserData(IdeaCeylonParser.CEYLON_NODE_KEY));
-    }
-
-    public CeylonCompositeElementImpl(ASTNode node, Node ceylonNode) {
         super(node);
-        this.ceylonNode = ceylonNode;
+        this.ceylonNode = node.getUserData(IdeaCeylonParser.CEYLON_NODE_KEY);
     }
 
     @Override

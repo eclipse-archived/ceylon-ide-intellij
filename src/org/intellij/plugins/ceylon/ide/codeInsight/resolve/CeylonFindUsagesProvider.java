@@ -7,10 +7,10 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.model.typechecker.model.Declaration;
-import com.redhat.ceylon.model.typechecker.model.Function;
-import com.redhat.ceylon.model.typechecker.model.Value;
+import com.redhat.ceylon.ide.common.util.nodes_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
@@ -93,30 +93,18 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getDescriptiveName(@NotNull PsiElement element) {
-        if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
-            Tree.AttributeDeclaration ceylonNode = ((CeylonPsi.AttributeDeclarationPsi) element).getCeylonNode();
-            Value model = ceylonNode.getDeclarationModel();
-            return model == null ? ceylonNode.getText() : model.getQualifiedNameString();
-        } else if (element instanceof CeylonPsi.ClassOrInterfacePsi) {
-            Tree.Declaration ceylonNode = ((CeylonPsi.ClassOrInterfacePsi) element).getCeylonNode();
-            Declaration model = ceylonNode.getDeclarationModel();
-            return model == null ? ceylonNode.getIdentifier().getText() : model.getQualifiedNameString();
-        } else if (element instanceof CeylonPsi.AnyMethodPsi) {
-            Tree.AnyMethod ceylonNode = ((CeylonPsi.AnyMethodPsi) element).getCeylonNode();
-            Function model = ceylonNode.getDeclarationModel();
-            return model == null ? ceylonNode.getIdentifier().getText() : model.getQualifiedNameString();
-        } else if (element instanceof CeylonPsi.ParameterDeclarationPsi) {
-            return ((CeylonPsi.ParameterDeclarationPsi) element).getCeylonNode().getTypedDeclaration().getIdentifier().getText();
-        } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {
-            return ((CeylonPsi.TypeParameterDeclarationPsi) element).getCeylonNode().getIdentifier().getText();
-        } else if (element instanceof CeylonFile) {
-            return ((CeylonFile) element).getName();
-        } else if (element instanceof CeylonPsi.ObjectDefinitionPsi) {
-            return ((CeylonPsi.ObjectDefinitionPsi) element).getCeylonNode().getIdentifier().getText();
-        } else if (element instanceof CeylonPsi.TypeAliasDeclarationPsi) {
-            return ((CeylonPsi.TypeAliasDeclarationPsi) element).getCeylonNode().getIdentifier().getText();
-        } else if (element instanceof CeylonPsi.VariablePsi) {
-            return ((CeylonPsi.VariablePsi) element).getCeylonNode().getIdentifier().getText();
+        if (element instanceof CeylonCompositeElement) {
+            CeylonFile file = (CeylonFile) element.getContainingFile();
+            Node node = nodes_.get_().findNode(file.getCompilationUnit(), file.getTokens(),
+                    element.getTextRange().getStartOffset(), element.getTextRange().getEndOffset());
+
+            if (node != null) {
+                Tree.Declaration declaration = nodes_.get_().findDeclaration(file.getCompilationUnit(), node);
+
+                if (declaration instanceof Tree.TypedDeclaration) {
+                    return declaration.getDeclarationModel().getQualifiedNameString();
+                }
+            }
         }
 
         logger.warn("Descriptive name not implemented for " + element.getClass());

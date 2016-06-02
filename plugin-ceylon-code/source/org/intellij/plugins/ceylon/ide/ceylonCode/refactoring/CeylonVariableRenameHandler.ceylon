@@ -54,6 +54,9 @@ shared class CeylonVariableRenameHandler() extends VariableInplaceRenameHandler(
             return false;
         }
 
+        if (is CeylonFile file) {
+            file.ensureTypechecked();
+        }
         return element is DeclarationPsiNameIdOwner;
     }
 }

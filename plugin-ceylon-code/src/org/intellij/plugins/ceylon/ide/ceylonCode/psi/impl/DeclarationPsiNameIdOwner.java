@@ -11,7 +11,6 @@ import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ObjectUtils;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
-import com.redhat.ceylon.model.typechecker.model.Value;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
 import org.jetbrains.annotations.NonNls;
@@ -59,9 +58,11 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @NotNull
     @Override
     public SearchScope getUseScope() {
-        if (getCeylonNode().getScope() instanceof Value
-                && !getCeylonNode().getDeclarationModel().isShared()) {
-            return new LocalSearchScope(getContainingFile());
+        if (((CeylonFile) getContainingFile()).ensureTypechecked() != null) {
+            if (!(getCeylonNode().getScope() instanceof Tree.Package)
+                    && !getCeylonNode().getDeclarationModel().isShared()) {
+                return new LocalSearchScope(getContainingFile());
+            }
         }
         if (((CeylonFile) getContainingFile()).getPhasedUnit() instanceof ExternalPhasedUnit) {
             return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope()

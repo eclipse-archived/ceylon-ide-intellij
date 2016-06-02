@@ -101,4 +101,10 @@ public class CeylonFile extends PsiFileBase {
         getNode().getLastChildNode();
         return ensureTypechecked();
     }
+
+    @Override
+    public void subtreeChanged() {
+        super.subtreeChanged();
+        setRootNode(null);
+    }
 }
