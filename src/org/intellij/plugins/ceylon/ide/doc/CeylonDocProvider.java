@@ -33,6 +33,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeyLightClass;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
@@ -44,6 +45,7 @@ import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 import static org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlight_.highlight;
@@ -80,7 +82,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
 
     @Nullable
     @Override
-    public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
+    public String generateDoc(final PsiElement element, @Nullable PsiElement originalElement) {
         try {
             TypeChecker tc = TypeCheckerProvider.getFor(element);
             if (tc == null) {
@@ -98,7 +100,15 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 return generator.getDocumentationText(referenceable, null, cu, generator.DocParams$new$(pu, element.getProject())).value;
             }
             if (element.getContainingFile() != null) {
-                PhasedUnit pu = ((CeylonFile) element.getContainingFile()).ensureTypechecked();
+                final PhasedUnit[] puRef = new PhasedUnit[] { null };
+                ConcurrencyManagerForJava.withAlternateResolution(new Callable<Object>() {
+                    @Override
+                    public Object call() throws Exception {
+                        puRef[0] = ((CeylonFile) element.getContainingFile()).ensureTypechecked();
+                        return null;
+                    }
+                });
+                PhasedUnit pu = puRef[0];
                 if (pu == null) {
                     LOGGER.warn("No phased unit for file " + element.getContainingFile().getVirtualFile().getPath());
                 } else {
