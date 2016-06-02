@@ -49,6 +49,11 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
                 } else if (declaration instanceof Tree.ClassOrInterface) {
                     type = ((Tree.ClassOrInterface) declaration).getDeclarationModel();
                 } else {
+                    type = null;
+                }
+
+                if (type == null) {
+                    // Maybe the file hasn't been typechecked yet
                     return elements;
                 }
 
