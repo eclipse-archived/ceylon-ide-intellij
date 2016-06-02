@@ -216,7 +216,8 @@ shared class CeylonModelManager(model)
     componentName => "CeylonModelManager";
     
     shared void scheduleModelUpdate(Integer delay = delayBeforeUpdatingAfterChange, Boolean force = false) {
-        if (ideaProjectReady) {
+        if (ideaProjectReady && 
+            (automaticModelUpdateEnabled_ || force)) {
             buildTriggeringAlarm.cancelAllRequests();
             buildTriggeringAlarm.addRequest(JavaRunnable {
                 void run () {
