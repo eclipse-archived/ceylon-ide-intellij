@@ -7,6 +7,7 @@ import com.intellij.ide.util.treeView.smartTree.Filter;
 import com.intellij.ide.util.treeView.smartTree.NodeProvider;
 import com.intellij.psi.PsiFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -58,6 +59,12 @@ public class CeylonFileTreeModel extends TextEditorBasedStructureViewModel imple
     @Override
     public Filter[] getFilters() {
         return FILTERS;
+    }
+
+    @NotNull
+    @Override
+    protected Class[] getSuitableClasses() {
+        return new Class[] {CeylonPsi.DeclarationPsi.class, CeylonPsi.SpecifierStatementPsi.class};
     }
 
     // TODO filters for inherited, fields, etc.
