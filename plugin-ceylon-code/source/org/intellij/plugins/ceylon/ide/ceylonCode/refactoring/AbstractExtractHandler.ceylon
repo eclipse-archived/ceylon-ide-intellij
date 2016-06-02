@@ -68,7 +68,9 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
     shared formal TextRange? extract(Project project, Editor editor, PsiFile file, PsiElement val);
 
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile, DataContext dataContext) {
-        if (exists val = selectValueToExtract(project, editor, psiFile)) {
+        if (is CeylonFile psiFile,
+            exists _ = psiFile.ensureTypechecked(),
+            exists val = selectValueToExtract(project, editor, psiFile)) {
             createAndIntroduceValue(project, editor, psiFile, val);
         }
     }
