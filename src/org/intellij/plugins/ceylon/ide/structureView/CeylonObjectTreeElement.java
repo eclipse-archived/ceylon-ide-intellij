@@ -6,7 +6,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -15,9 +14,9 @@ import java.util.List;
 
 import static org.intellij.plugins.ceylon.ide.structureView.CeylonFileTreeElement.getTreeElementForDeclaration;
 
-public class CeylonObjectTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ObjectDefinitionPsi> {
+class CeylonObjectTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ObjectDefinitionPsi> {
 
-    protected CeylonObjectTreeElement(CeylonPsi.ObjectDefinitionPsi psiElement, boolean isInherited) {
+    CeylonObjectTreeElement(CeylonPsi.ObjectDefinitionPsi psiElement, boolean isInherited) {
         super(psiElement, isInherited);
     }
 
@@ -36,12 +35,6 @@ public class CeylonObjectTreeElement extends CeylonDeclarationTreeElement<Ceylon
         }
 
         return children;
-    }
-
-    @Nullable
-    @Override
-    public String getPresentableText() {
-        return "object " + getName();
     }
 
     @Override

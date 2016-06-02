@@ -9,7 +9,6 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.psi.*;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.model.JavaUnit;
 import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
 import com.redhat.ceylon.model.loader.model.FieldValue;
 import com.redhat.ceylon.model.loader.model.JavaMethod;
@@ -64,7 +63,8 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
                                     : CeylonTreeUtil.getDeclaringFile(unit, element.getProject());
 
                             if (file != null) {
-                                StructureViewTreeElement treeElement = getTreeElementForDeclaration((CeylonFile) file, decl);
+                                boolean inherited = type.isInherited(decl);
+                                StructureViewTreeElement treeElement = getTreeElementForDeclaration((CeylonFile) file, decl, inherited);
 
                                 if (treeElement != null) {
                                     elements.add(treeElement);
@@ -93,7 +93,9 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
         return Collections.emptyList();
     }
 
-    private StructureViewTreeElement getTreeElementForDeclaration(CeylonFile myFile, Declaration declaration) {
+    private StructureViewTreeElement getTreeElementForDeclaration(CeylonFile myFile,
+                                                                  Declaration declaration,
+                                                                  boolean inherited) {
         if (declaration == null) {
             return null;
         }
@@ -110,7 +112,7 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
         }
 
         if (node instanceof Tree.Declaration) {
-            return CeylonFileTreeElement.getTreeElementForDeclaration(myFile, (Tree.Declaration) node, true);
+            return CeylonFileTreeElement.getTreeElementForDeclaration(myFile, (Tree.Declaration) node, inherited);
         }
 
         return null;

@@ -37,7 +37,9 @@ shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProv
 
 shared object ceylonDeclarationDescriptionProvider {
 
-    shared String? getDescription(PsiElement|Declaration element) {
+    shared String? getDescription(PsiElement|Declaration element, Boolean includeKeyword = true,
+        Boolean includeContainer = true) {
+        
         value decl = switch(element)
             case (is Declaration) element
             else if (is CeylonCompositeElement element,
@@ -45,9 +47,22 @@ shared object ceylonDeclarationDescriptionProvider {
                 exists decl = node.declarationModel)
             then decl
             else null;
-        return if (exists decl) 
-        then "``keyword(decl)`` ``container(decl)````decl.name````parameterLists(decl)``" 
-        else null;
+
+        if (exists decl) {
+            value sb = StringBuilder();
+
+            if (includeKeyword) {
+                sb.append(keyword(decl)).append(" ");
+            }
+            if (includeContainer) {
+                sb.append(container(decl));
+            }
+            sb.append(decl.name)
+                .append(parameterLists(decl));
+
+            return sb.string;
+        }
+        return null;
     }
     
     String container(Declaration decl)

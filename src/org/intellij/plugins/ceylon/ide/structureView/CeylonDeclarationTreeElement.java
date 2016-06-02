@@ -9,6 +9,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.util.ui.UIUtil;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,11 +17,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
+
 abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPsi> extends PsiTreeElementBase<Decl> implements ColoredItemPresentation, LocationPresentation {
 
     private boolean isInherited;
+    private ceylonDeclarationDescriptionProvider_ ceylonDeclarationDescriptionProvider =
+            ceylonDeclarationDescriptionProvider_.get_();
 
-    protected CeylonDeclarationTreeElement(Decl psiElement, boolean isInherited) {
+    CeylonDeclarationTreeElement(Decl psiElement, boolean isInherited) {
         super(psiElement);
         this.isInherited = isInherited;
     }
@@ -29,17 +34,6 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
         return Collections.emptyList();
-    }
-
-    @Nullable
-    protected String getPresentableParameters() {
-        Declaration model = getElement().getCeylonNode().getDeclarationModel();
-
-        if (model instanceof Functional) {
-            return getParametersString(((Functional) model).getParameterLists(), model.getUnit());
-        }
-
-        return "";
     }
 
     @NotNull
@@ -63,50 +57,12 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
         return builder.toString();
     }
 
-    @Nullable
-    protected String getPresentableTypeParameters() {
-        Declaration model = getElement().getCeylonNode().getDeclarationModel();
-
-        if (model instanceof Generic && ((Generic) model).getTypeParameters().size() > 0) {
-            StringBuilder builder = new StringBuilder("<");
-
-            for (TypeParameter parameter : ((Generic) model).getTypeParameters()) {
-                builder.append(parameter.getType().asString(model.getUnit())).append(", ");
-            }
-
-            if (builder.length() > 1) {
-                builder.setLength(builder.length() - 2);
-            }
-
-            builder.append(">");
-
-            return builder.toString();
-        }
-
-        return "";
-    }
-
     @Override
     public boolean equals(Object o) {
         if (!super.equals(o)) return false;
         final CeylonDeclarationTreeElement that = (CeylonDeclarationTreeElement) o;
 
         return isInherited == that.isInherited;
-    }
-
-    @NotNull
-    protected String getName() {
-        Decl element = getElement();
-
-        if (element != null) {
-            if (element.getCeylonNode().getDeclarationModel() != null) {
-                return element.getCeylonNode().getDeclarationModel().getName();
-            } else {
-                return element.getCeylonNode().getIdentifier().getText();
-            }
-        }
-
-        return "<unknown>";
     }
 
     @Override
@@ -141,5 +97,13 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
     @Override
     public String getLocationPrefix() {
         return " ";
+    }
+
+    @Nullable
+    @Override
+    public String getPresentableText() {
+        return toJavaString(
+                ceylonDeclarationDescriptionProvider.getDescription(getElement(), false, false)
+        );
     }
 }

@@ -9,7 +9,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -22,10 +21,10 @@ import static org.intellij.plugins.ceylon.ide.structureView.CeylonFileTreeElemen
 /**
  * A structure node which represents a CeylonClass (class or interface definition/declaration).
  */
-public class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ClassOrInterfacePsi> {
+class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ClassOrInterfacePsi> {
     private CeylonPsi.ClassOrInterfacePsi myClass;
 
-    public CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi element, boolean isInherited) {
+    CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi element, boolean isInherited) {
         super(element, isInherited);
         this.myClass = element;
     }
@@ -62,14 +61,6 @@ public class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonP
         }
 
         return elements;
-    }
-
-    @Nullable
-    @Override
-    public String getPresentableText() {
-        String kind = myClass instanceof CeylonPsi.AnyInterfacePsi ? "interface " : "class ";
-
-        return kind + getName() + getPresentableTypeParameters() + getPresentableParameters();
     }
 
     @Override
