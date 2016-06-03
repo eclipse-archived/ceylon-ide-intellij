@@ -79,7 +79,6 @@ shared class CeylonGotoClassContributor() satisfies GotoClassContributor {
             return item.decl.qualifiedNameString;
         }
 
-        logger.error("Couldn't get qualified name for item " + className(item));
         return null;
     }
 
