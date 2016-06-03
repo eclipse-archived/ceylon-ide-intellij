@@ -110,7 +110,7 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
         Node node = visitor.getDeclarationNode();
 
         if (node == null) {
-            PsiNameIdentifierOwner idOwner = CeylonReference.resolveDeclaration(declaration, myFile.getProject());
+            PsiElement idOwner = CeylonReference.resolveDeclaration(declaration, myFile.getProject());
             if (idOwner instanceof CeylonCompositeElement) {
                 node = ((CeylonCompositeElement) idOwner).getCeylonNode();
             }

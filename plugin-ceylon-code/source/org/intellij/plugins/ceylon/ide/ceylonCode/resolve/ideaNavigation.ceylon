@@ -14,7 +14,8 @@ import com.intellij.psi {
     PsiNameIdentifierOwner,
     PsiFile,
     JavaPsiFacade,
-    PsiClass
+    PsiClass,
+    PsiElement
 }
 import com.intellij.psi.search {
     GlobalSearchScope
@@ -58,16 +59,16 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class IdeaNavigation(Project project) 
-        extends AbstractNavigation<PsiNameIdentifierOwner,VirtualFile>() {
+        extends AbstractNavigation<PsiElement,VirtualFile>() {
     
     shared actual Path filePath(VirtualFile file) => Path(file.path);
     
-    shared actual PsiNameIdentifierOwner? gotoFile(VirtualFile file, 
+    shared actual PsiElement? gotoFile(VirtualFile file,
         Integer offset, Integer length) {
         
         if (is PsiFile psiFile = PsiManager.getInstance(project).findFile(file)) {
             return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(),
-               javaClass<PsiNameIdentifierOwner>(), false);
+               javaClass<PsiElement>(), false);
         }
         platformUtils.log(Status._WARNING, "Can't navigate to file " + file.canonicalPath);
         return null;
@@ -115,7 +116,7 @@ shared class IdeaNavigation(Project project)
         };
     }
     
-    shared actual PsiNameIdentifierOwner? gotoLocation(Path? path, 
+    shared actual PsiElement? gotoLocation(Path? path,
         Integer offset, Integer length) {
         
         if (exists strPath = path?.string,
@@ -124,7 +125,7 @@ shared class IdeaNavigation(Project project)
             is CeylonFile psiFile = PsiManager.getInstance(project).findFile(file)) {
 
             return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(),
-                javaClass<PsiNameIdentifierOwner>(), false);
+                javaClass<PsiElement>(), false);
         }
         
         return null;

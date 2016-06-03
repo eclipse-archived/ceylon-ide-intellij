@@ -84,7 +84,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
     }
 
     @Nullable
-    public static PsiNameIdentifierOwner resolveDeclaration(Referenceable declaration, Project project) {
+    public static PsiElement resolveDeclaration(Referenceable declaration, Project project) {
         return new IdeaNavigation(project).gotoDeclaration(declaration);
     }
 
