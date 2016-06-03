@@ -11,6 +11,18 @@ import com.intellij.codeInsight.lookup {
     LookupElementWeigher,
     LookupElement
 }
+import com.intellij.openapi.application {
+    ApplicationAdapter
+}
+import com.intellij.openapi.application.ex {
+    ApplicationManagerEx {
+        application=applicationEx
+    }
+}
+import com.intellij.openapi.progress {
+    EmptyProgressIndicator,
+    ProcessCanceledException
+}
 import com.intellij.psi.impl.source.tree {
     LeafPsiElement
 }
@@ -32,17 +44,18 @@ import java.lang {
     JInteger=Integer
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    findProjectForFile,
+    concurrencyManager
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
-    DummyProgressMonitor
+    ProgressIndicatorMonitor
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonTokens
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    findProjectForFile,
-    concurrencyManager
-}
+
 
 
 shared abstract class IdeaCompletionProvider() extends CompletionProvider<CompletionParameters>()  {
@@ -101,16 +114,38 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
         value project = findProjectForFile(ceylonFile);
         value params = IdeaCompletionContext(ceylonFile, parameters.editor, project, options);
 
-        completionManager.getContentProposals {
-            typecheckedRootNode = pu.compilationUnit;
-            ctx = params;
-            offset = parameters.editor.caretModel.offset;
-            line = doc.getLineNumber(element.textOffset);
-            secondLevel = isSecondLevel;
-            monitor = DummyProgressMonitor.wrap("");
-            // The parameters tooltip has nothing to do with code completion, so we bypass it
-            returnedParamInfo = true;
+        value progressMonitor = ProgressIndicatorMonitor.wrap {
+            object monitor extends EmptyProgressIndicator() {
+                // hashCode() seems to be quite slow when used in CoreProgressManager.threadsUnderIndicator
+                hash => 43;
+            }
         };
+        object listener extends ApplicationAdapter() {
+            shared actual void beforeWriteActionStart(Object action) {
+                if (!progressMonitor.cancelled) {
+                    progressMonitor.wrapped.cancel();
+                }
+            }
+        }
+        if (! application.writeActionPending) {
+            application.addApplicationListener(listener);
+            try {
+                completionManager.getContentProposals {
+                    typecheckedRootNode = pu.compilationUnit;
+                    ctx = params;
+                    offset = parameters.editor.caretModel.offset;
+                    line = doc.getLineNumber(element.textOffset);
+                    secondLevel = isSecondLevel;
+                    monitor = progressMonitor;
+                    // The parameters tooltip has nothing to do with code completion, so we bypass it
+                    returnedParamInfo = true;
+                };
+            } catch(ProcessCanceledException e) {
+                noop();// for debugging purposes
+            } finally {
+                application.removeApplicationListener(listener);
+            }
+        }
         
         CustomLookupCellRenderer.install(parameters.editor.project);
         
