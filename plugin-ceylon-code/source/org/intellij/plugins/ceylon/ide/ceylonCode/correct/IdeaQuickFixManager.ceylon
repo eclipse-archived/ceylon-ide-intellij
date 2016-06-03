@@ -127,14 +127,15 @@ class CustomIntention(Integer position, String desc, <PlatformTextChange|Anythin
         return true;
     }
     
-    shared actual String text => if (exists p = project) then highlightProposal(desc, p, qualifiedNameIsPath) else desc;
+    text => if (exists p = project) 
+        then highlightProposal(desc, p, qualifiedNameIsPath) 
+        else desc;
     
     shared actual Icon? getIcon(Integer int) => image;
     
     shared actual Boolean equals(Object that) {
         if (is CustomIntention that) {
-            return desc==that.desc &&
-                    qualifiedNameIsPath==that.qualifiedNameIsPath;
+            return desc==that.desc;
         } else {
             return false;
         }
@@ -214,12 +215,12 @@ shared class IdeaQuickFixData(
         value range = toRange(selection);
 
         if (is IdeaTextChange change) {
-            registerFix(desc, change, range, ideaIcons.correction);
+            registerFix(desc, change, range, ideaIcons.correction, qualifiedNameIsPath);
         } else if (is Anything() change) {
             if (kind == asyncModuleImport) {
                 candidateModules.add([desc, ideaIcons.imports, change]);
             } else if (kind == addModuleImport) {
-                registerFix(desc, null, range, ideaIcons.correction, false, (p, e, f) {
+                registerFix(desc, null, range, ideaIcons.correction, qualifiedNameIsPath, (p, e, f) {
                     candidateModules.clear();
                     ProgressManager.instance.runProcessWithProgressAsynchronously(
                         project.project,
@@ -235,7 +236,7 @@ shared class IdeaQuickFixData(
                     );
                 });
             } else {
-                registerFix(desc, change, range, ideaIcons.correction);
+                registerFix(desc, change, range, ideaIcons.correction, qualifiedNameIsPath);
             }
         }
     }

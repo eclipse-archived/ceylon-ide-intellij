@@ -1,9 +1,9 @@
+import ceylon.interop.java {
+    javaString
+}
+
 import com.intellij.ide.highlighter {
     HighlighterFactory
-}
-import com.intellij.openapi.editor.highlighter {
-    EditorHighlighter,
-    HighlighterIterator
 }
 import com.intellij.openapi.editor.markup {
     TextAttributes
@@ -18,14 +18,12 @@ import com.intellij.ui {
     ColorUtil,
     JBColor
 }
-import java.awt {
-    ...
-}
-import ceylon.interop.java {
-    javaString
-}
 import com.redhat.ceylon.ide.common.doc {
     convertToHTML
+}
+
+import java.awt {
+    ...
 }
 import java.lang {
     StringBuffer
@@ -39,9 +37,10 @@ import java.util.regex {
 
 Pattern path = Pattern.compile("\\b\\p{Ll}+(\\.\\p{Ll}+)+\\b");
 
-shared String highlightProposal(String description, Project project, Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
+shared String highlightProposal(String description, Project project, 
+    Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
     value result = StringBuffer();
-    StringTokenizer tokens = StringTokenizer(description, "'\"", true);
+    value tokens = StringTokenizer(description, "'\"", true);
     result.append("<html>");
     result.append(tokens.nextToken());
 
@@ -61,10 +60,10 @@ shared String highlightProposal(String description, Project project, Boolean qua
                     }
                     break;
                 } else if (token.equals("\"")) {
-                    result.append(style(token, 0, token.size, stringAttrs));
+                    result.append(style(token, stringAttrs));
                     while (tokens.hasMoreTokens()) {
                         value quoted = tokens.nextToken();
-                        result.append(style(quoted, 0, quoted.size, stringAttrs));
+                        result.append(style(quoted, stringAttrs));
                         if (quoted.equals("\"")) {
                             break;
                         }
@@ -83,35 +82,40 @@ shared String highlightProposal(String description, Project project, Boolean qua
 }
 
 shared String highlight(String rawText, Project project, Boolean qualifiedNameIsPath = false) {
-    EditorHighlighter highlighter = HighlighterFactory.createHighlighter(project, FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
+    value highlighter = 
+            HighlighterFactory.createHighlighter(project, 
+                FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
     highlighter.setText(javaString(rawText));
 
-    HighlighterIterator iterator = highlighter.createIterator(0);
-    StringBuilder builder = StringBuilder();
-
+    value builder = StringBuilder();
+    value iterator = highlighter.createIterator(0);
     while (!iterator.atEnd()) {
-        // TODO this doesn't work because dots have their own attributes and split qualified names into multiple parts
-        value attrs = if (qualifiedNameIsPath && path.matcher(javaString(rawText.span(iterator.start, iterator.end - 1))).find())
+        value start = iterator.start;
+        value end = iterator.end;
+        value token = rawText[start..end-1];
+        value attrs = 
+                if (qualifiedNameIsPath 
+                    //&& token.every((ch)=>ch.letter) //TODO: this is wrong!! 
+                    && (rawText[start-1:1]=="." || rawText[end:1]=="."))
                         then textAttributes(ceylonHighlightingColors.packages)
                         else iterator.textAttributes;
-        
-        builder.append(style(rawText, iterator.start, iterator.end, attrs));
+        builder.append(style(token, attrs));
         iterator.advance();
     }
 
     return builder.string;
 }
 
-String style(String text, Integer start, Integer end, TextAttributes attr) {
+String style(String token, TextAttributes attr) {
     String? color =
             if (exists fg = attr.foregroundColor, !fg.equals(JBColor.\iBLACK))
                 then "<font color='#" + ColorUtil.toHex(attr.foregroundColor) + "'>"
             else null;
 
-    Boolean isBold = (attr.fontType.and(Font.\iBOLD)) != 0;
-    Boolean isItalic = (attr.fontType.and(Font.\iITALIC)) != 0;
+    Boolean isBold = attr.fontType.and(Font.\iBOLD) != 0;
+    Boolean isItalic = attr.fontType.and(Font.\iITALIC) != 0;
 
-    StringBuilder builder = StringBuilder();
+    value builder = StringBuilder();
 
     if (exists color) {
         builder.append(color);
@@ -123,7 +127,7 @@ String style(String text, Integer start, Integer end, TextAttributes attr) {
         builder.append("<i>");
     }
 
-    builder.append(convertToHTML(text.span(start, end - 1)));
+    builder.append(convertToHTML(token));
     
     value endsWithNewLine = if ((builder.last else ' ') == '\n') then true else false;
     if (endsWithNewLine) {
