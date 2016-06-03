@@ -23,6 +23,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     DeclarationPsiNameIdOwner
 }
+import java.util {
+    List
+}
+import com.intellij.openapi.util {
+    TextRange,
+    Pair
+}
 
 shared class CeylonVariableRenameHandler() extends VariableInplaceRenameHandler() {
 
@@ -43,6 +50,9 @@ shared class CeylonVariableRenameHandler() extends VariableInplaceRenameHandler(
                     }.execute();
                 }
             }
+
+            collectAdditionalElementsToRename(List<Pair<PsiElement,TextRange>>? stringUsages)
+                    => noop();
         };
     }
 
