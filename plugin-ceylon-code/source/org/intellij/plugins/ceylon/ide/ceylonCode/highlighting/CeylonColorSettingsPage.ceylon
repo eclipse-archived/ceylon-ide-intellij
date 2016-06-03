@@ -99,22 +99,22 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
 }
 
 shared object ceylonHighlightingColors {
-    shared TextAttributesKey identifier = createTextAttributesKey("CEYLON_IDENTIFIER", DefaultLanguageHighlighterColors.\iIDENTIFIER);
-    shared TextAttributesKey type = createTextAttributesKey("CEYLON_TYPE", DefaultLanguageHighlighterColors.\iCLASS_NAME);
-    shared TextAttributesKey typeLiteral = createTextAttributesKey("CEYLON_TYPE_LITERAL", DefaultLanguageHighlighterColors.\iIDENTIFIER);
-    shared TextAttributesKey keyword = createTextAttributesKey("CEYLON_KEYWORD", DefaultLanguageHighlighterColors.\iKEYWORD);
-    shared TextAttributesKey number = createTextAttributesKey("CEYLON_NUMBER", DefaultLanguageHighlighterColors.\iNUMBER);
-    shared TextAttributesKey comment = createTextAttributesKey("CEYLON_COMMENT", DefaultLanguageHighlighterColors.\iDOC_COMMENT);
+    shared TextAttributesKey identifier = createTextAttributesKey("CEYLON_IDENTIFIER", DefaultLanguageHighlighterColors.identifier);
+    shared TextAttributesKey type = createTextAttributesKey("CEYLON_TYPE", DefaultLanguageHighlighterColors.className);
+    shared TextAttributesKey typeLiteral = createTextAttributesKey("CEYLON_TYPE_LITERAL", DefaultLanguageHighlighterColors.identifier);
+    shared TextAttributesKey keyword = createTextAttributesKey("CEYLON_KEYWORD", DefaultLanguageHighlighterColors.keyword);
+    shared TextAttributesKey number = createTextAttributesKey("CEYLON_NUMBER", DefaultLanguageHighlighterColors.number);
+    shared TextAttributesKey comment = createTextAttributesKey("CEYLON_COMMENT", DefaultLanguageHighlighterColors.docComment);
     shared TextAttributesKey strings = createTextAttributesKey("CEYLON_STRING", DefaultLanguageHighlighterColors.\iSTRING);
     shared TextAttributesKey char = createTextAttributesKey("CEYLON_CHAR", DefaultLanguageHighlighterColors.\iSTRING);
-    shared TextAttributesKey interp = createTextAttributesKey("CEYLON_INTERP", EditorColors.\iINJECTED_LANGUAGE_FRAGMENT);
+    shared TextAttributesKey interp = createTextAttributesKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
     shared TextAttributesKey annotationString = createTextAttributesKey("CEYLON_ANNOTATION_STRING", DefaultLanguageHighlighterColors.\iSTRING);
-    shared TextAttributesKey annotation = createTextAttributesKey("CEYLON_ANNOTATION", CodeInsightColors.\iANNOTATION_NAME_ATTRIBUTES);
-    shared TextAttributesKey todo = createTextAttributesKey("CEYLON_TODO", CodeInsightColors.\iTODO_DEFAULT_ATTRIBUTES);
-    shared TextAttributesKey semi = createTextAttributesKey("CEYLON_SEMI", DefaultLanguageHighlighterColors.\iSEMICOLON);
-    shared TextAttributesKey brace = createTextAttributesKey("CEYLON_BRACE", DefaultLanguageHighlighterColors.\iBRACES);
-    shared TextAttributesKey packages = createTextAttributesKey("CEYLON_PACKAGE", DefaultLanguageHighlighterColors.\iIDENTIFIER);
-    shared TextAttributesKey member = createTextAttributesKey("CEYLON_MEMBER", CodeInsightColors.\iINSTANCE_FIELD_ATTRIBUTES);
+    shared TextAttributesKey annotation = createTextAttributesKey("CEYLON_ANNOTATION", DefaultLanguageHighlighterColors.metadata);
+    shared TextAttributesKey todo = createTextAttributesKey("CEYLON_TODO", CodeInsightColors.todoDefaultAttributes);
+    shared TextAttributesKey semi = createTextAttributesKey("CEYLON_SEMI", DefaultLanguageHighlighterColors.semicolon);
+    shared TextAttributesKey brace = createTextAttributesKey("CEYLON_BRACE", DefaultLanguageHighlighterColors.braces);
+    shared TextAttributesKey packages = createTextAttributesKey("CEYLON_PACKAGE", DefaultLanguageHighlighterColors.identifier);
+    shared TextAttributesKey member = createTextAttributesKey("CEYLON_MEMBER", DefaultLanguageHighlighterColors.instanceField);
 }
 
 shared TextAttributes textAttributes(TextAttributesKey key) {
