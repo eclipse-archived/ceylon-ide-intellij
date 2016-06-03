@@ -35,15 +35,18 @@ shared object ideaIcons {
     shared Icon packages => IconLoader.getIcon("/icons/ceylonPackage.png");
     shared Icon modules => IconLoader.getIcon("/icons/ceylonModule.png");
     shared Icon classes => PlatformIcons.classIcon;
+    shared Icon abstractClasses => PlatformIcons.abstractClassIcon;
     shared Icon interfaces => PlatformIcons.interfaceIcon;
     shared Icon objects => AllIcons.Nodes.anonymousClass;
     shared Icon methods => PlatformIcons.methodIcon;
+    shared Icon formalMethods => PlatformIcons.abstractMethodIcon;
     shared Icon attributes = PlatformIcons.fieldIcon;
     shared Icon enumerations = PlatformIcons.enumIcon;
     shared Icon exceptions = AllIcons.Nodes.exceptionClass;
     shared Icon param => AllIcons.Nodes.parameter;
     shared Icon local => IconLoader.getIcon("/icons/ceylonLocal.png");
     shared Icon values => AllIcons.Nodes.variable;
+    shared Icon formalValues => IconLoader.getIcon("/icons/formalValue.png");
     shared Icon anonymousFunction => AllIcons.Nodes.\ifunction;
     shared Icon annotations => AllIcons.Gutter.extAnnotation;
     shared Icon constructors => AllIcons.Nodes.classInitializer;
@@ -66,20 +69,34 @@ shared object ideaIcons {
     shared Icon problemsViewErrors => IconLoader.getIcon("/icons/ceylonProblemsErrors.png");
     shared Icon problemsViewWarnings => IconLoader.getIcon("/icons/ceylonProblemsWarnings.png");
 
-    shared Icon? forDeclaration(Tree.Declaration|Declaration decl) {
+    shared Icon? forDeclaration(Tree.Declaration|Declaration obj) {
+        value decl = if (is Tree.Declaration obj, exists model = obj.declarationModel)
+        then model
+        else obj;
+
         variable value baseIcon = switch(decl)
         case (is Tree.AnyClass)
             classes
         case (is Class)
-            if (decl.anonymous) then objects else classes
+            if (decl.anonymous)
+            then objects
+            else if (decl.abstract)
+            then abstractClasses
+            else classes
         case (is Tree.AnyInterface|Interface)
             interfaces
-        case (is Tree.AnyMethod|Function)
+        case (is Tree.AnyMethod)
             methods
+        case (is Function)
+            if (decl.formal) then formalMethods else methods
         case (is Tree.ObjectDefinition)
             objects
         case (is Value)
-            if (ModelUtil.isObject(decl)) then objects else values
+            if (ModelUtil.isObject(decl))
+            then objects
+            else if (decl.formal)
+            then formalValues
+            else values
         case (is Tree.TypeAliasDeclaration|TypeAlias|NothingType)
             types
         case (is TypeParameter)
