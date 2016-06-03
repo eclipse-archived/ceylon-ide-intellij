@@ -1,0 +1,3 @@
+void fun() {
+    value result = computeThings("abc");
+}

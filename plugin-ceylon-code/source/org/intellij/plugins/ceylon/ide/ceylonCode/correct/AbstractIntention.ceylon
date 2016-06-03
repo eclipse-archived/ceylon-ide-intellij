@@ -128,7 +128,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                         value sel = if (exists selection)
                                     then DefaultRegion(selection.startOffset, selection.length)
                                     else null;
-                        if (is IdeaTextChange|Anything() change) {
+                        if (is <IdeaTextChange|Anything()>? change) {
                             makeAvailable(outerProject, desc, change, sel, callback);
                         }
                     }

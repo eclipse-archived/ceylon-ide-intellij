@@ -14,7 +14,8 @@ import com.intellij.openapi.project {
 }
 import com.redhat.ceylon.ide.common.correct {
     AssignToLocalProposal,
-    importProposals
+    importProposals,
+    assignToLocalQuickFix
 }
 import com.redhat.ceylon.model.typechecker.model {
     Type,
@@ -42,6 +43,13 @@ import com.redhat.ceylon.ide.common.completion {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
     IdeaProposalsHolder
+}
+
+shared class AssignToLocalIntention() extends AbstractIntention() {
+    checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset)
+            => assignToLocalQuickFix.addProposal(data, offset);
+    
+    familyName => "Assign to local";
 }
 
 class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFile f)
