@@ -9,7 +9,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -39,6 +41,9 @@ import com.redhat.ceylon.model.typechecker.model.DeclarationWithProximity;
 import com.redhat.ceylon.model.typechecker.model.TypeDeclaration;
 import com.redhat.ceylon.model.typechecker.model.TypeParameter;
 import com.redhat.ceylon.model.typechecker.model.Unit;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.PSIClass;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.PSIMethod;
+
 
 /**
  * Adds inherited members to the tree.
@@ -109,28 +114,33 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
         return Collections.emptyList();
     }
 
-    private StructureViewTreeElement getTreeElementForDeclaration(CeylonFile myFile,
-                                                                  Declaration declaration,
-                                                                  boolean inherited) {
+    private StructureViewTreeElement getTreeElementForDeclaration(final CeylonFile myFile,
+                                                                  final Declaration declaration,
+                                                                  final boolean inherited) {
         if (declaration == null) {
             return null;
         }
 
-        FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
-        myFile.getCompilationUnit().visit(visitor);
-        Node node = visitor.getDeclarationNode();
+        return (StructureViewTreeElement) ConcurrencyManagerForJava.outsideDumbMode(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                FindDeclarationNodeVisitor visitor = new FindDeclarationNodeVisitor(declaration);
+                myFile.getCompilationUnit().visit(visitor);
+                Node node = visitor.getDeclarationNode();
 
-        if (node == null) {
-            PsiElement idOwner = CeylonReference.resolveDeclaration(declaration, myFile.getProject());
-            if (idOwner instanceof CeylonCompositeElement) {
-                node = ((CeylonCompositeElement) idOwner).getCeylonNode();
+                if (node == null) {
+                    PsiElement idOwner = CeylonReference.resolveDeclaration(declaration, myFile.getProject());
+                    if (idOwner instanceof CeylonCompositeElement) {
+                        node = ((CeylonCompositeElement) idOwner).getCeylonNode();
+                    }
+                }
+
+                if (node instanceof Tree.Declaration) {
+                    return CeylonFileTreeElement.getTreeElementForDeclaration(myFile, (Tree.Declaration) node, inherited);
+                }
+                return null;
             }
-        }
+        });
 
-        if (node instanceof Tree.Declaration) {
-            return CeylonFileTreeElement.getTreeElementForDeclaration(myFile, (Tree.Declaration) node, inherited);
-        }
-
-        return null;
     }
 }
