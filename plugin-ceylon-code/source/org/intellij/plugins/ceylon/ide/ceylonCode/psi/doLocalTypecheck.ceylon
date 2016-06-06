@@ -22,7 +22,8 @@ import com.redhat.ceylon.ide.common.util {
     SingleSourceUnitPackage
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Package
+    Package,
+    Cancellable
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
@@ -32,13 +33,25 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     VirtualFileVirtualFile,
     IdeaVirtualFolder
 }
+import com.intellij.openapi.progress {
+    ProcessCanceledException
+}
 
 "Operates a local typecheck of the [[file]], without updating the global model."
-shared PhasedUnit? doLocalTypecheck(CeylonFile file) {
+shared PhasedUnit? doLocalTypecheck(CeylonFile file, Cancellable? cancellable = null) {
+    void checkCancelled() {
+        if (exists cancellable,
+            cancellable.cancelled) {
+            throw ProcessCanceledException();
+        }
+    }
+
     if (exists project = findProjectForFile(file),
         project.typechecked,
         exists tc = project.typechecker) {
-        
+
+        checkCancelled();
+
         return project.withSourceModel(true, () {
             value mod = project.ideArtifact;
             value sourceCodeVirtualFile = VirtualFileVirtualFile(file.virtualFile, mod);
@@ -46,6 +59,8 @@ shared PhasedUnit? doLocalTypecheck(CeylonFile file) {
             value cu = file.compilationUnit;
             IdeaVirtualFolder srcDir;
             Package pkg;
+
+            checkCancelled();
 
             if (exists phasedUnit) {
                 assert(is IdeaVirtualFolder f = phasedUnit.srcDir);
@@ -61,7 +76,9 @@ shared PhasedUnit? doLocalTypecheck(CeylonFile file) {
                 assert(exists cp = srcDir.ceylonPackage);
                 pkg = cp;
             }
-
+            
+            checkCancelled();
+            
             value projectPu = switch (phasedUnit)
             case (is EditedPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>) phasedUnit.originalPhasedUnit
             case (is ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>) phasedUnit
@@ -70,7 +87,9 @@ shared PhasedUnit? doLocalTypecheck(CeylonFile file) {
             value singleSourceUnitPackage = SingleSourceUnitPackage(pkg, sourceCodeVirtualFile.path);
 
             assert(is BaseIdeModuleSourceMapper msm = tc.phasedUnits.moduleSourceMapper);
-
+            
+            checkCancelled();
+            
             value editedPhasedUnit = EditedPhasedUnit {
                 unitFile = sourceCodeVirtualFile;
                 srcDir = srcDir;
@@ -84,17 +103,29 @@ shared PhasedUnit? doLocalTypecheck(CeylonFile file) {
                 project = mod;
                 file = file.virtualFile;
             };
-
+            
+            checkCancelled();
+            
             msm.moduleManager.modelLoader.loadPackageDescriptors();
-            editedPhasedUnit.validateTree();
-            editedPhasedUnit.visitSrcModulePhase();
-            editedPhasedUnit.visitRemainingModulePhase();
-            editedPhasedUnit.scanDeclarations();
-            editedPhasedUnit.scanTypeDeclarations();
-            editedPhasedUnit.validateRefinement();
-            editedPhasedUnit.analyseTypes();
-            editedPhasedUnit.analyseUsage();
-            editedPhasedUnit.analyseFlow();
+            
+            value phases = [
+                editedPhasedUnit.validateTree,
+                () { editedPhasedUnit.visitSrcModulePhase(); },
+                editedPhasedUnit.visitRemainingModulePhase,
+                editedPhasedUnit.scanDeclarations,
+                editedPhasedUnit.scanTypeDeclarations,
+                editedPhasedUnit.validateRefinement,
+                editedPhasedUnit.analyseTypes,
+                editedPhasedUnit.analyseUsage,
+                editedPhasedUnit.analyseFlow
+            ];
+                
+                checkCancelled();
+            
+            for (phase in phases) {
+                phase();
+                checkCancelled();
+            }
 
             file.phasedUnit = editedPhasedUnit;
             return editedPhasedUnit;
