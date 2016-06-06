@@ -42,7 +42,8 @@ import com.redhat.ceylon.model.loader.model {
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     ClassOrInterface,
-    Value
+    Value,
+    Referenceable
 }
 
 import java.lang {
@@ -62,6 +63,9 @@ shared class IdeaNavigation(Project project)
         extends AbstractNavigation<PsiElement,VirtualFile>() {
     
     shared actual Path filePath(VirtualFile file) => Path(file.path);
+    
+    shared actual PsiElement? gotoDeclaration(Referenceable? model) =>
+            concurrencyManager.withAlternateResolution(() => super.gotoDeclaration(model));
     
     shared actual PsiElement? gotoFile(VirtualFile file,
         Integer offset, Integer length) {
