@@ -1,5 +1,5 @@
 import com.redhat.ceylon.ide.common.correct {
-    convertThenElseToIfElse
+    convertThenElseToIfElseQuickFix
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -16,6 +16,6 @@ shared class ConvertThenElseToIfElseIntention() extends AbstractIntention() {
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
 
-        convertThenElseToIfElse.addConvertToIfElseProposal(data, statement);
+        convertThenElseToIfElseQuickFix.addConvertToIfElseProposal(data, statement);
     }
 }
