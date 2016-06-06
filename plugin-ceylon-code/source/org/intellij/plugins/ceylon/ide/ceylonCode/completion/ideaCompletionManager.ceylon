@@ -97,6 +97,7 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
             object monitor extends EmptyProgressIndicator() {
                 // hashCode() seems to be quite slow when used in CoreProgressManager.threadsUnderIndicator
                 hash => 43;
+                
             }
         };
         object listener extends ApplicationAdapter() {
