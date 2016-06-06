@@ -1,8 +1,18 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.antlr.runtime.CommonToken;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.jetbrains.annotations.NotNull;
+
 import com.intellij.extapi.psi.PsiFileBase;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.text.BlockSupport;
@@ -10,13 +20,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.antlr.runtime.CommonToken;
-import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerInvoker;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
+import com.redhat.ceylon.model.typechecker.model.Cancellable;
 
 public class CeylonFile extends PsiFileBase {
 
@@ -24,15 +28,26 @@ public class CeylonFile extends PsiFileBase {
     private List<CommonToken> tokens;
     private PhasedUnit phasedUnit;
     private boolean typechecked = false;
+    private Lock localTypecheckingLock = new ReentrantLock();
 
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
     }
 
     void setRootNode(Tree.CompilationUnit rootNode) {
-        synchronized (this) {
+        try {
+            if(! localTypecheckingLock.tryLock(1, TimeUnit.SECONDS)) {
+                throw new ProcessCanceledException();
+            }
+        } catch (InterruptedException e) {
+            throw new ProcessCanceledException(e);
+        }
+        try {
             typechecked = false;
             this.rootNode = rootNode;
+        }
+        finally {
+            localTypecheckingLock.unlock();
         }
     }
 
@@ -83,16 +98,29 @@ public class CeylonFile extends PsiFileBase {
     }
 
     public PhasedUnit ensureTypechecked() {
-        synchronized (this) {
+        return ensureTypechecked(null);
+    }
+    
+    public PhasedUnit ensureTypechecked(Cancellable cancellable) {
+        try {
+            if(! localTypecheckingLock.tryLock(1, TimeUnit.SECONDS)) {
+                throw new ProcessCanceledException();
+            }
+        } catch (InterruptedException e) {
+            throw new ProcessCanceledException(e);
+        }
+        try {
             if (!typechecked) {
-                if (doLocalTypecheck_.doLocalTypecheck(this) != null) {
+                if (doLocalTypecheck_.doLocalTypecheck(this, cancellable) != null) {
                     typechecked = true;
-                    return phasedUnit;
                 }
             }
-
-            return phasedUnit;
         }
+        finally {
+            localTypecheckingLock.unlock();
+        }
+        
+        return phasedUnit;
     }
 
     public PhasedUnit forceReparse() {
