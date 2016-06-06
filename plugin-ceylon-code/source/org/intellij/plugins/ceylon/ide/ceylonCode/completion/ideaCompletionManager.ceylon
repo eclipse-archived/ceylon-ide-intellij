@@ -93,27 +93,6 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
             }
         }
         
-        concurrencyManager.withAlternateResolution(() {
-            if (exists element = parameters.originalPosition,
-                is CeylonFile ceylonFile = element.containingFile,
-                exists pu = ceylonFile.ensureTypechecked()) {
-                addCompletionsInternal(parameters, context, result, pu, options);
-            }
-        });
-    }
-    
-    void addCompletionsInternal(CompletionParameters parameters, 
-        ProcessingContext context, CompletionResultSet result,
-        PhasedUnit pu, CompletionOptions options) {
-        
-        
-        value isSecondLevel = parameters.invocationCount > 0 && parameters.invocationCount % 2 == 0;
-        value element = parameters.originalPosition;
-        value doc = parameters.editor.document;
-        assert(is CeylonFile ceylonFile = element.containingFile);
-        value project = findProjectForFile(ceylonFile);
-        value params = IdeaCompletionContext(ceylonFile, parameters.editor, project, options);
-
         value progressMonitor = ProgressIndicatorMonitor.wrap {
             object monitor extends EmptyProgressIndicator() {
                 // hashCode() seems to be quite slow when used in CoreProgressManager.threadsUnderIndicator
@@ -130,22 +109,43 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
         if (! application.writeActionPending) {
             application.addApplicationListener(listener);
             try {
-                completionManager.getContentProposals {
-                    typecheckedRootNode = pu.compilationUnit;
-                    ctx = params;
-                    offset = parameters.editor.caretModel.offset;
-                    line = doc.getLineNumber(element.textOffset);
-                    secondLevel = isSecondLevel;
-                    monitor = progressMonitor;
-                    // The parameters tooltip has nothing to do with code completion, so we bypass it
-                    returnedParamInfo = true;
-                };
+                concurrencyManager.withAlternateResolution(() {
+                    if (exists element = parameters.originalPosition,
+                        is CeylonFile ceylonFile = element.containingFile,
+                        exists pu = ceylonFile.ensureTypechecked(progressMonitor)) {
+                        addCompletionsInternal(parameters, context, result, pu, options, progressMonitor);
+                    }
+                });
             } catch(ProcessCanceledException e) {
                 noop();// for debugging purposes
             } finally {
                 application.removeApplicationListener(listener);
             }
         }
+    }
+    
+    void addCompletionsInternal(CompletionParameters parameters, 
+        ProcessingContext context, CompletionResultSet result,
+        PhasedUnit pu, CompletionOptions options, ProgressIndicatorMonitor progressMonitor) {
+        
+        
+        value isSecondLevel = parameters.invocationCount > 0 && parameters.invocationCount % 2 == 0;
+        value element = parameters.originalPosition;
+        value doc = parameters.editor.document;
+        assert(is CeylonFile ceylonFile = element.containingFile);
+        value project = findProjectForFile(ceylonFile);
+        value params = IdeaCompletionContext(ceylonFile, parameters.editor, project, options);
+
+        completionManager.getContentProposals {
+            typecheckedRootNode = pu.compilationUnit;
+            ctx = params;
+            offset = parameters.editor.caretModel.offset;
+            line = doc.getLineNumber(element.textOffset);
+            secondLevel = isSecondLevel;
+            monitor = progressMonitor;
+            // The parameters tooltip has nothing to do with code completion, so we bypass it
+            returnedParamInfo = true;
+        };
         
         CustomLookupCellRenderer.install(parameters.editor.project);
         
