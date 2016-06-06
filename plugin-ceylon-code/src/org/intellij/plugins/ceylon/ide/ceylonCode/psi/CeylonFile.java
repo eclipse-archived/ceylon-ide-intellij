@@ -103,7 +103,7 @@ public class CeylonFile extends PsiFileBase {
     
     public PhasedUnit ensureTypechecked(Cancellable cancellable) {
         try {
-            if(! localTypecheckingLock.tryLock(1, TimeUnit.SECONDS)) {
+            if(! localTypecheckingLock.tryLock(2, TimeUnit.SECONDS)) {
                 throw new ProcessCanceledException();
             }
         } catch (InterruptedException e) {
