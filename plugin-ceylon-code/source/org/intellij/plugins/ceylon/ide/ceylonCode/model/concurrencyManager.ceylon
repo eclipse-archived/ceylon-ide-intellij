@@ -79,11 +79,11 @@ shared class IndexNeededWithNoIndexStrategy()
         extends ConcurrencyError(noIndexStrategyMessage) {}
 
 shared object concurrencyManager {
-    value deadLockDetectionTimeoutSeconds = 30;
+    value deadLockDetectionTimeout = 30000;
     
     value noIndexStrategy_ = ThreadLocal<NoIndexStrategy?>();
 
-    shared Return needReadAccess<Return>(Return() func) {
+    shared Return needReadAccess<Return>(Return() func, Integer timeout = deadLockDetectionTimeout) {
         if (application.readAccessAllowed) {
             value ref = Ref<Return>();
             ProgressManager.instance.executeNonCancelableSection(JavaRunnable(void () {
@@ -138,22 +138,24 @@ shared object concurrencyManager {
             
             value ref = Ref<Return>();
             
-            value allowedWaitingTime = System.currentTimeMillis() + deadLockDetectionTimeoutSeconds * 1000;
+            value allowedWaitingTime = System.currentTimeMillis() + timeout;
             while(!runInReadActionWithWriteActionPriority(JavaRunnable {
                 run() => ref.set(func());
             })) {
                 try {
                     if (System.currentTimeMillis() > allowedWaitingTime) {
-                        platformUtils.log(Status._ERROR, "Stopped waiting for read access to avoid a deadlock");
+                        if (timeout == deadLockDetectionTimeout) {
+                            platformUtils.log(Status._ERROR, "Stopped waiting for read access to avoid a deadlock");
+                        }
                         throw ProcessCanceledException();
                     }
-                    Thread.sleep(200);
+                    Thread.sleep(100);
                 } catch(InterruptedException ie) {
                     if (application.disposeInProgress) {
                         throw ProcessCanceledException(ie);
                     } else {
                         try {
-                            Thread.sleep(200);
+                            Thread.sleep(100);
                         } catch(InterruptedException ie2) {
                             throw ProcessCanceledException(ie2);
                         }
@@ -168,7 +170,7 @@ shared object concurrencyManager {
     Return withIndexStrategy<Return>(NoIndexStrategy s, Return() func) {
         NoIndexStrategy? previousStrategy;
         if (exists currentStrategy = noIndexStrategy_.get()) {
-            platformUtils.log(Status._WARNING, "The current strategy (``currentStrategy``) when indexes are unavailable should not be overriden by a new one (``s``)");
+            platformUtils.log(Status._DEBUG, "The current strategy (``currentStrategy``) when indexes are unavailable should not be overriden by a new one (``s``)");
             previousStrategy = currentStrategy;
         } else {
             previousStrategy = null;
@@ -246,7 +248,7 @@ shared object concurrencyManager {
                     noIndexStrategyMessage,
                     "  Stacktrace: ", *currentThread().stackTrace.array.coalesced.map((stackTraceElement) =>
                     "    ``stackTraceElement``") };
-                platformUtils.log(Status._WARNING, message);
+                platformUtils.log(Status._DEBUG, message);
                 return func();
             }
         }
@@ -266,3 +268,4 @@ object concurrencyManagerForJava {
     shared Anything outsideDumbMode(JCallable<Anything> func)
             => concurrencyManager.outsideDumbMode(func.call);
 }
+
