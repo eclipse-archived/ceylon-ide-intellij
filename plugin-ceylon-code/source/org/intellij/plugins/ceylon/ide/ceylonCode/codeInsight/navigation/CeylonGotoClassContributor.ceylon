@@ -37,7 +37,8 @@ import java.lang {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
-    IdeaModule
+    IdeaModule,
+    concurrencyManager
 }
 
 shared class CeylonGotoClassContributor() satisfies GotoClassContributor {
@@ -85,23 +86,26 @@ shared class CeylonGotoClassContributor() satisfies GotoClassContributor {
     qualifiedNameSeparator => ".";
 
     void processDeclarations(Project project, Boolean includeNonProjectItems, Boolean(Declaration) consumer) {
-        if (exists ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>())) {
-            for (mod in ModuleManager.getInstance(project).modules) {
-                if (exists ceylonProject = ceylonProjects.getProject(mod),
-                    exists modules = ceylonProject.modules) {
+        concurrencyManager.withAlternateResolution(() {
+            if (exists ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>())) {
+                for (mod in ModuleManager.getInstance(project).modules) {
+                    if (exists ceylonProject = ceylonProjects.getProject(mod),
+                        exists modules = ceylonProject.modules) {
 
-                    for (m in modules.typecheckerModules.listOfModules) {
-                        if (is IdeaModule m,
-                            includeNonProjectItems || m.isProjectModule) {
+                        for (m in modules.typecheckerModules.listOfModules) {
+                            if (is IdeaModule m,
+                                includeNonProjectItems || m.isProjectModule) {
 
-                            for (pack in ContainerUtil.newArrayList(m.packages)) {
-                                for (declaration in ContainerUtil.newArrayList(pack.members)) {
-                                    if (exists name = declaration.name,
-                                        !is AnyJavaUnit u = declaration.unit,
-                                        includeDeclaration(m, declaration)) {
+                                for (pack in ContainerUtil.newArrayList(m.packages)) {
 
-                                        if (!consumer(declaration)) {
-                                            return;
+                                    for (declaration in ContainerUtil.newArrayList(pack.members)) {
+                                        if (exists name = declaration.name,
+                                            !is AnyJavaUnit u = declaration.unit,
+                                            includeDeclaration(m, declaration)) {
+
+                                            if (!consumer(declaration)) {
+                                                return;
+                                            }
                                         }
                                     }
                                 }
@@ -110,7 +114,7 @@ shared class CeylonGotoClassContributor() satisfies GotoClassContributor {
                     }
                 }
             }
-        }
+        });
     }
 
     Boolean includeDeclaration(IdeaModule \imodule, Declaration dec) {
