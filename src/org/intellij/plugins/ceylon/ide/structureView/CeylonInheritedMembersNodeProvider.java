@@ -1,21 +1,15 @@
 package org.intellij.plugins.ceylon.ide.structureView;
 
-import com.intellij.ide.structureView.StructureViewTreeElement;
-import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.ide.structureView.impl.java.PsiFieldTreeElement;
-import com.intellij.ide.structureView.impl.java.PsiMethodTreeElement;
-import com.intellij.ide.util.InheritedMembersNodeProvider;
-import com.intellij.ide.util.treeView.smartTree.TreeElement;
-import com.intellij.psi.*;
-import com.redhat.ceylon.compiler.typechecker.tree.Node;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
-import com.redhat.ceylon.model.loader.model.FieldValue;
-import com.redhat.ceylon.model.loader.model.JavaMethod;
-import com.redhat.ceylon.model.loader.model.LazyClass;
-import com.redhat.ceylon.model.typechecker.model.*;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.PSIClass;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.PSIMethod;
+import static com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor.klass;
+import static com.redhat.ceylon.ide.common.completion.overloads_.overloads;
+import static com.redhat.ceylon.ide.common.util.toJavaIterable_.toJavaIterable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -23,11 +17,28 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-
-import static com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor.klass;
-import static com.redhat.ceylon.ide.common.completion.overloads_.overloads;
-import static com.redhat.ceylon.ide.common.util.toJavaIterable_.toJavaIterable;
+import com.intellij.ide.structureView.StructureViewTreeElement;
+import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.ide.structureView.impl.java.PsiFieldTreeElement;
+import com.intellij.ide.structureView.impl.java.PsiMethodTreeElement;
+import com.intellij.ide.util.InheritedMembersNodeProvider;
+import com.intellij.ide.util.treeView.smartTree.TreeElement;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMethod;
+import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.util.FindDeclarationNodeVisitor;
+import com.redhat.ceylon.model.loader.model.FieldValue;
+import com.redhat.ceylon.model.loader.model.JavaMethod;
+import com.redhat.ceylon.model.loader.model.LazyClass;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
+import com.redhat.ceylon.model.typechecker.model.DeclarationWithProximity;
+import com.redhat.ceylon.model.typechecker.model.TypeDeclaration;
+import com.redhat.ceylon.model.typechecker.model.TypeParameter;
+import com.redhat.ceylon.model.typechecker.model.Unit;
 
 /**
  * Adds inherited members to the tree.
@@ -57,7 +68,7 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
                     return elements;
                 }
 
-                Map<String, DeclarationWithProximity> decls = type.getMatchingMemberDeclarations(declaration.getUnit(), type, "", 0);
+                Map<String, DeclarationWithProximity> decls = type.getMatchingMemberDeclarations(declaration.getUnit(), type, "", 0, null);
 
                 for (DeclarationWithProximity dwp : decls.values()) {
                     for (Declaration decl : toJavaIterable(klass(Declaration.class),  overloads(dwp.getDeclaration()))) {
