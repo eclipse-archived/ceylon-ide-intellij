@@ -118,7 +118,7 @@ abstract class AbstractMetamodelEnricher implements ApplicationComponent {
                         throw new RuntimeException("Ceylon Metamodel Registering failed : several versions of the module '" + moduleName + "' are referenced from the plugin '" + getClass().getName() + "'");
                     }
 
-                    artifacts.put(moduleName, new ArtifactContext(moduleName, moduleVersion, moduleType));
+                    artifacts.put(moduleName, new ArtifactContext(null, moduleName, moduleVersion, moduleType));
                     return true;
                 }
                 return false;

@@ -114,6 +114,7 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
             }
             final String fileName = file.getName();
             final String moduleName = importedIdeaModules.getProperty(fileName);
+            final File finalFile = file;
             if (moduleName != null) {
                 ArtifactResult artifactResult = new ArtifactResult() {
                     @Override
@@ -147,11 +148,7 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
 
                     @Override
                     public File artifact() throws RepositoryException {
-                        try {
-                            return new File(url.toURI());
-                        } catch (URISyntaxException e) {
-                            throw new RepositoryException(e);
-                        }
+                        return finalFile;
                     }
 
                     @Override

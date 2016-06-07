@@ -75,7 +75,8 @@ import java.io {
 }
 import java.lang {
     Void,
-    System
+    System,
+    Thread
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
@@ -97,14 +98,15 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
         File? findLanguageCar() {
             String moduleName = "ceylon.language";
-            String moduleVersion = TypeChecker.\iLANGUAGE_MODULE_VERSION;
+            String moduleVersion = TypeChecker.languageModuleVersion;
 
             return repositoryManager.getArtifact(
-                ArtifactContext(moduleName, moduleVersion, ArtifactContext.\iCAR)
+                ArtifactContext(null, moduleName, moduleVersion, ArtifactContext.car)
             );
         }
 
         shared actual void beforeClasspathResolution(CeylonProjectBuildAlias build, CeylonProjectBuildAlias.State state) {
+            Thread.currentThread().contextClassLoader = javaClass<IdeaCeylonProject>().classLoader;
             if (! languageModuleAdded) {
                 if (exists languageModuleArtifact = findLanguageCar()) {
                     value runnable = JavaRunnable(() {

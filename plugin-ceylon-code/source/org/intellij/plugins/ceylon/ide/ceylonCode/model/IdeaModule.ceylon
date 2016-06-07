@@ -74,12 +74,12 @@ shared class IdeaModule(
             }
         }
         
-        variable ArtifactContext ctx = ArtifactContext(mod.nameAsString, mod.version,
-            ArtifactContext.\iCAR);
+        variable ArtifactContext ctx = ArtifactContext(null, mod.nameAsString, mod.version,
+            ArtifactContext.car);
         variable File? moduleArtifact = provider.getArtifact(ctx);
         if (!exists a = moduleArtifact) {
-            ctx = ArtifactContext(mod.nameAsString, mod.version,
-                ArtifactContext.\iJAR);
+            ctx = ArtifactContext(null, mod.nameAsString, mod.version,
+                ArtifactContext.jar);
             moduleArtifact = provider.getArtifact(ctx);
         }
         
