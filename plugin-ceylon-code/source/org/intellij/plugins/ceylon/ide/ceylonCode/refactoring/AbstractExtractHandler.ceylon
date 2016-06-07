@@ -133,13 +133,11 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             }
             editor.caretModel.moveToOffset(identifier.textOffset);
             value myDataContext = HashMap<JString,Object>();
-            myDataContext.put(JString(CommonDataKeys.\iEDITOR.name), editor);
-            myDataContext.put(JString(CommonDataKeys.\iPSI_FILE.name), file);
-            myDataContext.put(JString(LangDataKeys.\iPSI_ELEMENT_ARRAY.name), createJavaObjectArray<PsiElement>({ inserted }));
-            value handler = CeylonVariableRenameHandler();
-            if (handler.isAvailable(inserted, editor, file)) {
-                handler.invoke(_project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
-            }
+            myDataContext.put(JString(CommonDataKeys.editor.name), editor);
+            myDataContext.put(JString(CommonDataKeys.psiFile.name), file);
+            myDataContext.put(JString(LangDataKeys.psiElementArray.name), createJavaObjectArray<PsiElement>({ inserted }));
+            value handler = CeylonVariableRenameHandler(true);
+            handler.invoke(_project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
         }
     }
 

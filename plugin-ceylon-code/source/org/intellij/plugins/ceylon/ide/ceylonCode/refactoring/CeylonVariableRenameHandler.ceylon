@@ -32,7 +32,8 @@ import com.intellij.openapi.util {
     Pair
 }
 
-shared class CeylonVariableRenameHandler() extends VariableInplaceRenameHandler() {
+shared class CeylonVariableRenameHandler(Boolean forceInplace = false)
+        extends VariableInplaceRenameHandler() {
 
     shared actual VariableInplaceRenamer createRenamer(PsiElement elementToRename, Editor editor) {
         value file = elementToRename.containingFile;
@@ -54,10 +55,20 @@ shared class CeylonVariableRenameHandler() extends VariableInplaceRenameHandler(
 
             collectAdditionalElementsToRename(List<Pair<PsiElement,TextRange>>? stringUsages)
                     => noop();
+
+            shared actual PsiElement checkLocalScope() {
+                if (forceInplace) {
+                    return elementToRename.containingFile;
+                }
+                return super.checkLocalScope();
+            }
         };
     }
 
     shared actual Boolean isAvailable(PsiElement? element, Editor editor, PsiFile file) {
+        if (forceInplace) {
+            return true;
+        }
         if (exists context = file.findElementAt(editor.caretModel.offset),
             exists element,
             context.containingFile != element.containingFile) {
