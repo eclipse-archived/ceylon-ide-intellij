@@ -167,8 +167,11 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             return null;
         }
         final Tree.CompilationUnit cu = ((CeylonFile) context.getContainingFile()).getCompilationUnit();
-        final PhasedUnit pu = tc.getPhasedUnitFromRelativePath(cu.getUnit().getRelativePath());
+        final PhasedUnit pu = ((CeylonFile) context.getContainingFile()).getPhasedUnit();
 
+        if (cu == null || pu == null) {
+            return null;
+        }
         if (link.startsWith("stp:")) {
             int offset = Integer.parseInt(link.substring(4));
             final Node node = nodes_.get_().findNode(cu, null, offset, offset + 1);

@@ -172,11 +172,25 @@ shared class IdeaQuickFixData(
     shared default void registerFix(String desc, <PlatformTextChange|Anything()>? change, TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
         
-        assert (exists annotation);
-        value position = annotation.quickFixes?.size() else 0;
-        IntentionAction intention = CustomIntention(position, desc, change,
-            selection, image, qualifiedNameIsPath, callback);
-        annotation.registerFix(intention);
+        if (exists annotation) {
+            value position = annotation.quickFixes ?. size() else 0;
+            IntentionAction intention = CustomIntention(position, desc, change,
+                selection, image, qualifiedNameIsPath, callback);
+            annotation.registerFix(intention);
+        } else {
+            if (is IdeaTextChange change) {
+                change.apply();
+            } else if (is Anything() change){
+                change();
+            } else {
+                return;
+            }
+
+            if (exists selection, exists e = editor) {
+                e.selectionModel.setSelection(selection.startOffset, selection.endOffset);
+                e.caretModel.moveToOffset(selection.endOffset);
+            }
+        }
     }
 
     document = IdeaDocument(nativeDoc);
