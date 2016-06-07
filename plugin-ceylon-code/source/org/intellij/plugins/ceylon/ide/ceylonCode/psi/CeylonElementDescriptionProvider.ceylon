@@ -43,8 +43,12 @@ shared object ceylonDeclarationDescriptionProvider {
         value decl = switch(element)
             case (is Declaration) element
             else if (is CeylonCompositeElement element,
-                is Tree.Declaration node = element.ceylonNode,
-                exists decl = node.declarationModel)
+                     is Tree.Declaration node = element.ceylonNode,
+                     exists decl = node.declarationModel)
+            then decl
+            else if (is CeylonCompositeElement element,
+                     is Tree.SpecifierStatement node = element.ceylonNode,
+                     exists decl = node.declaration)
             then decl
             else null;
 

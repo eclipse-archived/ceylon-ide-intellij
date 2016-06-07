@@ -1,18 +1,23 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.resolve;
 
+import ceylon.language.Integer;
+import ceylon.language.Sequence;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.*;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.model.IResourceAware;
+import com.redhat.ceylon.ide.common.model.SourceAware;
+import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import com.redhat.ceylon.model.typechecker.model.Unit;
-
-import java.util.concurrent.Callable;
-
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -20,6 +25,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.Callable;
+
+import static com.intellij.psi.util.PsiTreeUtil.getParentOfType;
 
 public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
@@ -44,17 +53,42 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             }
         }
 
-        if (ConcurrencyManagerForJava.withAlternateResolution(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                return ((CeylonFile) myElement.getContainingFile()).ensureTypechecked();
-            }
-            
-        }) == null) {
-            return null;
-        }
+        final CeylonFile ceylonFile = (CeylonFile) myElement.getContainingFile();
+        final Tree.CompilationUnit compilationUnit = ceylonFile.getCompilationUnit();
 
-        Tree.CompilationUnit compilationUnit = ((CeylonFile) myElement.getContainingFile()).getCompilationUnit();
+        Sequence seq = ConcurrencyManagerForJava.withAlternateResolution(new Callable<Sequence>() {
+            @Override
+            public Sequence call() throws Exception {
+                if (ceylonFile.ensureTypechecked() != null) {
+                    return new IdeaNavigation(myElement.getProject()).findTarget(compilationUnit,
+                            ceylonFile.getTokens(),
+                            new DefaultRegion(myElement.getTextRange().getStartOffset(), myElement.getTextRange().getLength())
+                    );
+                }
+                return null;
+            }
+
+        });
+
+        if (seq != null) {
+            Node target = (Node) seq.get(new Integer(1));
+            VirtualFile vfile = null;
+            if (target.getUnit() instanceof SourceAware) {
+                String path = ((SourceAware) target.getUnit()).getSourceFullPath().toString();
+                vfile = VirtualFileManager.getInstance().findFileByUrl(
+                        (path.contains("!/") ? "jar" : "file") + "://" + path
+                );
+            } else if (target.getUnit() instanceof IResourceAware) {
+                vfile = (VirtualFile) ((IResourceAware) target.getUnit()).getResourceFile();
+            }
+            if (vfile != null) {
+                PsiFile psiFile = PsiManager.getInstance(myElement.getProject()).findFile(vfile);
+
+                if (psiFile instanceof CeylonFile) {
+                    return CeylonTreeUtil.findPsiElement(target, psiFile);
+                }
+            }
+        }
 
         Node node;
         if (myElement instanceof CeylonPsi.ImportPathPsi) {
@@ -85,7 +119,14 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
     @Nullable
     public static PsiElement resolveDeclaration(Referenceable declaration, Project project) {
-        return new IdeaNavigation(project).gotoDeclaration(declaration);
+        PsiElement location = new IdeaNavigation(project).gotoDeclaration(declaration);
+
+        PsiElement parent = location;
+        if (location.getLanguage() == CeylonLanguage.INSTANCE) {
+            parent = getParentOfType(location,
+                    CeylonPsi.SpecifierStatementPsi.class, PsiNameIdentifierOwner.class);
+        }
+        return parent == null ? location : parent;
     }
 
     @NotNull

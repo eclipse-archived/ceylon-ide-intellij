@@ -13,13 +13,15 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiFactory;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.SpecifierStatementPsiIdOwner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.CeylonStubTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class CeylonParserDefinition implements ParserDefinition {
 
-    public static final TokenSet WS_TOKENS = TokenSet.create(TokenTypes.WS.getTokenType());
+    private static final TokenSet WS_TOKENS = TokenSet.create(TokenTypes.WS.getTokenType());
 
     @NotNull
     @Override
@@ -64,9 +66,12 @@ public class CeylonParserDefinition implements ParserDefinition {
     @Override
     public PsiElement createElement(ASTNode node) {
         final IElementType type = node.getElementType();
-        return /*type == CeylonTypes.CLASS_DEFINITION || type == CeylonTypes.INTERFACE_DEFINITION
-                ? new StubbedClassDefinitionPsiImpl(node)
-                :*/ CeylonPsiFactory.createElement(node);
+
+        if (type == CeylonTypes.SPECIFIER_STATEMENT) {
+            return new SpecifierStatementPsiIdOwner(node);
+        } else {
+            return CeylonPsiFactory.createElement(node);
+        }
     }
 
     @Override

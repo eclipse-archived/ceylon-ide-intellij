@@ -101,9 +101,7 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             if (node != null) {
                 Tree.Declaration declaration = nodes_.get_().findDeclaration(file.getCompilationUnit(), node);
 
-                if (declaration instanceof Tree.TypedDeclaration) {
-                    return declaration.getDeclarationModel().getQualifiedNameString();
-                }
+                return declaration.getDeclarationModel().getQualifiedNameString();
             }
         }
 

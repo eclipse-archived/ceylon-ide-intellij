@@ -37,12 +37,12 @@ import com.redhat.ceylon.model.loader.model {
     JavaBeanValue,
     LazyClass,
     LazyInterface,
-    JavaMethod
+    JavaMethod,
+    FieldValue
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     ClassOrInterface,
-    Value,
     Referenceable
 }
 
@@ -66,7 +66,7 @@ shared class IdeaNavigation(Project project)
     
     shared actual PsiElement? gotoDeclaration(Referenceable? model) =>
             concurrencyManager.withAlternateResolution(() => super.gotoDeclaration(model));
-    
+
     shared actual PsiElement? gotoFile(VirtualFile file,
         Integer offset, Integer length) {
         
@@ -93,11 +93,11 @@ shared class IdeaNavigation(Project project)
             return meth.psi;
         } else if (is JavaBeanValue declaration, is PSIMethod meth = declaration.mirror) {
             return meth.psi;
-        } else if (is Value declaration) {
+        } else if (is FieldValue declaration) {
             if (is ClassOrInterface container = declaration.container,
                 exists cls = getJavaClass(container)) {
 
-                return cls.findFieldByName(declaration.name, true);
+                return cls.findFieldByName(declaration.realName, true);
             }
         }
         

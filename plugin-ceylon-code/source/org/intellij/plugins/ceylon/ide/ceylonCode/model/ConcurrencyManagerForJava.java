@@ -3,8 +3,8 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.model;
 import java.util.concurrent.Callable;
 
 public class ConcurrencyManagerForJava {
-    public static Object withAlternateResolution(Callable<Object> func) {
-        return concurrencyManagerForJava_.get_().withAlternateResolution(func);
+    public static <T> T withAlternateResolution(Callable<T> func) {
+        return (T) concurrencyManagerForJava_.get_().withAlternateResolution((Callable<Object>)func);
     }
 
     public static Object withUpToDateIndexes(Callable<Object> func) {
