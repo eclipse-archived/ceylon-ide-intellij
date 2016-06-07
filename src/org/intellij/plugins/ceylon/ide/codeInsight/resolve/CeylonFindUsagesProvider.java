@@ -15,7 +15,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.ParameterDeclarationPsiIdOwner;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.ParameterPsiIdOwner;
 import org.intellij.plugins.ceylon.ide.parser.CeylonAntlrToIntellijLexerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +61,7 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
                 return "annotation";
             }
             return "function";
-        } else if (element instanceof ParameterDeclarationPsiIdOwner) {
+        } else if (element instanceof ParameterPsiIdOwner) {
             return "function parameter";
         } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {
             return "type parameter";
@@ -83,6 +83,8 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return "setter";
         } else if (element instanceof CeylonPsi.EnumeratedPsi) {
             return "enumerated type";
+        } else if (element instanceof CeylonPsi.ParameterPsi) {
+            return "parameter";
         }
 
         logger.warn("Can't find type name for class " + element.getClass());
@@ -99,6 +101,9 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
                     element.getTextRange().getStartOffset(), element.getTextRange().getEndOffset());
 
             if (node != null) {
+                if (node instanceof Tree.InitializerParameter) {
+                    return ((Tree.InitializerParameter) node).getParameterModel().getName();
+                }
                 Tree.Declaration declaration = nodes_.get_().findDeclaration(file.getCompilationUnit(), node);
 
                 return declaration.getDeclarationModel().getQualifiedNameString();

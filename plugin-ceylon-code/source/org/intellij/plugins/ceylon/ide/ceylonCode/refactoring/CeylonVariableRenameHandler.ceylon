@@ -21,7 +21,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
-    DeclarationPsiNameIdOwner
+    DeclarationPsiNameIdOwner,
+    ParameterPsiIdOwner
 }
 import java.util {
     List
@@ -67,6 +68,6 @@ shared class CeylonVariableRenameHandler() extends VariableInplaceRenameHandler(
         if (is CeylonFile file) {
             file.ensureTypechecked();
         }
-        return element is DeclarationPsiNameIdOwner;
+        return element is DeclarationPsiNameIdOwner|ParameterPsiIdOwner;
     }
 }

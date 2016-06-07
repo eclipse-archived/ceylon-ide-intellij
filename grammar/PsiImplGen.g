@@ -71,8 +71,8 @@ extendsNode :
                 { print(" extends DeclarationPsiNameIdOwner"); }
               )
               |
-              { $n.text.equals("PARAMETER_DECLARATION") }?=> (
-                { print(" extends ParameterDeclarationPsiIdOwner"); }
+              { $n.text.equals("PARAMETER") }?=> (
+                { print(" extends ParameterPsiIdOwner"); }
               )
               | { print(" extends " + className($n.text) + "PsiImpl"); }
             )

@@ -309,31 +309,31 @@ public class CeylonPsiImpl {
         @Override public Tree.Parameter getCeylonNode() { return (Tree.Parameter) super.getCeylonNode(); }
     }
 
-    public static abstract class ParameterDeclarationPsiImpl extends ParameterPsiImpl
+    public static abstract class ParameterDeclarationPsiImpl extends ParameterPsiIdOwner
             implements CeylonPsi.ParameterDeclarationPsi {
         public ParameterDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.ParameterDeclaration getCeylonNode() { return (Tree.ParameterDeclaration) super.getCeylonNode(); }
     }
 
-    public static class ValueParameterDeclarationPsiImpl extends ParameterDeclarationPsiIdOwner
+    public static class ValueParameterDeclarationPsiImpl extends ParameterDeclarationPsiImpl
             implements CeylonPsi.ValueParameterDeclarationPsi {
         public ValueParameterDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.ValueParameterDeclaration getCeylonNode() { return (Tree.ValueParameterDeclaration) super.getCeylonNode(); }
     }
 
-    public static class FunctionalParameterDeclarationPsiImpl extends ParameterDeclarationPsiIdOwner
+    public static class FunctionalParameterDeclarationPsiImpl extends ParameterDeclarationPsiImpl
             implements CeylonPsi.FunctionalParameterDeclarationPsi {
         public FunctionalParameterDeclarationPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.FunctionalParameterDeclaration getCeylonNode() { return (Tree.FunctionalParameterDeclaration) super.getCeylonNode(); }
     }
 
-    public static class InitializerParameterPsiImpl extends ParameterPsiImpl
+    public static class InitializerParameterPsiImpl extends ParameterPsiIdOwner
             implements CeylonPsi.InitializerParameterPsi {
         public InitializerParameterPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.InitializerParameter getCeylonNode() { return (Tree.InitializerParameter) super.getCeylonNode(); }
     }
 
-    public static class PatternParameterPsiImpl extends ParameterPsiImpl
+    public static class PatternParameterPsiImpl extends ParameterPsiIdOwner
             implements CeylonPsi.PatternParameterPsi {
         public PatternParameterPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.PatternParameter getCeylonNode() { return (Tree.PatternParameter) super.getCeylonNode(); }
