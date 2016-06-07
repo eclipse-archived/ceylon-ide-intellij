@@ -120,6 +120,10 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
                     public String name() {
                         return moduleName;
                     }
+                    @Override
+                    public String namespace() {
+                        return null;
+                    }
 
                     @Override
                     public String version() {
