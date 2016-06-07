@@ -88,7 +88,8 @@ shared object ideaIcons {
         case (is Tree.AnyMethod)
             methods
         case (is Function)
-            if (decl.formal) then formalMethods else methods
+            if (ModelUtil.isConstructor(decl)) then constructors
+            else if (decl.formal) then formalMethods else methods
         case (is Tree.ObjectDefinition)
             objects
         case (is Value)

@@ -61,7 +61,7 @@ shared object ceylonDeclarationDescriptionProvider {
             if (includeContainer) {
                 sb.append(container(decl));
             }
-            sb.append(decl.name)
+            sb.append(decl.name else "new")
                 .append(parameterLists(decl));
 
             return sb.string;

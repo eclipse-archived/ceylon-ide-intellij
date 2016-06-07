@@ -18,11 +18,11 @@ import java.util.List;
 /**
  * Shows the children declarations of a Ceylon file in the structure tool window.
  */
-public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
+class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
 
     private CeylonFile myElement;
 
-    protected CeylonFileTreeElement(CeylonFile psiElement) {
+    CeylonFileTreeElement(CeylonFile psiElement) {
         super(psiElement);
         myElement = psiElement;
     }
@@ -40,7 +40,8 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
         List<StructureViewTreeElement> elements = new ArrayList<>();
 
         if (!compilationUnit.getImportList().getImports().isEmpty()) {
-            CeylonPsi.ImportPsi[] imports = PsiTreeUtil.getChildrenOfType(myElement.getFirstChild().getFirstChild(), CeylonPsi.ImportPsi.class);
+            CeylonPsi.ImportPsi[] imports = PsiTreeUtil.getChildrenOfType(
+                    myElement.getFirstChild().getFirstChild(), CeylonPsi.ImportPsi.class);
 
             if (imports != null && imports.length > 0) {
                 elements.add(new CeylonImportListTreeElement(imports));
@@ -57,23 +58,38 @@ public class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
         return elements;
     }
 
-    static StructureViewTreeElement getTreeElementForDeclaration(CeylonFile myFile, Tree.Declaration declaration, boolean isInherited) {
+    static StructureViewTreeElement getTreeElementForDeclaration(CeylonFile myFile,
+                                                                 Tree.Declaration declaration,
+                                                                 boolean isInherited) {
         if (declaration == null) {
             return null;
         }
 
         if (declaration instanceof CustomTree.ClassOrInterface) {
-            CeylonPsi.ClassOrInterfacePsi psiClass = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.ClassOrInterfacePsi.class);
+            CeylonPsi.ClassOrInterfacePsi psiClass = PsiTreeUtil.getParentOfType(
+                    myFile.findElementAt(declaration.getStartIndex()),
+                    CeylonPsi.ClassOrInterfacePsi.class);
             return new CeylonClassTreeElement(psiClass, isInherited);
         } else if (declaration instanceof Tree.AnyMethod) {
-            CeylonPsi.AnyMethodPsi psiMethod = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.AnyMethodPsi.class);
+            CeylonPsi.AnyMethodPsi psiMethod = PsiTreeUtil.getParentOfType(
+                    myFile.findElementAt(declaration.getStartIndex()),
+                    CeylonPsi.AnyMethodPsi.class);
             return new CeylonFunctionTreeElement(psiMethod, isInherited);
         } else if (declaration instanceof Tree.ObjectDefinition) {
-            CeylonPsi.ObjectDefinitionPsi psiObject = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.ObjectDefinitionPsi.class);
+            CeylonPsi.ObjectDefinitionPsi psiObject = PsiTreeUtil.getParentOfType(
+                    myFile.findElementAt(declaration.getStartIndex()),
+                    CeylonPsi.ObjectDefinitionPsi.class);
             return new CeylonObjectTreeElement(psiObject, isInherited);
         } else if (declaration instanceof Tree.AttributeDeclaration) {
-            CeylonPsi.AttributeDeclarationPsi psiDecl = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.getStartIndex()), CeylonPsi.AttributeDeclarationPsi.class);
+            CeylonPsi.AttributeDeclarationPsi psiDecl = PsiTreeUtil.getParentOfType(
+                    myFile.findElementAt(declaration.getStartIndex()),
+                    CeylonPsi.AttributeDeclarationPsi.class);
             return new CeylonAttributeTreeElement(psiDecl, isInherited);
+        } else if (declaration instanceof Tree.Constructor) {
+            CeylonPsi.ConstructorPsi psiDecl = PsiTreeUtil.getParentOfType(
+                    myFile.findElementAt(declaration.getStartIndex()),
+                    CeylonPsi.ConstructorPsi.class);
+            return new CeylonConstructorTreeElement(psiDecl);
         }
 
         return null;

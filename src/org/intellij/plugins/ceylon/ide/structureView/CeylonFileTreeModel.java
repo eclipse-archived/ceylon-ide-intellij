@@ -14,12 +14,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class CeylonFileTreeModel extends TextEditorBasedStructureViewModel implements StructureViewModel.ElementInfoProvider, StructureViewModel.ExpandInfoProvider {
+class CeylonFileTreeModel extends TextEditorBasedStructureViewModel
+        implements StructureViewModel.ElementInfoProvider, StructureViewModel.ExpandInfoProvider {
 
     private static final Filter[] FILTERS = new Filter[]{new UnsharedDeclarationsFilter()};
-    private static final List<NodeProvider> NODE_PROVIDERS = Collections.<NodeProvider>singletonList(new CeylonInheritedMembersNodeProvider());
+    private static final List<NodeProvider> NODE_PROVIDERS = Collections.<NodeProvider>singletonList(
+            new CeylonInheritedMembersNodeProvider()
+    );
 
-    public CeylonFileTreeModel(PsiFile psiFile) {
+    CeylonFileTreeModel(PsiFile psiFile) {
         super(psiFile);
     }
 
