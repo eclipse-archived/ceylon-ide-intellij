@@ -40,11 +40,6 @@
             <option name="FOREGROUND" value="0000FF"/>
         </value>
     </option>
-    <option name="CEYLON_INTERP">
-        <value>
-            <option name="FOREGROUND" value="0000FF"/>
-        </value>
-    </option>
     <option name="CEYLON_ANNOTATION_STRING">
         <value>
             <option name="FOREGROUND" value="008080"/>
