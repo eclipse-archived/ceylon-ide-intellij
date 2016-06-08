@@ -122,7 +122,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         PsiElement location = new IdeaNavigation(project).gotoDeclaration(declaration);
 
         PsiElement parent = location;
-        if (location.getLanguage() == CeylonLanguage.INSTANCE) {
+        if (location != null && location.getLanguage() == CeylonLanguage.INSTANCE) {
             parent = getParentOfType(location,
                     CeylonPsi.SpecifierStatementPsi.class, PsiNameIdentifierOwner.class);
         }
