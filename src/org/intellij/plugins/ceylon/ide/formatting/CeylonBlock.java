@@ -47,10 +47,10 @@ class CeylonBlock implements Block {
             CeylonTypes.SEQUENCE_ENUMERATION, CeylonTypes.ANNOTATION_LIST, CeylonTypes.TYPE_CONSTRAINT_LIST,
             CeylonTypes.IF_STATEMENT, CeylonTypes.ELSE_CLAUSE
     );
-    private static final List<IElementType> INDENT_CHILDREN_CONTINUE = Arrays.asList(
-            CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES,
-            CeylonTypes.LAZY_SPECIFIER_EXPRESSION
-    );
+//    private static final List<IElementType> INDENT_CHILDREN_CONTINUE = Arrays.asList(
+//            CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES,
+//            CeylonTypes.LAZY_SPECIFIER_EXPRESSION
+//    );
 
     private static final Collection<IElementType> TYPES_REQUIRING_NO_LEFT_SPACING = Arrays.asList(
             CeylonTypes.PARAMETER_LIST, CeylonTokens.RPAREN, CeylonTokens.COMMA, CeylonTokens.SEMICOLON,
@@ -102,8 +102,8 @@ class CeylonBlock implements Block {
         final IElementType nodeType = node.getElementType();
         final Indent normalChildIndent = INDENT_CHILDREN_NORMAL.contains(nodeType) ? Indent.getNormalIndent()
                 : INDENT_CHILDREN_NONE.contains(nodeType) ? Indent.getNoneIndent()
-                : INDENT_CHILDREN_CONTINUE.contains(nodeType) ? Indent.getContinuationIndent()
-                : Indent.getNoneIndent();
+//                : INDENT_CHILDREN_CONTINUE.contains(nodeType) ? Indent.getContinuationIndent()
+                : Indent.getContinuationWithoutFirstIndent();
 //        System.out.printf("normalChildIndent for %s: %s%n", nodeType, indent);
         IElementType prevChildType = null;
         for (ASTNode child = node.getFirstChildNode(); child != null; child = child.getTreeNext()) {
@@ -239,18 +239,6 @@ class CeylonBlock implements Block {
 
     private static boolean isMetaLiteral(CeylonBlock block) {
         return block.node.getPsi() instanceof CeylonPsi.MetaLiteralPsi;
-    }
-
-    private Object getSpacingName(Spacing result) {
-        return result == EMPTY_LINE_SPACING ? "EMPTY_LINE_SPACING"
-                : result == NEW_LINE_SPACING ? "NEW_LINE_SPACING"
-                : result == NO_SPACING ? "NO_SPACING"
-                : result == SINGLE_SPACE_SPACING ? "SINGLE_SPACE_SPACING"
-                : result == KEEP_SOME_SPACE ? "KEEP_SOME_SPACE"
-                : result == SINGLE_SPACE_SPACING_INLINE ? "SINGLE_SPACE_SPACING_INLINE"
-                : result == NEW_LINE_SPACING_STRICT ? "NEW_LINE_SPACING_STRICT"
-                : result == NO_SPACE_ALLOW_NEWLINE ? "NO_SPACE_ALLOW_NEWLINE"
-                : result;
     }
 
     @NotNull
