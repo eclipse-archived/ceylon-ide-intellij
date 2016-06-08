@@ -83,7 +83,7 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
                                     ? element.getContainingFile()
                                     : CeylonTreeUtil.getDeclaringFile(unit, element.getProject());
 
-                            if (file != null) {
+                            if (file instanceof CeylonFile) {
                                 boolean inherited = type.isInherited(decl);
                                 StructureViewTreeElement treeElement = getTreeElementForDeclaration((CeylonFile) file, decl, inherited);
 
