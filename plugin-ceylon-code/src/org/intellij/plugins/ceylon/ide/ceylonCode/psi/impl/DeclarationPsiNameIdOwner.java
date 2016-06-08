@@ -8,7 +8,6 @@ import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.intellij.util.ObjectUtils;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
@@ -40,12 +39,6 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     public PsiElement getNameIdentifier() {
         Tree.Declaration node = getCeylonNode();
         return node == null ? PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) : CeylonTreeUtil.findPsiElement(node.getIdentifier(), getContainingFile());
-    }
-
-    @NotNull
-    @Override
-    public PsiElement getNavigationElement() {
-        return ObjectUtils.notNull(getNameIdentifier(), this);
     }
 
     @Override

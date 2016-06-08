@@ -6,7 +6,6 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
-import com.intellij.util.ObjectUtils;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
 import org.jetbrains.annotations.NonNls;
@@ -40,12 +39,6 @@ public abstract class ParameterPsiIdOwner extends CeylonPsiImpl.ParameterPsiImpl
         }
 
         return null;
-    }
-
-    @NotNull
-    @Override
-    public PsiElement getNavigationElement() {
-        return ObjectUtils.notNull(getNameIdentifier(), this);
     }
 
     @Override

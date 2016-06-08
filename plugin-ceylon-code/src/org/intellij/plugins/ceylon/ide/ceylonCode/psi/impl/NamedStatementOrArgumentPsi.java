@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.util.IncorrectOperationException;
-import com.intellij.util.ObjectUtils;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
@@ -27,12 +26,6 @@ public class NamedStatementOrArgumentPsi extends CeylonPsiImpl.StatementOrArgume
         PsiElement id = getNameIdentifier();
 
         return id == null ? null : id.getText();
-    }
-
-    @NotNull
-    @Override
-    public PsiElement getNavigationElement() {
-        return ObjectUtils.notNull(getNameIdentifier(), this);
     }
 
     @Override
