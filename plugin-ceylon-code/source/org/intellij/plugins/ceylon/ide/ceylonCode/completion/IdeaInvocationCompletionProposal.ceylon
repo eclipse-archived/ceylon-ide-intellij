@@ -1,6 +1,7 @@
 import com.intellij.codeInsight.completion {
     InsertHandler,
-    InsertionContext
+    InsertionContext,
+    CompletionInitializationContext
 }
 import com.intellij.codeInsight.lookup {
     LookupElement
@@ -53,10 +54,11 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
 
     shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.forDeclaration(declaration),
         object satisfies InsertHandler<LookupElement> {
-            shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
+            shared actual void handleInsert(InsertionContext context, LookupElement? t) {
                 // Undo IntelliJ's completion
                 value platformDoc = ctx.commonDocument;
-                replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
+                value len = context.getOffset(CompletionInitializationContext.\iSELECTION_END_OFFSET) - offset;
+                replaceInDoc(platformDoc, offset, len, "");
                 PsiDocumentManager.getInstance(ctx.editor.project).commitDocument(platformDoc.nativeDocument);
                 
                 value change = createChange(platformDoc);
