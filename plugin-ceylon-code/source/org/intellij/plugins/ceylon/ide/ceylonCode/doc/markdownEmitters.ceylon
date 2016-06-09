@@ -28,7 +28,7 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    highlight
+    highlighter
 }
 
 
@@ -155,7 +155,7 @@ class CeylonBlockEmitter(Project project) satisfies BlockEmitter {
             value code = "\n".join(CeylonIterable(lines)) + "\n";
             
             if (exists meta, (meta.empty || "ceylon".equals(meta))) {
-                builder.append(highlight(code.string, project));
+                builder.append(highlighter.highlight(code.string, project));
             } else {
                 builder.append(code.string);
             }

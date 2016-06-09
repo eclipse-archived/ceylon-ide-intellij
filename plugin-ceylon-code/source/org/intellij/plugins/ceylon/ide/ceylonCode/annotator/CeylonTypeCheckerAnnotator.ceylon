@@ -8,7 +8,8 @@ import com.intellij.codeInspection {
 import com.intellij.lang.annotation {
     AnnotationHolder,
     ExternalAnnotator,
-    Annotation
+    Annotation,
+    HighlightSeverity
 }
 import com.intellij.openapi.application {
     ApplicationManager
@@ -20,7 +21,8 @@ import com.intellij.openapi.\imodule {
     ModuleUtil
 }
 import com.intellij.openapi.project {
-    DumbAware
+    DumbAware,
+    Project
 }
 import com.intellij.openapi.util {
     TextRange
@@ -52,6 +54,9 @@ import com.redhat.ceylon.ide.common.util {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     IdeaQuickFixData
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+    highlighter
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
@@ -87,8 +92,11 @@ shared class CeylonTypeCheckerAnnotator()
                 else null);
     
     shared actual void apply(PsiFile file, {[Message, TextRange?]*} ceylonMessages, AnnotationHolder holder) {
-        concurrencyManager.withAlternateResolution(()
-                => ceylonMessages.each(([message,range]) => addAnnotation(message, range, holder)));
+        concurrencyManager.withAlternateResolution(
+            () => ceylonMessages.each(
+                ([message,range]) => addAnnotation(message, range, holder, file.project)
+            )
+        );
         if (is CeylonFile file,
             exists cu = file.compilationUnit,
             cu.errors.empty) {
@@ -99,25 +107,40 @@ shared class CeylonTypeCheckerAnnotator()
         }
     }
 
-    void addAnnotation(Message message, variable TextRange? range, AnnotationHolder annotationHolder) {
+    void addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, Project project) {
         value unresolvedReferenceCodes = [ 100, 102 ];
         value unusedCodes = [ Warning.unusedDeclaration.string, Warning.unusedImport.string ];
         
         Annotation annotation;
         if (message is AnalysisError|RecognitionError|UnexpectedError) {
-            annotation = annotationHolder.createErrorAnnotation(range, message.message);
+            annotation = annotationHolder.createAnnotation(
+                HighlightSeverity.error,
+                range,
+                message.message,
+                highlighter.highlightQuotedMessage(message.message, project)
+            );
             if (unresolvedReferenceCodes.contains(message.code)) {
-                annotation.highlightType = ProblemHighlightType.\iLIKE_UNKNOWN_SYMBOL;
+                annotation.highlightType = ProblemHighlightType.likeUnknownSymbol;
             }
         } else if (is UsageWarning message) {
-            annotation = annotationHolder.createWarningAnnotation(range, message.message);
+            annotation = annotationHolder.createAnnotation(
+                HighlightSeverity.warning,
+                range,
+                message.message,
+                highlighter.highlightQuotedMessage(message.message, project)
+            );
             if (unusedCodes.contains(message.warningName)) {
-                annotation.highlightType = ProblemHighlightType.\iLIKE_UNUSED_SYMBOL;
+                annotation.highlightType = ProblemHighlightType.likeUnusedSymbol;
             } else {
-                annotation.highlightType = ProblemHighlightType.\iGENERIC_ERROR_OR_WARNING;
+                annotation.highlightType = ProblemHighlightType.genericErrorOrWarning;
             }
         } else {
-            annotation = annotationHolder.createInfoAnnotation(range, message.message);
+            annotation = annotationHolder.createAnnotation(
+                HighlightSeverity.information,
+                range,
+                message.message,
+                highlighter.highlightQuotedMessage(message.message, project)
+            );
         }
         if (exists r = range,
             !ApplicationManager.application.unitTestMode) {

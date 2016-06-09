@@ -6,6 +6,7 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.SimpleTextAttributes;
 import com.redhat.ceylon.ide.common.model.CeylonProjectBuild;
 import com.redhat.ceylon.ide.common.model.Severity;
 import org.jetbrains.annotations.NotNull;
@@ -40,16 +41,17 @@ class ProblemNode extends AbstractTreeNode<CeylonProjectBuild.BuildMessage> {
         if (message instanceof CeylonProjectBuild.SourceFileMessage) {
             CeylonProjectBuild.SourceFileMessage sourceMsg = (CeylonProjectBuild.SourceFileMessage) message;
 
-            presentation.setPresentableText(String.format(
-                    "%s(%d,%d): %s",
+            presentation.addText(String.format(
+                    "%s(%d,%d): ",
                     ((VirtualFile)sourceMsg.getFile()).getName(),
                     sourceMsg.getStartLine(),
-                    sourceMsg.getStartCol(),
-                    sourceMsg.getMessage()
-            ));
-        } else {
-            presentation.setPresentableText(message.getMessage());
+                    sourceMsg.getStartCol()
+            ), SimpleTextAttributes.GRAYED_ATTRIBUTES);
+
+            org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_.get_()
+                    .highlightPresentationData(presentation, sourceMsg.getMessage(), getProject());
         }
+        presentation.setPresentableText(message.getMessage());
     }
 
     @Override

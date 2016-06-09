@@ -37,6 +37,7 @@ shared class DeclarationModuleRendererFactory() extends ModuleRendererFactory() 
     handles(Object? element) => element is DeclarationNavigationItem;
 }
 
+"Renders a Ceylon declaration, for example in the results of Go To Class."
 shared object declarationListCellRenderer extends DefaultListCellRenderer() {
 
     value delegate = PsiElementModuleRenderer();

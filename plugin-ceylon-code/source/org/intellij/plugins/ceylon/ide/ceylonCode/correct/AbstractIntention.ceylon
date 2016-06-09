@@ -61,7 +61,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    highlightProposal
+    highlighter
 }
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
@@ -158,7 +158,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
         DefaultRegion? sel = null, 
         Anything callback(Project p, Editor e, PsiFile f) => noop) {
         
-        setText(highlightProposal(desc, p));
+        setText(highlighter.highlightQuotedMessage(desc, p));
         available = true;
         this.change = change;
         this.callback = callback;

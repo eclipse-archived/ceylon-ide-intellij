@@ -34,6 +34,9 @@ import java.util.List;
 
 import static com.intellij.ui.SimpleTextAttributes.merge;
 
+/**
+ * Highlights proposals returned by the completion manager.
+ */
 public class CustomLookupCellRenderer extends LookupCellRenderer {
 
     private static final Color PREFIX_FOREGROUND_COLOR = new JBColor(new Color(176, 0, 176), new Color(209, 122, 214));

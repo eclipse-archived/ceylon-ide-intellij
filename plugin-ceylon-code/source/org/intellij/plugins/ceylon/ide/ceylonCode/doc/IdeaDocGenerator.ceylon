@@ -75,7 +75,7 @@ import org.antlr.runtime {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     ceylonHighlightingColors,
-    highlight,
+    highlighter,
     textAttributes
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
@@ -86,8 +86,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 String psiProtocol = "psi_element://";
-
-String(String, Project) outerHighlight = highlight;
 
 shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
 
@@ -204,7 +202,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
 
     shared actual String highlight(String text, LocalAnalysisResult cmp) {
         assert (is DocParams cmp);
-        return outerHighlight(text, cmp.ideaProject);
+        return highlighter.highlight(text, cmp.ideaProject);
     }
 
     shared String buildUrl(Referenceable model) {

@@ -88,7 +88,7 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    highlightProposal
+    highlighter
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -128,7 +128,7 @@ class CustomIntention(Integer position, String desc, <PlatformTextChange|Anythin
     }
     
     text => if (exists p = project) 
-        then highlightProposal(desc, p, qualifiedNameIsPath) 
+        then highlighter.highlightQuotedMessage(desc, p, qualifiedNameIsPath) 
         else desc;
     
     shared actual Icon? getIcon(Integer int) => image;

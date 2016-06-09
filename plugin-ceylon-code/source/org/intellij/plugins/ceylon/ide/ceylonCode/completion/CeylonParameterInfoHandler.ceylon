@@ -55,7 +55,7 @@ import java.lang {
     JString=String
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    highlight
+    highlighter
 }
 
 shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<ArgumentListPsi, Functional> {
@@ -133,7 +133,7 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
             
             for (param in parameters) {
                 variable String paramLabel = getParameterLabel(param, (fun of Declaration).unit);
-                paramLabel = highlight(paramLabel, context.parameterOwner.project)
+                paramLabel = highlighter.highlight(paramLabel, context.parameterOwner.project)
                     .replace("<", "≤")
                     .replace(">", "≥")
                     .replace("&lt;", "<")
