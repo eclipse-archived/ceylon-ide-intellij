@@ -78,6 +78,9 @@ public class CeylonQuoteHandler extends SimpleTokenSetQuoteHandler implements Mu
 
     @Override
     protected boolean isNonClosedLiteral(HighlighterIterator iterator, CharSequence chars) {
+        if (iterator.getStart() + 1 == chars.length()) {
+            return true;
+        }
         char nextChar = chars.charAt(iterator.getStart() + 1);
         return nextChar != '\"' && nextChar != '\'';
     }
