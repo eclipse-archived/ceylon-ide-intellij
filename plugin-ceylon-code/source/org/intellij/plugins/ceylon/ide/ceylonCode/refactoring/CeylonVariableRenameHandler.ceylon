@@ -56,7 +56,7 @@ shared class CeylonVariableRenameHandler(Boolean forceInplace = false)
             collectAdditionalElementsToRename(List<Pair<PsiElement,TextRange>>? stringUsages)
                     => noop();
 
-            shared actual PsiElement checkLocalScope() {
+            shared actual PsiElement? checkLocalScope() {
                 if (forceInplace) {
                     return elementToRename.containingFile;
                 }
