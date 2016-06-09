@@ -4,10 +4,9 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.model.typechecker.model.Functional;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,10 +15,13 @@ import javax.swing.*;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.intellij.plugins.ceylon.ide.structureView.CeylonDeclarationTreeElement.getParametersString;
+import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 
 class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierStatementPsi>
         implements ColoredItemPresentation {
+
+    private ceylonDeclarationDescriptionProvider_ ceylonDeclarationDescriptionProvider =
+            ceylonDeclarationDescriptionProvider_.get_();
 
     CeylonSpecifierTreeElement(CeylonPsi.SpecifierStatementPsi psiElement) {
         super(psiElement);
@@ -46,18 +48,8 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
     @Nullable
     @Override
     public String getPresentableText() {
-        Tree.SpecifierStatement node = getElement().getCeylonNode();
-        TypedDeclaration declaration = node.getDeclaration();
-        if (declaration == null) {
-            return "<unknown> (" + getElement().getText() + ")";
-        }
-        StringBuilder builder = new StringBuilder(declaration.getName());
-
-        if (declaration instanceof Functional) {
-            builder.insert(0, "function ");
-            builder.append(getParametersString(((Functional) declaration).getParameterLists(), node.getUnit()));
-        }
-
-        return builder.toString();
+        return toJavaString(
+                ceylonDeclarationDescriptionProvider.getDescription(getElement(), false, false)
+        );
     }
 }
