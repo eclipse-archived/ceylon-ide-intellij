@@ -21,7 +21,9 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.util.containers {
-    ContainerUtil
+    ContainerUtil {
+        newArrayList
+    }
 }
 import com.redhat.ceylon.ide.common.model {
     AnyJavaUnit
@@ -92,13 +94,13 @@ shared class CeylonGotoClassContributor() satisfies GotoClassContributor {
                     if (exists ceylonProject = ceylonProjects.getProject(mod),
                         exists modules = ceylonProject.modules) {
 
-                        for (m in modules.typecheckerModules.listOfModules) {
+                        for (m in newArrayList(modules.typecheckerModules.listOfModules)) {
                             if (is IdeaModule m,
                                 includeNonProjectItems || m.isProjectModule) {
 
-                                for (pack in ContainerUtil.newArrayList(m.packages)) {
+                                for (pack in newArrayList(m.packages)) {
 
-                                    for (declaration in ContainerUtil.newArrayList(pack.members)) {
+                                    for (declaration in newArrayList(pack.members)) {
                                         if (exists name = declaration.name,
                                             !is AnyJavaUnit u = declaration.unit,
                                             includeDeclaration(m, declaration)) {
@@ -117,11 +119,11 @@ shared class CeylonGotoClassContributor() satisfies GotoClassContributor {
         });
     }
 
-    Boolean includeDeclaration(IdeaModule \imodule, Declaration dec) {
+    Boolean includeDeclaration(IdeaModule mod, Declaration dec) {
         try {
-            variable Boolean visibleFromSourceModules;
+            Boolean visibleFromSourceModules;
             if (dec.toplevel) {
-                visibleFromSourceModules = dec.shared || \imodule.isProjectModule;
+                visibleFromSourceModules = dec.shared || mod.isProjectModule;
             } else {
                 visibleFromSourceModules = dec.shared;
             }
