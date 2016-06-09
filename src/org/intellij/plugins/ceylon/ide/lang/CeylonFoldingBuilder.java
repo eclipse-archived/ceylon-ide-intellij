@@ -33,6 +33,8 @@ public class CeylonFoldingBuilder extends FoldingBuilderEx {
     private void appendDescriptors(PsiElement root, List<FoldingDescriptor> descriptors) {
         if (root instanceof CeylonPsi.BodyPsi) {
             descriptors.add(new FoldingDescriptor(root.getNode(), root.getTextRange()));
+        } else if (root instanceof CeylonPsi.ImportModuleListPsi) {
+            descriptors.add(new FoldingDescriptor(root.getNode(), root.getTextRange()));
         } else if (root.getNode().getElementType() == CeylonTokens.MULTI_COMMENT) {
             foldAfterFirstLine(root, descriptors);
         } else if (root.getNode().getElementType() == CeylonTokens.LINE_COMMENT) {
@@ -94,7 +96,8 @@ public class CeylonFoldingBuilder extends FoldingBuilderEx {
     @Override
     public String getPlaceholderText(@NotNull ASTNode node) {
         return Arrays.asList(
-                CeylonTypes.BLOCK, CeylonTypes.CLASS_BODY, CeylonTypes.INTERFACE_BODY
+                CeylonTypes.BLOCK, CeylonTypes.CLASS_BODY, CeylonTypes.INTERFACE_BODY,
+                CeylonTypes.IMPORT_MODULE_LIST
         ).contains(node.getElementType()) ? "{...}" : "...";
     }
 
