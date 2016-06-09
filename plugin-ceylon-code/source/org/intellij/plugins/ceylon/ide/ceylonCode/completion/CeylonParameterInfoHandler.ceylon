@@ -1,7 +1,8 @@
 import ceylon.interop.java {
     createJavaObjectArray,
     javaClass,
-    javaString
+    javaString,
+    CeylonIterable
 }
 
 import com.intellij.codeInsight.lookup {
@@ -16,6 +17,15 @@ import com.intellij.lang.parameterInfo {
     ParameterInfoUtils,
     ParameterInfoUIContextEx
 }
+import com.intellij.psi.util {
+    PsiUtilCore,
+    PsiTreeUtil {
+        getParentOfType
+    }
+}
+import com.intellij.util {
+    IJFunction=Function
+}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
@@ -24,66 +34,55 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit,
     Parameter,
     Function,
-    Declaration
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile,
-    TokenTypes,
-    CeylonPsi {
-        ArgumentListPsi
-    },
-    CeylonTreeUtil
-}
-import com.redhat.ceylon.ide.common.util {
-    nodes
-}
-import com.redhat.ceylon.ide.common.correct {
-    FindInvocationVisitor
-}
-import com.intellij.psi.util {
-    PsiUtilCore,
-    PsiTreeUtil
+    Declaration,
+    NamedArgumentList
 }
 import com.redhat.ceylon.model.typechecker.util {
     TypePrinter
 }
 
-import com.intellij.util {
-    IJFunction=Function
-}
 import java.lang {
     JString=String
 }
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile,
+    TokenTypes,
+    CeylonPsi {
+        ArgumentListPsi,
+        PositionalArgumentListPsi,
+        NamedArgumentListPsi
+    }
+}
+import com.redhat.ceylon.ide.common.doc {
+    convertToHTML
 }
 
 shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<ArgumentListPsi, Functional> {
     
     value printer = TypePrinter(true, true, false, true, false);
-    value htmlize = object satisfies IJFunction<JString, JString> {
-        fun(JString s) => javaString(s.string.replace("≤", "<").replace("≥", ">"));
-    };
-    
+
     couldShowInLookup() => true;
     
     shared actual ArgumentListPsi? findElementForParameterInfo(CreateParameterInfoContext context) {
-        if (is CeylonFile file = context.file,
-            exists node = nodes.findNode(file.compilationUnit, file.tokens, context.offset)) {
-            
-            value fiv = FindInvocationVisitor(node);
-            fiv.visit(file.compilationUnit);
-            
-            if (exists expr = fiv.result,
-                exists argList = expr.positionalArgumentList,
-                is Tree.MemberOrTypeExpression mot = expr.primary,
+        if (is CeylonFile file = context.file) {
+
+            value elementAtOffset = PsiUtilCore.getElementAtOffset(context.file,
+                context.editor.caretModel.offset);
+
+            if (exists args = getParentOfType(elementAtOffset, javaClass<CeylonPsi.ArgumentListPsi>()),
+                exists invocation = getParentOfType(args, javaClass<CeylonPsi.InvocationExpressionPsi>()),
+                exists argList = invocation.ceylonNode.positionalArgumentList
+                    else invocation.ceylonNode.namedArgumentList,
+                is Tree.MemberOrTypeExpression mot = invocation.ceylonNode.primary,
                 is Functional declaration = mot.declaration) {
                 
                 context.itemsToShow = createJavaObjectArray({declaration});
-                
-                if (is ArgumentListPsi psi = CeylonTreeUtil.findPsiElement(argList, file)) {
-                    return psi;
-                }
+
+                return args;
             }
         }
         
@@ -112,16 +111,58 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
     
     tracksParameterIndex() => true;
     
-    shared actual void updateParameterInfo(ArgumentListPsi pal,
+    shared actual void updateParameterInfo(ArgumentListPsi al,
         UpdateParameterInfoContext context) {
 
-        value index = ParameterInfoUtils.getCurrentParameterIndex(pal.node, context.offset,
-            TokenTypes.comma.tokenType);
-        context.setCurrentParameter(index);
+        value offset = context.editor.caretModel.offset;
+
+        if (is PositionalArgumentListPsi al) {
+            value index = ParameterInfoUtils.getCurrentParameterIndex(al.node, offset,
+                TokenTypes.comma.tokenType);
+            context.setCurrentParameter(index);
+        } else if (is NamedArgumentListPsi al,
+            exists model = al.ceylonNode.namedArgumentList) {
+
+            if (inSequencedArgs(al, model, offset)) {
+                context.setCurrentParameter(model.parameterList.parameters.size() - 1);
+            } else {
+                value arg = CeylonIterable(al.ceylonNode.namedArguments).find((a) {
+                    return a.startIndex.intValue() - 1 <= offset
+                        && offset <= a.endIndex.intValue() + 1;
+                });
+
+                if (exists arg) {
+                    value index = CeylonIterable(model.parameterList.parameters).indexed
+                        .find((idx -> param) => param.name == arg.identifier.text);
+
+                    if (exists index) {
+                        context.setCurrentParameter(index.key);
+                    }
+                }
+            }
+        }
+    }
+
+    Boolean inSequencedArgs(NamedArgumentListPsi nal, NamedArgumentList model, Integer offset) {
+
+        if (exists seq = nal.ceylonNode.sequencedArgument) {
+
+            if (nal.ceylonNode.namedArguments.empty) {
+                return true;
+            }
+            if (seq.startIndex.intValue() - 1 <= offset,
+                offset <= seq.stopIndex.intValue() + 1) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     shared actual void updateUI(Functional fun, ParameterInfoUIContext context) {
-        variable String params = "<no parameters>";
+        value noparams = "<no parameters>";
+        variable String params = noparams;
         StringBuilder builder = StringBuilder();
         variable Integer highlightOffsetStart = - 1;
         variable Integer highlightOffsetEnd = - 1;
@@ -132,12 +173,7 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
             parameters.size()>0) {
             
             for (param in parameters) {
-                variable String paramLabel = getParameterLabel(param, (fun of Declaration).unit);
-                paramLabel = highlighter.highlight(paramLabel, context.parameterOwner.project)
-                    .replace("<", "≤")
-                    .replace(">", "≥")
-                    .replace("&lt;", "<")
-                    .replace("&gt;", ">")
+                value paramLabel = getParameterLabel(param, (fun of Declaration).unit)
                     .replace("->", "→");
 
                 if (i == context.currentParameterIndex) {
@@ -151,6 +187,13 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
             params = builder.string;
         }
         if (is ParameterInfoUIContextEx context) {
+            value htmlize = object satisfies IJFunction<JString, JString> {
+                fun(JString s) => javaString(
+                    if (s.string == convertToHTML(noparams))
+                    then s.string
+                    else highlighter.highlight(s.string, context.parameterOwner.project)
+                );
+            };
             context.setEscapeFunction(htmlize);
         }
         context.setupUIComponentPresentation(params, highlightOffsetStart, highlightOffsetEnd,
