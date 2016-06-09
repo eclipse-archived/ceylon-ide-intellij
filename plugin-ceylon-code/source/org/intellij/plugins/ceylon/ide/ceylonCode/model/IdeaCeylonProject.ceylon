@@ -88,6 +88,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    IdePhasedUnit
+}
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
@@ -354,7 +357,13 @@ shared class IdeaCeylonProject(ideArtifact, model)
 }
 
 shared IdeaCeylonProject? findProjectForFile(CeylonFile file) {
-    
+
+    if (is IdePhasedUnit pu = file.phasedUnit,
+        is IdeaModuleSourceMapper msm = pu.moduleSourceMapper,
+        is IdeaCeylonProject project = msm.ceylonProject) {
+
+        return project;
+    }
     if (exists projects = file.project.getComponent(javaClass<IdeaCeylonProjects>()),
         exists mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project),
         is IdeaCeylonProject project = projects.getProject(mod)) {
