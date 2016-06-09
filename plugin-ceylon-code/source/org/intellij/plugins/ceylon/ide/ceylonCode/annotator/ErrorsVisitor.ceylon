@@ -15,6 +15,12 @@ import com.redhat.ceylon.ide.common.util {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    findProjectForFile
+}
+import com.redhat.ceylon.compiler.typechecker.analyzer {
+    ModuleSourceMapper
+}
 
 "A visitor that visits a compilation unit returned by
  [[com.redhat.ceylon.compiler.typechecker.parser::CeylonParser]] to gather errors and
@@ -29,6 +35,24 @@ shared class ErrorsVisitor(Tree.CompilationUnit compilationUnit, CeylonFile file
     
     shared {[Message, TextRange?]*} extractMessages() {
         compilationUnit.visit(this);
+
+        if (file.name == "module.ceylon",
+            exists project = findProjectForFile(file)) {
+
+            value errors = project.build
+                .messagesForSourceFile(file.virtualFile)
+                .map((msg) => msg.typecheckerMessage)
+                .narrow<ModuleSourceMapper.ModuleDependencyAnalysisError>();
+
+            messages.addAll(errors.map((err) {
+                value range = TextRange(
+                    err.treeNode.startIndex.intValue(),
+                    err.treeNode.endIndex.intValue()
+                );
+                return [err, range];
+            }));
+        }
+
         return messages;
     }
 
