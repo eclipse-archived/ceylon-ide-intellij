@@ -27,6 +27,10 @@ import com.intellij.openapi.project {
 import com.intellij.openapi.util {
     TextRange
 }
+import com.intellij.problems {
+    WolfTheProblemSolver,
+    Problem
+}
 import com.intellij.psi {
     PsiFile
 }
@@ -50,6 +54,10 @@ import com.redhat.ceylon.ide.common.typechecker {
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
+}
+
+import java.util {
+    ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
@@ -92,26 +100,40 @@ shared class CeylonTypeCheckerAnnotator()
                 else null);
     
     shared actual void apply(PsiFile file, {[Message, TextRange?]*} ceylonMessages, AnnotationHolder holder) {
+        variable value hasErrors = false;
         concurrencyManager.withAlternateResolution(
             () => ceylonMessages.each(
-                ([message,range]) => addAnnotation(message, range, holder, file.project)
+                ([message,range]) => hasErrors ||= addAnnotation(message, range, holder, file.project)
             )
         );
         if (is CeylonFile file,
-            exists cu = file.compilationUnit,
-            cu.errors.empty) {
-            value modelManager = file.project.getComponent(javaClass<CeylonModelManager>());
-            if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
-                modelManager.scheduleModelUpdate();
+            exists cu = file.compilationUnit) {
+
+            if (cu.errors.empty) {
+                value modelManager = file.project.getComponent(javaClass<CeylonModelManager>());
+                if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
+                    modelManager.scheduleModelUpdate();
+                }
+            }
+
+            if (hasErrors) {
+                value problems = object extends ArrayList<Problem>() {
+                    empty => false;
+                };
+
+                WolfTheProblemSolver.getInstance(file.project).reportProblems(file.virtualFile, problems);
+            } else {
+                WolfTheProblemSolver.getInstance(file.project).clearProblems(file.virtualFile);
             }
         }
     }
 
-    void addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, Project project) {
+    Boolean addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, Project project) {
         value unresolvedReferenceCodes = [ 100, 102 ];
         value unusedCodes = [ Warning.unusedDeclaration.string, Warning.unusedImport.string ];
         
         Annotation annotation;
+        Boolean isError;
         if (message is AnalysisError|RecognitionError|UnexpectedError) {
             annotation = annotationHolder.createAnnotation(
                 HighlightSeverity.error,
@@ -119,6 +141,7 @@ shared class CeylonTypeCheckerAnnotator()
                 message.message,
                 highlighter.highlightQuotedMessage(message.message, project)
             );
+            isError = true;
             if (unresolvedReferenceCodes.contains(message.code)) {
                 annotation.highlightType = ProblemHighlightType.likeUnknownSymbol;
             }
@@ -129,6 +152,7 @@ shared class CeylonTypeCheckerAnnotator()
                 message.message,
                 highlighter.highlightQuotedMessage(message.message, project)
             );
+            isError = false;
             if (unusedCodes.contains(message.warningName)) {
                 annotation.highlightType = ProblemHighlightType.likeUnusedSymbol;
             } else {
@@ -141,11 +165,13 @@ shared class CeylonTypeCheckerAnnotator()
                 message.message,
                 highlighter.highlightQuotedMessage(message.message, project)
             );
+            isError = false;
         }
         if (exists r = range,
             !ApplicationManager.application.unitTestMode) {
             addQuickFixes(r, message, annotation, annotationHolder);
         }
+        return isError;
     }
 
     void addQuickFixes(TextRange range, Message error, Annotation annotation, AnnotationHolder annotationHolder) {
