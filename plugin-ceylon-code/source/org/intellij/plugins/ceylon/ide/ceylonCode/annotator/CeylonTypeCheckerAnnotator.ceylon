@@ -75,6 +75,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
+shared alias AnyError => AnalysisError|RecognitionError|UnexpectedError;
+
 shared class CeylonTypeCheckerAnnotator() 
         extends ExternalAnnotator<CeylonFile?, {[Message, TextRange?]*}?>()
         satisfies DumbAware {
@@ -103,7 +105,10 @@ shared class CeylonTypeCheckerAnnotator()
         variable value hasErrors = false;
         concurrencyManager.withAlternateResolution(
             () => ceylonMessages.each(
-                ([message,range]) => hasErrors ||= addAnnotation(message, range, holder, file.project)
+                ([message,range]) {
+                    value result = addAnnotation(message, range, holder, file.project);
+                    hasErrors ||= result;
+            } 
             )
         );
         if (is CeylonFile file,
@@ -134,7 +139,7 @@ shared class CeylonTypeCheckerAnnotator()
         
         Annotation annotation;
         Boolean isError;
-        if (message is AnalysisError|RecognitionError|UnexpectedError) {
+        if (message is AnyError) {
             annotation = annotationHolder.createAnnotation(
                 HighlightSeverity.error,
                 range,
