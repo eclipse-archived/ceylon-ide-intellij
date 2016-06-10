@@ -71,9 +71,10 @@ shared object ideaIcons {
     shared Icon problemsViewErrors => IconLoader.getIcon("/icons/ceylonProblemsErrors.png");
     shared Icon problemsViewWarnings => IconLoader.getIcon("/icons/ceylonProblemsWarnings.png");
 
-    shared Icon? forDeclaration(Tree.Declaration|Declaration obj) {
-        value decl = if (is Tree.Declaration obj, exists model = obj.declarationModel)
-        then model
+    shared Icon? forDeclaration(Tree.Declaration|Tree.SpecifierStatement|Declaration obj) {
+        value decl = switch (obj) 
+        case (is Tree.Declaration) (obj.declarationModel else obj)
+        case (is Tree.SpecifierStatement) (obj.declaration else obj)
         else obj;
 
         variable value baseIcon = switch(decl)
@@ -118,7 +119,11 @@ shared object ideaIcons {
                 baseIcon = param;
             }
         }
-        Declaration? model = if (is Declaration decl) then decl else decl.declarationModel;
+        Declaration? model = 
+            switch (decl) 
+            case (is Tree.Declaration) decl.declarationModel
+            case (is Tree.SpecifierStatement) decl.declaration
+            else decl;
         
         if (exists icon = baseIcon, exists model) {
             value layer = if (model.shared) then PlatformIcons.publicIcon

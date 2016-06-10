@@ -130,6 +130,8 @@
                                   implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner"
                                   implementationClass="org.intellij.plugins.ceylon.ide.presentation.DeclarationPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.SpecifierStatementPsiIdOwner"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.SpecifierPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationNavigationItem"
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationPresentationProvider"/>
         <moduleRendererFactory implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationModuleRendererFactory"/>
