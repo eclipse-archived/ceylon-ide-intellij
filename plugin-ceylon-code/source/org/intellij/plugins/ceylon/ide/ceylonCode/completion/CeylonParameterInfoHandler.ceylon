@@ -127,12 +127,12 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
                 context.setCurrentParameter(model.parameterList.parameters.size() - 1);
             } else {
                 value arg = CeylonIterable(al.ceylonNode.namedArguments).find((a) {
-                    return a.startIndex.intValue() - 1 <= offset
-                        && offset <= a.endIndex.intValue() + 1;
+                    return a.startIndex.intValue() - 1 <= offset <= a.endIndex.intValue() + 1;
                 });
 
                 if (exists arg) {
-                    value index = CeylonIterable(model.parameterList.parameters).indexed
+                    value index = CeylonIterable(model.parameterList.parameters)
+                        .indexed
                         .find((idx -> param) => param.name == arg.identifier.text);
 
                     if (exists index) {
@@ -150,9 +150,7 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
             if (nal.ceylonNode.namedArguments.empty) {
                 return true;
             }
-            if (seq.startIndex.intValue() - 1 <= offset,
-                offset <= seq.stopIndex.intValue() + 1) {
-
+            if (seq.startIndex.intValue() - 1 <= offset <= seq.stopIndex.intValue() + 1) {
                 return true;
             }
         }
