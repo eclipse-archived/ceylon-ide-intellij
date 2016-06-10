@@ -39,7 +39,7 @@ class CeylonBlock implements Block {
     private static final List<IElementType> INDENT_CHILDREN_NORMAL = Arrays.asList(
             CeylonTypes.IMPORT_MODULE_LIST, CeylonTypes.BLOCK, CeylonTypes.CLASS_BODY, CeylonTypes.INTERFACE_BODY,
             CeylonTypes.NAMED_ARGUMENT_LIST, CeylonTypes.SEQUENCED_ARGUMENT, CeylonTypes.IMPORT_MEMBER_OR_TYPE_LIST,
-            CeylonTypes.CONDITION_LIST
+            CeylonTypes.CONDITION_LIST, CeylonTypes.EXPRESSION
     );
     private static final List<IElementType> INDENT_CHILDREN_NONE = Arrays.asList(
             CeylonStubTypes.CEYLON_FILE, CeylonTypes.COMPILATION_UNIT,
@@ -47,10 +47,10 @@ class CeylonBlock implements Block {
             CeylonTypes.SEQUENCE_ENUMERATION, CeylonTypes.ANNOTATION_LIST, CeylonTypes.TYPE_CONSTRAINT_LIST,
             CeylonTypes.IF_STATEMENT, CeylonTypes.ELSE_CLAUSE
     );
-//    private static final List<IElementType> INDENT_CHILDREN_CONTINUE = Arrays.asList(
-//            CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES,
-//            CeylonTypes.LAZY_SPECIFIER_EXPRESSION
-//    );
+    private static final List<IElementType> INDENT_CHILDREN_CONTINUE = Arrays.asList(
+            CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES,
+            CeylonTypes.LAZY_SPECIFIER_EXPRESSION
+    );
 
     private static final Collection<IElementType> TYPES_REQUIRING_NO_LEFT_SPACING = Arrays.asList(
             CeylonTypes.PARAMETER_LIST, CeylonTokens.RPAREN, CeylonTokens.COMMA, CeylonTokens.SEMICOLON,
@@ -99,11 +99,16 @@ class CeylonBlock implements Block {
     public List<Block> getSubBlocks() {
         List<Block> blocks = new ArrayList<>();
 
+        List<IElementType> lol = Arrays.asList(
+                CeylonTypes.IMPORT_MODULE_LIST, CeylonTypes.BLOCK, CeylonTypes.CLASS_BODY, CeylonTypes.INTERFACE_BODY,
+                CeylonTypes.NAMED_ARGUMENT_LIST, CeylonTypes.SEQUENCED_ARGUMENT, CeylonTypes.IMPORT_MEMBER_OR_TYPE_LIST,
+                CeylonTypes.CONDITION_LIST, CeylonTypes.EXPRESSION
+        );
         final IElementType nodeType = node.getElementType();
-        final Indent normalChildIndent = INDENT_CHILDREN_NORMAL.contains(nodeType) ? Indent.getNormalIndent()
+        final Indent normalChildIndent = lol.contains(nodeType) ? Indent.getNormalIndent()
                 : INDENT_CHILDREN_NONE.contains(nodeType) ? Indent.getNoneIndent()
-//                : INDENT_CHILDREN_CONTINUE.contains(nodeType) ? Indent.getContinuationIndent()
-                : Indent.getContinuationWithoutFirstIndent();
+                : INDENT_CHILDREN_CONTINUE.contains(nodeType) ? Indent.getContinuationIndent()
+                : Indent.getNoneIndent();
 //        System.out.printf("normalChildIndent for %s: %s%n", nodeType, indent);
         IElementType prevChildType = null;
         for (ASTNode child = node.getFirstChildNode(); child != null; child = child.getTreeNext()) {
@@ -114,6 +119,12 @@ class CeylonBlock implements Block {
                 }
                 if (prevChildType == CeylonTypes.ANNOTATION_LIST && indent == null) {
                     indent = Indent.getNoneIndent();
+                }
+                if (child.getElementType() == CeylonTokens.MEMBER_OP) {
+                    indent = Indent.getNormalIndent();
+                }
+                if (child.getElementType() == CeylonTypes.SPECIFIER_EXPRESSION) {
+                    indent = Indent.getNormalIndent();
                 }
                 blocks.add(new CeylonBlock(child, indent));
             }
