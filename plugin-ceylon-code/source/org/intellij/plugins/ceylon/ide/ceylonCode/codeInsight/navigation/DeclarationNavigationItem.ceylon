@@ -18,9 +18,17 @@ import com.redhat.ceylon.model.typechecker.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     CeylonReference
 }
+import com.intellij.openapi.actionSystem {
+    DataProvider,
+    CommonDataKeys
+}
+import com.intellij.psi {
+    PsiNameIdentifierOwner
+}
 
 shared class DeclarationNavigationItem(shared Declaration decl, shared Project project)
-        satisfies NavigationItem {
+        satisfies NavigationItem
+                & DataProvider {
 
     canNavigate() => true;
 
@@ -54,6 +62,20 @@ shared class DeclarationNavigationItem(shared Declaration decl, shared Project p
         hash = 31*hash + decl.hash;
         hash = 31*hash + project.hash;
         return hash;
+    }
+
+    shared actual Object? getData(String dataId) {
+        if (dataId == CommonDataKeys.psiElement.name,
+            exists psi = CeylonReference.resolveDeclaration(decl, project)) {
+
+            if (is PsiNameIdentifierOwner psi,
+                exists id = psi.nameIdentifier) {
+
+                return id;
+            }
+            return psi;
+        }
+        return null;
     }
 
 }
