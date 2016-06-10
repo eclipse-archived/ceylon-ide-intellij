@@ -110,3 +110,7 @@ If you want to use the current version, or debug/hack this plugin, you will need
 18. In `Run > Edit configurations`, create a new run configuration with type `Plugin` and leave the default options
 
 19. Run this configuration and enjoy writing Ceylon in IntelliJ!
+
+### Edit Ceylon code from Eclipse
+
+It is possible to edit the Ceylon part of this plugin, which is located in `plugin-ceylon-code`, in Eclipse. From Eclipse, do the usual `File > Import > Existing Projects into Workspace` and make it point to `ceylon-ide-intellij/plugin-ceylon-code`. The project should already be correctly configured.
