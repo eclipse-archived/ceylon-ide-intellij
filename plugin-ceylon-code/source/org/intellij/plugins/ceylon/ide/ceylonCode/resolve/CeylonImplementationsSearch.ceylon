@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    CeylonIterable
+    CeylonIterable,
+    CeylonSet
 }
 
 import com.intellij.openapi.application {
@@ -28,10 +29,12 @@ import com.redhat.ceylon.ide.common.typechecker {
     ExternalPhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
-    FindSubtypesVisitor
+    FindSubtypesVisitor,
+    FindRefinementsVisitor
 }
 import com.redhat.ceylon.model.typechecker.model {
-    TypeDeclaration
+    TypeDeclaration,
+    TypedDeclaration
 }
 
 import java.lang {
@@ -59,7 +62,7 @@ shared class CeylonImplementationsSearch()
         PsiElement sourceElement = queryParameters.element;
         if (is CeylonPsi.DeclarationPsi sourceElement,
             exists node = sourceElement.ceylonNode,
-            is TypeDeclaration decl = node.declarationModel,
+            is TypeDeclaration|TypedDeclaration decl = node.declarationModel,
             is CeylonFile ceylonFile = sourceElement.containingFile,
             exists project = findProjectForFile(ceylonFile),
             exists modules = project.modules) {
@@ -78,25 +81,32 @@ shared class CeylonImplementationsSearch()
         return true;
     }
 
-    void scanPhasedUnits({PhasedUnit*} pus, TypeDeclaration decl, Tree.Declaration node,
+    void scanPhasedUnits({PhasedUnit*} pus, TypeDeclaration|TypedDeclaration decl, Tree.Declaration node,
         CeylonPsi.DeclarationPsi sourceElement, Processor<PsiElement> consumer) {
 
         for (pu in pus) {
-            value cu = pu.compilationUnit;
-            value vis = FindSubtypesVisitor(decl);
-            cu.visit(vis);
-            for (d in vis.declarationNodes) {
-                if (!d.equals(node)) {
-                    Node declNode = d;
+            Set<Node> declarationNodes;
+            switch (decl)
+            case (is TypeDeclaration) {
+                value vis = FindSubtypesVisitor(decl);
+                pu.compilationUnit.visit(vis);
+                declarationNodes = CeylonSet(vis.declarationNodes);
+            }
+            case (is TypedDeclaration) {
+                value vis = FindRefinementsVisitor(decl);
+                pu.compilationUnit.visit(vis);
+                declarationNodes = vis.declarationNodes;
+            }
+            for (d in declarationNodes) {
+                if (d!=node) {
                     value run = object satisfies Runnable {
                         shared actual void run() {
-                            value declaringFile = getDeclaringFile(declNode.unit, sourceElement.project);
+                            value declaringFile = getDeclaringFile(d.unit, sourceElement.project);
                             if (is CeylonFile declaringFile) {
                                 (declaringFile).ensureTypechecked();
                             }
 
-                            consumer.process(findPsiElement(declNode,
-                            declaringFile));
+                            consumer.process(findPsiElement(d, declaringFile));
                         }
                     };
                     ApplicationManager.application.runReadAction(run);

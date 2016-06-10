@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.openapi.util.text.StringUtil;
+import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
@@ -19,19 +20,43 @@ public class DeclarationPresentationProvider implements ItemPresentationProvider
             @Nullable
             @Override
             public String getPresentableText() {
-                return item.getName();
+                Declaration model =
+                        item.getCeylonNode()
+                                .getDeclarationModel();
+                String name = model.getName();
+                //TODO: make this recursive
+                if (model.isClassOrInterfaceMember()) {
+                    ClassOrInterface classOrInterface =
+                            (ClassOrInterface)
+                                    model.getContainer();
+                    return classOrInterface.getName()
+                            + "." + name;
+                }
+                else {
+                    return name;
+                }
             }
 
             @Nullable
             @Override
             public String getLocationString() {
-                Declaration model = item.getCeylonNode().getDeclarationModel();
+                Declaration model =
+                        item.getCeylonNode()
+                                .getDeclarationModel();
                 if (model == null) {
                     return null;
                 }
-                String qualifiedNameString = model.getContainer().getQualifiedNameString();
+                //TODO: make this recursive
+                if (model.isClassOrInterfaceMember()) {
+                    model =
+                            (ClassOrInterface)
+                                    model.getContainer();
+                }
+                String qualifiedNameString =
+                        model.getContainer()
+                                .getQualifiedNameString();
                 if (StringUtil.isEmpty(qualifiedNameString)) {
-                        qualifiedNameString = "default module";
+                    qualifiedNameString = "default module";
                 }
                 return "(" + qualifiedNameString + ")";
             }
