@@ -43,6 +43,9 @@ import javax.swing.tree {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject
 }
+import java.lang {
+    Runnable
+}
 
 shared alias BuildMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.BuildMessage;
 shared alias SourceMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.SourceFileMessage;
@@ -55,7 +58,14 @@ class CeylonProblemsList(Project project) extends SimpleToolWindowPanel(false, t
     late ProblemsTreeBuilder builder;
 
     shared actual variable String name = "";
-
+    
+    shared void expand() {
+        variable value i = 0;
+        while (i<myTree.rowCount) {
+            myTree.expandRow(i++);
+        }
+    }
+    
     shared void setup() {
         this.layout = BorderLayout();
         add(JScrollPane(myTree), javaString(BorderLayout.center));
@@ -71,13 +81,14 @@ class CeylonProblemsList(Project project) extends SimpleToolWindowPanel(false, t
 
         model = ProblemsModel();
         builder.treeStructure = ProblemsTreeStructure(project, model);
+
     }
 
     shared void updateErrors(IdeaCeylonProject project, {SourceMsg*}? frontendMessages,
         {SourceMsg*}? backendMessages, {ProjectMsg*}? projectMessages) {
 
         model.updateProblems(project, frontendMessages, backendMessages, projectMessages);
-        builder.queueUpdate();
+        builder.queueUpdate().doWhenDone(object satisfies Runnable { run = expand; });
     }
 
     shared actual Object? getData(String dataId) {

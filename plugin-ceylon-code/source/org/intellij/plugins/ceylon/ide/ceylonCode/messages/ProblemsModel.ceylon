@@ -22,7 +22,7 @@ class ProblemsModel() {
         {SourceMsg*}? backendMessages;
         {ProjectMsg*}? projectMessages;
 
-        Integer count(Severity s)
+        shared Integer count(Severity s)
             => [frontendMessages, backendMessages, projectMessages].coalesced.fold(0)(
                 (Integer initial, {BuildMsg*} messages)
                         => initial + messages.count((msg) => msg.severity == s)
@@ -41,6 +41,9 @@ class ProblemsModel() {
 
         problemsByProject.put(project, Problems(project, frontendMessages, backendMessages, projectMessages));
     }
+
+    shared Integer count(Severity s)
+            => problemsByProject.items.fold(0)((sum, item) => sum + item.count(s));
 
     shared Integer countWarnings()
             => problemsByProject.items.fold(0)((sum, item) => sum + item.countWarnings());

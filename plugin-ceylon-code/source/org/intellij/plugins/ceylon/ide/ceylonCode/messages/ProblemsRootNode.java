@@ -3,25 +3,30 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.messages;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
+import com.redhat.ceylon.ide.common.model.Severity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
-class ProblemsRootNode extends BaseNode {
+class ProblemsRootNode extends AbstractTreeNode<Object> {
 
-    private final SummaryNode summaryNode;
+    private final SummaryNode errorNode;
+    private final SummaryNode warnNode;
+    private final SummaryNode infoNode;
 
     protected ProblemsRootNode(Project project, Object model) {
-        super(project);
+        super(project, true);
 
-        summaryNode = new SummaryNode(project, model);
+        errorNode = new SummaryNode(project, model, Severity.getSeverity$error());
+        warnNode = new SummaryNode(project, model, Severity.getSeverity$warning());
+        infoNode = new SummaryNode(project, model, Severity.getSeverity$info());
     }
 
     @NotNull
     @Override
     public Collection<? extends AbstractTreeNode> getChildren() {
-        return Collections.singletonList(summaryNode);
+        return Arrays.asList(errorNode, warnNode, infoNode);
     }
 
     @Override

@@ -39,13 +39,14 @@ class ProblemNode extends AbstractTreeNode<CeylonProjectBuild.BuildMessage> {
         }
 
         if (message instanceof CeylonProjectBuild.SourceFileMessage) {
-            CeylonProjectBuild.SourceFileMessage sourceMsg = (CeylonProjectBuild.SourceFileMessage) message;
+            CeylonProjectBuild.SourceFileMessage sourceMsg =
+                    (CeylonProjectBuild.SourceFileMessage) message;
 
             presentation.addText(String.format(
-                    "%s(%d,%d): ",
-                    ((VirtualFile)sourceMsg.getFile()).getName(),
-                    sourceMsg.getStartLine(),
-                    sourceMsg.getStartCol()
+                    "%d ",
+//                    ((VirtualFile)sourceMsg.getFile()).getName(),
+                    sourceMsg.getStartLine()
+//                    sourceMsg.getStartCol()
             ), SimpleTextAttributes.GRAYED_ATTRIBUTES);
 
             org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_.get_()
@@ -66,7 +67,8 @@ class ProblemNode extends AbstractTreeNode<CeylonProjectBuild.BuildMessage> {
 
     @Override
     public void navigate(boolean requestFocus) {
-        CeylonProjectBuild.SourceFileMessage msg = (CeylonProjectBuild.SourceFileMessage) getValue();
+        CeylonProjectBuild.SourceFileMessage msg =
+                (CeylonProjectBuild.SourceFileMessage) getValue();
 
         new OpenFileDescriptor(
                 myProject,
