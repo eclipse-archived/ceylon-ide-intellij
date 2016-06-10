@@ -22,7 +22,8 @@ import com.redhat.ceylon.model.typechecker.model {
     ModelUtil,
     TypeParameter,
     TypeAlias,
-    NothingType
+    NothingType,
+    Setter
 }
 
 import javax.swing {
@@ -50,7 +51,8 @@ shared object ideaIcons {
     shared Icon anonymousFunction => AllIcons.Nodes.\ifunction;
     shared Icon annotations => AllIcons.Gutter.extAnnotation;
     shared Icon constructors => AllIcons.Nodes.classInitializer;
-    
+    shared Icon setters => AllIcons.Nodes.classInitializer;
+
     shared Icon refinement => AllIcons.Gutter.implementingMethod;
     shared Icon extendedType => AllIcons.Gutter.overridingMethod;
     shared Icon satisfiedTypes => AllIcons.General.implementingMethod;
@@ -98,6 +100,8 @@ shared object ideaIcons {
             else if (decl.formal)
             then formalValues
             else values
+        case (is Setter)
+            setters
         case (is Tree.TypeAliasDeclaration|TypeAlias|NothingType)
             types
         case (is TypeParameter)

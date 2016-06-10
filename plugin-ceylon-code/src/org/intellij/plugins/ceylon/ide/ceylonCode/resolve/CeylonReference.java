@@ -14,9 +14,7 @@ import com.redhat.ceylon.ide.common.model.IResourceAware;
 import com.redhat.ceylon.ide.common.model.SourceAware;
 import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.util.nodes_;
-import com.redhat.ceylon.model.typechecker.model.Referenceable;
-import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
-import com.redhat.ceylon.model.typechecker.model.Unit;
+import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
@@ -135,13 +133,14 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         return PsiElement.EMPTY_ARRAY;
     }
 
-    // Make constructor references equivalent to their containing class
     @Override
     public boolean isReferenceTo(PsiElement element) {
         PsiElement resolved = resolve();
         if (getElement().getManager().areElementsEquivalent(resolved, element)) {
             return true;
         }
+
+        // Make constructor references equivalent to their containing class
         if (resolved instanceof PsiMethod && ((PsiMethod) resolved).isConstructor()) {
             PsiClass parent = ((PsiMethod) resolved).getContainingClass();
             return getElement().getManager().areElementsEquivalent(parent, element);
@@ -149,6 +148,44 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         if (element instanceof PsiMethod && ((PsiMethod) element).isConstructor()) {
             PsiClass parent = ((PsiMethod) element).getContainingClass();
             return getElement().getManager().areElementsEquivalent(resolved, parent);
+        }
+
+        // Make setters and getters equivalent
+        if (element instanceof CeylonPsi.AttributeSetterDefinitionPsi) {
+            Setter setter = ((CeylonPsi.AttributeSetterDefinitionPsi) element).getCeylonNode().getDeclarationModel();
+
+            Value getter = null;
+
+            if (resolved instanceof CeylonPsi.AttributeDeclarationPsi) {
+                getter = ((CeylonPsi.AttributeDeclarationPsi) resolved).getCeylonNode().getDeclarationModel();
+            } else if (myElement instanceof CeylonPsi.IdentifierPsi) {
+                Scope scope = ((CeylonPsi.IdentifierPsi) myElement).getCeylonNode().getScope();
+                if (scope instanceof Value) {
+                    getter = (Value) scope;
+                }
+            }
+
+            if (setter != null && setter.getGetter() != null) {
+                return setter.getGetter().equals(getter);
+            }
+        }
+        if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
+            Value getter = ((CeylonPsi.AttributeDeclarationPsi) element).getCeylonNode().getDeclarationModel();
+
+            Setter setter = null;
+
+            if (resolved instanceof CeylonPsi.AttributeSetterDefinitionPsi) {
+                 setter = ((CeylonPsi.AttributeSetterDefinitionPsi) resolved).getCeylonNode().getDeclarationModel();
+            } else if (myElement instanceof CeylonPsi.IdentifierPsi) {
+                Scope scope = ((CeylonPsi.IdentifierPsi) myElement).getCeylonNode().getScope();
+                if (scope instanceof Setter) {
+                    setter = (Setter) scope;
+                }
+            }
+
+            if (getter != null && getter.getSetter() != null) {
+                return getter.getSetter().equals(setter);
+            }
         }
 
         return false;
