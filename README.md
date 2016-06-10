@@ -88,7 +88,7 @@ If you want to use the current version, or debug/hack this plugin, you will need
 
 8. Open the project `ceylon-ide-intellij` in IDEA. You might be requested to enter the value of 2 path variables (see next point).
 
-9. In `Settings > Build, Execution, Deployment > Path Variable`, you should add a variabla named
+9. In `Settings > Build, Execution, Deployment > Path Variable`, you should add a variable named
 `̀CEYLON_DIST` that points to `../ceylon/dist/dist`.
 
 10. In the IDE's `Preferences > File Types`, under `Recognized File Types`, register `*.car` as `Archive files`
