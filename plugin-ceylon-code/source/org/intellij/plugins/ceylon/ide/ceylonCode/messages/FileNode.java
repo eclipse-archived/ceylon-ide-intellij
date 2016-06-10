@@ -52,7 +52,7 @@ class FileNode extends AbstractTreeNode<Object> {
                 SimpleTextAttributes.REGULAR_ATTRIBUTES);
         int size = getChildren().size();
         if (size>1) {
-            presentation.addText(String.format(" (%d %s)",
+            presentation.addText(String.format(" %d %s",
                     size,
                     severity == Severity.getSeverity$warning() ?
                             "warnings" : "errors"),
