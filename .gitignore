@@ -16,3 +16,6 @@ out
 ant-build
 .idea/inspectionProfiles
 .idea/shelf
+.idea/libraries/Ceylon_dependencies.xml
+modules/
+resources/rebel.xml
