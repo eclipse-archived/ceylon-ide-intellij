@@ -174,6 +174,9 @@ shared object ceylonDeclarationDescriptionProvider {
             if (exists name = param.name) {
                 builder.append(name);
             }
+            if (exists model = param.model) {
+                builder.append(parameterLists(model, unit));
+            }
         }
         builder.append(")");
     }
@@ -195,6 +198,11 @@ shared object ceylonDeclarationDescriptionProvider {
             case (is Tree.ParameterDeclaration) {
                 if (exists id = param.typedDeclaration.identifier) {
                     builder.append(id.text);
+                }
+                if (is Tree.AnyMethod dec = param.typedDeclaration) {
+                    for (pl in dec.parameterLists) {
+                        appendTreeParameters(builder, pl);
+                    }
                 }
             }
             //TODO: pattern parameters?
