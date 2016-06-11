@@ -158,6 +158,7 @@
         <lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonFindUsagesProvider"/>
         <readWriteAccessDetector implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReadWriteAccessDetector"/>
         <usageTypeProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonUsageTypeProvider"/>
+        <typeDeclarationProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonTypeDeclarationProvider"/>
         <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi$IdentifierPsi"
                                  implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
         <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonTargetElementEvaluator"/>
