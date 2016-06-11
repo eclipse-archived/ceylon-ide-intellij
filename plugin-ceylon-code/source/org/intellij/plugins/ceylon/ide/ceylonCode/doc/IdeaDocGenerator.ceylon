@@ -128,41 +128,36 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
         return "<code style='``color``; ``bold``; ``italic``'>``what else "<error>"``</code>";
     }
 
-    Icon? getIconUrl(Icons|Referenceable thing) {
-        if (is Declaration thing) {
-            return ideaIcons.getBaseIcon(thing);
-        } else if (is Referenceable thing) {
-            return switch (thing)
-                case (is Module) ideaIcons.modules
-                case (is Package) ideaIcons.packages
-                else null;
-        } else {
-            return switch (thing)
-                case (Icons.imports) ideaIcons.imports
-                case (Icons.annotations) ideaIcons.annotations
-                case (Icons.modules) ideaIcons.modules
-                case (Icons.objects) ideaIcons.objects
-                case (Icons.classes) ideaIcons.classes
-                case (Icons.interfaces) ideaIcons.interfaces
-                case (Icons.enumeration) ideaIcons.enumerations
-                case (Icons.extendedType) ideaIcons.extendedType
-                case (Icons.satisfiedTypes) ideaIcons.satisfiedTypes
-                case (Icons.exceptions) ideaIcons.exceptions
-                case (Icons.see) ideaIcons.see
-                case (Icons.implementation) ideaIcons.satisfiedTypes
-                case (Icons.override) ideaIcons.extendedType
-                case (Icons.returns) ideaIcons.returns
-                case (Icons.units) ideaIcons.file
-                case (Icons.parameters) ideaIcons.param
-                case (Icons.attributes) ideaIcons.attributes
-                case (Icons.types) ideaIcons.types
-                else null;
-        }
-    }
+    Icon? getIconUrl(Icons|Referenceable thing) 
+            => switch (thing)
+            //models:
+            case (is Declaration) ideaIcons.getBaseIcon(thing)
+            case (is Module) ideaIcons.modules
+            case (is Package) ideaIcons.packages
+            //icons:
+            case (Icons.imports) ideaIcons.imports
+            case (Icons.annotations) ideaIcons.annotations
+            case (Icons.modules) ideaIcons.modules
+            case (Icons.objects) ideaIcons.objects
+            case (Icons.classes) ideaIcons.classes
+            case (Icons.interfaces) ideaIcons.interfaces
+            case (Icons.enumeration) ideaIcons.enumerations
+            case (Icons.extendedType) ideaIcons.extendedType
+            case (Icons.satisfiedTypes) ideaIcons.satisfiedTypes
+            case (Icons.exceptions) ideaIcons.exceptions
+            case (Icons.see) ideaIcons.see
+            case (Icons.implementation) ideaIcons.satisfiedTypes
+            case (Icons.override) ideaIcons.extendedType
+            case (Icons.returns) ideaIcons.returns
+            case (Icons.units) ideaIcons.file
+            case (Icons.parameters) ideaIcons.param
+            case (Icons.attributes) ideaIcons.attributes
+            case (Icons.types) ideaIcons.types
+            else null;
 
     shared actual void addIconAndText(StringBuilder builder, Icons|Referenceable icon, String text) {
         if (exists iconUrl = getIconUrl(icon)) {
-            builder.append("<div style='background: url(" + iconUrl.string + ") left 10px no-repeat; padding-left: 16px'>");
+            builder.append("<div style='background: url(``iconUrl``) left 10px no-repeat; padding-left: 16px'>");
         } else {
             builder.append("<div>");
         }
