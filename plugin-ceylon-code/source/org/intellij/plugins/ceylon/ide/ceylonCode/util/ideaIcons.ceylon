@@ -127,7 +127,7 @@ shared object ideaIcons {
                 interfaces
             case (is Tree.AnyMethod)
                 methods
-            case (is Tree.AnyAttribute)
+            case (is Tree.AnyAttribute|Tree.Variable)
                 values
             case (is Tree.ObjectDefinition)
                 objects
@@ -176,6 +176,18 @@ shared object ideaIcons {
                 decorations.add(PlatformIcons.lockedIcon);
             }
             return createIcon(decorations, baseIcon, layer);
+        }
+        else if (is Tree.Declaration obj) {
+            for (a in obj.annotationList.annotations) {
+                if (is Tree.BaseMemberExpression p = a.primary,
+                    p.identifier.text=="shared") {
+                    return createIcon([], baseIcon, PlatformIcons.publicIcon);
+                }
+            }
+            return createIcon([], baseIcon, PlatformIcons.privateIcon);
+        }
+        else if (is Tree.SpecifierStatement obj) {
+            return createIcon([], baseIcon, PlatformIcons.publicIcon);
         }
         else {
             return baseIcon;

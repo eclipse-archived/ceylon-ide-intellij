@@ -40,25 +40,26 @@ shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProv
 shared object ceylonDeclarationDescriptionProvider {
 
     shared String? getDescription(CeylonCompositeElement element, 
-        Boolean includeKeyword = true, Boolean includeContainer = true) {
-
+        Boolean includeKeyword = true,
+        Boolean includeContainer = true) {
+        value node = element.ceylonNode;
         value decl =
-            switch (node = element.ceylonNode)
+            switch (node)
             case (is Tree.Declaration) node.declarationModel
             case (is Tree.SpecifierStatement) (node.refinement then node.declaration)
             else null;
 
         if (exists decl) {
-            value sb = StringBuilder();
+            value result = StringBuilder();
 
             if (includeKeyword) {
-                sb.append(keyword(decl)).append(" ");
+                result.append(keyword(decl)).append(" ");
             }
             if (includeContainer) {
-                sb.append(container(decl));
+                result.append(container(decl));
             }
-            sb.append(decl.name else "new")
-                .append(parameterLists(decl));
+            result.append(decl.name else "new")
+                .append(parameterLists(decl, node.unit));
 
             if (is TypedDeclaration decl,
                 !ModelUtil.isConstructor(decl)) {
@@ -67,27 +68,41 @@ shared object ceylonDeclarationDescriptionProvider {
                 }
                 else if (exists returnType = decl.type,
                         !ModelUtil.isTypeUnknown(returnType)) {
-                    sb.append(" ∊ ")
-                        .append(returnType.asString((decl of Declaration).unit));
+                    result.append(" ∊ ")
+                        .append(returnType.asString(node.unit));
                 }
             }
 
-            return sb.string;
+            return result.string;
         }
-        else if (is Tree.Declaration node = element.ceylonNode) {
-            value sb = StringBuilder();
+        else if (is Tree.Declaration node) {
+            value result = StringBuilder();
 
             if (includeKeyword) {
-                sb.append(nodeKeyword(node)).append(" ");
+                result.append(nodeKeyword(node)).append(" ");
             }
             
-            sb.append(node.identifier?.text else "new");
-            
-            if (node is Tree.AnyClass|Tree.AnyMethod|Tree.Constructor) {
-                sb.append("()"); //TODO: parameter lists!
-            }
+            result.append(node.identifier?.text else "new");
 
-            return sb.string;
+            switch (node)
+            case (is Tree.AnyClass) {
+                if (exists pl = node.parameterList) {
+                    appendTreeParameters(result, pl);
+                }
+            }
+            case (is Tree.AnyMethod) {
+                for (pl in node.parameterLists) {
+                    appendTreeParameters(result, pl);
+                }
+            }
+            case (is Tree.Constructor) {
+                if (exists pl = node.parameterList) {
+                    appendTreeParameters(result, pl);
+                }
+            }
+            else {}
+
+            return result.string;
         }
         else {
             return null;
@@ -103,34 +118,32 @@ shared object ceylonDeclarationDescriptionProvider {
             return "new";
         }
         return switch (declaration)
-        case (is Class) "class"
-        case (is Interface) "interface"
-        case (is Value) "value"
-        case (is Function) "function"
-        case (is TypeAlias) "alias"
-        case (is Constructor) "new"
-        else "";
+            case (is Class) "class"
+            case (is Interface) "interface"
+            case (is Value) "value"
+            case (is Function) "function"
+            case (is TypeAlias) "alias"
+            case (is Constructor) "new"
+            else "";
     }
 
-    String nodeKeyword(Tree.Declaration declaration) {
-        return switch (declaration)
-        case (is Tree.AnyClass) "class"
-        case (is Tree.AnyInterface) "interface"
-        case (is Tree.AnyAttribute) "value"
-        case (is Tree.AnyMethod) "function"
-        case (is Tree.TypeAliasDeclaration) "alias"
-        case (is Tree.Constructor|Tree.Enumerated) "new"
-        else "";
-    }
+    String nodeKeyword(Tree.Declaration declaration)
+            => switch (declaration)
+            case (is Tree.AnyClass) "class"
+            case (is Tree.AnyInterface) "interface"
+            case (is Tree.AnyAttribute) "value"
+            case (is Tree.AnyMethod) "function"
+            case (is Tree.TypeAliasDeclaration) "alias"
+            case (is Tree.Constructor|Tree.Enumerated) "new"
+            else "";
 
-    String parameterLists(Declaration decl) {
+    String parameterLists(Declaration decl, Unit unit) {
         if (!is Functional decl) {
             return "";
         }
         value builder = StringBuilder();
         for (paramList in decl.parameterLists) {
-            appendParameters(builder, paramList, 
-                (decl of Declaration).unit);
+            appendParameters(builder, paramList, unit);
         }
         return builder.string;
     }
@@ -164,5 +177,29 @@ shared object ceylonDeclarationDescriptionProvider {
         }
         builder.append(")");
     }
-    
+
+    void appendTreeParameters(StringBuilder builder, Tree.ParameterList paramList) {
+        builder.append("(");
+        variable value first = true;
+        for (param in paramList.parameters) {
+            if (first) {
+                first = false;
+            }
+            else {
+                builder.append(", ");
+            }
+            switch (param)
+            case (is Tree.InitializerParameter) {
+                builder.append(param.identifier.text);
+            }
+            case (is Tree.ParameterDeclaration) {
+                if (exists id = param.typedDeclaration.identifier) {
+                    builder.append(id.text);
+                }
+            }
+            //TODO: pattern parameters?
+            else {}
+        }
+        builder.append(")");
+    }
 }
