@@ -179,8 +179,7 @@ shared object ideaIcons {
         }
         else if (is Tree.Declaration obj) {
             for (a in obj.annotationList.annotations) {
-                if (is Tree.BaseMemberExpression p = a.primary,
-                    p.identifier.text=="shared") {
+                if (a.primary.text=="shared") {
                     return createIcon([], baseIcon, PlatformIcons.publicIcon);
                 }
             }

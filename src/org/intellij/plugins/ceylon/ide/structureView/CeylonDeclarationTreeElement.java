@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.ide.structureView.impl.java.AccessLevelProvider;
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.LocationPresentation;
@@ -10,6 +11,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiTypeElement;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.ui.UIUtil;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.*;
@@ -25,7 +27,8 @@ import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 
 abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPsi>
         extends PsiTreeElementBase<Decl>
-        implements ColoredItemPresentation, LocationPresentation, SortableTreeElement {
+        implements ColoredItemPresentation, LocationPresentation,
+        SortableTreeElement, AccessLevelProvider {
 
     private boolean isInherited;
 
@@ -110,5 +113,34 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
     public String getAlphaSortKey() {
         Tree.Identifier id = getElement().getCeylonNode().getIdentifier();
         return id==null ? "" : id.getText();
+    }
+
+    @Override
+    public int getAccessLevel() {
+        if (isInherited) {
+            return PsiUtil.ACCESS_LEVEL_PUBLIC;
+        }
+        Declaration model =
+                getElement()
+                    .getCeylonNode()
+                    .getDeclarationModel();
+        if (model != null && model.isShared()) {
+            return PsiUtil.ACCESS_LEVEL_PUBLIC;
+        }
+        Tree.AnnotationList annotationList =
+                getElement()
+                    .getCeylonNode()
+                    .getAnnotationList();
+        for (Tree.Annotation a: annotationList.getAnnotations()) {
+            if (a.getPrimary().getText().equals("shared")) {
+                return PsiUtil.ACCESS_LEVEL_PUBLIC;
+            }
+        }
+        return PsiUtil.ACCESS_LEVEL_PRIVATE;
+    }
+
+    @Override
+    public int getSubLevel() {
+        return 0;
     }
 }

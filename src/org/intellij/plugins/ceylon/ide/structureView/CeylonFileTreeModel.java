@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.structureView;
 import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.TextEditorBasedStructureViewModel;
+import com.intellij.ide.structureView.impl.java.VisibilitySorter;
 import com.intellij.ide.util.treeView.smartTree.Filter;
 import com.intellij.ide.util.treeView.smartTree.NodeProvider;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
@@ -74,7 +75,7 @@ class CeylonFileTreeModel extends TextEditorBasedStructureViewModel
     @NotNull
     @Override
     public Sorter[] getSorters() {
-        return new Sorter[] { Sorter.ALPHA_SORTER };
+        return new Sorter[] { VisibilitySorter.INSTANCE, Sorter.ALPHA_SORTER };
     }
 
     // TODO filters for inherited, fields, etc.

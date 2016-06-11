@@ -2,8 +2,10 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.ide.structureView.impl.java.AccessLevelProvider;
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiUtil;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +17,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement> implements SortableTreeElement {
+public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement>
+        implements SortableTreeElement, AccessLevelProvider {
 
     private CeylonPsi.ImportPsi[] imports;
 
@@ -50,6 +53,17 @@ public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement> 
     @Override
     public String getAlphaSortKey() {
         return "";
+    }
+
+    @Override
+    public int getAccessLevel() {
+        //hack to keep import lists at top
+        return PsiUtil.ACCESS_LEVEL_PUBLIC+1;
+    }
+
+    @Override
+    public int getSubLevel() {
+        return 0;
     }
 }
 

@@ -2,10 +2,12 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.ide.structureView.impl.java.AccessLevelProvider;
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.LocationPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.ui.UIUtil;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
@@ -24,7 +26,8 @@ import java.util.Collections;
 import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 
 class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierStatementPsi>
-        implements ColoredItemPresentation, LocationPresentation, SortableTreeElement {
+        implements ColoredItemPresentation, LocationPresentation,
+                   SortableTreeElement, AccessLevelProvider {
 
     private ceylonDeclarationDescriptionProvider_ provider =
             ceylonDeclarationDescriptionProvider_.get_();
@@ -94,5 +97,15 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
     @Override
     public String getLocationSuffix() {
         return "";
+    }
+
+    @Override
+    public int getAccessLevel() {
+        return PsiUtil.ACCESS_LEVEL_PUBLIC;
+    }
+
+    @Override
+    public int getSubLevel() {
+        return 0;
     }
 }
