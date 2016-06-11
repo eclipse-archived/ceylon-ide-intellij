@@ -33,6 +33,10 @@ import java.util {
     IdentityHashMap,
     Map
 }
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
+}
 
 class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         = IdentityHashMap<PsiType,PSIType?>(), PSIType? enclosing = null)
@@ -175,10 +179,15 @@ class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
         else null;
     }
 
-    shared actual TypeParameterMirror? typeParameter =>
-            if (is PsiTypeParameter psi)
-            then PSITypeParameter(psi)
-            else null;
+    shared actual TypeParameterMirror? typeParameter {
+        if (is PsiTypeParameter|PsiClassReferenceType psi) {
+            return PSITypeParameter(psi);
+        }
+        else {
+            platformUtils.log(Status._ERROR, "Unsupported PSIType.typeParameter " + className(psi));
+            return null;
+        }
+    }
     
     shared actual TypeMirror? upperBound =
             if (is PsiWildcardType psi,

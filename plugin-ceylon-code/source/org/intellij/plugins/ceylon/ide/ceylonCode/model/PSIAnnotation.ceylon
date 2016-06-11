@@ -8,10 +8,14 @@ import ceylon.interop.java {
 import com.intellij.psi {
     PsiAnnotation,
     PsiLiteralExpression,
-    PsiAnnotationMemberValue,
     PsiArrayInitializerMemberValue,
     PsiReferenceExpression,
-    PsiClassObjectAccessExpression
+    PsiClassObjectAccessExpression,
+    PsiNameValuePair,
+    PsiMethod,
+    PsiType,
+    PsiArrayType,
+    PsiAnnotationMemberValue
 }
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
@@ -25,14 +29,34 @@ import java.lang {
     JShort=Short
 }
 import java.util {
-    ArrayList
+    ArrayList,
+    Collections
 }
 
 class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
 
     value values = HashMap<String, Object>();
 
-    Object convert(PsiAnnotationMemberValue v, String paramName) {
+    // somehow, IntelliJ returns a single value when it reads things like
+    // `@MyAnnotation({...})`, so we have to make sure we return the correct type
+    Object toListIfNeeded(Object o, PsiType? type) {
+        return if (is PsiArrayType type)
+        then Collections.singletonList(o)
+        else o;
+    }
+
+    Object convert(PsiAnnotationMemberValue|PsiNameValuePair pair, String paramName) {
+        PsiType? type;
+        if (exists ref = pair.reference,
+            is PsiMethod method = ref.resolve()) {
+
+            type = method.returnType;
+        } else {
+            type = null;
+        }
+
+        value v = if (is PsiNameValuePair pair) then pair.\ivalue else pair;
+
         if (is PsiArrayInitializerMemberValue v) {
             value inits = v.initializers.array.coalesced;
             value values = ArrayList<Object>(inits.size);
@@ -40,9 +64,9 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
             
             return values;
         } else if (is PsiAnnotation v) {
-            return PSIAnnotation(v);
+            return toListIfNeeded(PSIAnnotation(v), type);
         } else if (is PsiReferenceExpression v) {
-            return javaString(v.referenceName);
+            return toListIfNeeded(javaString(v.referenceName), type);
         } else if (is PsiClassObjectAccessExpression v) {
             return PSIType(v.operand.type);
         } else if (is PsiLiteralExpression v) {
@@ -53,18 +77,18 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
 
                 return JShort(v.text);
             }
-            return v.\ivalue;
+            return toListIfNeeded(v.\ivalue, type);
         } else {
             platformUtils.log(Status._WARNING,
                 "unsupported PsiAnnotationMemberValue ``className(v)``");
             return v;
         }
     }
-    
+
     doWithLock(() {
-        psi.parameterList.attributes.array.coalesced.each((pair) {
-            value name = pair.name else "value";
-            value val = convert(pair.\ivalue, name);
+        psi.parameterList.attributes.array.coalesced.each((attr) {
+            value name = attr.name else "value";
+            value val = convert(attr, name);
             
             values.put(name, val);
         });
