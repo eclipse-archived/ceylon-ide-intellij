@@ -61,20 +61,32 @@ import com.redhat.ceylon.ide.common.util {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
+import com.intellij.codeInsight.generation.actions {
+    PresentableCodeInsightActionHandler
+}
+import com.intellij.openapi.actionSystem {
+    Presentation
+}
 
 shared class CeylonGotoSuperHandler()
         extends GotoTargetHandler()
-        satisfies LanguageCodeInsightActionHandler {
+        satisfies LanguageCodeInsightActionHandler
+                & PresentableCodeInsightActionHandler {
+
+    alias SourceTypes
+        => CeylonPsi.AnyClassPsi
+         | CeylonPsi.AnyInterfacePsi
+         | CeylonPsi.ObjectDefinitionPsi;
+    alias SourceMembers
+        => CeylonPsi.AnyAttributePsi
+         | CeylonPsi.AnyMethodPsi
+         | CeylonPsi.SpecifierStatementPsi;
+    alias SourceConstructors
+        => CeylonPsi.ConstructorPsi
+        | CeylonPsi.EnumeratedPsi;
 
     alias Source
-        => CeylonPsi.SpecifierStatementPsi
-         | CeylonPsi.AnyClassPsi
-         | CeylonPsi.AnyInterfacePsi
-         | CeylonPsi.AnyAttributePsi
-         | CeylonPsi.AnyMethodPsi
-         | CeylonPsi.ObjectDefinitionPsi
-         | CeylonPsi.ConstructorPsi
-         | CeylonPsi.EnumeratedPsi;
+        => SourceTypes | SourceMembers | SourceConstructors;
 
     featureUsedKey => GotoSuperAction.\iFEATURE_ID;
 
@@ -84,18 +96,18 @@ shared class CeylonGotoSuperHandler()
             else null;
 
     getChooserTitle(PsiElement sourceElement, String name, Integer length)
-            => if (is CeylonPsi.AnyClassPsi|CeylonPsi.AnyInterfacePsi|CeylonPsi.ObjectDefinitionPsi sourceElement)
+            => if (is SourceTypes sourceElement)
             then "Choose supertype declaration"
             else "Choose refined declaration";
 
-    getFindUsagesTitle(PsiElement sourceElement, String name, Integer length)
-            => CodeInsightBundle.message("goto.super.method.findUsages.title", name);
+//    getFindUsagesTitle(PsiElement sourceElement, String name, Integer length)
+//            => CodeInsightBundle.message("goto.super.method.findUsages.title", name);
 
     getNotFoundMessage(Project project, Editor editor, PsiFile file)
             => let (source = findSource(editor, file))
-            if (is CeylonPsi.AnyClassPsi|CeylonPsi.AnyInterfacePsi|CeylonPsi.ObjectDefinitionPsi source)
+            if (is SourceTypes source)
             then "No supertype declaration found"
-            else if (is CeylonPsi.ConstructorPsi|CeylonPsi.EnumeratedPsi source)
+            else if (is SourceConstructors source)
             then "No delegated constructor found"
             else "No refined declaration found";
 
@@ -209,4 +221,23 @@ shared class CeylonGotoSuperHandler()
 
     isValidFor(Editor editor, PsiFile file)
             => file.fileType==CeylonFileType.instance;
+
+    shared actual void update(Editor editor, PsiFile file, Presentation presentation) {
+        presentation.enabled = true;
+        value source = findSource(editor, file);
+        if (is SourceTypes source) {
+            presentation.setText("Supertype Declaration", false);
+        }
+        else if (is SourceMembers source) {
+            presentation.setText("Refined Declaration", false);
+        }
+        else if (is SourceConstructors source) {
+            presentation.setText("Delegated Constructor", false);
+        }
+        else {
+            presentation.setText("Inherited Declaration", false);
+            presentation.enabled = false;
+        }
+    }
+
 }
