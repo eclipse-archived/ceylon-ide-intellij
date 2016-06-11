@@ -23,7 +23,8 @@ import com.redhat.ceylon.model.typechecker.model {
     Value,
     TypeAlias,
     Constructor,
-    ClassOrInterface
+    ClassOrInterface,
+    TypedDeclaration
 }
 
 shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProvider {
@@ -58,6 +59,19 @@ shared object ceylonDeclarationDescriptionProvider {
             }
             sb.append(decl.name else "new")
                 .append(parameterLists(decl));
+
+            if (is TypedDeclaration decl) {
+                if (is Function decl, decl.declaredVoid) {
+                    //noop for void
+                }
+                else {
+                    if (exists returnType = decl.type,
+                            !ModelUtil.isTypeUnknown(returnType)) {
+                        sb.append(" ∊ ")
+                            .append(returnType.asString((decl of Declaration).unit));
+                    }
+                }
+            }
 
             return sb.string;
         }
