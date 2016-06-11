@@ -35,6 +35,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeyLightClass;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
@@ -63,7 +64,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             CeylonTokens.LPAREN, CeylonTokens.RPAREN
     );
 
-    private ceylonDeclarationDescriptionProvider_ ceylonDeclarationDescriptionProvider
+    private ceylonDeclarationDescriptionProvider_ provider
             = ceylonDeclarationDescriptionProvider_.get_();
 
     private highlighter_ highlighter = highlighter_.get_();
@@ -71,15 +72,15 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     @Nullable
     @Override
     public String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
-        String str = toJavaString(ceylonDeclarationDescriptionProvider.getDescription(element));
-
-        if (str != null) {
-            return highlighter.highlight(str, element.getProject())
-                    // font tags are removed in com.intellij.util.ui.UIUtil.getHtmlBody(com.intellij.util.ui.Html),
-                    // so we have to do a little trick to keep colors
-                    .replaceAll("<font", "<span").replaceAll("</font>", "</span>");
+        if (originalElement instanceof CeylonCompositeElement) {
+            String str = toJavaString(provider.getDescription((CeylonCompositeElement) element));
+            if (str != null) {
+                return highlighter.highlight(str, element.getProject())
+                        // font tags are removed in com.intellij.util.ui.UIUtil.getHtmlBody(com.intellij.util.ui.Html),
+                        // so we have to do a little trick to keep colors
+                        .replaceAll("<font", "<span").replaceAll("</font>", "</span>");
+            }
         }
-
         return null;
     }
 
