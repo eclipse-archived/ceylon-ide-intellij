@@ -85,6 +85,11 @@ class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
                     myFile.findElementAt(declaration.getStartIndex()),
                     CeylonPsi.AnyAttributePsi.class);
             return new CeylonAttributeTreeElement(psiDecl, isInherited);
+        } else if (declaration instanceof Tree.Variable) {
+            CeylonPsi.VariablePsi psiDecl = PsiTreeUtil.getParentOfType(
+                    myFile.findElementAt(declaration.getStartIndex()),
+                    CeylonPsi.VariablePsi.class);
+            return new CeylonVariableTreeElement(psiDecl, isInherited);
         } else if (declaration instanceof Tree.Constructor) {
             CeylonPsi.ConstructorPsi psiDecl = PsiTreeUtil.getParentOfType(
                     myFile.findElementAt(declaration.getStartIndex()),
