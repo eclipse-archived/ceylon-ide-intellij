@@ -1,8 +1,6 @@
 import com.intellij.psi {
     PsiMethod,
-    PsiModifier {
-        ...
-    },
+    PsiModifier,
     PsiType,
     PsiAnnotationMethod,
     PsiParameter
@@ -75,35 +73,35 @@ shared class PSIMethod(shared PsiMethod psi)
     shared Boolean isOverloading => lazyIsOverloading else (lazyIsOverloading = computedIsOverloading);
     
     abstract =>
-        psi.hasModifierProperty(\iABSTRACT)
+        psi.hasModifierProperty(PsiModifier.abstract)
         || doWithLock(() => psi.containingClass.\iinterface);
     
     constructor => psi.constructor;
     
-    declaredVoid => psi.returnType == PsiType.\iVOID;
+    declaredVoid => psi.returnType == PsiType.\ivoid;
     
     default => if (is PsiAnnotationMethod psi)
                then doWithLock(() => psi.defaultValue exists)
                else false;
     
-    defaultAccess => !(public || protected || psi.hasModifierProperty(\iPRIVATE));
+    defaultAccess => !(public || protected || psi.hasModifierProperty(PsiModifier.private));
     
     enclosingClass => PSIClass(doWithLock(() => psi.containingClass));
     
-    final => psi.hasModifierProperty(\iFINAL);
+    final => psi.hasModifierProperty(PsiModifier.final);
     
     parameters => doWithLock(() =>
         mirror<VariableMirror,PsiParameter>(psi.parameterList.parameters, PSIVariable)
     );
     
-    protected => psi.hasModifierProperty(\iPROTECTED);
+    protected => psi.hasModifierProperty(PsiModifier.protected);
     
-    public => psi.hasModifierProperty(\iPUBLIC);
+    public => psi.hasModifierProperty(PsiModifier.public);
     
     shared actual TypeMirror? returnType
             => doWithLock(() => if (exists t = psi.returnType) then PSIType(t) else null);
     
-    static => psi.hasModifierProperty(\iSTATIC);
+    static => psi.hasModifierProperty(PsiModifier.static);
     
     staticInit => false;
     
@@ -121,5 +119,5 @@ shared class PSIMethod(shared PsiMethod psi)
 
     string => "PSIMethod[``name``]";
     
-    defaultMethod => psi.hasModifierProperty(PsiModifier.\iDEFAULT);   
+    defaultMethod => psi.hasModifierProperty(PsiModifier.default);   
 }
