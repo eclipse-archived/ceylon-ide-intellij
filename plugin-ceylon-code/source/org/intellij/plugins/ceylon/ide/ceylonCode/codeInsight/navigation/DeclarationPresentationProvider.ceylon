@@ -11,23 +11,32 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
 import com.redhat.ceylon.model.typechecker.model {
-    ClassOrInterface
+    ClassOrInterface,
+    Scope
 }
 
 shared class DeclarationPresentationProvider()
         satisfies ItemPresentationProvider<DeclarationNavigationItem> {
 
-    getPresentation(DeclarationNavigationItem item) => object satisfies ItemPresentation {
+    getPresentation(DeclarationNavigationItem item) 
+            => object satisfies ItemPresentation {
 
-        shared actual Icon? getIcon(Boolean unused) => ideaIcons.forDeclaration(item.decl);
+        shared actual Icon? getIcon(Boolean unused) 
+                => ideaIcons.forDeclaration(item.decl);
+
+        function locationAsString(Scope container)
+                => "(``container.qualifiedNameString else "default package"``)";
 
         locationString
-            => let (qName = item.decl.container.qualifiedNameString else "default package")
-               "(" + qName + ")";
+                => let (dec = item.decl)
+                if (is ClassOrInterface type = dec.container)
+                then locationAsString(type.container)
+                else locationAsString(dec.container);
 
         presentableText 
-                => if (is ClassOrInterface container = item.decl.container) 
-                then container.name + "." + item.decl.name 
-                else item.decl.name;
+                => let (dec = item.decl)
+                if (is ClassOrInterface type = dec.container)
+                then type.name + "." + dec.name
+                else dec.name;
     };
 }
