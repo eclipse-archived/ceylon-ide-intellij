@@ -77,14 +77,12 @@ shared object ideaIcons {
         case (is Tree.SpecifierStatement) (obj.declaration else obj)
         else obj;
 
-        variable value baseIcon = switch(decl)
+        value baseIcon = switch (decl)
         case (is Tree.AnyClass)
             classes
         case (is Class)
-            if (decl.anonymous)
-            then objects
-            else if (decl.abstract)
-            then abstractClasses
+            if (decl.anonymous) then objects
+            else if (decl.abstract) then abstractClasses
             else classes
         case (is Tree.AnyInterface|Interface)
             interfaces
@@ -92,14 +90,16 @@ shared object ideaIcons {
             methods
         case (is Function)
             if (ModelUtil.isConstructor(decl)) then constructors
-            else if (decl.formal) then formalMethods else methods
+            else if (decl.parameter) then param
+            else if (decl.formal) then formalMethods
+            else methods
         case (is Tree.ObjectDefinition)
             objects
         case (is Value)
-            if (ModelUtil.isObject(decl))
-            then objects
-            else if (decl.formal)
-            then formalValues
+            if (ModelUtil.isObject(decl)) then objects
+            else if (ModelUtil.isConstructor(decl)) then constructors
+            else if (decl.parameter) then param
+            else if (decl.formal) then formalValues
             else values
         case (is Setter)
             setters
@@ -107,18 +107,13 @@ shared object ideaIcons {
             types
         case (is TypeParameter)
             param // TODO wrong!
-        case (is Tree.AttributeDeclaration)
+        case (is Tree.AnyAttribute)
             values
+        case (is Tree.SpecifierStatement)
+            values //TODO!!!
         else
             null;
-        
-        if (!exists a = baseIcon, is Declaration decl) {
-            if (ModelUtil.isConstructor(decl)) {
-                baseIcon = constructors;
-            } else if (decl.parameter) {
-                baseIcon = param;
-            }
-        }
+
         Declaration? model = 
             switch (decl) 
             case (is Tree.Declaration) decl.declarationModel
@@ -131,7 +126,7 @@ shared object ideaIcons {
             return createHorizontalIcon(icon, layer);
         }
         
-        if (baseIcon is Null) {
+        if (!baseIcon exists) {
             print("Missing icon for ``decl``");
         }
         
