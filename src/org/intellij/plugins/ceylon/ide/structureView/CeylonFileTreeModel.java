@@ -5,6 +5,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.TextEditorBasedStructureViewModel;
 import com.intellij.ide.util.treeView.smartTree.Filter;
 import com.intellij.ide.util.treeView.smartTree.NodeProvider;
+import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.psi.PsiFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -68,6 +69,12 @@ class CeylonFileTreeModel extends TextEditorBasedStructureViewModel
     @Override
     protected Class[] getSuitableClasses() {
         return new Class[] {CeylonPsi.DeclarationPsi.class, CeylonPsi.SpecifierStatementPsi.class};
+    }
+
+    @NotNull
+    @Override
+    public Sorter[] getSorters() {
+        return new Sorter[] { Sorter.ALPHA_SORTER };
     }
 
     // TODO filters for inherited, fields, etc.

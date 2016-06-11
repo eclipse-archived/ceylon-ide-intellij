@@ -2,9 +2,12 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.navigation.ColoredItemPresentation;
+import com.intellij.navigation.LocationPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.util.ui.UIUtil;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
@@ -21,7 +24,7 @@ import java.util.Collections;
 import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 
 class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierStatementPsi>
-        implements ColoredItemPresentation {
+        implements ColoredItemPresentation, LocationPresentation, SortableTreeElement {
 
     private ceylonDeclarationDescriptionProvider_ provider =
             ceylonDeclarationDescriptionProvider_.get_();
@@ -46,8 +49,8 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
     public String getLocationString() {
         Declaration model =
                 getElement()
-                        .getCeylonNode()
-                        .getDeclaration();
+                    .getCeylonNode()
+                    .getDeclaration();
         if (model != null) {
             Declaration refined =
                     model.getRefinedDeclaration();
@@ -71,5 +74,25 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
     @Override
     public String getPresentableText() {
         return toJavaString(provider.getDescription(getElement(), false, false));
+    }
+
+    @NotNull
+    @Override
+    public String getAlphaSortKey() {
+        TypedDeclaration dec =
+                getElement()
+                    .getCeylonNode()
+                    .getDeclaration();
+        return dec==null ? "" : dec.getName();
+    }
+
+    @Override
+    public String getLocationPrefix() {
+        return "";
+    }
+
+    @Override
+    public String getLocationSuffix() {
+        return "";
     }
 }

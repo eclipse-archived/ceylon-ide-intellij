@@ -2,6 +2,7 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.psi.PsiElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
@@ -14,7 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement> {
+public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement> implements SortableTreeElement {
 
     private CeylonPsi.ImportPsi[] imports;
 
@@ -44,9 +45,15 @@ public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement> 
     public Icon getIcon(boolean open) {
         return ideaIcons_.get_().getImports();
     }
+
+    @NotNull
+    @Override
+    public String getAlphaSortKey() {
+        return "";
+    }
 }
 
-class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi> {
+class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi> implements SortableTreeElement {
 
     protected CeylonImportTreeElement(CeylonPsi.ImportPsi psiElement) {
         super(psiElement);
@@ -61,7 +68,7 @@ class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi> {
     @Nullable
     @Override
     public String getPresentableText() {
-        return getElement().getText().substring(0, getElement().getText().indexOf('{')).trim();
+        return getElement().getText().substring(6, getElement().getText().indexOf('{')).trim();
 //        return "import " + getElement().getCeylonNode().getImportPath().getModel().getNameAsString();
     }
 
@@ -69,4 +76,11 @@ class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi> {
     public Icon getIcon(boolean open) {
         return ideaIcons_.get_().getSingleImport();
     }
+
+    @NotNull
+    @Override
+    public String getAlphaSortKey() {
+        return getElement().getText();
+    }
+
 }

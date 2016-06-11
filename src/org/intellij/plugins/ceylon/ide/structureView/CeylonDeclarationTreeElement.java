@@ -2,11 +2,16 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.LocationPresentation;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiTypeElement;
 import com.intellij.util.ui.UIUtil;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
@@ -20,7 +25,7 @@ import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 
 abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPsi>
         extends PsiTreeElementBase<Decl>
-        implements ColoredItemPresentation, LocationPresentation {
+        implements ColoredItemPresentation, LocationPresentation, SortableTreeElement {
 
     private boolean isInherited;
 
@@ -69,7 +74,7 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
                 ClassOrInterface container =
                         (ClassOrInterface)
                                 model.getContainer();
-                return UIUtil.rightArrow() + container.getName();
+                return " " + UIUtil.rightArrow() + container.getName();
             }
             Declaration refined =
                     model.getRefinedDeclaration();
@@ -78,7 +83,7 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
                 ClassOrInterface container =
                         (ClassOrInterface)
                                 refined.getContainer();
-                return UIUtil.upArrow("^") + container.getName();
+                return " " + UIUtil.upArrow("^") + container.getName();
             }
         }
         return super.getLocationString();
@@ -98,5 +103,12 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
     @Override
     public String getPresentableText() {
         return toJavaString(provider.getDescription(getElement(), false, false));
+    }
+
+    @NotNull
+    @Override
+    public String getAlphaSortKey() {
+        Tree.Identifier id = getElement().getCeylonNode().getIdentifier();
+        return id==null ? "" : id.getText();
     }
 }
