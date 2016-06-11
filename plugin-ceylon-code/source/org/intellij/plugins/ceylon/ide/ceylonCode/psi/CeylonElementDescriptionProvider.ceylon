@@ -60,16 +60,15 @@ shared object ceylonDeclarationDescriptionProvider {
             sb.append(decl.name else "new")
                 .append(parameterLists(decl));
 
-            if (is TypedDeclaration decl) {
+            if (is TypedDeclaration decl,
+                !ModelUtil.isConstructor(decl)) {
                 if (is Function decl, decl.declaredVoid) {
                     //noop for void
                 }
-                else {
-                    if (exists returnType = decl.type,
-                            !ModelUtil.isTypeUnknown(returnType)) {
-                        sb.append(" ∊ ")
-                            .append(returnType.asString((decl of Declaration).unit));
-                    }
+                else if (exists returnType = decl.type,
+                        !ModelUtil.isTypeUnknown(returnType)) {
+                    sb.append(" ∊ ")
+                        .append(returnType.asString((decl of Declaration).unit));
                 }
             }
 

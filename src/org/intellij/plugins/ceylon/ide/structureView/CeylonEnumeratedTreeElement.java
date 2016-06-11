@@ -5,10 +5,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
 
 import javax.swing.*;
 
-class CeylonAttributeTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.AnyAttributePsi> {
+class CeylonEnumeratedTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.EnumeratedPsi> {
 
-    CeylonAttributeTreeElement(CeylonPsi.AnyAttributePsi declaration, boolean isInherited) {
-        super(declaration, isInherited);
+    CeylonEnumeratedTreeElement(CeylonPsi.EnumeratedPsi psiElement) {
+        super(psiElement, false);
     }
 
     @Override

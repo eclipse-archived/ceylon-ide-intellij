@@ -80,16 +80,26 @@ class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
                     myFile.findElementAt(declaration.getStartIndex()),
                     CeylonPsi.ObjectDefinitionPsi.class);
             return new CeylonObjectTreeElement(psiObject, isInherited);
-        } else if (declaration instanceof Tree.AttributeDeclaration) {
-            CeylonPsi.AttributeDeclarationPsi psiDecl = PsiTreeUtil.getParentOfType(
+        } else if (declaration instanceof Tree.AnyAttribute) {
+            CeylonPsi.AnyAttributePsi psiDecl = PsiTreeUtil.getParentOfType(
                     myFile.findElementAt(declaration.getStartIndex()),
-                    CeylonPsi.AttributeDeclarationPsi.class);
+                    CeylonPsi.AnyAttributePsi.class);
             return new CeylonAttributeTreeElement(psiDecl, isInherited);
         } else if (declaration instanceof Tree.Constructor) {
             CeylonPsi.ConstructorPsi psiDecl = PsiTreeUtil.getParentOfType(
                     myFile.findElementAt(declaration.getStartIndex()),
                     CeylonPsi.ConstructorPsi.class);
             return new CeylonConstructorTreeElement(psiDecl);
+        } else if (declaration instanceof Tree.Enumerated) {
+            CeylonPsi.EnumeratedPsi psiDecl = PsiTreeUtil.getParentOfType(
+                    myFile.findElementAt(declaration.getStartIndex()),
+                    CeylonPsi.EnumeratedPsi.class);
+            return new CeylonEnumeratedTreeElement(psiDecl);
+        } else if (declaration instanceof Tree.TypeAliasDeclaration) {
+            CeylonPsi.TypeAliasDeclarationPsi psiDecl = PsiTreeUtil.getParentOfType(
+                    myFile.findElementAt(declaration.getStartIndex()),
+                    CeylonPsi.TypeAliasDeclarationPsi.class);
+            return new CeylonTypeAliasTreeElement(psiDecl);
         }
 
         return null;

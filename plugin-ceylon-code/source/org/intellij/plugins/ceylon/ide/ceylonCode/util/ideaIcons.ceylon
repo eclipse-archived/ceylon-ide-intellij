@@ -44,6 +44,8 @@ shared object ideaIcons {
     shared Icon attributes = PlatformIcons.fieldIcon;
     shared Icon enumerations = PlatformIcons.enumIcon;
     shared Icon exceptions = AllIcons.Nodes.exceptionClass;
+    shared Icon abstractExceptions = AllIcons.Nodes.abstractException;
+    shared Icon annotationClasses = AllIcons.Nodes.annotationtype;
     shared Icon param => AllIcons.Nodes.parameter;
     shared Icon local => IconLoader.getIcon("/icons/ceylonLocal.png");
     shared Icon values => AllIcons.Nodes.variable;
@@ -80,42 +82,55 @@ shared object ideaIcons {
         case (is Tree.SpecifierStatement) (obj.declaration else obj)
         else obj;
 
-        value baseIcon = switch (decl)
-        case (is Tree.AnyClass)
-            classes
-        case (is Class)
-            if (decl.anonymous) then objects
-            else if (decl.abstract) then abstractClasses
-            else classes
-        case (is Tree.AnyInterface|Interface)
-            interfaces
-        case (is Tree.AnyMethod)
-            methods
-        case (is Function)
-            if (ModelUtil.isConstructor(decl)) then constructors
-            else if (decl.parameter) then param
-            else if (decl.formal) then formalMethods
-            else methods
-        case (is Tree.ObjectDefinition)
-            objects
-        case (is Value)
-            if (ModelUtil.isObject(decl)) then objects
-            else if (ModelUtil.isConstructor(decl)) then constructors
-            else if (decl.parameter) then param
-            else if (decl.formal) then formalValues
-            else values
-        case (is Setter)
-            setters
-        case (is Tree.TypeAliasDeclaration|TypeAlias|NothingType)
-            types
-        case (is TypeParameter)
-            param // TODO wrong!
-        case (is Tree.AnyAttribute)
-            values
-        case (is Tree.SpecifierStatement)
-            values //TODO!!!
-        else
-            null;
+        value baseIcon 
+            = switch (decl)
+            //models:
+            case (is Interface)
+                interfaces
+            case (is Class)
+                if (decl.objectClass) then objects
+                else if (decl.inherits(decl.unit.throwableDeclaration))
+                    then (decl.abstract then abstractExceptions else exceptions)
+                else if (decl.annotation) then annotationClasses
+                else if (decl.abstract) then abstractClasses
+                else classes
+            case (is Function)
+                if (ModelUtil.isConstructor(decl)) then constructors
+                else if (decl.parameter) then param
+                else if (decl.formal) then formalMethods
+                else methods
+            case (is Value)
+                if (ModelUtil.isConstructor(decl)) then constructors
+                else if (ModelUtil.isObject(decl)) then objects
+                else if (decl.parameter) then param
+                else if (decl.formal) then formalValues
+                else values
+            case (is Setter)
+                setters
+            case (is TypeAlias|NothingType)
+                types
+            case (is TypeParameter)
+                param // TODO wrong!
+            //AST nodes:
+            case (is Tree.AnyClass)
+                classes
+            case (is Tree.AnyInterface)
+                interfaces
+            case (is Tree.AnyMethod)
+                methods
+            case (is Tree.AnyAttribute)
+                values
+            case (is Tree.ObjectDefinition)
+                objects
+            case (is Tree.Constructor|Tree.Enumerated)
+                constructors
+            case (is Tree.TypeAliasDeclaration)
+                types
+            case (is Tree.SpecifierStatement)
+                (decl.baseMemberExpression is Tree.StaticMemberOrTypeExpression 
+                    then values else methods)
+            else
+                null;
 
         Declaration? model = 
             switch (decl) 
