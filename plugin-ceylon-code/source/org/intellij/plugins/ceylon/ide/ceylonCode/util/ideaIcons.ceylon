@@ -72,6 +72,9 @@ shared object ideaIcons {
     shared Icon problemsViewWarnings => IconLoader.getIcon("/icons/ceylonProblemsWarnings.png");
 
     shared Icon? forDeclaration(Tree.Declaration|Tree.SpecifierStatement|Declaration obj) {
+        if (is Tree.SpecifierStatement obj, !obj.refinement) {
+            return null;
+        }
         value decl = switch (obj) 
         case (is Tree.Declaration) (obj.declarationModel else obj)
         case (is Tree.SpecifierStatement) (obj.declaration else obj)

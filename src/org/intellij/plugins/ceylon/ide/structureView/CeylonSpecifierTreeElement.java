@@ -4,6 +4,9 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.util.ui.UIUtil;
+import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
+import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
@@ -20,7 +23,7 @@ import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierStatementPsi>
         implements ColoredItemPresentation {
 
-    private ceylonDeclarationDescriptionProvider_ ceylonDeclarationDescriptionProvider =
+    private ceylonDeclarationDescriptionProvider_ provider =
             ceylonDeclarationDescriptionProvider_.get_();
 
     CeylonSpecifierTreeElement(CeylonPsi.SpecifierStatementPsi psiElement) {
@@ -40,16 +43,33 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
     }
 
     @Override
-    public Icon getIcon(boolean open) {
-        TypedDeclaration decl = getElement().getCeylonNode().getDeclaration();
-        return decl == null ? null : ideaIcons_.get_().forDeclaration(decl);
+    public String getLocationString() {
+        Declaration model =
+                getElement()
+                        .getCeylonNode()
+                        .getDeclaration();
+        if (model != null) {
+            Declaration refined =
+                    model.getRefinedDeclaration();
+            if (refined !=null &&
+                    !refined.equals(model)) {
+                ClassOrInterface container =
+                        (ClassOrInterface)
+                                refined.getContainer();
+                return UIUtil.upArrow("^") + container.getName();
+            }
+        }
+        return super.getLocationString();
     }
+
+    /*@Override
+    public Icon getIcon(boolean open) {
+        return ideaIcons_.get_().forDeclaration(getElement().getCeylonNode());
+    }*/
 
     @Nullable
     @Override
     public String getPresentableText() {
-        return toJavaString(
-                ceylonDeclarationDescriptionProvider.getDescription(getElement(), false, false)
-        );
+        return toJavaString(provider.getDescription(getElement(), false, false));
     }
 }

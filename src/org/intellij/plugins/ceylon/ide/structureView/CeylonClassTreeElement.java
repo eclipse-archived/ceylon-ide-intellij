@@ -38,25 +38,35 @@ class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.Clas
         List<Tree.Statement> bodyChildren;
 
         if (ceylonNode instanceof CustomTree.ClassDefinition) {
-            bodyChildren = ((CustomTree.ClassDefinition) ceylonNode).getClassBody().getStatements();
+            Tree.ClassDefinition definition =
+                    (CustomTree.ClassDefinition) ceylonNode;
+            bodyChildren = definition.getClassBody().getStatements();
         } else if (ceylonNode instanceof Tree.InterfaceDefinition) {
-            bodyChildren = ((Tree.InterfaceDefinition) ceylonNode).getInterfaceBody().getStatements();
+            Tree.InterfaceDefinition definition =
+                    (Tree.InterfaceDefinition) ceylonNode;
+            bodyChildren = definition.getInterfaceBody().getStatements();
         } else {
             bodyChildren = Collections.emptyList();
         }
 
         for (Node node : bodyChildren) {
             if (node instanceof Tree.Declaration) {
-                StructureViewTreeElement child = getTreeElementForDeclaration((CeylonFile) myClass.getContainingFile(),
-                        (Tree.Declaration) node, false);
+                StructureViewTreeElement child =
+                        getTreeElementForDeclaration(
+                                (CeylonFile) myClass.getContainingFile(),
+                                (Tree.Declaration) node, false);
                 if (child != null) {
                     elements.add(child);
                 }
             } else if (node instanceof Tree.SpecifierStatement) {
-                CeylonPsi.SpecifierStatementPsi spec = PsiTreeUtil.getParentOfType(
-                        myClass.getContainingFile().findElementAt(node.getStartIndex()),
-                        CeylonPsi.SpecifierStatementPsi.class);
-                elements.add(new CeylonSpecifierTreeElement(spec));
+                if (((Tree.SpecifierStatement) node).getRefinement()) {
+                    CeylonPsi.SpecifierStatementPsi spec =
+                            PsiTreeUtil.getParentOfType(
+                                    myClass.getContainingFile()
+                                            .findElementAt(node.getStartIndex()),
+                                    CeylonPsi.SpecifierStatementPsi.class);
+                    elements.add(new CeylonSpecifierTreeElement(spec));
+                }
             }
         }
 

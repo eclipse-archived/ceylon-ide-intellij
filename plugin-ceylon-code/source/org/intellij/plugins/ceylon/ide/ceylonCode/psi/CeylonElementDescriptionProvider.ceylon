@@ -30,26 +30,21 @@ shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProv
     
     shared actual String? getElementDescription(PsiElement element,
         ElementDescriptionLocation location) 
-            => if (is UsageViewLongNameLocation|UsageViewShortNameLocation location) 
+            => if (is UsageViewLongNameLocation|UsageViewShortNameLocation location,
+                    is CeylonCompositeElement element)
             then ceylonDeclarationDescriptionProvider.getDescription(element) 
             else null;
 }
 
 shared object ceylonDeclarationDescriptionProvider {
 
-    shared String? getDescription(PsiElement|Declaration element, Boolean includeKeyword = true,
-        Boolean includeContainer = true) {
-        
-        value decl = switch(element)
-            case (is Declaration) element
-            else if (is CeylonCompositeElement element,
-                     is Tree.Declaration node = element.ceylonNode,
-                     exists decl = node.declarationModel)
-            then decl
-            else if (is CeylonCompositeElement element,
-                     is Tree.SpecifierStatement node = element.ceylonNode,
-                     exists decl = node.declaration)
-            then decl
+    shared String? getDescription(CeylonCompositeElement element, 
+        Boolean includeKeyword = true, Boolean includeContainer = true) {
+
+        value decl =
+            switch (node = element.ceylonNode)
+            case (is Tree.Declaration) node.declarationModel
+            case (is Tree.SpecifierStatement) (node.refinement then node.declaration)
             else null;
 
         if (exists decl) {
@@ -66,7 +61,24 @@ shared object ceylonDeclarationDescriptionProvider {
 
             return sb.string;
         }
-        return null;
+        else if (is Tree.Declaration node = element.ceylonNode) {
+            value sb = StringBuilder();
+
+            if (includeKeyword) {
+                sb.append(nodeKeyword(node)).append(" ");
+            }
+            
+            sb.append(node.identifier?.text else "new");
+            
+            if (node is Tree.AnyClass|Tree.AnyMethod|Tree.Constructor) {
+                sb.append("()"); //TODO: parameter lists!
+            }
+
+            return sb.string;
+        }
+        else {
+            return null;
+        }
     }
     
     String container(Declaration decl)
@@ -86,7 +98,18 @@ shared object ceylonDeclarationDescriptionProvider {
         case (is Constructor) "new"
         else "";
     }
-    
+
+    String nodeKeyword(Tree.Declaration declaration) {
+        return switch (declaration)
+        case (is Tree.AnyClass) "class"
+        case (is Tree.AnyInterface) "interface"
+        case (is Tree.AnyAttribute) "value"
+        case (is Tree.AnyMethod) "function"
+        case (is Tree.TypeAliasDeclaration) "alias"
+        case (is Tree.Constructor|Tree.Enumerated) "new"
+        else "";
+    }
+
     String parameterLists(Declaration decl) {
         if (!is Functional decl) {
             return "";
@@ -98,7 +121,7 @@ shared object ceylonDeclarationDescriptionProvider {
         }
         return builder.string;
     }
-    
+
     void appendParameters(StringBuilder builder, ParameterList paramList, Unit unit) {
         builder.append("(");
         variable value first = true;
@@ -115,11 +138,11 @@ shared object ceylonDeclarationDescriptionProvider {
             }
             else if (param.sequenced) {
                 builder.append("*")
-                        .append(unit.getSequentialElementType(type).asString())
+                        .append(unit.getSequentialElementType(type).asString(unit))
                         .append(" ");
             }
             else {
-                builder.append(param.type.asString())
+                builder.append(param.type.asString(unit))
                         .append(" ");
             }
             if (exists name = param.name) {

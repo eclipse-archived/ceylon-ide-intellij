@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.openapi.util.text.StringUtil;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
@@ -22,18 +23,26 @@ public class DeclarationPresentationProvider implements ItemPresentationProvider
             public String getPresentableText() {
                 Declaration model =
                         item.getCeylonNode()
-                                .getDeclarationModel();
-                String name = model.getName();
-                //TODO: make this recursive
-                if (model.isClassOrInterfaceMember()) {
-                    ClassOrInterface classOrInterface =
-                            (ClassOrInterface)
-                                    model.getContainer();
-                    return classOrInterface.getName()
-                            + "." + name;
+                            .getDeclarationModel();
+                if (model == null) {
+                    Tree.Identifier id =
+                            item.getCeylonNode()
+                                .getIdentifier();
+                    return id==null ? null : id.getText();
                 }
                 else {
-                    return name;
+                    String name = model.getName();
+                    //TODO: make this recursive
+                    if (model.isClassOrInterfaceMember()) {
+                        ClassOrInterface classOrInterface =
+                                (ClassOrInterface)
+                                        model.getContainer();
+                        return classOrInterface.getName()
+                                + "." + name;
+                    }
+                    else {
+                        return name;
+                    }
                 }
             }
 
@@ -42,7 +51,7 @@ public class DeclarationPresentationProvider implements ItemPresentationProvider
             public String getLocationString() {
                 Declaration model =
                         item.getCeylonNode()
-                                .getDeclarationModel();
+                            .getDeclarationModel();
                 if (model == null) {
                     return null;
                 }
@@ -54,7 +63,7 @@ public class DeclarationPresentationProvider implements ItemPresentationProvider
                 }
                 String qualifiedNameString =
                         model.getContainer()
-                                .getQualifiedNameString();
+                            .getQualifiedNameString();
                 if (StringUtil.isEmpty(qualifiedNameString)) {
                     qualifiedNameString = "default module";
                 }

@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.openapi.util.text.StringUtil;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
@@ -13,14 +14,14 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-/**
- * Created by gavin on 6/10/16.
- */
+
 public class SpecifierPresentationProvider implements ItemPresentationProvider<SpecifierStatementPsiIdOwner> {
 
     @Override
     public ItemPresentation getPresentation(@NotNull final SpecifierStatementPsiIdOwner item) {
-
+        if (!item.getCeylonNode().getRefinement()) {
+            return null;
+        }
         return new ItemPresentation() {
             @Nullable
             @Override
@@ -28,17 +29,22 @@ public class SpecifierPresentationProvider implements ItemPresentationProvider<S
                 Declaration model =
                         item.getCeylonNode()
                                 .getDeclaration();
-                String name = model.getName();
-                //TODO: make this recursive
-                if (model.isClassOrInterfaceMember()) {
-                    ClassOrInterface classOrInterface =
-                            (ClassOrInterface)
-                                    model.getContainer();
-                    return classOrInterface.getName()
-                            + "." + name;
+                if (model == null) {
+                    //TODO: get it from the node!!!
+                    return null;
                 }
                 else {
-                    return name;
+                    String name = model.getName();
+                    //TODO: make this recursive
+                    if (model.isClassOrInterfaceMember()) {
+                        ClassOrInterface classOrInterface =
+                                (ClassOrInterface)
+                                        model.getContainer();
+                        return classOrInterface.getName()
+                                + "." + name;
+                    } else {
+                        return name;
+                    }
                 }
             }
 

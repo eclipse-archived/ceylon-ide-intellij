@@ -14,10 +14,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJav
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.concurrent.Callable;
 
 public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStatementPsiImpl
@@ -29,20 +31,29 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
 
     @Override
     public String getName() {
-        return getNameIdentifier().getText();
+        PsiElement id = getNameIdentifier();
+        return id == null ? null : id.getText();
     }
 
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        return CeylonTreeUtil.findPsiElement(getCeylonNode().getBaseMemberExpression(), getContainingFile());
+        //TODO: this looks wrong for case of ParameterizedExpression
+        return CeylonTreeUtil.findPsiElement(getCeylonNode().getBaseMemberExpression(),
+                getContainingFile());
     }
 
     @Override
-    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+    public PsiElement setName(@NonNls @NotNull String name)
+            throws IncorrectOperationException {
         return null;
     }
 
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return utilJ2C.getIconForDeclaration(getCeylonNode());
+    }
 
     @NotNull
     @Override

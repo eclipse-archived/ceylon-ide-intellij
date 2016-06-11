@@ -19,30 +19,36 @@ public abstract class ParameterPsiIdOwner extends CeylonPsiImpl.ParameterPsiImpl
         super(astNode);
     }
 
+    private Tree.Identifier getIdentifier() {
+        Tree.Parameter node = getCeylonNode();
+        if (node instanceof Tree.ParameterDeclaration) {
+            Tree.ParameterDeclaration param = (Tree.ParameterDeclaration) node;
+            return param.getTypedDeclaration().getIdentifier();
+        } else if (node instanceof Tree.InitializerParameter) {
+            Tree.InitializerParameter param = (Tree.InitializerParameter) node;
+            return param.getIdentifier();
+        }
+        else {
+            return null;
+        }
+    }
+
     @Override
     public String getName() {
-        PsiElement id = getNameIdentifier();
-
+        Tree.Identifier id = getIdentifier();
         return id == null ? null : id.getText();
     }
 
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        Tree.Parameter node = getCeylonNode();
-        if (node instanceof Tree.ParameterDeclaration) {
-            Tree.ParameterDeclaration param = (Tree.ParameterDeclaration) node;
-            return findPsiElement(param.getTypedDeclaration().getIdentifier(), getContainingFile());
-        } else if (node instanceof Tree.InitializerParameter) {
-            Tree.InitializerParameter param = (Tree.InitializerParameter) node;
-            return findPsiElement(param.getIdentifier(), getContainingFile());
-        }
-
-        return null;
+        Tree.Identifier id = getIdentifier();
+        return id == null ? null : findPsiElement(id, getContainingFile());
     }
 
     @Override
-    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+    public PsiElement setName(@NonNls @NotNull String name)
+            throws IncorrectOperationException {
         throw new UnsupportedOperationException("Not supported yet");
     }
 

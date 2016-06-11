@@ -29,8 +29,7 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
 
     @Override
     public String getName() {
-        PsiElement id = getNameIdentifier();
-
+        Tree.Identifier id = getCeylonNode().getIdentifier();
         return id == null ? null : id.getText();
     }
 
@@ -38,14 +37,18 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @Override
     public PsiElement getNameIdentifier() {
         Tree.Declaration node = getCeylonNode();
-        return node == null ? PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) : CeylonTreeUtil.findPsiElement(node.getIdentifier(), getContainingFile());
+        return node == null ?
+                PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) :
+                CeylonTreeUtil.findPsiElement(node.getIdentifier(), getContainingFile());
     }
 
     @Override
-    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+    public PsiElement setName(@NonNls @NotNull String name)
+            throws IncorrectOperationException {
         PsiElement id = findChildByType(CeylonTypes.IDENTIFIER);
-
-        CeylonPsi.DeclarationPsi decl = CeylonTreeUtil.createDeclarationFromText(getProject(), "void " + name + "(){}");
+        CeylonPsi.DeclarationPsi decl =
+                CeylonTreeUtil.createDeclarationFromText(getProject(),
+                        "void " + name + "(){}");
         if (id != null) {
             id.replace(decl.getChildren()[0]);
         }
@@ -63,7 +66,6 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
 
         }) != null) {
             Declaration model = getCeylonNode().getDeclarationModel();
-
             if (model != null && !isAffectingOtherFiles(model)) {
                 return new LocalSearchScope(getContainingFile());
             }
@@ -84,7 +86,6 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
         if (declaration.isParameter()) {
             FunctionOrValue fov = (FunctionOrValue) declaration;
             Declaration container = fov.getInitializerParameter().getDeclaration();
-
             if (container.isToplevel() || container.isShared()) {
                 return true;
             }
@@ -101,10 +102,6 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @Override
     public int getTextOffset() {
         PsiElement id = getNameIdentifier();
-
-        if (id != null) {
-            return id.getTextOffset();
-        }
-        return super.getTextOffset();
+        return id != null ? id.getTextOffset() : super.getTextOffset();
     }
 }
