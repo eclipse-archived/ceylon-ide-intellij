@@ -31,7 +31,8 @@ import com.redhat.ceylon.model.typechecker.model {
     TypeParameter,
     TypeAlias,
     NothingType,
-    Setter
+    Setter,
+    Constructor
 }
 
 import javax.swing {
@@ -81,17 +82,16 @@ shared object ideaIcons {
     shared Icon problemsViewErrors => IconLoader.getIcon("/icons/ceylonProblemsErrors.png");
     shared Icon problemsViewWarnings => IconLoader.getIcon("/icons/ceylonProblemsWarnings.png");
 
-    shared Icon? forDeclaration(Tree.Declaration|Tree.SpecifierStatement|Declaration obj) {
+    shared Icon? getBaseIcon(Tree.Declaration|Tree.SpecifierStatement|Declaration obj) {
         if (is Tree.SpecifierStatement obj, !obj.refinement) {
             return null;
         }
-        value decl = switch (obj) 
-        case (is Tree.Declaration) (obj.declarationModel else obj)
-        case (is Tree.SpecifierStatement) (obj.declaration else obj)
-        else obj;
-
-        value baseIcon
-            = switch (decl)
+        value decl 
+            = switch (obj) 
+            case (is Tree.Declaration) (obj.declarationModel else obj)
+            case (is Tree.SpecifierStatement) (obj.declaration else obj)
+            else obj;
+        return switch (decl)
             //models:
             case (is Interface)
                 interfaces
@@ -115,6 +115,7 @@ shared object ideaIcons {
                 else values
             case (is Setter)
                 setters
+            case (is Constructor) constructors
             case (is TypeAlias|NothingType)
                 types
             case (is TypeParameter)
@@ -139,14 +140,22 @@ shared object ideaIcons {
                     then values else methods)
             else
                 null;
+    }
+    
+    shared Icon? forDeclaration(Tree.Declaration|Tree.SpecifierStatement|Declaration obj) {
+        value baseIcon = getBaseIcon(obj);
+        if (!exists baseIcon) {
+            print("Missing icon for ``obj``");
+            return null;
+        }
 
         Declaration? model = 
-            switch (decl) 
-            case (is Tree.Declaration) decl.declarationModel
-            case (is Tree.SpecifierStatement) decl.declaration
-            else decl;
+            switch (obj) 
+            case (is Tree.Declaration) obj.declarationModel
+            case (is Tree.SpecifierStatement) obj.declaration
+            else obj;
         
-        if (exists icon = baseIcon, exists model) {
+        if (exists model) {
             value decorations = ArrayList<Icon>();
             value layer 
                 = if (model.shared) 
@@ -166,16 +175,13 @@ shared object ideaIcons {
             if (readonly) {
                 decorations.add(PlatformIcons.lockedIcon);
             }
-            return createHorizontalIcon(decorations, icon, layer);
+            return createIcon(decorations, baseIcon, layer);
         }
-        
-        if (!baseIcon exists) {
-            print("Missing icon for ``decl``");
+        else {
+            return baseIcon;
         }
-
-        return baseIcon;
     }
 
-    Icon createHorizontalIcon(List<Icon> decorations, Icon icon, Icon visibility) 
+    Icon createIcon(List<Icon> decorations, Icon icon, Icon visibility) 
             => RowIcon(LayeredIcon(icon, *decorations), visibility);
 }

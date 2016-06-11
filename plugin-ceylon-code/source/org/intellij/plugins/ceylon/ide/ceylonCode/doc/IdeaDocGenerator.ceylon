@@ -103,20 +103,21 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
         shared actual CommonDocument commonDocument => nothing;
     }
 
-    String hexColor(Integer red, Integer green, Integer blue) {
-        return "#" + formatInteger(red, 16).padLeading(2, '0') + formatInteger(green, 16).padLeading(2, '0') + formatInteger(blue, 16).padLeading(2, '0');
-    }
+    String hexColor(Integer red, Integer green, Integer blue) 
+            => "#" 
+            + formatInteger(red, 16).padLeading(2, '0') 
+            + formatInteger(green, 16).padLeading(2, '0') 
+            + formatInteger(blue, 16).padLeading(2, '0');
 
-    TextAttributesKey getAttributes(Colors color) {
-        switch (color)
-        case (Colors.strings) { return ceylonHighlightingColors.strings; }
-        case (Colors.annotationStrings) { return ceylonHighlightingColors.annotationString; }
-        case (Colors.numbers) { return ceylonHighlightingColors.number; }
-        case (Colors.annotations) { return ceylonHighlightingColors.annotation; }
-        case (Colors.keywords) { return ceylonHighlightingColors.keyword; }
-        case (Colors.identifiers) { return ceylonHighlightingColors.identifier; }
-        case (Colors.types) { return ceylonHighlightingColors.type; }
-    }
+    TextAttributesKey getAttributes(Colors color) 
+            => switch (color)
+            case (Colors.strings) ceylonHighlightingColors.strings
+            case (Colors.annotationStrings) ceylonHighlightingColors.annotationString
+            case (Colors.numbers) ceylonHighlightingColors.number
+            case (Colors.annotations) ceylonHighlightingColors.annotation
+            case (Colors.keywords) ceylonHighlightingColors.keyword
+            case (Colors.identifiers) ceylonHighlightingColors.identifier
+            case (Colors.types) ceylonHighlightingColors.type;
 
     shared actual String color(Object? what, Colors how) {
         value attributes = textAttributes(getAttributes(how));
@@ -129,7 +130,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
 
     Icon? getIconUrl(Icons|Referenceable thing) {
         if (is Declaration thing) {
-            return ideaIcons.forDeclaration(thing);
+            return ideaIcons.getBaseIcon(thing);
         } else if (is Referenceable thing) {
             return switch (thing)
                 case (is Module) ideaIcons.modules
@@ -160,9 +161,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
     }
 
     shared actual void addIconAndText(StringBuilder builder, Icons|Referenceable icon, String text) {
-        value iconUrl = getIconUrl(icon);
-
-        if (exists iconUrl) {
+        if (exists iconUrl = getIconUrl(icon)) {
             builder.append("<div style='background: url(" + iconUrl.string + ") left 10px no-repeat; padding-left: 16px'>");
         } else {
             builder.append("<div>");
