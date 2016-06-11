@@ -79,12 +79,14 @@ shared class CeylonGotoSuperHandler()
     featureUsedKey => GotoSuperAction.\iFEATURE_ID;
 
     shared actual GotoData? getSourceAndTargetElements(Editor editor, PsiFile file)
-            => if (exists e = findSource(editor, file))
-            then GotoData(e, findTargets(e), Collections.emptyList<AdditionalAction>())
+            => if (exists source = findSource(editor, file))
+            then GotoData(source, findTargets(source), Collections.emptyList<AdditionalAction>())
             else null;
 
     getChooserTitle(PsiElement sourceElement, String name, Integer length)
-            => "Choose supertype";
+            => if (is CeylonPsi.AnyClassPsi|CeylonPsi.AnyInterfacePsi|CeylonPsi.ObjectDefinitionPsi sourceElement)
+            then "Choose supertype declaration"
+            else "Choose refined declaration";
 
     getFindUsagesTitle(PsiElement sourceElement, String name, Integer length)
             => CodeInsightBundle.message("goto.super.method.findUsages.title", name);
@@ -92,10 +94,10 @@ shared class CeylonGotoSuperHandler()
     getNotFoundMessage(Project project, Editor editor, PsiFile file)
             => let (source = findSource(editor, file))
             if (is CeylonPsi.AnyClassPsi|CeylonPsi.AnyInterfacePsi|CeylonPsi.ObjectDefinitionPsi source)
-            then "No supertypes found"
+            then "No supertype declaration found"
             else if (is CeylonPsi.ConstructorPsi|CeylonPsi.EnumeratedPsi source)
             then "No delegated constructor found"
-            else "No super implementation found";
+            else "No refined declaration found";
 
     Source? findSource(Editor editor, PsiFile file) {
         if (exists element = file.findElementAt(editor.caretModel.offset)) {
@@ -122,12 +124,18 @@ shared class CeylonGotoSuperHandler()
             Function? meth = e.ceylonNode.declarationModel;
             if (exists meth, exists target = types.getRefinedDeclaration(meth)) {
                 list.add(target);
+                if (exists top = meth.refinedDeclaration, top!=target) {
+                    list.add(top);
+                }
             }
         }
         else if (is CeylonPsi.AnyAttributePsi e) {
             TypedDeclaration? att = e.ceylonNode.declarationModel;
             if (exists att, exists target = types.getRefinedDeclaration(att)) {
                 list.add(target);
+                if (exists top = att.refinedDeclaration, top!=target) {
+                    list.add(top);
+                }
             }
         }
         else if (is CeylonPsi.AnyClassPsi e) {
@@ -182,6 +190,9 @@ shared class CeylonGotoSuperHandler()
         else {
             if (exists target = e.ceylonNode.refined) {
                 list.add(target);
+                if (exists top = target.refinedDeclaration, top!=target) {
+                    list.add(top);
+                }
             }
         }
         value result = ArrayList<PsiElement>();
