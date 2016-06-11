@@ -65,6 +65,23 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
         return isInherited ? CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES : null;
     }
 
+    ClassOrInterface getType() {
+        Declaration model =
+                getElement()
+                    .getCeylonNode()
+                    .getDeclarationModel();
+        if (model!=null && model.isClassOrInterfaceMember()) {
+            if (isInherited) {
+                return (ClassOrInterface) model.getContainer();
+            }
+            Declaration refined = model.getRefinedDeclaration();
+            if (refined!=null && !refined.equals(model)) {
+                return (ClassOrInterface) refined.getContainer();
+            }
+        }
+        return null;
+    }
+
     @Override
     public String getLocationString() {
         Declaration model =

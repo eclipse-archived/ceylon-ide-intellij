@@ -67,9 +67,10 @@ public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement>
     }
 }
 
-class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi> implements SortableTreeElement {
+class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi>
+        implements SortableTreeElement, AccessLevelProvider {
 
-    protected CeylonImportTreeElement(CeylonPsi.ImportPsi psiElement) {
+    CeylonImportTreeElement(CeylonPsi.ImportPsi psiElement) {
         super(psiElement);
     }
 
@@ -97,4 +98,13 @@ class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi> im
         return getElement().getText();
     }
 
+    @Override
+    public int getAccessLevel() {
+        return PsiUtil.ACCESS_LEVEL_PRIVATE;
+    }
+
+    @Override
+    public int getSubLevel() {
+        return 0;
+    }
 }

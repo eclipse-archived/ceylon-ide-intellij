@@ -48,6 +48,20 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
         return null;
     }
 
+    ClassOrInterface getType() {
+        Declaration model =
+                getElement()
+                        .getCeylonNode()
+                        .getDeclaration();
+        if (model!=null && model.isClassOrInterfaceMember()) {
+            Declaration refined = model.getRefinedDeclaration();
+            if (refined!=null && !refined.equals(model)) {
+                return (ClassOrInterface) refined.getContainer();
+            }
+        }
+        return null;
+    }
+
     @Override
     public String getLocationString() {
         Declaration model =
