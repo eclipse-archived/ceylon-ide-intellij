@@ -125,6 +125,7 @@
         <gotoClassContributor implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoClassContributor"/>
         <completion.contributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonCompletionContributor"/>
         <codeInsight.parameterInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.completion.CeylonParameterInfoHandler"/>
+        <codeInsight.typeInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonExpressionTypeProvider"/>
 
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass"
                                   implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
@@ -135,7 +136,7 @@
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationNavigationItem"
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationPresentationProvider"/>
         <moduleRendererFactory implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationModuleRendererFactory"/>
-        
+
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonVariableRenameHandler"/>
         <renamePsiElementProcessor implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenamePsiProcessor"/>
