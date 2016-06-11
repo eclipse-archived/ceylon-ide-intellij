@@ -28,14 +28,21 @@ import com.intellij.psi.util {
     PsiTreeUtil
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    Class,
+    Value,
+    Function,
+    TypeDeclaration,
+    TypedDeclaration,
+    Interface
 }
 
 import java.lang {
     ObjectArray
 }
 import java.util {
-    Collections
+    Collections,
+    ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
@@ -51,6 +58,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 import com.redhat.ceylon.ide.common.util {
     types
 }
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
 
 shared class CeylonGotoSuperHandler()
         extends GotoTargetHandler()
@@ -59,10 +69,12 @@ shared class CeylonGotoSuperHandler()
     alias Source
         => CeylonPsi.SpecifierStatementPsi
          | CeylonPsi.AnyClassPsi
+         | CeylonPsi.AnyInterfacePsi
          | CeylonPsi.AnyAttributePsi
          | CeylonPsi.AnyMethodPsi
          | CeylonPsi.ObjectDefinitionPsi
-         | CeylonPsi.ConstructorPsi;
+         | CeylonPsi.ConstructorPsi
+         | CeylonPsi.EnumeratedPsi;
 
     featureUsedKey => GotoSuperAction.\iFEATURE_ID;
 
@@ -72,14 +84,17 @@ shared class CeylonGotoSuperHandler()
             else null;
 
     getChooserTitle(PsiElement sourceElement, String name, Integer length)
-            => CodeInsightBundle.message("goto.super.method.chooser.title");
+            => "Choose supertype";
 
     getFindUsagesTitle(PsiElement sourceElement, String name, Integer length)
             => CodeInsightBundle.message("goto.super.method.findUsages.title", name);
 
     getNotFoundMessage(Project project, Editor editor, PsiFile file)
-            => if (is CeylonPsi.AnyClassPsi source = findSource(editor, file))
-            then "No super classes found"
+            => let (source = findSource(editor, file))
+            if (is CeylonPsi.AnyClassPsi|CeylonPsi.AnyInterfacePsi|CeylonPsi.ObjectDefinitionPsi source)
+            then "No supertypes found"
+            else if (is CeylonPsi.ConstructorPsi|CeylonPsi.EnumeratedPsi source)
+            then "No delegated constructor found"
             else "No super implementation found";
 
     Source? findSource(Editor editor, PsiFile file) {
@@ -92,6 +107,7 @@ shared class CeylonGotoSuperHandler()
             }
             return PsiTreeUtil.getParentOfType(element,
                 javaClass<CeylonPsi.AnyClassPsi>(),
+                javaClass<CeylonPsi.AnyInterfacePsi>(),
                 javaClass<CeylonPsi.AnyAttributePsi>(),
                 javaClass<CeylonPsi.AnyMethodPsi>(),
                 javaClass<CeylonPsi.ConstructorPsi>(),
@@ -101,35 +117,81 @@ shared class CeylonGotoSuperHandler()
     }
 
     ObjectArray<PsiElement> findTargets(Source e) {
-        Declaration? target;
+        value list = ArrayList<Declaration>();
         if (is CeylonPsi.AnyMethodPsi e) {
-            target = types.getRefinedDeclaration(e.ceylonNode.declarationModel);
+            Function? meth = e.ceylonNode.declarationModel;
+            if (exists meth, exists target = types.getRefinedDeclaration(meth)) {
+                list.add(target);
+            }
         }
         else if (is CeylonPsi.AnyAttributePsi e) {
-            target = types.getRefinedDeclaration(e.ceylonNode.declarationModel);
+            TypedDeclaration? att = e.ceylonNode.declarationModel;
+            if (exists att, exists target = types.getRefinedDeclaration(att)) {
+                list.add(target);
+            }
         }
         else if (is CeylonPsi.AnyClassPsi e) {
-            target = e.ceylonNode.declarationModel.extendedType?.declaration;
+            Class? cla = e.ceylonNode.declarationModel;
+            if (exists cla) {
+                if (exists target = cla.extendedType ?. declaration) {
+                    list.add(target);
+                }
+                for (type in cla.satisfiedTypes) {
+                    list.add(type.declaration);
+                }
+            }
+        }
+        else if (is CeylonPsi.AnyInterfacePsi e) {
+            Interface? cla = e.ceylonNode.declarationModel;
+            if (exists cla) {
+                if (exists target = cla.extendedType ?. declaration) {
+                    list.add(target);
+                }
+                for (type in cla.satisfiedTypes) {
+                    list.add(type.declaration);
+                }
+            }
         }
         else if (is CeylonPsi.ObjectDefinitionPsi e) {
-            target = e.ceylonNode.anonymousClass.extendedType?.declaration;
+            Class? cla = e.ceylonNode.anonymousClass;
+            if (exists cla) {
+                if (exists target = cla.extendedType ?. declaration) {
+                    list.add(target);
+                }
+                for (type in cla.satisfiedTypes) {
+                    list.add(type.declaration);
+                }
+            }
         }
         else if (is CeylonPsi.ConstructorPsi e) {
-            target = e.ceylonNode.delegatedConstructor?.type?.typeModel?.declaration;
+            Tree.DelegatedConstructor? delegatedConstructor
+                    = e.ceylonNode.delegatedConstructor;
+            if (exists target
+                    = delegatedConstructor?.type?.typeModel?.declaration) {
+                list.add(target);
+            }
+        }
+        else if (is CeylonPsi.EnumeratedPsi e) {
+            Tree.DelegatedConstructor? delegatedConstructor
+                = e.ceylonNode.delegatedConstructor;
+            if (exists target
+                    = delegatedConstructor?.type?.typeModel?.declaration) {
+                list.add(target);
+            }
         }
         else {
-            target = e.ceylonNode.refined;
+            if (exists target = e.ceylonNode.refined) {
+                list.add(target);
+            }
         }
-        if (exists target,
-            exists targetNode
-                = CeylonReference.resolveDeclaration(target,e.project)) {
-            value array = ObjectArray<PsiElement>(1);
-            array.set(0, targetNode);
-            return array;
+        value result = ArrayList<PsiElement>();
+        for (target in list) {
+            if (exists targetNode
+                    = CeylonReference.resolveDeclaration(target, e.project)) {
+                result.add(targetNode);
+            }
         }
-        else {
-            return ObjectArray<PsiElement>(0);
-        }
+        return result.toArray(ObjectArray<PsiElement>(0));
     }
 
     startInWriteAction() => false;
