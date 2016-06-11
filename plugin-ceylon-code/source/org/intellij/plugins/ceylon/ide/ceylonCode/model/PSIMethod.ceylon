@@ -59,11 +59,12 @@ shared class PSIMethod(shared PsiMethod psi)
         } else {
             return doWithLock(() {
                     return psi.containingClass.findMethodsByName(psi.name, true).iterable.coalesced.filter(
-                        (m) => !m.modifierList.hasModifierProperty("static")
+                        (m) => (m == psi) || ( 
+                               !m.modifierList.hasModifierProperty("static")
                             && !m.modifierList.hasModifierProperty("private")
                             && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
                             && !MethodSignatureUtil.areOverrideEquivalent(psi, m)
-                    ).size > 1;
+                        )).size > 1;
             });
         }
     }
