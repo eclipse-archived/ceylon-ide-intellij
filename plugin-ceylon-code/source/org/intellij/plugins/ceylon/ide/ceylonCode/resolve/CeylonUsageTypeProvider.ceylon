@@ -30,29 +30,29 @@ shared class CeylonUsageTypeProvider() satisfies UsageTypeProvider {
                     else PsiTreeUtil.getParentOfType(el,
                 javaClass<QualifiedTypeExpressionPsi>())) {
             
-            return UsageType.\iCLASS_NEW_OPERATOR;
+            return UsageType.classNewOperator;
         }
         
         if (is ImportMemberPsi p = el.parent) {
-            return UsageType.\iCLASS_IMPORT;
+            return UsageType.classImport;
         }
         
         if (exists param = PsiTreeUtil.getParentOfType(el,
                 javaClass<TypeArgumentListPsi>())) {
             
-            return UsageType.\iTYPE_PARAMETER;
+            return UsageType.typeParameter;
         }
         
         if (exists param = PsiTreeUtil.getParentOfType(el,
                 javaClass<ValueParameterDeclarationPsi>())) {
             
-            return UsageType.\iCLASS_METHOD_PARAMETER_DECLARATION;
+            return UsageType.classMethodParameterDeclaration;
         }
         
         if (PsiTreeUtil.getParentOfType(el, javaClass<ExtendedTypePsi>()) exists
             || PsiTreeUtil.getParentOfType(el, javaClass<SatisfiedTypesPsi>()) exists) {
             
-            return UsageType.\iCLASS_EXTENDS_IMPLEMENTS_LIST;
+            return UsageType.classExtendsImplementsList;
         }
         
         return null;

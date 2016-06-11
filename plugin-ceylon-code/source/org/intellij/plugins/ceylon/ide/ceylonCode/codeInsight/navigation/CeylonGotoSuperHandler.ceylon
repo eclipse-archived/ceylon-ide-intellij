@@ -2,8 +2,8 @@ import ceylon.interop.java {
     javaClass
 }
 
-import com.intellij.codeInsight {
-    CodeInsightBundle
+import com.intellij.codeInsight.generation.actions {
+    PresentableCodeInsightActionHandler
 }
 import com.intellij.codeInsight.navigation {
     GotoTargetHandler
@@ -13,6 +13,9 @@ import com.intellij.codeInsight.navigation.actions {
 }
 import com.intellij.lang {
     LanguageCodeInsightActionHandler
+}
+import com.intellij.openapi.actionSystem {
+    Presentation
 }
 import com.intellij.openapi.editor {
     Editor
@@ -27,12 +30,16 @@ import com.intellij.psi {
 import com.intellij.psi.util {
     PsiTreeUtil
 }
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
+import com.redhat.ceylon.ide.common.util {
+    types
+}
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     Class,
-    Value,
     Function,
-    TypeDeclaration,
     TypedDeclaration,
     Interface
 }
@@ -52,20 +59,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
-    IdeaNavigation,
     CeylonReference
-}
-import com.redhat.ceylon.ide.common.util {
-    types
-}
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
-}
-import com.intellij.codeInsight.generation.actions {
-    PresentableCodeInsightActionHandler
-}
-import com.intellij.openapi.actionSystem {
-    Presentation
 }
 
 shared class CeylonGotoSuperHandler()
