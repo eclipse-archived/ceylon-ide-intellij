@@ -1,3 +1,7 @@
+import ceylon.collection {
+    ArrayList
+}
+
 import com.intellij.icons {
     AllIcons
 }
@@ -5,13 +9,17 @@ import com.intellij.openapi.util {
     IconLoader
 }
 import com.intellij.ui {
-    RowIcon
+    RowIcon,
+    LayeredIcon
 }
 import com.intellij.util {
     PlatformIcons
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
+}
+import com.redhat.ceylon.ide.common.model {
+    AnyModifiableSourceFile
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
@@ -38,22 +46,22 @@ shared object ideaIcons {
     shared Icon classes => PlatformIcons.classIcon;
     shared Icon abstractClasses => PlatformIcons.abstractClassIcon;
     shared Icon interfaces => PlatformIcons.interfaceIcon;
-    shared Icon objects => AllIcons.Nodes.anonymousClass;
+    shared Icon objects => PlatformIcons.anonymousClassIcon;
     shared Icon methods => PlatformIcons.methodIcon;
     shared Icon formalMethods => PlatformIcons.abstractMethodIcon;
     shared Icon attributes = PlatformIcons.fieldIcon;
     shared Icon enumerations = PlatformIcons.enumIcon;
     shared Icon exceptions = AllIcons.Nodes.exceptionClass;
     shared Icon abstractExceptions = AllIcons.Nodes.abstractException;
-    shared Icon annotationClasses = AllIcons.Nodes.annotationtype;
-    shared Icon param => AllIcons.Nodes.parameter;
+    shared Icon annotationClasses = PlatformIcons.annotationTypeIcon;
+    shared Icon param => PlatformIcons.parameterIcon;
     shared Icon local => IconLoader.getIcon("/icons/ceylonLocal.png");
-    shared Icon values => AllIcons.Nodes.variable;
+    shared Icon values => PlatformIcons.variableIcon;
     shared Icon formalValues => IconLoader.getIcon("/icons/formalValue.png");
     shared Icon anonymousFunction => AllIcons.Nodes.\ifunction;
+    shared Icon constructors => PlatformIcons.classInitializer;
+    shared Icon setters => PlatformIcons.classInitializer;
     shared Icon annotations => AllIcons.Gutter.extAnnotation;
-    shared Icon constructors => AllIcons.Nodes.classInitializer;
-    shared Icon setters => AllIcons.Nodes.classInitializer;
 
     shared Icon refinement => AllIcons.Gutter.implementingMethod;
     shared Icon extendedType => AllIcons.Gutter.overridingMethod;
@@ -82,7 +90,7 @@ shared object ideaIcons {
         case (is Tree.SpecifierStatement) (obj.declaration else obj)
         else obj;
 
-        value baseIcon 
+        value baseIcon
             = switch (decl)
             //models:
             case (is Interface)
@@ -127,7 +135,7 @@ shared object ideaIcons {
             case (is Tree.TypeAliasDeclaration)
                 types
             case (is Tree.SpecifierStatement)
-                (decl.baseMemberExpression is Tree.StaticMemberOrTypeExpression 
+                (decl.baseMemberExpression is Tree.StaticMemberOrTypeExpression
                     then values else methods)
             else
                 null;
@@ -139,21 +147,35 @@ shared object ideaIcons {
             else decl;
         
         if (exists icon = baseIcon, exists model) {
-            value layer = if (model.shared) then PlatformIcons.publicIcon
-                                            else PlatformIcons.privateIcon;
-            return createHorizontalIcon(icon, layer);
+            value decorations = ArrayList<Icon>();
+            value layer 
+                = if (model.shared) 
+                then PlatformIcons.publicIcon
+                else PlatformIcons.privateIcon;
+            value final 
+                = switch (model)
+                case (is Class) model.final
+//                case (is FunctionOrValue) model.classOrInterfaceMember && !model.actual
+                else false;
+            if (final) {
+                decorations.add(AllIcons.Nodes.finalMark);
+            }
+            value readonly
+                = model.toplevel 
+                && !model.unit is AnyModifiableSourceFile;
+            if (readonly) {
+                decorations.add(PlatformIcons.lockedIcon);
+            }
+            return createHorizontalIcon(decorations, icon, layer);
         }
         
         if (!baseIcon exists) {
             print("Missing icon for ``decl``");
         }
-        
+
         return baseIcon;
     }
 
-    Icon createHorizontalIcon(Icon *icons) {
-        value icon = RowIcon(icons.size, RowIcon.Alignment.center);
-        icons.indexed.each((idx -> ic) => icon.setIcon(ic, idx));
-        return icon;
-    }
+    Icon createHorizontalIcon(List<Icon> decorations, Icon icon, Icon visibility) 
+            => RowIcon(LayeredIcon(icon, *decorations), visibility);
 }
