@@ -10,6 +10,9 @@ import com.intellij.psi {
 import com.intellij.psi.search.searches {
     SuperMethodsSearch
 }
+import com.redhat.ceylon.model.loader {
+    AbstractModelLoader
+}
 import com.redhat.ceylon.model.loader.mirror {
     MethodMirror,
     TypeParameterMirror,
@@ -23,9 +26,6 @@ import java.util {
 }
 import com.intellij.psi.util {
     MethodSignatureUtil
-}
-import com.redhat.ceylon.model.loader {
-    AbstractModelLoader
 }
 
 shared class PSIMethod(shared PsiMethod psi)
@@ -60,10 +60,11 @@ shared class PSIMethod(shared PsiMethod psi)
             return false;
         } else {
             return doWithLock(() {
-                    return MethodSignatureUtil.getOverloads(psi).iterable.coalesced.filter(
+                    return psi.containingClass.findMethodsByName(psi.name, true).iterable.coalesced.filter(
                         (m) => !m.modifierList.hasModifierProperty("static")
                             && !m.modifierList.hasModifierProperty("private")
                             && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
+                            && !MethodSignatureUtil.areOverrideEquivalent(psi, m)
                     ).size > 1;
             });
         }

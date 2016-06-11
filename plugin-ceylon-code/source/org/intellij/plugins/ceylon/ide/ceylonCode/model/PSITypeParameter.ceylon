@@ -10,18 +10,28 @@ import com.intellij.psi {
     PsiTypeParameter,
     PsiNamedElement
 }
+import com.intellij.psi.impl.source {
+    PsiClassReferenceType
+}
 
-class PSITypeParameter(PsiTypeParameter psi) satisfies TypeParameterMirror {
+class PSITypeParameter(PsiTypeParameter|PsiClassReferenceType psi) satisfies TypeParameterMirror {
     
     shared actual List<TypeMirror> bounds = ArrayList<TypeMirror>();
 
-    doWithLock(() {
-        psi.extendsList.referencedTypes.array.coalesced.each(
-            (bound) => bounds.add(PSIType(bound))
-        );
-    });
+    if (is PsiTypeParameter psi) {
+        doWithLock(() {
+                psi.extendsList.referencedTypes.array.coalesced.each(
+                    (bound) => bounds.add(PSIType(bound))
+                );
+        });
+    }
 
-    shared actual String name = (psi of PsiNamedElement).name;
+    shared actual String name;
+    if (is PsiNamedElement psi) {
+        name = psi.name;
+    } else {
+        name = psi.className;
+    }
     
     string => "PSITypeParameter[``name``]";    
 }
