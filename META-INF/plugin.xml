@@ -140,7 +140,8 @@
 
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonVariableRenameHandler"/>
-        <codeInsight.implementMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.RefineFormalMembersAction"/>
+        <codeInsight.implementMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.ImplementMembersAction"/>
+        <codeInsight.overrideMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.OverrideMembersAction"/>
         <renamePsiElementProcessor implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenamePsiProcessor"/>
         <refactoring.elementListenerProvider implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringListener"/>
         <inlineActionHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.InlineAction"/>

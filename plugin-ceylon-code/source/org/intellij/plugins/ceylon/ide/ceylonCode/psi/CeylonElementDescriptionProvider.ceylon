@@ -8,7 +8,8 @@ import com.intellij.usageView {
     UsageViewShortNameLocation
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
+    Tree,
+    Node
 }
 import com.redhat.ceylon.model.typechecker.model {
     Function,
@@ -39,7 +40,62 @@ shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProv
 
 shared object ceylonDeclarationDescriptionProvider {
 
-    shared String? getDescription(CeylonCompositeElement element, 
+    shared String descriptionForDeclaration(Declaration decl,
+            Boolean includeKeyword = true,
+            Boolean includeContainer = true,
+            Boolean includeReturnType = true,
+            Unit unit = decl.unit) {
+        value result = StringBuilder();
+        if (includeKeyword) {
+                result.append(keyword(decl)).append(" ");
+            }
+        if (includeContainer) {
+                result.append(container(decl));
+            }
+        result.append(decl.name else "new")
+                .append(parameterLists(decl, unit));
+        if (includeReturnType,
+                is TypedDeclaration decl,
+                !ModelUtil.isConstructor(decl)) {
+                if (is Function decl, decl.declaredVoid) {
+                    //noop for void
+                }
+                else if (exists returnType = decl.type,
+                        !ModelUtil.isTypeUnknown(returnType)) {
+                    result.append(" ∊ ")
+                        .append(returnType.asString(unit));
+                }
+            }
+        return result.string;
+    }
+    
+    shared String descriptionForNode(Tree.Declaration node, Boolean includeKeyword = true) {
+        value result = StringBuilder();
+        if (includeKeyword) {
+            result.append(nodeKeyword(node)).append(" ");
+        }
+        result.append(node.identifier?.text else "new");
+        switch (node)
+        case (is Tree.AnyClass) {
+            if (exists pl = node.parameterList) {
+                appendTreeParameters(result, pl);
+            }
+        }
+        case (is Tree.AnyMethod) {
+            for (pl in node.parameterLists) {
+                appendTreeParameters(result, pl);
+            }
+        }
+        case (is Tree.Constructor) {
+            if (exists pl = node.parameterList) {
+                appendTreeParameters(result, pl);
+            }
+        }
+        else {}
+        return result.string;
+    }
+
+    shared String? getDescription(CeylonCompositeElement element,
         Boolean includeKeyword = true,
         Boolean includeContainer = true,
         Boolean includeReturnType = true) {
@@ -51,60 +107,16 @@ shared object ceylonDeclarationDescriptionProvider {
             else null;
 
         if (exists decl) {
-            value result = StringBuilder();
-
-            if (includeKeyword) {
-                result.append(keyword(decl)).append(" ");
-            }
-            if (includeContainer) {
-                result.append(container(decl));
-            }
-            result.append(decl.name else "new")
-                .append(parameterLists(decl, node.unit));
-
-            if (includeReturnType,
-                is TypedDeclaration decl,
-                !ModelUtil.isConstructor(decl)) {
-                if (is Function decl, decl.declaredVoid) {
-                    //noop for void
-                }
-                else if (exists returnType = decl.type,
-                        !ModelUtil.isTypeUnknown(returnType)) {
-                    result.append(" ∊ ")
-                        .append(returnType.asString(node.unit));
-                }
-            }
-
-            return result.string;
+            return descriptionForDeclaration {
+                decl = decl;
+                includeKeyword = includeKeyword;
+                includeContainer = includeContainer;
+                includeReturnType = includeReturnType;
+                unit = node.unit;
+            };
         }
         else if (is Tree.Declaration node) {
-            value result = StringBuilder();
-
-            if (includeKeyword) {
-                result.append(nodeKeyword(node)).append(" ");
-            }
-            
-            result.append(node.identifier?.text else "new");
-
-            switch (node)
-            case (is Tree.AnyClass) {
-                if (exists pl = node.parameterList) {
-                    appendTreeParameters(result, pl);
-                }
-            }
-            case (is Tree.AnyMethod) {
-                for (pl in node.parameterLists) {
-                    appendTreeParameters(result, pl);
-                }
-            }
-            case (is Tree.Constructor) {
-                if (exists pl = node.parameterList) {
-                    appendTreeParameters(result, pl);
-                }
-            }
-            else {}
-
-            return result.string;
+            return descriptionForNode(node, includeKeyword);
         }
         else {
             return null;
@@ -120,17 +132,18 @@ shared object ceylonDeclarationDescriptionProvider {
             return "new";
         }
         return switch (declaration)
-            case (is Class) "class"
             case (is Interface) "interface"
-            case (is Value) "value"
+            case (is Class) (declaration.objectClass then "object" else "class")
+            case (is Value) (ModelUtil.isObject(declaration) then "object" else "value")
+            case (is Function) (declaration.declaredVoid then "void" else "function")
             case (is TypeAlias) "alias"
             case (is Constructor) "new"
-            case (is Function) (declaration.declaredVoid then "void" else "function")
             else "";
     }
 
     String nodeKeyword(Tree.Declaration declaration)
             => switch (declaration)
+            case (is Tree.ObjectDefinition) "object"
             case (is Tree.AnyClass) "class"
             case (is Tree.AnyInterface) "interface"
             case (is Tree.AnyAttribute) "value"

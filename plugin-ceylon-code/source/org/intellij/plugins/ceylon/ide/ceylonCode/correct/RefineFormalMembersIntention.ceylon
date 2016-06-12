@@ -10,7 +10,6 @@ shared class RefineFormalMembersIntention() extends AbstractIntention() {
     
     familyName => "Refine formal members";
     
-    shared actual Anything checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
-        return refineFormalMembersQuickFix.addRefineFormalMembersProposal(data, false);
-    }
+    checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) 
+            => refineFormalMembersQuickFix.addRefineFormalMembersProposal(data, false);
 }
