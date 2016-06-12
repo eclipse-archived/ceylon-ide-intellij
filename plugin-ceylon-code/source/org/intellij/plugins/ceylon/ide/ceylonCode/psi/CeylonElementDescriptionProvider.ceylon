@@ -111,7 +111,7 @@ shared object ceylonDeclarationDescriptionProvider {
                 includeKeyword = includeKeyword;
                 includeContainer = includeContainer;
                 includeReturnType = includeReturnType;
-                unit = node.unit;
+                unit = node.unit else decl.unit;
             };
         }
         else if (is Tree.Declaration node) {
