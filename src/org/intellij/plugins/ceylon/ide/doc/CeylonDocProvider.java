@@ -72,7 +72,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     @Nullable
     @Override
     public String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
-        if (originalElement instanceof CeylonCompositeElement) {
+        if (element instanceof CeylonCompositeElement) {
             String str = toJavaString(provider.getDescription((CeylonCompositeElement) element));
             if (str != null) {
                 return highlighter.highlight(str, element.getProject())
