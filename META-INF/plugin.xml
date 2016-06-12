@@ -138,7 +138,7 @@
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationPresentationProvider"/>
         <moduleRendererFactory implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationModuleRendererFactory"/>
 
-        <typeHierarchyProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.CeylonTypeHierarchyProvider"/>
+        <typeHierarchyProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.hierarchy.CeylonTypeHierarchyProvider"/>
 
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonVariableRenameHandler"/>

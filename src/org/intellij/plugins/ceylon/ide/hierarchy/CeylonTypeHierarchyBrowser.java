@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide;
+package org.intellij.plugins.ceylon.ide.hierarchy;
 
 import com.intellij.ide.hierarchy.HierarchyBrowserManager;
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor;
