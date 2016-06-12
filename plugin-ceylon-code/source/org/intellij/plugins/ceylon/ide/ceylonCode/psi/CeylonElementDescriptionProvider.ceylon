@@ -121,9 +121,9 @@ shared object ceylonDeclarationDescriptionProvider {
             case (is Class) "class"
             case (is Interface) "interface"
             case (is Value) "value"
-            case (is Function) "function"
             case (is TypeAlias) "alias"
             case (is Constructor) "new"
+            case (is Function) (declaration.declaredVoid then "void" else "function")
             else "";
     }
 
@@ -132,9 +132,9 @@ shared object ceylonDeclarationDescriptionProvider {
             case (is Tree.AnyClass) "class"
             case (is Tree.AnyInterface) "interface"
             case (is Tree.AnyAttribute) "value"
-            case (is Tree.AnyMethod) "function"
             case (is Tree.TypeAliasDeclaration) "alias"
             case (is Tree.Constructor|Tree.Enumerated) "new"
+            case (is Tree.AnyMethod) (declaration.type is Tree.VoidModifier then "void" else "function")
             else "";
 
     String parameterLists(Declaration decl, Unit unit) {
