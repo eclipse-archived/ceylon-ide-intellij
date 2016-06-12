@@ -23,9 +23,6 @@ import com.intellij.psi {
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
-import com.redhat.ceylon.compiler.typechecker.io {
-    VirtualFile
-}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree,
     Node
@@ -45,13 +42,9 @@ import java.lang {
     JString=String
 }
 import java.util {
-    List,
     ArrayList
 }
 
-import org.antlr.runtime {
-    CommonToken
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
     IdeaTextChange
