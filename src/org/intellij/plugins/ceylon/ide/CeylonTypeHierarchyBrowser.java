@@ -44,10 +44,10 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         final CeylonPsi.ClassOrInterfacePsi element =
                 (CeylonPsi.ClassOrInterfacePsi) psiElement;
         if (SUPERTYPES_HIERARCHY_TYPE.equals(typeName)) {
-            return new SubtypeHierarchyTreeStructure(element);
+            return new SupertypesHierarchyTreeStructure(element);
         }
         else if (SUBTYPES_HIERARCHY_TYPE.equals(typeName)) {
-            return new SupertypeHierarchyTreeStructure(element);
+            return new SubtypesHierarchyTreeStructure(element);
         }
         else if (TYPE_HIERARCHY_TYPE.equals(typeName)) {
             return null;
@@ -161,8 +161,8 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
     }
 
-    private class SubtypeHierarchyTreeStructure extends HierarchyTreeStructure {
-        public SubtypeHierarchyTreeStructure(CeylonPsi.ClassOrInterfacePsi element) {
+    private class SupertypesHierarchyTreeStructure extends HierarchyTreeStructure {
+        public SupertypesHierarchyTreeStructure(CeylonPsi.ClassOrInterfacePsi element) {
             super(CeylonTypeHierarchyBrowser.this.project, new TypeHierarchyNodeDescriptor(element));
         }
 
@@ -197,10 +197,10 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
     }
 
-    private class SupertypeHierarchyTreeStructure extends HierarchyTreeStructure {
+    private class SubtypesHierarchyTreeStructure extends HierarchyTreeStructure {
         private final Set<Module> modules;
 
-        private SupertypeHierarchyTreeStructure(CeylonPsi.ClassOrInterfacePsi element) {
+        private SubtypesHierarchyTreeStructure(CeylonPsi.ClassOrInterfacePsi element) {
             super(CeylonTypeHierarchyBrowser.this.project, new TypeHierarchyNodeDescriptor(element));
             modules = collectModules();
         }
