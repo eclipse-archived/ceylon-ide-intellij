@@ -26,7 +26,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 shared class CeylonTypeDeclarationProvider() satisfies TypeDeclarationProvider {
 
     shared actual ObjectArray<PsiElement>? getSymbolTypeDeclarations(PsiElement psiElement) {
-        TypeDeclaration? typeDec;
+        TypeDeclaration typeDec;
         if (is CeylonPsi.StaticMemberOrTypeExpressionPsi psiElement,
             is TypedDeclaration dec = psiElement.ceylonNode.declaration,
             exists type = dec.type,
