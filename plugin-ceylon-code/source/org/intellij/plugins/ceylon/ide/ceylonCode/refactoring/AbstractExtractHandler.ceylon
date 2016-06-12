@@ -65,13 +65,14 @@ import com.intellij.openapi.actionSystem.impl {
 
 shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandler {
 
-    shared formal TextRange? extract(Project project, Editor editor, PsiFile file, TextRange range);
-
+    shared formal TextRange? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope);
+    
+    shared default void extractToScope(Project myProject, Editor editor, CeylonFile file, TextRange range) 
+            => createAndIntroduceValue(myProject, editor, file, range, null);
+    
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile, DataContext dataContext) {
-        if (is CeylonFile psiFile,
-            exists _ = psiFile.ensureTypechecked(),
-            exists range = selectValueToExtract(project, editor, psiFile)) {
-            createAndIntroduceValue(project, editor, psiFile, range);
+        if (is CeylonFile psiFile, psiFile.ensureTypechecked() exists) {
+            extractSelectedExpression(project, editor, psiFile);
         }
     }
 
@@ -79,46 +80,45 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         // Do nothing
     }
 
-    TextRange? selectValueToExtract(Project project, Editor editor, PsiFile file) {
+    void extractSelectedExpression(Project project, Editor editor, CeylonFile file) {
+        
         if (editor.selectionModel.selectionStart < editor.selectionModel.selectionEnd) {
-            return TextRange(editor.selectionModel.selectionStart, editor.selectionModel.selectionEnd);
+            value textRange 
+                = TextRange(editor.selectionModel.selectionStart, 
+                            editor.selectionModel.selectionEnd);
+            extractToScope(project, editor, file, textRange);
         }
+        else {
+            value visitor = FindContainingExpressionsVisitor(editor.caretModel.offset);
+            visitor.visitAny(PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()).ceylonNode);
 
-        value visitor = FindContainingExpressionsVisitor(editor.caretModel.offset);
-        visitor.visitAny(PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()).ceylonNode);
-
-        value allParentExpressions = toPsi(file, visitor.elements);
-        if (allParentExpressions.empty) {
-            return null;
-        } else if (allParentExpressions.size() == 1) {
-            return allParentExpressions.get(0).textRange;
-        } else {
-            IntroduceTargetChooser.showChooser(
-                editor,
-                allParentExpressions,
-                object extends Pass<CeylonPsi.TermPsi>() {
-                    shared actual void pass(CeylonPsi.TermPsi selectedValue) {
-                        createAndIntroduceValue(project, editor, file, selectedValue.textRange);
-                    }
-                },
-                object satisfies Function<CeylonPsi.TermPsi,JString> {
-                    shared actual JString fun(CeylonPsi.TermPsi element) {
-                        return JString(element.text);
-                    }
-                },
-                "Expressions");
+            value allParentExpressions = toPsi(file, visitor.elements);
+            if (allParentExpressions.empty) { 
+                //noop
+            } 
+            else if (allParentExpressions.size() == 1) {
+                extractToScope(project, editor, file, allParentExpressions.get(0).textRange);
+            }
+            else {
+                IntroduceTargetChooser.showChooser(editor,
+                    allParentExpressions,
+                    object extends Pass<CeylonPsi.TermPsi>() {
+                        pass(CeylonPsi.TermPsi selectedValue)
+                                => extractToScope(project, editor, file, selectedValue.textRange);
+                    },
+                    object satisfies Function<CeylonPsi.TermPsi,JString> {
+                        fun(CeylonPsi.TermPsi element) => JString(element.text);
+                    },
+                    "Select expression");
+            }
         }
-        return null;
     }
 
-    void createAndIntroduceValue(Project _project, Editor editor, PsiFile file, TextRange range) {
-        assert (is CeylonFile ceylonFile = file);
+    shared void createAndIntroduceValue(Project _project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? ceylonNode) {
 
-        if (exists newIdentifier = extract(_project, editor, file, range)) {
+        if (exists newIdentifier = extract(_project, editor, file, range, ceylonNode)) {
             object extends WriteCommandAction<Nothing>(_project, file) {
-                shared actual void run(Result<Nothing> result) {
-                    ceylonFile.forceReparse();
-                }
+                run(Result<Nothing> result) => file.forceReparse();
             }.execute();
 
             PsiElement? identifierElement = file.findElementAt(newIdentifier.startOffset);
@@ -143,8 +143,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
 
     List<CeylonPsi.TermPsi> toPsi(PsiFile file, ObjectArray<Tree.Term> elements) {
         value psi = ArrayList<CeylonPsi.TermPsi>();
-
-        for (Tree.Term term in elements) {
+        for (term in elements) {
             value visitor = FindMatchingPsiNodeVisitor(term, javaClass<CeylonPsi.TermPsi>());
             visitor.visitFile(file);
 

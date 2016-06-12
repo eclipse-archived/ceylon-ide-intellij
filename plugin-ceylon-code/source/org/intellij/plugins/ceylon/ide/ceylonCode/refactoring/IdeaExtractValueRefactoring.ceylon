@@ -65,8 +65,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 
 shared class ExtractValueHandler() extends AbstractExtractHandler() {
 
-    shared actual TextRange? extract(Project project, Editor editor, PsiFile file, TextRange range) {
-        assert(is CeylonFile file);
+    shared actual TextRange? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
         assert(exists node = nodes.findNode {
             node = file.compilationUnit;
             tokens = file.tokens;
