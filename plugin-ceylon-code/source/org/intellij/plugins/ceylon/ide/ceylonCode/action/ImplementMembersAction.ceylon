@@ -171,6 +171,7 @@ shared class ImplementMembersAction()
                 ceylonDeclarationDescriptionProvider.descriptionForDeclaration {
                     decl = container;
                     includeContainer = false;
+                    includeKeyword = false;
                 },
                 ideaIcons.forDeclaration(container)) {
         hash => container.hash;
@@ -185,6 +186,7 @@ shared class ImplementMembersAction()
                 ceylonDeclarationDescriptionProvider.descriptionForDeclaration {
                     decl = declaration;
                     includeContainer = false;
+                    includeKeyword = false;
                 },
                 ideaIcons.forDeclaration(declaration))
             satisfies ClassMember {
