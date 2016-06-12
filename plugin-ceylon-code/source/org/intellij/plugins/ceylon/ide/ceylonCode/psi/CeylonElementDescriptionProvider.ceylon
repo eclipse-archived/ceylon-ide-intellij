@@ -41,7 +41,8 @@ shared object ceylonDeclarationDescriptionProvider {
 
     shared String? getDescription(CeylonCompositeElement element, 
         Boolean includeKeyword = true,
-        Boolean includeContainer = true) {
+        Boolean includeContainer = true,
+        Boolean includeReturnType = true) {
         value node = element.ceylonNode;
         value decl =
             switch (node)
@@ -61,7 +62,8 @@ shared object ceylonDeclarationDescriptionProvider {
             result.append(decl.name else "new")
                 .append(parameterLists(decl, node.unit));
 
-            if (is TypedDeclaration decl,
+            if (includeReturnType,
+                is TypedDeclaration decl,
                 !ModelUtil.isConstructor(decl)) {
                 if (is Function decl, decl.declaredVoid) {
                     //noop for void

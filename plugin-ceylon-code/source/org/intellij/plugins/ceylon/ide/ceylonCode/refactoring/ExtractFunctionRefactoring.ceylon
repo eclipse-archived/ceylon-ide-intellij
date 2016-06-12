@@ -36,7 +36,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
 import com.redhat.ceylon.ide.common.refactoring {
-    createExtractFunctionRefactoring
+    createExtractFunctionRefactoring,
+    DefaultRegion
 }
 
 import java.lang {
@@ -94,7 +95,11 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
     
     function containerLabel(CeylonPsi.DeclarationPsi element)
             => if (exists container = findContainer(element),
-                   exists desc = ceylonDeclarationDescriptionProvider.getDescription(container, true, true))
+                   exists desc
+                       = ceylonDeclarationDescriptionProvider.getDescription {
+                           element = container;
+                           includeReturnType = false;
+                       })
             then javaString(desc)
             else javaString("package " + element.ceylonNode.unit.\ipackage.qualifiedNameString);
 
@@ -138,7 +143,7 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
         
     }
     
-    shared actual default TextRange? extract(Project proj, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
+    shared actual default [TextRange+]? extract(Project proj, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
         
         value refactoring = createExtractFunctionRefactoring {
             doc = IdeaDocument(editor.document);
@@ -153,8 +158,8 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
 
         if (exists refactoring) {
 
-            return object extends WriteCommandAction<TextRange?>(proj, file) {
-                shared actual void run(Result<TextRange?> result) {
+            return object extends WriteCommandAction<[TextRange+]?>(proj, file) {
+                shared actual void run(Result<[TextRange+]?> result) {
 
                     switch (change = refactoring.build())
                     case (is IdeaTextChange) {
@@ -165,10 +170,12 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
                     }
                     else {}
 
-                    if (exists reg = refactoring.decRegion) {
-                        editor.selectionModel.setSelection(reg.start, reg.end);
-                        value range = TextRange.from(reg.start, reg.length);
-                        value newId = editor.document.getText(range);
+                    function textRange(DefaultRegion r) => TextRange.from(r.start, r.length);
+
+                    if (exists dec = refactoring.decRegion,
+                        exists ref = refactoring.refRegion) {
+                        editor.selectionModel.setSelection(dec.start, dec.end);
+                        value newId = editor.document.getText(textRange(dec));
 
                         for (dupe in refactoring.dupeRegions) {
                             editor.document.replaceString(
@@ -177,7 +184,7 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
                                 JString(newId));
                         }
 
-                        result.setResult(range);
+                        result.setResult([dec, ref, for (dupe in refactoring.dupeRegions) dupe].collect(textRange));
                     }
 
                     PsiDocumentManager.getInstance(project).commitAllDocuments();

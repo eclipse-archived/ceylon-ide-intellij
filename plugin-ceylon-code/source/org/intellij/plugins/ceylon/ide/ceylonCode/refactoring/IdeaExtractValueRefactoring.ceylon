@@ -58,7 +58,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 
 shared class ExtractValueHandler() extends AbstractExtractHandler() {
 
-    shared actual TextRange? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
+    shared actual [TextRange+]? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
         assert(exists node = nodes.findNode {
             node = file.compilationUnit;
             tokens = file.tokens;
@@ -109,29 +109,29 @@ class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node node)
     
     newRegion(Integer start, Integer length) => TextRange.from(start, length);
 
-    shared TextRange? extractInFile(Project myProject, PsiFile file) {
+    shared [TextRange+]? extractInFile(Project myProject, PsiFile file) {
         value document = editor.document;
         value tfc = IdeaTextChange(IdeaDocument(document));
         build(tfc);
 
-        return object extends WriteCommandAction<TextRange?>(myProject, file) {
-            shared actual void run(Result<TextRange?> result) {
+        return object extends WriteCommandAction<[TextRange+]?>(myProject, file) {
+            shared actual void run(Result<[TextRange+]?> result) {
                 tfc.apply();
 
-                if (exists reg = decRegion) {
-                    editor.selectionModel.setSelection(reg.startOffset, reg.endOffset);
-                    value newId = document.getText(reg);
+                if (exists dec = decRegion, exists ref = refRegion) {
+                    editor.selectionModel.setSelection(dec.startOffset, dec.endOffset);
+                    value newId = document.getText(dec);
                     for (dupe in dupeRegions) {
                         document.replaceString(
                             dupe.startOffset, 
                             dupe.endOffset, 
                             JString(newId));
                     }
+                    result.setResult([dec, ref, for (dupe in dupeRegions) dupe]);
                 }
 
                 PsiDocumentManager.getInstance(project).commitAllDocuments();
-                
-                result.setResult(decRegion);
+
             }
         }.execute().resultObject;
     }
