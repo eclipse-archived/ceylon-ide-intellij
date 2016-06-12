@@ -50,7 +50,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             return new SubtypesHierarchyTreeStructure(element);
         }
         else if (TYPE_HIERARCHY_TYPE.equals(typeName)) {
-            return null;
+            return new TypeHierarchyTreeStructure(element);
         }
         else {
             return null;
@@ -71,7 +71,8 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     @Override
     protected boolean isInterface(PsiElement psiElement) {
-        return psiElement instanceof CeylonPsi.AnyInterfacePsi;
+        return false;
+//        return psiElement instanceof CeylonPsi.AnyInterfacePsi;
     }
 
     @Override
@@ -118,11 +119,38 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             CeylonProject.Modules modules = ceylonProjects.getProject(mod).getModules();
             result.addAll(modules.getTypecheckerModules().getListOfModules());
         }
+        System.out.println(result);
         return result;
+    }
+
+    private TypeHierarchyNodeDescriptor build(CeylonPsi.ClassOrInterfacePsi element) {
+        Type extendedType =
+                element.getCeylonNode()
+                        .getDeclarationModel()
+                        .getExtendedType();
+        if (extendedType == null) {
+            return new TypeHierarchyNodeDescriptor(element);
+        }
+        else {
+            PsiElement psiElement
+                    = CeylonReference.resolveDeclaration(extendedType.getDeclaration(), project);
+            if (psiElement instanceof CeylonPsi.ClassOrInterfacePsi) {
+                TypeHierarchyNodeDescriptor parentDescriptor =
+                        build((CeylonPsi.ClassOrInterfacePsi) psiElement);
+                TypeHierarchyNodeDescriptor nodeDescriptor =
+                        new TypeHierarchyNodeDescriptor(parentDescriptor, element);
+                parentDescriptor.children = new TypeHierarchyNodeDescriptor[] { nodeDescriptor };
+                return nodeDescriptor;
+            }
+            else {
+                return new TypeHierarchyNodeDescriptor(element);
+            }
+        }
     }
 
     private class TypeHierarchyNodeDescriptor extends HierarchyNodeDescriptor {
         private CeylonPsi.TypeDeclarationPsi element;
+        private TypeHierarchyNodeDescriptor[] children;
 
         private TypeHierarchyNodeDescriptor(@NotNull CeylonPsi.TypeDeclarationPsi element) {
             super(project, null, element, true);
@@ -162,7 +190,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
     }
 
     private class SupertypesHierarchyTreeStructure extends HierarchyTreeStructure {
-        public SupertypesHierarchyTreeStructure(CeylonPsi.ClassOrInterfacePsi element) {
+        private SupertypesHierarchyTreeStructure(CeylonPsi.ClassOrInterfacePsi element) {
             super(CeylonTypeHierarchyBrowser.this.project, new TypeHierarchyNodeDescriptor(element));
         }
 
@@ -209,7 +237,10 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         @Override
         protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor parent) {
             TypeHierarchyNodeDescriptor descriptor = (TypeHierarchyNodeDescriptor) parent;
-            List<HierarchyNodeDescriptor> result = new ArrayList<HierarchyNodeDescriptor>();
+            if (descriptor.children!=null) {
+                return descriptor.children;
+            }
+            List<TypeHierarchyNodeDescriptor> result = new ArrayList<>();
             TypeDeclaration model = descriptor.element.getCeylonNode().getDeclarationModel();
             if (model!=null) {
                 for (Module module : modules) {
@@ -245,7 +276,76 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                     }
                 }
             }
-            return result.toArray(new HierarchyNodeDescriptor[0]);
+            TypeHierarchyNodeDescriptor[] children
+                    = result.toArray(new TypeHierarchyNodeDescriptor[0]);
+            descriptor.children = children;
+            return children;
+        }
+    }
+
+    /*private TypeHierarchyNodeDescriptor root(TypeHierarchyNodeDescriptor child) {
+        TypeHierarchyNodeDescriptor parentDescriptor =
+                (TypeHierarchyNodeDescriptor)
+                        child.getParentDescriptor();
+        return parentDescriptor == null ? child : root(parentDescriptor);
+    }*/
+
+    private class TypeHierarchyTreeStructure extends HierarchyTreeStructure {
+        private final Set<Module> modules;
+
+        private TypeHierarchyTreeStructure(CeylonPsi.ClassOrInterfacePsi element) {
+            super(project, build(element));
+            modules = collectModules();
+            setBaseElement(myBaseDescriptor);
+        }
+
+        @NotNull
+        @Override
+        protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor parent) {
+            TypeHierarchyNodeDescriptor descriptor = (TypeHierarchyNodeDescriptor) parent;
+            if (descriptor.children!=null) {
+                return descriptor.children;
+            }
+            List<TypeHierarchyNodeDescriptor> result = new ArrayList<>();
+            TypeDeclaration model = descriptor.element.getCeylonNode().getDeclarationModel();
+            if (model!=null) {
+                for (Module module : modules) {
+                    for (Package pack : new ArrayList<Package>(module.getPackages())) {
+                        for (Unit unit : pack.getUnits()) {
+                            for (Declaration declaration : unit.getDeclarations()) {
+                                if (declaration instanceof ClassOrInterface) {
+                                    ClassOrInterface ci = (ClassOrInterface) declaration;
+                                    Type extendedType = ci.getExtendedType();
+                                    if (extendedType != null) {
+                                        if (extendedType.getDeclaration().equals(model)) {
+                                            PsiElement psiElement
+                                                    = CeylonReference.resolveDeclaration(ci, project);
+                                            if (psiElement instanceof CeylonPsi.TypeDeclarationPsi) {
+                                                result.add(new TypeHierarchyNodeDescriptor(descriptor,
+                                                        (CeylonPsi.TypeDeclarationPsi) psiElement));
+                                            }
+                                        }
+                                    }
+                                    for (Type satisfiedType : ci.getSatisfiedTypes()) {
+                                        if (satisfiedType.getDeclaration().equals(model)) {
+                                            PsiElement psiElement
+                                                    = CeylonReference.resolveDeclaration(ci, project);
+                                            if (psiElement instanceof CeylonPsi.TypeDeclarationPsi) {
+                                                result.add(new TypeHierarchyNodeDescriptor(descriptor,
+                                                        (CeylonPsi.TypeDeclarationPsi) psiElement));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            TypeHierarchyNodeDescriptor[] children
+                    = result.toArray(new TypeHierarchyNodeDescriptor[0]);
+            descriptor.children = children;
+            return children;
         }
     }
 

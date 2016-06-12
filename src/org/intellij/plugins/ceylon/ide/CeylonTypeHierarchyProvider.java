@@ -16,7 +16,7 @@ public class CeylonTypeHierarchyProvider implements HierarchyProvider {
     @Override
     public void browserActivated(@NotNull HierarchyBrowser hierarchyBrowser) {
         ((CeylonTypeHierarchyBrowser)hierarchyBrowser)
-                .changeView(CeylonTypeHierarchyBrowser.SUBTYPES_HIERARCHY_TYPE);
+                .changeView(CeylonTypeHierarchyBrowser.TYPE_HIERARCHY_TYPE);
     }
 
     @Nullable
