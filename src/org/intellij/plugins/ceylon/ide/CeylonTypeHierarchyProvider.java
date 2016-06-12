@@ -12,10 +12,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CeylonTypeHierarchyProvider implements HierarchyProvider {
+
     @Override
     public void browserActivated(@NotNull HierarchyBrowser hierarchyBrowser) {
         ((CeylonTypeHierarchyBrowser)hierarchyBrowser)
-                .changeView(CeylonTypeHierarchyBrowser.SUPERTYPES_HIERARCHY_TYPE);
+                .changeView(CeylonTypeHierarchyBrowser.SUBTYPES_HIERARCHY_TYPE);
     }
 
     @Nullable
