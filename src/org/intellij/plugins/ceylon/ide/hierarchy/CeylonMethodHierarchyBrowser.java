@@ -115,6 +115,10 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private TypeHierarchyNodeDescriptor build(CeylonPsi.TypedDeclarationPsi element) {
         TypedDeclaration model = element.getCeylonNode().getDeclarationModel();
+        if (model==null) {
+            //TODO: should not really happen, but it does...
+            return new TypeHierarchyNodeDescriptor(element);
+        }
         Declaration refined = model.getRefinedDeclaration();
         if (refined == null || refined.equals(model)) {
             return new TypeHierarchyNodeDescriptor(element);
@@ -156,6 +160,7 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             this.element = element;
             myName = element.getCeylonNode().getIdentifier().getText();
         }
+
         private TypeHierarchyNodeDescriptor(@NotNull NodeDescriptor parentDescriptor,
                                            @NotNull CeylonPsi.TypedDeclarationPsi element) {
             super(project, parentDescriptor, element, false);

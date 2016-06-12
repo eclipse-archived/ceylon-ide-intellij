@@ -51,15 +51,16 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         for (com.intellij.openapi.module.Module mod: ModuleManager.getInstance(project).getModules()) {
             CeylonProject<com.intellij.openapi.module.Module, VirtualFile, VirtualFile, VirtualFile> cp
                     = ceylonProjects.getProject(mod);
-            CeylonProject.Modules modules = cp.getModules();
-            TypeChecker typechecker = cp.getTypechecker();
-            if (typechecker!=null) {
-                result.addAll(typechecker.getPhasedUnits().getPhasedUnits());
-            }
-            for (Module m: modules.getTypecheckerModules().getListOfModules()) {
-                result.addAll(new JavaCollection<PhasedUnit>(null,
-                        ((IdeModule) m).getPhasedUnits().sequence()));
-
+            if (cp!=null) {
+                CeylonProject.Modules modules = cp.getModules();
+                TypeChecker typechecker = cp.getTypechecker();
+                if (typechecker != null) {
+                    result.addAll(typechecker.getPhasedUnits().getPhasedUnits());
+                }
+                for (Module m : modules.getTypecheckerModules().getListOfModules()) {
+                    result.addAll(new JavaCollection<PhasedUnit>(null,
+                            ((IdeModule) m).getPhasedUnits().sequence()));
+                }
             }
         }
 
