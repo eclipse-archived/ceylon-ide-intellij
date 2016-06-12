@@ -8,8 +8,7 @@ import com.intellij.usageView {
     UsageViewShortNameLocation
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree,
-    Node
+    Tree
 }
 import com.redhat.ceylon.model.typechecker.model {
     Function,
@@ -47,25 +46,25 @@ shared object ceylonDeclarationDescriptionProvider {
             Unit unit = decl.unit) {
         value result = StringBuilder();
         if (includeKeyword) {
-                result.append(keyword(decl)).append(" ");
-            }
+            result.append(keyword(decl)).append(" ");
+        }
         if (includeContainer) {
-                result.append(container(decl));
-            }
+            result.append(container(decl));
+        }
         result.append(decl.name else "new")
                 .append(parameterLists(decl, unit));
         if (includeReturnType,
-                is TypedDeclaration decl,
-                !ModelUtil.isConstructor(decl)) {
-                if (is Function decl, decl.declaredVoid) {
-                    //noop for void
-                }
-                else if (exists returnType = decl.type,
-                        !ModelUtil.isTypeUnknown(returnType)) {
-                    result.append(" ∊ ")
-                        .append(returnType.asString(unit));
-                }
+            is TypedDeclaration decl,
+            !ModelUtil.isConstructor(decl)) {
+            if (is Function decl, decl.declaredVoid) {
+                //noop for void
             }
+            else if (exists returnType = decl.type,
+                    !ModelUtil.isTypeUnknown(returnType)) {
+                result.append(" ∊ ")
+                    .append(returnType.asString(unit));
+            }
+        }
         return result.string;
     }
     
