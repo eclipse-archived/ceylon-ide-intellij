@@ -35,6 +35,9 @@ import java.lang {
 import java.util {
     StringTokenizer
 }
+import com.intellij.openapi.roots.ui.util {
+    CompositeAppearance
+}
 
 shared object highlighter {
 
@@ -85,6 +88,28 @@ shared object highlighter {
         });
     }
 
+    "Highlights a message that contains code snippets in single quotes, and add colored
+     fragments to the given [[appearance]]."
+    shared void highlightCompositeAppearance(CompositeAppearance appearance, String description, Project project,
+            Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
+
+        value data = appearance.ending;
+        iterateTokens(description, eliminateQuotes, (token, highlight) {
+            switch(highlight)
+            case (is Boolean) {
+                highlightInternal(token, project, qualifiedNameIsPath, (token, attrs) {
+                    data.addText(token, SimpleTextAttributes.fromTextAttributes(attrs));
+                });
+            }
+            case (is TextAttributes) {
+                data.addText(token, SimpleTextAttributes.fromTextAttributes(highlight));
+            }
+            else {
+                data.addText(token, SimpleTextAttributes.regularAttributes);
+            }
+        });
+    }
+
     "Highlights a snippet of Ceylon code and returns its HTML representation *without*
      surrounding `<html>` tags."
     shared String highlight(String rawText, Project project, Boolean qualifiedNameIsPath = false) {
@@ -101,29 +126,29 @@ shared object highlighter {
         Anything(String, <TextAttributes|Boolean>?) consume) {
 
         value tokens = StringTokenizer(description, "'\"", true);
-        consume(tokens.nextToken(), null);
+//        consume(tokens.nextToken(), null);
 
         value stringAttrs = textAttributes(ceylonHighlightingColors.strings);
 
         while (tokens.hasMoreTokens()) {
             variable String tok = tokens.nextToken();
-            if (tok.equals("\'")) {
+            if (tok=="'") {
                 if (!eliminateQuotes) {
                     consume(tok, null);
                 }
                 while (tokens.hasMoreTokens()) {
                     variable String token = tokens.nextToken();
-                    if (token.equals("\'")) {
+                    if (token=="'") {
                         if (!eliminateQuotes) {
                             consume(token, null);
                         }
                         break;
-                    } else if (token.equals("\"")) {
+                    } else if (token=="\"") {
                         consume(token, stringAttrs);
                         while (tokens.hasMoreTokens()) {
                             value quoted = tokens.nextToken();
                             consume(quoted, stringAttrs);
-                            if (quoted.equals("\"")) {
+                            if (quoted=="\"") {
                                 break;
                             }
                         }

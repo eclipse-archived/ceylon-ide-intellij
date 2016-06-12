@@ -15,6 +15,7 @@ import com.intellij.openapi.util.Comparing;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.model.typechecker.model.Type;
 import com.redhat.ceylon.model.typechecker.model.TypeDeclaration;
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference;
@@ -115,11 +116,13 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         private TypeHierarchyNodeDescriptor(@NotNull CeylonPsi.TypeDeclarationPsi element) {
             super(project, null, element, true);
             this.element = element;
+            myName = element.getCeylonNode().getDeclarationModel().getName();
         }
         private TypeHierarchyNodeDescriptor(@NotNull NodeDescriptor parentDescriptor,
                                            @NotNull CeylonPsi.TypeDeclarationPsi element) {
             super(project, parentDescriptor, element, false);
             this.element = element;
+            myName = element.getCeylonNode().getDeclarationModel().getName();
         }
 
         @Override
@@ -128,9 +131,8 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             final CompositeAppearance oldText = myHighlightedText;
             myHighlightedText = new CompositeAppearance();
             String description =
-                    provider.getDescription(element, false)
-                            .toString();
-            myHighlightedText.getEnding().addText(description);
+                    "'" + provider.getDescription(element, false) + "'";
+            highlighter_.get_().highlightCompositeAppearance(myHighlightedText, description, project);
             String pname = element.getCeylonNode().getUnit().getPackage().getQualifiedNameString();
             myHighlightedText.getEnding().addText(" (" + pname + ")", getPackageNameAttributes());
             if (!Comparing.equal(myHighlightedText, oldText)) {
