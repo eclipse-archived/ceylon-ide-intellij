@@ -81,57 +81,66 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
         return psi;
     }
 
-    shared actual void extractToScope(Project myProject, Editor editor, CeylonFile file, TextRange range) {
-        
-        object containerFinder extends Visitor() {
-            shared List<Tree.Declaration> declarations =
-                ArrayList<Tree.Declaration>();
+    function findContainer(CeylonPsi.DeclarationPsi element) {
+        assert (is CeylonPsi.DeclarationPsi? result 
+            = PsiTreeUtil.findFirstParent(element,
+                    object satisfies Condition<PsiElement> {
+                        \ivalue(PsiElement cand)
+                                => cand is CeylonPsi.DeclarationPsi
+                                && cand!=element;
+                    }));
+        return result;
+    }
+    
+    function containerLabel(CeylonPsi.DeclarationPsi element)
+            => if (exists container = findContainer(element),
+                   exists desc = ceylonDeclarationDescriptionProvider.getDescription(container, true, true))
+            then javaString(desc)
+            else javaString("package " + element.ceylonNode.unit.\ipackage.qualifiedNameString);
 
+    shared actual void extractToScope(Project project, Editor editor, CeylonFile file, TextRange range) {
+
+        value declarations = ArrayList<Tree.Declaration>();
+        
+        file.compilationUnit.visit(object extends Visitor() {
             shared actual void visit(Tree.Declaration that) {
                 if (that.startIndex.intValue()<=range.startOffset,
-                        that.endIndex.intValue()>=range.endOffset) {
-                        super.visit(that);
+                    that.endIndex.intValue()>=range.endOffset) {
+                    super.visit(that);
                     if (!that is Tree.AttributeDeclaration) {
                         declarations.add(that);
                     }
                 }
             }
-        }
-        file.compilationUnit.visit(containerFinder);
+        });
         
-        if (containerFinder.declarations.size()>1) {
-            \IceylonDeclarationDescriptionProvider provider
-                = ceylonDeclarationDescriptionProvider;
+        if (declarations.size()>1) {
             IntroduceTargetChooser.showChooser(editor,
-                toPsi(file, containerFinder.declarations),
+                toPsi(file, declarations),
                 object extends Pass<CeylonPsi.DeclarationPsi>() {
                     pass(CeylonPsi.DeclarationPsi selectedValue)
-                            => createAndIntroduceValue(myProject, editor, file, range, selectedValue.ceylonNode);
+                            => createAndIntroduceValue { 
+                                proj = project;
+                                editor = editor;
+                                file = file;
+                                range = range;
+                                ceylonNode = selectedValue.ceylonNode;
+                            };
                 },
                 object satisfies Function<CeylonPsi.DeclarationPsi,JString> {
-                    fun(CeylonPsi.DeclarationPsi element)
-                            => if (is CeylonPsi.DeclarationPsi container
-                                        = PsiTreeUtil.findFirstParent(element,
-                                            object satisfies Condition<PsiElement> {
-                                                \ivalue(PsiElement cand)
-                                                        => cand is CeylonPsi.DeclarationPsi
-                                                        && cand!=element;
-                                            }),
-                                    exists desc = provider.getDescription(container, true, true))
-                                then javaString(desc)
-                                else javaString("package " + element.ceylonNode.unit.\ipackage.qualifiedNameString);
+                    fun(CeylonPsi.DeclarationPsi element) => containerLabel(element);
                 },
                 "Select target scope");
         }
         else {
-            super.extractToScope(myProject, editor, file, range);
+            super.extractToScope(project, editor, file, range);
         }
         
     }
     
-    shared actual default TextRange? extract(Project myProject, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
+    shared actual default TextRange? extract(Project proj, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
         
-        value refacto = createExtractFunctionRefactoring {
+        value refactoring = createExtractFunctionRefactoring {
             doc = IdeaDocument(editor.document);
             selectionStart = range.startOffset;
             selectionEnd = range.endOffset;
@@ -142,27 +151,30 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
             vfile = file.phasedUnit.unitFile;
         };
 
-        if (exists refacto) {
+        if (exists refactoring) {
 
-            return object extends WriteCommandAction<TextRange?>(myProject, file) {
+            return object extends WriteCommandAction<TextRange?>(proj, file) {
                 shared actual void run(Result<TextRange?> result) {
 
-                    switch (change = refacto.build())
+                    switch (change = refactoring.build())
                     case (is IdeaTextChange) {
-                        change.applyOnProject(myProject);
+                        change.applyOnProject(proj);
                     }
                     case (is IdeaCompositeChange) {
-                        change.applyChanges(myProject);
+                        change.applyChanges(proj);
                     }
                     else {}
 
-                    if (exists reg = refacto.decRegion) {
-                        value range = TextRange.from(reg.start, reg.length);
+                    if (exists reg = refactoring.decRegion) {
                         editor.selectionModel.setSelection(reg.start, reg.end);
+                        value range = TextRange.from(reg.start, reg.length);
                         value newId = editor.document.getText(range);
 
-                        for (dupe in refacto.dupeRegions) {
-                            editor.document.replaceString(dupe.start, dupe.start + dupe.length, JString(newId));
+                        for (dupe in refactoring.dupeRegions) {
+                            editor.document.replaceString(
+                                dupe.start, 
+                                dupe.start + dupe.length, 
+                                JString(newId));
                         }
 
                         result.setResult(range);

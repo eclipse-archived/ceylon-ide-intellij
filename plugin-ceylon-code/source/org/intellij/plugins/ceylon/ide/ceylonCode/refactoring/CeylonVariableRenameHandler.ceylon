@@ -36,15 +36,14 @@ shared class CeylonVariableRenameHandler(Boolean forceInplace = false)
         extends VariableInplaceRenameHandler() {
 
     shared actual VariableInplaceRenamer createRenamer(PsiElement elementToRename, Editor editor) {
-        value file = elementToRename.containingFile;
-
-        assert(is PsiNamedElement elementToRename);
+        assert (is PsiNamedElement elementToRename);
 
         return object extends VariableInplaceRenamer(elementToRename, editor) {
+            
             shared actual void finish(Boolean success) {
                 super.finish(success);
 
-                if (success, is CeylonFile file) {
+                if (success, is CeylonFile file = elementToRename.containingFile) {
                     object extends WriteCommandAction<Nothing>(myProject, file) {
                         shared actual void run(Result<Nothing> result) {
                             file.forceReparse();
@@ -69,10 +68,9 @@ shared class CeylonVariableRenameHandler(Boolean forceInplace = false)
         if (forceInplace) {
             return true;
         }
-        if (exists context = file.findElementAt(editor.caretModel.offset),
-            exists element,
+        if (exists element,
+            exists context = file.findElementAt(editor.caretModel.offset),
             context.containingFile != element.containingFile) {
-
             return false;
         }
 

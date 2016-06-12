@@ -66,10 +66,16 @@ import com.intellij.openapi.actionSystem.impl {
 shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandler {
 
     shared formal TextRange? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope);
-    
-    shared default void extractToScope(Project myProject, Editor editor, CeylonFile file, TextRange range) 
-            => createAndIntroduceValue(myProject, editor, file, range, null);
-    
+
+    shared default void extractToScope(Project project, Editor editor, CeylonFile file, TextRange range)
+            => createAndIntroduceValue {
+                proj = project;
+                editor = editor;
+                file = file;
+                range = range;
+                ceylonNode = null;
+            };
+
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile, DataContext dataContext) {
         if (is CeylonFile psiFile, psiFile.ensureTypechecked() exists) {
             extractSelectedExpression(project, editor, psiFile);
@@ -81,30 +87,43 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
     }
 
     void extractSelectedExpression(Project project, Editor editor, CeylonFile file) {
-        
+
         if (editor.selectionModel.selectionStart < editor.selectionModel.selectionEnd) {
-            value textRange 
-                = TextRange(editor.selectionModel.selectionStart, 
-                            editor.selectionModel.selectionEnd);
-            extractToScope(project, editor, file, textRange);
+            extractToScope {
+                project = project;
+                editor = editor;
+                file = file;
+                range = TextRange(editor.selectionModel.selectionStart,
+                                  editor.selectionModel.selectionEnd);
+            };
         }
         else {
             value visitor = FindContainingExpressionsVisitor(editor.caretModel.offset);
             visitor.visitAny(PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()).ceylonNode);
 
             value allParentExpressions = toPsi(file, visitor.elements);
-            if (allParentExpressions.empty) { 
+            if (allParentExpressions.empty) {
                 //noop
-            } 
+            }
             else if (allParentExpressions.size() == 1) {
-                extractToScope(project, editor, file, allParentExpressions.get(0).textRange);
+                extractToScope {
+                    project = project;
+                    editor = editor;
+                    file = file;
+                    range = allParentExpressions.get(0).textRange;
+                };
             }
             else {
                 IntroduceTargetChooser.showChooser(editor,
                     allParentExpressions,
                     object extends Pass<CeylonPsi.TermPsi>() {
                         pass(CeylonPsi.TermPsi selectedValue)
-                                => extractToScope(project, editor, file, selectedValue.textRange);
+                                => extractToScope {
+                            project = project;
+                            editor = editor;
+                            file = file;
+                            range = selectedValue.textRange;
+                        };
                     },
                     object satisfies Function<CeylonPsi.TermPsi,JString> {
                         fun(CeylonPsi.TermPsi element) => JString(element.text);
@@ -114,10 +133,10 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         }
     }
 
-    shared void createAndIntroduceValue(Project _project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? ceylonNode) {
+    shared void createAndIntroduceValue(Project proj, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? ceylonNode) {
 
-        if (exists newIdentifier = extract(_project, editor, file, range, ceylonNode)) {
-            object extends WriteCommandAction<Nothing>(_project, file) {
+        if (exists newIdentifier = extract(proj, editor, file, range, ceylonNode)) {
+            object extends WriteCommandAction<Nothing>(proj, file) {
                 run(Result<Nothing> result) => file.forceReparse();
             }.execute();
 
@@ -137,7 +156,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             myDataContext.put(JString(CommonDataKeys.psiFile.name), file);
             myDataContext.put(JString(LangDataKeys.psiElementArray.name), createJavaObjectArray<PsiElement>({ inserted }));
             value handler = CeylonVariableRenameHandler(true);
-            handler.invoke(_project, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
+            handler.invoke(proj, editor, file, SimpleDataContext.getSimpleContext(myDataContext, null));
         }
     }
 

@@ -73,36 +73,26 @@ shared class ExtractValueHandler() extends AbstractExtractHandler() {
             endOffset = range.endOffset;
         });
 
-        value refacto = IdeaExtractValueRefactoring(file, editor, node);
+        value refactoring = IdeaExtractValueRefactoring(file, editor, node);
         value name = nodes.nameProposals(node).first;
-        refacto.newName = name;
-
-        return refacto.extractInFile(project, file);
+        refactoring.newName = name;
+        return refactoring.extractInFile(project, file);
     }
 }
 
-class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node _node)
+class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node node)
         satisfies ExtractValueRefactoring<TextRange> {
 
     editorPhasedUnit => file.phasedUnit;
 
-    shared actual List<PhasedUnit> getAllUnits() => ArrayList<PhasedUnit>();
-    shared actual Boolean searchInFile(PhasedUnit pu) => false;
-    shared actual Boolean searchInEditor() => false;
-    shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
+    getAllUnits() => ArrayList<PhasedUnit>();
+    searchInFile(PhasedUnit pu) => false;
+    searchInEditor() => false;
+    rootNode => file.compilationUnit;
+    
     shared variable actual Boolean canBeInferred = false;
     shared actual variable Type? type = null;
     shared actual variable Boolean getter = false;
-
-    shared actual List<TextRange> dupeRegions => ArrayList<TextRange>();
-
-    shared actual EditorData editorData => object satisfies EditorData {
-        shared actual List<CommonToken> tokens => file.tokens;
-        shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
-        shared actual Node node => _node;
-        shared actual VirtualFile? sourceVirtualFile
-                => VirtualFileVirtualFile(file.virtualFile, ModuleUtil.findModuleForFile(file.virtualFile, file.project));
-    };
 
     shared variable actual String? internalNewName = "";
     shared actual variable Boolean explicitType = false;
@@ -111,7 +101,20 @@ class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node _node)
     shared actual variable TextRange? decRegion = null;
     shared actual variable TextRange? refRegion = null;
 
-    shared actual TextRange newRegion(Integer start, Integer length) => TextRange.from(start, length);
+    inSameProject(Declaration decl) => true; // TODO
+    
+    dupeRegions = ArrayList<TextRange>();
+
+    editorData => object satisfies EditorData {
+        tokens => file.tokens;
+        rootNode => file.compilationUnit;
+        node => outer.node;
+        sourceVirtualFile
+                => VirtualFileVirtualFile(file.virtualFile, 
+                    ModuleUtil.findModuleForFile(file.virtualFile, file.project));
+    };
+    
+    newRegion(Integer start, Integer length) => TextRange.from(start, length);
 
     shared TextRange? extractInFile(Project myProject, PsiFile file) {
         value document = editor.document;
@@ -126,7 +129,10 @@ class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node _node)
                     editor.selectionModel.setSelection(reg.startOffset, reg.endOffset);
                     value newId = document.getText(reg);
                     for (dupe in dupeRegions) {
-                        document.replaceString(dupe.startOffset, dupe.endOffset, JString(newId));
+                        document.replaceString(
+                            dupe.startOffset, 
+                            dupe.endOffset, 
+                            JString(newId));
                     }
                 }
 
@@ -136,5 +142,5 @@ class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node _node)
             }
         }.execute().resultObject;
     }
-    shared actual Boolean inSameProject(Declaration decl) => true; // TODO
+    
 }
