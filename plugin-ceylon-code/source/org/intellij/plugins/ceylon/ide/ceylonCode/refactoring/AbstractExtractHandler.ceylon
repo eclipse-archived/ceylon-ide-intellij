@@ -1,6 +1,7 @@
 import ceylon.interop.java {
     javaClass,
-    createJavaObjectArray
+    createJavaObjectArray,
+    JavaCollection
 }
 
 import com.intellij.openapi.actionSystem {
@@ -25,11 +26,16 @@ import com.intellij.openapi.project {
 }
 import com.intellij.openapi.util {
     Pass,
-    TextRange
+    TextRange,
+    Pair
 }
 import com.intellij.psi {
     PsiElement,
-    PsiFile
+    PsiFile,
+    PsiNamedElement
+}
+import com.intellij.psi.search {
+    SearchScope
 }
 import com.intellij.psi.util {
     PsiTreeUtil
@@ -37,6 +43,10 @@ import com.intellij.psi.util {
 import com.intellij.refactoring {
     IntroduceTargetChooser,
     RefactoringActionHandler
+}
+import com.intellij.refactoring.rename.inplace {
+    VariableInplaceRenameHandler,
+    VariableInplaceRenamer
 }
 import com.intellij.util {
     Function
@@ -159,7 +169,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             myDataContext.put(JString(CommonDataKeys.psiFile.name), file);
             myDataContext.put(JString(LangDataKeys.psiElementArray.name), createJavaObjectArray<PsiElement>({ inserted }));
             value context = SimpleDataContext.getSimpleContext(myDataContext, null);
-            CeylonVariableRenameHandler(true, usages).invoke(proj, editor, file, context);
+            ExtractedVariableRenameHandler(usages).invoke(proj, editor, file, context);
         }
     }
 
@@ -177,4 +187,37 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         }
         return psi;
     }
+}
+
+class ExtractedVariableRenameHandler(TextRange[] usages = [])
+        extends VariableInplaceRenameHandler() {
+
+    isAvailable(PsiElement? element, Editor editor, PsiFile file) => true;
+    
+    shared actual VariableInplaceRenamer createRenamer(PsiElement elementToRename, Editor editor) {
+        assert (is PsiNamedElement elementToRename);
+
+        return object extends VariableInplaceRenamer(elementToRename, editor) {
+
+            shared actual void finish(Boolean success) {
+                super.finish(success);
+                if (success, is CeylonFile file = elementToRename.containingFile) {
+                    object extends WriteCommandAction<Nothing>(myProject, file) {
+                        run(Result<Nothing> result) => file.forceReparse();
+                    }.execute();
+                }
+            }
+
+            collectAdditionalElementsToRename(List<Pair<PsiElement,TextRange>> stringUsages)
+                    => noop();
+
+            collectRefs(SearchScope referencesSearchScope)
+                    => JavaCollection(usages.collect((r)
+                        => elementToRename.containingFile
+                            .findReferenceAt(r.startOffset)));
+
+            checkLocalScope() => elementToRename.containingFile;
+        };
+    }
+    
 }
