@@ -18,9 +18,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
         ...
     }
 }
-import java.lang {
-    Class
-}
 
 shared class CeylonUsageTypeProvider() satisfies UsageTypeProvider {
 

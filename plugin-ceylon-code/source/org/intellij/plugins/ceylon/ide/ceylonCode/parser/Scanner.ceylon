@@ -10,6 +10,11 @@ import com.intellij.psi.tree {
 import com.redhat.ceylon.compiler.typechecker.parser {
     CeylonLexer
 }
+
+import java.lang {
+    CharSequence
+}
+
 import org.antlr.runtime {
     ANTLRStringStream,
     CommonToken,
@@ -19,20 +24,11 @@ import org.antlr.runtime {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     TokenTypes
 }
-import org.jetbrains.annotations {
-    NotNull
-}
-import java.lang {
-    CharSequence
-}
-import ceylon.interop.java {
-    javaString
-}
 
 shared class CeylonAntlrToIntellijLexerAdapter() extends LexerBase() {
 
-    late CharSequence buffer;
-    late Lexer lexer;
+    variable late CharSequence buffer;
+    variable late Lexer lexer;
     
     variable Integer endOffset = -1;
     variable CommonToken? myToken = null;

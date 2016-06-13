@@ -94,11 +94,11 @@
         <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.CeylonFileTypeFactory"/>
         <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.parser.CeylonParserDefinition"/>
 
-        <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonHighlighterFactory"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonSyntaxAnnotator"/>
         <externalAnnotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.annotator.CeylonTypeCheckerAnnotator"/>
-        <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonFileHighlightFilter"/>
-        <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonColorSettingsPage"/>
+        <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonFileHighlightFilter"/>
+        <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonColorSettingsPage"/>
         <additionalTextAttributes scheme="Default" file="colorSchemes/CeylonDefault.xml"/>
         <additionalTextAttributes scheme="Darcula" file="colorSchemes/CeylonDarcula.xml"/>
 

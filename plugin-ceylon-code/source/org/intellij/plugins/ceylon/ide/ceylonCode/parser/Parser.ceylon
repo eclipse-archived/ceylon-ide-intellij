@@ -3,22 +3,20 @@ import com.intellij.lang {
     ParserDefinition,
     PsiParser
 }
-import com.intellij.lexer {
-    Lexer
-}
 import com.intellij.openapi.project {
     Project
 }
 import com.intellij.psi {
-    FileViewProvider,
-    PsiElement,
-    PsiFile
+    FileViewProvider
 }
 import com.intellij.psi.tree {
-    IElementType,
-    IFileElementType,
     TokenSet
 }
+
+import java.lang {
+    UnsupportedOperationException
+}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsiFactory,
@@ -30,12 +28,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub {
     CeylonStubTypes
-}
-import org.jetbrains.annotations {
-    NotNull
-}
-import java.lang {
-    UnsupportedOperationException
 }
 
 shared class CeylonParserDefinition() satisfies ParserDefinition {
