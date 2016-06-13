@@ -28,7 +28,6 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
                                final VirtualFile srcRoot, final String eventPackage,
                                final PsiDirectory eventPsiDir) {
 
-
         final String packageName = Messages.showInputDialog(
                 e.getProject(),
                 message("ceylon.package.wizard.message"),

@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide.wizard;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBTextField;
 import com.redhat.ceylon.model.typechecker.model.Module;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
@@ -15,26 +15,23 @@ import java.util.Set;
 
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterables.all;
-import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageNameIsLegal;
-import static org.intellij.plugins.ceylon.ide.validate.NameValidator.unitNameIsLegal;
 import static java.util.Arrays.asList;
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
+import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageNameIsLegal;
+import static org.intellij.plugins.ceylon.ide.validate.NameValidator.unitNameIsLegal;
 
 public class CreateCeylonModuleWizard extends DialogWrapper {
     private final IdeaCeylonProject project;
     private JPanel contentPane;
     private JTextField moduleName;
     private JTextField moduleVersion;
-    private JCheckBox sharedPackage;
     private JTextField compilationUnit;
-    private JPanel headerPane;
 
     public CreateCeylonModuleWizard(@NotNull Project project, @Nullable IdeaCeylonProject ceylonProject) {
         super(project, true);
         this.project = ceylonProject;
 
         setTitle(message("ceylon.module.wizard.title"));
-        headerPane.setBackground(JBColor.WHITE);
         init();
     }
 
@@ -99,8 +96,9 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
         return compilationUnit.getText();
     }
 
-    public boolean isSharedPackage() {
-        return sharedPackage.isSelected();
+    private void createUIComponents() {
+        JBTextField compilationUnit = new JBTextField();
+        compilationUnit.getEmptyText().setText("No runnable compilation unit");
+        this.compilationUnit = compilationUnit;
     }
-
 }
