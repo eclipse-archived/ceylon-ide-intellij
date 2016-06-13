@@ -10,6 +10,8 @@ import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.SourceComparator;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.module.*;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.util.CompositeAppearance;
 import com.intellij.openapi.util.Comparing;
@@ -41,24 +43,37 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         this.project = project;
     }
 
-    static Set<PhasedUnit> collectPhasedUnits(Project project) {
-        Set<PhasedUnit> result = new HashSet<>();
-        IdeaCeylonProjects ceylonProjects = project.getComponent(IdeaCeylonProjects.class);
-        for (com.intellij.openapi.module.Module mod: ModuleManager.getInstance(project).getModules()) {
-            CeylonProject<com.intellij.openapi.module.Module, VirtualFile, VirtualFile, VirtualFile> cp
-                    = ceylonProjects.getProject(mod);
-            if (cp!=null) {
-                CeylonProject.Modules modules = cp.getModules();
-                TypeChecker typechecker = cp.getTypechecker();
-                if (typechecker != null) {
-                    result.addAll(typechecker.getPhasedUnits().getPhasedUnits());
-                }
-                for (Module m : modules.getTypecheckerModules().getListOfModules()) {
-                    result.addAll(new JavaCollection<PhasedUnit>(null,
-                            ((IdeModule) m).getPhasedUnits().sequence()));
-                }
-            }
-        }
+    static Set<PhasedUnit> collectPhasedUnits(final Project project) {
+        final Set<PhasedUnit> result = new HashSet<>();
+        ProgressManager.getInstance()
+                .runProcessWithProgressSynchronously(new Runnable() {
+             @Override
+             public void run() {
+                 ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
+                 IdeaCeylonProjects ceylonProjects = project.getComponent(IdeaCeylonProjects.class);
+                 for (com.intellij.openapi.module.Module mod:
+                         ModuleManager.getInstance(project).getModules()) {
+                     indicator.setText("Indexing project " + mod.getName() + "...");
+                     indicator.setIndeterminate(true);
+                     CeylonProject ceylonProject = ceylonProjects.getProject(mod);
+                     if (ceylonProject!=null) {
+                         CeylonProject.Modules modules = ceylonProject.getModules();
+                         Set<Module> listOfModules = modules.getTypecheckerModules().getListOfModules();
+                         TypeChecker typechecker = ceylonProject.getTypechecker();
+                         if (typechecker != null) {
+                             result.addAll(typechecker.getPhasedUnits().getPhasedUnits());
+                         }
+                         int size = listOfModules.size();
+                         for (Module m : listOfModules) {
+                             indicator.setText2("Indexing module " + m.getNameAsString());
+                             IdeModule ideModule = (IdeModule) m;
+                             result.addAll(new JavaCollection<PhasedUnit>(null,
+                                     ideModule.getPhasedUnits().sequence()));
+                         }
+                     }
+                 }
+             }
+         }, "Indexing Hierarchy", true, project);
 
         return result;
     }
