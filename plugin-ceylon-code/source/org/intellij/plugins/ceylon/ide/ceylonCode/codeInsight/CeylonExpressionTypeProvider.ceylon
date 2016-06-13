@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    javaClass
+}
+
 import com.intellij.lang {
     ExpressionTypeProvider
 }
@@ -5,33 +9,19 @@ import com.intellij.openapi.util.text {
     StringUtil
 }
 import com.intellij.psi {
-    PsiClass,
-    PsiElement,
-    PsiElementVisitor,
-    PsiType
+    PsiElement
 }
 import com.intellij.psi.util {
-    PsiTreeUtil,
-    PsiUtil
+    PsiTreeUtil
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Type
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonPsi
-}
-import org.jetbrains.annotations {
-    NotNull
-}
+
 import java.util {
     ArrayList,
     List
 }
-import ceylon.interop.java {
-    javaClass
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonPsi
 }
 
 shared class CeylonExpressionTypeProvider() extends ExpressionTypeProvider<CeylonPsi.TermPsi>() {

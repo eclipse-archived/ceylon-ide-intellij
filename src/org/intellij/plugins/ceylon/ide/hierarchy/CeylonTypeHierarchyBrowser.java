@@ -163,19 +163,20 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
     }
 
     private class TypeHierarchyNodeDescriptor extends HierarchyNodeDescriptor {
-        private CeylonPsi.TypeDeclarationPsi element;
         private TypeHierarchyNodeDescriptor[] children;
 
         private TypeHierarchyNodeDescriptor(@NotNull CeylonPsi.TypeDeclarationPsi element) {
             super(project, null, element, true);
-            this.element = element;
             myName = element.getCeylonNode().getIdentifier().getText();
         }
         private TypeHierarchyNodeDescriptor(@NotNull NodeDescriptor parentDescriptor,
                                            @NotNull CeylonPsi.TypeDeclarationPsi element) {
             super(project, parentDescriptor, element, false);
-            this.element = element;
             myName = element.getCeylonNode().getIdentifier().getText();
+        }
+
+        private CeylonPsi.TypeDeclarationPsi getTypedDeclarationPsi() {
+            return (CeylonPsi.TypeDeclarationPsi) super.getPsiElement();
         }
 
         @Override
@@ -183,11 +184,12 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             boolean changes = super.update();
             final CompositeAppearance oldText = myHighlightedText;
             myHighlightedText = new CompositeAppearance();
+            CeylonPsi.TypeDeclarationPsi psi = getTypedDeclarationPsi();
             String description =
-                    "'" + descriptions_.get_().descriptionForPsi(element, false) + "'";
+                    "'" + descriptions_.get_().descriptionForPsi(psi, false) + "'";
             highlighter_.get_()
                     .highlightCompositeAppearance(myHighlightedText, description, project);
-            Unit unit = element.getCeylonNode().getUnit();
+            Unit unit = psi.getCeylonNode().getUnit();
             if (unit!=null) {
                 String qualifiedNameString =
                         unit.getPackage()
@@ -211,9 +213,13 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         @NotNull
         @Override
         protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor parent) {
-            TypeHierarchyNodeDescriptor descriptor = (TypeHierarchyNodeDescriptor) parent;
+            TypeHierarchyNodeDescriptor descriptor =
+                    (TypeHierarchyNodeDescriptor) parent;
             List<HierarchyNodeDescriptor> result = new ArrayList<HierarchyNodeDescriptor>();
-            TypeDeclaration model = descriptor.element.getCeylonNode().getDeclarationModel();
+            TypeDeclaration model =
+                    descriptor.getTypedDeclarationPsi()
+                            .getCeylonNode()
+                            .getDeclarationModel();
             if (model!=null) {
                 Type cl = model.getExtendedType();
                 if (cl != null) {
@@ -250,12 +256,16 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         @NotNull
         @Override
         protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor parent) {
-            TypeHierarchyNodeDescriptor descriptor = (TypeHierarchyNodeDescriptor) parent;
+            TypeHierarchyNodeDescriptor descriptor =
+                    (TypeHierarchyNodeDescriptor) parent;
             if (descriptor.children!=null) {
                 return descriptor.children;
             }
             List<TypeHierarchyNodeDescriptor> result = new ArrayList<>();
-            TypeDeclaration model = descriptor.element.getCeylonNode().getDeclarationModel();
+            TypeDeclaration model =
+                    descriptor.getTypedDeclarationPsi()
+                            .getCeylonNode()
+                            .getDeclarationModel();
             if (model!=null) {
                 for (PhasedUnit unit : modules) {
                     for (Declaration declaration : unit.getDeclarations()) {
@@ -312,12 +322,16 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         @NotNull
         @Override
         protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor parent) {
-            TypeHierarchyNodeDescriptor descriptor = (TypeHierarchyNodeDescriptor) parent;
+            TypeHierarchyNodeDescriptor descriptor =
+                    (TypeHierarchyNodeDescriptor) parent;
             if (descriptor.children!=null) {
                 return descriptor.children;
             }
             List<TypeHierarchyNodeDescriptor> result = new ArrayList<>();
-            TypeDeclaration model = descriptor.element.getCeylonNode().getDeclarationModel();
+            TypeDeclaration model =
+                    descriptor.getTypedDeclarationPsi()
+                            .getCeylonNode()
+                            .getDeclarationModel();
             if (model!=null) {
                 for (PhasedUnit unit : modules) {
                     for (Declaration declaration : unit.getDeclarations()) {
