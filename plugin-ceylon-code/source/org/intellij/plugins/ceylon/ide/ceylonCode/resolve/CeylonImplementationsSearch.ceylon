@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    CeylonIterable,
-    CeylonSet
+    CeylonIterable
 }
 
 import com.intellij.openapi.application {
@@ -90,7 +89,7 @@ shared class CeylonImplementationsSearch()
             case (is TypeDeclaration) {
                 value vis = FindSubtypesVisitor(decl);
                 pu.compilationUnit.visit(vis);
-                declarationNodes = CeylonSet(vis.declarationNodes);
+                declarationNodes = vis.declarationNodes;
             }
             case (is TypedDeclaration) {
                 value vis = FindRefinementsVisitor(decl);
