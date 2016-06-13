@@ -44,8 +44,8 @@ shared class ImportAliasReferencesSearch() extends
         QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters>() {
 
     shared actual void processQuery(ReferencesSearch.SearchParameters params, Processor<PsiReference> consumer) {
-        if (is PsiNameIdentifierOwner toSearch = params.elementToSearch) {
-            value name = toSearch.name;
+        if (is PsiNameIdentifierOwner toSearch = params.elementToSearch, 
+                exists name = toSearch.name) {
             value helper = ServiceManager.getService(params.project, javaClass<PsiSearchHelper>());
             value scope = params.effectiveSearchScope;
             value processor = object satisfies TextOccurenceProcessor {
