@@ -34,7 +34,7 @@ shared class CeylonIconProvider() extends IconProvider() {
     shared actual Icon? getIcon(PsiElement element, Integer flags) {
         switch (element)
         case (is CeylonFile) {
-            String fileName = (element).name;
+            String fileName = element.name;
             if (fileName==ModuleManager.packageFile) {
                 return ideaIcons.packages;
             } else if (fileName==ModuleManager.moduleFile) {

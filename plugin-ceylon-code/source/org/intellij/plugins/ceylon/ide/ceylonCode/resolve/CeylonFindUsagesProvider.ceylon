@@ -71,7 +71,7 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
                 then "attribute" else "value";
         } else if (is CeylonPsi.AnyMethodPsi element) {
             CeylonPsi.AnyMethodPsi methodPsi = element;
-            for (Tree.Annotation a in methodPsi.ceylonNode.annotationList.annotations) {
+            for (a in methodPsi.ceylonNode.annotationList.annotations) {
                 if (a.primary.token.text.equals("annotation")) {
                     return "annotation";
                 }
