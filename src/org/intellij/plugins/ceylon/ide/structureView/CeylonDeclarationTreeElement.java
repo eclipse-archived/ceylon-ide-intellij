@@ -8,9 +8,6 @@ import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.LocationPresentation;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiTypeElement;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.ui.UIUtil;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -31,9 +28,6 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
         SortableTreeElement, AccessLevelProvider {
 
     private boolean isInherited;
-
-    private descriptions_ provider =
-            descriptions_.get_();
 
     CeylonDeclarationTreeElement(Decl psiElement, boolean isInherited) {
         super(psiElement);
@@ -122,7 +116,7 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
     @Nullable
     @Override
     public String getPresentableText() {
-        return toJavaString(provider.getDescription(getElement(), false, false));
+        return toJavaString(descriptions_.get_().descriptionForPsi(getElement(), false, false));
     }
 
     @NotNull

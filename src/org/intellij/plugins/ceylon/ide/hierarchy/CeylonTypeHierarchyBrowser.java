@@ -1,7 +1,6 @@
 package org.intellij.plugins.ceylon.ide.hierarchy;
 
 import ceylon.interop.java.JavaCollection;
-import ceylon.interop.java.JavaIterable;
 import com.intellij.ide.hierarchy.HierarchyBrowserManager;
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor;
 import com.intellij.ide.hierarchy.HierarchyTreeStructure;
@@ -22,7 +21,6 @@ import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.ide.common.model.IdeModule;
 import com.redhat.ceylon.model.typechecker.model.*;
 import com.redhat.ceylon.model.typechecker.model.Module;
-import com.redhat.ceylon.model.typechecker.model.Package;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -36,8 +34,6 @@ import java.util.*;
 
 public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
 
-    descriptions_ provider =
-            descriptions_.get_();
     private Project project;
 
     CeylonTypeHierarchyBrowser(Project project, PsiElement element) {
@@ -188,7 +184,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             final CompositeAppearance oldText = myHighlightedText;
             myHighlightedText = new CompositeAppearance();
             String description =
-                    "'" + provider.getDescription(element, false) + "'";
+                    "'" + descriptions_.get_().descriptionForPsi(element, false) + "'";
             highlighter_.get_()
                     .highlightCompositeAppearance(myHighlightedText, description, project);
             Unit unit = element.getCeylonNode().getUnit();

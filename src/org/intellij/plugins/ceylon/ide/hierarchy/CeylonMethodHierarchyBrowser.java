@@ -174,7 +174,7 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             final CompositeAppearance oldText = myHighlightedText;
             myHighlightedText = new CompositeAppearance();
             String description =
-                    "'" + provider.getDescription(element, false) + "'";
+                    "'" + provider.descriptionForPsi(element, false) + "'";
             highlighter_.get_()
                     .highlightCompositeAppearance(myHighlightedText, description, project);
             Unit unit = element.getCeylonNode().getUnit();
