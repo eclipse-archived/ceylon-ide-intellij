@@ -75,14 +75,38 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     ideaIcons
 }
-
-shared class OverrideMembersAction() extends ImplementMembersAction() {
-    proposable(Declaration member) => member.formal || member.default;
+import com.intellij.codeInsight.generation.actions {
+    PresentableCodeInsightActionHandler
+}
+import com.intellij.openapi.actionSystem {
+    Presentation
 }
 
-shared class ImplementMembersAction()
-        satisfies LanguageCodeInsightActionHandler {
-    
+shared class OverrideMembersAction() extends AbstractMembersAction() {
+    proposable(Declaration member) => member.formal || member.default;
+    title => "Select inherited members to refine";
+    menuLabel => "Refine Inherited Members";
+}
+
+shared class ImplementMembersAction() extends AbstractMembersAction() {
+    proposable(Declaration member) => member.formal;
+    title => "Select inherited formal members to implement";
+    menuLabel => "Implement Formal Members";
+}
+
+shared abstract class AbstractMembersAction()
+        satisfies LanguageCodeInsightActionHandler
+                & PresentableCodeInsightActionHandler {
+
+    shared formal String menuLabel;
+
+    shared formal Boolean proposable(Declaration member);
+
+    shared formal String title;
+
+    shared actual void update(Editor editor, PsiFile psiFile, Presentation presentation)
+            => presentation.setText(menuLabel, false);
+
     void apply(CeylonFile file, Editor editor, Tree.Declaration node,
             List<ClassMember> selected, ClassOrInterface ci, Integer offset) {
         value rootNode = file.compilationUnit;
@@ -115,9 +139,6 @@ shared class ImplementMembersAction()
         change.apply();
     }
 
-    shared default Boolean proposable(Declaration member)
-            => member.formal;
-
     shared actual void invoke(Project project, Editor editor, PsiFile file) {
         value offset = editor.selectionModel.selectionStart;
 
@@ -139,7 +160,7 @@ shared class ImplementMembersAction()
             if (!exists ci) {
                 return;
             }
-            
+
             value proposals = ci.getMatchingMemberDeclarations(ci.unit, ci, "", 0, null).values();
             value list = ArrayList<ClassMember>();
             for (dwp in proposals) {
@@ -154,6 +175,7 @@ shared class ImplementMembersAction()
             value chooser
                 = MemberChooser(list.toArray(ObjectArray<ClassMember>(0)),
                     true, true, project, null, ObjectArray<JComponent>(0));
+            chooser.title = title;
             chooser.show();
             if (exists selected = chooser.selectedElements, selected.size()>0) {
                 value p = project;
