@@ -9,17 +9,14 @@ import com.intellij.navigation.LocationPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.ui.UIUtil;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.descriptions_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -28,9 +25,6 @@ import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierStatementPsi>
         implements ColoredItemPresentation, LocationPresentation,
                    SortableTreeElement, AccessLevelProvider {
-
-    private descriptions_ provider =
-            descriptions_.get_();
 
     CeylonSpecifierTreeElement(CeylonPsi.SpecifierStatementPsi psiElement) {
         super(psiElement);
@@ -90,7 +84,7 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
     @Nullable
     @Override
     public String getPresentableText() {
-        return toJavaString(provider.getDescription(getElement(), false, false));
+        return toJavaString(descriptions_.get_().descriptionForPsi(getElement(), false, false));
     }
 
     @NotNull
