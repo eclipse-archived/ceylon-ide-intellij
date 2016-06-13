@@ -4,8 +4,7 @@ import com.intellij.psi {
     PsiElement
 }
 import com.intellij.usageView {
-    UsageViewLongNameLocation,
-    UsageViewShortNameLocation
+    UsageViewLongNameLocation
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
@@ -25,9 +24,6 @@ import com.redhat.ceylon.model.typechecker.model {
     Constructor,
     ClassOrInterface,
     TypedDeclaration
-}
-import com.intellij.codeInsight.highlighting {
-    HighlightUsagesDescriptionLocation
 }
 
 shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProvider {
