@@ -5,22 +5,26 @@ import ceylon.collection {
 import com.intellij.openapi.util {
     TextRange
 }
+import com.redhat.ceylon.compiler.typechecker.analyzer {
+    ModuleSourceMapper
+}
 import com.redhat.ceylon.compiler.typechecker.tree {
-    ...
+    Tree,
+    Message,
+    Node,
+    UnexpectedError
 }
 import com.redhat.ceylon.ide.common.util {
     ErrorVisitor
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     findProjectForFile
 }
-import com.redhat.ceylon.compiler.typechecker.analyzer {
-    ModuleSourceMapper
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile
 }
+
 
 "A visitor that visits a compilation unit returned by
  [[com.redhat.ceylon.compiler.typechecker.parser::CeylonParser]] to gather errors and
@@ -58,8 +62,12 @@ shared class ErrorsVisitor(Tree.CompilationUnit compilationUnit, CeylonFile file
 
     shared actual void handleMessage(Integer startOffset, Integer endOffset,
         Integer startCol, Integer startLine, Message error) {
-
-        messages.add([error, TextRange(startOffset, endOffset)]);
+        if (error is UnexpectedError) {
+            process.writeError(error.message);
+        }
+        else {
+            messages.add([error, TextRange(startOffset, endOffset)]);
+        }
     }
 
 }
