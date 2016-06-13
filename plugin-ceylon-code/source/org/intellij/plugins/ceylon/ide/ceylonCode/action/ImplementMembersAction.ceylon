@@ -133,9 +133,13 @@ shared class ImplementMembersAction()
                 if (is CeylonPsi.ClassOrInterfacePsi typeDec)
                 then typeDec.ceylonNode
                 else typeDec.ceylonNode;
-            value ci = switch (node)
+            ClassOrInterface? ci = switch (node)
                 case (is Tree.ClassOrInterface) node.declarationModel
                 case (is Tree.ObjectDefinition) node.anonymousClass;
+            if (!exists ci) {
+                return;
+            }
+            
             value proposals = ci.getMatchingMemberDeclarations(ci.unit, ci, "", 0, null).values();
             value list = ArrayList<ClassMember>();
             for (dwp in proposals) {
