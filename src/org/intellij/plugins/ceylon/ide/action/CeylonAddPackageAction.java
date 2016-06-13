@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiDirectory;
@@ -26,9 +27,17 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
     protected void createFiles(final AnActionEvent e, final IdeaCeylonProject project,
                                final VirtualFile srcRoot, final String eventPackage,
                                final PsiDirectory eventPsiDir) {
-        final String packageName = Messages.showInputDialog(e.getProject(),
+
+
+        final String packageName = Messages.showInputDialog(
+                e.getProject(),
                 message("ceylon.package.wizard.message"),
-                message("ceylon.package.wizard.title"), null, eventPackage, new AddPackageInputValidator());
+                message("ceylon.package.wizard.title"),
+                null,
+                eventPackage,
+                new AddPackageInputValidator(),
+                TextRange.from(eventPackage.length(), 0)
+        );
 
         if (packageName != null) {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
