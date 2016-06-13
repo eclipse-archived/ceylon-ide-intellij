@@ -82,13 +82,13 @@ import com.intellij.openapi.actionSystem {
     Presentation
 }
 
-shared class OverrideMembersAction() extends AbstractMembersAction() {
+shared class CeylonOverrideMembersAction() extends AbstractMembersAction() {
     proposable(Declaration member) => member.formal || member.default;
     title => "Select inherited members to refine";
     menuLabel => "Refine Inherited Members";
 }
 
-shared class ImplementMembersAction() extends AbstractMembersAction() {
+shared class CeylonImplementMembersAction() extends AbstractMembersAction() {
     proposable(Declaration member) => member.formal;
     title => "Select inherited formal members to implement";
     menuLabel => "Implement Formal Members";

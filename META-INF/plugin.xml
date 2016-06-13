@@ -94,7 +94,7 @@
         <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.CeylonFileTypeFactory"/>
         <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.parser.CeylonParserDefinition"/>
 
-        <lang.syntaxHighlighterFactory key="Ceylon" language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonHighlighterFactory"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonSyntaxAnnotator"/>
         <externalAnnotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonFileHighlightFilter"/>
@@ -143,8 +143,8 @@
 
         <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonVariableRenameHandler"/>
-        <codeInsight.implementMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.ImplementMembersAction"/>
-        <codeInsight.overrideMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.OverrideMembersAction"/>
+        <codeInsight.implementMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.CeylonImplementMembersAction"/>
+        <codeInsight.overrideMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.CeylonOverrideMembersAction"/>
         <renamePsiElementProcessor implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenamePsiProcessor"/>
         <refactoring.elementListenerProvider implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringListener"/>
         <inlineActionHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.InlineAction"/>
