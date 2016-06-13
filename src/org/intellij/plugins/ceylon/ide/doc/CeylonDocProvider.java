@@ -73,7 +73,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
     @Override
     public String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
         if (element instanceof CeylonCompositeElement) {
-            String str = toJavaString(provider.getDescription((CeylonCompositeElement) element));
+            String str = toJavaString(provider.descriptionForPsi((CeylonCompositeElement) element));
             if (str != null) {
                 return highlighter.highlight(str, element.getProject())
                         // font tags are removed in com.intellij.util.ui.UIUtil.getHtmlBody(com.intellij.util.ui.Html),
