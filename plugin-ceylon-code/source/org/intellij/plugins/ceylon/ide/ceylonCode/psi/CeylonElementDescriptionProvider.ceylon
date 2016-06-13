@@ -26,19 +26,24 @@ import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
     TypedDeclaration
 }
+import com.intellij.codeInsight.highlighting {
+    HighlightUsagesDescriptionLocation
+}
 
 shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProvider {
     
     shared actual String? getElementDescription(PsiElement element,
-        ElementDescriptionLocation location) 
-            => if (is CeylonCompositeElement element)
-            then (switch (location)
-                  case (is UsageViewLongNameLocation) 
-                    descriptions.descriptionForPsi(element)
-                  case (is UsageViewShortNameLocation) 
-                    element.name
-                  else null) 
-            else null;
+            ElementDescriptionLocation location) {
+        if (is CeylonCompositeElement element) {
+            return if (location is UsageViewLongNameLocation)
+                  then descriptions.descriptionForPsi(element)
+                  else element.name;
+        }
+        else {
+            return null;
+        }
+    }
+    
 }
 
 shared object descriptions {
