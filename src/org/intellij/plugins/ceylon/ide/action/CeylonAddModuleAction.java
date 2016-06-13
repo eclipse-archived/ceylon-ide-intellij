@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
@@ -62,13 +63,15 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                         );
 
                         ceylonFileFactory.createPackageDescriptor(subdirectory,
-                                moduleName, wizard.isSharedPackage());
+                                moduleName);
 
-                        PsiElement run = ceylonFileFactory.createRun(subdirectory, moduleName,
-                                unitFileName, unitName);
+                        if (StringUtil.isNotEmpty(moduleName)) {
+                            PsiElement run = ceylonFileFactory.createRun(subdirectory, moduleName,
+                                    unitFileName, unitName);
 
-                        if (run instanceof PsiFile) {
-                            ((PsiFile) run).navigate(true);
+                            if (run instanceof PsiFile) {
+                                ((PsiFile) run).navigate(true);
+                            }
                         }
                     } catch (Exception e1) {
                         Logger.getInstance(CeylonAddModuleAction.class)

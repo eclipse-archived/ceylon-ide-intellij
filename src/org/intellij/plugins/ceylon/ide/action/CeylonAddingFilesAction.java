@@ -19,7 +19,7 @@ import javax.swing.*;
 import static com.intellij.openapi.module.ModuleUtilCore.findModuleForFile;
 
 abstract class CeylonAddingFilesAction extends AnAction {
-    protected  ceylonFileFactory_ ceylonFileFactory = ceylonFileFactory_.get_();
+    ceylonFileFactory_ ceylonFileFactory = ceylonFileFactory_.get_();
 
     private VirtualFile getSourceRoot(AnActionEvent e, VirtualFile eventDir) {
         return ProjectRootManager.getInstance(e.getProject()).getFileIndex()
