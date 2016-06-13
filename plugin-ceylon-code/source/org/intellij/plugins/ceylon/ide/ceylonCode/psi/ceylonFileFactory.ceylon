@@ -77,15 +77,14 @@ shared object ceylonFileFactory {
         );
     }
 
-    shared PsiElement createUnit(PsiDirectory dir, String unitName, String fileName, Boolean isClass) {
+    shared PsiElement createUnit(PsiDirectory dir, String unitName, String fileName, String templateName) {
         value tplManager = fileTemplateManager(dir.project);
         value props = HashMap<JString,Object>();
 
         props.put(javaString("UNIT_NAME"), javaString(unitName));
-        props.put(javaString("IS_CLASS"), javaString(isClass.string));
 
         return createFromTemplate(
-            tplManager.getInternalTemplate("unit.ceylon"),
+            tplManager.getInternalTemplate(templateName + ".ceylon"),
             fileName, props, dir, null
         );
     }
