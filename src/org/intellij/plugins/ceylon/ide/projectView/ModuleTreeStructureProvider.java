@@ -16,7 +16,7 @@ import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -192,7 +192,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider, DumbA
         @Override
         public void update(PresentationData presentation) {
             presentation.setPresentableText(moduleName);
-            presentation.setIcon(ideaIcons_.get_().getModules());
+            presentation.setIcon(icons_.get_().getModules());
         }
 
         @Override
