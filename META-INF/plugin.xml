@@ -169,6 +169,7 @@
         <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonTargetElementEvaluator"/>
         <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.GotoTargetRenderer"/>
+        <referencesSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.ImportAliasReferencesSearch"/>
         <!--<java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>-->
         <!--<java.shortNamesCache implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonShortNamesCache"/>-->
         <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
