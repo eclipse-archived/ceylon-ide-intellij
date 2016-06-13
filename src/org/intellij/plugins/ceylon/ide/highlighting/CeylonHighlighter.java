@@ -9,7 +9,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import gnu.trove.THashMap;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
-import org.intellij.plugins.ceylon.ide.parser.CeylonAntlrToIntellijLexerAdapter;
+import org.intellij.plugins.ceylon.ide.ceylonCode.parser.CeylonAntlrToIntellijLexerAdapter;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.TokenTypes;
 import org.jetbrains.annotations.NotNull;

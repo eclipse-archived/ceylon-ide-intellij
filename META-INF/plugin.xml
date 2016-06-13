@@ -92,7 +92,7 @@
         <lang.documentationProvider implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonDocProvider" language="Ceylon"/>
 
         <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.CeylonFileTypeFactory"/>
-        <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.parser.CeylonParserDefinition"/>
+        <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.parser.CeylonParserDefinition"/>
 
         <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonHighlighterFactory"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonSyntaxAnnotator"/>
@@ -160,7 +160,7 @@
         <facetType implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetType"/>
         <framework.detector implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetDetector"/>
 
-        <lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonFindUsagesProvider"/>
+        <lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonFindUsagesProvider"/>
         <readWriteAccessDetector implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReadWriteAccessDetector"/>
         <usageTypeProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonUsageTypeProvider"/>
         <typeDeclarationProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonTypeDeclarationProvider"/>
