@@ -25,7 +25,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 class IdeaFunctionCompletionProposal
@@ -35,7 +35,7 @@ class IdeaFunctionCompletionProposal
 
     shared actual variable Boolean toggleOverwrite = false;
     
-    shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.surround)
+    shared LookupElement lookupElement => newLookup(desc, text, icons.surround)
             .withInsertHandler(object satisfies InsertHandler<LookupElement> {
         shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
             // Undo IntelliJ's completion

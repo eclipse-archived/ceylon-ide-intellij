@@ -37,7 +37,7 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 
@@ -94,7 +94,7 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
     
     shared actual String displayName => "Ceylon";
     
-    shared actual Icon icon => ideaIcons.ceylon;
+    shared actual Icon icon => icons.ceylon;
     
 }
 

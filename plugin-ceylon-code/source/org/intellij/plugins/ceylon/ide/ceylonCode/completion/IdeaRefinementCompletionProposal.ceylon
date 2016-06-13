@@ -28,7 +28,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference pr,
@@ -38,7 +38,7 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         (offset, prefix, pr, desc, text, ctx, dec, scope, fullType, explicitReturnType) 
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.forDeclaration(dec),
+    shared LookupElement lookupElement => newLookup(desc, text, icons.forDeclaration(dec),
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
@@ -67,7 +67,7 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         value desc = getNestedCompletionText(true, unit, dec);
         
         if (is IdeaProposalsHolder proposals) {
-            proposals.add(newLookup(desc, name, ideaIcons.forDeclaration(dec)));
+            proposals.add(newLookup(desc, name, icons.forDeclaration(dec)));
         }
     }
     
@@ -75,7 +75,7 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         String val, Integer loc) {
         
         if (is IdeaProposalsHolder proposals) {
-            proposals.add(newLookup(val, val, ideaIcons.correction));
+            proposals.add(newLookup(val, val, icons.correction));
         }
     }
     

@@ -39,7 +39,8 @@ import javax.swing {
     Icon
 }
 
-shared object ideaIcons {
+shared object icons {
+    
     shared Icon imports => IconLoader.getIcon("/icons/ceylonImports.png");
     shared Icon singleImport => IconLoader.getIcon("/icons/ceylonImport.png");
     shared Icon packages => IconLoader.getIcon("/icons/ceylonPackage.png");

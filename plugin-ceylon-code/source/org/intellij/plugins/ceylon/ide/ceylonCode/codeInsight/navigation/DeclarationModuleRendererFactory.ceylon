@@ -15,7 +15,7 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 import com.intellij.util.ui {
     UIUtil
@@ -58,7 +58,7 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
             } else {
                 value mod = val.decl.unit.\ipackage.\imodule;
                 text = mod.nameAsString + "/" + mod.version;
-                icon = ideaIcons.modules;
+                icon = icons.modules;
             }
 
             border = BorderFactory.createEmptyBorder(0, 0, 0, UIUtil.listCellHPadding);

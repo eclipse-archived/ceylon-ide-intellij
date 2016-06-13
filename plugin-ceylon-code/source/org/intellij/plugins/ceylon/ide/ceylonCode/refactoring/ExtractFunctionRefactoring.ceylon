@@ -56,7 +56,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsi,
-    ceylonDeclarationDescriptionProvider
+    descriptions
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     FindMatchingPsiNodeVisitor
@@ -96,7 +96,7 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
     function containerLabel(CeylonPsi.DeclarationPsi element)
             => if (exists container = findContainer(element),
                    exists desc
-                       = ceylonDeclarationDescriptionProvider.getDescription {
+                       = descriptions.descriptionForPsi {
                            element = container;
                            includeReturnType = false;
                        })

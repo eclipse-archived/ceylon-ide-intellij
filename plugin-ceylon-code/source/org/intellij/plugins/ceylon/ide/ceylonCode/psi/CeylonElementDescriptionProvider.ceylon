@@ -33,11 +33,11 @@ shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProv
         ElementDescriptionLocation location) 
             => if (is UsageViewLongNameLocation|UsageViewShortNameLocation location,
                     is CeylonCompositeElement element)
-            then ceylonDeclarationDescriptionProvider.getDescription(element) 
+            then descriptions.descriptionForPsi(element) 
             else null;
 }
 
-shared object ceylonDeclarationDescriptionProvider {
+shared object descriptions {
 
     shared String descriptionForDeclaration(Declaration decl,
             Boolean includeKeyword = true,
@@ -94,7 +94,7 @@ shared object ceylonDeclarationDescriptionProvider {
         return result.string;
     }
 
-    shared String? getDescription(CeylonCompositeElement element,
+    shared String? descriptionForPsi(CeylonCompositeElement element,
         Boolean includeKeyword = true,
         Boolean includeContainer = true,
         Boolean includeReturnType = true) {

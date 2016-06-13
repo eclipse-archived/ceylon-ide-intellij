@@ -30,7 +30,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
@@ -52,7 +52,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         return null;
     }
 
-    shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.forDeclaration(declaration),
+    shared LookupElement lookupElement => newLookup(desc, text, icons.forDeclaration(declaration),
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext context, LookupElement? t) {
                 // Undo IntelliJ's completion
@@ -84,7 +84,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
             value desc = getNestedCompletionText(op, ctx.lastCompilationUnit.unit, dec, qualifier, basic, true);
             value text = getNestedCompletionText(op, ctx.lastCompilationUnit.unit, dec, qualifier, basic, false);
             
-            proposals.add(newLookup(desc, text, ideaIcons.forDeclaration(dec)));
+            proposals.add(newLookup(desc, text, icons.forDeclaration(dec)));
         }
     }
     
@@ -92,7 +92,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         String val, Integer loc, Integer index) {
         
         if (is IdeaProposalsHolder proposals) {
-            proposals.add(newLookup(val, val, ideaIcons.correction));
+            proposals.add(newLookup(val, val, icons.correction));
         }
     }
 }

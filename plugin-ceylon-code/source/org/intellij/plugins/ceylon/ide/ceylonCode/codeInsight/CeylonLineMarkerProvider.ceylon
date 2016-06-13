@@ -47,7 +47,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     CeylonReference
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
@@ -77,7 +77,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             value tooltip = object satisfies Function<PsiElement, JString> {
                 shared actual JString fun(PsiElement? param) => javaString(text);
             };
-            value icon = refined.formal then ideaIcons.refinement else ideaIcons.extendedType;
+            value icon = refined.formal then icons.refinement else icons.extendedType;
 
             return LineMarkerInfo(element of CeylonCompositeElement, element.textRange, icon,
                 Pass.\iUPDATE_ALL, tooltip, NavigationHandler(refined),

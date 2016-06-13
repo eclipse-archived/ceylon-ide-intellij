@@ -21,7 +21,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
@@ -30,7 +30,7 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         (offset, prefix, desc, text, node, declaration, ctx)
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => newLookup(desc, text, ideaIcons.correction,
+    shared LookupElement lookupElement => newLookup(desc, text, icons.correction,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion

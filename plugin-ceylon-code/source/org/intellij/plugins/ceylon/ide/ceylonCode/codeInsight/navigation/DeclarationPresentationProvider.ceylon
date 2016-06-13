@@ -8,7 +8,7 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
@@ -22,7 +22,7 @@ shared class DeclarationPresentationProvider()
             => object satisfies ItemPresentation {
 
         shared actual Icon? getIcon(Boolean unused) 
-                => ideaIcons.forDeclaration(item.decl);
+                => icons.forDeclaration(item.decl);
 
         function locationAsString(Scope container)
                 => "(``container.qualifiedNameString else "default package"``)";

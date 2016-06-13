@@ -98,7 +98,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 class CustomIntention(Integer position, String desc, <PlatformTextChange|Anything()>? change, TextRange? selection = null, Icon? image = null,
@@ -229,12 +229,12 @@ shared class IdeaQuickFixData(
         value range = toRange(selection);
 
         if (is IdeaTextChange change) {
-            registerFix(desc, change, range, ideaIcons.correction, qualifiedNameIsPath);
+            registerFix(desc, change, range, icons.correction, qualifiedNameIsPath);
         } else if (is Anything() change) {
             if (kind == asyncModuleImport) {
-                candidateModules.add([desc, ideaIcons.imports, change]);
+                candidateModules.add([desc, icons.imports, change]);
             } else if (kind == addModuleImport) {
-                registerFix(desc, null, range, ideaIcons.correction, qualifiedNameIsPath, (p, e, f) {
+                registerFix(desc, null, range, icons.correction, qualifiedNameIsPath, (p, e, f) {
                     candidateModules.clear();
                     ProgressManager.instance.runProcessWithProgressAsynchronously(
                         project.project,
@@ -250,7 +250,7 @@ shared class IdeaQuickFixData(
                     );
                 });
             } else {
-                registerFix(desc, change, range, ideaIcons.correction, qualifiedNameIsPath);
+                registerFix(desc, change, range, icons.correction, qualifiedNameIsPath);
             }
         }
     }

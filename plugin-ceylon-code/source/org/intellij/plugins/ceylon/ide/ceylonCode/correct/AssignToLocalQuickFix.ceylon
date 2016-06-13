@@ -36,7 +36,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 import com.redhat.ceylon.ide.common.completion {
     ProposalsHolder
@@ -83,10 +83,10 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
         
         types.each((type) {
             if (is String type) {
-                proposals.add(LookupElementBuilder.create(type).withIcon(ideaIcons.correction));
+                proposals.add(LookupElementBuilder.create(type).withIcon(icons.correction));
             } else {
                 value prop = LookupElementBuilder.create(type.asString(unit))
-                    .withIcon(ideaIcons.forDeclaration(type.declaration))
+                    .withIcon(icons.forDeclaration(type.declaration))
                     .withInsertHandler(object satisfies InsertHandler<LookupElement> {
                         shared actual void handleInsert(InsertionContext ctx, LookupElement el) {
                             // TODO abstract that
@@ -111,7 +111,7 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
         assert(is IdeaProposalsHolder proposals);
         
         names.each(
-            (n) => proposals.add(LookupElementBuilder.create(n).withIcon(ideaIcons.local))
+            (n) => proposals.add(LookupElementBuilder.create(n).withIcon(icons.local))
         );
     }
 }

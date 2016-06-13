@@ -82,7 +82,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaJavaModelAware
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 String psiProtocol = "psi_element://";
@@ -131,28 +131,28 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
     Icon? getIconUrl(Icons|Referenceable thing) 
             => switch (thing)
             //models:
-            case (is Declaration) ideaIcons.getBaseIcon(thing)
-            case (is Module) ideaIcons.modules
-            case (is Package) ideaIcons.packages
+            case (is Declaration) icons.getBaseIcon(thing)
+            case (is Module) icons.modules
+            case (is Package) icons.packages
             //icons:
-            case (Icons.imports) ideaIcons.imports
-            case (Icons.annotations) ideaIcons.annotations
-            case (Icons.modules) ideaIcons.modules
-            case (Icons.objects) ideaIcons.objects
-            case (Icons.classes) ideaIcons.classes
-            case (Icons.interfaces) ideaIcons.interfaces
-            case (Icons.enumeration) ideaIcons.enumerations
-            case (Icons.extendedType) ideaIcons.extendedType
-            case (Icons.satisfiedTypes) ideaIcons.satisfiedTypes
-            case (Icons.exceptions) ideaIcons.exceptions
-            case (Icons.see) ideaIcons.see
-            case (Icons.implementation) ideaIcons.satisfiedTypes
-            case (Icons.override) ideaIcons.extendedType
-            case (Icons.returns) ideaIcons.returns
-            case (Icons.units) ideaIcons.file
-            case (Icons.parameters) ideaIcons.param
-            case (Icons.attributes) ideaIcons.attributes
-            case (Icons.types) ideaIcons.types
+            case (Icons.imports) icons.imports
+            case (Icons.annotations) icons.annotations
+            case (Icons.modules) icons.modules
+            case (Icons.objects) icons.objects
+            case (Icons.classes) icons.classes
+            case (Icons.interfaces) icons.interfaces
+            case (Icons.enumeration) icons.enumerations
+            case (Icons.extendedType) icons.extendedType
+            case (Icons.satisfiedTypes) icons.satisfiedTypes
+            case (Icons.exceptions) icons.exceptions
+            case (Icons.see) icons.see
+            case (Icons.implementation) icons.satisfiedTypes
+            case (Icons.override) icons.extendedType
+            case (Icons.returns) icons.returns
+            case (Icons.units) icons.file
+            case (Icons.parameters) icons.param
+            case (Icons.attributes) icons.attributes
+            case (Icons.types) icons.types
             else null;
 
     shared actual void addIconAndText(StringBuilder builder, Icons|Referenceable icon, String text) {

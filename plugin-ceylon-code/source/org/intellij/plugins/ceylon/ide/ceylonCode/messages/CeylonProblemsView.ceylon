@@ -38,7 +38,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 String ceylonProblemsContentId = "";
@@ -81,7 +81,7 @@ shared class CeylonProblemsViewImpl(project, startupManager, toolWindowManager)
             .createContent(list, ceylonProblemsContentId, false);
         myToolWindow.contentManager.addContent(content);
 
-        myToolWindow.icon = ideaIcons.problemsViewOk;
+        myToolWindow.icon = icons.problemsViewOk;
         ContentManagerWatcher(myToolWindow, myToolWindow.contentManager);
 
         myPostponedRunnables.each((func) => func());
@@ -109,11 +109,11 @@ shared class CeylonProblemsViewImpl(project, startupManager, toolWindowManager)
 
             value allErrors = expand { frontendMessages else {}, backendMessages else {}, projectMessages else {} };
             if (allErrors.empty) {
-                myToolWindow.icon = ideaIcons.problemsViewOk;
+                myToolWindow.icon = icons.problemsViewOk;
             } else if (project.build.messages.any((m) => m.severity == Severity.error)) {
-                myToolWindow.icon = ideaIcons.problemsViewErrors;
+                myToolWindow.icon = icons.problemsViewErrors;
             } else {
-                myToolWindow.icon = ideaIcons.problemsViewWarnings;
+                myToolWindow.icon = icons.problemsViewWarnings;
             }
         }
 

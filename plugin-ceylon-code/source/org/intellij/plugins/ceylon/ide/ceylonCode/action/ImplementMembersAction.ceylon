@@ -70,10 +70,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsi,
-    ceylonDeclarationDescriptionProvider
+    descriptions
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 import com.intellij.codeInsight.generation.actions {
     PresentableCodeInsightActionHandler
@@ -194,12 +194,12 @@ shared abstract class AbstractMembersAction()
 
     class Parent(ClassOrInterface container)
             extends MemberChooserObjectBase(
-                ceylonDeclarationDescriptionProvider.descriptionForDeclaration {
+                descriptions.descriptionForDeclaration {
                     decl = container;
                     includeContainer = false;
                     includeKeyword = false;
                 },
-                ideaIcons.forDeclaration(container)) {
+                icons.forDeclaration(container)) {
         hash => container.hash;
         equals(Object that)
                 => if (is Parent that)
@@ -209,12 +209,12 @@ shared abstract class AbstractMembersAction()
     
     class Member(shared Declaration declaration, ClassOrInterface container)
             extends MemberChooserObjectBase(
-                ceylonDeclarationDescriptionProvider.descriptionForDeclaration {
+                descriptions.descriptionForDeclaration {
                     decl = declaration;
                     includeContainer = false;
                     includeKeyword = false;
                 },
-                ideaIcons.forDeclaration(declaration))
+                icons.forDeclaration(declaration))
             satisfies ClassMember {
         parentNodeDelegate = Parent(container);
         hash => declaration.hash;

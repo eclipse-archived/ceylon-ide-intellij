@@ -20,7 +20,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     SpecifierStatementPsiIdOwner
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 shared class ClassPresentationProvider() 
@@ -51,7 +51,7 @@ shared class ClassPresentationProvider()
 
             shared actual Icon? getIcon(Boolean unused) 
                     => if (exists node = item.ceylonNode) 
-                    then ideaIcons.forDeclaration(node)
+                    then icons.forDeclaration(node)
                     else null;
         };
     }
@@ -94,7 +94,7 @@ shared class DeclarationPresentationProvider()
 
             shared actual Icon? getIcon(Boolean unused) 
                     => if (exists node = item.ceylonNode) 
-                    then ideaIcons.forDeclaration(node) 
+                    then icons.forDeclaration(node) 
                     else null;
         };
     }
@@ -138,7 +138,7 @@ shared class SpecifierPresentationProvider()
 
             shared actual Icon? getIcon(Boolean unused)
                     => if (exists node = item.ceylonNode)
-                    then ideaIcons.forDeclaration(node) 
+                    then icons.forDeclaration(node) 
                     else null;
             
         };

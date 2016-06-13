@@ -20,7 +20,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 shared class GotoTargetRenderer() satisfies GotoTargetRendererProvider {
@@ -45,7 +45,7 @@ shared class GotoTargetRenderer() satisfies GotoTargetRendererProvider {
         
         shared actual Icon? getIcon(PsiElement psiElement) 
                 => if (is CeylonPsi.ObjectExpressionPsi psiElement) 
-                then ideaIcons.objects 
+                then icons.objects
                 else super.getIcon(psiElement);
     };
 }

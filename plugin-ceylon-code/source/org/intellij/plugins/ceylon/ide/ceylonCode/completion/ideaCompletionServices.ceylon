@@ -38,7 +38,7 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaTextChange
@@ -57,7 +57,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         String prefix, String desc, String text, JList<Type> argTypes, Node node, Unit unit) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(prefix + desc, prefix + text, ideaIcons.correction));
+            ctx.proposals.add(newLookup(prefix + desc, prefix + text, icons.correction));
         }
     }
     
@@ -86,7 +86,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
     
     shared actual void newPackageDescriptorProposal(CompletionContext ctx, Integer offset, String prefix, String desc, String text) {
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(desc, text, ideaIcons.packages));
+            ctx.proposals.add(newLookup(desc, text, icons.packages));
         }
     }
     
@@ -127,7 +127,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         
         value selection = TextRange.from(selectionStart, selectionLength); 
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(desc, text, ideaIcons.modules, null, selection));
+            ctx.proposals.add(newLookup(desc, text, icons.modules, null, selection));
         }
     }
     
@@ -135,7 +135,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         String versioned, String name) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(versioned, versioned.spanFrom(len), ideaIcons.modules));
+            ctx.proposals.add(newLookup(versioned, versioned.spanFrom(len), icons.modules));
         }
     }
     
@@ -165,7 +165,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         if (is IdeaProposalsHolder ctx) {
             ctx.add(
                 newLookup(desc, text)
-                    .withIcon(if (exists type) then ideaIcons.forDeclaration(type.declaration) else null)
+                    .withIcon(if (exists type) then icons.forDeclaration(type.declaration) else null)
             );
         }
     }
@@ -178,7 +178,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         if (is IdeaProposalsHolder proposals) {
             value myIcon = switch(icon)
             case (is Icons) null
-            else ideaIcons.forDeclaration(icon);
+            else icons.forDeclaration(icon);
             
             proposals.add(newLookup(description, text, myIcon));
         }
@@ -191,7 +191,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         if (is IdeaCompletionContext ctx) {
             value myIcon = switch(icon)
             case (is Icons) null
-            else ideaIcons.forDeclaration(icon);
+            else icons.forDeclaration(icon);
             
             value myRange = if (exists selection)
             then TextRange.from(selection.start, selection.length)

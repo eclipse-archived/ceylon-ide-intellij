@@ -27,7 +27,7 @@ import com.redhat.ceylon.ide.common.refactoring {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 class IdeaModuleCompletionProposal(Integer offset, String prefix,
@@ -39,7 +39,7 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         satisfies IdeaCompletionProposal {
    
     shared LookupElement lookupElement => newLookup(versioned, versioned.spanFrom(len),
-       ideaIcons.modules, object satisfies InsertHandler<LookupElement> {
+       icons.modules, object satisfies InsertHandler<LookupElement> {
            shared actual void handleInsert(InsertionContext insertionContext,
                LookupElement? t) {
                

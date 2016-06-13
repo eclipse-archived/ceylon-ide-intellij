@@ -4,10 +4,10 @@ import com.intellij.openapi.actionSystem {
     LangDataKeys
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
-shared class ConfigureCeylonAction() extends AnAction(ideaIcons.ceylon) {
+shared class ConfigureCeylonAction() extends AnAction(icons.ceylon) {
     shared actual void actionPerformed(AnActionEvent e) {
         if (exists mod = e.getData(LangDataKeys.\iMODULE_CONTEXT)) {
             AndroidStudioSupportImpl().setupModule(mod);

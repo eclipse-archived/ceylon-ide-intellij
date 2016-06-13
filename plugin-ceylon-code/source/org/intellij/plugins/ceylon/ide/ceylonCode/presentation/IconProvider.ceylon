@@ -26,7 +26,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 shared class CeylonIconProvider() extends IconProvider() {
@@ -36,9 +36,9 @@ shared class CeylonIconProvider() extends IconProvider() {
         case (is CeylonFile) {
             String fileName = element.name;
             if (fileName==ModuleManager.packageFile) {
-                return ideaIcons.packages;
+                return icons.packages;
             } else if (fileName==ModuleManager.moduleFile) {
-                return ideaIcons.modules;
+                return icons.modules;
             }
             else {
                 return null;

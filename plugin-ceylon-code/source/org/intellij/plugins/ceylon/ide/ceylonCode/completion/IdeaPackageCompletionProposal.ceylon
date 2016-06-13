@@ -28,7 +28,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    ideaIcons
+    icons
 }
 
 class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
@@ -39,7 +39,7 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
 
     shared actual variable Boolean toggleOverwrite = false;
     
-    shared LookupElement lookupElement => newLookup(description, text, ideaIcons.packages,
+    shared LookupElement lookupElement => newLookup(description, text, icons.packages,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
@@ -54,7 +54,7 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
     
     shared actual void newPackageMemberCompletionProposal(ProposalsHolder proposals, Declaration d, DefaultRegion selection, LinkedMode lm) {
         if (is IdeaProposalsHolder proposals) {
-             proposals.add(LookupElementBuilder.create(d.name).withIcon(ideaIcons.forDeclaration(d)));
+             proposals.add(LookupElementBuilder.create(d.name).withIcon(icons.forDeclaration(d)));
         }
     }
 }
@@ -66,7 +66,7 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => newLookup(description, text, ideaIcons.modules,
+    shared LookupElement lookupElement => newLookup(description, text, icons.modules,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext ctx, LookupElement? t) {
                 // TODO
