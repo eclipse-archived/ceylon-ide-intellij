@@ -125,7 +125,7 @@
         <gotoClassContributor implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoClassContributor"/>
         <completion.contributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonCompletionContributor"/>
         <codeInsight.parameterInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.completion.CeylonParameterInfoHandler"/>
-        <codeInsight.typeInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonExpressionTypeProvider"/>
+        <codeInsight.typeInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonExpressionTypeProvider"/>
         <codeInsight.gotoSuper language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoSuperHandler"/>
 
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass"
