@@ -46,7 +46,11 @@ shared PhasedUnit? doLocalTypecheck(CeylonFile file, Cancellable? cancellable = 
         }
     }
 
-    if (exists project = findProjectForFile(file),
+    if (is ExternalPhasedUnit unit = file.phasedUnit) {
+            unit.analyseTypes();
+            unit.analyseUsage();
+        return unit;
+    } else if (exists project = findProjectForFile(file),
         project.typechecked,
         exists tc = project.typechecker) {
 
@@ -130,10 +134,6 @@ shared PhasedUnit? doLocalTypecheck(CeylonFile file, Cancellable? cancellable = 
             file.phasedUnit = editedPhasedUnit;
             return editedPhasedUnit;
         }, 0);
-    } else if (is ExternalPhasedUnit unit = file.phasedUnit) {
-        unit.analyseTypes();
-        unit.analyseUsage();
-        return unit;
     }
     
     return null;
