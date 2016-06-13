@@ -18,43 +18,43 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
         ...
     }
 }
+import java.lang {
+    Class
+}
 
 shared class CeylonUsageTypeProvider() satisfies UsageTypeProvider {
-    
+
     shared actual UsageType? getUsageType(PsiElement el) {
-        if (exists invocation = PsiTreeUtil.getParentOfType(el,
-                javaClass<InvocationExpressionPsi>()),
+        if (exists invocation = PsiTreeUtil.getParentOfType(el, javaClass<InvocationExpressionPsi>()),
             invocation.ceylonNode.primary.endIndex.intValue() >= el.textRange.endOffset,
-            exists type = PsiTreeUtil.getParentOfType(el,
-                javaClass<BaseTypeExpressionPsi>())
-                    else PsiTreeUtil.getParentOfType(el,
-                javaClass<QualifiedTypeExpressionPsi>())) {
-            
+            PsiTreeUtil.getParentOfType(el, javaClass<BaseTypeExpressionPsi>()) exists
+         || PsiTreeUtil.getParentOfType(el, javaClass<QualifiedTypeExpressionPsi>()) exists,
+            !PsiTreeUtil.getParentOfType(el, javaClass<QualifiedMemberExpressionPsi>()) exists
+         /*&& !PsiTreeUtil.getParentOfType(el, javaClass<BaseMemberExpressionPsi>()) exists*/) {
             return UsageType.classNewOperator;
         }
         
-        if (is ImportMemberPsi p = el.parent) {
+        if (el.parent is ImportMemberPsi) {
             return UsageType.classImport;
         }
         
-        if (exists param = PsiTreeUtil.getParentOfType(el,
-                javaClass<TypeArgumentListPsi>())) {
-            
+        if (PsiTreeUtil.getParentOfType(el, javaClass<TypeArgumentListPsi>()) exists) {
             return UsageType.typeParameter;
         }
         
-        if (exists param = PsiTreeUtil.getParentOfType(el,
-                javaClass<ValueParameterDeclarationPsi>())) {
-            
+        if (PsiTreeUtil.getParentOfType(el, javaClass<ValueParameterDeclarationPsi>()) exists) {
             return UsageType.classMethodParameterDeclaration;
         }
         
         if (PsiTreeUtil.getParentOfType(el, javaClass<ExtendedTypePsi>()) exists
-            || PsiTreeUtil.getParentOfType(el, javaClass<SatisfiedTypesPsi>()) exists) {
-            
+         || PsiTreeUtil.getParentOfType(el, javaClass<SatisfiedTypesPsi>()) exists) {
             return UsageType.classExtendsImplementsList;
         }
-        
+
+        if (PsiTreeUtil.getParentOfType(el, javaClass<AnnotationPsi>()) exists) {
+            return UsageType.annotation;
+        }
+
         return null;
     }
 }
