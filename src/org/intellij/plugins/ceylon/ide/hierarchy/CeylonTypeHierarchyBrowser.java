@@ -26,7 +26,7 @@ import com.redhat.ceylon.model.typechecker.model.Package;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.descriptions_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,8 +36,8 @@ import java.util.*;
 
 public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
 
-    ceylonDeclarationDescriptionProvider_ provider =
-            ceylonDeclarationDescriptionProvider_.get_();
+    descriptions_ provider =
+            descriptions_.get_();
     private Project project;
 
     CeylonTypeHierarchyBrowser(Project project, PsiElement element) {

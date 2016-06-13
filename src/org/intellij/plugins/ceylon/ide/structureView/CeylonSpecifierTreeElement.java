@@ -14,7 +14,7 @@ import com.redhat.ceylon.model.typechecker.model.ClassOrInterface;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.descriptions_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,8 +29,8 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
         implements ColoredItemPresentation, LocationPresentation,
                    SortableTreeElement, AccessLevelProvider {
 
-    private ceylonDeclarationDescriptionProvider_ provider =
-            ceylonDeclarationDescriptionProvider_.get_();
+    private descriptions_ provider =
+            descriptions_.get_();
 
     CeylonSpecifierTreeElement(CeylonPsi.SpecifierStatementPsi psiElement) {
         super(psiElement);

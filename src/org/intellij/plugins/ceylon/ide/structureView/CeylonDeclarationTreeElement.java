@@ -16,7 +16,7 @@ import com.intellij.util.ui.UIUtil;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.descriptions_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +32,8 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
 
     private boolean isInherited;
 
-    private ceylonDeclarationDescriptionProvider_ provider =
-            ceylonDeclarationDescriptionProvider_.get_();
+    private descriptions_ provider =
+            descriptions_.get_();
 
     CeylonDeclarationTreeElement(Decl psiElement, boolean isInherited) {
         super(psiElement);

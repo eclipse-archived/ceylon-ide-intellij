@@ -38,7 +38,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJav
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.descriptions_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,8 +64,8 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             CeylonTokens.LPAREN, CeylonTokens.RPAREN
     );
 
-    private ceylonDeclarationDescriptionProvider_ provider
-            = ceylonDeclarationDescriptionProvider_.get_();
+    private descriptions_ provider
+            = descriptions_.get_();
 
     private highlighter_ highlighter = highlighter_.get_();
 
