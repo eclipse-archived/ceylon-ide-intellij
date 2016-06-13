@@ -6,6 +6,7 @@ import ceylon.tool.converter.java2ceylon.JavaToCeylonConverter;
 import ceylon.tool.converter.java2ceylon.ScopeTree;
 import com.intellij.ide.PasteProvider;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -14,7 +15,11 @@ import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
@@ -46,24 +51,31 @@ public class PasteJavaToCeylonAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(AnActionEvent e) {
-        String ceylonCode = "<error>";
+    public void actionPerformed(final AnActionEvent e) {
+        final String javaCode = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor);
+        final DataContext dataContext = e.getDataContext();
+        final Editor editor = (Editor) dataContext.getData("editor");
+        PsiFile psiFile = PsiDocumentManager.getInstance(e.getProject()).getPsiFile(editor.getDocument());
+        IdeaCeylonProjects projects = e.getProject().getComponent(IdeaCeylonProjects.class);
+        Module module = ModuleUtil.findModuleForFile(psiFile.getVirtualFile(), psiFile.getProject());
+        final CeylonIdeConfig ideConfig = projects.getProject(module).getIdeConfiguration();
 
-        try {
-            String javaCode = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor);
-            final DataContext dataContext = e.getDataContext();
-            final Editor editor = (Editor) dataContext.getData("editor");
-            PsiFile psiFile = PsiDocumentManager.getInstance(e.getProject()).getPsiFile(editor.getDocument());
-            IdeaCeylonProjects projects = e.getProject().getComponent(IdeaCeylonProjects.class);
-            Module module = ModuleUtil.findModuleForFile(psiFile.getVirtualFile(), psiFile.getProject());
-            CeylonIdeConfig ideConfig = projects.getProject(module).getIdeConfiguration();
+        Task.Backgroundable task = new Task.Backgroundable(psiFile.getProject(), "Transforming Java code", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                String ceylonCode;
+                try {
+                    ceylonCode = transformJavaToCeylon(javaCode, ideConfig);
+                } catch (IOException e) {
+                    Logger.getInstance(PasteJavaToCeylonAction.class).error("Couldn't transform Java code to Ceylon", e);
+                    ceylonCode = "<error>";
+                }
 
-            ceylonCode = transformJavaToCeylon(javaCode, ideConfig);
-        } catch (IOException exc) {
-            Logger.getInstance(PasteJavaToCeylonAction.class).error("Couldn't transform Java code to Ceylon", exc);
-        }
+                insertTextInEditor(ceylonCode, e);
+            }
+        };
 
-        insertTextInEditor(ceylonCode, e);
+        ProgressManager.getInstance().run(task);
     }
 
     private String transformJavaToCeylon(String javaCode, CeylonIdeConfig ideConfig) throws IOException {
@@ -97,7 +109,12 @@ public class PasteJavaToCeylonAction extends AnAction {
             return;
         }
 
-        final PsiFile file = PsiDocumentManager.getInstance(eventProject).getPsiFile(editor.getDocument());
+        final PsiFile file = ApplicationManager.getApplication().runReadAction(new Computable<PsiFile>() {
+            @Override
+            public PsiFile compute() {
+                return PsiDocumentManager.getInstance(eventProject).getPsiFile(editor.getDocument());
+            }
+        });
 
         if (file == null) {
             return;
