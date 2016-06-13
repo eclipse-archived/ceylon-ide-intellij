@@ -50,9 +50,9 @@ public class CeylonAddFileAction extends CreateFromTemplateAction<DeclarationPsi
     @Override
     protected void buildDialog(Project project, PsiDirectory directory, CreateFileFromTemplateDialog.Builder builder) {
         builder
-                .setTitle("Create Ceylon declaration")
+                .setTitle("Create Ceylon Declaration")
                 .addKind("Class", icons.getClasses(), "class")
-                .addKind("Function", icons.getMethods(), "unit")
+                .addKind("Function", icons.getMethods(), "function")
                 .addKind("Interface", icons.getInterfaces(), "interface")
                 .addKind("Object", icons.getObjects(), "object")
                 .setValidator(new AddFileInputValidator(directory.getVirtualFile()));
