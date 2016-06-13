@@ -29,8 +29,10 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     public WordsScanner getWordsScanner() {
         return new DefaultWordsScanner(
                 new CeylonAntlrToIntellijLexerAdapter(),
-                TokenSet.create(TokenTypes.LIDENTIFIER.getTokenType(), TokenTypes.UIDENTIFIER.getTokenType()),
-                TokenSet.create(TokenTypes.MULTI_COMMENT.getTokenType(), TokenTypes.LINE_COMMENT.getTokenType()),
+                TokenSet.create(TokenTypes.LIDENTIFIER.getTokenType(),
+                                TokenTypes.UIDENTIFIER.getTokenType()),
+                TokenSet.create(TokenTypes.MULTI_COMMENT.getTokenType(),
+                                TokenTypes.LINE_COMMENT.getTokenType()),
                 TokenSet.create(TokenTypes.STRING_LITERAL.getTokenType())
         );
     }
@@ -54,21 +56,31 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
         } else if (element instanceof CeylonPsi.AnyInterfacePsi) {
             return "interface";
         } else if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
-            return "attribute";
+            return element.getParent() instanceof CeylonPsi.ClassBodyPsi
+                || element.getParent() instanceof CeylonPsi.InterfaceBodyPsi ?
+                    "attribute" : "value";
         } else if (element instanceof CeylonPsi.AnyMethodPsi) {
-            Tree.AnyMethod node = ((CeylonPsi.AnyMethodPsi) element).getCeylonNode();
-            if (node.getDeclarationModel() != null && node.getDeclarationModel().isAnnotation()) {
-                return "annotation";
+            CeylonPsi.AnyMethodPsi methodPsi = (CeylonPsi.AnyMethodPsi) element;
+            for (Tree.Annotation a: methodPsi.getCeylonNode().getAnnotationList().getAnnotations()) {
+                if (a.getPrimary().getText().equals("annotation")) {
+                    return "annotation";
+                }
             }
-            return "function";
+            return element.getParent() instanceof CeylonPsi.ClassBodyPsi
+                || element.getParent() instanceof CeylonPsi.InterfaceBodyPsi ?
+                    "method" : "function";
         } else if (element instanceof ParameterPsiIdOwner) {
             return "function parameter";
+        } else if (element instanceof CeylonPsi.ParameterPsi) {
+            return "parameter";
         } else if (element instanceof CeylonPsi.TypeParameterDeclarationPsi) {
             return "type parameter";
         } else if (element instanceof CeylonPsi.ObjectDefinitionPsi) {
             return "object";
         } else if (element instanceof CeylonPsi.ConstructorPsi) {
             return "constructor";
+        } else if (element instanceof CeylonPsi.EnumeratedPsi) {
+            return "value constructor";
         } else if (element instanceof CeylonPsi.TypeAliasDeclarationPsi) {
             return "alias";
         } else if (element instanceof CeylonPsi.PackageDescriptorPsi) {
@@ -77,14 +89,10 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
             return "module";
         } else if (element instanceof CeylonPsi.VariablePsi) {
             return "variable";
-        } else if (element instanceof CeylonPsi.AttributeGetterDefinitionPsi) {
-            return "getter";
+//        } else if (element instanceof CeylonPsi.AttributeGetterDefinitionPsi) {
+//            return "getter";
         } else if (element instanceof CeylonPsi.AttributeSetterDefinitionPsi) {
             return "setter";
-        } else if (element instanceof CeylonPsi.EnumeratedPsi) {
-            return "enumerated type";
-        } else if (element instanceof CeylonPsi.ParameterPsi) {
-            return "parameter";
         }
 
         logger.warn("Can't find type name for class " + element.getClass());
@@ -97,23 +105,33 @@ public class CeylonFindUsagesProvider implements FindUsagesProvider {
     public String getDescriptiveName(@NotNull PsiElement element) {
         if (element instanceof CeylonCompositeElement) {
             CeylonFile file = (CeylonFile) element.getContainingFile();
-            Node node = nodes_.get_().findNode(file.getCompilationUnit(), file.getTokens(),
-                    element.getTextRange().getStartOffset(), element.getTextRange().getEndOffset());
+            Node node =
+                    nodes_.get_()
+                        .findNode(file.getCompilationUnit(), file.getTokens(),
+                                element.getTextRange().getStartOffset(),
+                                element.getTextRange().getEndOffset());
 
             if (node != null) {
+                //TODO: handle shortcut refinement here!!!
                 if (node instanceof Tree.InitializerParameter) {
-                    return ((Tree.InitializerParameter) node).getParameterModel().getName();
+                    Tree.InitializerParameter initializerParameter =
+                            (Tree.InitializerParameter) node;
+                    return initializerParameter.getIdentifier().getText();
                 }
-                Tree.Declaration declaration = nodes_.get_().findDeclaration(file.getCompilationUnit(), node);
-
-                return declaration.getDeclarationModel().getNameAsString();
+                else {
+                    Tree.Declaration declaration =
+                            nodes_.get_()
+                                .findDeclaration(file.getCompilationUnit(), node);
+                    return declaration.getIdentifier().getText();
+                }
             }
         }
 
         logger.warn("Descriptive name not implemented for " + element.getClass());
 
         if (element instanceof CeylonPsi.IdentifierPsi) {
-            return ((CeylonPsi.IdentifierPsi) element).getCeylonNode().getText();
+            CeylonPsi.IdentifierPsi id = (CeylonPsi.IdentifierPsi) element;
+            return id.getCeylonNode().getText();
         }
         return "<unknown>";
     }
