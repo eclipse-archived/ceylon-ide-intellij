@@ -7,7 +7,7 @@ import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiUtil;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +46,7 @@ public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement>
 
     @Override
     public Icon getIcon(boolean open) {
-        return ideaIcons_.get_().getImports();
+        return icons_.get_().getImports();
     }
 
     @NotNull
@@ -89,7 +89,7 @@ class CeylonImportTreeElement extends PsiTreeElementBase<CeylonPsi.ImportPsi>
 
     @Override
     public Icon getIcon(boolean open) {
-        return ideaIcons_.get_().getSingleImport();
+        return icons_.get_().getSingleImport();
     }
 
     @NotNull

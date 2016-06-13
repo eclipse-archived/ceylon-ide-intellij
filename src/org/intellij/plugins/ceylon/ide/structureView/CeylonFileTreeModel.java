@@ -161,12 +161,12 @@ class CeylonFileTreeModel extends TextEditorBasedStructureViewModel
             private final ClassOrInterface type;
             private List<TreeElement> list = new ArrayList<>();
 
-            private List<TreeElement> getList() {
-                return list;
-            }
-
             private SupertypeGroup(ClassOrInterface type) {
                 this.type = type;
+            }
+
+            private List<TreeElement> getList() {
+                return list;
             }
 
             @NotNull
@@ -191,7 +191,7 @@ class CeylonFileTreeModel extends TextEditorBasedStructureViewModel
             @Override
             public Icon getIcon(boolean b) {
                 return AllIcons.General.ImplementingMethod;
-//                        return ideaIcons_.get_().forDeclaration(type);
+//                        return icons_.get_().forDeclaration(type);
             }
 
             @NotNull

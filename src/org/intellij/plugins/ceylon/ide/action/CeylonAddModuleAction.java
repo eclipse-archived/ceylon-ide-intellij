@@ -12,7 +12,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.common.Backend;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.intellij.plugins.ceylon.ide.wizard.CreateCeylonModuleWizard;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -89,6 +89,6 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
     @Override
     protected Icon getCeylonIcon() {
-        return ideaIcons_.get_().getModules();
+        return icons_.get_().getModules();
     }
 }

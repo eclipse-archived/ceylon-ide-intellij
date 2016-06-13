@@ -1,7 +1,7 @@
 package org.intellij.plugins.ceylon.ide.structureView;
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 
 import javax.swing.*;
 
@@ -13,6 +13,6 @@ class CeylonTypeAliasTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.
 
     @Override
     public Icon getIcon(boolean open) {
-        return ideaIcons_.get_().forDeclaration(getElement().getCeylonNode());
+        return icons_.get_().forDeclaration(getElement().getCeylonNode());
     }
 }

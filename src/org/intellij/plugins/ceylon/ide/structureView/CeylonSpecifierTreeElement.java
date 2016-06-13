@@ -15,7 +15,7 @@ import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.TypedDeclaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonDeclarationDescriptionProvider_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,7 +84,7 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
 
     /*@Override
     public Icon getIcon(boolean open) {
-        return ideaIcons_.get_().forDeclaration(getElement().getCeylonNode());
+        return icons_.get_().forDeclaration(getElement().getCeylonNode());
     }*/
 
     @Nullable

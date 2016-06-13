@@ -7,7 +7,7 @@ import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.Condition;
 import com.intellij.util.ArrayUtil;
 import org.intellij.plugins.ceylon.ide.CeylonBundle;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,10 +20,9 @@ import java.util.ArrayList;
  */
 public class CeylonModuleType extends ModuleType<CeylonModuleBuilder> {
 
-    private static CeylonModuleType INSTANCE = new CeylonModuleType();
-
     @NonNls
     private static final String ID = "CEYLON_MODULE";
+    private static CeylonModuleType INSTANCE = new CeylonModuleType();
 
     public CeylonModuleType() {
         super(ID);
@@ -53,12 +52,12 @@ public class CeylonModuleType extends ModuleType<CeylonModuleBuilder> {
 
     @Override
     public Icon getBigIcon() {
-        return ideaIcons_.get_().getCeylon();
+        return icons_.get_().getCeylon();
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return ideaIcons_.get_().getCeylon();
+        return icons_.get_().getCeylon();
     }
 
 

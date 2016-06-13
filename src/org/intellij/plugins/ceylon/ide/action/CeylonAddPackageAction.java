@@ -11,7 +11,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -55,7 +55,7 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
 
     @Override
     protected Icon getCeylonIcon() {
-        return ideaIcons_.get_().getPackages();
+        return icons_.get_().getPackages();
     }
 
     private class AddPackageInputValidator implements InputValidatorEx {

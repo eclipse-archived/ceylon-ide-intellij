@@ -11,7 +11,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +54,7 @@ public class CeylonAddFileAction extends CeylonAddingFilesAction {
 
     @Override
     protected Icon getCeylonIcon() {
-        return ideaIcons_.get_().getFile();
+        return icons_.get_().getFile();
     }
 
     @NotNull

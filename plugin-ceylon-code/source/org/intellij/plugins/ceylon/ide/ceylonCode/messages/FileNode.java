@@ -9,7 +9,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.redhat.ceylon.ide.common.model.CeylonProjectBuild;
 import com.redhat.ceylon.ide.common.model.Severity;
 import org.jetbrains.annotations.NotNull;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,9 +17,9 @@ import java.util.List;
 
 class FileNode extends AbstractTreeNode<Object> {
 
+    private final Severity severity;
     private VirtualFile file;
     private Iterable messages;
-    private final Severity severity;
 
     FileNode(Project project, VirtualFile file, Severity severity, Iterable messages) {
         super(project, file.getPath());
@@ -47,7 +47,7 @@ class FileNode extends AbstractTreeNode<Object> {
 
     @Override
     protected void update(PresentationData presentation) {
-        presentation.setIcon(ideaIcons_.get_().getFile());
+        presentation.setIcon(icons_.get_().getFile());
         presentation.addText(file.getPresentableName(),
                 SimpleTextAttributes.REGULAR_ATTRIBUTES);
         int size = getChildren().size();
