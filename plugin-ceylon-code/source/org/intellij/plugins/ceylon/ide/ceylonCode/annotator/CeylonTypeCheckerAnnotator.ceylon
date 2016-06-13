@@ -147,7 +147,7 @@ shared class CeylonTypeCheckerAnnotator()
                 highlighter.highlightQuotedMessage(message.message, project)
             );
             isError = true;
-            if (unresolvedReferenceCodes.contains(message.code)) {
+            if (message.code in unresolvedReferenceCodes) {
                 annotation.highlightType = ProblemHighlightType.likeUnknownSymbol;
             }
         } else if (is UsageWarning message) {
@@ -158,7 +158,7 @@ shared class CeylonTypeCheckerAnnotator()
                 highlighter.highlightQuotedMessage(message.message, project)
             );
             isError = false;
-            if (unusedCodes.contains(message.warningName)) {
+            if (message.warningName in unusedCodes) {
                 annotation.highlightType = ProblemHighlightType.likeUnusedSymbol;
             } else {
                 annotation.highlightType = ProblemHighlightType.genericErrorOrWarning;
