@@ -129,11 +129,11 @@
         <codeInsight.gotoSuper language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoSuperHandler"/>
 
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass"
-                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.ClassPresentationProvider"/>
+                                  implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.presentation.ClassPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner"
-                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.DeclarationPresentationProvider"/>
+                                  implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.presentation.DeclarationPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.SpecifierStatementPsiIdOwner"
-                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.SpecifierPresentationProvider"/>
+                                  implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.presentation.SpecifierPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationNavigationItem"
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationPresentationProvider"/>
         <moduleRendererFactory implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.DeclarationModuleRendererFactory"/>
@@ -150,7 +150,7 @@
         <inlineActionHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.InlineAction"/>
         <lang.importOptimizer language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonImportOptimizer"/>
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementDescriptionProvider"/>
-        <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>
+        <iconProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.presentation.CeylonIconProvider"/>
         <codeInsight.lineMarkerProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonLineMarkerProvider"/>
         <lang.smartEnterProcessor language="Ceylon"
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.editor.TerminateStatementAction"/>
@@ -166,7 +166,7 @@
         <typeDeclarationProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonTypeDeclarationProvider"/>
         <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi$IdentifierPsi"
                                  implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
-        <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.resolve.CeylonTargetElementEvaluator"/>
+        <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonTargetElementEvaluator"/>
         <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.GotoTargetRenderer"/>
         <!--<java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>-->

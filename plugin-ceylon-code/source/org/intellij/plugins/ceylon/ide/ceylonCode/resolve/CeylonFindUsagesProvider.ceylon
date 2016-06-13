@@ -46,38 +46,38 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
 shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
 
     Logger logger = Logger.getInstance(javaClass<CeylonFindUsagesProvider>());
-    
-    wordsScanner 
-            => DefaultWordsScanner(CeylonAntlrToIntellijLexerAdapter(), 
-                TokenSet.create(TokenTypes.lidentifier.tokenType, TokenTypes.uidentifier.tokenType), 
-                TokenSet.create(TokenTypes.multiComment.tokenType, TokenTypes.lineComment.tokenType), 
+
+    wordsScanner
+            => DefaultWordsScanner(CeylonAntlrToIntellijLexerAdapter(),
+                TokenSet.create(TokenTypes.lidentifier.tokenType, TokenTypes.uidentifier.tokenType),
+                TokenSet.create(TokenTypes.multiComment.tokenType, TokenTypes.lineComment.tokenType),
                 TokenSet.create(TokenTypes.stringLiteral.tokenType));
 
-    canFindUsagesFor(PsiElement psiElement) 
+    canFindUsagesFor(PsiElement psiElement)
             => psiElement is DeclarationPsiNameIdOwner;
 
-    getHelpId(PsiElement psiElement) 
+    getHelpId(PsiElement psiElement)
             => "Please open an issue if you ever need this help :)";
 
     shared actual String getType(PsiElement element) {
-        
+
         if (is CeylonPsi.AnyClassPsi element) {
             return "class";
         } else if (is CeylonPsi.AnyInterfacePsi element) {
             return "interface";
         } else if (is CeylonPsi.AttributeDeclarationPsi element) {
-            return if (element.parent is CeylonPsi.ClassBodyPsi 
-                    || element.parent is CeylonPsi.InterfaceBodyPsi) 
+            return if (element.parent is CeylonPsi.ClassBodyPsi
+                    || element.parent is CeylonPsi.InterfaceBodyPsi)
                 then "attribute" else "value";
         } else if (is CeylonPsi.AnyMethodPsi element) {
             CeylonPsi.AnyMethodPsi methodPsi = element;
             for (Tree.Annotation a in methodPsi.ceylonNode.annotationList.annotations) {
-                if (a.primary.text.equals("annotation")) {
+                if (a.primary.token.text.equals("annotation")) {
                     return "annotation";
                 }
             }
-            return if (element.parent is CeylonPsi.ClassBodyPsi 
-                    || element.parent is CeylonPsi.InterfaceBodyPsi) 
+            return if (element.parent is CeylonPsi.ClassBodyPsi
+                    || element.parent is CeylonPsi.InterfaceBodyPsi)
                 then "method" else "function";
         } else if (is ParameterPsiIdOwner element) {
             return "function parameter";
@@ -109,11 +109,11 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
     shared actual String getDescriptiveName(PsiElement element) {
         if (is CeylonCompositeElement element) {
             assert (is CeylonFile file = element.containingFile);
-            value node = nodes.findNode { 
-                node = file.compilationUnit; 
-                tokens = file.tokens; 
-                startOffset = element.textRange.startOffset; 
-                endOffset = element.textRange.endOffset; 
+            value node = nodes.findNode {
+                node = file.compilationUnit;
+                tokens = file.tokens;
+                startOffset = element.textRange.startOffset;
+                endOffset = element.textRange.endOffset;
             };
             if (exists node) {
                 if (is Tree.InitializerParameter node) {
@@ -126,9 +126,9 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
                 }
             }
         }
-        
+
         logger.warn("Descriptive name not implemented for " + className(element));
-        
+
         if (is CeylonPsi.IdentifierPsi element) {
             CeylonPsi.IdentifierPsi id = element;
             return id.ceylonNode.text;
