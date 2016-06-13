@@ -31,9 +31,13 @@ shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProv
     
     shared actual String? getElementDescription(PsiElement element,
         ElementDescriptionLocation location) 
-            => if (is UsageViewLongNameLocation|UsageViewShortNameLocation location,
-                    is CeylonCompositeElement element)
-            then descriptions.descriptionForPsi(element) 
+            => if (is CeylonCompositeElement element)
+            then (switch (location)
+                  case (is UsageViewLongNameLocation) 
+                    descriptions.descriptionForPsi(element)
+                  case (is UsageViewShortNameLocation) 
+                    element.name
+                  else null) 
             else null;
 }
 
