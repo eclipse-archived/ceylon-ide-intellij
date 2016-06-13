@@ -5,7 +5,7 @@ import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunConfigurationModule;
 import com.intellij.openapi.project.Project;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.ideaIcons_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -33,7 +33,7 @@ public class CeylonRunConfigurationType implements ConfigurationType {
 
     @Override
     public Icon getIcon() {
-        return ideaIcons_.get_().getCeylon();
+        return icons_.get_().getCeylon();
     }
 
     @NotNull
