@@ -1,3 +1,10 @@
+import com.intellij.codeInsight.completion {
+    InsertHandler,
+    InsertionContext
+}
+import com.intellij.codeInsight.lookup {
+    LookupElement
+}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -33,28 +40,17 @@ import com.redhat.ceylon.model.typechecker.model {
     Reference
 }
 
-import java.util {
-    JList=List
-}
-
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    icons
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaTextChange
 }
-import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
-}
-import com.intellij.codeInsight.lookup {
-    LookupElement
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    icons
 }
 
 shared object ideaCompletionServices satisfies CompletionServices {
     
     shared actual void newParametersCompletionProposal(CompletionContext ctx, Integer offset,
-        String prefix, String desc, String text, JList<Type> argTypes, Node node, Unit unit) {
+        String prefix, String desc, String text, List<Type> argTypes, Node node, Unit unit) {
         
         if (is IdeaCompletionContext ctx) {
             ctx.proposals.add(newLookup(prefix + desc, prefix + text, icons.correction));

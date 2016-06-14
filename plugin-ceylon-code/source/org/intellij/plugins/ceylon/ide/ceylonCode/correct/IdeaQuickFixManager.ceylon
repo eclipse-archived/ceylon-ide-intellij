@@ -1,3 +1,6 @@
+import ceylon.collection {
+    ArrayList
+}
 import ceylon.interop.java {
     JavaRunnable
 }
@@ -93,9 +96,6 @@ import com.redhat.ceylon.ide.common.refactoring {
 
 import java.lang {
     Comparable
-}
-import java.util {
-    ArrayList
 }
 
 import javax.swing {
@@ -265,8 +265,8 @@ shared class IdeaQuickFixData(
     void showImportModulesPopup(Editor editor) {
         value list = JBList(candidateModules);
         list.installCellRenderer(object satisfies NotNullFunction<[String, Icon, Anything()], JComponent> {
-            fun([String, Icon, Anything()] tuple) 
-                    => let ([desc, icon, _] = tuple) 
+            fun([String, Icon, Anything()] tuple)
+                    => let ([desc, icon, _] = tuple)
                     JLabel(desc, icon, JLabel.leading);
         });
 
