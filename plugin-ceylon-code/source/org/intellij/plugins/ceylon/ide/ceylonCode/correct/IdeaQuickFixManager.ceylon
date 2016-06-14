@@ -100,12 +100,57 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
+import com.intellij.codeInspection {
+    HintAction
+}
+import com.intellij.codeInsight.hint {
+    HintManager,
+    QuestionAction
+}
+import com.intellij.openapi.actionSystem {
+    IdeActions,
+    ActionManager
+}
+import com.intellij.openapi.keymap {
+    KeymapUtil
+}
+import com.intellij.psi.util {
+    PsiUtil
+}
 
-class CustomIntention(Integer position, String desc, <PlatformTextChange|Anything()>? change, TextRange? selection = null, Icon? image = null,
-    Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop)
+class CustomIntention(Integer position, String desc,
+    <PlatformTextChange|Anything()>? change,
+    TextRange? selection = null, Icon? image = null,
+    Boolean qualifiedNameIsPath = false,
+    [String,TextRange]? hint = null,
+    Anything callback(Project project, Editor editor, PsiFile psiFile) => noop)
         extends BaseIntentionAction()
-        satisfies Iconable & Comparable<IntentionAction> {
-    
+        satisfies Iconable & Comparable<IntentionAction> & HintAction {
+
+    shared actual Boolean showHint(Editor editor) {
+        if (exists [text,range] = hint) {
+            value shortcut
+                = KeymapUtil.getFirstKeyboardShortcutText(ActionManager.instance.getAction(IdeActions.actionShowIntentionActions));
+                HintManager.instance.showQuestionHint(editor,
+                    text + " " + shortcut,
+                    range.startOffset, range.endOffset,
+                    object satisfies QuestionAction {
+                        shared actual Boolean execute() {
+                            return true;
+                        }
+                    } /*HintManager.above,
+                HintManager.hideByAnyKey
+            .or(HintManager.hideByTextChange)
+            .or(HintManager.hideIfOutOfEditor)
+            .or(HintManager.hideByScrolling),
+            6000*/);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     shared actual String familyName => "Ceylon Intentions";
     variable Project? project = null;
     
@@ -169,13 +214,25 @@ shared class IdeaQuickFixData(
                        then DefaultRegion(e.selectionModel.selectionStart, e.selectionModel.selectionEnd)
                        else DefaultRegion(0);
     
-    shared default void registerFix(String desc, <PlatformTextChange|Anything()>? change, TextRange? selection = null, Icon? image = null,
-        Boolean qualifiedNameIsPath = false, Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
+    shared default void registerFix(String desc,
+        <PlatformTextChange|Anything()>? change,
+        TextRange? selection = null, Icon? image = null,
+        Boolean qualifiedNameIsPath = false, String? hint = null,
+        Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
         
         if (exists annotation) {
             value position = annotation.quickFixes ?. size() else 0;
-            IntentionAction intention = CustomIntention(position, desc, change,
-                selection, image, qualifiedNameIsPath, callback);
+            value intention
+                = CustomIntention {
+                    position = position;
+                    desc = desc;
+                    change = change;
+                    selection = selection;
+                    image = image;
+                    qualifiedNameIsPath = qualifiedNameIsPath;
+                    callback = callback;
+                    hint = if (exists hint) then [hint, TextRange(annotation.startOffset, annotation.endOffset)] else null;
+                };
             annotation.registerFix(intention);
         } else {
             if (is IdeaTextChange change) {
@@ -225,32 +282,54 @@ shared class IdeaQuickFixData(
     shared actual default void addQuickFix(String desc,
         PlatformTextChange|Anything() change,
         DefaultRegion? selection, Boolean qualifiedNameIsPath, Icons? icon,
-        QuickFixKind kind) {
+        QuickFixKind kind, String? hint) {
         value range = toRange(selection);
 
         if (is IdeaTextChange change) {
-            registerFix(desc, change, range, icons.correction, qualifiedNameIsPath);
+            registerFix {
+                desc = desc;
+                change = change;
+                selection = range;
+                image = icons.correction;
+                qualifiedNameIsPath = qualifiedNameIsPath;
+                hint = hint;
+            };
         } else if (is Anything() change) {
             if (kind == asyncModuleImport) {
                 candidateModules.add([desc, icons.imports, change]);
             } else if (kind == addModuleImport) {
-                registerFix(desc, null, range, icons.correction, qualifiedNameIsPath, (p, e, f) {
-                    candidateModules.clear();
-                    ProgressManager.instance.runProcessWithProgressAsynchronously(
-                        project.project,
-                        "Querying module repositories",
-                        JavaRunnable(change),
-                        JavaRunnable(void () {
-                            if (!candidateModules.empty) {
-                                showImportModulesPopup(e);
-                            }
-                        }),
-                        null,
-                        PerformInBackgroundOption.alwaysBackground
-                    );
-                });
+                registerFix {
+                    desc = desc;
+                    change = null;
+                    selection = range;
+                    image = icons.correction;
+                    qualifiedNameIsPath = qualifiedNameIsPath;
+                    hint = hint;
+                    void callback(Project p, Editor e, PsiFile f) {
+                        candidateModules.clear();
+                        ProgressManager.instance.runProcessWithProgressAsynchronously(
+                            project.project,
+                            "Querying module repositories",
+                            JavaRunnable(change),
+                            JavaRunnable(void () {
+                                if (!candidateModules.empty) {
+                                    showImportModulesPopup(e);
+                                }
+                            }),
+                            null,
+                            PerformInBackgroundOption.alwaysBackground
+                        );
+                    }
+                };
             } else {
-                registerFix(desc, change, range, icons.correction, qualifiedNameIsPath);
+                registerFix {
+                    desc = desc;
+                    change = change;
+                    selection = range;
+                    image = icons.correction;
+                    qualifiedNameIsPath = qualifiedNameIsPath;
+                    hint = hint;
+                };
             }
         }
     }

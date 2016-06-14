@@ -50,6 +50,9 @@ import javax.swing {
     Icon
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+    highlighter
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
 }
@@ -59,9 +62,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    highlighter
 }
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
@@ -115,14 +115,15 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                     _editor
                 ) {
                     shared actual void addQuickFix(String desc, PlatformTextChange|Anything() change,
-                        DefaultRegion? selection, Boolean ignored, Icons? icon, QuickFixKind kind) {
+                        DefaultRegion? selection, Boolean ignored, Icons? icon, QuickFixKind kind,
+                        String? hint) {
                         if (is IdeaTextChange|Anything() change) {
                             makeAvailable(outerProject, desc, change, selection);
                         }
                     }
 
                     shared actual void registerFix(String desc, <PlatformTextChange|Anything()>? change,
-                        TextRange? selection, Icon? image, Boolean qualifiedNameIsPath,
+                        TextRange? selection, Icon? image, Boolean qualifiedNameIsPath, String? hint,
                         Anything callback(Project project, Editor editor, PsiFile psiFile)) {
 
                         value sel = if (exists selection)
