@@ -123,22 +123,27 @@ class CustomIntention(Integer position, String desc,
     TextRange? selection = null, Icon? image = null,
     Boolean qualifiedNameIsPath = false,
     [String,TextRange]? hint = null,
-    Anything callback(Project project, Editor editor, PsiFile psiFile) => noop)
+    Anything callback(Project project, Editor editor, PsiFile psiFile) => noop())
         extends BaseIntentionAction()
         satisfies Iconable & Comparable<IntentionAction> & HintAction {
 
+    variable Project? project = null;
+    
     shared actual Boolean showHint(Editor editor) {
         if (exists [text,range] = hint) {
             value shortcut
-                = KeymapUtil.getFirstKeyboardShortcutText(ActionManager.instance.getAction(IdeActions.actionShowIntentionActions));
-                HintManager.instance.showQuestionHint(editor,
-                    text + " " + shortcut,
-                    range.startOffset, range.endOffset,
-                    object satisfies QuestionAction {
-                        shared actual Boolean execute() {
-                            return true;
-                        }
-                    } /*HintManager.above,
+                = KeymapUtil.getFirstKeyboardShortcutText(
+                    ActionManager.instance.getAction(
+                        IdeActions.actionShowIntentionActions));
+            HintManager.instance.showQuestionHint(editor,
+                text + " " + shortcut,
+                range.startOffset, range.endOffset,
+                object satisfies QuestionAction {
+                    shared actual Boolean execute() {
+                        return true;
+                    }
+                }
+            /*HintManager.above,
                 HintManager.hideByAnyKey
             .or(HintManager.hideByTextChange)
             .or(HintManager.hideIfOutOfEditor)
@@ -151,8 +156,7 @@ class CustomIntention(Integer position, String desc,
         }
     }
 
-    shared actual String familyName => "Ceylon Intentions";
-    variable Project? project = null;
+    familyName => "Ceylon Intentions";
     
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
         if (is IdeaTextChange change) {
@@ -178,20 +182,13 @@ class CustomIntention(Integer position, String desc,
     
     shared actual Icon? getIcon(Integer int) => image;
     
-    shared actual Boolean equals(Object that) {
-        if (is CustomIntention that) {
-            return desc==that.desc;
-        } else {
-            return false;
-        }
-    }
+    equals(Object that)
+            => if (is CustomIntention that)
+            then desc==that.desc else false;
     
-    shared actual Integer compareTo(IntentionAction? t) {
-        if (is CustomIntention t) {
-            return position - t.position;
-        }
-        return 0;
-    }
+    compareTo(IntentionAction? t) 
+            => if (is CustomIntention t) 
+            then position - t.position else 0;
 }
 
 shared class IdeaQuickFixData(
@@ -218,7 +215,7 @@ shared class IdeaQuickFixData(
         <PlatformTextChange|Anything()>? change,
         TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, String? hint = null,
-        Anything callback(Project project, Editor editor, PsiFile psiFile) => noop) {
+        Anything callback(Project project, Editor editor, PsiFile psiFile) => noop()) {
         
         if (exists annotation) {
             value position = annotation.quickFixes ?. size() else 0;
@@ -257,7 +254,8 @@ shared class IdeaQuickFixData(
     void showImportModulesPopup(Editor editor) {
         value list = JBList(candidateModules);
         list.installCellRenderer(object satisfies NotNullFunction<[String, Icon, Anything()], JComponent> {
-            fun([String, Icon, Anything()] tuple) => JLabel(tuple[0], tuple[1], JLabel.leading);
+            fun([String, Icon, Anything()] tuple) 
+                    => JLabel(tuple[0], tuple[1], JLabel.leading);
         });
 
         JBPopupFactory.instance
