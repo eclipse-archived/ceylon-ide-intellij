@@ -43,13 +43,22 @@
                     id="Ceylon.ToggleAutoUpdate" text="Disable automatic update of model"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
-        <action id="Ceylon.AddCeylonModule" class="org.intellij.plugins.ceylon.ide.action.CeylonAddModuleAction" text="Ceylon _Module" description="Add a new Ceylon module">
+        <action id="Ceylon.AddCeylonModule"
+                class="org.intellij.plugins.ceylon.ide.action.CeylonAddModuleAction"
+                text="Ceylon _Module"
+                description="Add a new Ceylon module">
             <add-to-group group-id="NewGroup1" anchor="before" relative-to-action="NewModuleInGroup"/>
         </action>
-        <action id="Ceylon.AddCeylonPackage" class="org.intellij.plugins.ceylon.ide.action.CeylonAddPackageAction" text="Ceylon _Package" description="Add a new Ceylon package">
+        <action id="Ceylon.AddCeylonPackage"
+                class="org.intellij.plugins.ceylon.ide.action.CeylonAddPackageAction"
+                text="Ceylon _Package"
+                description="Add a new Ceylon package">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="Ceylon.AddCeylonModule"/>
         </action>
-        <action id="Ceylon.AddCeylonFile" class="org.intellij.plugins.ceylon.ide.action.CeylonAddFileAction" text="Ceylon File/Declaration" description="Add a new Ceylon declaration">
+        <action id="Ceylon.AddCeylonFile"
+                class="org.intellij.plugins.ceylon.ide.action.CeylonAddFileAction"
+                text="Ceylon File/Declaration"
+                description="Add a new Ceylon declaration">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="Ceylon.AddCeylonPackage"/>
         </action>
         <action id="Ceylon.RefineEqualsHash"
@@ -64,7 +73,9 @@
             <add-to-group group-id="GenerateGroup"/>
             <keyboard-shortcut first-keystroke="control shift 2" second-keystroke="F" keymap="$default"/>
         </action>
-        <action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction" id="Ceylon.PasteAsCeylon" text="Paste Java as Ceylon">
+        <action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction"
+                id="Ceylon.PasteAsCeylon"
+                text="Paste Java as Ceylon">
             <add-to-group group-id="CutCopyPasteGroup" anchor="last"/>
         </action>
         <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.AddBootstrapFilesAction"
