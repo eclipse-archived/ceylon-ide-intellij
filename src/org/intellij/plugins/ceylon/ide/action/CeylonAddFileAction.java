@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.redhat.ceylon.ide.common.util.escaping_;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -17,15 +16,17 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.google.common.base.Objects.firstNonNull;
+import static com.intellij.psi.util.PsiTreeUtil.findChildOfType;
 import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 
-public class CeylonAddFileAction extends CreateFromTemplateAction<DeclarationPsiNameIdOwner> {
+public class CeylonAddFileAction extends CreateFromTemplateAction<PsiElement> {
 
     private static final icons_ icons = icons_.get_();
     private ceylonFileFactory_ ceylonFileFactory = ceylonFileFactory_.get_();
 
     public CeylonAddFileAction() {
-        super("", "Create new Ceylon declaration", icons.getCeylon());
+        super("", "Create new Ceylon declaration", icons.getFile());
     }
 
     @NotNull
@@ -38,19 +39,23 @@ public class CeylonAddFileAction extends CreateFromTemplateAction<DeclarationPsi
 
     @Nullable
     @Override
-    protected DeclarationPsiNameIdOwner createFile(String name, String templateName, PsiDirectory dir) {
+    protected PsiElement createFile(String name, String templateName, PsiDirectory dir) {
         PsiElement unit = ceylonFileFactory.createUnit(dir, name, name + ".ceylon", templateName);
 
+        PsiElement namedElement = null;
+
         if (unit instanceof CeylonFile) {
-            return PsiTreeUtil.findChildOfType(unit, DeclarationPsiNameIdOwner.class);
+            namedElement = findChildOfType(unit, DeclarationPsiNameIdOwner.class);
         }
-        return null;
+
+        return firstNonNull(namedElement, unit);
     }
 
     @Override
     protected void buildDialog(Project project, PsiDirectory directory, CreateFileFromTemplateDialog.Builder builder) {
         builder
                 .setTitle("Create Ceylon Declaration")
+                .addKind("File", icons.getFile(), "unit")
                 .addKind("Class", icons.getClasses(), "class")
                 .addKind("Function", icons.getMethods(), "function")
                 .addKind("Interface", icons.getInterfaces(), "interface")
