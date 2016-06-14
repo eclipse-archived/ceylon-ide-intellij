@@ -99,7 +99,7 @@ shared class CeylonTypeCheckerAnnotator()
     shared actual {[Message, TextRange?]*}? doAnnotate(CeylonFile ceylonFile)
             => concurrencyManager.withAlternateResolution(() 
                 => if (exists pu = ceylonFile.ensureTypechecked(),
-                        exists cu = pu.compilationUnit)
+                       exists cu = pu.compilationUnit)
                 then ErrorsVisitor(cu, ceylonFile).extractMessages()
                 else null);
     
@@ -108,16 +108,21 @@ shared class CeylonTypeCheckerAnnotator()
         concurrencyManager.withAlternateResolution(
             () => ceylonMessages.each(
                 ([message,range]) {
-                    value result = addAnnotation(message, range, holder, file);
+                    value result = addAnnotation {
+                        message = message;
+                        range = range;
+                        annotationHolder = holder;
+                        file = file;
+                    };
                     hasErrors ||= result;
-            } 
-            )
+            })
         );
         if (is CeylonFile file,
             exists cu = file.compilationUnit) {
 
             if (cu.errors.empty) {
-                value modelManager = file.project.getComponent(javaClass<CeylonModelManager>());
+                value modelManager =
+                    file.project.getComponent(javaClass<CeylonModelManager>());
                 if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
                     modelManager.scheduleModelUpdate();
                 }
@@ -128,9 +133,11 @@ shared class CeylonTypeCheckerAnnotator()
                     empty => false;
                 };
 
-                WolfTheProblemSolver.getInstance(file.project).reportProblems(file.virtualFile, problems);
+                WolfTheProblemSolver.getInstance(file.project)
+                    .reportProblems(file.virtualFile, problems);
             } else {
-                WolfTheProblemSolver.getInstance(file.project).clearProblems(file.virtualFile);
+                WolfTheProblemSolver.getInstance(file.project)
+                    .clearProblems(file.virtualFile);
             }
         }
     }
@@ -138,44 +145,52 @@ shared class CeylonTypeCheckerAnnotator()
     Boolean addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, PsiFile file) {
 
         value project = file.project;
+
+        String highlighted
+            = highlighter.highlightQuotedMessage(message.message, project);
         Annotation annotation;
         Boolean isError;
         if (is AnyError message) {
             annotation = annotationHolder.createAnnotation(
                 HighlightSeverity.error,
-                range,
-                message.message,
-                highlighter.highlightQuotedMessage(message.message, project)
+                range, message.message, highlighted
             );
             isError = true;
             if (message.code in unresolvedReferenceCodes) {
-                annotation.highlightType = ProblemHighlightType.likeUnknownSymbol;
+                annotation.highlightType
+                    = ProblemHighlightType.likeUnknownSymbol;
             }
-        } else if (is UsageWarning message) {
+        }
+        else if (is UsageWarning message) {
             annotation = annotationHolder.createAnnotation(
                 HighlightSeverity.warning,
-                range,
-                message.message,
-                highlighter.highlightQuotedMessage(message.message, project)
+                range, message.message, highlighted
             );
             isError = false;
             if (message.warningName in unusedCodes) {
-                annotation.highlightType = ProblemHighlightType.likeUnusedSymbol;
-            } else {
-                annotation.highlightType = ProblemHighlightType.genericErrorOrWarning;
+                annotation.highlightType
+                    = ProblemHighlightType.likeUnusedSymbol;
             }
-        } else {
+            else {
+                annotation.highlightType
+                    = ProblemHighlightType.genericErrorOrWarning;
+            }
+        }
+        else {
             annotation = annotationHolder.createAnnotation(
                 HighlightSeverity.information,
-                range,
-                message.message,
-                highlighter.highlightQuotedMessage(message.message, project)
+                range, message.message, highlighted
             );
             isError = false;
         }
         if (exists range,
             !ApplicationManager.application.unitTestMode) {
-            addQuickFixes(range, message, annotation, annotationHolder);
+            addQuickFixes {
+                range = range;
+                error = message;
+                annotation = annotation;
+                annotationHolder = annotationHolder;
+            };
         }
         return isError;
     }
@@ -185,13 +200,27 @@ shared class CeylonTypeCheckerAnnotator()
         value mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project);
         value pu = file.phasedUnit;
         
-        if (is IdeaCeylonProjects projects = file.project.getComponent(javaClass<IdeaCeylonProjects>()),
+        if (is IdeaCeylonProjects projects
+                = file.project.getComponent(javaClass<IdeaCeylonProjects>()),
             exists project = projects.getProject(mod),
             exists tc = project.typechecker,
-            exists node = nodes.findNode(pu.compilationUnit, null, range.startOffset, range.endOffset)) {
+            exists node = nodes.findNode {
+                node = pu.compilationUnit;
+                tokens = null;
+                startOffset = range.startOffset;
+                endOffset = range.endOffset;
+            }) {
             
-            value data = IdeaQuickFixData(error, file.viewProvider.document, pu.compilationUnit,
-                pu, node, mod, annotation, project);
+            value data = IdeaQuickFixData {
+                message = error;
+                nativeDoc = file.viewProvider.document;
+                rootNode = pu.compilationUnit;
+                phasedUnit = pu;
+                node = node;
+                project = mod;
+                annotation = annotation;
+                ceylonProject = project;
+            };
             
             try {
                 ideQuickFixManager.addQuickFixes(data, tc);
