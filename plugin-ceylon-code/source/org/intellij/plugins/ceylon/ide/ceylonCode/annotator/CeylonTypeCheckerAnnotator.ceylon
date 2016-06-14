@@ -80,6 +80,9 @@ shared class CeylonTypeCheckerAnnotator()
         extends ExternalAnnotator<CeylonFile?, {[Message, TextRange?]*}?>()
         satisfies DumbAware {
 
+    value unresolvedReferenceCodes = [ 100, 102 ];
+    value unusedCodes = [ Warning.unusedDeclaration.string, Warning.unusedImport.string ];
+
     shared actual CeylonFile? collectInformation(PsiFile file) {
         if (is CeylonFile file,
             !file.phasedUnit is ExternalPhasedUnit) {
@@ -133,8 +136,6 @@ shared class CeylonTypeCheckerAnnotator()
     }
 
     Boolean addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, PsiFile file) {
-        value unresolvedReferenceCodes = [ 100, 102 ];
-        value unusedCodes = [ Warning.unusedDeclaration.string, Warning.unusedImport.string ];
 
         value project = file.project;
         Annotation annotation;
