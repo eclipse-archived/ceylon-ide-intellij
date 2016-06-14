@@ -2,14 +2,25 @@ import ceylon.interop.java {
     JavaRunnable
 }
 
+import com.intellij.codeInsight.hint {
+    HintManager,
+    QuestionAction
+}
 import com.intellij.codeInsight.intention {
     IntentionAction
 }
 import com.intellij.codeInsight.intention.impl {
     BaseIntentionAction
 }
+import com.intellij.codeInspection {
+    HintAction
+}
 import com.intellij.lang.annotation {
     Annotation
+}
+import com.intellij.openapi.actionSystem {
+    IdeActions,
+    ActionManager
 }
 import com.intellij.openapi.application {
     Result
@@ -20,6 +31,9 @@ import com.intellij.openapi.command {
 import com.intellij.openapi.editor {
     Document,
     Editor
+}
+import com.intellij.openapi.keymap {
+    KeymapUtil
 }
 import com.intellij.openapi.\imodule {
     Module
@@ -40,6 +54,9 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiFile
+}
+import com.intellij.psi.util {
+    PsiUtilBase
 }
 import com.intellij.ui.components {
     JBList
@@ -100,55 +117,49 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
-import com.intellij.codeInspection {
-    HintAction
-}
-import com.intellij.codeInsight.hint {
-    HintManager,
-    QuestionAction
-}
-import com.intellij.openapi.actionSystem {
-    IdeActions,
-    ActionManager
-}
-import com.intellij.openapi.keymap {
-    KeymapUtil
-}
-import com.intellij.psi.util {
-    PsiUtil
-}
 
 class CustomIntention(Integer position, String desc,
     <PlatformTextChange|Anything()>? change,
     TextRange? selection = null, Icon? image = null,
     Boolean qualifiedNameIsPath = false,
-    [String,TextRange]? hint = null,
+    variable [String,TextRange]? hint = null,
     Anything callback(Project project, Editor editor, PsiFile psiFile) => noop())
         extends BaseIntentionAction()
         satisfies Iconable & Comparable<IntentionAction> & HintAction {
 
     variable Project? project = null;
-    
+
     shared actual Boolean showHint(Editor editor) {
-        if (exists [text,range] = hint) {
+        //TODO: only popup the hint if our caret is really close to the annotation?
+        if (exists [text,range] = hint,
+            exists project = this.project) {
+
+            object hintedAction satisfies QuestionAction {
+                shared actual Boolean execute() {
+                    hint = null;
+                    HintManager.instance.hideAllHints(); //TODO: this doesn't work!
+                    value p = project;
+                    object extends WriteCommandAction<Nothing>(p, "Execute Hinted Fix") {
+                        run(Result<Nothing> result) => invoke {
+                            project = project;
+                            editor = editor;
+                            psiFile = PsiUtilBase.getPsiFileInEditor(editor, project);
+                        };
+                    }.execute();
+                    return true;
+                }
+            }
+
             value shortcut
                 = KeymapUtil.getFirstKeyboardShortcutText(
                     ActionManager.instance.getAction(
                         IdeActions.actionShowIntentionActions));
+
             HintManager.instance.showQuestionHint(editor,
                 text + " " + shortcut,
                 range.startOffset, range.endOffset,
-                object satisfies QuestionAction {
-                    shared actual Boolean execute() {
-                        return true;
-                    }
-                }
-            /*HintManager.above,
-                HintManager.hideByAnyKey
-            .or(HintManager.hideByTextChange)
-            .or(HintManager.hideIfOutOfEditor)
-            .or(HintManager.hideByScrolling),
-            6000*/);
+                hintedAction);
+
             return true;
         }
         else {
@@ -157,7 +168,7 @@ class CustomIntention(Integer position, String desc,
     }
 
     familyName => "Ceylon Intentions";
-    
+
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
         if (is IdeaTextChange change) {
             change.applyOnProject(project);
@@ -186,8 +197,8 @@ class CustomIntention(Integer position, String desc,
             => if (is CustomIntention that)
             then desc==that.desc else false;
     
-    compareTo(IntentionAction? t) 
-            => if (is CustomIntention t) 
+    compareTo(IntentionAction? t)
+            => if (is CustomIntention t)
             then position - t.position else 0;
 }
 
@@ -254,7 +265,7 @@ shared class IdeaQuickFixData(
     void showImportModulesPopup(Editor editor) {
         value list = JBList(candidateModules);
         list.installCellRenderer(object satisfies NotNullFunction<[String, Icon, Anything()], JComponent> {
-            fun([String, Icon, Anything()] tuple) 
+            fun([String, Icon, Anything()] tuple)
                     => JLabel(tuple[0], tuple[1], JLabel.leading);
         });
 
