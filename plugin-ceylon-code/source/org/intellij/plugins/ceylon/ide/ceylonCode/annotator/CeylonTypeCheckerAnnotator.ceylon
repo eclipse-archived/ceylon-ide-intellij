@@ -2,12 +2,8 @@ import ceylon.interop.java {
     javaClass
 }
 
-import com.intellij.codeInsight.hint {
-    HintManager
-}
 import com.intellij.codeInspection {
-    ProblemHighlightType,
-    HintAction
+    ProblemHighlightType
 }
 import com.intellij.lang.annotation {
     AnnotationHolder,
@@ -15,18 +11,11 @@ import com.intellij.lang.annotation {
     Annotation,
     HighlightSeverity
 }
-import com.intellij.openapi.actionSystem {
-    ActionManager,
-    IdeActions
-}
 import com.intellij.openapi.application {
     ApplicationManager
 }
 import com.intellij.openapi.editor {
     Editor
-}
-import com.intellij.openapi.keymap {
-    KeymapUtil
 }
 import com.intellij.openapi.\imodule {
     ModuleUtil
@@ -186,35 +175,6 @@ shared class CeylonTypeCheckerAnnotator()
         if (exists range,
             !ApplicationManager.application.unitTestMode) {
             addQuickFixes(range, message, annotation, annotationHolder);
-            if (exists fixes = annotation.quickFixes, !fixes.empty) {
-                annotation.registerFix(object satisfies HintAction {
-                    value fix = annotation.quickFixes.get(0).quickFix;
-                    familyName => fix.familyName;
-                    invoke = fix.invoke;
-                    isAvailable = fix.isAvailable;
-                    startInWriteAction = fix.startInWriteAction;
-                    text => fix.text;
-                    shared actual Boolean showHint(Editor editor) {
-                        value shortcut
-                            = KeymapUtil.getFirstKeyboardShortcutText(
-                                ActionManager.instance.getAction(
-                                    IdeActions.actionShowIntentionActions));
-                        HintManager.instance.showErrorHint(editor,
-                            text[...text.size-8]
-                            + " " + shortcut
-                            + text[text.size-7...],
-                            range.startOffset, range.endOffset,
-                            HintManager.above,
-                                HintManager.hideByAnyKey
-                            .or(HintManager.hideByTextChange)
-                            .or(HintManager.hideIfOutOfEditor)
-                            .or(HintManager.hideByScrolling),
-                            6000);
-                        return true;
-                    }
-
-                });
-            }
         }
         return isError;
     }
