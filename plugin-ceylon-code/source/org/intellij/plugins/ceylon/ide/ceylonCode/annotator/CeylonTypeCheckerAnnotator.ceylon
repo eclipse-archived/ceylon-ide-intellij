@@ -2,6 +2,9 @@ import ceylon.interop.java {
     javaClass
 }
 
+import com.intellij.codeInsight.daemon {
+    DaemonCodeAnalyzer
+}
 import com.intellij.codeInspection {
     ProblemHighlightType
 }
@@ -104,6 +107,10 @@ shared class CeylonTypeCheckerAnnotator()
                 else null);
     
     shared actual void apply(PsiFile file, {[Message, TextRange?]*} ceylonMessages, AnnotationHolder holder) {
+        //see CustomIntention.showHint()
+        DaemonCodeAnalyzer.getInstance(file.project)
+            .resetImportHintsEnabledForProject();
+
         variable value hasErrors = false;
         concurrencyManager.withAlternateResolution(
             () => ceylonMessages.each(

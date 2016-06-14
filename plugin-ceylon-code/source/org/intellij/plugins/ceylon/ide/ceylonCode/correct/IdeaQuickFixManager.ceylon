@@ -5,6 +5,9 @@ import ceylon.interop.java {
     JavaRunnable
 }
 
+import com.intellij.codeInsight.daemon {
+    DaemonCodeAnalyzer
+}
 import com.intellij.codeInsight.hint {
     HintManager,
     QuestionAction
@@ -122,7 +125,7 @@ class CustomIntention(Integer position, String desc,
     <PlatformTextChange|Anything()>? change,
     TextRange? selection = null, Icon? image = null,
     Boolean qualifiedNameIsPath = false,
-    variable [String,TextRange]? hint = null,
+    [String,TextRange]? hint = null,
     Anything callback(Project project, Editor editor, PsiFile psiFile) => noop())
         extends BaseIntentionAction()
         satisfies Iconable & Comparable<IntentionAction> & HintAction {
@@ -136,15 +139,20 @@ class CustomIntention(Integer position, String desc,
 
             object hintedAction satisfies QuestionAction {
                 shared actual Boolean execute() {
-                    hint = null;
-                    HintManager.instance.hideAllHints(); //TODO: this doesn't work!
+//                    hint = null;
                     value p = project;
                     object extends WriteCommandAction<Nothing>(p, "Execute Hinted Fix") {
-                        run(Result<Nothing> result) => invoke {
-                            project = project;
-                            editor = editor;
-                            psiFile = PsiUtilBase.getPsiFileInEditor(editor, project);
-                        };
+                        shared actual void run(Result<Nothing> result) {
+                            value file = PsiUtilBase.getPsiFileInEditor(editor, project);
+                            invoke {
+                                project = project;
+                                editor = editor;
+                                psiFile = file;
+                            };
+                            //cleared later on in CeylonTypeCheckerAnnotator.apply()
+                            DaemonCodeAnalyzer.getInstance(project)
+                                .setImportHintsEnabled(file, false);
+                        }
                     }.execute();
                     return true;
                 }
@@ -344,7 +352,9 @@ shared class IdeaQuickFixData(
         }
     }
 
-    shared actual default void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {}
+    shared actual default void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {
+        //TODO
+    }
 
     shared actual void addAssignToLocalProposal(String description) {
         registerFix { 
