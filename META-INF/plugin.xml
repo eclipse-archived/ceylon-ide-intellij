@@ -131,6 +131,7 @@
         <psi.classFileDecompiler implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler"/>
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes"/>
         <stubIndex implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex"/>
+        <qualifiedNameProvider implementation="org.intellij.plugins.ceylon.ide.lang.CeylonQualifiedNameProvider"/>
         <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>-->
 
         <gotoClassContributor implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoClassContributor"/>
