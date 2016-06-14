@@ -265,17 +265,18 @@ shared class IdeaQuickFixData(
     void showImportModulesPopup(Editor editor) {
         value list = JBList(candidateModules);
         list.installCellRenderer(object satisfies NotNullFunction<[String, Icon, Anything()], JComponent> {
-            fun([String, Icon, Anything()] tuple)
-                    => JLabel(tuple[0], tuple[1], JLabel.leading);
+            fun([String, Icon, Anything()] tuple) 
+                    => let ([desc, icon, _] = tuple) 
+                    JLabel(desc, icon, JLabel.leading);
         });
 
         JBPopupFactory.instance
             .createListPopupBuilder(list)
             .setTitle("Choose module to import")
             .setItemChoosenCallback(JavaRunnable(void () {
-                if (exists tuple = candidateModules.get(list.selectedIndex)) {
+                if (exists [d, i, fun] = candidateModules.get(list.selectedIndex)) {
                     object extends WriteCommandAction<Nothing>(editor.project) {
-                        run(Result<Nothing>? result) => tuple[2]();
+                        run(Result<Nothing>? result) => fun();
                     }.execute();
                 }
             }))
