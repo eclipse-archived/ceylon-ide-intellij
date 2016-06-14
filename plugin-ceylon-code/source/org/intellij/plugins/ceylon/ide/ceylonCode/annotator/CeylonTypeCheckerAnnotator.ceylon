@@ -2,8 +2,12 @@ import ceylon.interop.java {
     javaClass
 }
 
+import com.intellij.codeInsight.hint {
+    HintManager
+}
 import com.intellij.codeInspection {
-    ProblemHighlightType
+    ProblemHighlightType,
+    HintAction
 }
 import com.intellij.lang.annotation {
     AnnotationHolder,
@@ -11,18 +15,24 @@ import com.intellij.lang.annotation {
     Annotation,
     HighlightSeverity
 }
+import com.intellij.openapi.actionSystem {
+    ActionManager,
+    IdeActions
+}
 import com.intellij.openapi.application {
     ApplicationManager
 }
 import com.intellij.openapi.editor {
     Editor
 }
+import com.intellij.openapi.keymap {
+    KeymapUtil
+}
 import com.intellij.openapi.\imodule {
     ModuleUtil
 }
 import com.intellij.openapi.project {
-    DumbAware,
-    Project
+    DumbAware
 }
 import com.intellij.openapi.util {
     TextRange
@@ -106,7 +116,7 @@ shared class CeylonTypeCheckerAnnotator()
         concurrencyManager.withAlternateResolution(
             () => ceylonMessages.each(
                 ([message,range]) {
-                    value result = addAnnotation(message, range, holder, file.project);
+                    value result = addAnnotation(message, range, holder, file);
                     hasErrors ||= result;
             } 
             )
@@ -133,13 +143,14 @@ shared class CeylonTypeCheckerAnnotator()
         }
     }
 
-    Boolean addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, Project project) {
+    Boolean addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, PsiFile file) {
         value unresolvedReferenceCodes = [ 100, 102 ];
         value unusedCodes = [ Warning.unusedDeclaration.string, Warning.unusedImport.string ];
-        
+
+        value project = file.project;
         Annotation annotation;
         Boolean isError;
-        if (message is AnyError) {
+        if (is AnyError message) {
             annotation = annotationHolder.createAnnotation(
                 HighlightSeverity.error,
                 range,
@@ -172,9 +183,38 @@ shared class CeylonTypeCheckerAnnotator()
             );
             isError = false;
         }
-        if (exists r = range,
+        if (exists range,
             !ApplicationManager.application.unitTestMode) {
-            addQuickFixes(r, message, annotation, annotationHolder);
+            addQuickFixes(range, message, annotation, annotationHolder);
+            if (exists fixes = annotation.quickFixes, !fixes.empty) {
+                annotation.registerFix(object satisfies HintAction {
+                    value fix = annotation.quickFixes.get(0).quickFix;
+                    familyName => fix.familyName;
+                    invoke = fix.invoke;
+                    isAvailable = fix.isAvailable;
+                    startInWriteAction = fix.startInWriteAction;
+                    text => fix.text;
+                    shared actual Boolean showHint(Editor editor) {
+                        value shortcut
+                            = KeymapUtil.getFirstKeyboardShortcutText(
+                                ActionManager.instance.getAction(
+                                    IdeActions.actionShowIntentionActions));
+                        HintManager.instance.showErrorHint(editor,
+                            text[...text.size-8]
+                            + " " + shortcut
+                            + text[text.size-7...],
+                            range.startOffset, range.endOffset,
+                            HintManager.above,
+                                HintManager.hideByAnyKey
+                            .or(HintManager.hideByTextChange)
+                            .or(HintManager.hideIfOutOfEditor)
+                            .or(HintManager.hideByScrolling),
+                            6000);
+                        return true;
+                    }
+
+                });
+            }
         }
         return isError;
     }
