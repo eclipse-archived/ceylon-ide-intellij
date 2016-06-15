@@ -19,14 +19,6 @@ for better user experience.
 We embed a full Ceylon distribution in the plugin, so you won't necessarily have to download Ceylon
 separately. You may need a local repository though.
 
-# Features
-
-While we are working very hard at making this a great plugin, only a few features are working at the
-moment. Please note that the plugin is not currently ready for daily usage.
-
-See the [Features](https://github.com/ceylon/ceylon-ide-intellij/wiki/Features) page for a detailed
-list of things that are working and that will be implemented in the future.
-
 # Testing & Hacking
 
 For the moment, we do not provide an official release package in the JetBrains plugins repository,
@@ -45,39 +37,36 @@ You can either install the Ceylon IDE for IntelliJ from there, or build it from 
 
 ## Install from the Development plugin repository
 
-_This is the **simplest way** to install Ceyon IDE for IntelliJ._ 
+_This is the simplest way to install Ceyon IDE for IntelliJ._
 
 Inside the Intellij IDEA environment, follow
 [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
-in order to add one of the following URLs:
+to add one of the following custom repository URLs. From the repository, you will be able to install
+a plugin named **Ceylon IDE**. After installing the plugin and restarting IntelliJ IDEA, you will
+have the ability to create Ceylon IntelliJ modules in which you can develop and run Ceylon code.
 
-**IntelliJ 15/2016.1+ and Android Studio 2.0+:**
+
+#### For IntelliJ 15/2016.1+ and Android Studio 2.0+
 
 Development builds (updated from time to time):
-```
-http://downloads.ceylon-lang.org/ide/intellij/development/updatePlugins.xml
-```
+
+<http://downloads.ceylon-lang.org/ide/intellij/development/updatePlugins.xml>
+
 
 Nightly builds:
-```
-https://ci-ceylon.rhcloud.com/job/ceylon-ide-intellij/ws/out/installation-packages/updatePlugins.xml
-```
 
-**IntelliJ 14 and Android Studio 1.5:**
-```
-http://downloads.ceylon-lang.org/ide/intellij/development/legacy/updatePlugins.xml
-```
+<https://ci-ceylon.rhcloud.com/job/ceylon-ide-intellij/ws/out/installation-packages/updatePlugins.xml>
 
-to the list of custom plugin repositories.
 
-Then, from this new repository, you should be able to install a plugin named **Ceylon IDE**. After
-installing the plugin and restarting IntelliJ IDEA, you should have the ability to create Ceylon
-IntelliJ modules in which you can develop and run Ceylon code.
+#### For IntelliJ 14 and Android Studio 1.5:
+
+
+<http://downloads.ceylon-lang.org/ide/intellij/development/legacy/updatePlugins.xml>
+
 
 ## Install from sources 
 
-If you want to use the current version, or debug/hack this plugin, you will need to build it from
-sources:
+If you want to debug or hack this plugin, you'll need to build it from sources.
 
 1. Make sure you're using **IntelliJ 2016.1** (support for IntelliJ 14/15 and Android Studio is
    planned in a [separate branch](https://github.com/ceylon/ceylon-ide-intellij/tree/141.x-compat))
@@ -108,11 +97,11 @@ sources:
    if necessary.)
 
 8. Open the project `ceylon-ide-intellij` in IDEA. You might be requested to enter the value of two
-   path variables. Go to 'Preferences ... > Appearance & Behavior > Path Variables`, and add a
+   path variables. Go to 'Preferences ... > Appearance & Behavior > Path Variables', and add a
    variable named `CEYLON_DIST` pointing to `../ceylon/dist/dist`.
 
 9. In the IDE's 'Preferences ... > Editor > File Types', under 'Recognized File Types', register
-   `*.car` as an extension under the 'Archive' files type.
+   `*.car` as an extension under the 'Archive' file type.
 
 11. Go to 'File > Project Structure ... > SDKs':
     - Click on the `+` icon and add a new 'JDK' pointing to a *Java SDK 1.8*
