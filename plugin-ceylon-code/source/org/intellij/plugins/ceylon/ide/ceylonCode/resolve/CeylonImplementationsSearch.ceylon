@@ -70,7 +70,7 @@ shared class CeylonImplementationsSearch()
                 scanPhasedUnits(CeylonIterable(pus.phasedUnits), decl, node, sourceElement, consumer);
             }
 
-            if (is ExternalPhasedUnit pu = ceylonFile.phasedUnit) {
+            if (is ExternalPhasedUnit pu = ceylonFile.localAnalysisResult?.lastPhasedUnit) {
                 for (mod in modules) {
                     scanPhasedUnits(mod.phasedUnits, decl, node, sourceElement, consumer);
                 }

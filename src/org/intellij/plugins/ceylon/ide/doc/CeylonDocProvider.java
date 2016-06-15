@@ -25,6 +25,7 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.correct.specifyTypeQuickFix_;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
@@ -99,7 +100,8 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             IdeaDocGenerator generator = new IdeaDocGenerator(tc);
             if (element instanceof DummyPsiElement) {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;
-                PhasedUnit pu = ((CeylonFile) element.getContainingFile()).getPhasedUnit();
+                LocalAnalysisResult localAnalysisResult = ((CeylonFile) element.getContainingFile()).getLocalAnalysisResult();
+                PhasedUnit pu = localAnalysisResult.getLastPhasedUnit();
                 Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
                 return generator.getDocumentationText(referenceable, null, cu, generator.DocParams$new$(pu, element.getProject())).value;
             }
@@ -170,8 +172,12 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         if (tc == null) {
             return null;
         }
-        final Tree.CompilationUnit cu = ((CeylonFile) context.getContainingFile()).getCompilationUnit();
-        final PhasedUnit pu = ((CeylonFile) context.getContainingFile()).getPhasedUnit();
+        LocalAnalysisResult localAnalysisResult = ((CeylonFile) context.getContainingFile()).getLocalAnalysisResult();
+        if (localAnalysisResult == null) {
+            return null;
+        }
+        final Tree.CompilationUnit cu = localAnalysisResult.getTypecheckedRootNode();
+        final PhasedUnit pu = localAnalysisResult.getLastPhasedUnit();
 
         if (cu == null || pu == null) {
             return null;
@@ -190,7 +196,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 new WriteCommandAction(context.getProject()) {
                     @Override
                     protected void run(@NotNull Result result) throws Throwable {
-                        Document doc = context.getContainingFile().getViewProvider().getDocument();
+                        Document doc = context.getContainingFile().getViewProvider().getDocument(); // we should retrieve the document in LocalAnalysisResult to be perfectly consistent
                         IdeaQuickFixData data = new IdeaQuickFixData(null, doc, cu, pu, node, null, null, null);
                         specifyTypeQuickFix_.get_().createProposal((Tree.Type) node, data);
                     }

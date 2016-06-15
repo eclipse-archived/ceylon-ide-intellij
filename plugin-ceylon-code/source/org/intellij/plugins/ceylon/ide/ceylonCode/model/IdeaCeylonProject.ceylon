@@ -358,7 +358,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
 shared IdeaCeylonProject? findProjectForFile(CeylonFile file) {
 
-    if (is IdePhasedUnit pu = file.phasedUnit,
+    if (is IdePhasedUnit pu = file.localAnalysisResult?.lastPhasedUnit,
         is IdeaModuleSourceMapper msm = pu.moduleSourceMapper,
         is IdeaCeylonProject project = msm.ceylonProject) {
 

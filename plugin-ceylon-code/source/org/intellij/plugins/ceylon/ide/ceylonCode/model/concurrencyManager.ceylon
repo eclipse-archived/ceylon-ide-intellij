@@ -83,6 +83,14 @@ shared object concurrencyManager {
     
     value noIndexStrategy_ = ThreadLocal<NoIndexStrategy?>();
 
+    shared Return|ProcessCanceledException tryReadAccess<Return>(Return() func) {
+        try {
+            return needReadAccess(func, 0);
+        } catch(ProcessCanceledException e) {
+            return e;
+        }
+    }
+
     shared Return needReadAccess<Return>(Return() func, Integer timeout = deadLockDetectionTimeout) {
         if (application.readAccessAllowed) {
             value ref = Ref<Return>();
@@ -149,13 +157,13 @@ shared object concurrencyManager {
                         }
                         throw ProcessCanceledException();
                     }
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                 } catch(InterruptedException ie) {
                     if (application.disposeInProgress) {
                         throw ProcessCanceledException(ie);
                     } else {
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(200);
                         } catch(InterruptedException ie2) {
                             throw ProcessCanceledException(ie2);
                         }
@@ -170,7 +178,7 @@ shared object concurrencyManager {
     Return withIndexStrategy<Return>(NoIndexStrategy s, Return() func) {
         NoIndexStrategy? previousStrategy;
         if (exists currentStrategy = noIndexStrategy_.get()) {
-            platformUtils.log(Status._DEBUG, "The current strategy (``currentStrategy``) when indexes are unavailable should not be overriden by a new one (``s``)");
+            platformUtils.log(Status._DEBUG, "The current strategy (``currentStrategy``) when indexes are unavailable should overriden by a new one (``s``) with care");
             previousStrategy = currentStrategy;
         } else {
             previousStrategy = null;
@@ -259,6 +267,12 @@ shared Return doWithIndex<Return>(Project p, Return() func) => concurrencyManage
 shared Return doWithLock<Return>(Return() func) => concurrencyManager.needReadAccess(func);
 
 object concurrencyManagerForJava {
+    shared Anything needReadAccess(JCallable<Anything> func, Integer timeout)
+            => concurrencyManager.needReadAccess(func.call, timeout);
+    
+    shared Anything tryReadAccess(JCallable<Anything> func)
+            => concurrencyManager.tryReadAccess(func.call);
+    
     shared Anything withAlternateResolution(JCallable<Anything> func)
             => concurrencyManager.withAlternateResolution(func.call);
     

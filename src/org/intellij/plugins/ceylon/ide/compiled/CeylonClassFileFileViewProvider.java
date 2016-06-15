@@ -19,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
 
 import static org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler.detectInnerClass;
 
-class CeylonFileViewProvider extends SingleRootFileViewProvider {
-    CeylonFileViewProvider(@NotNull PsiManager manager, @NotNull VirtualFile virtualFile,
+class CeylonClassFileFileViewProvider extends SingleRootFileViewProvider {
+    CeylonClassFileFileViewProvider(@NotNull PsiManager manager, @NotNull VirtualFile virtualFile,
                            boolean eventSystemEnabled) {
         super(manager, virtualFile, eventSystemEnabled, CeylonLanguage.INSTANCE);
     }

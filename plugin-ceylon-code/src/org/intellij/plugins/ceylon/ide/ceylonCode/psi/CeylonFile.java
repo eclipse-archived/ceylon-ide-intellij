@@ -1,58 +1,26 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.antlr.runtime.CommonToken;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.NotNull;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.text.BlockSupport;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.platform.Status;
+import com.redhat.ceylon.ide.common.platform.platformUtils_;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.model.typechecker.model.Cancellable;
 
 public class CeylonFile extends PsiFileBase {
 
-    private Tree.CompilationUnit rootNode;
-    private List<CommonToken> tokens;
-    private PhasedUnit phasedUnit;
-    private boolean typechecked = false;
-    private Lock localTypecheckingLock = new ReentrantLock();
-
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
-    }
-
-    void setRootNode(Tree.CompilationUnit rootNode) {
-        try {
-            if(! localTypecheckingLock.tryLock(1, TimeUnit.SECONDS)) {
-                throw new ProcessCanceledException();
-            }
-        } catch (InterruptedException e) {
-            throw new ProcessCanceledException(e);
-        }
-        try {
-            typechecked = false;
-            this.rootNode = rootNode;
-        }
-        finally {
-            localTypecheckingLock.unlock();
-        }
-    }
-
-    void setTokens(List<CommonToken> tokens) {
-        this.tokens = ContainerUtil.immutableList(tokens);
     }
 
     private CeylonPsi.CompilationUnitPsi getCompilationUnitPsi() {
@@ -60,25 +28,37 @@ public class CeylonFile extends PsiFileBase {
     }
 
     public Tree.CompilationUnit getCompilationUnit() {
-        if (rootNode == null) {
-            CeylonPsi.CompilationUnitPsi cu = getCompilationUnitPsi();
-            if (cu != null) {
-                return cu.getCeylonNode();
-            }
+        CeylonPsi.CompilationUnitPsi cu = getCompilationUnitPsi();
+        if (cu != null) {
+            return cu.getCeylonNode();
         }
-        return rootNode;
+        return null;
     }
 
-    public List<CommonToken> getTokens() {
-        return tokens;
+    CeylonLocalAnalyzer getLocalAnalyzer() {
+        FileViewProvider fileViewProvider;
+        if (getOriginalFile() != null
+                && getOriginalFile() instanceof CeylonFile) {
+            fileViewProvider = getOriginalFile().getViewProvider();
+        } else {
+            fileViewProvider = getViewProvider();
+        }
+        
+        if (fileViewProvider instanceof CeylonSourceFileViewProvider) {
+            return ((CeylonSourceFileViewProvider) fileViewProvider)
+                    .getCeylonLocalAnalyzer();
+        }
+        
+        return null;
     }
-
-    public PhasedUnit getPhasedUnit() {
-        return phasedUnit;
-    }
-
-    public void setPhasedUnit(PhasedUnit phasedUnit) {
-        this.phasedUnit = phasedUnit;
+    
+    public LocalAnalysisResult getLocalAnalysisResult() {
+        CeylonLocalAnalyzer localAnalyzer = getLocalAnalyzer();
+        if (localAnalyzer != null) {
+            return localAnalyzer.getResult();
+        }
+        platformUtils_.get_().log(Status.getStatus$_WARNING(), "localAnalysisResult requested, but was null");
+        return null;
     }
 
     @NotNull
@@ -87,6 +67,7 @@ public class CeylonFile extends PsiFileBase {
         return CeylonFileType.INSTANCE;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getUserData(@NotNull Key<T> key) {
         if (BlockSupport.TREE_DEPTH_LIMIT_EXCEEDED.equals(key)) {
@@ -97,30 +78,30 @@ public class CeylonFile extends PsiFileBase {
         return super.getUserData(key);
     }
 
+    public PhasedUnit getUpToDatePhasedUnit() {
+        LocalAnalysisResult analysisResult = getLocalAnalysisResult();
+        if (analysisResult != null) {
+            if (analysisResult.getTypecheckedRootNode() != null) {
+                return analysisResult.getLastPhasedUnit();
+            }
+        }
+        return null;
+    }
+    
+    private PhasedUnit ensureTypechecked(Cancellable cancellable, int timeoutSeconds) {
+        CeylonLocalAnalyzer localAnalyzer = getLocalAnalyzer();
+        if (localAnalyzer != null) {
+            return localAnalyzer.ensureTypechecked(cancellable, timeoutSeconds);
+        }
+        return null;
+    }
+
     public PhasedUnit ensureTypechecked() {
         return ensureTypechecked(null);
     }
     
     public PhasedUnit ensureTypechecked(Cancellable cancellable) {
-        try {
-            if(! localTypecheckingLock.tryLock(2, TimeUnit.SECONDS)) {
-                throw new ProcessCanceledException();
-            }
-        } catch (InterruptedException e) {
-            throw new ProcessCanceledException(e);
-        }
-        try {
-            if (!typechecked) {
-                if (doLocalTypecheck_.doLocalTypecheck(this, cancellable) != null) {
-                    typechecked = true;
-                }
-            }
-        }
-        finally {
-            localTypecheckingLock.unlock();
-        }
-        
-        return phasedUnit;
+        return ensureTypechecked(cancellable, 5);
     }
 
     public PhasedUnit forceReparse() {
@@ -133,6 +114,5 @@ public class CeylonFile extends PsiFileBase {
     @Override
     public void subtreeChanged() {
         super.subtreeChanged();
-        setRootNode(null);
     }
 }

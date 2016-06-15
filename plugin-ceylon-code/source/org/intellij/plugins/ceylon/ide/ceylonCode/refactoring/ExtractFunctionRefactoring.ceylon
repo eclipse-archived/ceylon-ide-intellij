@@ -144,17 +144,21 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
     }
     
     shared actual default [TextRange+]? extract(Project proj, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
+        assert(exists localAnalysisResult = file.localAnalysisResult);
+        assert(exists phasedUnit = localAnalysisResult.lastPhasedUnit);
         
-        value refactoring = createExtractFunctionRefactoring {
+        value refactoring = if (exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode)
+        then createExtractFunctionRefactoring {
             doc = IdeaDocument(editor.document);
             selectionStart = range.startOffset;
             selectionEnd = range.endOffset;
-            rootNode = file.compilationUnit;
-            tokens = file.tokens;
+            rootNode = typecheckedRootNode;
+            tokens = localAnalysisResult.tokens;
             target = scope;
             moduleUnits = empty;
-            vfile = file.phasedUnit.unitFile;
-        };
+            vfile = phasedUnit.unitFile;
+        }
+        else null;
 
         if (exists refactoring) {
 

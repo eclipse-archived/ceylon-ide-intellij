@@ -96,7 +96,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
         shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
         shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
         shared actual PhasedUnit lastPhasedUnit => pu;
-        shared actual JList<CommonToken>? tokens => pu.tokens;
+        shared actual JList<CommonToken> tokens => pu.tokens;
         shared actual TypeChecker typeChecker => tc;
         shared actual BaseCeylonProject? ceylonProject => pu.moduleSourceMapper?.ceylonProject;
         shared Project ideaProject => p;

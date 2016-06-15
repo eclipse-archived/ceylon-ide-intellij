@@ -9,10 +9,13 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.platform.Status;
+import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.FunctionOrValue;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
 import org.jetbrains.annotations.NonNls;
@@ -20,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.concurrent.Callable;
 
 public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.DeclarationPsiImpl implements PsiNameIdentifierOwner {
     public DeclarationPsiNameIdOwner(ASTNode astNode) {
@@ -58,22 +60,22 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @NotNull
     @Override
     public SearchScope getUseScope() {
-        if (ConcurrencyManagerForJava.withAlternateResolution(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                return ((CeylonFile) getContainingFile()).ensureTypechecked();
+        LocalAnalysisResult localAnalysisResult = ((CeylonFile) getContainingFile()).getLocalAnalysisResult();
+        if (localAnalysisResult != null) {
+            if (localAnalysisResult.getUpToDate()) {
+                Declaration model = getCeylonNode().getDeclarationModel();
+                if (model != null && !isAffectingOtherFiles(model)) {
+                    return new LocalSearchScope(getContainingFile());
+                }
+            } else {
+                platformUtils_.get_().log(Status.getStatus$_ERROR(), "Local scope not added in getUseScope() because the file " + getContainingFile() + " is not typechecked and up-to-date");
+                throw platformUtils_.get_().newOperationCanceledException();
             }
-
-        }) != null) {
-            Declaration model = getCeylonNode().getDeclarationModel();
-            if (model != null && !isAffectingOtherFiles(model)) {
-                return new LocalSearchScope(getContainingFile());
+                
+            if (localAnalysisResult.getLastPhasedUnit() instanceof ExternalPhasedUnit) {
+                return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope()
+                        .union(new LocalSearchScope(getContainingFile()));
             }
-        }
-
-        if (((CeylonFile) getContainingFile()).getPhasedUnit() instanceof ExternalPhasedUnit) {
-            return ProjectScopeBuilder.getInstance(getProject()).buildAllScope()
-                    .union(new LocalSearchScope(getContainingFile()));
         }
 
         return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope();

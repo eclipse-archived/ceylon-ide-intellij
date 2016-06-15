@@ -16,8 +16,7 @@ import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.intellij.psi {
-    PsiManager,
-    PsiDocumentManager
+    PsiManager
 }
 import com.redhat.ceylon.ide.common.util {
     synchronize
@@ -63,7 +62,7 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     
     hash => file.hash;
     
-    inputStream => doWithLock(() => ByteArrayInputStream(javaString(PsiDocumentManager.getInstance(mod.project).getLastCommittedDocument(PsiManager.getInstance(mod.project).findFile(file)).text).getBytes(file.charset.string)));
+    inputStream => doWithLock(() => ByteArrayInputStream(javaString(PsiManager.getInstance(mod.project).findViewProvider(file).contents.string).getBytes(file.charset.string)));
     
     name => file.name;
     path => file.canonicalPath;
