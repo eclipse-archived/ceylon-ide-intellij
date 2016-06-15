@@ -7,12 +7,8 @@ import ceylon.interop.java {
     JavaList
 }
 
-import com.intellij.codeInsight.daemon {
-    DaemonCodeAnalyzer
-}
 import com.intellij.codeInsight.hint {
-    HintManager,
-    QuestionAction
+    HintManager
 }
 import com.intellij.codeInsight.intention {
     IntentionAction
@@ -20,15 +16,8 @@ import com.intellij.codeInsight.intention {
 import com.intellij.codeInsight.intention.impl {
     BaseIntentionAction
 }
-import com.intellij.codeInspection {
-    HintAction
-}
 import com.intellij.lang.annotation {
     Annotation
-}
-import com.intellij.openapi.actionSystem {
-    IdeActions,
-    ActionManager
 }
 import com.intellij.openapi.application {
     Result
@@ -39,9 +28,6 @@ import com.intellij.openapi.command {
 import com.intellij.openapi.editor {
     Document,
     Editor
-}
-import com.intellij.openapi.keymap {
-    KeymapUtil
 }
 import com.intellij.openapi.\imodule {
     Module
@@ -62,9 +48,6 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiFile
-}
-import com.intellij.psi.util {
-    PsiUtilBase
 }
 import com.intellij.ui.components {
     JBList

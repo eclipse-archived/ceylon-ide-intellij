@@ -2,9 +2,6 @@ import ceylon.interop.java {
     javaClass
 }
 
-import com.intellij.codeInsight.daemon {
-    DaemonCodeAnalyzer
-}
 import com.intellij.codeInspection {
     ProblemHighlightType
 }
@@ -53,6 +50,9 @@ import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    ExternalPhasedUnit
+}
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
@@ -74,9 +74,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsi
-}
-import com.redhat.ceylon.ide.common.typechecker {
-    ExternalPhasedUnit
 }
 
 shared alias AnyError => AnalysisError|RecognitionError|UnexpectedError;
