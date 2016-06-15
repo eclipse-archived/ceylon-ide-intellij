@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    javaClassFromInstance
 }
 
 import com.intellij.codeInsight.intention.impl {
@@ -98,7 +99,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             
             value typecheckedCompilationUnit = localAnalysisResult.typecheckedRootNode;
             if (! exists typecheckedCompilationUnit) {
-                platformUtils.log(Status._ERROR, "AbstractIntention `` this`` is not available because the file `` psiFile `` is not typechecked and up-to-date");
+                platformUtils.log(Status._DEBUG, "AbstractIntention '`` this.text ``' is not available because the file `` psiFile `` is not typechecked and up-to-date");
                 return false;
             }
             value offset = _editor.caretModel.offset;

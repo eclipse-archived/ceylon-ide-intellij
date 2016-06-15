@@ -157,13 +157,13 @@ shared object concurrencyManager {
                         }
                         throw ProcessCanceledException();
                     }
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                 } catch(InterruptedException ie) {
                     if (application.disposeInProgress) {
                         throw ProcessCanceledException(ie);
                     } else {
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(200);
                         } catch(InterruptedException ie2) {
                             throw ProcessCanceledException(ie2);
                         }
@@ -178,7 +178,7 @@ shared object concurrencyManager {
     Return withIndexStrategy<Return>(NoIndexStrategy s, Return() func) {
         NoIndexStrategy? previousStrategy;
         if (exists currentStrategy = noIndexStrategy_.get()) {
-            platformUtils.log(Status._DEBUG, "The current strategy (``currentStrategy``) when indexes are unavailable should not be overriden by a new one (``s``)");
+            platformUtils.log(Status._DEBUG, "The current strategy (``currentStrategy``) when indexes are unavailable should overriden by a new one (``s``) with care");
             previousStrategy = currentStrategy;
         } else {
             previousStrategy = null;

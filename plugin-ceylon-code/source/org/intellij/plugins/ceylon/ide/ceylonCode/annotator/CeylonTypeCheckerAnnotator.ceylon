@@ -212,7 +212,7 @@ shared class CeylonTypeCheckerAnnotator()
                      }
                 }
             } else {
-                platformUtils.log(Status._ERROR, "The CeylonFile is not typechecked during the GeneralHighlightinhPass !");
+                platformUtils.log(Status._DEBUG, "The CeylonFile is not typechecked during the GeneralHighlightinhPass !");
                 platformUtils.newOperationCanceledException();
             }
         }

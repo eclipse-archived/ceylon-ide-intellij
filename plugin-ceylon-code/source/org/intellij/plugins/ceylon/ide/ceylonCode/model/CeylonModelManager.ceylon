@@ -183,7 +183,9 @@ shared class CeylonModelManager(model)
                 } else {
                     e = Exception(null, t);
                 }
-                platformUtils.log(Status._WARNING, "An exception as thrown during the change submission task", e);
+                if (! e is ProcessCanceledException) {
+                    platformUtils.log(Status._WARNING, "An exception as thrown during the change submission task", e);
+                }
             }
             
             if (ideaProjectReady) {
