@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaClass,
-    javaClassFromInstance
+    javaClass
 }
 
 import com.intellij.codeInsight.intention.impl {
