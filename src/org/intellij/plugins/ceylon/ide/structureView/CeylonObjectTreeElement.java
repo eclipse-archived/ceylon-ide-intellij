@@ -15,7 +15,8 @@ import java.util.List;
 
 import static org.intellij.plugins.ceylon.ide.structureView.CeylonFileTreeElement.getTreeElementForDeclaration;
 
-class CeylonObjectTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ObjectDefinitionPsi> {
+class CeylonObjectTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ObjectDefinitionPsi>
+        implements CeylonContainerTreeElement {
 
     CeylonObjectTreeElement(CeylonPsi.ObjectDefinitionPsi psiElement, boolean isInherited) {
         super(psiElement, isInherited);
@@ -43,8 +44,4 @@ class CeylonObjectTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.Obj
         return children;
     }
 
-    @Override
-    public Icon getIcon(boolean open) {
-        return icons_.get_().forDeclaration(getElement().getCeylonNode());
-    }
 }

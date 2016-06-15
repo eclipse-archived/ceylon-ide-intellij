@@ -14,9 +14,11 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.descriptions_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -24,8 +26,7 @@ import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 
 abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPsi>
         extends PsiTreeElementBase<Decl>
-        implements ColoredItemPresentation, LocationPresentation,
-        SortableTreeElement, AccessLevelProvider {
+        implements ColoredItemPresentation, SortableTreeElement, AccessLevelProvider {
 
     private boolean isInherited;
 
@@ -103,20 +104,15 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
         return super.getLocationString();
     }
 
-    @Override
-    public String getLocationSuffix() {
-        return "";
-    }
-
-    @Override
-    public String getLocationPrefix() {
-        return " ";
-    }
-
     @Nullable
     @Override
-    public String getPresentableText() {
+    public final String getPresentableText() {
         return toJavaString(descriptions_.get_().descriptionForPsi(getElement(), false, false));
+    }
+
+    @Override
+    public final Icon getIcon(boolean open) {
+        return icons_.get_().forDeclaration(getElement().getCeylonNode());
     }
 
     @NotNull

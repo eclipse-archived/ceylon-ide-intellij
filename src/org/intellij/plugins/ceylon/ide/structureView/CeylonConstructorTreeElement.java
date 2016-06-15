@@ -11,8 +11,4 @@ class CeylonConstructorTreeElement extends CeylonDeclarationTreeElement<CeylonPs
         super(psiElement, false);
     }
 
-    @Override
-    public Icon getIcon(boolean open) {
-        return icons_.get_().forDeclaration(getElement().getCeylonNode());
-    }
 }

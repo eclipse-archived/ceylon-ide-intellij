@@ -11,8 +11,4 @@ class CeylonVariableTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.V
         super(declaration, isInherited);
     }
 
-    @Override
-    public Icon getIcon(boolean open) {
-        return icons_.get_().forDeclaration(getElement().getCeylonNode());
-    }
 }

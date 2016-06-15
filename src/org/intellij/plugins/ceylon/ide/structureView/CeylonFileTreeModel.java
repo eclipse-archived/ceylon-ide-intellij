@@ -57,13 +57,12 @@ class CeylonFileTreeModel extends TextEditorBasedStructureViewModel
 
     @Override
     public boolean isAlwaysShowsPlus(StructureViewTreeElement element) {
-        return true;
+        return element instanceof CeylonContainerTreeElement;
     }
 
     @Override
     public boolean isAlwaysLeaf(StructureViewTreeElement element) {
-        return element instanceof CeylonFunctionTreeElement ||
-                element instanceof CeylonAttributeTreeElement;
+        return !(element instanceof CeylonContainerTreeElement);
     }
 
     @Override

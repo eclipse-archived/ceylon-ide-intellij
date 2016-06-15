@@ -18,7 +18,8 @@ import java.util.List;
 /**
  * Shows the children declarations of a Ceylon file in the structure tool window.
  */
-class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile> {
+class CeylonFileTreeElement extends PsiTreeElementBase<CeylonFile>
+        implements CeylonContainerTreeElement {
 
     private CeylonFile myElement;
 

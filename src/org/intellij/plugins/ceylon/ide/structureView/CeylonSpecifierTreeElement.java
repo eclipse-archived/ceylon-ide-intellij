@@ -23,8 +23,7 @@ import java.util.Collections;
 import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 
 class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierStatementPsi>
-        implements ColoredItemPresentation, LocationPresentation,
-                   SortableTreeElement, AccessLevelProvider {
+        implements ColoredItemPresentation, SortableTreeElement, AccessLevelProvider {
 
     CeylonSpecifierTreeElement(CeylonPsi.SpecifierStatementPsi psiElement) {
         super(psiElement);
@@ -76,11 +75,6 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
         return super.getLocationString();
     }
 
-    /*@Override
-    public Icon getIcon(boolean open) {
-        return icons_.get_().forDeclaration(getElement().getCeylonNode());
-    }*/
-
     @Nullable
     @Override
     public String getPresentableText() {
@@ -95,16 +89,6 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
                     .getCeylonNode()
                     .getDeclaration();
         return dec==null ? "" : dec.getName();
-    }
-
-    @Override
-    public String getLocationPrefix() {
-        return "";
-    }
-
-    @Override
-    public String getLocationSuffix() {
-        return "";
     }
 
     @Override

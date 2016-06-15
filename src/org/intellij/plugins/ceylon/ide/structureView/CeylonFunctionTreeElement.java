@@ -11,8 +11,4 @@ class CeylonFunctionTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.A
         super(psiElement, isInherited);
     }
 
-    @Override
-    public Icon getIcon(boolean open) {
-        return icons_.get_().forDeclaration(getElement().getCeylonNode());
-    }
 }

@@ -41,47 +41,7 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
         final PhasedUnit pu = tc.getPhasedUnitFromRelativePath(sourceFileName);
         final Tree.CompilationUnit cu = pu.getCompilationUnit();
 
-        LocalAnalysisResult params = new LocalAnalysisResult() {
-            @Override
-            public Tree.CompilationUnit getLastCompilationUnit() {
-                return cu;
-            }
-
-            @Override
-            public Tree.CompilationUnit getParsedRootNode() {
-                return cu;
-            }
-
-            @Override
-            public Tree.CompilationUnit getTypecheckedRootNode() {
-                return cu;
-            }
-
-            @Override
-            public PhasedUnit getLastPhasedUnit() {
-                return pu;
-            }
-
-            @Override
-            public CommonDocument getCommonDocument() {
-                return null;
-            }
-
-            @Override
-            public List<CommonToken> getTokens() {
-                return pu.getTokens();
-            }
-
-            @Override
-            public TypeChecker getTypeChecker() {
-                return tc;
-            }
-
-            @Override
-            public BaseCeylonProject getCeylonProject() {
-                return null;
-            }
-        };
+        LocalAnalysisResult params = null;
         String doc = new IdeaDocGenerator(tc).getDocumentation(cu, cursorOffset, params).toString();
 
         File expectedFile = new File("plugin-ceylon-code/test-resources/" + expectedFileName);

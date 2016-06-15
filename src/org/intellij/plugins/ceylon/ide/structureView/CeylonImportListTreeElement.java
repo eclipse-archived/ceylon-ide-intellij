@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement>
-        implements SortableTreeElement, AccessLevelProvider {
+        implements SortableTreeElement, AccessLevelProvider /*, CeylonContainerTreeElement*/ {
 
     private CeylonPsi.ImportPsi[] imports;
 
@@ -30,12 +30,13 @@ public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement>
     @NotNull
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
-        List<StructureViewTreeElement> nodes = new ArrayList<>();
+        /*List<StructureViewTreeElement> nodes = new ArrayList<>();
 
         for (CeylonPsi.ImportPsi child : imports) {
             nodes.add(new CeylonImportTreeElement(child));
         }
-        return nodes;
+        return nodes;*/
+        return Collections.emptyList();
     }
 
     @Nullable
@@ -58,7 +59,7 @@ public class CeylonImportListTreeElement extends PsiTreeElementBase<PsiElement>
     @Override
     public int getAccessLevel() {
         //hack to keep import lists at top
-        return PsiUtil.ACCESS_LEVEL_PUBLIC+1;
+        return PsiUtil.ACCESS_LEVEL_PRIVATE;
     }
 
     @Override

@@ -44,7 +44,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.PSIMethod;
 /**
  * Adds inherited members to the tree.
  */
-class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider {
+class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider
+        implements CeylonContainerTreeElement {
 
     @NotNull
     @Override

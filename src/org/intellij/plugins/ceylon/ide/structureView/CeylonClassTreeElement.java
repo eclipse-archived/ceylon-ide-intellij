@@ -21,7 +21,9 @@ import static org.intellij.plugins.ceylon.ide.structureView.CeylonFileTreeElemen
 /**
  * A structure node which represents a CeylonClass (class or interface definition/declaration).
  */
-class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ClassOrInterfacePsi> {
+class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.ClassOrInterfacePsi>
+        implements CeylonContainerTreeElement {
+
     private CeylonPsi.ClassOrInterfacePsi myClass;
 
     CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi element, boolean isInherited) {
@@ -73,8 +75,4 @@ class CeylonClassTreeElement extends CeylonDeclarationTreeElement<CeylonPsi.Clas
         return elements;
     }
 
-    @Override
-    public Icon getIcon(boolean open) {
-        return icons_.get_().forDeclaration(getElement().getCeylonNode());
-    }
 }
