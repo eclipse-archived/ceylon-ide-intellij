@@ -1,3 +1,7 @@
+import ceylon.collection {
+    HashSet
+}
+
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
@@ -12,6 +16,9 @@ import com.intellij.openapi.editor {
 import com.intellij.openapi.project {
     Project
 }
+import com.redhat.ceylon.ide.common.completion {
+    ProposalsHolder
+}
 import com.redhat.ceylon.ide.common.correct {
     AssignToLocalProposal,
     importProposals,
@@ -23,10 +30,9 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration
 }
 
-import java.util {
-    HashSet
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
+    IdeaProposalsHolder
 }
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaTextChange,
     IdeaLinkedMode,
@@ -37,12 +43,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
-}
-import com.redhat.ceylon.ide.common.completion {
-    ProposalsHolder
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaProposalsHolder
 }
 
 shared class AssignToLocalIntention() extends AbstractIntention() {

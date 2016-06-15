@@ -12,6 +12,7 @@ import com.redhat.ceylon.ide.common.util {
 import com.redhat.ceylon.model.typechecker.model {
     Unit
 }
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
     ideaCompletionServices
 }
