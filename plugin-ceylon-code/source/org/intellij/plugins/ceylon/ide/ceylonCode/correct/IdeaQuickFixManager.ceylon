@@ -110,6 +110,9 @@ import javax.swing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    concurrencyManager
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
     IdeaTextChange
@@ -139,7 +142,6 @@ class CustomIntention(Integer position, String desc,
 
             object hintedAction satisfies QuestionAction {
                 shared actual Boolean execute() {
-//                    hint = null;
                     value p = project;
                     object extends WriteCommandAction<Nothing>(p, "Execute Hinted Fix") {
                         shared actual void run(Result<Nothing> result) {
@@ -227,9 +229,17 @@ shared class IdeaQuickFixData(
     problemOffset => annotation?.startOffset else 0;
     problemLength => (annotation?.endOffset else 0) - problemOffset;
     editorSelection => if (exists e = editor)
-                       then DefaultRegion(e.selectionModel.selectionStart, e.selectionModel.selectionEnd)
+                       then DefaultRegion {
+                            start = e.selectionModel.selectionStart;
+                            length = e.selectionModel.selectionEnd
+                                   - e.selectionModel.selectionStart;
+                        }
                        else DefaultRegion(0);
     
+    function textRange(Annotation annotation)
+            => TextRange(annotation.startOffset,
+                         annotation.endOffset);
+
     shared default void registerFix(String desc,
         <PlatformTextChange|Anything()>? change,
         TextRange? selection = null, Icon? image = null,
@@ -237,26 +247,26 @@ shared class IdeaQuickFixData(
         Anything callback(Project project, Editor editor, PsiFile psiFile) => noop()) {
         
         if (exists annotation) {
-            value position = annotation.quickFixes ?. size() else 0;
             value intention
                 = CustomIntention {
-                    position = position;
+                    position = annotation.quickFixes?.size() else 0;
                     desc = desc;
                     change = change;
                     selection = selection;
                     image = image;
                     qualifiedNameIsPath = qualifiedNameIsPath;
                     callback = callback;
-                    hint = if (exists hint) then [hint, TextRange(annotation.startOffset, annotation.endOffset)] else null;
+                    hint = if (exists hint) then [hint, textRange(annotation)] else null;
                 };
             annotation.registerFix(intention);
         } else {
-            if (is IdeaTextChange change) {
-                change.apply();
-            } else if (is Anything() change){
-                change();
-            } else {
+            switch (change)
+            case (null) {
                 return;
+            } case (is PlatformTextChange) {
+                change.apply();
+            } else {
+                change();
             }
 
             if (exists selection, exists e = editor) {
@@ -271,8 +281,12 @@ shared class IdeaQuickFixData(
     void showPopup(Editor editor, List<Resolution> candidates, String title) {
         value list = JBList(JavaList(candidates));
         list.installCellRenderer(object satisfies NotNullFunction<Resolution, JComponent> {
-            fun(Resolution action)
-                    => JLabel(action.description, action.icon, JLabel.leading);
+            fun(Resolution resolution)
+                    => JLabel(highlighter.highlightQuotedMessage { 
+                        description = resolution.description;
+                        qualifiedNameIsPath = resolution.qualifiedNameIsPath;
+                        project = project.project;
+                    }, resolution.icon, JLabel.leading);
         });
 
         JBPopupFactory.instance
@@ -302,7 +316,12 @@ shared class IdeaQuickFixData(
                then TextRange.from(region.start, region.length)
                else null;
 
-    class Resolution(shared String description, shared Icon icon, shared PlatformTextChange|Anything() change) {}
+    class Resolution(description, icon, change, qualifiedNameIsPath) {
+        shared PlatformTextChange|Anything() change;
+        shared Icon icon;
+        shared String description;
+        shared Boolean qualifiedNameIsPath;
+    }
     variable ListMutator<Resolution>? resolutions = null;
 
     shared actual default void addQuickFix(String desc,
@@ -327,10 +346,14 @@ shared class IdeaQuickFixData(
                             .runProcessWithProgressAsynchronously(
                         project.project,
                         "Searching...",
-                        JavaRunnable(change),
+                        JavaRunnable(() => concurrencyManager.needReadAccess(change)),
                         JavaRunnable(void() {
                             resolutions = null;
-                            if (!candidates.empty) {
+                            if (candidates.empty) {
+                                //TODO show it at the right location!
+                                HintManager.instance.showErrorHint(e, "No resolutions found");
+                            }
+                            else {
                                 showPopup(e, candidates, "Select a Resolution");
                             }
                         }),
@@ -339,7 +362,12 @@ shared class IdeaQuickFixData(
                 }
             };
         } else if (exists candidates = resolutions) {
-            candidates.add(Resolution(desc, icons.imports, change));
+            candidates.add(Resolution { 
+                description = desc; 
+                icon = icons.imports; 
+                change = change; 
+                qualifiedNameIsPath = qualifiedNameIsPath; 
+            });
         } else {
             registerFix {
                 desc = desc;
