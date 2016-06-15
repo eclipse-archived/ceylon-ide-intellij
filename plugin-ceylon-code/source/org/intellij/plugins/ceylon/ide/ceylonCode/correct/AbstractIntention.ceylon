@@ -116,7 +116,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                 ) {
                     shared actual void addQuickFix(String desc, PlatformTextChange|Anything() change,
                         DefaultRegion? selection, Boolean ignored, Icons? icon, QuickFixKind kind,
-                        String? hint) {
+                        String? hint, Boolean async) {
                         if (is IdeaTextChange|Anything() change) {
                             makeAvailable(outerProject, desc, change, selection);
                         }

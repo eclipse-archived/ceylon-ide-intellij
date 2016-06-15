@@ -1,5 +1,6 @@
 import ceylon.collection {
-    ArrayList
+    ArrayList,
+    ListMutator
 }
 import ceylon.interop.java {
     JavaRunnable,
@@ -267,21 +268,28 @@ shared class IdeaQuickFixData(
 
     document = IdeaDocument(nativeDoc);
 
-    void showPopup(Editor editor, List<[String, Icon, Anything()]> candidates, String title) {
+    void showPopup(Editor editor, List<Resolution> candidates, String title) {
         value list = JBList(JavaList(candidates));
-        list.installCellRenderer(object satisfies NotNullFunction<[String, Icon, Anything()], JComponent> {
-            fun([String, Icon, Anything()] tuple)
-                    => let ([desc, icon, _] = tuple)
-                    JLabel(desc, icon, JLabel.leading);
+        list.installCellRenderer(object satisfies NotNullFunction<Resolution, JComponent> {
+            fun(Resolution action)
+                    => JLabel(action.description, action.icon, JLabel.leading);
         });
 
         JBPopupFactory.instance
             .createListPopupBuilder(list)
             .setTitle(title)
             .setItemChoosenCallback(JavaRunnable(void () {
-                if (exists [d, i, fun] = candidates.get(list.selectedIndex)) {
+                if (exists candidate = candidates[list.selectedIndex]) {
                     object extends WriteCommandAction<Nothing>(editor.project) {
-                        run(Result<Nothing>? result) => fun();
+                        shared actual void run(Result<Nothing>? result) {
+                            switch (change = candidate.change)
+                            case (is PlatformTextChange) {
+                                change.apply();
+                            }
+                            else {
+                                change();
+                            }
+                        }
                     }.execute();
                 }
             }))
@@ -289,21 +297,50 @@ shared class IdeaQuickFixData(
             .showInBestPositionFor(editor);
     }
 
-    TextRange? toRange(DefaultRegion? region)
+    function toRange(DefaultRegion? region)
             => if (exists region)
                then TextRange.from(region.start, region.length)
                else null;
 
-    value candidateModules = ArrayList<[String, Icon, Anything()]>();
-    value candidateImports = ArrayList<[String, Icon, Anything()]>();
+    class Resolution(shared String description, shared Icon icon, shared PlatformTextChange|Anything() change) {}
+    variable ListMutator<Resolution>? resolutions = null;
 
     shared actual default void addQuickFix(String desc,
         PlatformTextChange|Anything() change,
         DefaultRegion? selection, Boolean qualifiedNameIsPath, Icons? icon,
-        QuickFixKind kind, String? hint) {
+        QuickFixKind kind, String? hint, Boolean asynchronous) {
         value range = toRange(selection);
 
-        if (is IdeaTextChange change) {
+        if (asynchronous) {
+            assert (is Anything() change);
+            registerFix {
+                desc = desc;
+                change = null;
+                selection = range;
+                image = icons.correction;
+                qualifiedNameIsPath = qualifiedNameIsPath;
+                hint = hint;
+                void callback(Project p, Editor e, PsiFile f) {
+                    value candidates = ArrayList<Resolution>();
+                    resolutions = candidates;
+                    ProgressManager.instance
+                            .runProcessWithProgressAsynchronously(
+                        project.project,
+                        "Searching...",
+                        JavaRunnable(change),
+                        JavaRunnable(void() {
+                            resolutions = null;
+                            if (!candidates.empty) {
+                                showPopup(e, candidates, "Select a Resolution");
+                            }
+                        }),
+                        null,
+                        PerformInBackgroundOption.alwaysBackground);
+                }
+            };
+        } else if (exists candidates = resolutions) {
+            candidates.add(Resolution(desc, icons.imports, change));
+        } else {
             registerFix {
                 desc = desc;
                 change = change;
@@ -312,72 +349,6 @@ shared class IdeaQuickFixData(
                 qualifiedNameIsPath = qualifiedNameIsPath;
                 hint = hint;
             };
-        } else if (is Anything() change) {
-            switch (kind)
-            case (QuickFixKind.asyncImport) {
-                candidateImports.add([desc, icons.imports, change]);
-            } case (QuickFixKind.asyncModuleImport) {
-                candidateModules.add([desc, icons.imports, change]);
-            } case (QuickFixKind.addImport) {
-                registerFix {
-                    desc = desc;
-                    change = null;
-                    selection = range;
-                    image = icons.correction;
-                    qualifiedNameIsPath = qualifiedNameIsPath;
-                    hint = hint;
-                    void callback(Project p, Editor e, PsiFile f) {
-                        candidateImports.clear();
-                        ProgressManager.instance.runProcessWithProgressAsynchronously(
-                            project.project,
-                            "Scanning packages...",
-                            JavaRunnable(change),
-                            JavaRunnable(void () {
-                                if (!candidateImports.empty) {
-                                    showPopup(e, candidateImports,
-                                        "Choose package to import from");
-                                }
-                            }),
-                            null,
-                            PerformInBackgroundOption.alwaysBackground
-                        );
-                    }
-                };
-            } case (QuickFixKind.addModuleImport) {
-                registerFix {
-                    desc = desc;
-                    change = null;
-                    selection = range;
-                    image = icons.correction;
-                    qualifiedNameIsPath = qualifiedNameIsPath;
-                    hint = hint;
-                    void callback(Project p, Editor e, PsiFile f) {
-                        candidateModules.clear();
-                        ProgressManager.instance.runProcessWithProgressAsynchronously(
-                            project.project,
-                            "Querying module repositories...",
-                            JavaRunnable(change),
-                            JavaRunnable(void () {
-                                if (!candidateModules.empty) {
-                                    showPopup(e, candidateModules,
-                                        "Choose module to import");
-                                }
-                            }),
-                            null,
-                            PerformInBackgroundOption.alwaysBackground
-                        );
-                    }
-                };
-            } else {
-                registerFix {
-                    desc = desc;
-                    change = change;
-                    selection = range;
-                    image = icons.correction;
-                    qualifiedNameIsPath = qualifiedNameIsPath;
-                    hint = hint;
-                };
-            }
         }
     }
 
