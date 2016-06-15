@@ -1,9 +1,12 @@
 .idea/ant.xml
 .idea/misc.xml
-.idea/scopes/scope_settings.xml
 .idea/workspace.xml
 .idea/uiDesigner.xml
+.idea/inspectionProfiles
+.idea/shelf
 .idea/dictionaries/
+.idea/scopes/scope_settings.xml
+.idea/libraries/Ceylon_dependencies.xml
 testdata/CeylonTest/.idea/misc.xml
 testdata/CeylonTest/.idea/scopes/scope_settings.xml
 testdata/CeylonTest/.idea/workspace.xml
@@ -12,10 +15,8 @@ grammar/gen
 grammar/gensrc
 grammar/build
 plugin-ceylon-code/test-resources/modules
+plugin-ceylon-code/.ceylon/ide-config~
 out
 ant-build
-.idea/inspectionProfiles
-.idea/shelf
-.idea/libraries/Ceylon_dependencies.xml
 modules/
 resources/rebel.xml
