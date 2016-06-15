@@ -131,11 +131,11 @@ class CustomIntention(Integer position, String desc,
     [String,TextRange]? hint = null,
     Anything callback(Project project, Editor editor, PsiFile psiFile) => noop())
         extends BaseIntentionAction()
-        satisfies Iconable & Comparable<IntentionAction> & HintAction {
+        satisfies Iconable & Comparable<IntentionAction> /*& HintAction*/ {
 
     variable Project? project = null;
 
-    shared actual Boolean showHint(Editor editor) {
+    /*shared actual Boolean showHint(Editor editor) {
         //TODO: only popup the hint if our caret is really close to the annotation?
         if (exists [text,range] = hint,
             exists project = this.project) {
@@ -175,7 +175,7 @@ class CustomIntention(Integer position, String desc,
         else {
             return false;
         }
-    }
+    }*/
 
     familyName => "Ceylon Intentions";
 

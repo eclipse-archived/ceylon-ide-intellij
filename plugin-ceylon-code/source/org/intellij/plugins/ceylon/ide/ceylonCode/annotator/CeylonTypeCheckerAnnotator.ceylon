@@ -180,10 +180,12 @@ shared class CeylonTypeCheckerAnnotator()
             if (exists pu = ceylonFile.upToDatePhasedUnit) {
                 if (exists cu = pu.compilationUnit,
                     ! (pu is ExternalPhasedUnit)) {
-                     value ceylonMessages = ErrorsVisitor(cu, ceylonFile).extractMessages();
+                     value ceylonMessages 
+                         = ErrorsVisitor(cu, ceylonFile)
+                             .extractMessages();
                      
-                     DaemonCodeAnalyzer.getInstance(ceylonFile.project)
-                             .resetImportHintsEnabledForProject();
+                     /*DaemonCodeAnalyzer.getInstance(ceylonFile.project)
+                             .resetImportHintsEnabledForProject();*/
                      
                      variable value hasErrors = false;
                      concurrencyManager.withAlternateResolution(
