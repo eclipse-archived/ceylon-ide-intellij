@@ -1,31 +1,11 @@
 import com.intellij.lang {
     ImportOptimizer
 }
-import com.intellij.openapi.editor.colors {
-    EditorColorsManager,
-    EditorFontType
-}
 import com.intellij.openapi.project {
     Project
 }
-import com.intellij.openapi.ui {
-    DialogWrapper
-}
 import com.intellij.psi {
     PsiFile
-}
-import com.intellij.ui {
-    ScrollPaneFactory
-}
-import com.intellij.ui.components {
-    JBList
-}
-import com.intellij.usageView {
-    UsageTreeColorsScheme,
-    UsageTreeColors
-}
-import com.intellij.util {
-    NotNullFunction
 }
 import com.redhat.ceylon.ide.common.imports {
     AbstractImportsCleaner
@@ -34,35 +14,15 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration
 }
 
-import java.awt {
-    BorderLayout,
-    Dimension
-}
 import java.lang {
-    Runnable,
-    JavaString=String
+    Runnable
 }
 
-import javax.swing {
-    ListSelectionModel,
-    DefaultListModel,
-    JPanel,
-    JComponent,
-    JLabel
-}
-
-import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    highlighter
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile,
-    descriptions
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.util {
-    icons
+    CeylonFile
 }
 
 shared class CeylonImportOptimizer()
@@ -86,16 +46,17 @@ shared class CeylonImportOptimizer()
     supports(PsiFile? psiFile) => psiFile is CeylonFile;
 
     shared actual Declaration? select(List<Declaration> proposals) {
-        assert (exists p = project);
+        /*assert (exists p = project);
         value dialog = DeclarationChooserDialog(p, proposals);
         dialog.title = "Resolve Missing Import";
         dialog.modal = true;
-//        dialog.setUndecorated(true);
-        return dialog.select();
+        //dialog.setUndecorated(true);
+        return dialog.select();*/
+        return null;
     }
 }
 
-class DeclarationChooserDialog(Project project, List<Declaration> declarations)
+/*class DeclarationChooserDialog(Project project, List<Declaration> declarations)
         extends DialogWrapper(project,true) {
 
     value model = DefaultListModel<Declaration>();
@@ -141,4 +102,4 @@ class DeclarationChooserDialog(Project project, List<Declaration> declarations)
     }
 
     preferredFocusedComponent => list;
-}
+}*/
