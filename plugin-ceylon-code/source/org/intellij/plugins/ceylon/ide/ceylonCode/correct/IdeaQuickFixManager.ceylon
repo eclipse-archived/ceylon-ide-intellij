@@ -228,13 +228,14 @@ shared class IdeaQuickFixData(
     errorCode => message.code;
     problemOffset => annotation?.startOffset else 0;
     problemLength => (annotation?.endOffset else 0) - problemOffset;
-    editorSelection => if (exists e = editor)
-                       then DefaultRegion {
-                            start = e.selectionModel.selectionStart;
-                            length = e.selectionModel.selectionEnd
-                                   - e.selectionModel.selectionStart;
-                        }
-                       else DefaultRegion(0);
+    editorSelection
+            => if (exists e = editor)
+            then DefaultRegion {
+                start = e.selectionModel.selectionStart;
+                length = e.selectionModel.selectionEnd
+                       - e.selectionModel.selectionStart;
+            }
+            else DefaultRegion(0);
     
     function textRange(Annotation annotation)
             => TextRange(annotation.startOffset,
@@ -282,7 +283,7 @@ shared class IdeaQuickFixData(
         value list = JBList(JavaList(candidates));
         list.installCellRenderer(object satisfies NotNullFunction<Resolution, JComponent> {
             fun(Resolution resolution)
-                    => JLabel(highlighter.highlightQuotedMessage { 
+                    => JLabel(highlighter.highlightQuotedMessage {
                         description = resolution.description;
                         qualifiedNameIsPath = resolution.qualifiedNameIsPath;
                         project = project.project;
@@ -292,7 +293,7 @@ shared class IdeaQuickFixData(
         JBPopupFactory.instance
             .createListPopupBuilder(list)
             .setTitle(title)
-            .setItemChoosenCallback(JavaRunnable(void () {
+            .setItemChoosenCallback(JavaRunnable(() {
                 if (exists candidate = candidates[list.selectedIndex]) {
                     object extends WriteCommandAction<Nothing>(editor.project) {
                         shared actual void run(Result<Nothing>? result) {
@@ -347,7 +348,7 @@ shared class IdeaQuickFixData(
                         project.project,
                         "Searching...",
                         JavaRunnable(() => concurrencyManager.needReadAccess(change)),
-                        JavaRunnable(void() {
+                        JavaRunnable(() {
                             resolutions = null;
                             if (candidates.empty) {
                                 //TODO show it at the right location!
@@ -362,11 +363,11 @@ shared class IdeaQuickFixData(
                 }
             };
         } else if (exists candidates = resolutions) {
-            candidates.add(Resolution { 
-                description = desc; 
-                icon = icons.imports; 
-                change = change; 
-                qualifiedNameIsPath = qualifiedNameIsPath; 
+            candidates.add(Resolution {
+                description = desc;
+                icon = icons.imports;
+                change = change;
+                qualifiedNameIsPath = qualifiedNameIsPath;
             });
         } else {
             registerFix {
