@@ -150,7 +150,7 @@ shared class MutableLocalAnalysisResult(
 }
 
 shared variable Integer delayToRetryCancelledLocalAnalysis = 1000;
-shared variable Integer delayToStartLocalAnalysisAfterParsing = 100;
+shared variable Integer delayToStartLocalAnalysisAfterParsing = 200;
 
 shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile() virtualFileAccessor, Project() ideaProjectAccessor) {
     variable MutableLocalAnalysisResult? result_= null;
@@ -207,18 +207,16 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
                 return;
             }
             
-            function findPsiFile() => PsiManager.getInstance(ideaProject).findFile(virtualFile) else null; 
-            try {
-                if (exists psiFile = 
-                    concurrencyManager.needReadAccess(findPsiFile, 2000)) {
+            void restartDaemonCodeAnalyzer() {
+                if (exists psiFile = PsiManager.getInstance(ideaProject).findFile(virtualFile)) {
                     DaemonCodeAnalyzer.getInstance(ideaProject).restart(psiFile);
                 }
+            }
+            try {
+                concurrencyManager.needReadAccess(restartDaemonCodeAnalyzer, 0);
             } catch(ProcessCanceledException e) {
-                ApplicationManager.application.invokeLater(JavaRunnable(() {
-                    if (exists psiFile = findPsiFile()) {
-                        DaemonCodeAnalyzer.getInstance(ideaProject).restart(psiFile);
-                    }
-                }));
+                ApplicationManager.application.invokeLater(
+                    JavaRunnable(restartDaemonCodeAnalyzer));
             }
         }), delay);
     }
