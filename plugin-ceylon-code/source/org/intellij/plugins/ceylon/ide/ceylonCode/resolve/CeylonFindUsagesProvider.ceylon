@@ -109,19 +109,22 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
     shared actual String getDescriptiveName(PsiElement element) {
         if (is CeylonCompositeElement element) {
             assert (is CeylonFile file = element.containingFile);
-            value node = nodes.findNode {
-                node = file.compilationUnit;
-                tokens = file.tokens;
-                startOffset = element.textRange.startOffset;
-                endOffset = element.textRange.endOffset;
-            };
-            if (exists node) {
-                if (is Tree.InitializerParameter node) {
-                    Tree.InitializerParameter initializerParameter = node;
-                    return initializerParameter.identifier.text;
-                } else {
-                    if (exists declaration = nodes.findDeclaration(file.compilationUnit, node)) {
-                        return declaration.identifier.text;
+            if (exists localAnalysisResult = file.localAnalysisResult,
+                exists lastCompilationUnit = localAnalysisResult.lastCompilationUnit) {
+                value node = nodes.findNode {
+                    node = lastCompilationUnit;
+                    tokens = localAnalysisResult.tokens;
+                    startOffset = element.textRange.startOffset;
+                    endOffset = element.textRange.endOffset;
+                };
+                if (exists node) {
+                    if (is Tree.InitializerParameter node) {
+                        Tree.InitializerParameter initializerParameter = node;
+                        return initializerParameter.identifier.text;
+                    } else {
+                        if (exists declaration = nodes.findDeclaration(lastCompilationUnit, node)) {
+                            return declaration.identifier.text;
+                        }
                     }
                 }
             }

@@ -172,8 +172,12 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         if (tc == null) {
             return null;
         }
-        final Tree.CompilationUnit cu = ((CeylonFile) context.getContainingFile()).getCompilationUnit();
-        final PhasedUnit pu = ((CeylonFile) context.getContainingFile()).getPhasedUnit();
+        LocalAnalysisResult localAnalysisResult = ((CeylonFile) context.getContainingFile()).getLocalAnalysisResult();
+        if (localAnalysisResult == null) {
+            return null;
+        }
+        final Tree.CompilationUnit cu = localAnalysisResult.getTypecheckedRootNode();
+        final PhasedUnit pu = localAnalysisResult.getLastPhasedUnit();
 
         if (cu == null || pu == null) {
             return null;
@@ -192,7 +196,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 new WriteCommandAction(context.getProject()) {
                     @Override
                     protected void run(@NotNull Result result) throws Throwable {
-                        Document doc = context.getContainingFile().getViewProvider().getDocument();
+                        Document doc = context.getContainingFile().getViewProvider().getDocument(); // we should retrieve the document in LocalAnalysisResult to be perfectly consistent
                         IdeaQuickFixData data = new IdeaQuickFixData(null, doc, cu, pu, node, null, null, null);
                         specifyTypeQuickFix_.get_().createProposal((Tree.Type) node, data);
                     }

@@ -53,11 +53,7 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-<<<<<<< Upstream, based on origin/master
     highlighter
-=======
-    highlightProposal
->>>>>>> 71d2748 Local typechecking lifecycle rework (#261)
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
