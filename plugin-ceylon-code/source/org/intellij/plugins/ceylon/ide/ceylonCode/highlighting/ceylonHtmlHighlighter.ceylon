@@ -188,7 +188,7 @@ shared object highlighter {
         }
     }
 
-    String toColoredHtml(String token, TextAttributes attr) {
+    shared String toColoredHtml(String token, TextAttributes attr) {
         String? color =
         if (exists fg = attr.foregroundColor, !fg.equals(JBColor.\iBLACK))
         then "<font color='#" + ColorUtil.toHex(attr.foregroundColor) + "'>"
