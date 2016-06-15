@@ -36,10 +36,10 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        Tree.Declaration node = getCeylonNode();
-        return node == null ?
+        Tree.Identifier id = getCeylonNode().getIdentifier();
+        return id == null ?
                 PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) :
-                CeylonTreeUtil.findPsiElement(node.getIdentifier(), getContainingFile());
+                CeylonTreeUtil.findPsiElement(id, getContainingFile());
     }
 
     @Override
