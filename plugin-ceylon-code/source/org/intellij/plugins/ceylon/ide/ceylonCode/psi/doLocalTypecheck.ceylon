@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    JavaRunnable
+    JavaRunnable,
+    javaClass
 }
 
 import com.intellij.codeInsight.daemon {
@@ -83,7 +84,8 @@ import org.antlr.runtime {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
-    concurrencyManager
+    concurrencyManager,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
@@ -353,6 +355,14 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
                     typechecker = typechecker; 
                     phasedUnit = createPhasedUnitAndTypecheck(typechecker, parsedRootNode, tokens, fileVirtualFileToTypecheck, srcDir, pkg, centralModelPhasedUnit, cancellable); 
                 };
+                
+                if (result.parsedRootNode.errors.empty) {
+                    value modelManager =
+                            ceylonProject.model.ideaProject.getComponent(javaClass<CeylonModelManager>());
+                    if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
+                        modelManager.scheduleModelUpdate();
+                    }
+                }
             }, waitForModelInSeconds);
         } else {
             // Case of a virtual file that is not linked to any Idea module 
@@ -435,7 +445,7 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
         if (exists typechecker = phasedUnit.typeChecker) {
             result.finishedTypechecking(phasedUnit, typechecker);
         } else {
-            platformUtils.log(Status._WARNING, "the `typechecker` of the ExternalPhasedUnit `` phasedUnit `` is null");
+            platformUtils.log(Status._DEBUG, "the `typechecker` of the ExternalPhasedUnit `` phasedUnit `` is null");
         }
     }
     
