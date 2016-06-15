@@ -42,9 +42,13 @@ import java.lang {
     JString=String
 }
 import java.util {
-    ArrayList
+    ArrayList,
+    List
 }
 
+import org.antlr.runtime {
+    CommonToken
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
     IdeaTextChange
@@ -59,30 +63,34 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 shared class ExtractValueHandler() extends AbstractExtractHandler() {
 
     shared actual [TextRange+]? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
-        assert(exists node = nodes.findNode {
-            node = file.compilationUnit;
-            tokens = file.tokens;
-            startOffset = range.startOffset;
-            endOffset = range.endOffset;
-        });
-
-        value refactoring = IdeaExtractValueRefactoring(file, editor, node);
-        value name = nodes.nameProposals(node).first;
-        refactoring.newName = name;
-        return refactoring.extractInFile(project, file);
+        if (exists localAnalysisResult = file.localAnalysisResult,
+            exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode,
+            exists phasedUnit = localAnalysisResult.lastPhasedUnit) {
+            assert(exists node = nodes.findNode {
+                node = typecheckedRootNode;
+                tokens = localAnalysisResult.tokens;
+                startOffset = range.startOffset;
+                endOffset = range.endOffset;
+            });
+            
+            value refactoring = IdeaExtractValueRefactoring(file, phasedUnit, localAnalysisResult.tokens, editor, node);
+            value name = nodes.nameProposals(node).first;
+            refactoring.newName = name;
+            return refactoring.extractInFile(project, file);
+        }
+        return null;
     }
 }
 
-class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node node)
+class IdeaExtractValueRefactoring(CeylonFile file, PhasedUnit phasedUnit, List<CommonToken> theTokens, Editor editor, Node node)
         satisfies ExtractValueRefactoring<TextRange> {
 
-    editorPhasedUnit => file.phasedUnit;
+    editorPhasedUnit => phasedUnit;
 
     getAllUnits() => ArrayList<PhasedUnit>();
     searchInFile(PhasedUnit pu) => false;
     searchInEditor() => false;
-    rootNode => file.compilationUnit;
-    
+    rootNode => phasedUnit.compilationUnit;
     shared variable actual Boolean canBeInferred = false;
     shared actual variable Type? type = null;
     shared actual variable Boolean getter = false;
@@ -99,8 +107,8 @@ class IdeaExtractValueRefactoring(CeylonFile file, Editor editor, Node node)
     dupeRegions = ArrayList<TextRange>();
 
     editorData => object satisfies EditorData {
-        tokens => file.tokens;
-        rootNode => file.compilationUnit;
+        tokens => theTokens;
+        rootNode => phasedUnit.compilationUnit;
         node => outer.node;
         sourceVirtualFile
                 => VirtualFileVirtualFile(file.virtualFile, 

@@ -16,6 +16,10 @@ import com.intellij.refactoring.rename.inplace {
     VariableInplaceRenameHandler,
     VariableInplaceRenamer
 }
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
@@ -54,10 +58,13 @@ shared class CeylonVariableRenameHandler()
             return false;
         }
 
-        if (is CeylonFile file) {
-            file.ensureTypechecked();
+        if (is CeylonFile file,
+            exists localAnalysisResult = file.localAnalysisResult,
+            ! localAnalysisResult.upToDate) {
+
+            platformUtils.log(Status._DEBUG, "CeylonVariableRenameHandler unavailable because the file `` file `` is not typechecked and up-to-date");
+            return false;
         }
-        
         return true;
     }
 }

@@ -10,15 +10,12 @@ import com.intellij.codeInspection {
 }
 import com.intellij.lang.annotation {
     AnnotationHolder,
-    ExternalAnnotator,
     Annotation,
-    HighlightSeverity
+    HighlightSeverity,
+    Annotator
 }
 import com.intellij.openapi.application {
     ApplicationManager
-}
-import com.intellij.openapi.editor {
-    Editor
 }
 import com.intellij.openapi.\imodule {
     ModuleUtil
@@ -34,6 +31,7 @@ import com.intellij.problems {
     Problem
 }
 import com.intellij.psi {
+    PsiElement,
     PsiFile
 }
 import com.redhat.ceylon.compiler.typechecker.analyzer {
@@ -51,8 +49,9 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 import com.redhat.ceylon.ide.common.correct {
     ideQuickFixManager
 }
-import com.redhat.ceylon.ide.common.typechecker {
-    ExternalPhasedUnit
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -70,84 +69,22 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
-    concurrencyManager,
-    CeylonModelManager
+    concurrencyManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
+    CeylonFile,
+    CeylonPsi
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    ExternalPhasedUnit
 }
 
 shared alias AnyError => AnalysisError|RecognitionError|UnexpectedError;
 
 shared class CeylonTypeCheckerAnnotator() 
-        extends ExternalAnnotator<CeylonFile?, {[Message, TextRange?]*}?>()
-        satisfies DumbAware {
-
+        satisfies Annotator & DumbAware {
     value unresolvedReferenceCodes = [ 100, 102 ];
     value unusedCodes = [ Warning.unusedDeclaration.string, Warning.unusedImport.string ];
-
-    shared actual CeylonFile? collectInformation(PsiFile file) {
-        if (is CeylonFile file,
-            !file.phasedUnit is ExternalPhasedUnit) {
-
-            return file;
-        }
-
-        return null;
-    }
-    
-    shared actual CeylonFile? collectInformation(PsiFile file, Editor editor, Boolean hasErrors)
-            => collectInformation(file);
-    
-    shared actual {[Message, TextRange?]*}? doAnnotate(CeylonFile ceylonFile)
-            => concurrencyManager.withAlternateResolution(() 
-                => if (exists pu = ceylonFile.ensureTypechecked(),
-                       exists cu = pu.compilationUnit)
-                then ErrorsVisitor(cu, ceylonFile).extractMessages()
-                else null);
-    
-    shared actual void apply(PsiFile file, {[Message, TextRange?]*} ceylonMessages, AnnotationHolder holder) {
-        //see CustomIntention.showHint()
-        DaemonCodeAnalyzer.getInstance(file.project)
-            .resetImportHintsEnabledForProject();
-
-        variable value hasErrors = false;
-        concurrencyManager.withAlternateResolution(
-            () => ceylonMessages.each(
-                ([message,range]) {
-                    value result = addAnnotation {
-                        message = message;
-                        range = range;
-                        annotationHolder = holder;
-                        file = file;
-                    };
-                    hasErrors ||= result;
-            })
-        );
-        if (is CeylonFile file,
-            exists cu = file.compilationUnit) {
-
-            if (cu.errors.empty) {
-                value modelManager =
-                    file.project.getComponent(javaClass<CeylonModelManager>());
-                if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
-                    modelManager.scheduleModelUpdate();
-                }
-            }
-
-            if (hasErrors) {
-                value problems = object extends ArrayList<Problem>() {
-                    empty => false;
-                };
-
-                WolfTheProblemSolver.getInstance(file.project)
-                    .reportProblems(file.virtualFile, problems);
-            } else {
-                WolfTheProblemSolver.getInstance(file.project)
-                    .clearProblems(file.virtualFile);
-            }
-        }
-    }
 
     Boolean addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, PsiFile file) {
 
@@ -205,7 +142,7 @@ shared class CeylonTypeCheckerAnnotator()
     void addQuickFixes(TextRange range, Message error, Annotation annotation, AnnotationHolder annotationHolder) {
         assert (is CeylonFile file = annotationHolder.currentAnnotationSession.file);
         value mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project);
-        value pu = file.phasedUnit;
+        assert(exists pu = file.localAnalysisResult.lastPhasedUnit);
         
         if (is IdeaCeylonProjects projects
                 = file.project.getComponent(javaClass<IdeaCeylonProjects>()),
@@ -233,6 +170,50 @@ shared class CeylonTypeCheckerAnnotator()
                 ideQuickFixManager.addQuickFixes(data, tc);
             } catch (Exception|AssertionError e) {
                 e.printStackTrace();
+            }
+        }
+    }
+    
+    shared actual void annotate(PsiElement psiElement, AnnotationHolder annotationHolder) {
+        if (is CeylonPsi.CompilationUnitPsi psiElement,
+            is CeylonFile ceylonFile = psiElement.containingFile) {
+            if (exists pu = ceylonFile.upToDatePhasedUnit) {
+                if (exists cu = pu.compilationUnit,
+                    ! (pu is ExternalPhasedUnit)) {
+                     value ceylonMessages = ErrorsVisitor(cu, ceylonFile).extractMessages();
+                     
+                     DaemonCodeAnalyzer.getInstance(ceylonFile.project)
+                             .resetImportHintsEnabledForProject();
+                     
+                     variable value hasErrors = false;
+                     concurrencyManager.withAlternateResolution(
+                         () => ceylonMessages.each(
+                             ([message,range]) {
+                                 value result = addAnnotation {
+                                     message = message;
+                                     range = range;
+                                     annotationHolder = annotationHolder;
+                                     file = ceylonFile;
+                                 };
+                                 hasErrors ||= result;
+                             })
+                         );
+                             
+                     if (hasErrors) {
+                         value problems = object extends ArrayList<Problem>() {
+                             empty => false;
+                         };
+                         
+                         WolfTheProblemSolver.getInstance(ceylonFile.project)
+                                 .reportProblems(ceylonFile.virtualFile, problems);
+                     } else {
+                         WolfTheProblemSolver.getInstance(ceylonFile.project)
+                                 .clearProblems(ceylonFile.virtualFile);
+                     }
+                }
+            } else {
+                platformUtils.log(Status._ERROR, "The CeylonFile is not typechecked during the GeneralHighlightinhPass !");
+                platformUtils.newOperationCanceledException();
             }
         }
     }

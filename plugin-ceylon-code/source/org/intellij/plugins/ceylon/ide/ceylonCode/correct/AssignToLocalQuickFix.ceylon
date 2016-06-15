@@ -71,7 +71,8 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
         }
         assert(is IdeaDocument doc = data.document);
         value lm = IdeaLinkedMode(doc);
-        addLinkedPositions(lm, f.phasedUnit.unit);
+        assert(exists phasedUnit = f.localAnalysisResult?.lastPhasedUnit);
+        addLinkedPositions(lm, phasedUnit.unit);
         // TODO can't we do that in ide-common?
         lm.install(this, 0, 0);
     }

@@ -78,9 +78,12 @@ shared class InlineAction() extends InlineActionHandler() {
     }
 
     shared actual void inlineElement(Project _project, Editor editor, PsiElement element) {
-        if (is CeylonFile file = element.containingFile) {
+        if (is CeylonFile file = element.containingFile,
+            exists localAnalysisResult = file.localAnalysisResult,
+            exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode, 
+            exists phasedUnit = localAnalysisResult.lastPhasedUnit) {
             value node = nodes.findNode(
-                file.compilationUnit, file.tokens,
+                typecheckedRootNode, localAnalysisResult.tokens,
                 editor.selectionModel.selectionStart,
                 editor.selectionModel.selectionEnd
             );
@@ -88,7 +91,7 @@ shared class InlineAction() extends InlineActionHandler() {
             if (exists node,
                 is Declaration decl = nodes.getReferencedDeclaration(node)) {
 
-                value refactoring = IdeaInlineRefactoring(file, node, decl, editor);
+                value refactoring = IdeaInlineRefactoring(phasedUnit, localAnalysisResult.tokens, node, decl, editor);
                 value dialog = InlineDialog(_project, element, refactoring);
 
                 if (dialog.showAndGet()) {
@@ -108,10 +111,10 @@ shared class InlineAction() extends InlineActionHandler() {
     shared actual Boolean isEnabledForLanguage(Language l) => l == CeylonLanguage.\iINSTANCE;
 }
 
-class IdeaInlineRefactoring(CeylonFile file, Node node, Declaration decl, Editor editor) 
+class IdeaInlineRefactoring(PhasedUnit phasedUnit, List<CommonToken> theTokens, Node node, Declaration decl, Editor editor) 
         satisfies InlineRefactoring {
 
-    editorPhasedUnit => file.phasedUnit;
+    editorPhasedUnit => phasedUnit;
 
     class IdeaInlineData() satisfies InlineData {
         shared actual Declaration declaration => decl;
@@ -124,18 +127,18 @@ class IdeaInlineRefactoring(CeylonFile file, Node node, Declaration decl, Editor
         
         shared actual Node node => outer.node;
         
-        shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
+        shared actual Tree.CompilationUnit rootNode => phasedUnit.compilationUnit;
         
         shared actual VirtualFile? sourceVirtualFile => null;
         
-        shared actual List<CommonToken> tokens => file.tokens;
+        shared actual List<CommonToken> tokens => theTokens;
     }
     
     shared actual InlineData editorData = IdeaInlineData();
     
     shared actual List<PhasedUnit> getAllUnits() => ArrayList<PhasedUnit>();
     
-    shared actual Tree.CompilationUnit rootNode => file.compilationUnit;
+    shared actual Tree.CompilationUnit rootNode => phasedUnit.compilationUnit;
     
     shared actual Boolean searchInEditor() => true;
     

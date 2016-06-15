@@ -8,6 +8,8 @@ import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
@@ -92,10 +94,10 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     public static TypeChecker getFor(PsiElement element) {
         if (element.getContainingFile() instanceof CeylonFile) {
             CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
-
-            if (ceylonFile.getPhasedUnit() instanceof IdePhasedUnit) {
-                IdePhasedUnit phasedUnit = (IdePhasedUnit) ceylonFile.getPhasedUnit();
-                return phasedUnit.getTypeChecker();
+            LocalAnalysisResult localAnalysisResult = ceylonFile.getLocalAnalysisResult();
+            TypeChecker typechecker = localAnalysisResult.getTypeChecker();
+            if (typechecker != null) {
+                return typechecker;
             }
 
             //LOGGER.warn("CeylonFile has no IdePhasedUnit: " + ceylonFile.getVirtualFile().getCanonicalPath());

@@ -17,6 +17,11 @@ import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
+import com.redhat.ceylon.ide.common.platform.Status;
+import com.redhat.ceylon.ide.common.platform.platformUtils_;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -52,20 +57,25 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         }
 
         final CeylonFile ceylonFile = (CeylonFile) myElement.getContainingFile();
-        final Tree.CompilationUnit compilationUnit = ceylonFile.getCompilationUnit();
+        final LocalAnalysisResult localAnalysisResult = ceylonFile.getLocalAnalysisResult();
+        if (localAnalysisResult == null) {
+            return null;
+        }
+            
+        final Tree.CompilationUnit compilationUnit = localAnalysisResult.getTypecheckedRootNode();
+        if (compilationUnit == null) {
+            platformUtils_.get_().log(Status.getStatus$_ERROR(), "CeylonReference is not resolved because the file " + myElement.getContainingFile() + " is not typechecked and up-to-date");
+            throw platformUtils_.get_().newOperationCanceledException();
+        }
 
         Sequence seq = ConcurrencyManagerForJava.withAlternateResolution(new Callable<Sequence>() {
             @Override
             public Sequence call() throws Exception {
-                if (ceylonFile.ensureTypechecked() != null) {
-                    return new IdeaNavigation(myElement.getProject()).findTarget(compilationUnit,
-                            ceylonFile.getTokens(),
-                            new DefaultRegion(myElement.getTextRange().getStartOffset(), myElement.getTextRange().getLength())
-                    );
-                }
-                return null;
+                return new IdeaNavigation(myElement.getProject()).findTarget(compilationUnit,
+                        localAnalysisResult.getTokens(),
+                        new DefaultRegion(myElement.getTextRange().getStartOffset(), myElement.getTextRange().getLength())
+                );
             }
-
         });
 
         if (seq != null) {
@@ -88,6 +98,8 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             }
         }
 
+        
+        
         Node node;
         if (myElement instanceof CeylonPsi.ImportPathPsi) {
             node = ((CeylonPsi.ImportPathPsi) myElement).getCeylonNode();

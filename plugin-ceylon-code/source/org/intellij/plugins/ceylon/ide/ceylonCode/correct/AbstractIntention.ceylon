@@ -34,7 +34,9 @@ import com.redhat.ceylon.ide.common.doc {
     Icons
 }
 import com.redhat.ceylon.ide.common.platform {
-    PlatformTextChange=TextChange
+    PlatformTextChange=TextChange,
+    platformUtils,
+    Status
 }
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
@@ -51,7 +53,11 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+<<<<<<< Upstream, based on origin/master
     highlighter
+=======
+    highlightProposal
+>>>>>>> 71d2748 Local typechecking lifecycle rework (#261)
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
@@ -91,11 +97,17 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
         callback = noop;
 
         if (is CeylonFile psiFile,
-            is ModifiablePhasedUnit<out Anything,out Anything,out Anything,out Anything> u=psiFile.phasedUnit) {
-            psiFile.ensureTypechecked();
+            exists localAnalysisResult = psiFile.localAnalysisResult,
+            is ModifiablePhasedUnit<out Anything,out Anything,out Anything,out Anything> analyzedPhasedUnit = localAnalysisResult.lastPhasedUnit) {
+            
+            value typecheckedCompilationUnit = localAnalysisResult.typecheckedRootNode;
+            if (! exists typecheckedCompilationUnit) {
+                platformUtils.log(Status._ERROR, "AbstractIntention `` this`` is not available because the file `` psiFile `` is not typechecked and up-to-date");
+                return false;
+            }
             value offset = _editor.caretModel.offset;
-            value _node = nodes.findNode(psiFile.compilationUnit,
-                psiFile.tokens, offset);
+            value _node = nodes.findNode(typecheckedCompilationUnit,
+                localAnalysisResult.tokens, offset);
             
             value mod = ModuleUtil.findModuleForFile(psiFile.virtualFile, project);
             
@@ -106,8 +118,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                 value data = object extends IdeaQuickFixData(
                     dummyMsg, 
                     psiFile.viewProvider.document,
-                    psiFile.compilationUnit,
-                    psiFile.phasedUnit,
+                    typecheckedCompilationUnit,
+                    analyzedPhasedUnit,
                     _node,
                     mod,
                     null,

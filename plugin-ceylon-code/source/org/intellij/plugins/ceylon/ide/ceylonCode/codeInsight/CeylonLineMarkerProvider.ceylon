@@ -21,6 +21,10 @@ import com.intellij.psi {
 import com.intellij.util {
     Function
 }
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
+}
 import com.redhat.ceylon.ide.common.util {
     types
 }
@@ -35,9 +39,6 @@ import java.lang {
     JString=String
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    concurrencyManager
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
     CeylonFile,
@@ -62,8 +63,10 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
     shared actual LineMarkerInfo<PsiElement>? getLineMarkerInfo(PsiElement element) {
         
         if (is CeylonFile file = element.containingFile) {
-            concurrencyManager.withAlternateResolution(void () {
-                file.ensureTypechecked(); });
+            if (! file.upToDatePhasedUnit exists) {
+                platformUtils.log(Status._DEBUG, "CeylonLineMarkerProvider returned no marker info because the file `` file `` is not typechecked and up-to-date");
+                throw platformUtils.newOperationCanceledException();
+            }
         }
         if (is CeylonPsi.IdentifierPsi|CeylonPsi.SpecifierStatementPsi element,
             exists decl = findParentDeclaration(element),

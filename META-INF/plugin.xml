@@ -26,6 +26,10 @@
         <component>
             <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.model.CeylonModelManager</implementation-class>
         </component>
+<!--        <component>
+            <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.codeHighlighting.CeylonLocalTypecheckingPassFactory</implementation-class>
+        </component>
+-->
     </project-components>
 
     <module-components>
@@ -99,6 +103,8 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <lang.fileViewProviderFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonSourceFileViewProviderFactory"/>
+    
         <ApplicationLoadListener implementation="org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin"/>
         <lang.documentationProvider implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonDocProvider" language="Ceylon"/>
 
@@ -107,7 +113,7 @@
 
         <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonHighlighterFactory"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonSyntaxAnnotator"/>
-        <externalAnnotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.annotator.CeylonTypeCheckerAnnotator"/>
+        <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonFileHighlightFilter"/>
         <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonColorSettingsPage"/>
         <additionalTextAttributes scheme="Default" file="colorSchemes/CeylonDefault.xml"/>

@@ -115,6 +115,9 @@ import javax.swing {
     JCheckBox
 }
 
+import org.antlr.runtime {
+    CommonToken
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonFileType
 }
@@ -138,7 +141,8 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
     shared actual PsiElement? findTargetMember(PsiElement? element) {
         if (exists element,
             is CeylonFile file = element.containingFile,
-            exists node = nodes.findNode(file.compilationUnit, file.tokens, element.textOffset)) {
+            exists localAnalysisResult = file.localAnalysisResult,
+            exists node = nodes.findNode(localAnalysisResult.parsedRootNode, localAnalysisResult.tokens, element.textOffset)) {
 
             return element;
         }
@@ -155,13 +159,16 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
     }
 
     shared actual void invoke(Project _project, Editor editor, PsiFile file, DataContext? dataContext) {
-        if (is CeylonFile file) {
+        if (is CeylonFile file,
+            exists localAnalysisResult = file.localAnalysisResult,
+            exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode,
+            exists phasedUnit = localAnalysisResult.lastPhasedUnit) {
             value projects = _project.getComponent(javaClass<IdeaCeylonProjects>());
 
             if (exists mod = ModuleUtil.findModuleForFile(file.virtualFile, _project),
                 is IdeaCeylonProject ceylonProject = projects.getProject(mod)) {
 
-                value refacto = IdeaChangeParameterRefactoring(file, editor, ceylonProject);
+                value refacto = IdeaChangeParameterRefactoring(phasedUnit, localAnalysisResult.tokens, editor, ceylonProject);
                 if (refacto.enabled,
                     exists params = refacto.computeParameters()) {
 
@@ -191,16 +198,17 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
 }
 
 class IdeaChangeParameterRefactoring(
-    CeylonFile file,
+    PhasedUnit phasedUnit,
+    List<CommonToken> theTokens,
     Editor editor,
     IdeaCeylonProject project
 ) extends ChangeParametersRefactoring(
-    file.compilationUnit,
+    phasedUnit.compilationUnit,
     editor.selectionModel.selectionStart,
     editor.selectionModel.selectionEnd,
-    file.tokens,
+    theTokens,
     IdeaDocument(editor.document),
-    file.phasedUnit,
+    phasedUnit,
     CeylonIterable(project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>())
 ) {
 
@@ -208,7 +216,7 @@ class IdeaChangeParameterRefactoring(
 
     searchInEditor() => true;
 
-    searchInFile(PhasedUnit pu) => pu.unit != file.phasedUnit.unit;
+    searchInFile(PhasedUnit pu) => pu.unit != phasedUnit.unit;
 
 }
 

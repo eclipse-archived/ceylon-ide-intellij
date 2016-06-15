@@ -25,6 +25,7 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.correct.specifyTypeQuickFix_;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.Referenceable;
@@ -99,7 +100,8 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             IdeaDocGenerator generator = new IdeaDocGenerator(tc);
             if (element instanceof DummyPsiElement) {
                 Referenceable referenceable = ((DummyPsiElement) element).referenceable;
-                PhasedUnit pu = ((CeylonFile) element.getContainingFile()).getPhasedUnit();
+                LocalAnalysisResult localAnalysisResult = ((CeylonFile) element.getContainingFile()).getLocalAnalysisResult();
+                PhasedUnit pu = localAnalysisResult.getLastPhasedUnit();
                 Tree.CompilationUnit cu = ((CeylonFile) element.getContainingFile()).getCompilationUnit();
                 return generator.getDocumentationText(referenceable, null, cu, generator.DocParams$new$(pu, element.getProject())).value;
             }

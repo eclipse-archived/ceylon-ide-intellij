@@ -8,8 +8,11 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Editor
 }
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
 }
 import com.redhat.ceylon.ide.common.completion {
     CompletionContext,
@@ -32,6 +35,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import com.redhat.ceylon.compiler.typechecker {
+    TypeChecker
+}
 
 shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfies CompletionContext {
     shared Editor editor;
@@ -41,24 +47,33 @@ shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfi
     
     shared actual IdeaDocument commonDocument = IdeaDocument(editor.document);
     
-    lastCompilationUnit => file.phasedUnit.compilationUnit;
-    parsedRootNode => file.compilationUnit;
-    lastPhasedUnit => file.phasedUnit;
-    tokens => file.tokens;
-    typecheckedRootNode => file.compilationUnit;
+    assert(exists localAnalysisResult = file.localAnalysisResult);
+
+    parsedRootNode => localAnalysisResult.parsedRootNode;
+    tokens => localAnalysisResult.tokens;
+    typecheckedRootNode => localAnalysisResult.typecheckedRootNode;
+    
+    shared actual TypeChecker typeChecker {
+        assert(exists existingTypeChecker = localAnalysisResult.typeChecker);
+        return existingTypeChecker;
+    }
+
+    shared actual Tree.CompilationUnit lastCompilationUnit {
+        assert (exists lastCompilationUnit = localAnalysisResult.lastCompilationUnit);
+        return lastCompilationUnit;
+    }
+    
+    shared actual PhasedUnit lastPhasedUnit {
+        assert (exists lastPhasedUnit = localAnalysisResult.lastPhasedUnit);
+        return lastPhasedUnit;
+    }
+    
     
     shared actual CompletionOptions options;
     
     shared actual List<Pattern> proposalFilters => empty;
     
     shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder();
-    
-    shared actual TypeChecker typeChecker {
-        if (exists tc = ceylonProject?.typechecker) {
-            return tc;
-        }
-        throw Exception("Can't find typechecker");
-    }
 }
 
 shared class IdeaProposalsHolder() satisfies ProposalsHolder {
