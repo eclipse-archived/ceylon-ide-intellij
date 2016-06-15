@@ -40,7 +40,7 @@ public class CeylonDecompiler extends ClassFileDecompilers.Full {
     @Override
     public FileViewProvider createFileViewProvider(@NotNull VirtualFile file,
                                                    @NotNull PsiManager manager, boolean physical) {
-        return new CeylonFileViewProvider(manager, file, physical);
+        return new CeylonClassFileFileViewProvider(manager, file, physical);
     }
 
     @Override
