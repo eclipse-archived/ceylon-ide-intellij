@@ -83,6 +83,14 @@ shared object concurrencyManager {
     
     value noIndexStrategy_ = ThreadLocal<NoIndexStrategy?>();
 
+    shared Return|ProcessCanceledException tryReadAccess<Return>(Return() func) {
+        try {
+            return needReadAccess(func, 0);
+        } catch(ProcessCanceledException e) {
+            return e;
+        }
+    }
+
     shared Return needReadAccess<Return>(Return() func, Integer timeout = deadLockDetectionTimeout) {
         if (application.readAccessAllowed) {
             value ref = Ref<Return>();
@@ -259,6 +267,12 @@ shared Return doWithIndex<Return>(Project p, Return() func) => concurrencyManage
 shared Return doWithLock<Return>(Return() func) => concurrencyManager.needReadAccess(func);
 
 object concurrencyManagerForJava {
+    shared Anything needReadAccess(JCallable<Anything> func, Integer timeout)
+            => concurrencyManager.needReadAccess(func.call, timeout);
+    
+    shared Anything tryReadAccess(JCallable<Anything> func)
+            => concurrencyManager.tryReadAccess(func.call);
+    
     shared Anything withAlternateResolution(JCallable<Anything> func)
             => concurrencyManager.withAlternateResolution(func.call);
     
