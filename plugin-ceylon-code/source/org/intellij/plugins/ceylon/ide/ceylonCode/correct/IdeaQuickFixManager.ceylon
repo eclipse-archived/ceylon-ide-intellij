@@ -2,7 +2,8 @@ import ceylon.collection {
     ArrayList
 }
 import ceylon.interop.java {
-    JavaRunnable
+    JavaRunnable,
+    JavaList
 }
 
 import com.intellij.codeInsight.daemon {
@@ -80,9 +81,7 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.correct {
     QuickFixData,
-    asyncModuleImport,
-    QuickFixKind,
-    addModuleImport
+    QuickFixKind
 }
 import com.redhat.ceylon.ide.common.doc {
     Icons
@@ -268,10 +267,8 @@ shared class IdeaQuickFixData(
 
     document = IdeaDocument(nativeDoc);
 
-    value candidateModules = ArrayList<[String, Icon, Anything()]>();
-
-    void showImportModulesPopup(Editor editor) {
-        value list = JBList(candidateModules);
+    void showPopup(Editor editor, List<[String, Icon, Anything()]> candidates, String title) {
+        value list = JBList(JavaList(candidates));
         list.installCellRenderer(object satisfies NotNullFunction<[String, Icon, Anything()], JComponent> {
             fun([String, Icon, Anything()] tuple)
                     => let ([desc, icon, _] = tuple)
@@ -280,9 +277,9 @@ shared class IdeaQuickFixData(
 
         JBPopupFactory.instance
             .createListPopupBuilder(list)
-            .setTitle("Choose module to import")
+            .setTitle(title)
             .setItemChoosenCallback(JavaRunnable(void () {
-                if (exists [d, i, fun] = candidateModules.get(list.selectedIndex)) {
+                if (exists [d, i, fun] = candidates.get(list.selectedIndex)) {
                     object extends WriteCommandAction<Nothing>(editor.project) {
                         run(Result<Nothing>? result) => fun();
                     }.execute();
@@ -296,6 +293,9 @@ shared class IdeaQuickFixData(
             => if (exists region)
                then TextRange.from(region.start, region.length)
                else null;
+
+    value candidateModules = ArrayList<[String, Icon, Anything()]>();
+    value candidateImports = ArrayList<[String, Icon, Anything()]>();
 
     shared actual default void addQuickFix(String desc,
         PlatformTextChange|Anything() change,
@@ -313,9 +313,37 @@ shared class IdeaQuickFixData(
                 hint = hint;
             };
         } else if (is Anything() change) {
-            if (kind == asyncModuleImport) {
+            switch (kind)
+            case (QuickFixKind.asyncImport) {
+                candidateImports.add([desc, icons.imports, change]);
+            } case (QuickFixKind.asyncModuleImport) {
                 candidateModules.add([desc, icons.imports, change]);
-            } else if (kind == addModuleImport) {
+            } case (QuickFixKind.addImport) {
+                registerFix {
+                    desc = desc;
+                    change = null;
+                    selection = range;
+                    image = icons.correction;
+                    qualifiedNameIsPath = qualifiedNameIsPath;
+                    hint = hint;
+                    void callback(Project p, Editor e, PsiFile f) {
+                        candidateImports.clear();
+                        ProgressManager.instance.runProcessWithProgressAsynchronously(
+                            project.project,
+                            "Scanning packages...",
+                            JavaRunnable(change),
+                            JavaRunnable(void () {
+                                if (!candidateImports.empty) {
+                                    showPopup(e, candidateImports,
+                                        "Choose package to import from");
+                                }
+                            }),
+                            null,
+                            PerformInBackgroundOption.alwaysBackground
+                        );
+                    }
+                };
+            } case (QuickFixKind.addModuleImport) {
                 registerFix {
                     desc = desc;
                     change = null;
@@ -327,11 +355,12 @@ shared class IdeaQuickFixData(
                         candidateModules.clear();
                         ProgressManager.instance.runProcessWithProgressAsynchronously(
                             project.project,
-                            "Querying module repositories",
+                            "Querying module repositories...",
                             JavaRunnable(change),
                             JavaRunnable(void () {
                                 if (!candidateModules.empty) {
-                                    showImportModulesPopup(e);
+                                    showPopup(e, candidateModules,
+                                        "Choose module to import");
                                 }
                             }),
                             null,
