@@ -64,6 +64,9 @@ shared object descriptions {
             if (is Function decl, decl.declaredVoid) {
                 //noop for void
             }
+            if (is Value decl, ModelUtil.isObject(decl)) {
+                //noop for anon classes
+            }
             else if (exists returnType = decl.type,
                     !ModelUtil.isTypeUnknown(returnType)) {
                 result.append(" ∊ ")
