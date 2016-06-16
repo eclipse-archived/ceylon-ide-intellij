@@ -37,11 +37,7 @@ import com.redhat.ceylon.ide.common.util {
     types
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration,
-    Class,
-    Function,
-    TypedDeclaration,
-    Interface
+    Declaration
 }
 
 import java.lang {
@@ -70,7 +66,8 @@ shared class CeylonGotoSuperHandler()
     alias SourceTypes
         => CeylonPsi.AnyClassPsi
          | CeylonPsi.AnyInterfacePsi
-         | CeylonPsi.ObjectDefinitionPsi;
+         | CeylonPsi.ObjectDefinitionPsi
+         | CeylonPsi.ObjectExpressionPsi;
     alias SourceMembers
         => CeylonPsi.AnyAttributePsi
          | CeylonPsi.AnyMethodPsi
@@ -119,7 +116,8 @@ shared class CeylonGotoSuperHandler()
                 javaClass<CeylonPsi.AnyAttributePsi>(),
                 javaClass<CeylonPsi.AnyMethodPsi>(),
                 javaClass<CeylonPsi.ConstructorPsi>(),
-                javaClass<CeylonPsi.ObjectDefinitionPsi>());
+                javaClass<CeylonPsi.ObjectDefinitionPsi>(),
+                javaClass<CeylonPsi.ObjectExpressionPsi>());
         }
         return null;
     }
@@ -127,26 +125,25 @@ shared class CeylonGotoSuperHandler()
     ObjectArray<PsiElement> findTargets(Source e) {
         value list = ArrayList<Declaration>();
         if (is CeylonPsi.AnyMethodPsi e) {
-            Function? meth = e.ceylonNode.declarationModel;
-            if (exists meth, exists target = types.getRefinedDeclaration(meth)) {
+            if (exists fun = e.ceylonNode.declarationModel,
+                exists target = types.getRefinedDeclaration(fun)) {
                 list.add(target);
-                if (exists top = meth.refinedDeclaration, top!=target) {
+                if (exists top = fun.refinedDeclaration, top!=target) {
                     list.add(top);
                 }
             }
         }
         else if (is CeylonPsi.AnyAttributePsi e) {
-            TypedDeclaration? att = e.ceylonNode.declarationModel;
-            if (exists att, exists target = types.getRefinedDeclaration(att)) {
+            if (exists val = e.ceylonNode.declarationModel,
+                exists target = types.getRefinedDeclaration(val)) {
                 list.add(target);
-                if (exists top = att.refinedDeclaration, top!=target) {
+                if (exists top = val.refinedDeclaration, top!=target) {
                     list.add(top);
                 }
             }
         }
         else if (is CeylonPsi.AnyClassPsi e) {
-            Class? cla = e.ceylonNode.declarationModel;
-            if (exists cla) {
+            if (exists cla = e.ceylonNode.declarationModel) {
                 if (exists target = cla.extendedType ?. declaration) {
                     list.add(target);
                 }
@@ -156,8 +153,17 @@ shared class CeylonGotoSuperHandler()
             }
         }
         else if (is CeylonPsi.AnyInterfacePsi e) {
-            Interface? cla = e.ceylonNode.declarationModel;
-            if (exists cla) {
+            if (exists int = e.ceylonNode.declarationModel) {
+                if (exists target = int.extendedType ?. declaration) {
+                    list.add(target);
+                }
+                for (type in int.satisfiedTypes) {
+                    list.add(type.declaration);
+                }
+            }
+        }
+        else if (is CeylonPsi.ObjectDefinitionPsi e) {
+            if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType ?. declaration) {
                     list.add(target);
                 }
@@ -166,14 +172,13 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is CeylonPsi.ObjectDefinitionPsi e) {
-            Class? cla = e.ceylonNode.anonymousClass;
-            if (exists cla) {
+        else if (is CeylonPsi.ObjectExpressionPsi e) {
+            if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType ?. declaration) {
-                    list.add(target);
+                        list.add(target);
                 }
                 for (type in cla.satisfiedTypes) {
-                    list.add(type.declaration);
+                        list.add(type.declaration);
                 }
             }
         }
@@ -203,7 +208,7 @@ shared class CeylonGotoSuperHandler()
         }
         value result = ArrayList<PsiElement>();
         for (target in list) {
-            if (exists targetNode
+            if (exists targetNode 
                     = CeylonReference.resolveDeclaration(target, e.project)) {
                 result.add(targetNode);
             }
