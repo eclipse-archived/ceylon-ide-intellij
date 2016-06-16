@@ -34,7 +34,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeyLightClass;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonLightElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -122,8 +122,8 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                     IdeaDocGenerator.DocParams params = generator.DocParams$new$(pu, element.getProject());
 
                     ceylon.language.String doc;
-                    if (element instanceof CeyLightClass) {
-                        doc = generator.getDocumentationText(((CeyLightClass) element).getDelegate(),
+                    if (element instanceof CeylonLightElement) {
+                        doc = generator.getDocumentationText(((CeylonLightElement) element).getDeclaration(),
                                 null, cu, params);
                     } else {
                         doc = generator.getDocumentation(cu, element.getTextRange().getStartOffset(),

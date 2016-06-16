@@ -7,8 +7,8 @@ public class ConcurrencyManagerForJava {
         return concurrencyManagerForJava_.get_().needReadAccess(func, timeout);
     }
 
-    public static Object tryReadAccess(Callable<Object> func) {
-        return concurrencyManagerForJava_.get_().tryReadAccess(func);
+    public static <T> T tryReadAccess(Callable<T> func) {
+        return (T) concurrencyManagerForJava_.get_().tryReadAccess((Callable<Object>)func);
     }
 
     public static <T> T withAlternateResolution(Callable<T> func) {

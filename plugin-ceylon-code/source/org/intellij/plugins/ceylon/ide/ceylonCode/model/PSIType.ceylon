@@ -38,7 +38,7 @@ import com.redhat.ceylon.ide.common.platform {
     Status
 }
 
-class PSIType(PsiType psi, Map<PsiType,PSIType?> originatingTypes
+shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
         = IdentityHashMap<PsiType,PSIType?>(), PSIType? enclosing = null)
         satisfies TypeMirror {
 

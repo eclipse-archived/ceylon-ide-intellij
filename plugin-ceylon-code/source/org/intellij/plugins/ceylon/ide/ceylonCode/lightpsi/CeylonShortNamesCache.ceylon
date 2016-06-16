@@ -25,10 +25,15 @@ import com.intellij.util {
 import com.intellij.util.containers {
     HashSet
 }
+import com.redhat.ceylon.ide.common.model {
+    CeylonUnit
+}
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
     Value,
-    Declaration
+    Declaration,
+    FunctionOrValue,
+    Function
 }
 
 import java.lang {
@@ -43,7 +48,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 
 String getJavaName(Declaration decl) {
     return switch(decl)
-        case (is Value) decl.name + "_"
+    case (is Value) decl.name + "_"
+    case (is Function) if (decl.toplevel) then decl.name + "_" else decl.name
     else decl.name;
 }
 
@@ -58,7 +64,8 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
                     for (pack in mod.packages) {
                         classes.addAll(
                             CeylonIterable(pack.members)
-                                .narrow<ClassOrInterface|Value>()
+                                .narrow<ClassOrInterface|FunctionOrValue>()
+                                .filter((c) => (c of Declaration).unit is CeylonUnit)
                                 .map((c) => JString(getJavaName(c)))
                         );
                     }
@@ -66,7 +73,8 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
                 
             }
         }
-        
+
+        print(classes);
         return createJavaObjectArray(classes);
     }
     
@@ -85,7 +93,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
     shared actual void getAllMethodNames(HashSet<JString> hashSet)
             => allMethodNames.array.coalesced.each(hashSet.add);
     
-    void scanInners(ClassOrInterface|Value decl, String name, ArrayList<PsiClass> classes) {
+    void scanInners(ClassOrInterface|FunctionOrValue decl, String name, ArrayList<PsiClass> classes) {
         value members = if (is ClassOrInterface decl) then decl.members else decl.members;
         
         for (member in members) {
@@ -115,6 +123,9 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
                             }
                             
                             scanInners(decl, name, classes);
+                        } else if (is Function decl = source.modelDeclaration,
+                                   name == getJavaName(decl)) {
+                            classes.add(CeyLightToplevelFunction(decl, project));
                         }
                     }
                 }

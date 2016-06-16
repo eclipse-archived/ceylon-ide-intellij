@@ -16,7 +16,9 @@ import com.intellij.psi.search {
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
     Value,
-    Declaration
+    Declaration,
+    FunctionOrValue,
+    Function
 }
 
 import java.lang {
@@ -28,6 +30,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import com.redhat.ceylon.ide.common.model.asjava {
     getJavaQualifiedName
+}
+import com.redhat.ceylon.ide.common.model {
+    CeylonUnit
 }
 
 shared class CeylonElementFinder() extends PsiElementFinder() {
@@ -46,8 +51,11 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     for (pack in mod.packages) {
                         for (dec in pack.members) {
                             if (fqName == getJavaQualifiedName(dec)) {
-                                if (is ClassOrInterface|Value dec) {
+                                if (is ClassOrInterface|Value dec,
+                                    is CeylonUnit unit = (dec of Declaration).unit) {
                                     return CeyLightClass(dec of Declaration, p);
+                                } else if (is Function dec, dec.toplevel) {
+                                    return CeyLightToplevelFunction(dec, p);
                                 }
                             }
                         }
@@ -76,10 +84,15 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     
                     for (pack in mod.packages) {
                         if (pack.qualifiedNameString == fqName) {
-                            return createJavaObjectArray(
+                            return createJavaObjectArray<PsiClass>(
                                 CeylonIterable(pack.members)
-                                    .narrow<ClassOrInterface|Value>()
-                                    .map((dec) => CeyLightClass(dec of Declaration, p))
+                                    .narrow<ClassOrInterface|FunctionOrValue>()
+                                    .filter((element) => (element of Declaration).unit is CeylonUnit)
+                                    .map(
+                                        (dec) => if (is Function dec)
+                                                 then CeyLightToplevelFunction(dec, p)
+                                                 else CeyLightClass(dec of Declaration, p)
+                                    )
                             );
                         }
                     }

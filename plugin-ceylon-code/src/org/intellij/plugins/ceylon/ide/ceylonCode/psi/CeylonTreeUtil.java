@@ -14,9 +14,11 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.CeylonUnit;
 import com.redhat.ceylon.model.typechecker.model.Unit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 public class CeylonTreeUtil {
 
@@ -63,14 +65,19 @@ public class CeylonTreeUtil {
     }
 
     @Nullable
-    public static PsiFile getDeclaringFile(Unit unit, Project project) {
+    public static PsiFile getDeclaringFile(Unit unit, final Project project) {
         if (unit instanceof CeylonUnit) {
             CeylonUnit ceylonUnit = (CeylonUnit) unit;
             String path = ceylonUnit.getSourceFullPath().toString();
             String protocol = path.contains("!/") ? "jar://" : "file://";
-            VirtualFile vfile = VirtualFileManager.getInstance().findFileByUrl(protocol + path);
+            final VirtualFile vfile = VirtualFileManager.getInstance().findFileByUrl(protocol + path);
             if (vfile != null) {
-                return PsiManager.getInstance(project).findFile(vfile);
+                return ConcurrencyManagerForJava.tryReadAccess(new Callable<PsiFile>() {
+                    @Override
+                    public PsiFile call() throws Exception {
+                        return PsiManager.getInstance(project).findFile(vfile);
+                    }
+                });
             }
         }
 
