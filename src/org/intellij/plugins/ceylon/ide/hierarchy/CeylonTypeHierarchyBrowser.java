@@ -15,9 +15,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.util.CompositeAppearance;
 import com.intellij.openapi.util.Comparing;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.redhat.ceylon.compiler.java.metadata.Ceylon;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
@@ -212,7 +210,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             myName = element.getCeylonNode().getIdentifier().getText();
         }
 
-        private CeylonPsi.DeclarationPsi getTypedDeclarationPsi() {
+        private CeylonPsi.DeclarationPsi getDeclarationPsi() {
             return (CeylonPsi.DeclarationPsi) super.getPsiElement();
         }
 
@@ -221,7 +219,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             boolean changes = super.update();
             final CompositeAppearance oldText = myHighlightedText;
             myHighlightedText = new CompositeAppearance();
-            CeylonPsi.DeclarationPsi psi = getTypedDeclarationPsi();
+            CeylonPsi.DeclarationPsi psi = getDeclarationPsi();
             String description =
                     "'" + descriptions_.get_().descriptionForPsi(psi, false) + "'";
             highlighter_.get_()
@@ -302,8 +300,9 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
     @NotNull
     private TypeHierarchyNodeDescriptor[] aggregateSubtypes(TypeHierarchyNodeDescriptor descriptor) {
         List<TypeHierarchyNodeDescriptor> result = new ArrayList<>();
-        Declaration model = getModel(descriptor.getTypedDeclarationPsi());
-        if (model instanceof ClassOrInterface) {
+        Declaration model = getModel(descriptor.getDeclarationPsi());
+        if (model instanceof ClassOrInterface
+                && !((ClassOrInterface) model).isFinal()) {
             for (PhasedUnit unit : modules) {
                 for (Declaration declaration : unit.getDeclarations()) {
                     if (declaration instanceof ClassOrInterface) {
@@ -340,7 +339,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
     private List<HierarchyNodeDescriptor> aggregateSupertypes(@NotNull HierarchyNodeDescriptor parent,
                                                               TypeHierarchyNodeDescriptor descriptor) {
         List<HierarchyNodeDescriptor> result = new ArrayList<HierarchyNodeDescriptor>();
-        Declaration model = getModel(descriptor.getTypedDeclarationPsi());
+        Declaration model = getModel(descriptor.getDeclarationPsi());
         if (model instanceof ClassOrInterface) {
             ClassOrInterface ci = (ClassOrInterface) model;
             Type cl = ci.getExtendedType();

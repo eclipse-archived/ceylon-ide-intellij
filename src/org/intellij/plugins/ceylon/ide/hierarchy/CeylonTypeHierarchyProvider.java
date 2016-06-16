@@ -25,9 +25,11 @@ public class CeylonTypeHierarchyProvider implements HierarchyProvider {
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
         if (project == null) return null;
 
-        PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-        CeylonPsi.DeclarationPsi psi = PsiTreeUtil.getParentOfType(element, CeylonPsi.ClassOrInterfacePsi.class, false);
-        if (psi==null) psi = PsiTreeUtil.getParentOfType(element, CeylonPsi.ObjectDefinitionPsi.class, false);
+        PsiElement psi = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
+        while (!(psi instanceof CeylonPsi.ClassOrInterfacePsi
+              || psi instanceof CeylonPsi.ObjectDefinitionPsi)) {
+            psi = PsiTreeUtil.getParentOfType(psi, CeylonPsi.DeclarationPsi.class, false);
+        }
         return psi;
     }
 

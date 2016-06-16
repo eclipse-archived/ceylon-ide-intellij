@@ -13,6 +13,7 @@ import com.intellij.openapi.roots.ui.util.CompositeAppearance;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.psi.PsiElement;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
+import com.redhat.ceylon.ide.common.util.types_;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -27,17 +28,19 @@ import java.util.*;
 public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private Project project;
+    private final Set<PhasedUnit> modules;
 
     CeylonMethodHierarchyBrowser(Project project, PsiElement element) {
         super(project, element);
         this.project = project;
+        modules = CeylonTypeHierarchyBrowser.collectPhasedUnits(project);
     }
 
     @Nullable
     @Override
     protected HierarchyTreeStructure createHierarchyTreeStructure(@NotNull String typeName, @NotNull PsiElement psiElement) {
-        final CeylonPsi.TypedDeclarationPsi element =
-                (CeylonPsi.TypedDeclarationPsi) psiElement;
+        final CeylonPsi.DeclarationPsi element =
+                (CeylonPsi.DeclarationPsi) psiElement;
         if (SUPERTYPES_HIERARCHY_TYPE.equals(typeName)) {
             return new SupertypesHierarchyTreeStructure(element);
         }
@@ -91,7 +94,7 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     @Override
     protected boolean isApplicableElement(@NotNull PsiElement psiElement) {
-        return psiElement instanceof CeylonPsi.TypedDeclarationPsi;
+        return psiElement instanceof CeylonPsi.DeclarationPsi;
     }
 
     @Nullable
@@ -107,23 +110,24 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
     }
 
-    private MethodHierarchyNodeDescriptor build(CeylonPsi.TypedDeclarationPsi element) {
-        TypedDeclaration model =
-                element.getCeylonNode().getDeclarationModel();
+    private MethodHierarchyNodeDescriptor build(CeylonPsi.DeclarationPsi element) {
+        Declaration model =
+                element.getCeylonNode()
+                    .getDeclarationModel();
         if (model==null) {
             //TODO: should not really happen, but it does...
             return new MethodHierarchyNodeDescriptor(element);
         }
-        Declaration refined = model.getRefinedDeclaration();
+        Declaration refined = types_.get_().getRefinedDeclaration(model);
         if (refined == null || refined.equals(model)) {
             return new MethodHierarchyNodeDescriptor(element);
         }
         else {
             PsiElement psiElement
                     = CeylonReference.resolveDeclaration(refined, project);
-            if (psiElement instanceof CeylonPsi.TypedDeclarationPsi) {
+            if (psiElement instanceof CeylonPsi.DeclarationPsi) {
                 MethodHierarchyNodeDescriptor parentDescriptor =
-                        build((CeylonPsi.TypedDeclarationPsi) psiElement);
+                        build((CeylonPsi.DeclarationPsi) psiElement);
                 MethodHierarchyNodeDescriptor nodeDescriptor =
                         new MethodHierarchyNodeDescriptor(parentDescriptor, element);
                 parentDescriptor.children = new MethodHierarchyNodeDescriptor[] { nodeDescriptor };
@@ -135,7 +139,7 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
     }
 
-    private boolean directlyRefines(TypedDeclaration subtype, TypedDeclaration supertype) {
+    private boolean directlyRefines(Declaration subtype, Declaration supertype) {
         List<Declaration> interveningRefinements
                 = ModelUtil.getInterveningRefinements(
                     subtype.getName(),
@@ -149,19 +153,19 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
     private class MethodHierarchyNodeDescriptor extends HierarchyNodeDescriptor {
         private MethodHierarchyNodeDescriptor[] children;
 
-        private MethodHierarchyNodeDescriptor(@NotNull CeylonPsi.TypedDeclarationPsi element) {
+        private MethodHierarchyNodeDescriptor(@NotNull CeylonPsi.DeclarationPsi element) {
             super(project, null, element, true);
             myName = element.getCeylonNode().getIdentifier().getText();
         }
 
         private MethodHierarchyNodeDescriptor(@NotNull NodeDescriptor parentDescriptor,
-                                              @NotNull CeylonPsi.TypedDeclarationPsi element) {
+                                              @NotNull CeylonPsi.DeclarationPsi element) {
             super(project, parentDescriptor, element, false);
             myName = element.getCeylonNode().getIdentifier().getText();
         }
 
-        private CeylonPsi.TypedDeclarationPsi getTypedDeclarationPsi() {
-            return (CeylonPsi.TypedDeclarationPsi) super.getPsiElement();
+        private CeylonPsi.DeclarationPsi getDeclarationPsi() {
+            return (CeylonPsi.DeclarationPsi) super.getPsiElement();
         }
 
         @Override
@@ -169,7 +173,7 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             boolean changes = super.update();
             final CompositeAppearance oldText = myHighlightedText;
             myHighlightedText = new CompositeAppearance();
-            CeylonPsi.TypedDeclarationPsi psi = getTypedDeclarationPsi();
+            CeylonPsi.DeclarationPsi psi = getDeclarationPsi();
             String description =
                     "'" + descriptions_.get_().descriptionForPsi(psi, false) + "'";
             highlighter_.get_()
@@ -191,11 +195,9 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
     }
 
     private class SupertypesHierarchyTreeStructure extends HierarchyTreeStructure {
-        private final Set<PhasedUnit> modules;
 
-        private SupertypesHierarchyTreeStructure(CeylonPsi.TypedDeclarationPsi element) {
+        private SupertypesHierarchyTreeStructure(CeylonPsi.DeclarationPsi element) {
             super(CeylonMethodHierarchyBrowser.this.project, new MethodHierarchyNodeDescriptor(element));
-            modules = CeylonTypeHierarchyBrowser.collectPhasedUnits(project);
         }
 
         @NotNull
@@ -206,35 +208,7 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             if (descriptor.children!=null) {
                 return descriptor.children;
             }
-            List<MethodHierarchyNodeDescriptor> result = new ArrayList<>();
-            TypedDeclaration model =
-                    descriptor.getTypedDeclarationPsi()
-                            .getCeylonNode()
-                            .getDeclarationModel();
-            if (model!=null && model.isClassOrInterfaceMember() && model.isActual()) {
-                ClassOrInterface container = (ClassOrInterface) model.getContainer();
-                Declaration refined = model.getRefinedDeclaration();
-                List<Type> signature = ModelUtil.getSignature(model);
-                for (Declaration types: container.getSupertypeDeclarations()) {
-                    Declaration declaration
-                            = types.getDirectMember(model.getName(), signature, false);
-                    if (declaration instanceof TypedDeclaration &&
-                            (declaration.isDefault() || declaration.isFormal())) {
-                        TypedDeclaration candidate = (TypedDeclaration) declaration;
-                        if (candidate.getRefinedDeclaration().equals(refined)
-                                && directlyRefines(model, candidate)) {
-                            PsiElement psiElement
-                                    = CeylonReference.resolveDeclaration(candidate, project);
-                            if (psiElement instanceof CeylonPsi.TypedDeclarationPsi) {
-                                result.add(new MethodHierarchyNodeDescriptor(descriptor,
-                                        (CeylonPsi.TypedDeclarationPsi) psiElement));
-                            }
-                        }
-                    }
-                }
-            }
-            MethodHierarchyNodeDescriptor[] children
-                    = result.toArray(new MethodHierarchyNodeDescriptor[0]);
+            MethodHierarchyNodeDescriptor[] children = aggregateSupertypes(descriptor);
             descriptor.children = children;
             return children;
         }
@@ -248,11 +222,9 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
     }*/
 
     private class SubtypesHierarchyTreeStructure extends HierarchyTreeStructure {
-        private final Set<PhasedUnit> modules;
 
-        private SubtypesHierarchyTreeStructure(CeylonPsi.TypedDeclarationPsi element) {
+        private SubtypesHierarchyTreeStructure(CeylonPsi.DeclarationPsi element) {
             super(project, new MethodHierarchyNodeDescriptor(element));
-            modules = CeylonTypeHierarchyBrowser.collectPhasedUnits(project);
         }
 
         @NotNull
@@ -263,46 +235,16 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             if (descriptor.children!=null) {
                 return descriptor.children;
             }
-            List<MethodHierarchyNodeDescriptor> result = new ArrayList<>();
-            TypedDeclaration model =
-                    descriptor.getTypedDeclarationPsi()
-                            .getCeylonNode()
-                            .getDeclarationModel();
-            if (model!=null
-                    && model.isClassOrInterfaceMember()
-                    && (model.isFormal() || model.isDefault())) {
-//                Declaration refined = model.getRefinedDeclaration();
-                for (PhasedUnit unit : modules) {
-                    for (Declaration declaration : unit.getDeclarations()) {
-                        if (declaration instanceof TypedDeclaration &&
-                                declaration.isClassOrInterfaceMember() &&
-                                declaration.isActual()) {
-                            TypedDeclaration candidate = (TypedDeclaration) declaration;
-                            if (candidate.refines(model) && directlyRefines(candidate, model)) {
-                                PsiElement psiElement
-                                        = CeylonReference.resolveDeclaration(candidate, project);
-                                if (psiElement instanceof CeylonPsi.TypedDeclarationPsi) {
-                                    result.add(new MethodHierarchyNodeDescriptor(descriptor,
-                                            (CeylonPsi.TypedDeclarationPsi) psiElement));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            MethodHierarchyNodeDescriptor[] children
-                    = result.toArray(new MethodHierarchyNodeDescriptor[0]);
+            MethodHierarchyNodeDescriptor[] children = aggregateSubtypes(descriptor);
             descriptor.children = children;
             return children;
         }
     }
 
     private class TypeHierarchyTreeStructure extends HierarchyTreeStructure {
-        private final Set<PhasedUnit> modules;
 
-        private TypeHierarchyTreeStructure(CeylonPsi.TypedDeclarationPsi element) {
+        private TypeHierarchyTreeStructure(CeylonPsi.DeclarationPsi element) {
             super(project, build(element));
-            modules = CeylonTypeHierarchyBrowser.collectPhasedUnits(project);
             setBaseElement(myBaseDescriptor);
         }
 
@@ -314,38 +256,75 @@ public class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             if (descriptor.children!=null) {
                 return descriptor.children;
             }
-            List<MethodHierarchyNodeDescriptor> result = new ArrayList<>();
-            TypedDeclaration model =
-                    descriptor.getTypedDeclarationPsi()
-                            .getCeylonNode()
-                            .getDeclarationModel();
-            if (model!=null
-                    && model.isClassOrInterfaceMember()
-                    && (model.isFormal() || model.isDefault())) {
-//                Declaration refined = model.getRefinedDeclaration();
-                for (PhasedUnit unit : modules) {
-                    for (Declaration declaration : unit.getDeclarations()) {
-                        if (declaration instanceof TypedDeclaration &&
-                                declaration.isClassOrInterfaceMember() &&
-                                declaration.isActual()) {
-                            TypedDeclaration candidate = (TypedDeclaration) declaration;
-                            if (candidate.refines(model) && directlyRefines(candidate, model)) {
-                                PsiElement psiElement
-                                        = CeylonReference.resolveDeclaration(candidate, project);
-                                if (psiElement instanceof CeylonPsi.TypedDeclarationPsi) {
-                                    result.add(new MethodHierarchyNodeDescriptor(descriptor,
-                                            (CeylonPsi.TypedDeclarationPsi) psiElement));
-                                }
+            MethodHierarchyNodeDescriptor[] children = aggregateSubtypes(descriptor);
+            descriptor.children = children;
+            return children;
+        }
+
+    }
+
+    @NotNull
+    private MethodHierarchyNodeDescriptor[] aggregateSubtypes(MethodHierarchyNodeDescriptor descriptor) {
+        List<MethodHierarchyNodeDescriptor> result = new ArrayList<>();
+        Declaration model =
+                descriptor.getDeclarationPsi()
+                        .getCeylonNode()
+                        .getDeclarationModel();
+        if (model!=null
+                && model.isClassOrInterfaceMember()
+                && (model.isFormal() || model.isDefault())) {
+            for (PhasedUnit unit : modules) {
+                for (Declaration declaration : unit.getDeclarations()) {
+                    if (declaration.isClassOrInterfaceMember() &&
+                        declaration.isActual()) {
+                        if (declaration.refines(model)
+                                && directlyRefines(declaration, model)) {
+                            PsiElement psiElement
+                                    = CeylonReference.resolveDeclaration(declaration, project);
+                            if (psiElement instanceof CeylonPsi.DeclarationPsi) {
+                                result.add(new MethodHierarchyNodeDescriptor(descriptor,
+                                        (CeylonPsi.DeclarationPsi) psiElement));
                             }
                         }
                     }
                 }
             }
-            MethodHierarchyNodeDescriptor[] children
-                    = result.toArray(new MethodHierarchyNodeDescriptor[0]);
-            descriptor.children = children;
-            return children;
         }
+        return result.toArray(new MethodHierarchyNodeDescriptor[0]);
+    }
+
+    @NotNull
+    private MethodHierarchyNodeDescriptor[] aggregateSupertypes(MethodHierarchyNodeDescriptor descriptor) {
+        List<MethodHierarchyNodeDescriptor> result = new ArrayList<>();
+        Declaration model =
+                descriptor.getDeclarationPsi()
+                        .getCeylonNode()
+                        .getDeclarationModel();
+        if (model!=null
+                && model.isClassOrInterfaceMember()
+                && model.isActual()) {
+            ClassOrInterface container =
+                    (ClassOrInterface) model.getContainer();
+            Declaration refined = model.getRefinedDeclaration();
+            List<Type> signature = ModelUtil.getSignature(model);
+            for (Declaration supertype: container.getSupertypeDeclarations()) {
+                Declaration declaration
+                        = supertype.getDirectMember(model.getName(), signature, false);
+                if (declaration!=null
+                        && (declaration.isDefault() || declaration.isFormal())) {
+                    if (declaration.getRefinedDeclaration().equals(refined)
+                            && directlyRefines(model, declaration)) {
+                        PsiElement psiElement
+                                = CeylonReference.resolveDeclaration(declaration, project);
+                        if (psiElement instanceof CeylonPsi.DeclarationPsi) {
+                            result.add(new MethodHierarchyNodeDescriptor(descriptor,
+                                    (CeylonPsi.DeclarationPsi) psiElement));
+                        }
+                    }
+                }
+            }
+        }
+        return result.toArray(new MethodHierarchyNodeDescriptor[0]);
     }
 
 }

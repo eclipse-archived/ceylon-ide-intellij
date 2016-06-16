@@ -26,7 +26,7 @@ public class CeylonMethodHierarchyProvider implements HierarchyProvider {
         if (project == null) return null;
 
         PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-        return PsiTreeUtil.getParentOfType(element, CeylonPsi.TypedDeclarationPsi.class, false);
+        return PsiTreeUtil.getParentOfType(element, CeylonPsi.DeclarationPsi.class, false);
     }
 
     @NotNull
