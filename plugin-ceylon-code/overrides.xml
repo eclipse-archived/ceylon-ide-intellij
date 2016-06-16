@@ -12,17 +12,17 @@
         <add module="com.intellij.annotations" version="current" shared="false"/>
         <add module="com.intellij.util" version="current" shared="false"/>
         <add module="com.intellij.openapi" version="current" shared="false"/>
-        <filter>
-            <exclude path="com/intellij/util/containers/*"/>
-            <exclude path="com/intellij/codeInsight/highlighting/*"/>
-            <exclude path="com/intellij/openapi/editor/*"/>
-            <include path="com/intellij/openapi/progress/util/*"/>
-            <exclude path="com/intellij/openapi/progress/*"/>
-            <include path="com/intellij/psi/text/*"/>
-            <include path="com/intellij/psi/impl/*"/>
-            <exclude path="com/intellij/psi/*"/>
-            <exclude path="com/intellij/ui/*"/>
-        </filter>
+        <!--<filter>-->
+            <!--<exclude path="com/intellij/util/containers/*"/>-->
+            <!--<exclude path="com/intellij/codeInsight/highlighting/*"/>-->
+            <!--<exclude path="com/intellij/openapi/editor/*"/>-->
+            <!--<include path="com/intellij/openapi/progress/util/*"/>-->
+            <!--<exclude path="com/intellij/openapi/progress/*"/>-->
+            <!--<include path="com/intellij/psi/text/*"/>-->
+            <!--<include path="com/intellij/psi/impl/*"/>-->
+            <!--<exclude path="com/intellij/psi/*"/>-->
+            <!--<exclude path="com/intellij/ui/*"/>-->
+        <!--</filter>-->
     </module>
 
     <module module="org.intellij.groovy">

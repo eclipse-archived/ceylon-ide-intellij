@@ -90,6 +90,19 @@
         	message="Please set the 'ideaRoot' property to the root of the IntelliJ IDEA installation (which must contain a 'lib' sub-folder)"/>
 		<foreach list="${modulesToImport}" param="moduleToImport" target="importModule">
 		</foreach>
+        <!-- Merge several jars -->
+        <delete file="${intellij.repo.dir}/com.intellij.idea-current.jar"/>
+        <delete file="${intellij.repo.dir}/com.intellij.openapi-current.jar"/>
+        <delete file="${intellij.repo.dir}/com.intellij.util-current.jar"/>
+        <zip destfile="${intellij.repo.dir}/com.intellij.idea-current.jar">
+            <zipgroupfileset dir="${ideaRoot}/lib/">
+                <include name="idea.jar"/>
+                <include name="openapi.jar"/>
+                <include name="util.jar"/>
+            </zipgroupfileset>
+        </zip>
+        <zip destfile="${intellij.repo.dir}/com.intellij.openapi-current.jar" whenempty="create" basedir="." excludes="**"/>
+        <zip destfile="${intellij.repo.dir}/com.intellij.util-current.jar" whenempty="create" basedir="." excludes="**"/>
 	</target>
 
     <target name="build" depends="ceylondefs,copy-intellij-dependencies">
