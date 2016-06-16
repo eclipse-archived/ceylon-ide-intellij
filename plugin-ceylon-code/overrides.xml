@@ -18,11 +18,19 @@
             <exclude path="com/intellij/openapi/editor/*"/>
             <include path="com/intellij/openapi/progress/util/*"/>
             <exclude path="com/intellij/openapi/progress/*"/>
+            <include path="com/intellij/psi/text/*"/>
+            <include path="com/intellij/psi/impl/*"/>
+            <exclude path="com/intellij/psi/*"/>
             <exclude path="com/intellij/ui/*"/>
         </filter>
     </module>
 
     <module module="org.intellij.groovy">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+        <add module="com.intellij.openapi" version="current" shared="false"/>
+    </module>
+
+    <module module="com.intellij.util">
         <add module="com.intellij.idea" version="current" shared="false"/>
     </module>
 </overrides>
