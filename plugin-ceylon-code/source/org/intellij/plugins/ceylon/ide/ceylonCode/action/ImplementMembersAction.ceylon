@@ -1,16 +1,18 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.codeInsight.generation {
     ClassMember,
     MemberChooserObjectBase
+}
+import com.intellij.codeInsight.generation.actions {
+    PresentableCodeInsightActionHandler
 }
 import com.intellij.ide.util {
     MemberChooser
 }
 import com.intellij.lang {
     LanguageCodeInsightActionHandler
+}
+import com.intellij.openapi.actionSystem {
+    Presentation
 }
 import com.intellij.openapi.application {
     Result
@@ -25,13 +27,11 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.psi {
-    PsiFile
-}
-import com.intellij.psi.util {
-    PsiTreeUtil
+    PsiFile,
+    PsiElement
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
+    Node
 }
 import com.redhat.ceylon.ide.common.completion {
     overloads,
@@ -59,10 +59,6 @@ import java.util {
     List
 }
 
-import javax.swing {
-    JComponent
-}
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
     IdeaTextChange
@@ -75,23 +71,19 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
-import com.intellij.codeInsight.generation.actions {
-    PresentableCodeInsightActionHandler
-}
-import com.intellij.openapi.actionSystem {
-    Presentation
-}
 
 shared class CeylonOverrideMembersAction() extends AbstractMembersAction() {
     proposable(Declaration member) => member.formal || member.default;
-    title => "Select inherited members to refine";
+    title => "Select Inherited Members to Refine";
     menuLabel => "Refine Inherited Members";
+    selectAll => false;
 }
 
 shared class CeylonImplementMembersAction() extends AbstractMembersAction() {
     proposable(Declaration member) => member.formal;
-    title => "Select inherited formal members to implement";
+    title => "Select Inherited Formal Members to Implement";
     menuLabel => "Implement Formal Members";
+    selectAll => true;
 }
 
 shared abstract class AbstractMembersAction()
@@ -103,11 +95,13 @@ shared abstract class AbstractMembersAction()
     shared formal Boolean proposable(Declaration member);
 
     shared formal String title;
+    
+    shared formal Boolean selectAll;
 
     shared actual void update(Editor editor, PsiFile psiFile, Presentation presentation)
             => presentation.setText(menuLabel, false);
 
-    void apply(CeylonFile file, Editor editor, Tree.Declaration node,
+    void apply(CeylonFile file, Editor editor, Node node,
             List<ClassMember> selected, ClassOrInterface ci, Integer offset) {
         value rootNode = file.compilationUnit;
         value doc = IdeaDocument(editor.document);
@@ -138,25 +132,31 @@ shared abstract class AbstractMembersAction()
         change.addEdit(InsertEdit(offset, result.string));
         change.apply();
     }
-
+    
+    alias TypeDecPsi 
+            => CeylonPsi.ClassOrInterfacePsi
+             | CeylonPsi.ObjectDefinitionPsi
+             | CeylonPsi.ObjectExpressionPsi;
+    
     shared actual void invoke(Project project, Editor editor, PsiFile file) {
         value offset = editor.selectionModel.selectionStart;
 
         if (is CeylonFile file,
-            exists typeDec
-                //TODO: fix this:
-                = PsiTreeUtil.findElementOfClassAtOffset(file, offset,
-                    javaClass<CeylonPsi.ObjectDefinitionPsi>(), false)
-                else PsiTreeUtil.findElementOfClassAtOffset(file, offset,
-                        javaClass<CeylonPsi.ClassOrInterfacePsi>(), false)) {
-
-            value node =
-                if (is CeylonPsi.ClassOrInterfacePsi typeDec)
-                then typeDec.ceylonNode
-                else typeDec.ceylonNode;
-            ClassOrInterface? ci = switch (node)
-                case (is Tree.ClassOrInterface) node.declarationModel
-                case (is Tree.ObjectDefinition) node.anonymousClass;
+            exists psi = file.findElementAt(offset)) {
+            variable PsiElement? element = psi;
+            while (exists e = element, !e is TypeDecPsi) {
+                element = e.parent;
+            }
+            
+            value node = element;
+            if (!is TypeDecPsi node) {
+                return;
+            }
+            
+            ClassOrInterface? ci = 
+                if (is CeylonPsi.ObjectDefinitionPsi node) then node.ceylonNode.anonymousClass
+                else if (is CeylonPsi.ObjectExpressionPsi node) then node.ceylonNode.anonymousClass
+                else node.ceylonNode.declarationModel;
             if (!exists ci) {
                 return;
             }
@@ -171,17 +171,19 @@ shared abstract class AbstractMembersAction()
                     }
                 }
             }
-
-            value chooser
-                = MemberChooser(list.toArray(ObjectArray<ClassMember>(0)),
-                    true, true, project, null, ObjectArray<JComponent>(0));
+            
+            value none = ObjectArray<ClassMember>(0);
+            value elements = list.toArray(none);
+            value chooser = MemberChooser(elements, false, true, project, null, null);
             chooser.title = title;
+            chooser.setCopyJavadocVisible(false);
+            chooser.selectElements(selectAll then elements else none);
             chooser.show();
-            if (exists selected = chooser.selectedElements, selected.size()>0) {
+            if (exists selected = chooser.selectedElements, !selected.empty) {
                 value p = project;
-                object extends WriteCommandAction<Nothing>(p, "Implement members") {
+                object extends WriteCommandAction<Nothing>(p, "Refine Members") {
                     run(Result<Nothing> result)
-                            => apply(file, editor, node, selected, ci, offset);
+                            => apply(file, editor, node.ceylonNode, selected, ci, offset);
                 }.execute();
             }
         }
