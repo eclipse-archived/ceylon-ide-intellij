@@ -67,9 +67,9 @@ Development builds are published irregularly to this repository:
 
 1. Clone [`ceylon`](http://github.com/ceylon/ceylon) and other required dependencies from Git:
 
-       git clone https://github.com/ceylon/ceylon.git
-       cd ceylon
-       ant setup-sdk setup-ide
+        git clone https://github.com/ceylon/ceylon.git
+        cd ceylon
+        ant setup-sdk setup-ide
 
    This will clone sibling projects including `../ceylon-sdk`, `../ceylon-ide-common`, and
    `../ceylon-ide-intellij`.
@@ -77,11 +77,11 @@ Development builds are published irregularly to this repository:
 2. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and change the following line
    so that it points to your IntelliJ installation:
 
-       ideaRoot=/Applications/IntelliJ IDEA 2016.1 CE.app/Contents/
+        ideaRoot=/Applications/IntelliJ IDEA 2016.1 CE.app/Contents/
 
 3. Build the Ceylon distribution, SDK, and Ceylon IDE:
 
-       ant dist sdk intellij
+        ant dist sdk intellij
 
 4. Inside IntelliJ, go to 'Preferences ... > Plugins' and click 'Install plugin from disk...',
    select `../ceylon-ide-intellij/out/installation-packages/CeylonIDEA.zip`.
@@ -105,9 +105,9 @@ If you want to debug or hack this plugin, you'll need to build it from sources.
 
 3. Clone [`ceylon`](http://github.com/ceylon/ceylon) and other required dependencies from Git:
 
-       git clone https://github.com/ceylon/ceylon.git
-       cd ceylon
-       ant setup-sdk setup-ide
+        git clone https://github.com/ceylon/ceylon.git
+        cd ceylon
+        ant setup-sdk setup-ide
 
    This will clone sibling projects including `../ceylon-sdk`, `../ceylon-ide-common`, and
    `../ceylon-ide-intellij`.
@@ -115,11 +115,11 @@ If you want to debug or hack this plugin, you'll need to build it from sources.
 4. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and change the following line
    so that it points to your IntelliJ installation:
 
-       ideaRoot=/Applications/IntelliJ IDEA 2016.1 CE.app/Contents/
+        ideaRoot=/Applications/IntelliJ IDEA 2016.1 CE.app/Contents/
 
 5. Build the Ceylon distribution, SDK, and Ceylon IDE. In the directory `../ceylon`, type:
 
-       ant dist sdk intellij
+        ant dist sdk intellij
 
    This will create a `dist` sub-directory in `../ceylon/dist`, with a full Ceylon distribution,
    along with everything needed to build Ceylon IDE, including the Ceylon SDK, formatter, Java to
