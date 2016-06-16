@@ -1,6 +1,7 @@
 import com.intellij.codeInsight.generation {
     ClassMember,
-    MemberChooserObjectBase
+    MemberChooserObjectBase,
+    PsiElementMemberChooserObject
 }
 import com.intellij.codeInsight.generation.actions {
     PresentableCodeInsightActionHandler
@@ -55,8 +56,7 @@ import java.lang {
     ObjectArray
 }
 import java.util {
-    ArrayList,
-    List
+    ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
@@ -67,6 +67,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsi,
     descriptions
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
+    CeylonReference
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
@@ -101,8 +104,8 @@ shared abstract class AbstractMembersAction()
     shared actual void update(Editor editor, PsiFile psiFile, Presentation presentation)
             => presentation.setText(menuLabel, false);
 
-    void apply(CeylonFile file, Editor editor, Node node,
-            List<ClassMember> selected, ClassOrInterface ci, Integer offset) {
+    void apply(CeylonFile file, Editor editor, Integer offset, Node node, 
+            {Declaration*} selected, ClassOrInterface ci) {
         value rootNode = file.compilationUnit;
         value doc = IdeaDocument(editor.document);
         value bodyIndent = doc.getIndent(node);
@@ -110,9 +113,7 @@ shared abstract class AbstractMembersAction()
         value indent = delim + bodyIndent + platformServices.document.defaultIndent;
         value importProposals = CommonImportProposals(doc, rootNode);
         value result = StringBuilder();
-        for (element in selected) {
-            assert (is Member element);
-            value d = element.declaration;
+        for (d in selected) {
             value rtext = getRefinementTextFor { 
                 d = d; 
                 pr = completionManager.getRefinedProducedReference(ci, d); 
@@ -139,6 +140,53 @@ shared abstract class AbstractMembersAction()
              | CeylonPsi.ObjectExpressionPsi;
     
     shared actual void invoke(Project project, Editor editor, PsiFile file) {
+
+        //TODO: make this approach work:
+        // object chooser extends MemberChooser<ClassMember>
+        //      (elements, false, true, project, null, null) {
+        //  isContainerNode(MemberChooserObject key) => key is Parent;
+        //}
+        
+        class Parent(ClassOrInterface container)
+                extends PsiElementMemberChooserObject(
+            //TODO: I hate resoving and passing this in here, but
+            //      due to a packaging issue I could not refine
+            //      MemberChooser.isContainerNode
+            CeylonReference.resolveDeclaration(container, project),
+            descriptions.descriptionForDeclaration {
+                decl = container;
+                includeContainer = false;
+                includeKeyword = false;
+            },
+            icons.forDeclaration(container)) {
+            hash => container.hash;
+            equals(Object that)
+                    => if (is Parent that)
+            then container==that.container
+            else false;
+        }
+
+        class Member(declaration, container)
+                extends MemberChooserObjectBase(
+            descriptions.descriptionForDeclaration {
+                decl = declaration;
+                includeContainer = false;
+                includeKeyword = false;
+            },
+            icons.forDeclaration(declaration))
+                satisfies ClassMember {
+
+            ClassOrInterface container;
+            shared Declaration declaration;
+
+            parentNodeDelegate = Parent(container);
+            hash => declaration.hash;
+            equals(Object that)
+                    => if (is Member that)
+            then declaration ==that.declaration
+            else false;
+        }
+        
         value offset = editor.selectionModel.selectionStart;
 
         if (is CeylonFile file,
@@ -179,11 +227,21 @@ shared abstract class AbstractMembersAction()
             chooser.setCopyJavadocVisible(false);
             chooser.selectElements(selectAll then elements else none);
             chooser.show();
-            if (exists selected = chooser.selectedElements, !selected.empty) {
+            if (exists selected = chooser.selectedElements, 
+                    !selected.empty) {
                 value p = project;
-                object extends WriteCommandAction<Nothing>(p, "Refine Members") {
-                    run(Result<Nothing> result)
-                            => apply(file, editor, node.ceylonNode, selected, ci, offset);
+                object extends WriteCommandAction<Nothing>
+                        (p, "Refine Members") {
+                    run(Result<Nothing> result) => apply { 
+                        file = file; 
+                        editor = editor; 
+                        node = node.ceylonNode;
+                        ci = ci; 
+                        offset = offset;
+                        for (cm in selected) 
+                            if (is Member cm) 
+                                cm.declaration
+                    };
                 }.execute();
             }
         }
@@ -194,35 +252,4 @@ shared abstract class AbstractMembersAction()
 
     startInWriteAction() => true;
 
-    class Parent(ClassOrInterface container)
-            extends MemberChooserObjectBase(
-                descriptions.descriptionForDeclaration {
-                    decl = container;
-                    includeContainer = false;
-                    includeKeyword = false;
-                },
-                icons.forDeclaration(container)) {
-        hash => container.hash;
-        equals(Object that)
-                => if (is Parent that)
-        then container==that.container
-        else false;
-    }
-    
-    class Member(shared Declaration declaration, ClassOrInterface container)
-            extends MemberChooserObjectBase(
-                descriptions.descriptionForDeclaration {
-                    decl = declaration;
-                    includeContainer = false;
-                    includeKeyword = false;
-                },
-                icons.forDeclaration(declaration))
-            satisfies ClassMember {
-        parentNodeDelegate = Parent(container);
-        hash => declaration.hash;
-        equals(Object that)
-                => if (is Member that)
-                then declaration ==that.declaration
-                else false;
-    }
 }
