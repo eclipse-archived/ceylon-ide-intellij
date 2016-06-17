@@ -54,6 +54,10 @@ import java.util {
     List,
     ArrayList
 }
+import com.intellij.psi.impl.source {
+    PsiExtensibleClass,
+    ClassInnerStuffCache
+}
 
 // TODO investigate why psi.containingFile is sometimes null
 shared class PSIClass(shared PsiClass psi)
@@ -106,6 +110,12 @@ shared class PSIClass(shared PsiClass psi)
                 }
                 result.add(PSIMethod(m));
             });
+
+            if (psi.enum, is PsiExtensibleClass psi) {
+                value cache = ClassInnerStuffCache(psi);
+                result.add(PSIMethod(cache.valueOfMethod));
+                result.add(PSIMethod(cache.valuesMethod));
+            }
 
             // unfortunately, IntelliJ does not include implicit default constructors in `psi.methods`
             if (!hasCtor) {
