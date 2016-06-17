@@ -35,7 +35,7 @@ public class CeylonFile extends PsiFileBase {
         return null;
     }
 
-    CeylonLocalAnalyzer getLocalAnalyzer() {
+    public CeylonLocalAnalyzer getLocalAnalyzer() {
         FileViewProvider fileViewProvider;
         if (getOriginalFile() != null
                 && getOriginalFile() instanceof CeylonFile) {
