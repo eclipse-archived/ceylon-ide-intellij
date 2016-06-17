@@ -10,14 +10,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class AnonymousFunctionIntention() extends AbstractIntention() {
-    familyName => "Convert anonymous function block";
+    familyName => "Convert anonymous function block/specifier";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset)
             => miscQuickFixes.addAnonymousFunctionProposals(data);
 }
 
 shared class DeclarationIntention() extends AbstractIntention() {
-    familyName => "Convert declaration";
+    familyName => "Convert declaration block/specifier";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value decl = nodes.findDeclaration(data.rootNode, data.node);

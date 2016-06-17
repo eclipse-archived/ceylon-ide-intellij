@@ -46,7 +46,7 @@ shared class ConvertSwitchStatementToExpressionIntention() extends AbstractInten
 
 shared class ConvertSwitchExpressionToStatementIntention() extends AbstractIntention() {
 
-    familyName => "Convert switch statement to expression";
+    familyName => "Convert switch expression to statement";
 
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);

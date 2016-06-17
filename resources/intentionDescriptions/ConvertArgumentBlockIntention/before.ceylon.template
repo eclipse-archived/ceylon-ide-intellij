@@ -1,1 +1,1 @@
-str.split((ch) => ch.equals(' '));
+"".split { splitting(Character ch) => ch.equals(' '); };

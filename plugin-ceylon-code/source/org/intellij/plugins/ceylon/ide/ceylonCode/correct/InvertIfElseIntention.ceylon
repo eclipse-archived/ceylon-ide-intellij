@@ -11,7 +11,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class InvertIfElseIntention() extends AbstractIntention() {
     
-    familyName => "Invert if/then/else expression";
+    familyName => "Invert if/else";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);

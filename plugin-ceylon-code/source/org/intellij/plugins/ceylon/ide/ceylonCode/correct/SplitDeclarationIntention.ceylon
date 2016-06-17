@@ -11,7 +11,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class SplitDeclarationIntention() extends AbstractIntention() {
 
-    familyName => "Convert to class with default constructor";
+    familyName => "Split declaration";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
