@@ -11,6 +11,7 @@ import com.redhat.ceylon.compiler.java.runtime.tools.*;
 import com.redhat.ceylon.compiler.java.runtime.tools.Compiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
+import org.jetbrains.jps.ProjectPaths;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
 import org.jetbrains.jps.builders.FileProcessor;
@@ -209,6 +210,15 @@ class CeylonBuilder extends ModuleLevelBuilder {
                     resourcePath.add(sourceRoot.getFile());
                 }
             }
+
+            if (chunk.containsTests()) {
+                // This is because test modules will be built in a second pass, and they rely
+                // on the result of the first pass.
+                File out = ProjectPaths.getModuleOutputDir(module, false);
+                if (out != null && out.isDirectory()) {
+                    options.addUserRepository(out.getAbsolutePath());
+                }
+            }
         }
 
         JpsCeylonModuleExtension facet = chunk.representativeTarget().getModule().getContainer()
@@ -273,10 +283,19 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
     private List<File> getSourceRoots(ModuleChunk chunk) {
         List<File> roots = new ArrayList<>();
+        JpsModuleSourceRootType<?> expectedSrcRootType;
+
+        if (chunk.containsTests()) {
+            expectedSrcRootType = JavaSourceRootType.TEST_SOURCE;
+        } else {
+            expectedSrcRootType = JavaSourceRootType.SOURCE;
+        }
 
         for (JpsModule module : chunk.getModules()) {
             for (JpsModuleSourceRoot sourceRoot : module.getSourceRoots()) {
-                roots.add(sourceRoot.getFile());
+                if (sourceRoot.getRootType() == expectedSrcRootType) {
+                    roots.add(sourceRoot.getFile());
+                }
             }
         }
 
