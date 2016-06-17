@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,10 +75,13 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
                 contentEntry.addExcludeFolder(virtualFile);
             }
 
-            String outUrl = pageTwo.getOutputDirectory().startsWith("./") ? "file://$MODULE_DIR$/" + pageTwo.getOutputDirectory().substring(2) : outPath;
             CompilerModuleExtension compiler = rootModel.getModuleExtension(CompilerModuleExtension.class);
-            compiler.setCompilerOutputPath(outUrl);
-            compiler.setCompilerOutputPathForTests(outUrl);
+            try {
+                compiler.setCompilerOutputPath(outDirectory.getCanonicalPath());
+                compiler.setCompilerOutputPathForTests(outDirectory.getCanonicalPath());
+            } catch (IOException e) {
+                throw new ConfigurationException(e.getMessage());
+            }
             compiler.inheritCompilerOutputPath(false);
             compiler.commit();
         }
