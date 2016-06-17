@@ -89,9 +89,6 @@ import com.intellij.testFramework {
     LightVirtualFile
 }
 import com.intellij.util {
-    FileContentUtilCore {
-        reparseFiles
-    },
     Alarm
 }
 import com.intellij.util.messages {
@@ -288,6 +285,22 @@ shared class CeylonModelManager(model)
                                             ceylonProject.build.performBuild(progress.newChild(1000));
                                         }
                                     });
+                                    
+                                    ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
+                                        concurrencyManager.needReadAccess(() {
+                                            fileEditorManagerInstance(model.ideaProject)
+                                                    .openFiles.array.coalesced
+                                                    .filter((file) => file.fileType == ceylonFileType)
+                                                    .each(void (VirtualFile element) {
+                                                if (is CeylonFile ceylonFile = 
+                                                    psiManager(model.ideaProject).findFile(element),
+                                                    exists localAnalyzer = ceylonFile.localAnalyzer) {
+                                                    localAnalyzer.forceTypechecking(null,1);
+                                                }
+                                            });
+                                        });
+                                    }));
+                                    /*
                                     application.invokeLater(JavaRunnable {
                                         void run() {
                                             reparseFiles(*fileEditorManagerInstance(model.ideaProject)
@@ -295,6 +308,7 @@ shared class CeylonModelManager(model)
                                             .filter((file) => file.fileType == ceylonFileType));
                                         }
                                     }, ModalityState.any());
+                                     */
                                 } catch(Throwable t) {
                                     if (is ProcessCanceledException t) {
                                         throw t;
