@@ -1,3 +1,2 @@
-void run() {
-    value a = "abcd";
+void fun(String->{Integer+} arg) {
 }

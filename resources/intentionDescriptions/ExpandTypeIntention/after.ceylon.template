@@ -1,3 +1,2 @@
-void run() {
-    String a = "abcd";
+void fun(Entry<String,Iterable<Integer,Nothing> arg) {
 }
