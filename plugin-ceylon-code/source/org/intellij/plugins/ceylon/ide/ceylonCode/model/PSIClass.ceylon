@@ -80,13 +80,13 @@ shared class PSIClass(shared PsiClass psi)
     
     ceylonToplevelObject => !innerClass && hasAnnotation(Annotations.\iobject);
     
-    defaultAccess => let (private = psi.hasModifierProperty(PsiModifier.\iPRIVATE)) 
+    defaultAccess => let (private = psi.hasModifierProperty(PsiModifier.private))
                      !(public || protected || private);
     
     directFields => doWithLock(() =>
         mirror<FieldMirror,PsiField>(
             psi.fields.iterable.coalesced.filter(
-                (f) => !f.hasModifierProperty(PsiModifier.\iPRIVATE) // TODO !f.synthetic?
+                (f) => !f.hasModifierProperty(PsiModifier.private) // TODO !f.synthetic?
             ),
             PSIField
         )
@@ -110,7 +110,7 @@ shared class PSIClass(shared PsiClass psi)
             // unfortunately, IntelliJ does not include implicit default constructors in `psi.methods`
             if (!hasCtor) {
                 value builder = LightMethodBuilder(PsiManager.getInstance(psi.project),
-                    JavaLanguage.\iINSTANCE,
+                    JavaLanguage.instance,
                     (psi of PsiNameIdentifierOwner).name
                 ).addModifier("public").setConstructor(true);
                 result.add(PSIMethod(builder));
@@ -130,7 +130,7 @@ shared class PSIClass(shared PsiClass psi)
     
     enum => psi.enum;
     
-    final => psi.hasModifierProperty(PsiModifier.\iFINAL);
+    final => psi.hasModifierProperty(PsiModifier.final);
     
     flatName => doWithLock(() => psi.qualifiedName else "");
    
@@ -155,16 +155,16 @@ shared class PSIClass(shared PsiClass psi)
     
     \ipackage => PSIPackage(psi);
      
-    protected => psi.hasModifierProperty(PsiModifier.\iPROTECTED);
+    protected => psi.hasModifierProperty(PsiModifier.protected);
     
-    public => psi.hasModifierProperty(PsiModifier.\iPUBLIC);
+    public => psi.hasModifierProperty(PsiModifier.public);
     
     qualifiedName => 
             if (is PsiTypeParameter psi)
             then \ipackage.qualifiedName + "." + name
             else (doWithLock(() => psi.qualifiedName else ""));
     
-    static => psi.hasModifierProperty(PsiModifier.\iSTATIC);
+    static => psi.hasModifierProperty(PsiModifier.static);
     
     shared actual TypeMirror? superclass {
         if (psi.\iinterface || qualifiedName == "java.lang.Object") {
