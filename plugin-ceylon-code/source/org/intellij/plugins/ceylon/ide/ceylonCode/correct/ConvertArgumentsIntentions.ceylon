@@ -8,7 +8,7 @@ import com.redhat.ceylon.ide.common.correct {
 
 shared class ConvertToNamedArgumentsIntention() extends AbstractIntention() {
 
-    familyName => "Convert to Named Arguments";
+    familyName => "Convert to named arguments";
 
     checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset)
             => convertToNamedArgumentsQuickFix.addProposal(data, offset);
@@ -17,7 +17,7 @@ shared class ConvertToNamedArgumentsIntention() extends AbstractIntention() {
 
 shared class ConvertToPositionalArgumentsIntention() extends AbstractIntention() {
 
-    familyName => "Convert to Positional Arguments";
+    familyName => "Convert to positional arguments";
 
     checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset)
             => convertToPositionalArgumentsQuickFix.addProposal(data, offset);
