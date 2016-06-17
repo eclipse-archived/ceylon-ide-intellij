@@ -1,5 +1,7 @@
 import com.redhat.ceylon.ide.common.correct {
-    convertSwitchToIfQuickFix
+    convertSwitchToIfQuickFix,
+    convertSwitchStatementToExpressionQuickFix,
+    convertSwitchExpressionToStatementQuickFix
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -28,5 +30,27 @@ shared class ConvertIfToSwitchIntention() extends AbstractIntention() {
         value statement = nodes.findStatement(data.rootNode, data.node);
         
         convertSwitchToIfQuickFix.addConvertIfToSwitchProposal(data, statement);
+    }
+}
+
+shared class ConvertSwitchStatementToExpressionIntention() extends AbstractIntention() {
+
+    familyName => "Convert switch statement to expression";
+
+    shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
+        value statement = nodes.findStatement(data.rootNode, data.node);
+
+        convertSwitchStatementToExpressionQuickFix.addConvertSwitchStatementToExpressionProposal(data, statement);
+    }
+}
+
+shared class ConvertSwitchExpressionToStatementIntention() extends AbstractIntention() {
+
+    familyName => "Convert switch statement to expression";
+
+    shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
+        value statement = nodes.findStatement(data.rootNode, data.node);
+
+        convertSwitchExpressionToStatementQuickFix.addConvertSwitchExpressionToStatementProposal(data, statement);
     }
 }
