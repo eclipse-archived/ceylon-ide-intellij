@@ -125,8 +125,8 @@ class CustomIntention(Integer position, String desc,
 
             object hintedAction satisfies QuestionAction {
                 shared actual Boolean execute() {
-                    value p = project;
-                    object extends WriteCommandAction<Nothing>(p, "Execute Hinted Fix") {
+                    value project = project;
+                    object extends WriteCommandAction<Nothing>(project, "Execute Hinted Fix") {
                         shared actual void run(Result<Nothing> result) {
                             value file = PsiUtilBase.getPsiFileInEditor(editor, project);
                             invoke {
@@ -262,50 +262,11 @@ shared class IdeaQuickFixData(
 
     document = IdeaDocument(nativeDoc);
 
-    void showPopup(Editor editor, List<Resolution> candidates, String title) {
-        value list = JBList(JavaList(candidates));
-        list.installCellRenderer(object satisfies NotNullFunction<Resolution, JComponent> {
-            fun(Resolution resolution)
-                    => JLabel(highlighter.highlightQuotedMessage {
-                        description = resolution.description;
-                        qualifiedNameIsPath = resolution.qualifiedNameIsPath;
-                        project = project.project;
-                    }, resolution.icon, JLabel.leading);
-        });
-
-        JBPopupFactory.instance
-            .createListPopupBuilder(list)
-            .setTitle(title)
-            .setItemChoosenCallback(JavaRunnable(() {
-                if (exists candidate = candidates[list.selectedIndex]) {
-                    object extends WriteCommandAction<Nothing>(editor.project) {
-                        shared actual void run(Result<Nothing>? result) {
-                            switch (change = candidate.change)
-                            case (is PlatformTextChange) {
-                                change.apply();
-                            }
-                            else {
-                                change();
-                            }
-                        }
-                    }.execute();
-                }
-            }))
-            .createPopup()
-            .showInBestPositionFor(editor);
-    }
-
     function toRange(DefaultRegion? region)
             => if (exists region)
                then TextRange.from(region.start, region.length)
                else null;
 
-    class Resolution(description, icon, change, qualifiedNameIsPath) {
-        shared PlatformTextChange|Anything() change;
-        shared Icon icon;
-        shared String description;
-        shared Boolean qualifiedNameIsPath;
-    }
     variable ListMutator<Resolution>? resolutions = null;
 
     shared actual default void addQuickFix(String desc,
@@ -323,22 +284,26 @@ shared class IdeaQuickFixData(
                 image = icons.correction;
                 qualifiedNameIsPath = qualifiedNameIsPath;
                 hint = hint;
-                void callback(Project p, Editor e, PsiFile f) {
+                void callback(Project project, Editor editor, PsiFile f) {
                     value candidates = ArrayList<Resolution>();
                     resolutions = candidates;
                     ProgressManager.instance
                             .runProcessWithProgressAsynchronously(
-                        project.project,
-                        "Searching...",
+                        project, "Searching...",
                         JavaRunnable(() => concurrencyManager.needReadAccess(change)),
                         JavaRunnable(() {
                             resolutions = null;
                             if (candidates.empty) {
                                 //TODO show it at the right location!
-                                HintManager.instance.showErrorHint(e, "No resolutions found");
+                                HintManager.instance.showErrorHint(editor, "No resolutions found");
                             }
                             else {
-                                showPopup(e, candidates, "Select a Resolution");
+                                showPopup {
+                                    editor = editor;
+                                    candidates = candidates;
+                                    title = "Select a Resolution";
+                                    project = project;
+                                };
                             }
                         }),
                         null,
@@ -348,7 +313,7 @@ shared class IdeaQuickFixData(
         } else if (exists candidates = resolutions) {
             candidates.add(Resolution {
                 description = desc;
-                icon = icons.imports;
+                icon = icons.singleImport;
                 change = change;
                 qualifiedNameIsPath = qualifiedNameIsPath;
             });
@@ -381,3 +346,44 @@ shared class IdeaQuickFixData(
     }
     
 }
+
+shared class Resolution(description, icon, change, qualifiedNameIsPath) {
+    shared PlatformTextChange|Anything() change;
+    shared Icon icon;
+    shared String description;
+    shared Boolean qualifiedNameIsPath;
+}
+
+shared void showPopup(Editor editor, List<Resolution> candidates, String title, Project project) {
+    value list = JBList(JavaList(candidates));
+    list.installCellRenderer(object satisfies NotNullFunction<Resolution, JComponent> {
+        fun(Resolution resolution)
+                => JLabel(highlighter.highlightQuotedMessage {
+                    description = resolution.description;
+                    qualifiedNameIsPath = resolution.qualifiedNameIsPath;
+                    project = project;
+                }, resolution.icon, JLabel.leading);
+    });
+
+    JBPopupFactory.instance
+        .createListPopupBuilder(list)
+        .setTitle(title)
+        .setItemChoosenCallback(JavaRunnable(() {
+            if (exists candidate = candidates[list.selectedIndex]) {
+                object extends WriteCommandAction<Nothing>(editor.project) {
+                    shared actual void run(Result<Nothing>? result) {
+                        switch (change = candidate.change)
+                        case (is PlatformTextChange) {
+                            change.apply();
+                        }
+                        else {
+                            change();
+                        }
+                    }
+                }.execute();
+            }
+        }))
+        .createPopup()
+        .showInBestPositionFor(editor);
+}
+
