@@ -416,6 +416,7 @@ shared void showPopup(Editor editor, List<Resolution> candidates, String title, 
     JBPopupFactory.instance
         .createListPopupBuilder(list)
         .setTitle(title)
+        .setMovable(true)
         .setItemChoosenCallback(JavaRunnable(() {
             if (exists candidate = candidates[list.selectedIndex]) {
                 object extends WriteCommandAction<Nothing>(editor.project) {
