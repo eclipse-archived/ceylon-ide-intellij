@@ -65,6 +65,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration
+}
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
@@ -124,7 +127,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                 ) {
                     shared actual void addQuickFix(String desc, PlatformTextChange|Anything() change,
                         DefaultRegion? selection, Boolean ignored, Icons? icon, QuickFixKind kind,
-                        String? hint, Boolean async) {
+                        String? hint, Boolean async, Declaration? declaration) {
                         if (is IdeaTextChange|Anything() change) {
                             makeAvailable(outerProject, desc, change, selection);
                         }

@@ -106,6 +106,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration
+}
 
 class CustomIntention(Integer position, String desc,
     <PlatformTextChange|Anything()>? change,
@@ -271,8 +274,9 @@ shared class IdeaQuickFixData(
 
     shared actual default void addQuickFix(String desc,
         PlatformTextChange|Anything() change,
-        DefaultRegion? selection, Boolean qualifiedNameIsPath, Icons? icon,
-        QuickFixKind kind, String? hint, Boolean asynchronous) {
+        DefaultRegion? selection, Boolean qualifiedNameIsPath,
+        Icons? icon, QuickFixKind kind, String? hint,
+        Boolean asynchronous, Declaration? declaration) {
         value range = toRange(selection);
 
         if (asynchronous) {
@@ -313,7 +317,9 @@ shared class IdeaQuickFixData(
         } else if (exists candidates = resolutions) {
             candidates.add(Resolution {
                 description = desc;
-                icon = icons.singleImport;
+                icon = if (exists declaration,
+                           exists icon = icons.forDeclaration(declaration))
+                       then icon else icons.singleImport;
                 change = change;
                 qualifiedNameIsPath = qualifiedNameIsPath;
             });
