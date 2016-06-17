@@ -28,6 +28,9 @@ import com.intellij.util {
     Processor
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    concurrencyManager
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
     CeylonPsi
@@ -47,7 +50,7 @@ shared class ImportAliasReferencesSearch() extends
         if (is PsiNameIdentifierOwner toSearch = params.elementToSearch, 
                 exists name = toSearch.name) {
             value helper = ServiceManager.getService(params.project, javaClass<PsiSearchHelper>());
-            value scope = params.effectiveSearchScope;
+            value scope = concurrencyManager.needReadAccess(() => params.effectiveSearchScope);
             value processor = object satisfies TextOccurenceProcessor {
                 shared actual Boolean execute(PsiElement element, Integer offsetInElement) {
                     if (is CeylonCompositeElement element,
