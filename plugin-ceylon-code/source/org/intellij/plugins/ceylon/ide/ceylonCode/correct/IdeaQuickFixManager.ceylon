@@ -30,7 +30,7 @@ import com.intellij.openapi.editor {
     Editor
 }
 import com.intellij.openapi.\imodule {
-    Module
+    Mod=Module
 }
 import com.intellij.openapi.progress {
     ProgressManager,
@@ -49,11 +49,14 @@ import com.intellij.openapi.util {
 import com.intellij.psi {
     PsiFile
 }
+import com.intellij.ui {
+    SimpleTextAttributes
+}
 import com.intellij.ui.components {
     JBList
 }
-import com.intellij.util {
-    NotNullFunction
+import com.redhat.ceylon.cmr.api {
+    ModuleVersionDetails
 }
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
@@ -79,19 +82,29 @@ import com.redhat.ceylon.ide.common.platform {
 import com.redhat.ceylon.ide.common.refactoring {
     DefaultRegion
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration,
+    TypeDeclaration,
+    TypedDeclaration,
+    Referenceable,
+    Module
+}
 
+import java.awt {
+    Color
+}
 import java.lang {
     Comparable
 }
 
 import javax.swing {
-    Icon,
-    JComponent,
-    JLabel
+    Icon
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    highlighter
+    highlighter,
+    ceylonHighlightingColors,
+    textAttributes
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     concurrencyManager
@@ -105,9 +118,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Declaration
 }
 
 class CustomIntention(Integer position, String desc,
@@ -204,7 +214,7 @@ shared class IdeaQuickFixData(
     shared actual Tree.CompilationUnit rootNode,
     shared actual PhasedUnit phasedUnit,
     shared actual Node node,
-    shared Module project,
+    shared Mod project,
     shared Annotation? annotation,
     shared actual BaseCeylonProject ceylonProject,
     shared variable Editor? editor = null
@@ -276,7 +286,7 @@ shared class IdeaQuickFixData(
         PlatformTextChange|Anything() change,
         DefaultRegion? selection, Boolean qualifiedNameIsPath,
         Icons? icon, QuickFixKind kind, String? hint,
-        Boolean asynchronous, Declaration? declaration) {
+        Boolean asynchronous, Referenceable|ModuleVersionDetails? declaration) {
         value range = toRange(selection);
 
         if (asynchronous) {
@@ -316,12 +326,26 @@ shared class IdeaQuickFixData(
             };
         } else if (exists candidates = resolutions) {
             candidates.add(Resolution {
-                description = desc;
-                icon = if (exists declaration,
-                           exists icon = icons.forDeclaration(declaration))
-                       then icon else icons.singleImport;
+                description =
+                    if (is Referenceable declaration) then declaration.nameAsString
+                    else if (is ModuleVersionDetails declaration) then declaration.\imodule
+                    else desc;
+                qualifier =
+                    if (is Declaration declaration) then declaration.unit?.\ipackage?.nameAsString
+                    else if (is Module declaration) then declaration.version
+                    else if (is ModuleVersionDetails declaration) then declaration.version
+                    else null;
+                icon =
+                    if (is Declaration declaration,
+                        exists icon = icons.forDeclaration(declaration)) then icon
+                    else icons.modules;
                 change = change;
                 qualifiedNameIsPath = qualifiedNameIsPath;
+                color = switch (declaration)
+                        case (is TypeDeclaration) textAttributes(ceylonHighlightingColors.type).foregroundColor
+                        case (is TypedDeclaration) textAttributes(ceylonHighlightingColors.identifier).foregroundColor
+                        case (is Module|ModuleVersionDetails) textAttributes(ceylonHighlightingColors.packages).foregroundColor
+                        else SimpleTextAttributes.regularAttributes.fgColor;
             });
         } else {
             registerFix {
@@ -344,7 +368,7 @@ shared class IdeaQuickFixData(
             desc = description;
             change = null;
             callback = (p, e, f) {
-                if(is CeylonFile f) {
+                if (is CeylonFile f) {
                     AssignToLocalElement(this, p, e, f).perform();
                 }
             };
@@ -353,23 +377,41 @@ shared class IdeaQuickFixData(
     
 }
 
-shared class Resolution(description, icon, change, qualifiedNameIsPath) {
+shared class Resolution(description, icon, change, qualifiedNameIsPath, qualifier, color) {
     shared PlatformTextChange|Anything() change;
     shared Icon icon;
     shared String description;
+    shared String? qualifier;
     shared Boolean qualifiedNameIsPath;
+    shared Color color;
 }
 
 shared void showPopup(Editor editor, List<Resolution> candidates, String title, Project project) {
-    value list = JBList(JavaList(candidates));
-    list.installCellRenderer(object satisfies NotNullFunction<Resolution, JComponent> {
-        fun(Resolution resolution)
-                => JLabel(highlighter.highlightQuotedMessage {
-                    description = resolution.description;
-                    qualifiedNameIsPath = resolution.qualifiedNameIsPath;
-                    project = project;
-                }, resolution.icon, JLabel.leading);
-    });
+    value list = JBList(JavaList(candidates.collect((c)
+            => CeylonCellRenderer.Item(c.icon, c.color, c.description, c.qualifier, c.change))));
+    list.setCellRenderer(CeylonCellRenderer());
+
+    /*list.installCellRenderer(object satisfies NotNullFunction<Resolution, JComponent> {
+        shared actual JLabel fun(Resolution resolution) {
+            value desc = resolution.description;
+            value index = desc.lastInclusion(" (") else desc.size;
+            value description = desc;
+//                = highlighter.highlightQuotedMessage {
+//                    description = desc[0:index];
+//                    qualifiedNameIsPath = resolution.qualifiedNameIsPath;
+//                    project = project;
+//                }
+//                .removeTerminal("</html>")
+//                + highlighter.toColoredHtml {
+//                    token = desc[index...];
+//                    attr =
+//                        UsageTreeColorsScheme.instance.scheme
+//                            .getAttributes(UsageTreeColors.numberOfUsages);
+//                }
+//                + "</html>";
+            return JLabel(description, resolution.icon, JLabel.leading);
+        }
+    });*/
 
     JBPopupFactory.instance
         .createListPopupBuilder(list)

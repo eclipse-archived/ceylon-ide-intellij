@@ -20,6 +20,9 @@ import com.intellij.openapi.util {
 import com.intellij.psi {
     PsiFile
 }
+import com.redhat.ceylon.cmr.api {
+    ModuleVersionDetails
+}
 import com.redhat.ceylon.compiler.typechecker.analyzer {
     UsageWarning
 }
@@ -47,6 +50,9 @@ import com.redhat.ceylon.ide.common.typechecker {
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Referenceable
+}
 
 import javax.swing {
     Icon
@@ -64,9 +70,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Declaration
 }
 
 abstract shared class AbstractIntention() extends BaseIntentionAction() {
@@ -127,7 +130,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                 ) {
                     shared actual void addQuickFix(String desc, PlatformTextChange|Anything() change,
                         DefaultRegion? selection, Boolean ignored, Icons? icon, QuickFixKind kind,
-                        String? hint, Boolean async, Declaration? declaration) {
+                        String? hint, Boolean async, Referenceable|ModuleVersionDetails? declaration) {
                         if (is IdeaTextChange|Anything() change) {
                             makeAvailable(outerProject, desc, change, selection);
                         }
