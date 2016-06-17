@@ -373,7 +373,7 @@
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddThrowsAnnotationIntention</className>
-            <category>Ceylon/Declaration</category>
+            <category>Ceylon/Annotations</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ExpandTypeIntention</className>

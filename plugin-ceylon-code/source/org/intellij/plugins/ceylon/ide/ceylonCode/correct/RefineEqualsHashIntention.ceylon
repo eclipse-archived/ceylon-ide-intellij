@@ -8,7 +8,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class RefineEqualsHashIntention() extends AbstractIntention() {
     
-    familyName => "Refine equals() and/or hash";
+    familyName => "Refine 'equals()' and/or 'hash'";
     
     checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset)
             => refineEqualsHashQuickFix.addRefineEqualsHashProposal(data, offset);
