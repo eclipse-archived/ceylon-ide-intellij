@@ -19,6 +19,9 @@ import com.intellij.psi {
     SingleRootFileViewProvider,
     PsiManager
 }
+import com.intellij.openapi.util {
+    Disposer
+}
 
 shared class CeylonSourceFileViewProvider(
             PsiManager manager,
@@ -39,5 +42,10 @@ shared class CeylonSourceFileViewProvider(
         ceylonProject = ceylonProject; 
         virtualFileAccessor() => virtualFile;
         ideaProjectAccessor() => manager.project;
-    };    
+    };
+    ceylonLocalAnalyzer.init();
+    
+    shared actual void markInvalidated() {
+        Disposer.dispose(ceylonLocalAnalyzer);
+    }
 }
