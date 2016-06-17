@@ -11,7 +11,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class SplitIfStatementIntention() extends AbstractIntention() {
     
-    familyName => "Split if statement";
+    familyName => "Split 'if' statement";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);

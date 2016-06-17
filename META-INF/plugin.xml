@@ -236,7 +236,7 @@
             <category>Ceylon/Control flow</category>
         </intentionAction>
         <intentionAction>
-            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ChangeToIfIntention</className>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ChangeAssertToIfIntention</className>
             <category>Ceylon/Control flow</category>
         </intentionAction>
         <intentionAction>

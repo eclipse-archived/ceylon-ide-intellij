@@ -11,7 +11,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class ConvertThenElseToIfElseIntention() extends AbstractIntention() {
     
-    familyName => "Convert if/then/else to statement";
+    familyName => "Convert 'if' or 'then'/'else' expression to statement";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);

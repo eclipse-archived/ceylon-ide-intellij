@@ -13,7 +13,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class ConvertSwitchToIfIntention() extends AbstractIntention() {
     
-    familyName => "Convert switch to if";
+    familyName => "Convert 'switch' to 'if'";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
@@ -24,7 +24,7 @@ shared class ConvertSwitchToIfIntention() extends AbstractIntention() {
 
 shared class ConvertIfToSwitchIntention() extends AbstractIntention() {
     
-    familyName => "Convert if to switch";
+    familyName => "Convert 'if' to 'switch'";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
@@ -35,7 +35,7 @@ shared class ConvertIfToSwitchIntention() extends AbstractIntention() {
 
 shared class ConvertSwitchStatementToExpressionIntention() extends AbstractIntention() {
 
-    familyName => "Convert switch statement to expression";
+    familyName => "Convert 'switch' statement to expression";
 
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
@@ -46,7 +46,7 @@ shared class ConvertSwitchStatementToExpressionIntention() extends AbstractInten
 
 shared class ConvertSwitchExpressionToStatementIntention() extends AbstractIntention() {
 
-    familyName => "Convert switch expression to statement";
+    familyName => "Convert 'switch' expression to statement";
 
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
         value statement = nodes.findStatement(data.rootNode, data.node);
