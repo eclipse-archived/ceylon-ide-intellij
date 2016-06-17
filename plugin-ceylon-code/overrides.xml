@@ -7,6 +7,14 @@
         <add module="org.jdom" version="current"/>
     </module>
 
+    <module module="com.intellij.extensions">
+        <filter>
+            <include path="com/intellij/openapi/extensions/*"/>
+            <include path="com/intellij/openapi/extensions/impl/*"/>
+            <exclude path="com/intellij/openapi/*"/>
+        </filter>
+    </module>
+
     <module module="com.intellij.idea">
         <add module="com.intellij.extensions" version="current" shared="false"/>
         <add module="com.intellij.annotations" version="current" shared="false"/>
