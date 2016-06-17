@@ -301,7 +301,11 @@
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaSpecifyTypeIntention</className>
-            <category>Ceylon/Syntax</category>
+            <category>Ceylon/Typing</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaSpecifyTypeArgumentsIntention</className>
+            <category>Ceylon/Typing</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AnonymousFunctionIntention</className>
@@ -345,19 +349,19 @@
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddVariableAnnotationIntention</className>
-            <category>Ceylon/Declaration</category>
+            <category>Ceylon/Annotations</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddSharedAnnotationIntention</className>
-            <category>Ceylon/Declaration</category>
+            <category>Ceylon/Annotations</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddDefaultAnnotationIntention</className>
-            <category>Ceylon/Declaration</category>
+            <category>Ceylon/Annotations</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.AddFormalAnnotationIntention</className>
-            <category>Ceylon/Declaration</category>
+            <category>Ceylon/Annotations</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.SplitDeclarationIntention</className>
@@ -373,7 +377,7 @@
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ExpandTypeIntention</className>
-            <category>Ceylon/Declaration</category>
+            <category>Ceylon/Typing</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.RefineEqualsHashIntention</className>
@@ -381,19 +385,19 @@
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertStringToVerbatimIntention</className>
-            <category>Ceylon/String</category>
+            <category>Ceylon/Strings</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertVerbatimToStringIntention</className>
-            <category>Ceylon/String</category>
+            <category>Ceylon/Strings</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertToInterpolationIntention</className>
-            <category>Ceylon/String</category>
+            <category>Ceylon/Strings</category>
         </intentionAction>
         <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.ceylonCode.correct.ConvertToConcatenationIntention</className>
-            <category>Ceylon/String</category>
+            <category>Ceylon/Strings</category>
         </intentionAction>
     </extensions>
 </idea-plugin>
