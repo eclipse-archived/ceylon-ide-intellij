@@ -26,22 +26,20 @@ import com.intellij.openapi.project {
 import com.intellij.openapi.util {
     Ref
 }
-import com.redhat.ceylon.ide.common.platform {
-    platformUtils,
-    Status
-}
 
 import java.lang {
-    Thread {
-        currentThread
-    },
+    Thread,
     InterruptedException,
     ThreadLocal,
     Runnable,
     System
 }
-import java.util.concurrent { 
-    JCallable = Callable
+import java.util.concurrent {
+    JCallable=Callable
+}
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    CeylonLogger
 }
 
 shared class NoIndexStrategy 
@@ -79,6 +77,8 @@ shared class IndexNeededWithNoIndexStrategy()
         extends ConcurrencyError(noIndexStrategyMessage) {}
 
 shared object concurrencyManager {
+    value logger = CeylonLogger<\IconcurrencyManager>();
+
     value deadLockDetectionTimeout = 30000;
     
     value noIndexStrategy_ = ThreadLocal<NoIndexStrategy?>();
@@ -153,7 +153,7 @@ shared object concurrencyManager {
                 try {
                     if (System.currentTimeMillis() > allowedWaitingTime) {
                         if (timeout == deadLockDetectionTimeout) {
-                            platformUtils.log(Status._ERROR, "Stopped waiting for read access to avoid a deadlock");
+                            logger.error(()=>"Stopped waiting for read access to avoid a deadlock", 15);
                         }
                         throw ProcessCanceledException();
                     }
@@ -169,7 +169,7 @@ shared object concurrencyManager {
                         }
                     }
                 }
-                platformUtils.log(Status._DEBUG, "Retrying the read action after a write action");
+                logger.debug(()=>"Retrying the read action after a write action");
             }
             return ref.get();
         }
@@ -178,7 +178,7 @@ shared object concurrencyManager {
     Return withIndexStrategy<Return>(NoIndexStrategy s, Return() func) {
         NoIndexStrategy? previousStrategy;
         if (exists currentStrategy = noIndexStrategy_.get()) {
-            platformUtils.log(Status._DEBUG, "The current strategy (``currentStrategy``) when indexes are unavailable should overriden by a new one (``s``) with care");
+            logger.debug(()=>"The current strategy (``currentStrategy``) when indexes are unavailable should overriden by a new one (``s``) with care", 10);
             previousStrategy = currentStrategy;
         } else {
             previousStrategy = null;
@@ -252,11 +252,7 @@ shared object concurrencyManager {
             if (ds.dumb) {
                 throw IndexNeededWithNoIndexStrategy();
             } else {
-                value message = "\n".join { 
-                    noIndexStrategyMessage,
-                    "  Stacktrace: ", *currentThread().stackTrace.array.coalesced.map((stackTraceElement) =>
-                    "    ``stackTraceElement``") };
-                platformUtils.log(Status._DEBUG, message);
+                logger.debug(()=>noIndexStrategyMessage, 20);
                 return func();
             }
         }
