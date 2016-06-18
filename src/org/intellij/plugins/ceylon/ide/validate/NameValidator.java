@@ -32,13 +32,13 @@ public class NameValidator {
     public static boolean packageNameIsLegal(String packageName) {
         return packageName.isEmpty() ||
                 matches(packageNamePattern, packageName) &&
-                        !matches(forbiddenWords, packageName);
+                !matches(forbiddenWords, packageName);
     }
 
     public static boolean unitNameIsLegal(String unitName) {
         return unitName.isEmpty() ||
                 matches(unitNamePattern, unitName) &&
-                        !matches(forbiddenWords, unitName);
+                !matches(forbiddenWords, unitName);
     }
 
     private static boolean matches(Pattern pattern, String name) {
