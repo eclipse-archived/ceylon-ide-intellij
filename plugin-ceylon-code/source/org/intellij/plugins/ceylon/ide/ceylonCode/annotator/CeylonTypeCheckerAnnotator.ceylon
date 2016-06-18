@@ -80,7 +80,7 @@ shared alias AnyError => AnalysisError|RecognitionError|UnexpectedError;
 
 shared class CeylonTypeCheckerAnnotator() 
         satisfies Annotator & DumbAware {
-    value unresolvedReferenceCodes = [ 100, 102 ];
+    value unresolvedReferenceCodes = [ 100, 102, 7000 ];
     value unusedCodes = [ Warning.unusedDeclaration.string, Warning.unusedImport.string ];
 
     Boolean addAnnotation(Message message, TextRange? range, AnnotationHolder annotationHolder, PsiFile file) {
