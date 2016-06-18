@@ -65,7 +65,7 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                         ceylonFileFactory.createPackageDescriptor(subdirectory,
                                 moduleName);
 
-                        if (StringUtil.isNotEmpty(moduleName)) {
+                        if (StringUtil.isNotEmpty(unitName)) {
                             PsiElement run = ceylonFileFactory.createRun(subdirectory, moduleName,
                                     unitFileName, unitName);
 
