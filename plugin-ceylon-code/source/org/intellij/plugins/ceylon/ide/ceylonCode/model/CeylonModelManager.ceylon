@@ -286,20 +286,18 @@ shared class CeylonModelManager(model)
                                         }
                                     });
                                     
-                                    ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
-                                        concurrencyManager.needReadAccess(() {
+                                    value ceylonEditedFiles = concurrencyManager.needReadAccess(() =>
                                             fileEditorManagerInstance(model.ideaProject)
-                                                    .openFiles.array.coalesced
-                                                    .filter((file) => file.fileType == ceylonFileType)
-                                                    .each(void (VirtualFile element) {
-                                                if (is CeylonFile ceylonFile = 
-                                                    psiManager(model.ideaProject).findFile(element),
-                                                    exists localAnalyzer = ceylonFile.localAnalyzer) {
-                                                    localAnalyzer.forceTypechecking(null,1);
-                                                }
-                                            });
-                                        });
-                                    }));
+                                                .openFiles.array.coalesced
+                                                .filter((file) => file.fileType == ceylonFileType));
+                                        
+                                    ceylonEditedFiles.each(void (VirtualFile element) {
+                                        if (is CeylonFile ceylonFile = concurrencyManager.needReadAccess(()=>
+                                                psiManager(model.ideaProject).findFile(element)),
+                                            exists localAnalyzer = ceylonFile.localAnalyzer) {
+                                            localAnalyzer.scheduleForcedTypechecking();
+                                        }
+                                    });
                                     /*
                                     application.invokeLater(JavaRunnable {
                                         void run() {

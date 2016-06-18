@@ -19,7 +19,8 @@ import com.intellij.openapi.fileEditor {
     FileDocumentManager
 }
 import com.intellij.openapi.\imodule {
-    Module
+    Module,
+    ModuleUtil
 }
 import com.intellij.openapi.progress {
     ProcessCanceledException
@@ -34,17 +35,19 @@ import com.intellij.psi {
     PsiManager,
     PsiDocumentManager
 }
-import com.intellij.util {
-    Alarm
-}
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
 }
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
+import com.redhat.ceylon.compiler.typechecker.parser {
+    RecognitionError
+}
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
+    Tree,
+    Visitor,
+    Node
 }
 import com.redhat.ceylon.ide.common.model {
     BaseIdeModuleSourceMapper,
@@ -92,13 +95,16 @@ import org.antlr.runtime {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
     concurrencyManager,
-    CeylonModelManager
+    CeylonModelManager,
+    IdeaCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger,
     LogUtils
 }
-
+import com.intellij.util {
+    Alarm
+}
 
 
 shared variable Integer delayToRetryCancelledLocalAnalysis = 1000;
@@ -106,7 +112,7 @@ shared variable Integer delayToStartLocalAnalysisAfterParsing = 200;
 
 CeylonLogger<CeylonLocalAnalyzer> ceylonLocalAnalyzerLogger = CeylonLogger<CeylonLocalAnalyzer>();
 
-shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile() virtualFileAccessor, Project() ideaProjectAccessor) 
+shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject) 
     satisfies Disposable {
     variable MutableLocalAnalysisResult? result_= null;
     value resultLock = ReentrantLock(true);
@@ -114,20 +120,19 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
     variable Anything()? taskSubmittedWhileBackgroundTypecheckingWasDisabled = null;
     variable value cancelledToRestart_ = false; 
     variable value disposed = false; 
-    variable value initialized = false; 
     object restarterCancellable satisfies Cancellable {
         shared actual Boolean cancelled => cancelledToRestart_;
     }
     
-    late Alarm localTypecheckingAlarm;
+    value localTypecheckingAlarm = Alarm(Alarm.ThreadToUse.pooledThread, ideaProject);
+    value model = ideaProject.getComponent(javaClass<IdeaCeylonProjects>());
+    assert(is IdeaCeylonProject? ceylonProject = 
+        model.getProject(
+            ModuleUtil.findModuleForFile(virtualFile, ideaProject) else null));
     
-    shared void init() {
-        localTypecheckingAlarm = Alarm(Alarm.ThreadToUse.pooledThread, this);
-        initialized = true;
-    }
-
     shared actual void dispose() {
         disposed = true;
+        localTypecheckingAlarm.dispose();
     }
 
     void checkCancelled(Cancellable? cancellable) {
@@ -138,9 +143,6 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
     }
 
     value logger => ceylonLocalAnalyzerLogger;
-    
-    value virtualFile => virtualFileAccessor();
-    value ideaProject => ideaProjectAccessor();
     
     void submitLocalTypechecking(
         void typecheckingTask(), 
@@ -153,12 +155,6 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
             return;
         }
         
-        if (! initialized) {
-            logger.debug(()=>"ERROR : Submitted local tyechecking task `` taskId `` while the CeylonLocalAnalyzer is not initialized.
-                                  Returning directly");
-            return;
-        }
-
         if (exists p=ceylonProject,
             ! p.typechecked) {
             logger.debug(()=>"ERROR : Submitted local tyechecking task `` taskId `` while the Ceylon project global model is not available.
@@ -286,6 +282,52 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
         logger.debug(()=>"Exit translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``");
     }
 
+    void removePreviousTypecheckingErrors(Tree.CompilationUnit parsedRootNode) {
+        parsedRootNode.visit(object extends Visitor() {
+            shared actual void visitAny(Node node) {
+                super.visitAny(node);
+                value iterator = node.errors.iterator();
+                while (iterator.hasNext()) {
+                    if (! iterator.next() is RecognitionError) {
+                        iterator.remove();
+                    }
+                }
+            }
+        });
+    }
+    
+    shared void scheduleForcedTypechecking(Integer delay = 0, Integer waitForModelInSeconds = 0) {
+        logger.debug(()=>"Enter scheduleForcedTypechecking(``0``, ``waitForModelInSeconds``) for file ``virtualFile.name``", 20);
+        void typecheckingTask() {
+            Document document;
+            Tree.CompilationUnit parsedRootNode;
+            List<CommonToken> commonTokens;
+            MutableLocalAnalysisResult currentResult;
+            
+            resultLock.lock();
+            try {
+                value theResult = result_;
+                if (! exists theResult) {
+                    return;
+                }
+                
+                currentResult = theResult;
+                
+                document = currentResult.document;
+                parsedRootNode = currentResult.parsedRootNode;
+                commonTokens = currentResult.tokens;
+
+                removePreviousTypecheckingErrors(parsedRootNode);
+            } finally {
+                resultLock.unlock();
+            }
+            
+            typecheckSourceFile(document, parsedRootNode, commonTokens, currentResult, waitForModelInSeconds, restarterCancellable);
+        }
+        submitLocalTypechecking(typecheckingTask, delay);
+        logger.debug(()=>"Exit scheduleForcedTypechecking(``0``, ``waitForModelInSeconds``) for file ``virtualFile.name``", 20);
+    }
+
     shared PhasedUnit? forceTypechecking(Cancellable? cancellable, Integer waitForModelInSeconds) =>
             runTypechecking(cancellable, waitForModelInSeconds, true);
 
@@ -294,16 +336,10 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
     
     "Synchronously perform the typechecking (if necessary)"
     PhasedUnit? runTypechecking(Cancellable? cancellable, Integer waitForModelInSeconds, Boolean force) {
-        logger.debug(()=>"Enter runTypechecking(``cancellable else "<null>"``, ``waitForModelInSeconds``, ``force``) for file ``virtualFile.name``");
+        logger.debug(()=>"Enter runTypechecking(``cancellable else "<null>"``, ``waitForModelInSeconds``, ``force``) for file ``virtualFile.name``", 10);
 
         if (disposed) {
-            logger.debug(()=>"ERROR : Try to run a local typechecking synchronously while the CeylonLocalAnalyzer is already disposed.
-                                  Returning directly");
-            return null;
-        }
-        
-        if (! initialized) {
-            logger.debug(()=>"ERROR : Submitted local typechecking task while the CeylonLocalAnalyzer is not initialized.
+            logger.error(()=>"Try to run a local typechecking synchronously while the CeylonLocalAnalyzer is already disposed.
                                   Returning directly");
             return null;
         }
@@ -347,6 +383,9 @@ shared class CeylonLocalAnalyzer(IdeaCeylonProject? ceylonProject, VirtualFile()
                 document = currentResult.document;
                 parsedRootNode = currentResult.parsedRootNode;
                 commonTokens = currentResult.tokens;
+                if (force) {
+                    removePreviousTypecheckingErrors(parsedRootNode);
+                }
             } finally {
                 resultLock.unlock();
             }
