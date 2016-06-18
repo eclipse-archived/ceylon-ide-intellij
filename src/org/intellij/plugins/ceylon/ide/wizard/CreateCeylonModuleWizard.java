@@ -37,6 +37,12 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
 
     @Nullable
     @Override
+    public JComponent getPreferredFocusedComponent() {
+        return moduleName;
+    }
+
+    @Nullable
+    @Override
     protected ValidationInfo doValidate() {
         String name = moduleName.getText();
 
