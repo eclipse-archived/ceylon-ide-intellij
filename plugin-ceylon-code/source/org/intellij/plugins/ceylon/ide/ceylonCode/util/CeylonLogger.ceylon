@@ -22,7 +22,7 @@ shared class CeylonLogger<Type>()
                         "
                          ===================================================",
                         message(),
-                        "  Stacktrace: ", *stackTrace.array.coalesced.skip(2).take(stackTraceDepth).map((stackTraceElement) =>
+                        "  Stacktrace: ", *stackTrace.array.coalesced.skip(4).take(stackTraceDepth).map((stackTraceElement) =>
                             "    ``stackTraceElement``")
                         .chain {
                         "==================================================="}}
