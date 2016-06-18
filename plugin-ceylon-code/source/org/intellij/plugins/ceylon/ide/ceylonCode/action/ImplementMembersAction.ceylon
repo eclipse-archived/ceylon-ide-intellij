@@ -231,7 +231,7 @@ shared abstract class AbstractMembersAction()
                     !selected.empty) {
                 value p = project;
                 object extends WriteCommandAction<Nothing>
-                        (p, "Refine Members") {
+                        (p, "Refine Members", file) {
                     run(Result<Nothing> result) => apply { 
                         file = file; 
                         editor = editor; 
