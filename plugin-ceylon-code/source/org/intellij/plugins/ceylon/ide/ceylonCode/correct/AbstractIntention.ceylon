@@ -100,7 +100,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
         if (is CeylonFile psiFile,
             exists localAnalysisResult = psiFile.localAnalysisResult,
-            is ModifiablePhasedUnit<out Anything,out Anything,out Anything,out Anything> analyzedPhasedUnit = localAnalysisResult.lastPhasedUnit) {
+            is ModifiablePhasedUnit<out Anything,out Anything,out Anything,out Anything>
+                analyzedPhasedUnit = localAnalysisResult.lastPhasedUnit) {
             
             value typecheckedCompilationUnit = localAnalysisResult.typecheckedRootNode;
             if (! exists typecheckedCompilationUnit) {
