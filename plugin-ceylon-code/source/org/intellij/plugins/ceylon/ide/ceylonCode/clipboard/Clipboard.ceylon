@@ -88,7 +88,7 @@ shared class CopiedReferences({<Declaration->String>*} references)
     shared {<Declaration->String>*} resolve(CeylonFile file) {
         if (exists tc = file.localAnalysisResult.typeChecker) {
             value modules = tc.context.modules.listOfModules;
-            return {
+            return map {
                 for ([pname, name, al] in serializableState)
                 for (m in modules)
                 if (exists p = m.getDirectPackage(pname),
@@ -139,50 +139,57 @@ shared class CeylonCopyPastePostProcessor()
         }
     }
 
-    function color(Declaration dec) {
-        return switch (dec)
+    function color(Declaration dec)
+            => switch (dec)
             case (is TypeDeclaration)
                 textAttributes(ceylonHighlightingColors.type).foregroundColor
             case (is TypedDeclaration)
                 textAttributes(ceylonHighlightingColors.identifier).foregroundColor
             else SimpleTextAttributes.regularAttributes.fgColor;
-    }
 
     shared actual void processTransferableData(Project project, Editor editor, RangeMarker bounds,
             Integer caretOffset, Ref<Boolean> indented, List<CopiedReferences> references) {
         if (!references.empty,
             is CeylonFile file = PsiUtilBase.getPsiFileInEditor(editor, project),
             exists reference = references[0]) {
-            value dialog
-                = PasteImportsDialog(project,
-                    for (dec->al in reference.resolve(file))
-                        let (p = dec.unit.\ipackage, m = p.\imodule)
+            value unit = file.compilationUnit.unit;
+            value items = {
+                for (dec->al in reference.resolve(file))
+                if (dec.unit.\ipackage!=unit.\ipackage,
+                    every { for (i in unit.imports) i.declaration!=dec})
+                    let (p = dec.unit.\ipackage, m = p.\imodule)
                         Item(icons.forDeclaration(dec),
                             color(dec),
                             dec.name,
                             p.nameAsString,
                             "``m.nameAsString`` \"``m.version``\"",
-                            dec->al));
-            dialog.init();
-            if (dialog.showAndGet()) {
-                value insertEdits = pasteImports {
-                    references = map {
-                        for (it in dialog.selectedElements)
-                        if (is Declaration->String entry = it.payload)
-                            entry
+                            dec->al)
+            };
+            if (!items.empty) {
+                value dialog
+                    = PasteImportsDialog(project,
+                        items.sort(byIncreasing(Item.label)));
+                dialog.init();
+                if (dialog.showAndGet()) {
+                    value insertEdits = pasteImports {
+                        references = map {
+                            for (it in dialog.selectedElements)
+                            if (is Declaration->String entry = it.payload)
+                                entry
+                        };
+                        doc = IdeaDocument(editor.document);
+                        rootNode = file.compilationUnit;
                     };
-                    doc = IdeaDocument(editor.document);
-                    rootNode = file.compilationUnit;
-                };
-                if (!insertEdits.empty) {
-                    object extends WriteCommandAction<Nothing>(file.project, file) {
-                        shared actual void run(Result<Nothing> result) {
-                            value change = IdeaTextChange(IdeaDocument(editor.document));
-                            change.initMultiEdit();
-                            insertEdits.each(change.addEdit);
-                            change.apply();
-                        }
-                    }.execute();
+                    if (!insertEdits.empty) {
+                        object extends WriteCommandAction<Nothing>(file.project, file) {
+                            shared actual void run(Result<Nothing> result) {
+                                value change = IdeaTextChange(IdeaDocument(editor.document));
+                                change.initMultiEdit();
+                                insertEdits.each(change.addEdit);
+                                change.apply();
+                            }
+                        }.execute();
+                    }
                 }
             }
         }

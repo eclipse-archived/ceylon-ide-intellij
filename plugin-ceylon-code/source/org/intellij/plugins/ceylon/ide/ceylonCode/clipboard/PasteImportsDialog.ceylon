@@ -39,7 +39,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     }
 }
 
-class PasteImportsDialog(Project project, Item* elements)
+class PasteImportsDialog(Project project, {Item*} elements)
         extends DialogWrapper(project, true) {
 
     value myList = JBList(*elements);
