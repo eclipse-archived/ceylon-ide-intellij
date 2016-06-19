@@ -34,15 +34,15 @@ shared abstract class AbstractIntentionAction() extends AnAction() {
     shared actual void actionPerformed(AnActionEvent evt) {
         if (exists project = evt.project,
             exists editor = evt.getData(CommonDataKeys.editor),
-            is CeylonFile psiFile = evt.getData(CommonDataKeys.psiFile)) {
+            is CeylonFile file = evt.getData(CommonDataKeys.psiFile)) {
             
             value intention = createIntention();
-            if (intention.isAvailable(project, editor, psiFile)) {
+            if (intention.isAvailable(project, editor, file)) {
                 value p = project;
                 value cn = commandName;
-                object extends WriteCommandAction<Nothing>(p, cn) {
+                object extends WriteCommandAction<Nothing>(p, cn, file) {
                     run(Result<Nothing> result)
-                            => intention.invoke(project, editor, psiFile);
+                            => intention.invoke(project, editor, file);
                 }.execute();
             }
         }

@@ -30,14 +30,14 @@ shared class RefineFormalMembersAction() extends AbstractIntentionAction()
     
     createIntention() => RefineFormalMembersIntention();
     
-    shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
+    shared actual void invoke(Project project, Editor editor, PsiFile file) {
         value intention = createIntention();
-        if (intention.isAvailable(project, editor, psiFile)) {
+        if (intention.isAvailable(project, editor, file)) {
             value p = project;
             value cn = commandName;
-            object extends WriteCommandAction<Nothing>(p, cn) {
+            object extends WriteCommandAction<Nothing>(p, cn, file) {
                 run(Result<Nothing> result) 
-                        => intention.invoke(project, editor, psiFile);
+                        => intention.invoke(project, editor, file);
             }.execute();
         }
     }
