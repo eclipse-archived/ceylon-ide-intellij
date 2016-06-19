@@ -1,6 +1,5 @@
-import ceylon.interop.java {
-    javaClass,
-    javaString
+import ceylon.collection {
+    ArrayList
 }
 
 import com.intellij.openapi.application {
@@ -17,19 +16,14 @@ import com.intellij.openapi.project {
 }
 import com.intellij.openapi.util {
     TextRange,
-    Pass,
     Condition
 }
 import com.intellij.psi {
-    PsiFile,
     PsiDocumentManager,
     PsiElement
 }
-import com.intellij.refactoring {
-    IntroduceTargetChooser
-}
-import com.intellij.util {
-    Function
+import com.intellij.psi.util {
+    PsiTreeUtil
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Visitor,
@@ -43,10 +37,6 @@ import com.redhat.ceylon.ide.common.refactoring {
 import java.lang {
     JString=String
 }
-import java.util {
-    List,
-    ArrayList
-}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -58,29 +48,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
     descriptions
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
-    FindMatchingPsiNodeVisitor
-}
-import com.intellij.psi.util {
-    PsiTreeUtil
-}
 
 shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
-
-    List<CeylonPsi.DeclarationPsi> toPsi(PsiFile file, List<Tree.Declaration> elements) {
-        value psi = ArrayList<CeylonPsi.DeclarationPsi>();
-        for (term in elements) {
-            value visitor = FindMatchingPsiNodeVisitor(term, javaClass<CeylonPsi.DeclarationPsi>());
-            visitor.visitFile(file);
-
-            if (is CeylonPsi.DeclarationPsi element = visitor.psi) {
-                psi.add(element);
-            } else {
-                print("Couldn't find PSI node for Node " + term.string);
-            }
-        }
-        return psi;
-    }
 
     function findContainer(CeylonPsi.DeclarationPsi element) {
         assert (is CeylonPsi.DeclarationPsi? result 
@@ -92,16 +61,6 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
                     }));
         return result;
     }
-    
-    function containerLabel(CeylonPsi.DeclarationPsi element)
-            => if (exists container = findContainer(element),
-                   exists desc
-                       = descriptions.descriptionForPsi {
-                           element = container;
-                           includeReturnType = false;
-                       })
-            then javaString(desc)
-            else javaString("package " + element.ceylonNode.unit.\ipackage.qualifiedNameString);
 
     shared actual void extractToScope(Project project, Editor editor, CeylonFile file, TextRange range) {
 
@@ -119,23 +78,31 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
             }
         });
         
-        if (declarations.size()>1) {
-            IntroduceTargetChooser.showChooser(editor,
-                toPsi(file, declarations),
-                object extends Pass<CeylonPsi.DeclarationPsi>() {
-                    pass(CeylonPsi.DeclarationPsi selectedValue)
-                            => createAndIntroduceValue { 
-                                proj = project;
-                                editor = editor;
-                                file = file;
-                                range = range;
-                                ceylonNode = selectedValue.ceylonNode;
-                            };
-                },
-                object satisfies Function<CeylonPsi.DeclarationPsi,JString> {
-                    fun(CeylonPsi.DeclarationPsi element) => containerLabel(element);
-                },
-                "Select target scope");
+        if (declarations.size>1) {
+            value allParentScopes
+                = psiElements<CeylonPsi.DeclarationPsi>(file, declarations);
+            showChooser {
+                editor = editor;
+                expressions = allParentScopes;
+                title = "Select target scope";
+            }
+                ((selectedValue)
+                    => createAndIntroduceValue {
+                        proj = project;
+                        editor = editor;
+                        file = file;
+                        range = range;
+                        ceylonNode = selectedValue.ceylonNode;
+                    },
+                (element)
+                    => if (exists container = findContainer(element),
+                           exists desc
+                               = descriptions.descriptionForPsi {
+                                   element = container;
+                                   includeReturnType = false;
+                               })
+                    then desc
+                    else "package " + element.ceylonNode.unit.\ipackage.qualifiedNameString);
         }
         else {
             super.extractToScope(project, editor, file, range);

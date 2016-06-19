@@ -25,7 +25,6 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.openapi.util {
-    Pass,
     TextRange,
     Pair
 }
@@ -41,18 +40,15 @@ import com.intellij.psi.util {
     PsiTreeUtil
 }
 import com.intellij.refactoring {
-    IntroduceTargetChooser,
     RefactoringActionHandler
 }
 import com.intellij.refactoring.rename.inplace {
     VariableInplaceRenameHandler,
     VariableInplaceRenamer
 }
-import com.intellij.util {
-    Function
-}
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree
+    Tree,
+    Node
 }
 import com.redhat.ceylon.ide.common.refactoring {
     FindContainingExpressionsVisitor
@@ -64,13 +60,13 @@ import java.lang {
 }
 import java.util {
     HashMap,
-    List,
-    ArrayList
+    JList=List
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
-    CeylonFile
+    CeylonFile,
+    CeylonCompositeElement
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     FindMatchingPsiNodeVisitor
@@ -114,34 +110,34 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             value visitor = FindContainingExpressionsVisitor(editor.caretModel.offset);
             visitor.visitAny(PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()).ceylonNode);
 
-            value allParentExpressions = toPsi(file, visitor.elements);
-            if (allParentExpressions.empty) {
+            value allParentExpressions
+                = psiElements<CeylonPsi.TermPsi> { file = file;
+                    elements = visitor.elements.iterable.coalesced; };
+            if (!nonempty allParentExpressions) {
                 //noop
             }
-            else if (allParentExpressions.size() == 1) {
+            else if (allParentExpressions.size == 1) {
                 extractToScope {
                     project = project;
                     editor = editor;
                     file = file;
-                    range = allParentExpressions.get(0).textRange;
+                    range = allParentExpressions.first.textRange;
                 };
             }
             else {
-                IntroduceTargetChooser.showChooser(editor,
-                    allParentExpressions,
-                    object extends Pass<CeylonPsi.TermPsi>() {
-                        pass(CeylonPsi.TermPsi selectedValue)
-                                => extractToScope {
+                showChooser {
+                    editor = editor;
+                    expressions = allParentExpressions;
+                    title = "Select expression";
+                }
+                    ((selectedValue)
+                        => extractToScope {
                             project = project;
                             editor = editor;
                             file = file;
                             range = selectedValue.textRange;
-                        };
-                    },
-                    object satisfies Function<CeylonPsi.TermPsi,JString> {
-                        fun(CeylonPsi.TermPsi element) => JString(element.text);
-                    },
-                    "Select expression");
+                        },
+                    PsiElement.text);
             }
         }
     }
@@ -173,20 +169,21 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         }
     }
 
-    List<CeylonPsi.TermPsi> toPsi(PsiFile file, ObjectArray<Tree.Term> elements) {
-        value psi = ArrayList<CeylonPsi.TermPsi>();
-        for (term in elements) {
-            value visitor = FindMatchingPsiNodeVisitor(term, javaClass<CeylonPsi.TermPsi>());
-            visitor.visitFile(file);
+    shared T[] psiElements<T>(PsiFile file, {Node*} elements)
+            given T satisfies CeylonCompositeElement
+            => elements.map((term) {
+                value visitor
+                    = FindMatchingPsiNodeVisitor(term, javaClass<T>());
+                visitor.visitFile(file);
+                if (is T element = visitor.psi) {
+                    return element;
+                } else {
+                    return null;
+                }
+            })
+            .coalesced
+            .sequence();
 
-            if (is CeylonPsi.TermPsi element = visitor.psi) {
-                psi.add(element);
-            } else {
-                print("Couldn't find PSI node for Node " + term.string);
-            }
-        }
-        return psi;
-    }
 }
 
 class ExtractedVariableRenameHandler(TextRange[] usages = [])
@@ -208,7 +205,7 @@ class ExtractedVariableRenameHandler(TextRange[] usages = [])
                 }
             }
 
-            collectAdditionalElementsToRename(List<Pair<PsiElement,TextRange>> stringUsages)
+            collectAdditionalElementsToRename(JList<Pair<PsiElement,TextRange>> stringUsages)
                     => noop();
 
             collectRefs(SearchScope referencesSearchScope)
