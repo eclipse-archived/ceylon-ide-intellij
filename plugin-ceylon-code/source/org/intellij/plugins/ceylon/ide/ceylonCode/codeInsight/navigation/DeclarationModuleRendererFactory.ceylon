@@ -62,9 +62,9 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
             }
 
             border = BorderFactory.createEmptyBorder(0, 0, 0, UIUtil.listCellHPadding);
-            horizontalTextPosition = SwingConstants.\iLEFT;
-            background = if (isSelected) then UIUtil.listSelectionBackground else UIUtil.listBackground;
-            foreground = if (isSelected) then UIUtil.listSelectionForeground else UIUtil.inactiveTextColor;
+            horizontalTextPosition = SwingConstants.left;
+            background = isSelected then UIUtil.listSelectionBackground else UIUtil.listBackground;
+            foreground = isSelected then UIUtil.listSelectionForeground else UIUtil.inactiveTextColor;
 
             return cmp;
         } else {
