@@ -106,7 +106,8 @@ shared class CeylonGotoSymbolContributor() extends CeylonGotoContributor() {
         //pick up stuff from edited source files
         for (pu in typechecker.phasedUnits.phasedUnits) {
             for (declaration in pu.declarations) {
-                if (!consumer(declaration)) {
+                if (isPresentable(declaration),
+                        !consumer(declaration)) {
                     return;
                 }
             }
