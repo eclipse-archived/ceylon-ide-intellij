@@ -51,13 +51,13 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
             value text = StringBuilder();
             if (is AnyProjectSourceFile psf = val.decl.unit,
                 is Module proj = psf.resourceProject) {
-                text.append(proj.name).append(" ");
+                text.append(proj.name);
                 icon = icons.file;
             }
             else {
+                text.append(mod.nameAsString).append("/").append(mod.version);
                 icon = icons.modules;
             }
-            text.append(mod.nameAsString).append("/").append(mod.version);
             this.text = text.string;
 
             border = BorderFactory.createEmptyBorder(0, 0, 0, UIUtil.listCellHPadding);
