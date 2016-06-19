@@ -56,7 +56,7 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
             }
             else {
                 text.append(mod.nameAsString).append("/").append(mod.version);
-                icon = icons.modules;
+                icon = icons.moduleArchives;
             }
             this.text = text.string;
 

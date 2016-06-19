@@ -43,8 +43,12 @@ shared object icons {
     
     shared Icon imports => IconLoader.getIcon("/icons/ceylonImports.png");
     shared Icon singleImport => IconLoader.getIcon("/icons/ceylonImport.png");
-    shared Icon packages => IconLoader.getIcon("/icons/ceylonPackage.png");
-    shared Icon modules => IconLoader.getIcon("/icons/ceylonModule.png");
+//    shared Icon packages => IconLoader.getIcon("/icons/ceylonPackage.png");
+    shared Icon packageFolders => PlatformIcons.packageIcon;
+    shared Icon packageArchives => PlatformIcons.packageIcon;
+    shared Icon moduleFolders => IconLoader.getIcon("/icons/moduleFolder.png");
+    shared Icon moduleArchives => IconLoader.getIcon("/icons/moduleArchive.png");
+    shared Icon descriptors => IconLoader.getIcon("/icons/descriptor.png");
     shared Icon classes => PlatformIcons.classIcon;
     shared Icon abstractClasses => PlatformIcons.abstractClassIcon;
     shared Icon interfaces => PlatformIcons.interfaceIcon;

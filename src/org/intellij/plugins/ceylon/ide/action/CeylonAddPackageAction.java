@@ -63,7 +63,7 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
 
     @Override
     protected Icon getCeylonIcon() {
-        return icons_.get_().getPackages();
+        return icons_.get_().getPackageFolders();
     }
 
     private class AddPackageInputValidator implements InputValidatorEx {

@@ -59,7 +59,9 @@ shared class CeylonGotoClassContributor() extends CeylonGotoContributor() {
     shared actual void scanModules(TypeChecker typechecker, Set<Module> modules,
             Boolean includeNonProjectItems, Boolean(Declaration) consumer) {
         for (mod in newArrayList(modules)) {
-            if (is IdeaModule mod, includeNonProjectItems || mod.isProjectModule) {
+            if (!mod.java,
+                is IdeaModule mod,
+                includeNonProjectItems || mod.isProjectModule) {
                 for (pack in newArrayList(mod.packages)) {
                     for (declaration in newArrayList(pack.members)) {
                         if (!declaration.unit is AnyJavaUnit,
@@ -115,7 +117,9 @@ shared class CeylonGotoSymbolContributor() extends CeylonGotoContributor() {
         }
         //scan all the modules
         for (mod in modules) {
-            if (is IdeaModule mod, includeNonProjectItems || mod.isProjectModule) {
+            if (!mod.java,
+                is IdeaModule mod,
+                includeNonProjectItems || mod.isProjectModule) {
                 for (pu in mod.phasedUnits) {
                     for (declaration in pu.declarations) {
                         if (!declaration.unit is AnyJavaUnit,

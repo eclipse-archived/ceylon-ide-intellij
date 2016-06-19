@@ -39,7 +39,7 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         satisfies IdeaCompletionProposal {
    
     shared LookupElement lookupElement => newLookup(versioned, versioned.spanFrom(len),
-       icons.modules, object satisfies InsertHandler<LookupElement> {
+       icons.moduleArchives, object satisfies InsertHandler<LookupElement> {
            shared actual void handleInsert(InsertionContext insertionContext,
                LookupElement? t) {
                

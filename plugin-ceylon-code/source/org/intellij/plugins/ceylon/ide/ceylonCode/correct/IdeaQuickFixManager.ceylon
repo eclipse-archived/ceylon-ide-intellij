@@ -338,7 +338,7 @@ shared class IdeaQuickFixData(
                 icon =
                     if (is Declaration declaration,
                         exists icon = icons.forDeclaration(declaration)) then icon
-                    else icons.modules;
+                    else icons.moduleArchives;
                 change = change;
                 qualifiedNameIsPath = qualifiedNameIsPath;
                 color = switch (declaration)

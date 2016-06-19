@@ -92,6 +92,6 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
     @Override
     protected Icon getCeylonIcon() {
-        return icons_.get_().getModules();
+        return icons_.get_().getModuleFolders();
     }
 }

@@ -132,12 +132,12 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
             => switch (thing)
             //models:
             case (is Declaration) icons.getBaseIcon(thing)
-            case (is Module) icons.modules
-            case (is Package) icons.packages
+            case (is Module) icons.moduleArchives
+            case (is Package) icons.packageArchives
             //icons:
-            case (Icons.imports) icons.imports
+            case (Icons.imports) icons.singleImport
             case (Icons.annotations) icons.annotations
-            case (Icons.modules) icons.modules
+            case (Icons.modules) icons.moduleFolders
             case (Icons.objects) icons.objects
             case (Icons.classes) icons.classes
             case (Icons.interfaces) icons.interfaces

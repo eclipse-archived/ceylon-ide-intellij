@@ -39,7 +39,7 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
 
     shared actual variable Boolean toggleOverwrite = false;
     
-    shared LookupElement lookupElement => newLookup(description, text, icons.packages,
+    shared LookupElement lookupElement => newLookup(description, text, icons.packageArchives,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
@@ -66,7 +66,7 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => newLookup(description, text, icons.modules,
+    shared LookupElement lookupElement => newLookup(description, text, icons.moduleArchives,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext ctx, LookupElement? t) {
                 // TODO

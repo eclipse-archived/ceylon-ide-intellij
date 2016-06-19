@@ -82,7 +82,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
     
     shared actual void newPackageDescriptorProposal(CompletionContext ctx, Integer offset, String prefix, String desc, String text) {
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(desc, text, icons.packages));
+            ctx.proposals.add(newLookup(desc, text, icons.descriptors));
         }
     }
     
@@ -123,7 +123,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         
         value selection = TextRange.from(selectionStart, selectionLength); 
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(desc, text, icons.modules, null, selection));
+            ctx.proposals.add(newLookup(desc, text, icons.descriptors, null, selection));
         }
     }
     
@@ -131,7 +131,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         String versioned, String name) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(versioned, versioned.spanFrom(len), icons.modules));
+            ctx.proposals.add(newLookup(versioned, versioned.spanFrom(len), icons.moduleArchives));
         }
     }
     

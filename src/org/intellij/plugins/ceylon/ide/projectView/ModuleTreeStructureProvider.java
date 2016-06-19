@@ -192,7 +192,7 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider, DumbA
         @Override
         public void update(PresentationData presentation) {
             presentation.setPresentableText(moduleName);
-            presentation.setIcon(icons_.get_().getModules());
+            presentation.setIcon(icons_.get_().getModuleFolders());
         }
 
         @Override
