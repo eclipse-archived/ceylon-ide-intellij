@@ -67,7 +67,6 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                          if (typechecker != null) {
                              result.addAll(typechecker.getPhasedUnits().getPhasedUnits());
                          }
-                         int size = listOfModules.size();
                          for (Module m : listOfModules) {
                              indicator.setText2("Indexing module " + m.getNameAsString());
                              IdeModule ideModule = (IdeModule) m;
@@ -186,7 +185,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
     }
 
-    private Declaration getModel(CeylonPsi.DeclarationPsi element) {
+    private static Declaration getModel(CeylonPsi.DeclarationPsi element) {
         Declaration dec = element.getCeylonNode().getDeclarationModel();
         if (dec instanceof Value) {
             Value value = (Value) dec;
