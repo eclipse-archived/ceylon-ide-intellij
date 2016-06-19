@@ -25,15 +25,22 @@ import com.intellij.openapi.util {
     Ref
 }
 import com.intellij.psi {
-    PsiFile,
-    PsiDocumentManager
+    PsiFile
+}
+import com.intellij.psi.util {
+    PsiUtilBase
+}
+import com.intellij.ui {
+    SimpleTextAttributes
 }
 import com.redhat.ceylon.ide.common.imports {
     SelectedImportsVisitor,
     pasteImports
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    TypeDeclaration,
+    TypedDeclaration
 }
 
 import java.awt.datatransfer {
@@ -49,6 +56,15 @@ import java.util {
     Collections
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
+    CeylonCellRenderer {
+        Item
+    }
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+    ceylonHighlightingColors,
+    textAttributes
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
     IdeaTextChange
@@ -56,32 +72,39 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    icons
+}
 
 DataFlavor flavor = DataFlavor(javaClass<CopiedReferences>(), "Copied References");
 
-shared class CopiedReferences(Map<Declaration,String> references)
+shared class CopiedReferences({<Declaration->String>*} references)
         satisfies TextBlockTransferableData {
 
     value serializableState
             = references.collect((dec->al)
                 => [dec.unit.\ipackage.nameAsString, dec.name, al]);
 
-    shared Map<Declaration,String> resolve(CeylonFile file) {
-        value mod = file.upToDatePhasedUnit.compilationUnit.unit.\ipackage.\imodule;  //TODO: check with David which is correct here
-        return map {
-            for ([pname, name, al] in serializableState)
-            if (exists p = mod.getPackage(pname))
-            if (exists d = p.getDirectMember(name, null, false))
-                d -> al
-        };
+    shared {<Declaration->String>*} resolve(CeylonFile file) {
+        if (exists tc = file.localAnalysisResult.typeChecker) {
+            value modules = tc.context.modules.listOfModules;
+            return {
+                for ([pname, name, al] in serializableState)
+                for (m in modules)
+                if (exists p = m.getDirectPackage(pname),
+                    exists d = p.getDirectMember(name, null, false))
+                d->al
+            };
+        }
+        else {
+            return {};
+        }
     }
 
     flavor => package.flavor;
 
     getOffsets(IntArray ints, Integer i) => 0;
-
     offsetCount => 0;
-
     setOffsets(IntArray ints, Integer i) => 0;
 
 }
@@ -89,47 +112,78 @@ shared class CopiedReferences(Map<Declaration,String> references)
 shared class CeylonCopyPastePostProcessor()
         extends CopyPastePostProcessor<CopiedReferences>() {
 
-    shared actual List<CopiedReferences> collectTransferableData(PsiFile psiFile, Editor editor,
+    shared actual List<CopiedReferences> collectTransferableData(PsiFile file, Editor editor,
             IntArray startOffsets, IntArray endOffsets) {
-        if (is CeylonFile psiFile) {
+        if (is CeylonFile file) {
             value selection = editor.selectionModel;
             value visitor = SelectedImportsVisitor {
                 offset = selection.selectionStart;
                 length = selection.selectionEnd
                 - selection.selectionStart;
             };
-            visitor.visit(psiFile.upToDatePhasedUnit.compilationUnit); //TODO: check with David which is correct here
+            visitor.visit(file.compilationUnit); //TODO: check with David which is correct here
             value result = CopiedReferences(visitor.copiedReferences);
             return Collections.singletonList(result);
         }
         return Collections.emptyList<CopiedReferences>();
     }
 
-    shared actual List<CopiedReferences> extractTransferableData(Transferable content)
-            => if (is CopiedReferences data = content.getTransferData(flavor))
-            then Collections.singletonList(data)
-            else Collections.emptyList<CopiedReferences>();
+    shared actual List<CopiedReferences> extractTransferableData(Transferable content) {
+        try {
+            return if (is CopiedReferences data = content.getTransferData(flavor))
+                then Collections.singletonList(data)
+                else Collections.emptyList<CopiedReferences>();
+        }
+        catch (e) {
+            return Collections.emptyList<CopiedReferences>();
+        }
+    }
+
+    function color(Declaration dec) {
+        return switch (dec)
+            case (is TypeDeclaration)
+                textAttributes(ceylonHighlightingColors.type).foregroundColor
+            case (is TypedDeclaration)
+                textAttributes(ceylonHighlightingColors.identifier).foregroundColor
+            else SimpleTextAttributes.regularAttributes.fgColor;
+    }
 
     shared actual void processTransferableData(Project project, Editor editor, RangeMarker bounds,
             Integer caretOffset, Ref<Boolean> indented, List<CopiedReferences> references) {
-        if (is CeylonFile file
-                = PsiDocumentManager.getInstance(project)
-                    .getPsiFile(editor.document),
+        if (!references.empty,
+            is CeylonFile file = PsiUtilBase.getPsiFileInEditor(editor, project),
             exists reference = references[0]) {
-            value insertEdits = pasteImports {
-                references = reference.resolve(file);
-                doc = IdeaDocument(editor.document);
-                rootNode = file.compilationUnit;
-            };
-            if (!insertEdits.empty) {
-                object extends WriteCommandAction<Nothing>(file.project, file) {
-                    shared actual void run(Result<Nothing> result) {
-                        value change = IdeaTextChange(IdeaDocument(editor.document));
-                        change.initMultiEdit();
-                        insertEdits.each(change.addEdit);
-                        change.apply();
-                    }
-                }.execute();
+            value dialog
+                = PasteImportsDialog(project,
+                    for (dec->al in reference.resolve(file))
+                        let (p = dec.unit.\ipackage, m = p.\imodule)
+                        Item(icons.forDeclaration(dec),
+                            color(dec),
+                            dec.name,
+                            p.nameAsString,
+                            "``m.nameAsString`` \"``m.version``\"",
+                            dec->al));
+            dialog.init();
+            if (dialog.showAndGet()) {
+                value insertEdits = pasteImports {
+                    references = map {
+                        for (it in dialog.selectedElements)
+                        if (is Declaration->String entry = it.payload)
+                            entry
+                    };
+                    doc = IdeaDocument(editor.document);
+                    rootNode = file.compilationUnit;
+                };
+                if (!insertEdits.empty) {
+                    object extends WriteCommandAction<Nothing>(file.project, file) {
+                        shared actual void run(Result<Nothing> result) {
+                            value change = IdeaTextChange(IdeaDocument(editor.document));
+                            change.initMultiEdit();
+                            insertEdits.each(change.addEdit);
+                            change.apply();
+                        }
+                    }.execute();
+                }
             }
         }
     }

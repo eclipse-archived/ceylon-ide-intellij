@@ -7,10 +7,15 @@ import javax.swing.*;
 import java.awt.*;
 
 
-public class CeylonCellRenderer extends ColoredListCellRenderer {
+public class CeylonCellRenderer extends ColoredListCellRenderer<Object> {
 
     public static class Item {
         public Icon icon;
+
+        public Item(Icon icon, Color color, String label, String qualifier, String extraQualifier, Object payload) {
+            this(icon, color, label, qualifier, payload);
+            this.extraQualifier = extraQualifier;
+        }
 
         public Item(Icon icon, Color color, String label, String qualifier, Object payload) {
             this.icon = icon;
@@ -22,6 +27,7 @@ public class CeylonCellRenderer extends ColoredListCellRenderer {
 
         public String label;
         public String qualifier;
+        public String extraQualifier;
         public Object payload;
         public Color color;
     }
@@ -35,12 +41,21 @@ public class CeylonCellRenderer extends ColoredListCellRenderer {
             if (item.qualifier != null) {
                 this.append(" (" + item.qualifier + ")");
             }
+//            if (item.extraQualifier != null) {
+//                this.append(" < " + item.extraQualifier + " >",
+//                        SimpleTextAttributes.REGULAR_ATTRIBUTES);
+//            }
         } else {
             this.append(item.label,
                     new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, item.color));
             if (item.qualifier != null) {
-                this.append(" (" + item.qualifier + ")", SimpleTextAttributes.GRAY_ATTRIBUTES);
+                this.append(" (" + item.qualifier + ")",
+                        SimpleTextAttributes.GRAYED_ATTRIBUTES);
             }
+//            if (item.extraQualifier != null) {
+//                this.append(" < " + item.extraQualifier + " >",
+//                        SimpleTextAttributes.REGULAR_ATTRIBUTES);
+//            }
         }
     }
 }
