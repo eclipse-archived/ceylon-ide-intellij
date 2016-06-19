@@ -35,9 +35,7 @@ import javax.swing {
     DefaultListModel,
     DefaultListCellRenderer,
     JList,
-    ListSelectionModel,
-    JComponent,
-    JLabel
+    ListSelectionModel
 }
 import javax.swing.event {
     ListSelectionListener,
@@ -46,9 +44,6 @@ import javax.swing.event {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter
-}
-import com.intellij.util {
-    NotNullFunction
 }
 
 shared void showChooser<out T>
@@ -70,24 +65,31 @@ shared void showChooser<out T>
         myList.selectedIndex = selection;
     }
 
-    myList.installCellRenderer(object satisfies NotNullFunction<Object,JComponent> {
-        shared actual JComponent fun(Object param) {
-            assert (is SmartPsiElementPointer<out Anything> pointer = param);
-            String coloredText;
+    myList.setCellRenderer(object extends DefaultListCellRenderer() {
+        shared actual Component getListCellRendererComponent(JList<out Object> list,
+                Object \ivalue, Integer index, Boolean isSelected, Boolean cellHasFocus) {
+            Component rendererComponent =
+                super.getListCellRendererComponent(list, \ivalue, index, isSelected, cellHasFocus);
+            assert (is SmartPsiElementPointer<out Anything> pointer = \ivalue);
             if (is T expr = pointer.element) {
                 value text = renderer(expr).normalized;
-                coloredText = "<html>``highlighter.highlight {
-                    rawText = text.longerThan(100)
-                        then text.spanTo(100) + "..."
-                        else text;
-                    project = expr.project;
-                    qualifiedNameIsPath = text.startsWith("package ");
-                }``</html>";
+                value rawText = text.longerThan(100) then text.spanTo(100) + "..." else text;
+                if (isSelected) {
+                    this.text = rawText;
+                }
+                else {
+                    this.text =
+                        "<html>``highlighter.highlight {
+                            rawText = rawText;
+                            project = expr.project;
+                            qualifiedNameIsPath = text.startsWith("package");
+                        }``</html>";
+                }
             } else {
-                coloredText = "<html><font color='red'>Invalid</font></html>";
+                this.setForeground(JBColor.\iRED);
+                this.text = "Invalid";
             }
-            value label = JLabel(coloredText);
-            return label;
+            return rendererComponent;
         }
     });
 
