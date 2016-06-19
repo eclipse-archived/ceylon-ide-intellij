@@ -2,6 +2,15 @@ import com.intellij.ide.util {
     ModuleRendererFactory,
     PsiElementModuleRenderer
 }
+import com.intellij.openapi.\imodule {
+    Module
+}
+import com.intellij.util.ui {
+    UIUtil
+}
+import com.redhat.ceylon.ide.common.model {
+    AnyProjectSourceFile
+}
 
 import java.awt {
     Component
@@ -16,18 +25,6 @@ import javax.swing {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
-}
-import com.intellij.util.ui {
-    UIUtil
-}
-import com.redhat.ceylon.ide.common.model {
-    SourceFile
-}
-import com.intellij.openapi.vfs {
-    VirtualFileManager
-}
-import com.intellij.psi {
-    PsiManager
 }
 
 shared class DeclarationModuleRendererFactory() extends ModuleRendererFactory() {
@@ -49,17 +46,19 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
 
             value cmp = super.getListCellRendererComponent(list, val, index, isSelected, cellHasFocus);
 
-            if (is SourceFile unit = val.decl.unit,
-                exists vfile = VirtualFileManager.instance.findFileByUrl(
-                    (unit.ceylonSourceFullPath.contains("!/") then "jar" else "file") + "://" + unit.ceylonSourceFullPath),
-                exists file = PsiManager.getInstance(val.project).findFile(vfile)) {
+            value mod = val.decl.unit.\ipackage.\imodule;
 
-                return delegate.getListCellRendererComponent(list, file, index, isSelected, cellHasFocus);
-            } else {
-                value mod = val.decl.unit.\ipackage.\imodule;
-                text = mod.nameAsString + "/" + mod.version;
+            value text = StringBuilder();
+            if (is AnyProjectSourceFile psf = val.decl.unit,
+                is Module proj = psf.resourceProject) {
+                text.append(proj.name).append(" ");
+                icon = icons.file;
+            }
+            else {
                 icon = icons.modules;
             }
+            text.append(mod.nameAsString).append("/").append(mod.version);
+            this.text = text.string;
 
             border = BorderFactory.createEmptyBorder(0, 0, 0, UIUtil.listCellHPadding);
             horizontalTextPosition = SwingConstants.left;

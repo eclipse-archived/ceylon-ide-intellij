@@ -9,7 +9,7 @@ import com.intellij.ide.util.treeView.AlphaComparator;
 import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.SourceComparator;
 import com.intellij.openapi.actionSystem.IdeActions;
-import com.intellij.openapi.module.*;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
@@ -21,7 +21,6 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.ide.common.model.IdeModule;
 import com.redhat.ceylon.model.typechecker.model.*;
-import com.redhat.ceylon.model.typechecker.model.Module;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -36,12 +35,12 @@ import java.util.*;
 public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private Project project;
-    private final Set<PhasedUnit> modules;
+    private final Set<PhasedUnit> phasedUnits;
 
     CeylonTypeHierarchyBrowser(Project project, PsiElement element) {
         super(project, element);
         this.project = project;
-        modules = collectPhasedUnits(project);
+        phasedUnits = collectPhasedUnits(project);
     }
 
     static Set<PhasedUnit> collectPhasedUnits(final Project project) {
@@ -65,6 +64,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                                  modules.getTypecheckerModules().getListOfModules();
                          TypeChecker typechecker = ceylonProject.getTypechecker();
                          if (typechecker != null) {
+                             //pick up stuff from edited source files
                              result.addAll(typechecker.getPhasedUnits().getPhasedUnits());
                          }
                          for (Module m : listOfModules) {
@@ -302,7 +302,7 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         Declaration model = getModel(descriptor.getDeclarationPsi());
         if (model instanceof ClassOrInterface
                 && !((ClassOrInterface) model).isFinal()) {
-            for (PhasedUnit unit : modules) {
+            for (PhasedUnit unit : phasedUnits) {
                 for (Declaration declaration : unit.getDeclarations()) {
                     if (declaration instanceof ClassOrInterface) {
                         ClassOrInterface ci = (ClassOrInterface) declaration;

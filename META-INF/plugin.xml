@@ -142,6 +142,7 @@
         <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>-->
 
         <gotoClassContributor implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoClassContributor"/>
+        <gotoSymbolContributor implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoSymbolContributor"/>
         <completion.contributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonCompletionContributor"/>
         <codeInsight.parameterInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.completion.CeylonParameterInfoHandler"/>
         <codeInsight.typeInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonExpressionTypeProvider"/>
