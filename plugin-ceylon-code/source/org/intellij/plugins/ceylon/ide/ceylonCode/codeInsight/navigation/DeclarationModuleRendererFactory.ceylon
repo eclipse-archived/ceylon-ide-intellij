@@ -52,7 +52,7 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
             if (is AnyProjectSourceFile psf = val.decl.unit,
                 is Module proj = psf.resourceProject) {
                 text.append(proj.name);
-                icon = icons.file;
+                icon = icons.project;
             }
             else {
                 text.append(mod.nameAsString).append("/").append(mod.version);

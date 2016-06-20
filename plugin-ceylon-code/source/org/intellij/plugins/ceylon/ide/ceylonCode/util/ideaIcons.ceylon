@@ -79,7 +79,8 @@ shared object icons {
     shared Icon addCorrection => AllIcons.General.add;
     shared Icon see => AllIcons.Actions.share;
     shared Icon returns => AllIcons.Actions.stepOut;
-    
+
+    shared Icon project => IconLoader.getIcon("/icons/module.png");
     shared Icon ceylon => IconLoader.getIcon("/icons/ceylon.png");
     shared Icon file => IconLoader.getIcon("/icons/ceylonFile.png");
 

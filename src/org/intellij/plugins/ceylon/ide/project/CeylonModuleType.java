@@ -52,12 +52,12 @@ public class CeylonModuleType extends ModuleType<CeylonModuleBuilder> {
 
     @Override
     public Icon getBigIcon() {
-        return icons_.get_().getCeylon();
+        return icons_.get_().getProject();
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean isOpened) {
-        return icons_.get_().getCeylon();
+        return icons_.get_().getProject();
     }
 
 
