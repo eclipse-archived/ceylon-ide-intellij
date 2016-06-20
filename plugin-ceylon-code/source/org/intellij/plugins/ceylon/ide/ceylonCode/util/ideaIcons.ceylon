@@ -84,6 +84,7 @@ shared object icons {
     shared Icon project => IconLoader.getIcon("/icons/module.png");
     shared Icon ceylon => IconLoader.getIcon("/icons/ceylon.png");
     shared Icon file => IconLoader.getIcon("/icons/ceylonFile.png");
+    shared Icon newFile => IconLoader.getIcon("/icons/ceylonNewFile.png");
 
     shared Icon problemsViewOk => IconLoader.getIcon("/icons/ceylonProblemsOk.png");
     shared Icon problemsViewErrors => IconLoader.getIcon("/icons/ceylonProblemsErrors.png");

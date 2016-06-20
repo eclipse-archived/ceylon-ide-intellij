@@ -26,7 +26,7 @@ public class CeylonAddFileAction extends CreateFromTemplateAction<PsiElement> {
     private ceylonFileFactory_ ceylonFileFactory = ceylonFileFactory_.get_();
 
     public CeylonAddFileAction() {
-        super("", message("ceylon.file.wizard.title"), icons.getFile());
+        super("", message("ceylon.file.wizard.title"), icons.getNewFile());
     }
 
     @NotNull
@@ -55,7 +55,7 @@ public class CeylonAddFileAction extends CreateFromTemplateAction<PsiElement> {
     protected void buildDialog(Project project, PsiDirectory directory, CreateFileFromTemplateDialog.Builder builder) {
         builder
                 .setTitle(message("ceylon.file.wizard.title"))
-                .addKind("File", icons.getFile(), "unit")
+                .addKind("File", icons.getNewFile(), "unit")
                 .addKind("Class", icons.getClasses(), "class")
                 .addKind("Function", icons.getMethods(), "function")
                 .addKind("Interface", icons.getInterfaces(), "interface")
