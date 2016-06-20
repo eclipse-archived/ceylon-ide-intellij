@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    javaClass
+}
+
 import com.intellij.codeInsight.navigation {
     GotoTargetRendererProvider,
     GotoTargetHandler
@@ -11,6 +15,9 @@ import com.intellij.navigation {
 import com.intellij.psi {
     PsiElement
 }
+import com.intellij.psi.util {
+    PsiTreeUtil
+}
 
 import javax.swing {
     Icon
@@ -23,29 +30,54 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-shared class GotoTargetRenderer() satisfies GotoTargetRendererProvider {
+shared class GotoTargetRenderer()
+        extends PsiElementListCellRenderer<PsiElement>()
+        satisfies GotoTargetRendererProvider {
     
-    shared actual PsiElementListCellRenderer<out PsiElement> getRenderer(
-        PsiElement psiElement, GotoTargetHandler.GotoData gotoData) 
-            => object extends PsiElementListCellRenderer<PsiElement>() {
-        
-        shared actual String? getContainerText(PsiElement t, String string) 
-                => if (is NavigationItem t) 
-                then t.presentation?.locationString 
-                else null;
-        
-        shared actual String? getElementText(PsiElement t) 
-                => if (is NavigationItem t)
-                    then t.presentation?.presentableText
-                /*else if (is CeylonPsi.ObjectExpressionPsi t)
-                    then "anonymous in " + t.containingFile.name*/
-                else t.containingFile.name;
-        
-        iconFlags => 0;
-        
-        shared actual Icon? getIcon(PsiElement psiElement) 
-                => if (is CeylonPsi.ObjectExpressionPsi psiElement) 
-                then icons.objects
-                else super.getIcon(psiElement);
-    };
+    getRenderer(PsiElement psiElement, GotoTargetHandler.GotoData gotoData)
+            => this;
+
+    iconFlags => 0; //TODO?
+
+    shared actual String getContainerText(PsiElement element, String string) {
+        if (is NavigationItem element,
+            exists p = element.presentation,
+            exists loc = p.locationString) {
+            return loc;
+        }
+        else if (exists parent
+                    = PsiTreeUtil.getParentOfType(element,
+                        javaClass<CeylonPsi.DeclarationPsi>())) {
+            return getContainerText(parent, string);
+        }
+        else {
+            return element.containingFile.containingDirectory.name;
+        }
+    }
+
+    shared actual String getElementText(PsiElement element) {
+        if (is NavigationItem element,
+            exists p = element.presentation,
+            exists text = p.presentableText) {
+            return text;
+        }
+        else if (exists parent
+                    = PsiTreeUtil.getParentOfType(element,
+                        javaClass<CeylonPsi.DeclarationPsi>())) {
+            return getElementText(parent);
+        }
+        else {
+            return element.containingFile.name;
+        }
+    }
+
+    shared actual Icon? getIcon(PsiElement psiElement) {
+        if (is CeylonPsi.ObjectExpressionPsi psiElement) {
+            return icons.objects;
+        }
+        else {
+            return super.getIcon(psiElement);
+        }
+    }
+
 }
