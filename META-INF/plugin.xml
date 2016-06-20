@@ -164,6 +164,7 @@
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonVariableRenameHandler"/>
         <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonRenameTypeInputValidator"/>
         <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonRenameTypedInputValidator"/>
+        <lang.namesValidator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonNamesValidator"/>
         <nameSuggestionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonNameSuggestionProvider"/>
         <codeInsight.implementMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.CeylonImplementMembersAction"/>
         <codeInsight.overrideMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.action.CeylonOverrideMembersAction"/>

@@ -32,6 +32,9 @@ import java.util.regex {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
 }
+import com.intellij.lang.refactoring {
+    NamesValidator
+}
 
 shared class CeylonRenameTypeInputValidator() satisfies RenameInputValidatorEx {
 
@@ -52,9 +55,7 @@ shared class CeylonRenameTypeInputValidator() satisfies RenameInputValidatorEx {
         return null;
     }
 
-    shared actual Boolean isInputValid(String newName, PsiElement element, ProcessingContext processingContext) {
-        return true;
-    }
+    isInputValid(String newName, PsiElement element, ProcessingContext processingContext) => true;
 
     shared actual ElementPattern<out PsiElement> pattern
             => PlatformPatterns.psiElement(javaClass<CeylonPsi.TypeDeclarationPsi>());
@@ -80,11 +81,21 @@ shared class CeylonRenameTypedInputValidator() satisfies RenameInputValidatorEx 
         return null;
     }
 
-    shared actual Boolean isInputValid(String newName, PsiElement element, ProcessingContext processingContext) {
-        return true;
-    }
+    isInputValid(String newName, PsiElement element, ProcessingContext processingContext) => true;
 
     shared actual ElementPattern<out PsiElement> pattern
             => PlatformPatterns.psiElement(javaClass<CeylonPsi.TypedDeclarationPsi>());
+
+}
+
+shared class CeylonNamesValidator() satisfies NamesValidator {
+
+    isIdentifier(String string, Project project)
+            => !string.empty
+            && Pattern.matches("^[a-zA-Z_]\\w*$", JString(string))
+            && !escaping.isKeyword(string);
+
+    isKeyword(String string, Project project)
+            => escaping.isKeyword(string);
 
 }
