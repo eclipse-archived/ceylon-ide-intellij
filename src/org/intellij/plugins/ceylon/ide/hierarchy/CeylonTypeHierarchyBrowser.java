@@ -21,6 +21,7 @@ import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.ide.common.model.IdeModule;
 import com.redhat.ceylon.model.typechecker.model.*;
+import com.redhat.ceylon.model.typechecker.model.Class;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -306,9 +307,10 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                 for (Declaration declaration : unit.getDeclarations()) {
                     if (declaration instanceof ClassOrInterface) {
                         ClassOrInterface ci = (ClassOrInterface) declaration;
-                        Type extendedType = ci.getExtendedType();
-                        if (extendedType != null) {
-                            if (extendedType.getDeclaration().equals(model)) {
+                        if (model instanceof Class) {
+                            Type extendedType = ci.getExtendedType();
+                            if (extendedType != null
+                                    && extendedType.getDeclaration().equals(model)) {
                                 PsiElement psiElement
                                         = CeylonReference.resolveDeclaration(ci, project);
                                 if (psiElement instanceof CeylonPsi.DeclarationPsi) {
@@ -317,13 +319,16 @@ public class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                                 }
                             }
                         }
-                        for (Type satisfiedType : ci.getSatisfiedTypes()) {
-                            if (satisfiedType.getDeclaration().equals(model)) {
-                                PsiElement psiElement
-                                        = CeylonReference.resolveDeclaration(ci, project);
-                                if (psiElement instanceof CeylonPsi.DeclarationPsi) {
-                                    result.add(new TypeHierarchyNodeDescriptor(descriptor,
-                                            (CeylonPsi.DeclarationPsi) psiElement));
+                        if (model instanceof Interface) {
+                            for (Type satisfiedType : ci.getSatisfiedTypes()) {
+                                if (satisfiedType != null
+                                        && satisfiedType.getDeclaration().equals(model)) {
+                                    PsiElement psiElement
+                                            = CeylonReference.resolveDeclaration(ci, project);
+                                    if (psiElement instanceof CeylonPsi.DeclarationPsi) {
+                                        result.add(new TypeHierarchyNodeDescriptor(descriptor,
+                                                (CeylonPsi.DeclarationPsi) psiElement));
+                                    }
                                 }
                             }
                         }
