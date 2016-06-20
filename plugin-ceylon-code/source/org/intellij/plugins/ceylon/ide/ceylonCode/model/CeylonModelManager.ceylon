@@ -292,8 +292,8 @@ shared class CeylonModelManager(model)
                                                 .filter((file) => file.fileType == ceylonFileType));
                                         
                                     ceylonEditedFiles.each(void (VirtualFile element) {
-                                        if (is CeylonFile ceylonFile = concurrencyManager.needReadAccess(()=>
-                                                psiManager(model.ideaProject).findFile(element)),
+                                        if (is CeylonFile ceylonFile = concurrencyManager.needReadAccess(()
+                                                => psiManager(model.ideaProject).findFile(element)),
                                             exists localAnalyzer = ceylonFile.localAnalyzer) {
                                             localAnalyzer.scheduleForcedTypechecking();
                                         }
