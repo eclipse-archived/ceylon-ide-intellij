@@ -74,7 +74,7 @@ shared class ExtractValueHandler() extends AbstractExtractHandler() {
             });
             
             value refactoring = IdeaExtractValueRefactoring(file, phasedUnit, localAnalysisResult.tokens, editor, node);
-            value name = nodes.nameProposals(node).first;
+            value name = nodes.nameProposals(if (is Tree.Term node) then node else null).first;
             refactoring.newName = name;
             return refactoring.extractInFile(project, file);
         }
