@@ -139,7 +139,6 @@
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes"/>
         <stubIndex implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex"/>
         <qualifiedNameProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonQualifiedNameProvider"/>
-        <!--<stubIndex implementation="org.intellij.plugins.ceylon.psi.stub.ModuleIndex"/>-->
 
         <gotoClassContributor implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoClassContributor"/>
         <gotoSymbolContributor implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoSymbolContributor"/>
@@ -194,7 +193,6 @@
         <referencesSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.ImportAliasReferencesSearch"/>
         <!--<java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>-->
         <!--<java.shortNamesCache implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonShortNamesCache"/>-->
-        <!--<psi.referenceContributor language="Ceylon" implementation="org.intellij.plugins.ceylon.codeInsight.resolve.CeylonReferenceContributor"/>-->
 
         <buildProcess.parametersProvider
                 implementation="org.intellij.plugins.ceylon.ide.build.BuildClasspathProvider"/>
@@ -207,7 +205,7 @@
         <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonJsRunConfigurationType"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationProducer"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonJsRunConfigurationProducer"/>
-        <runLineMarkerContributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.runner.CeylonRunLineMarkerContributor"/>
+        <!--<runLineMarkerContributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.runner.CeylonRunLineMarkerContributor"/>-->
         <debugger.javaDebugAware implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonDebugAware"/>
         <debugger.positionManagerFactory implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonPositionManagerFactory"/>
         <debugger.nodeRenderer implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonNodeRenderer"/>

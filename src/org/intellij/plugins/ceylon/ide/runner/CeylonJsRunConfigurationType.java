@@ -8,6 +8,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Run/Debug configuration type for the JS backend.
+ */
 public class CeylonJsRunConfigurationType extends ConfigurationTypeBase {
 
     protected CeylonJsRunConfigurationType() {

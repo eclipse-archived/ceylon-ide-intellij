@@ -3,18 +3,17 @@ package org.intellij.plugins.ceylon.ide.runner;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.RunConfigurationProducer;
 import com.intellij.execution.configurations.ConfigurationType;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.common.Backend;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.CeylonIdeConfig;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.model.typechecker.model.Module;
+import com.redhat.ceylon.model.typechecker.model.Unit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -24,10 +23,20 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 
+import static com.intellij.openapi.extensions.Extensions.getExtensions;
+import static com.intellij.util.containers.ContainerUtil.findInstance;
+
+/**
+ * Produces run configurations for the JVM. Can be overriden to produce configuration for other
+ * backends.
+ */
 public class CeylonRunConfigurationProducer extends RunConfigurationProducer<CeylonRunConfiguration> {
 
     protected CeylonRunConfigurationProducer() {
-        super(ContainerUtil.findInstance(Extensions.getExtensions(ConfigurationType.CONFIGURATION_TYPE_EP), CeylonRunConfigurationType.class));
+        super(findInstance(
+                getExtensions(ConfigurationType.CONFIGURATION_TYPE_EP),
+                CeylonRunConfigurationType.class
+        ));
     }
 
     CeylonRunConfigurationProducer(ConfigurationType configurationType) {
@@ -41,7 +50,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
             return false;
         }
         CeylonProject project = projects.getProject(context.getModule());
-        if (project == null || !isBackendEnabled(project.getIdeConfiguration())) {
+        if (project == null || !isBackendEnabled(project.getIdeConfiguration(), context)) {
             return false;
         }
         final RunConfigParams params = getRunConfigParams(sourceElement.get());
@@ -73,7 +82,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
 
         return params != null
                 && params.equals(new RunConfigParams(rc))
-                && isBackendEnabled(project.getIdeConfiguration());
+                && isBackendEnabled(project.getIdeConfiguration(), context);
     }
 
     private RunConfigParams getRunConfigParams(PsiElement psiElement) {
@@ -137,8 +146,28 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
         return Backend.Java;
     }
 
-    boolean isBackendEnabled(CeylonIdeConfig config) {
-        return config.getCompileToJvm() != null && config.getCompileToJvm().booleanValue();
+    boolean isBackendEnabled(CeylonIdeConfig config, ConfigurationContext context) {
+        return config.getCompileToJvm() != null
+                && config.getCompileToJvm().booleanValue()
+                && isCompatibleWithModuleBackends(context);
+    }
+
+    boolean isCompatibleWithModuleBackends(ConfigurationContext context) {
+        PsiElement location = context.getPsiLocation();
+
+        if (location != null && location.getContainingFile() instanceof CeylonFile) {
+            CeylonFile file = (CeylonFile) location.getContainingFile();
+
+            if (file.getCompilationUnit() != null) {
+                Unit unit = file.getCompilationUnit().getUnit();
+                if (unit != null) {
+                    Module mod = unit.getPackage().getModule();
+                    return mod.getNativeBackends().none()
+                            || mod.getNativeBackends().supports(getBackend());
+                }
+            }
+        }
+        return false;
     }
 
     static class RunConfigParams {

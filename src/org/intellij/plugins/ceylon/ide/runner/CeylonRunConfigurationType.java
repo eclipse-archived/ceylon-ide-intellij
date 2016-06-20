@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 /**
- * Run configuration type for Ceylon files.
+ * Run/Debug configuration type for the JVM backend.
  */
 public class CeylonRunConfigurationType implements ConfigurationType {
 
