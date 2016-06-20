@@ -36,9 +36,9 @@ shared class CeylonIconProvider() extends IconProvider() {
         case (is CeylonFile) {
             String fileName = element.name;
             if (fileName==ModuleManager.packageFile) {
-                return icons.descriptors;
+                return icons.packageDescriptors;
             } else if (fileName==ModuleManager.moduleFile) {
-                return icons.descriptors;
+                return icons.moduleDescriptors;
             }
             else {
                 return null;

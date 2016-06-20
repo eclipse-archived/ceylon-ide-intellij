@@ -48,7 +48,8 @@ shared object icons {
     shared Icon packageArchives => PlatformIcons.packageIcon;
     shared Icon moduleFolders => IconLoader.getIcon("/icons/moduleFolder.png");
     shared Icon moduleArchives => IconLoader.getIcon("/icons/moduleArchive.png");
-    shared Icon descriptors => IconLoader.getIcon("/icons/descriptor.png");
+    shared Icon moduleDescriptors => IconLoader.getIcon("/icons/descriptor.png");
+    shared Icon packageDescriptors => IconLoader.getIcon("/icons/packageDescriptor.png");
     shared Icon classes => PlatformIcons.classIcon;
     shared Icon abstractClasses => PlatformIcons.abstractClassIcon;
     shared Icon interfaces => PlatformIcons.interfaceIcon;
