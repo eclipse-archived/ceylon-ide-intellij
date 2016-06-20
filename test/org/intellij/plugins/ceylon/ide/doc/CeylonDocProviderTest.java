@@ -7,15 +7,11 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.model.BaseCeylonProject;
-import com.redhat.ceylon.ide.common.platform.CommonDocument;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
-import org.antlr.runtime.CommonToken;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class CeylonDocProviderTest extends LightCodeInsightTestCase {
 
@@ -23,17 +19,17 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
 
     public CeylonDocProviderTest() {
         tc = new TypeCheckerBuilder()
-                .addSrcDirectory(new File("plugin-ceylon-code/test-resources/"))
+                .addSrcDirectory(new File("testdata/"))
                 .getTypeChecker();
 
         tc.process();
     }
 
-    void testDoc(String baseName, int cursorOffset) throws IOException {
+    private void testDoc(String baseName, int cursorOffset) throws IOException {
         testDoc(baseName, cursorOffset, "");
     }
 
-    void testDoc(String baseName, int cursorOffset, String testName) throws IOException {
+    private void testDoc(String baseName, int cursorOffset, String testName) throws IOException {
         String sourceFileName = "documentation/" + baseName + ".ceylon";
         String suffix = testName.isEmpty() ? "" : "." + testName;
         String expectedFileName = sourceFileName + suffix + ".html";
@@ -41,10 +37,11 @@ public class CeylonDocProviderTest extends LightCodeInsightTestCase {
         final PhasedUnit pu = tc.getPhasedUnitFromRelativePath(sourceFileName);
         final Tree.CompilationUnit cu = pu.getCompilationUnit();
 
-        LocalAnalysisResult params = null;
-        String doc = new IdeaDocGenerator(tc).getDocumentation(cu, cursorOffset, params).toString();
+        IdeaDocGenerator generator = new IdeaDocGenerator(tc);
+        LocalAnalysisResult params = generator.DocParams$new$(pu, getProject());
+        String doc = generator.getDocumentation(cu, cursorOffset, params).toString();
 
-        File expectedFile = new File("plugin-ceylon-code/test-resources/" + expectedFileName);
+        File expectedFile = new File("testdata/" + expectedFileName);
         if (expectedFile.exists()) {
             String expectedContent = FileUtil.loadFile(expectedFile);
 
