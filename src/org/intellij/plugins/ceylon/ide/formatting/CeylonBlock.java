@@ -49,7 +49,7 @@ class CeylonBlock implements Block {
     );
     private static final List<IElementType> INDENT_CHILDREN_CONTINUE = Arrays.asList(
             CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES,
-            CeylonTypes.LAZY_SPECIFIER_EXPRESSION
+            CeylonTypes.LAZY_SPECIFIER_EXPRESSION, CeylonTypes.SPECIFIER_EXPRESSION
     );
 
     private static final Collection<IElementType> TYPES_REQUIRING_NO_LEFT_SPACING = Arrays.asList(
@@ -119,9 +119,6 @@ class CeylonBlock implements Block {
                     indent = Indent.getNormalIndent();
                 }
                 if (child.getElementType() == CeylonTypes.LISTED_ARGUMENT) {
-                    indent = Indent.getNormalIndent();
-                }
-                if (child.getElementType() == CeylonTypes.SPECIFIER_EXPRESSION) {
                     indent = Indent.getNormalIndent();
                 }
                 blocks.add(new CeylonBlock(child, indent));
