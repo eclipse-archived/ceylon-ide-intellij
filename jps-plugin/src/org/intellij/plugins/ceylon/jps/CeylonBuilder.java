@@ -27,6 +27,7 @@ import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
@@ -269,16 +270,55 @@ class CeylonBuilder extends ModuleLevelBuilder {
             }
         }
 
-        List<String> moduleNames = expandWildcards(
+        List<String> moduleNames = new ArrayList<>(expandWildcards(
                 getSourceRoots(chunk),
                 Collections.singletonList("*"),
                 (backend == Backend.Java)
                         ? com.redhat.ceylon.common.Backend.Java
                         : com.redhat.ceylon.common.Backend.JavaScript
-        );
+        ));
+        if (defaultModulePresent(chunk)) {
+            moduleNames.add("default");
+        }
         options.setModules(moduleNames);
 
         return options;
+    }
+
+    private boolean defaultModulePresent(ModuleChunk chunk) {
+        for (File root : getSourceRoots(chunk)) {
+            if (containsDefaultModule(root)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private FilenameFilter ceylonFilter = new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.endsWith(".ceylon")
+                    && !new File(dir, "module.ceylon").exists();
+        }
+    };
+    private boolean containsDefaultModule(File file) {
+        File[] files = file.listFiles(ceylonFilter);
+        if (files != null && files.length > 0) {
+            return true;
+        }
+
+        File[] children = file.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                if (child.isDirectory() && containsDefaultModule(child)) {
+                    return true;
+                }
+                if (child.isFile() && child.getName().equals("module.ceylon")) {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     private List<File> getSourceRoots(ModuleChunk chunk) {
