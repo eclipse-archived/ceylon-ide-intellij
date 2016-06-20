@@ -67,12 +67,24 @@ shared class CeylonImplementationsSearch()
             exists modules = project.modules) {
 
             if (exists pus = project.typechecker?.phasedUnits) {
-                scanPhasedUnits(CeylonIterable(pus.phasedUnits), decl, node, sourceElement, consumer);
+                scanPhasedUnits {
+                    pus = CeylonIterable(pus.phasedUnits);
+                    decl = decl;
+                    node = node;
+                    sourceElement = sourceElement;
+                    consumer = consumer;
+                };
             }
 
             if (is ExternalPhasedUnit pu = ceylonFile.localAnalysisResult?.lastPhasedUnit) {
                 for (mod in modules) {
-                    scanPhasedUnits(mod.phasedUnits, decl, node, sourceElement, consumer);
+                    scanPhasedUnits {
+                        pus = mod.phasedUnits;
+                        decl = decl;
+                        node = node;
+                        sourceElement = sourceElement;
+                        consumer = consumer;
+                    };
                 }
             }
         }
@@ -102,7 +114,7 @@ shared class CeylonImplementationsSearch()
                         shared actual void run() {
                             value declaringFile = getDeclaringFile(d.unit, sourceElement.project);
                             if (is CeylonFile declaringFile) {
-                                (declaringFile).ensureTypechecked();
+                                declaringFile.ensureTypechecked();
                             }
 
                             consumer.process(findPsiElement(d, declaringFile));

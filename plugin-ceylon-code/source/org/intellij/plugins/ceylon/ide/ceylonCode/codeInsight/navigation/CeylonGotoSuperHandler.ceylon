@@ -79,7 +79,7 @@ shared class CeylonGotoSuperHandler()
     alias Source
         => SourceTypes | SourceMembers | SourceConstructors;
 
-    featureUsedKey => GotoSuperAction.\iFEATURE_ID;
+    featureUsedKey => GotoSuperAction.featureId;
 
     shared actual GotoData? getSourceAndTargetElements(Editor editor, PsiFile file)
             => if (exists source = findSource(editor, file))
