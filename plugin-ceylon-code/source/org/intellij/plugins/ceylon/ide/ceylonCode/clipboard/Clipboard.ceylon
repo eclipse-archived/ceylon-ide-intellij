@@ -152,43 +152,46 @@ shared class CeylonCopyPastePostProcessor()
         if (!references.empty,
             is CeylonFile file = PsiUtilBase.getPsiFileInEditor(editor, project),
             exists reference = references[0]) {
-            value unit = file.compilationUnit.unit;
-            value items = {
-                for (dec->al in reference.resolve(file))
-                if (dec.unit.\ipackage!=unit.\ipackage,
-                    every { for (i in unit.imports) i.declaration!=dec})
+            if (exists phasedUnit = file.localAnalysisResult.lastPhasedUnit) {
+                value pack = phasedUnit.\ipackage;
+                value unit = phasedUnit.unit;
+                value items = {
+                    for (dec->al in reference.resolve(file))
+                    if (dec.unit.\ipackage != pack,
+                        every { for (i in unit.imports) i.declaration != dec })
                     let (p = dec.unit.\ipackage, m = p.\imodule)
-                        Item(icons.forDeclaration(dec),
-                            color(dec),
-                            dec.name,
-                            p.nameAsString,
-                            "``m.nameAsString`` \"``m.version``\"",
-                            dec->al)
-            };
-            if (!items.empty) {
-                value dialog
-                    = PasteImportsDialog(project,
-                        items.sort(byIncreasing(Item.label)));
-                dialog.init();
-                if (dialog.showAndGet()) {
-                    value insertEdits = pasteImports {
-                        references = map {
-                            for (it in dialog.selectedElements)
-                            if (is Declaration->String entry = it.payload)
+                    Item(icons.forDeclaration(dec),
+                        color(dec),
+                        dec.name,
+                        p.nameAsString,
+                        "``m.nameAsString`` \"``m.version``\"",
+                        dec->al)
+                };
+                if (!items.empty) {
+                    value dialog
+                        = PasteImportsDialog(project,
+                            items.sort(byIncreasing(Item.label)));
+                    dialog.init();
+                    if (dialog.showAndGet()) {
+                        value insertEdits = pasteImports {
+                            references = map {
+                                for (it in dialog.selectedElements)
+                                if (is Declaration->String entry = it.payload)
                                 entry
+                            };
+                            doc = IdeaDocument(editor.document);
+                            rootNode = phasedUnit.compilationUnit;
                         };
-                        doc = IdeaDocument(editor.document);
-                        rootNode = file.compilationUnit;
-                    };
-                    if (!insertEdits.empty) {
-                        object extends WriteCommandAction<Nothing>(file.project, file) {
-                            shared actual void run(Result<Nothing> result) {
-                                value change = IdeaTextChange(IdeaDocument(editor.document));
-                                change.initMultiEdit();
-                                insertEdits.each(change.addEdit);
-                                change.apply();
-                            }
-                        }.execute();
+                        if (!insertEdits.empty) {
+                            object extends WriteCommandAction<Nothing>(file.project, file) {
+                                shared actual void run(Result<Nothing> result) {
+                                    value change = IdeaTextChange(IdeaDocument(editor.document));
+                                    change.initMultiEdit();
+                                    insertEdits.each(change.addEdit);
+                                    change.apply();
+                                }
+                            }.execute();
+                        }
                     }
                 }
             }
