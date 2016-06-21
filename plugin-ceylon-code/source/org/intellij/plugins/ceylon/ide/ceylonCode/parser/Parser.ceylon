@@ -32,22 +32,23 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub {
 
 shared class CeylonParserDefinition() satisfies ParserDefinition {
 
-    TokenSet wsTokens = TokenSet.create(TokenTypes.ws.tokenType);
-
-    createLexer(Project project) 
+    createLexer(Project project)
             => CeylonAntlrToIntellijLexerAdapter();
 
     fileNodeType => CeylonStubTypes.ceylonFile;
 
-    whitespaceTokens => wsTokens;
+    createFile = CeylonFile;
+
+    whitespaceTokens
+            = TokenSet.create(TokenTypes.ws.tokenType);
 
     commentTokens
-            => TokenSet.create(
+            = TokenSet.create(
                 TokenTypes.lineComment.tokenType,
                 TokenTypes.multiComment.tokenType);
 
     stringLiteralElements
-            => TokenSet.create(
+            = TokenSet.create(
                 TokenTypes.stringLiteral.tokenType,
                 TokenTypes.stringStart.tokenType,
                 TokenTypes.stringMid.tokenType,
@@ -58,9 +59,6 @@ shared class CeylonParserDefinition() satisfies ParserDefinition {
             => if (node.elementType == CeylonTypes.specifierStatement)
             then SpecifierStatementPsiIdOwner(node)
             else CeylonPsiFactory.createElement(node);
-
-    createFile(FileViewProvider viewProvider)
-            => CeylonFile(viewProvider);
 
     spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right)
             => SpaceRequirements.may;
