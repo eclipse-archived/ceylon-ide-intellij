@@ -20,6 +20,10 @@ import java.util.List;
 
 public class CeylonFoldingBuilder extends FoldingBuilderEx {
 
+    private static final List<com.intellij.psi.tree.IElementType> BLOCK_ELEMENT_TYPES
+            = Arrays.asList(CeylonTypes.BLOCK, CeylonTypes.CLASS_BODY, CeylonTypes.INTERFACE_BODY,
+                            CeylonTypes.IMPORT_MODULE_LIST);
+
     @NotNull
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
@@ -95,10 +99,18 @@ public class CeylonFoldingBuilder extends FoldingBuilderEx {
     @Nullable
     @Override
     public String getPlaceholderText(@NotNull ASTNode node) {
-        return Arrays.asList(
-                CeylonTypes.BLOCK, CeylonTypes.CLASS_BODY, CeylonTypes.INTERFACE_BODY,
-                CeylonTypes.IMPORT_MODULE_LIST
-        ).contains(node.getElementType()) ? "{...}" : "...";
+        if (BLOCK_ELEMENT_TYPES.contains(node.getElementType())) {
+            String text = normalize(node.getText());
+            return text.length() < 40 ? text : "{...}";
+        }
+        else {
+            return "...";
+        }
+    }
+
+    @NotNull
+    private String normalize(@NotNull String text) {
+        return ceylon.language.String.instance(text).getNormalized().trim().toString();
     }
 
     @Override
