@@ -343,10 +343,18 @@ public class IdeaCeylonParser extends IStubFileElementType {
 
             while (index < targetIndex) {
                 Token token = tokens.remove();
-                parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), token));
+                String text = token.getText();
+                if (text.endsWith("\n")) {
+                    parent.rawAddChildrenWithoutNotifications(new LeafPsiElement(getElementType(token.getType()),
+                            text.substring(0, text.length()-1)));
+                    parent.rawAddChildrenWithoutNotifications(new PsiWhiteSpaceImpl("\n"));
+                }
+                else {
+                    parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), token));
+                }
                 index += getTokenLength(token);
                 if (verbose) {
-                    System.out.println("c \"" + token.getText() + "\"");
+                    System.out.println("c \"" + text + "\"");
                 }
             }
 
