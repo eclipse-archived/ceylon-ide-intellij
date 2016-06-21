@@ -6,9 +6,6 @@ import com.intellij.lang {
 import com.intellij.openapi.project {
     Project
 }
-import com.intellij.psi {
-    FileViewProvider
-}
 import com.intellij.psi.tree {
     TokenSet
 }
