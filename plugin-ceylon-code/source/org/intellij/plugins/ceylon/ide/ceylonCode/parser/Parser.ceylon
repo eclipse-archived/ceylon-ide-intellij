@@ -55,7 +55,7 @@ shared class CeylonParserDefinition() satisfies ParserDefinition {
                 TokenTypes.charLiteral.tokenType);
 
     createElement(ASTNode node)
-            => if (node.elementType == CeylonTypes.\iSPECIFIER_STATEMENT)
+            => if (node.elementType == CeylonTypes.specifierStatement)
             then SpecifierStatementPsiIdOwner(node)
             else CeylonPsiFactory.createElement(node);
 
