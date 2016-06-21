@@ -1,6 +1,7 @@
 import ceylon.interop.java {
     javaClass,
-    JavaRunnable
+    JavaRunnable,
+    javaString
 }
 
 import com.intellij.facet {
@@ -17,9 +18,6 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.extensions {
     Extensions
 }
-import com.intellij.openapi.externalSystem.service.project {
-    IdeModifiableModelsProviderImpl
-}
 import com.intellij.openapi.\imodule {
     Module,
     ModuleUtil
@@ -31,7 +29,8 @@ import com.intellij.openapi.project {
 }
 import com.intellij.openapi.roots {
     ModuleRootManager,
-    OrderRootType
+    OrderRootType,
+    LibraryOrderEntry
 }
 import com.intellij.openapi.ui {
     Messages
@@ -62,6 +61,9 @@ import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    IdePhasedUnit
+}
 import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitorChild
 }
@@ -82,14 +84,17 @@ import java.lang {
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerInvoker
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    vfsKeychain
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import com.redhat.ceylon.ide.common.typechecker {
-    IdePhasedUnit
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
+    vfsKeychain
+}
+import com.redhat.ceylon.model.cmr {
+    ArtifactResult
+}
+import com.intellij.openapi.externalSystem.service.project {
+    IdeModifiableModelsProviderImpl
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -99,11 +104,11 @@ shared class IdeaCeylonProject(ideArtifact, model)
     object addModuleArchiveHook
             satisfies BuildHook<Module, VirtualFile, VirtualFile, VirtualFile> {
 
-        File? findLanguageCar() {
+        ArtifactResult? findLanguageCar() {
             String moduleName = "ceylon.language";
             String moduleVersion = TypeChecker.languageModuleVersion;
 
-            return repositoryManager.getArtifact(
+            return repositoryManager.getArtifactResult(
                 ArtifactContext(null, moduleName, moduleVersion, ArtifactContext.car)
             );
         }
@@ -114,8 +119,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 if (exists languageModuleArtifact = findLanguageCar()) {
                     value runnable = JavaRunnable(() {
                         try {
-                            value path = languageModuleArtifact.canonicalPath;
-                            addLibrary(path, true);
+                            addLibrary(languageModuleArtifact, true);
                         } catch (IOException e) {
                             platformUtils.log(Status._ERROR,
                                 "Can't add ceylon language to classpath", e);
@@ -281,35 +285,52 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             };
     
-    value libraryName => "Ceylon dependencies";
-    
-    shared void addLibrary(String jarFile, Boolean clear = false) {
+    shared void addLibrary(ArtifactResult artifact, Boolean clear = false) {
         value lock = application.acquireWriteActionLock(javaClass<IdeaCeylonProject>());
         value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
-        value lib = provider.getLibraryByName(libraryName) else provider.createLibrary(libraryName);
-        value model = lib.modifiableModel;
-        
+        value mrm = provider.getModifiableRootModel(ideArtifact);
+
         try {
             if (clear) {
-                for (url in model.getUrls(OrderRootType.\iCLASSES)) {
-                    model.removeRoot(url.string, OrderRootType.\iCLASSES);
+                for (e in mrm.orderEntries) {
+                    if (is LibraryOrderEntry e,
+                        e.libraryName.startsWith("Ceylon: ") || e.libraryName == "Ceylon dependencies") {
+                        mrm.removeOrderEntry(e);
+                    }
                 }
             }
 
-            value srcFile = VirtualFileManager.instance
-                .findFileByUrl(JarFileSystem.\iPROTOCOL_PREFIX + jarFile + JarFileSystem.\iJAR_SEPARATOR);
-            
-            model.addRoot(srcFile, OrderRootType.\iCLASSES);
-            
-            value mrm = provider.getModifiableRootModel(ideArtifact);
+            value libraryName = "Ceylon: " + artifact.name() + "/" + artifact.version();
+            value lib = provider.getLibraryByName(libraryName)
+                else provider.createLibrary(libraryName);
+            value libModel = provider.getModifiableLibraryModel(lib);
+
+            void updateUrl(OrderRootType type, VirtualFile file) {
+                if (!libModel.getUrls(type).iterable.contains(javaString(file.string))) {
+                    libModel.addRoot(file, type);
+                }
+            }
+
+            value carFile = VirtualFileManager.instance
+                .findFileByUrl(JarFileSystem.protocolPrefix + artifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
+
+            updateUrl(OrderRootType.classes, carFile);
+
+            value sourceContext = ArtifactContext(null, artifact.name(), artifact.version(), ArtifactContext.src);
+            if (exists sourceArtifact = repositoryManager.getArtifactResult(sourceContext)) {
+                value srcFile = VirtualFileManager.instance
+                    .findFileByUrl(JarFileSystem.protocolPrefix + sourceArtifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
+                updateUrl(OrderRootType.sources, srcFile);
+            }
+
             if (!exists entry = mrm.findLibraryOrderEntry(lib)) {
                 mrm.addLibraryEntry(lib);
             }
-            
-            model.commit();
+
             provider.commit();
         } catch (e) {
-            model.dispose();
+            platformUtils.log(Status._ERROR, "Couldn't add library", e);
+            provider.dispose();
         } finally {
             lock.finish();
         }

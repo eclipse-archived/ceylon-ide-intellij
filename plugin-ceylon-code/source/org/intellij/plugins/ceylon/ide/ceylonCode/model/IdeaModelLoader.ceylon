@@ -64,7 +64,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             // the process
             application.invokeAndWait(object satisfies Runnable {
                 shared actual void run() {
-                    project.addLibrary(artifact.artifact().absolutePath);
+                    project.addLibrary(artifact);
                 }
             }, ModalityState.any());
         }
