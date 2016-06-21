@@ -6,6 +6,9 @@ import com.intellij.lang {
 import com.intellij.openapi.project {
     Project
 }
+import com.intellij.psi {
+    FileViewProvider
+}
 import com.intellij.psi.tree {
     TokenSet
 }
@@ -34,8 +37,6 @@ shared class CeylonParserDefinition() satisfies ParserDefinition {
 
     fileNodeType => CeylonStubTypes.ceylonFile;
 
-    createFile = CeylonFile;
-
     whitespaceTokens
             = TokenSet.create(TokenTypes.ws.tokenType);
 
@@ -56,6 +57,9 @@ shared class CeylonParserDefinition() satisfies ParserDefinition {
             => if (node.elementType == CeylonTypes.specifierStatement)
             then SpecifierStatementPsiIdOwner(node)
             else CeylonPsiFactory.createElement(node);
+
+    createFile(FileViewProvider viewProvider)
+            => CeylonFile(viewProvider);
 
     spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right)
             => SpaceRequirements.may;
