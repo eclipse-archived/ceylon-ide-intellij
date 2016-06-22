@@ -53,7 +53,8 @@ import com.intellij.ui {
     SimpleTextAttributes
 }
 import com.intellij.ui.components {
-    JBList
+    JBList,
+    JBLabel
 }
 import com.redhat.ceylon.cmr.api {
     ModuleVersionDetails
@@ -298,7 +299,7 @@ shared class IdeaQuickFixData(
                 image = icons.correction;
                 qualifiedNameIsPath = qualifiedNameIsPath;
                 hint = hint;
-                void callback(Project project, Editor editor, PsiFile f) {
+                void callback(Project project, Editor editor, PsiFile file) {
                     value candidates = ArrayList<Resolution>();
                     resolutions = candidates;
                     ProgressManager.instance
@@ -309,7 +310,32 @@ shared class IdeaQuickFixData(
                             resolutions = null;
                             if (candidates.empty) {
                                 //TODO show it at the right location!
-                                HintManager.instance.showErrorHint(editor, "No resolutions found");
+                                HintManager.instance.showErrorHint(editor,
+                                    "No resolutions found");
+                            }
+                            else if (candidates.size==1) {
+                                assert (exists resolution = candidates[0]);
+                                value change = resolution.change;
+                                value p = project;
+                                object extends WriteCommandAction<Nothing>(p, file) {
+                                    shared actual void run(Result<Nothing>? result) {
+                                        if (is PlatformTextChange change) {
+                                            assert (is IdeaTextChange change);
+                                            change.applyOnProject(project);
+                                        } else {
+                                            change();
+                                        }
+                                        if (exists qualifier = resolution.qualifier) {
+                                            value text = highlighter.highlightQuotedMessage {
+                                                description = "Automatically resolved '``resolution.description``' ('``qualifier``')";
+                                                project = project;
+                                                qualifiedNameIsPath = true;
+                                            };
+                                            //TODO: the icon?
+                                            HintManager.instance.showInformationHint(editor, JBLabel(text));
+                                        }
+                                    }
+                                }.execute();
                             }
                             else {
                                 showPopup {
