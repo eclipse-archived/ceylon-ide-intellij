@@ -20,3 +20,4 @@ out
 ant-build
 modules/
 resources/rebel.xml
+**/.DS_Store
