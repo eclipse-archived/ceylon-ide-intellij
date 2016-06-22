@@ -157,7 +157,7 @@ shared class PSIClass(shared PsiClass psi)
         else mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType)
     );
     
-    javaSource => psi.containingFile?.name?.endsWith(".java") else false;
+    javaSource => concurrencyManager.needReadAccess(()=> psi.containingFile else null)?.name?.endsWith(".java") else false;
     
     loadedFromSource => javaSource;
     
