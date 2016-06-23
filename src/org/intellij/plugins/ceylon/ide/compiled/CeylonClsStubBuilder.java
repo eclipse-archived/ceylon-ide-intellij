@@ -10,13 +10,13 @@ import com.intellij.psi.impl.java.stubs.PsiJavaFileStub;
 import com.intellij.psi.impl.java.stubs.impl.PsiJavaFileStubImpl;
 import com.intellij.util.cls.ClsFormatException;
 import com.intellij.util.indexing.FileContent;
+import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.CeylonBinaryData;
+import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.org.objectweb.asm.ClassReader;
 
 import java.io.IOException;
-
-import static org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler.detectInnerClass;
 
 class CeylonClsStubBuilder extends ClsStubBuilder {
     private static final int STUB_VERSION = 1;
@@ -34,7 +34,8 @@ class CeylonClsStubBuilder extends ClsStubBuilder {
         byte[] bytes = fileContent.getContent();
         VirtualFile file = fileContent.getFile();
 
-        if (fileContent.getFileName().indexOf('$') >= 0 && detectInnerClass(file, bytes)) {
+        CeylonBinaryData data = classFileDecompilerUtil_.get_().getCeylonBinaryData(file);
+        if (data.getInner()) {
             return null;
         }
 

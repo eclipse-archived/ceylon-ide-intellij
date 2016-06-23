@@ -147,6 +147,9 @@
         <codeInsight.typeInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonExpressionTypeProvider"/>
         <codeInsight.gotoSuper language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoSuperHandler"/>
 
+        <projectViewNodeDecorator implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonClassDecorator"/>
+        <itemPresentationProvider forClass="com.intellij.psi.impl.compiled.ClsClassImpl" order="first"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.compiled.CeylonClassDecorator"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass"
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.presentation.ClassPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner"

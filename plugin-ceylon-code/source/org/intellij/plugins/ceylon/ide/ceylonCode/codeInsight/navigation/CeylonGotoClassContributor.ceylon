@@ -61,7 +61,7 @@ shared class CeylonGotoClassContributor() extends CeylonGotoContributor() {
         for (mod in newArrayList(modules)) {
             if (!mod.java,
                 is IdeaModule mod,
-                includeNonProjectItems || mod.isProjectModule) {
+                /*includeNonProjectItems ||*/ mod.isProjectModule) {
                 for (pack in newArrayList(mod.packages)) {
                     for (declaration in newArrayList(pack.members)) {
                         if (!declaration.unit is AnyJavaUnit,

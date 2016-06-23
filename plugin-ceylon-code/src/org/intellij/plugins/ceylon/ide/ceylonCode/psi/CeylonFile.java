@@ -1,5 +1,8 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassOwner;
+import com.intellij.util.IncorrectOperationException;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +20,10 @@ import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.model.typechecker.model.Cancellable;
 
-public class CeylonFile extends PsiFileBase {
+import java.util.ArrayList;
+import java.util.List;
+
+public class CeylonFile extends PsiFileBase implements PsiClassOwner {
 
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
@@ -114,5 +120,30 @@ public class CeylonFile extends PsiFileBase {
     @Override
     public void subtreeChanged() {
         super.subtreeChanged();
+    }
+
+    @NotNull
+    @Override
+    public PsiClass[] getClasses() {
+        List<PsiClass> classes = new ArrayList<>();
+
+
+//        CeylonPsi.DeclarationPsi[] decls = PsiTreeUtil.getChildrenOfType(getCompilationUnitPsi(), CeylonPsi.DeclarationPsi.class);
+//        if (decls != null) {
+//            for (CeylonPsi.DeclarationPsi decl : decls) {
+//                classes.add(new NavigationPsiClass(decl));
+//            }
+//        }
+
+        return classes.toArray(new PsiClass[classes.size()]);
+    }
+
+    @Override
+    public String getPackageName() {
+        return "";
+    }
+
+    @Override
+    public void setPackageName(String packageName) throws IncorrectOperationException {
     }
 }

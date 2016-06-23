@@ -8,6 +8,12 @@ import com.intellij.icons {
 import com.intellij.openapi.util {
     IconLoader
 }
+import com.intellij.psi {
+    PsiModifier
+}
+import com.intellij.psi.impl.compiled {
+    ClsClassImpl
+}
 import com.intellij.ui {
     RowIcon,
     LayeredIcon
@@ -199,6 +205,45 @@ shared object icons {
         else {
             return baseIcon;
         }
+    }
+
+    shared Icon? forClass(ClsClassImpl cls) {
+        Icon? baseIcon;
+
+        function has(String ann) {
+            return cls.modifierList.findAnnotation(ann) exists;
+        }
+
+        if (has("com.redhat.ceylon.compiler.java.metadata.Module")) {
+            baseIcon = moduleDescriptors;
+        } else if (has("com.redhat.ceylon.compiler.java.metadata.Package")) {
+            baseIcon = packageDescriptors;
+        } else if (has("com.redhat.ceylon.compiler.java.metadata.Method")) {
+            baseIcon = methods;
+        } else if (has("com.redhat.ceylon.compiler.java.metadata.Object")) {
+            baseIcon = objects;
+        } else if (has("com.redhat.ceylon.compiler.java.metadata.Attribute")) {
+            baseIcon = attributes;
+        } else if (cls.\iinterface) {
+            baseIcon = interfaces;
+        } else {
+            baseIcon = classes;
+        }
+
+        if (exists baseIcon) {
+            value visibility = if (cls.hasModifierProperty(PsiModifier.public))
+            then PlatformIcons.publicIcon
+            else PlatformIcons.privateIcon;
+
+            value decorations = ArrayList<Icon>();
+            if (cls.hasModifierProperty(PsiModifier.final)) {
+                decorations.add(AllIcons.Nodes.finalMark);
+            }
+            decorations.add(PlatformIcons.lockedIcon);
+            return createIcon(decorations, baseIcon, visibility);
+        }
+
+        return null;
     }
 
     Icon createIcon(List<Icon> decorations, Icon icon, Icon visibility) 

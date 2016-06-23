@@ -5,6 +5,14 @@ import com.intellij.ide.util {
 import com.intellij.openapi.\imodule {
     Module
 }
+import com.intellij.openapi.vfs {
+    JarFileSystem {
+        jarFs=instance
+    }
+}
+import com.intellij.psi.impl.compiled {
+    ClsClassImpl
+}
 import com.intellij.util.ui {
     UIUtil
 }
@@ -23,6 +31,9 @@ import javax.swing {
     BorderFactory
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
+    classFileDecompilerUtil
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
@@ -31,7 +42,7 @@ shared class DeclarationModuleRendererFactory() extends ModuleRendererFactory() 
 
     moduleRenderer => declarationListCellRenderer;
 
-    handles(Object? element) => element is DeclarationNavigationItem;
+    handles(Object? element) => element is DeclarationNavigationItem|ClsClassImpl;
 }
 
 "Renders a Ceylon declaration, for example in the results of Go To Class."
@@ -42,23 +53,14 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
     shared actual Component getListCellRendererComponent(JList<out Object>? list, Object? val,
         Integer index, Boolean isSelected, Boolean cellHasFocus) {
 
-        if (is DeclarationNavigationItem val) {
+        function superComponent() {
+            value oldText = text;
+            value oldIcon = icon;
 
             value cmp = super.getListCellRendererComponent(list, val, index, isSelected, cellHasFocus);
 
-            value mod = val.decl.unit.\ipackage.\imodule;
-
-            value text = StringBuilder();
-            if (is AnyProjectSourceFile psf = val.decl.unit,
-                is Module proj = psf.resourceProject) {
-                text.append(proj.name);
-                icon = icons.project;
-            }
-            else {
-                text.append(mod.nameAsString).append("/").append(mod.version);
-                icon = icons.moduleArchives;
-            }
-            this.text = text.string;
+            text = oldText;
+            icon = oldIcon;
 
             border = BorderFactory.createEmptyBorder(0, 0, 0, UIUtil.listCellHPadding);
             horizontalTextPosition = SwingConstants.left;
@@ -66,6 +68,38 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
             foreground = isSelected then UIUtil.listSelectionForeground else UIUtil.inactiveTextColor;
 
             return cmp;
+        }
+        if (is DeclarationNavigationItem val) {
+            value mod = val.decl.unit.\ipackage.\imodule;
+            value text = StringBuilder();
+
+            if (is AnyProjectSourceFile psf = val.decl.unit,
+                is Module proj = psf.resourceProject) {
+                text.append(proj.name);
+                icon = icons.project;
+            } else {
+                text.append(mod.nameAsString).append("/").append(mod.version);
+                icon = icons.moduleArchives;
+            }
+            this.text = text.string;
+
+            return superComponent();
+        } else if (is ClsClassImpl val,
+            classFileDecompilerUtil.hasValidCeylonBinaryData(val.containingFile.virtualFile)) {
+
+            if (exists jar = jarFs.getVirtualFileForJar(val.containingFile.virtualFile)) {
+                if (exists pos = jar.nameWithoutExtension.firstOccurrence('-')) {
+                    text = jar.nameWithoutExtension.replaceFirst("-", "/");
+                } else {
+                    text = jar.name;
+                }
+            } else {
+                text = val.containingFile.virtualFile.name;
+            }
+
+            icon = icons.moduleArchives;
+
+            return superComponent();
         } else {
             return delegate.getListCellRendererComponent(list, val, index, isSelected, cellHasFocus);
         }
