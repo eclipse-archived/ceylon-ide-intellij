@@ -94,7 +94,6 @@ public class CeylonClassDecorator
 
     @Override
     public void decorate(PackageDependenciesNode node, ColoredTreeCellRenderer cellRenderer) {
-        System.out.println("hello");
     }
 
     @Override
