@@ -6,7 +6,8 @@ import com.intellij.openapi.util {
     TextRange
 }
 import com.redhat.ceylon.compiler.typechecker.analyzer {
-    ModuleSourceMapper
+    ModuleSourceMapper,
+    Warning
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree,
@@ -24,6 +25,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import com.redhat.ceylon.compiler.typechecker.util {
+    WarningSuppressionVisitor
+}
+import ceylon.interop.java {
+    javaClass
+}
 
 
 "A visitor that visits a compilation unit returned by
@@ -38,6 +45,10 @@ shared class ErrorsVisitor(Tree.CompilationUnit compilationUnit, CeylonFile file
     }
     
     shared {[Message, TextRange?]*} extractMessages() {
+        if (exists ceylonProject = findProjectForFile(file)) {
+            compilationUnit.visit(WarningSuppressionVisitor(javaClass<Warning>(),
+                ceylonProject.configuration.suppressWarningsEnum));
+        }
         compilationUnit.visit(this);
 
         if (file.name == "module.ceylon",
