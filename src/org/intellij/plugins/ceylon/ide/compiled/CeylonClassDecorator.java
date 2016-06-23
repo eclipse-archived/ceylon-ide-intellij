@@ -4,6 +4,7 @@ import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.ProjectViewNodeDecorator;
 import com.intellij.ide.projectView.impl.nodes.ClassTreeNode;
+import com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.packageDependencies.ui.PackageDependenciesNode;
@@ -48,6 +49,9 @@ public class CeylonClassDecorator
                     data.setIcon(icon);
                 }
             }
+        } else if (node.getParentDescriptor() instanceof NamedLibraryElementNode
+                && ((NamedLibraryElementNode) node.getParentDescriptor()).getName().startsWith("Ceylon: ")) {
+            node.getParentDescriptor().setIcon(icons_.get_().getModuleArchives());
         }
     }
 
@@ -90,7 +94,7 @@ public class CeylonClassDecorator
 
     @Override
     public void decorate(PackageDependenciesNode node, ColoredTreeCellRenderer cellRenderer) {
-
+        System.out.println("hello");
     }
 
     @Override
