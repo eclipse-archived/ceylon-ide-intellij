@@ -22,8 +22,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 
 
-Boolean isInSourceArchive(VirtualFile virtualFile)
-        => ".src!/" in virtualFile.path.lowercased;
+shared Boolean isInSourceArchive(VirtualFile? virtualFile) {
+    if (exists path = virtualFile?.path) {
+        return ".src!/" in path.lowercased;
+    } else {
+        return false;
+    }
+}
 
 CeylonLogger<CeylonSourceFileViewProviderFactory> ceylonSourceFileViewProviderFactoryLogger = CeylonLogger<CeylonSourceFileViewProviderFactory>();
 
