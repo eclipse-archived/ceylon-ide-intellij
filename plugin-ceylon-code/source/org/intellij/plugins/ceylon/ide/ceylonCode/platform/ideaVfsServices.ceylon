@@ -25,20 +25,19 @@ import com.redhat.ceylon.model.typechecker.model {
     Package
 }
 
+import java.io {
+    File
+}
 import java.lang.ref {
     WeakReference
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    vfsKeychain,
-    IdeaVirtualFolder,
-    VirtualFileVirtualFile
-}
-import java.io {
-    File
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
+    IdeaVirtualFolder,
+    VirtualFileVirtualFile
 }
 
 object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,VirtualFile> {
@@ -55,30 +54,35 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
     
     findFile(VirtualFile resource, String fileName) => resource.findChild(fileName);
     
+    IdeaCeylonProject.\InativeFolderProperties nativeFolderProperties(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject) {
+        assert(is IdeaCeylonProject ceylonProject);
+        return ceylonProject.nativeFolderProperties;
+    }
+    
     getPackagePropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder)
-            => WeakReference(folder.getUserData(vfsKeychain.findOrCreate<Package>(ceylonProject.ideArtifact)));
+            => WeakReference(folder.getUserData(nativeFolderProperties(ceylonProject).packageModel));
     
     getParent(VirtualFile resource) => resource.parent;
 
     getRootIsSourceProperty(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile rootFolder)
-        => rootFolder.getUserData(vfsKeychain.findOrCreate<Boolean>(ceylonProject.ideArtifact));
+        => rootFolder.getUserData(nativeFolderProperties(ceylonProject).rootIsSource);
     
     getRootPropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder)
-            => WeakReference<FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>>(folder.getUserData(vfsKeychain.findOrCreate<IdeaVirtualFolder>(ceylonProject.ideArtifact)));
+            => WeakReference<FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>>(folder.getUserData(nativeFolderProperties(ceylonProject).root));
     
     getShortName(VirtualFile resource) => resource.name;
     
     isFolder(VirtualFile resource) => resource.directory;
     
-    setPackagePropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder, WeakReference<Package> p) 
-        => folder.putUserData(vfsKeychain.findOrCreate<Package>(ceylonProject.ideArtifact), p.get());
+    setPackagePropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder, WeakReference<Package> p) => 
+            folder.putUserData(nativeFolderProperties(ceylonProject).packageModel, p.get());
     
-    shared actual void setRootIsSourceProperty(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile rootFolder, Boolean isSource) 
-        => rootFolder.putUserData(vfsKeychain.findOrCreate<Boolean>(ceylonProject.ideArtifact), isSource);
+    setRootIsSourceProperty(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile rootFolder, Boolean isSource) => 
+            rootFolder.putUserData(nativeFolderProperties(ceylonProject).rootIsSource, isSource);
     
     shared actual void setRootPropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder, WeakReference<FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>> root) {
         assert(is IdeaVirtualFolder r = root.get());
-        folder.putUserData(vfsKeychain.findOrCreate<IdeaVirtualFolder>(ceylonProject.ideArtifact), r);
+        folder.putUserData(nativeFolderProperties(ceylonProject).root, r);
     }
     
     toPackageName(VirtualFile resource, VirtualFile sourceDir) 
@@ -110,20 +114,14 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
            else null;
 
     shared actual void removePackagePropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder) {
-        if (exists key = vfsKeychain.find<Package>(ceylonProject.ideArtifact)) {
-            folder.putUserData(key, null);
-        }
+        folder.putUserData(nativeFolderProperties(ceylonProject).packageModel, null);
     }
 
     shared actual void removeRootIsSourceProperty(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder) {
-        if (exists key = vfsKeychain.find<Boolean>(ceylonProject.ideArtifact)) {
-            folder.putUserData(key, null);
-        }
+        folder.putUserData(nativeFolderProperties(ceylonProject).rootIsSource, null);
     }
 
     shared actual void removeRootPropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder) {
-        if (exists key = vfsKeychain.find<IdeaVirtualFolder>(ceylonProject.ideArtifact)) {
-            folder.putUserData(key, null);
-        }
+        folder.putUserData(nativeFolderProperties(ceylonProject).root, null);
     }
 }

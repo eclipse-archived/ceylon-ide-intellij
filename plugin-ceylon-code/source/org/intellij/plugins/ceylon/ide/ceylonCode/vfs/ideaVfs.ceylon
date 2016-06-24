@@ -1,6 +1,3 @@
-import ceylon.collection {
-    ArrayList
-}
 import ceylon.interop.java {
     javaClass,
     javaString
@@ -9,17 +6,11 @@ import ceylon.interop.java {
 import com.intellij.openapi.\imodule {
     Module
 }
-import com.intellij.openapi.util {
-    Key
-}
 import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.intellij.psi {
     PsiManager
-}
-import com.redhat.ceylon.ide.common.util {
-    synchronize
 }
 import com.redhat.ceylon.ide.common.vfs {
     FileVirtualFile,
@@ -110,42 +101,4 @@ shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
     ceylonProject => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod);
     
     nativeProject => mod;
-}
-
-shared object vfsKeychain {
-    
-    shared alias VfsKey<T> => Key<T>;
-    
-    value keys = ArrayList<VfsKey<out Anything>>();
-
-    shared VfsKey<T>? find<T>(Module mod) {
-        if (is MyKey<T> key = keys.find(
-            (k) => if (is MyKey<T> k) then k.mod == mod else false)) {
-            return key;
-        }
-        
-        return null;
-    }
-    
-    shared VfsKey<T> findOrCreate<T>(Module mod) {
-        if (is MyKey<T> key = keys.find(
-            (k) => if (is MyKey<T> k) then k.mod == mod else false)) {
-            return key;
-        } else {
-            return synchronize(keys, () {
-                value key = MyKey<T>("VfsKey", mod);
-                keys.add(key);
-                return key;
-            });
-        }
-    }
-    
-    class MyKey<T>(String name, shared Module mod) extends Key<T>(name) {
-    }
-
-    alias AnyMyKey => MyKey<in Nothing>;
-
-    shared void clear(Module mod)
-            => keys.removeWhere((key)
-                => if (is AnyMyKey key) then key.mod == mod else false);
 }
