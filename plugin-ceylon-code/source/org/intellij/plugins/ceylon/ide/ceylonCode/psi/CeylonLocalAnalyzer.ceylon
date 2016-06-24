@@ -35,6 +35,9 @@ import com.intellij.psi {
     PsiManager,
     PsiDocumentManager
 }
+import com.intellij.util {
+    Alarm
+}
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
 }
@@ -102,8 +105,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger,
     LogUtils
 }
-import com.intellij.util {
-    Alarm
+import com.intellij.openapi.util {
+    Computable
 }
 
 
@@ -271,13 +274,30 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         logger.debug(()=>"Exit parsedProjectSource(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``");
     }
 
+    shared void scheduleExternalSourcePreparation() {
+        logger.debug(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
+            ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
+                assert (is PsiDocumentManagerBase psiDocumentManager = PsiDocumentManager.getInstance(ideaProject));
+                value document = ApplicationManager.application.runReadAction(object satisfies Computable<Document> { compute()
+                    => psiDocumentManager.getLastCommittedDocument(FileDocumentManager.instance.getDocument(virtualFile));});
+                value phasedUnit = ideaProject.getComponent(javaClass<IdeaCeylonProjects>()).findExternalPhasedUnit(virtualFile);
+                if (exists phasedUnit) {
+                    value result = prepareLocalAnalysisResult(document, phasedUnit.compilationUnit, phasedUnit.tokens);
+                    result.finishedTypechecking(phasedUnit, phasedUnit.typeChecker);
+                    scheduleReparse(virtualFile);
+                } else {
+                    logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
+                }
+            }));
+        logger.debug(()=>"Exit prepareExternalSource() for file ``virtualFile.name``");
+    }
+    
     shared void translatedExternalSource(Document document, ExternalPhasedUnit phasedUnit) {
         logger.debug(()=>"Enter translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``", 20);
         value result = prepareLocalAnalysisResult(document, phasedUnit.compilationUnit, phasedUnit.tokens);
         result.finishedTypechecking(phasedUnit, phasedUnit.typeChecker);
         submitLocalTypechecking(void () {
             completeExternalPhasedUnitTypechecking(phasedUnit, result, restarterCancellable);
-            result_ = result;
         });
         logger.debug(()=>"Exit translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``");
     }
@@ -565,4 +585,30 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
     
     shared LocalAnalysisResult? result => result_;
+    
+    shared void scheduleReparse(VirtualFile virtualFile) {
+        if (is CeylonFile ceylonFile=
+            ApplicationManager.application.runReadAction(object satisfies Computable<PsiFile> { compute()
+            => PsiManager.getInstance(ideaProject).findFile(virtualFile);})) {
+            ApplicationManager.application.invokeLater(JavaRunnable(() {
+                ApplicationManager.application.runWriteAction(JavaRunnable(() {
+                    ceylonFile.onContentReload();
+                }));
+                ApplicationManager.application.runReadAction(JavaRunnable(() {
+                    suppressWarnings("unusedDeclaration")
+                    value unused = ceylonFile.node.lastChildNode;
+                }));
+            })); 
+        }
+    }
+    
+    shared void initialize() {
+        if (isInSourceArchive(virtualFile)) {
+            scheduleExternalSourcePreparation();
+        } else {
+            ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
+                scheduleReparse(virtualFile);
+            }));
+        }
+    }
 }

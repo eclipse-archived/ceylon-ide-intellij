@@ -21,12 +21,4 @@ shared class CeylonSourceFileViewProvider(
         eventSystemEnabled, 
         CeylonLanguage.instance, 
         CeylonFileType.instance) {
-    
-    shared CeylonLocalAnalyzer ceylonLocalAnalyzer = CeylonLocalAnalyzer(virtualFile, manager.project);
-    
-    shared actual void markInvalidated() {
-        ceylonSourceFileViewProviderFactoryLogger.debug(()=>"File view provider marked invalidated for virtual file `` virtualFile ``");
-        ceylonLocalAnalyzer.dispose();
-        super.markInvalidated();
-    }
 }

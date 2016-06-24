@@ -26,10 +26,9 @@
         <component>
             <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.model.CeylonModelManager</implementation-class>
         </component>
-<!--        <component>
-            <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.codeHighlighting.CeylonLocalTypecheckingPassFactory</implementation-class>
+        <component>
+            <implementation-class>org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonLocalAnalyzerManager</implementation-class>
         </component>
--->
     </project-components>
 
     <module-components>
