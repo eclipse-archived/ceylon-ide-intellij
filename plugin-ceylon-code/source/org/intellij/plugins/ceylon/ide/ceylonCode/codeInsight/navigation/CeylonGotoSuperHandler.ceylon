@@ -178,10 +178,10 @@ shared class CeylonGotoSuperHandler()
         else if (is CeylonPsi.ObjectExpressionPsi e) {
             if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType ?. declaration) {
-                        list.add(target);
+                    list.add(target);
                 }
                 for (type in cla.satisfiedTypes) {
-                        list.add(type.declaration);
+                    list.add(type.declaration);
                 }
             }
         }
