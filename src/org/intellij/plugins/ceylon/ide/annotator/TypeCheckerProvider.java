@@ -95,9 +95,11 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         if (element.getContainingFile() instanceof CeylonFile) {
             CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
             LocalAnalysisResult localAnalysisResult = ceylonFile.getLocalAnalysisResult();
-            TypeChecker typechecker = localAnalysisResult.getTypeChecker();
-            if (typechecker != null) {
-                return typechecker;
+            if (localAnalysisResult != null) {
+                TypeChecker typechecker = localAnalysisResult.getTypeChecker();
+                if (typechecker != null) {
+                    return typechecker;
+                }
             }
 
             //LOGGER.warn("CeylonFile has no IdePhasedUnit: " + ceylonFile.getVirtualFile().getCanonicalPath());
