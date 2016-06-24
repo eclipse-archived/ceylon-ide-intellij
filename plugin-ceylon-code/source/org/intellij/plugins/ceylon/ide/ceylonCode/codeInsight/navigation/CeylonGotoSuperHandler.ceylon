@@ -33,11 +33,10 @@ import com.intellij.psi.util {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.ide.common.util {
-    types
-}
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    ModelUtil,
+    ClassOrInterface
 }
 
 import java.lang {
@@ -126,19 +125,23 @@ shared class CeylonGotoSuperHandler()
         value list = ArrayList<Declaration>();
         if (is CeylonPsi.AnyMethodPsi e) {
             if (exists fun = e.ceylonNode.declarationModel,
-                exists target = types.getRefinedDeclaration(fun)) {
-                list.add(target);
-                if (exists top = fun.refinedDeclaration, top!=target) {
-                    list.add(top);
+                exists root = fun.refinedDeclaration,
+                is ClassOrInterface bottom = fun.container,
+                is ClassOrInterface top = root.container) {
+                for (dec in ModelUtil.getInterveningRefinements(fun.name,
+                                ModelUtil.getSignature(fun), root, bottom, top)) {
+                    list.add(dec);
                 }
             }
         }
         else if (is CeylonPsi.AnyAttributePsi e) {
             if (exists val = e.ceylonNode.declarationModel,
-                exists target = types.getRefinedDeclaration(val)) {
-                list.add(target);
-                if (exists top = val.refinedDeclaration, top!=target) {
-                    list.add(top);
+                exists root = val.refinedDeclaration,
+                is ClassOrInterface bottom = val.container,
+                is ClassOrInterface top = root.container) {
+                for (dec in ModelUtil.getInterveningRefinements(val.name,
+                                null, root, bottom, top)) {
+                    list.add(dec);
                 }
             }
         }
@@ -199,10 +202,15 @@ shared class CeylonGotoSuperHandler()
             }
         }
         else {
-            if (exists target = e.ceylonNode.refined) {
-                list.add(target);
-                if (exists top = target.refinedDeclaration, top!=target) {
-                    list.add(top);
+            value node = e.ceylonNode;
+            if (node.refinement,
+                exists ref = node.declaration,
+                exists root = ref.refinedDeclaration,
+                is ClassOrInterface bottom = ref.container,
+                is ClassOrInterface top = root.container) {
+                for (dec in ModelUtil.getInterveningRefinements(ref.name,
+                                ModelUtil.getSignature(ref), root, bottom, top)) {
+                    list.add(dec);
                 }
             }
         }
