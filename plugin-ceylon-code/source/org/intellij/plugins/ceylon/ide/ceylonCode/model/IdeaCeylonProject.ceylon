@@ -35,6 +35,9 @@ import com.intellij.openapi.roots {
 import com.intellij.openapi.ui {
     Messages
 }
+import com.intellij.openapi.util {
+    Key
+}
 import com.intellij.openapi.vfs {
     VirtualFile,
     VfsUtil,
@@ -67,6 +70,9 @@ import com.redhat.ceylon.ide.common.typechecker {
 import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitorChild
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Package
+}
 import com.redhat.ceylon.model.typechecker.util {
     TCModManager=ModuleManager
 }
@@ -88,7 +94,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    vfsKeychain
+    IdeaVirtualFolder
 }
 import com.redhat.ceylon.model.cmr {
     ArtifactResult
@@ -100,6 +106,12 @@ import com.intellij.openapi.externalSystem.service.project {
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
     variable Boolean languageModuleAdded = false;
+    
+    shared object nativeFolderProperties {
+        shared Key<Package> packageModel = Key<Package>("CeylonPlugin.nativeFolder_packageModel");
+        shared Key<IdeaVirtualFolder> root = Key<IdeaVirtualFolder>("CeylonPlugin.nativeFolder_root");
+        shared Key<Boolean> rootIsSource = Key<Boolean>("CeylonPlugin.nativeFolder_rootIsSource");
+    }
 
     object addModuleArchiveHook
             satisfies BuildHook<Module, VirtualFile, VirtualFile, VirtualFile> {
@@ -371,7 +383,6 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
     shared void clean() {
         sourceNativeFolders.each(removeFolderFromModel);
-        vfsKeychain.clear(ideaModule);
     }
 
     buildHooks => { addModuleArchiveHook };
