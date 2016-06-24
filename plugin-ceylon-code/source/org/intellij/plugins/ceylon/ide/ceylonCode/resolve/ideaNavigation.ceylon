@@ -62,9 +62,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 shared class IdeaNavigation(Project project) 
         extends AbstractNavigation<PsiElement,VirtualFile>() {
     
-    filePath(VirtualFile file) => Path(file.path);
+    shared actual Path filePath(VirtualFile file) => Path(file.path);
     
-    gotoDeclaration(Referenceable? model) =>
+    shared actual PsiElement? gotoDeclaration(Referenceable? model) =>
             concurrencyManager.withAlternateResolution(() => super.gotoDeclaration(model));
 
     shared actual PsiElement? gotoFile(VirtualFile file,

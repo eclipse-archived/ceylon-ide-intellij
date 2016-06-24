@@ -8,6 +8,10 @@ import com.redhat.ceylon.model.typechecker.model {
     TypeDeclaration
 }
 
+import javax.swing {
+    Icon
+}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonClass
 }
@@ -40,12 +44,12 @@ shared class ClassPresentationProvider()
                 }
             }
 
-            locationString
+            shared actual String? locationString 
                     => if (exists node = item.ceylonNode) 
                     then "(``node.unit.\ipackage.\imodule.nameAsString``)" 
                     else null;
 
-            getIcon(Boolean unused)
+            shared actual Icon? getIcon(Boolean unused) 
                     => if (exists node = item.ceylonNode) 
                     then icons.forDeclaration(node)
                     else null;
@@ -88,7 +92,7 @@ shared class DeclarationPresentationProvider()
                 }
             }
 
-            getIcon(Boolean unused)
+            shared actual Icon? getIcon(Boolean unused) 
                     => if (exists node = item.ceylonNode) 
                     then icons.forDeclaration(node) 
                     else null;
@@ -129,12 +133,10 @@ shared class SpecifierPresentationProvider()
                     then "(default module)" 
                     else "(``qualifiedNameString``)";
                 }
-                else {
-                    return null;
-                }
+                return null;
             }
 
-            getIcon(Boolean unused)
+            shared actual Icon? getIcon(Boolean unused)
                     => if (exists node = item.ceylonNode)
                     then icons.forDeclaration(node) 
                     else null;

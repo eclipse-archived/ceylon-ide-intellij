@@ -53,10 +53,12 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
         throw Exception("File has no parent: ``file.canonicalPath``");
     }
     
-    equals(Object that)
-            => if (is VirtualFileVirtualFile that)
-            then that.file == file
-            else false;
+    shared actual Boolean equals(Object that) {
+        if (is VirtualFileVirtualFile that) {
+            return that.file == file;
+        }
+        return false;
+    }
     
     hash => file.hash;
     
@@ -102,10 +104,12 @@ shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
         
     hash => folder.hash;
     
-    equals(Object that)
-            => if (is IdeaVirtualFolder that)
-            then that.folder == folder
-            else false;
+    shared actual Boolean equals(Object that) {
+        if (is IdeaVirtualFolder that) {
+            return that.folder == folder;
+        }
+        return false;
+    }
     
     ceylonProject => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod);
     
@@ -145,7 +149,7 @@ shared object vfsKeychain {
 
     alias AnyMyKey => MyKey<in Nothing>;
 
-    shared void clear(Module mod)
-            => keys.removeWhere((key)
-                => if (is AnyMyKey key) then key.mod == mod else false);
+    shared void clear(Module mod) {
+        keys.removeWhere((key) => if (is AnyMyKey key) then key.mod == mod else false);
+    }
 }

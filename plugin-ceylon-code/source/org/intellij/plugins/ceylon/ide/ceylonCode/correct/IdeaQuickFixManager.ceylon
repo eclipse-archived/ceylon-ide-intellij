@@ -198,7 +198,7 @@ class CustomIntention(Integer position, String desc,
         then highlighter.highlightQuotedMessage(desc, p, qualifiedNameIsPath) 
         else desc;
     
-    getIcon(Integer int) => image;
+    shared actual Icon? getIcon(Integer int) => image;
     
     equals(Object that)
             => if (is CustomIntention that)

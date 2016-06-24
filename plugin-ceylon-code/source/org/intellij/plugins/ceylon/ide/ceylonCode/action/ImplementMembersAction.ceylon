@@ -101,7 +101,7 @@ shared abstract class AbstractMembersAction()
     
     shared formal Boolean selectAll;
 
-    update(Editor editor, PsiFile psiFile, Presentation presentation)
+    shared actual void update(Editor editor, PsiFile psiFile, Presentation presentation)
             => presentation.setText(menuLabel, false);
 
     void apply(CeylonFile file, Editor editor, Integer offset, Node node, 

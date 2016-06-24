@@ -81,5 +81,5 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
         }
     );
     
-    toggleOverwrite => false;
+    shared actual Boolean toggleOverwrite => false;
 }

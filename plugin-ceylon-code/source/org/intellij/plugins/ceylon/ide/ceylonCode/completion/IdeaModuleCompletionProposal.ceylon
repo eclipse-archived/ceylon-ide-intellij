@@ -59,5 +59,5 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         }
     }
     
-    toggleOverwrite => false;
+    shared actual Boolean toggleOverwrite => false;
 }

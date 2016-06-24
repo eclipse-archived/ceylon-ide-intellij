@@ -12,9 +12,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class CeylonTargetElementEvaluator() extends TargetElementEvaluatorEx2() {
 
-    getElementByReference(PsiReference ref, Integer flags) => null;
+    shared actual Null getElementByReference(PsiReference ref, Integer flags) => null;
 
-    getNamedElement(PsiElement element)
+    shared actual PsiElement? getNamedElement(PsiElement element)
             => if (is CeylonPsi.IdentifierPsi id = element.parent,
                    is CeylonPsi.DeclarationPsi dec = id.parent)
                         then dec else null;

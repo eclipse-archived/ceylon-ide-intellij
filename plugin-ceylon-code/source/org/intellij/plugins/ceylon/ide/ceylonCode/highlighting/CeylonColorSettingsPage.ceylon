@@ -24,11 +24,16 @@ import com.intellij.openapi.options.colors {
 }
 
 import java.lang {
-    JString=String
+    JString=String,
+    ObjectArray
 }
 import java.util {
     JMap=Map,
     HashMap
+}
+
+import javax.swing {
+    Icon
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
@@ -64,11 +69,11 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
     ourTags.put(javaString("member"), ceylonHighlightingColors.member);
     ourTags.put(javaString("pkg"), ceylonHighlightingColors.packages);
     
-    additionalHighlightingTagToDescriptorMap => ourTags;
+    shared actual JMap<JString,TextAttributesKey> additionalHighlightingTagToDescriptorMap => ourTags;
     
-    attributeDescriptors => createJavaObjectArray(ourDescriptors);
+    shared actual ObjectArray<AttributesDescriptor> attributeDescriptors => createJavaObjectArray(ourDescriptors);
     
-    colorDescriptors => ColorDescriptor.\iEMPTY_ARRAY;
+    shared actual ObjectArray<ColorDescriptor> colorDescriptors => ColorDescriptor.\iEMPTY_ARRAY;
     
     shared actual String demoText => """import <pkg>ceylon</pkg>.<pkg>math</pkg>.<pkg>integer</pkg> { smallest }
                                         
@@ -87,9 +92,9 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
                                         }
                                       """;
     
-    displayName => "Ceylon";
+    shared actual String displayName => "Ceylon";
     
-    icon => icons.ceylon;
+    shared actual Icon icon => icons.ceylon;
     
 }
 
@@ -112,5 +117,6 @@ shared object ceylonHighlightingColors {
     shared TextAttributesKey member = createTextAttributesKey("CEYLON_MEMBER", DefaultLanguageHighlighterColors.instanceField);
 }
 
-shared TextAttributes textAttributes(TextAttributesKey key)
-        => EditorColorsManager.instance.globalScheme.getAttributes(key);
+shared TextAttributes textAttributes(TextAttributesKey key) {
+    return EditorColorsManager.instance.globalScheme.getAttributes(key);
+}

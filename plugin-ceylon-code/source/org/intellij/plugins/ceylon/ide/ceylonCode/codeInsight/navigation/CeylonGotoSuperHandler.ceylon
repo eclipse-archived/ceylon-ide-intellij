@@ -81,7 +81,7 @@ shared class CeylonGotoSuperHandler()
 
     featureUsedKey => GotoSuperAction.featureId;
 
-    getSourceAndTargetElements(Editor editor, PsiFile file)
+    shared actual GotoData? getSourceAndTargetElements(Editor editor, PsiFile file)
             => if (exists source = findSource(editor, file))
             then GotoData(source, findTargets(source), Collections.emptyList<AdditionalAction>())
             else null;

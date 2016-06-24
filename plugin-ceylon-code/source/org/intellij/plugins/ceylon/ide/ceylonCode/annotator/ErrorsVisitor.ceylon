@@ -40,7 +40,9 @@ shared class ErrorsVisitor(Tree.CompilationUnit compilationUnit, CeylonFile file
 
     value messages = LinkedList<[Message, TextRange?]>();
 
-    handleException(Exception e, Node that) => e.printStackTrace();
+    shared actual void handleException(Exception e, Node that) {
+        e.printStackTrace();
+    }
     
     shared {[Message, TextRange?]*} extractMessages() {
         if (exists ceylonProject = findProjectForFile(file)) {

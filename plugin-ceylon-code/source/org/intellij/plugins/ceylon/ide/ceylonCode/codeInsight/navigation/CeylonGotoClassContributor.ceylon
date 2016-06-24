@@ -174,7 +174,7 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
         return createJavaStringArray(names);
     }
 
-    getQualifiedName(NavigationItem item)
+    shared actual String? getQualifiedName(NavigationItem item)
             => if (is DeclarationNavigationItem item)
             then item.decl.qualifiedNameString else null;
 
