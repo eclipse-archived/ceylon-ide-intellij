@@ -1,6 +1,7 @@
 package org.intellij.plugins.ceylon.jps;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathUtil;
 import com.redhat.ceylon.common.config.CeylonConfig;
@@ -13,6 +14,7 @@ import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.ProjectPaths;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
+import org.jetbrains.jps.builders.FileProcessor;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.fs.FilesDelta;
@@ -87,7 +89,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
         }
 
         try {
-            final List<File> filesToBuild = new ArrayList<>();
+            final Set<File> filesToBuild = new HashSet<>();
             File storage = context.getProjectDescriptor().dataManager.getDataPaths().getDataStorageRoot();
             File ceylonFiles = new File(storage, "ceylonFiles.txt");
             if (ceylonFiles.isFile()) {
@@ -95,8 +97,18 @@ class CeylonBuilder extends ModuleLevelBuilder {
                     filesToBuild.add(new File(line));
                 }
             }
+            dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
+                @Override
+                public boolean apply(ModuleBuildTarget target, File file, JavaSourceRootDescriptor root) throws IOException {
+                    if (Boolean.TRUE.equals(compileForBackend.get(target.getModule()))
+                            && getCompilableFileExtensions().contains(FileUtilRt.getExtension(file.getName()))) {
+                        filesToBuild.add(file);
+                    }
+                    return true;
+                }
+            });
 
-            return compile(context, chunk, filesToBuild, settings);
+            return compile(context, chunk, new ArrayList<>(filesToBuild), settings);
         } catch (Exception e) {
             context.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR, "Could not launch compiler"));
             context.processMessage(new CompilerMessage(BUILDER_NAME, e));
