@@ -63,8 +63,8 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
         }
     }
 
-    shared ExternalPhasedUnit? findExternalPhasedUnit(CeylonFile file) {
-        value path = file.virtualFile?.path;
+    shared ExternalPhasedUnit? findExternalPhasedUnit(CeylonFile|VirtualFile file) {
+        value path = if (is CeylonFile file) then file.virtualFile?.path else file.path;
 
         if (exists path,
             exists offset = path.firstInclusion(JarFileSystem.jarSeparator)) {
