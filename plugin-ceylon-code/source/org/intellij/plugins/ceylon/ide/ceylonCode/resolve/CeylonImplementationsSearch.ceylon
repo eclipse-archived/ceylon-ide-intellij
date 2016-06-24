@@ -54,11 +54,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class CeylonImplementationsSearch()
         satisfies QueryExecutor<PsiElement,SearchParameters> {
-    
+
     shared actual Boolean execute(SearchParameters queryParameters,
-        Processor<PsiElement> consumer) {
-        
-        PsiElement sourceElement = queryParameters.element;
+                                  Processor<PsiElement> consumer) {
+        findImplementors(queryParameters.element, consumer.process);
+        return true;
+    }
+
+    void findImplementors(PsiElement sourceElement, void consumer(PsiElement element)) {
         if (is CeylonPsi.DeclarationPsi sourceElement,
             exists node = sourceElement.ceylonNode,
             is TypeDeclaration|TypedDeclaration decl = node.declarationModel,
@@ -88,12 +91,10 @@ shared class CeylonImplementationsSearch()
                 }
             }
         }
-        
-        return true;
     }
 
     void scanPhasedUnits({PhasedUnit*} pus, TypeDeclaration|TypedDeclaration decl, Tree.Declaration node,
-        CeylonPsi.DeclarationPsi sourceElement, Processor<PsiElement> consumer) {
+        CeylonPsi.DeclarationPsi sourceElement, void consumer(PsiElement element)) {
 
         for (pu in pus) {
             Set<Node> declarationNodes;
@@ -108,18 +109,22 @@ shared class CeylonImplementationsSearch()
                 pu.compilationUnit.visit(vis);
                 declarationNodes = vis.declarationNodes;
             }
-            for (d in declarationNodes) {
-                if (d!=node) {
-                    value run = object satisfies Runnable {
+            for (dnode in declarationNodes) {
+                if (dnode!=node) {
+                    if (is Tree.Declaration dnode,
+                        dnode.declarationModel.qualifiedNameString
+                            == decl.qualifiedNameString) {
+                        continue;
+                    }
+                    object run satisfies Runnable {
                         shared actual void run() {
-                            value declaringFile = getDeclaringFile(d.unit, sourceElement.project);
+                            value declaringFile = getDeclaringFile(dnode.unit, sourceElement.project);
                             if (is CeylonFile declaringFile) {
                                 declaringFile.ensureTypechecked();
                             }
-
-                            consumer.process(findPsiElement(d, declaringFile));
+                            consumer(findPsiElement(dnode, declaringFile));
                         }
-                    };
+                    }
                     ApplicationManager.application.runReadAction(run);
                 }
             }
