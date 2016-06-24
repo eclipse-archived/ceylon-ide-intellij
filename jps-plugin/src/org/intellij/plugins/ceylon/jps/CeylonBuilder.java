@@ -1,7 +1,6 @@
 package org.intellij.plugins.ceylon.jps;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathUtil;
 import com.redhat.ceylon.common.config.CeylonConfig;
@@ -14,7 +13,6 @@ import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.ProjectPaths;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
-import org.jetbrains.jps.builders.FileProcessor;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.fs.FilesDelta;
@@ -30,10 +28,13 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.redhat.ceylon.common.config.DefaultToolOptions.*;
 import static com.redhat.ceylon.common.tools.ModuleWildcardsHelper.expandWildcards;
+import static java.nio.file.Files.readAllLines;
+import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isForcedRecompilationAllJavaModules;
 
 class CeylonBuilder extends ModuleLevelBuilder {
 
@@ -81,24 +82,19 @@ class CeylonBuilder extends ModuleLevelBuilder {
             }
         }
 
-        if (compileForBackend.isEmpty()) {
+        if (!compileForBackend.values().contains(true)) {
             return ExitCode.NOTHING_DONE;
         }
 
         try {
-            final List<String> filesToBuild = new ArrayList<>();
-
-            dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
-                @Override
-                public boolean apply(ModuleBuildTarget target, File file, JavaSourceRootDescriptor root) throws IOException {
-                    if (Boolean.TRUE.equals(compileForBackend.get(target.getModule()))
-                            && getCompilableFileExtensions().contains(FileUtilRt.getExtension(file.getName()))) {
-                        String path = file.getAbsolutePath();
-                        filesToBuild.add(path);
-                    }
-                    return true;
+            final List<File> filesToBuild = new ArrayList<>();
+            File storage = context.getProjectDescriptor().dataManager.getDataPaths().getDataStorageRoot();
+            File ceylonFiles = new File(storage, "ceylonFiles.txt");
+            if (ceylonFiles.isFile()) {
+                for (String line : readAllLines(ceylonFiles.toPath(), StandardCharsets.UTF_8)) {
+                    filesToBuild.add(new File(line));
                 }
-            });
+            }
 
             return compile(context, chunk, filesToBuild, settings);
         } catch (Exception e) {
@@ -111,18 +107,21 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
     private ExitCode compile(final CompileContext ctx,
                              ModuleChunk chunk,
-                             List<String> filesToBuild,
+                             List<File> filesToBuild,
                              JpsCeylonGlobalSettings settings) throws IOException {
 
         if (filesToBuild.isEmpty()) {
             return ExitCode.NOTHING_DONE;
         }
 
+        boolean fullBuild = isForcedRecompilationAllJavaModules(ctx);
         Compiler compiler = CeylonToolProvider.getCompiler(backend);
-        CompilerOptions options = buildOptions(chunk);
+        CompilerOptions options = buildOptions(chunk, filesToBuild, fullBuild);
 
         String message;
-        if (options.getModules().isEmpty()) {
+        if (backend == Backend.Java && !fullBuild) {
+            message = "Incremental build for " + backend.name() + " backend.";
+        } else if (options.getModules().isEmpty()) {
             message = "No Ceylon module to build for " + backend.name() + " backend.";
         } else {
             message = "Building modules " + options.getModules() + " using the " + backend.name() + " backend.";
@@ -132,7 +131,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 message));
         logger.info(message);
 
-        if (options.getModules().isEmpty()) {
+        if (options.getModules().isEmpty() && options.getFiles().isEmpty()) {
             logger.info("Nothing done");
             return ExitCode.NOTHING_DONE;
         }
@@ -183,7 +182,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
         return ExitCode.OK;
     }
 
-    private CompilerOptions buildOptions(ModuleChunk chunk) {
+    private CompilerOptions buildOptions(ModuleChunk chunk, List<File> filesToBuild, boolean fullBuild) {
         CompilerOptions options = (backend == Backend.Java)
                 ? new JavaCompilerOptions()
                 : new CompilerOptions();
@@ -270,17 +269,22 @@ class CeylonBuilder extends ModuleLevelBuilder {
             }
         }
 
-        List<String> moduleNames = new ArrayList<>(expandWildcards(
-                getSourceRoots(chunk),
-                Collections.singletonList("*"),
-                (backend == Backend.Java)
-                        ? com.redhat.ceylon.common.Backend.Java
-                        : com.redhat.ceylon.common.Backend.JavaScript
-        ));
-        if (defaultModulePresent(chunk)) {
-            moduleNames.add("default");
+        // Only the Java backend can do incremental builds
+        if (backend == Backend.Java && !fullBuild) {
+            options.setFiles(filesToBuild);
+        } else {
+            List<String> moduleNames = new ArrayList<>(expandWildcards(
+                    getSourceRoots(chunk),
+                    Collections.singletonList("*"),
+                    (backend == Backend.Java)
+                            ? com.redhat.ceylon.common.Backend.Java
+                            : com.redhat.ceylon.common.Backend.JavaScript
+            ));
+            if (defaultModulePresent(chunk)) {
+                moduleNames.add("default");
+            }
+            options.setModules(moduleNames);
         }
-        options.setModules(moduleNames);
 
         return options;
     }
@@ -356,7 +360,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
     }
 
     // Remove Java files from the list of files to process because we already compiled them
-    private void removeCompiledJavaFilesFromContext(CompileContext ctx, ModuleChunk chunk, List<String> filesToBuild) {
+    private void removeCompiledJavaFilesFromContext(CompileContext ctx, ModuleChunk chunk, List<File> filesToBuild) {
         FilesDelta delta = ctx.getProjectDescriptor().fsState
                 .getEffectiveFilesDelta(ctx, chunk.representativeTarget());
         try {
@@ -369,7 +373,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 Iterator<File> it = entry.getValue().iterator();
                 while (it.hasNext()) {
                     File file = it.next();
-                    if (filesToBuild.contains(file.getAbsolutePath())
+                    if (filesToBuild.contains(file)
                             && file.getName().endsWith(".java")) {
                         it.remove();
                     }
