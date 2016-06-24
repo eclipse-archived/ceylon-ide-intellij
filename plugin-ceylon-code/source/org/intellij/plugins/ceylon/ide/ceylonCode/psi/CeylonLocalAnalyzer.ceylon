@@ -36,9 +36,7 @@ import com.intellij.openapi.vfs {
 }
 import com.intellij.psi {
     PsiManager,
-    PsiDocumentManager,
-    FileViewProvider,
-    SingleRootFileViewProvider
+    PsiDocumentManager
 }
 import com.intellij.psi.impl {
     PsiDocumentManagerBase
@@ -102,9 +100,6 @@ import java.util.concurrent.locks {
 
 import org.antlr.runtime {
     CommonToken
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
@@ -282,7 +277,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         logger.debug(()=>"Exit parsedProjectSource(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``");
     }
 
-    shared void scheduleExternalSourcePreparation() {
+    shared void scheduleExternalSourcePreparation(CeylonLocalAnalyzerManager manager) {
         logger.debug(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
             ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
                 assert (is PsiDocumentManagerBase psiDocumentManager = PsiDocumentManager.getInstance(ideaProject));
@@ -292,7 +287,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                 if (exists phasedUnit) {
                     value result = prepareLocalAnalysisResult(document, phasedUnit.compilationUnit, phasedUnit.tokens);
                     result.finishedTypechecking(phasedUnit, phasedUnit.typeChecker);
-                    scheduleReparse(virtualFile);
+                    manager.scheduleReparse(virtualFile);
                 } else {
                     logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
                 }
@@ -594,30 +589,12 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     
     shared LocalAnalysisResult? result => result_;
     
-    shared void scheduleReparse(VirtualFile virtualFile) {
-        if (is SingleRootFileViewProvider fileViewProvider =
-            ApplicationManager.application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
-            => PsiManager.getInstance(ideaProject).findViewProvider(virtualFile);})) {
-            ApplicationManager.application.invokeLater(JavaRunnable(() {
-                ApplicationManager.application.runWriteAction(JavaRunnable(() {
-                    fileViewProvider.onContentReload();
-                }));
-                ApplicationManager.application.runReadAction(JavaRunnable(() {
-                    if (exists cachedPsi = fileViewProvider.getCachedPsi(CeylonLanguage.instance)) {
-                        suppressWarnings("unusedDeclaration")
-                        value unused = cachedPsi.node.lastChildNode;
-                    }
-                }));
-            })); 
-        }
-    }
-    
-    shared void initialize() {
+    shared void initialize(CeylonLocalAnalyzerManager manager) {
         if (isInSourceArchive(virtualFile)) {
-            scheduleExternalSourcePreparation();
+            scheduleExternalSourcePreparation(manager);
         } else {
             ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
-                scheduleReparse(virtualFile);
+                manager.scheduleReparse(virtualFile);
             }));
         }
     }

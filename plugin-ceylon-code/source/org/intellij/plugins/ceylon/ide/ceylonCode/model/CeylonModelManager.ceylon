@@ -25,9 +25,7 @@ import com.intellij.openapi.editor {
     Document
 }
 import com.intellij.openapi.fileEditor {
-    FileEditorManager {
-        fileEditorManagerInstance=getInstance
-    },
+    FileEditorManager,
     FileEditorManagerEvent,
     FileEditorManagerListener {
         fileEditorManagerTopic=fileEditorManager
@@ -103,7 +101,6 @@ import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
-
 import java.lang {
     Runnable,
     InterruptedException
@@ -119,11 +116,6 @@ import java.util.concurrent {
     Future
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType {
-        ceylonFileType=instance
-    }
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
     getCeylonProblemsView,
     SourceMsg,
@@ -285,28 +277,6 @@ shared class CeylonModelManager(model)
                                             ceylonProject.build.performBuild(progress.newChild(1000));
                                         }
                                     });
-                                    
-                                    value ceylonEditedFiles = concurrencyManager.needReadAccess(() =>
-                                            fileEditorManagerInstance(model.ideaProject)
-                                                .openFiles.array.coalesced
-                                                .filter((file) => file.fileType == ceylonFileType));
-                                        
-                                    ceylonEditedFiles.each(void (VirtualFile element) {
-                                        if (is CeylonFile ceylonFile = concurrencyManager.needReadAccess(()
-                                                => psiManager(model.ideaProject).findFile(element)),
-                                            exists localAnalyzer = ceylonFile.localAnalyzer) {
-                                            localAnalyzer.scheduleForcedTypechecking();
-                                        }
-                                    });
-                                    /*
-                                    application.invokeLater(JavaRunnable {
-                                        void run() {
-                                            reparseFiles(*fileEditorManagerInstance(model.ideaProject)
-                                            .openFiles.array.coalesced
-                                            .filter((file) => file.fileType == ceylonFileType));
-                                        }
-                                    }, ModalityState.any());
-                                     */
                                 } catch(Throwable t) {
                                     if (is ProcessCanceledException t) {
                                         throw t;

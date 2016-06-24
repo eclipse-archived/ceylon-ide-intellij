@@ -5,6 +5,9 @@ import ceylon.interop.java {
 import com.intellij.openapi {
     Disposable
 }
+import com.intellij.openapi.application {
+    ApplicationManager
+}
 import com.intellij.openapi.components {
     ProjectComponent
 }
@@ -12,11 +15,19 @@ import com.intellij.openapi.fileEditor {
     FileEditorManagerListener {
         fileEditorManagerTopic=fileEditorManager
     },
-    FileEditorManager,
+    FileEditorManager {
+        fileEditorManagerInstance=getInstance
+    },
     FileEditorManagerEvent
+}
+import com.intellij.openapi.\imodule {
+    Module
 }
 import com.intellij.openapi.startup {
     StartupManager
+}
+import com.intellij.openapi.util {
+    Computable
 }
 import com.intellij.openapi.vfs {
     VirtualFileListener,
@@ -27,25 +38,41 @@ import com.intellij.openapi.vfs {
     VirtualFileCopyEvent,
     VirtualFileManager
 }
+import com.intellij.psi {
+    PsiManager {
+        psiManager=getInstance
+    },
+    FileViewProvider,
+    SingleRootFileViewProvider
+}
 import com.intellij.util.messages {
     MessageBusConnection
+}
+import com.redhat.ceylon.ide.common.model {
+    ModelListenerAdapter
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    ProjectPhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
     ImmutableMapWrapper
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType
+    CeylonFileType,
+    CeylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
+    IdeaCeylonProjects,
+    concurrencyManager
 }
-class CeylonLocalAnalyzerManager(model) 
+shared class CeylonLocalAnalyzerManager(model) 
         satisfies Correspondence<VirtualFile, CeylonLocalAnalyzer>
         & ProjectComponent
         & Disposable
         & VirtualFileListener
-        & FileEditorManagerListener {
+        & FileEditorManagerListener
+        & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;    
     value mutableMap = ImmutableMapWrapper<VirtualFile, CeylonLocalAnalyzer>(emptyMap, map);
     
@@ -68,6 +95,7 @@ class CeylonLocalAnalyzerManager(model)
         dispose();
         busConnection.disconnect();
         VirtualFileManager.instance.removeVirtualFileListener(this);
+        model.removeModelListener(this);
     }
     
     shared actual void projectOpened() {
@@ -83,6 +111,7 @@ class CeylonLocalAnalyzerManager(model)
         busConnection = model.ideaProject.messageBus.connect();
         busConnection.subscribe(fileEditorManagerTopic, this);
         VirtualFileManager.instance.addVirtualFileListener(this);
+        model.addModelListener(this);
     }
     
     shared actual void projectClosed() {
@@ -95,14 +124,14 @@ class CeylonLocalAnalyzerManager(model)
             value analyzer = mutableMap.remove(virtualFile);
             if (exists analyzer) {
                 analyzer.dispose();
-                analyzer.scheduleReparse(virtualFile);
+                scheduleReparse(virtualFile);
             }
         }
     }
     
     CeylonLocalAnalyzer newCeylonLocalAnalyzer(VirtualFile virtualFile) {
         value ceylonLocalAnalyzer = CeylonLocalAnalyzer(virtualFile, model.ideaProject);
-        ceylonLocalAnalyzer.initialize();
+        ceylonLocalAnalyzer.initialize(this);
         return ceylonLocalAnalyzer;
     }
     
@@ -121,6 +150,45 @@ class CeylonLocalAnalyzerManager(model)
         if (exists analyzer = analyzers[virtualFile],
             isInSourceArchive(virtualFile)) {
             mutableMap.put(virtualFile, newCeylonLocalAnalyzer(virtualFile));
+        }
+    }
+
+    shared actual void modelPhasedUnitsTypechecked({ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile>*} typecheckedUnits) {
+        value ceylonEditedFiles = concurrencyManager.needReadAccess(() =>
+            fileEditorManagerInstance(model.ideaProject)
+                .openFiles.array.coalesced).sequence();
+
+        for (unit in typecheckedUnits) {
+            value virtualFile = unit.unitFile.nativeResource;
+            if (virtualFile in ceylonEditedFiles) {
+                if (is CeylonFile ceylonFile = concurrencyManager.needReadAccess(()
+                    => psiManager(model.ideaProject).findFile(virtualFile)),
+                    exists localAnalyzer = ceylonFile.localAnalyzer) {
+                    localAnalyzer.scheduleForcedTypechecking();
+                }
+            } else {
+                scheduleReparse(virtualFile);
+            }
+        }
+        
+        
+    }
+
+    shared void scheduleReparse(VirtualFile virtualFile) {
+        if (is SingleRootFileViewProvider fileViewProvider =
+            ApplicationManager.application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
+            => PsiManager.getInstance(model.ideaProject).findViewProvider(virtualFile);})) {
+            ApplicationManager.application.invokeLater(JavaRunnable(() {
+                ApplicationManager.application.runWriteAction(JavaRunnable(() {
+                    fileViewProvider.onContentReload();
+                }));
+                ApplicationManager.application.runReadAction(JavaRunnable(() {
+                    if (exists cachedPsi = fileViewProvider.getCachedPsi(CeylonLanguage.instance)) {
+                        suppressWarnings("unusedDeclaration")
+                        value unused = cachedPsi.node.lastChildNode;
+                    }
+                }));
+            })); 
         }
     }
 
