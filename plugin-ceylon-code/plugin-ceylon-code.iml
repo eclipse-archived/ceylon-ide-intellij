@@ -40,8 +40,8 @@
     <orderEntry type="library" name="Ceylon: org.jgrapht.core/0.9.1" level="project" />
     <orderEntry type="library" name="Ceylon: net.lingala.zip4j/1.3.2" level="project" />
     <orderEntry type="library" name="Ceylon: com.intellij.openapi/current" level="project" />
-    <orderEntry type="library" name="Ceylon: com.intellij.extensions/current" level="project" />
     <orderEntry type="library" name="Ceylon: com.intellij.annotations/current" level="project" />
+    <orderEntry type="library" name="Ceylon: com.intellij.extensions/current" level="project" />
     <orderEntry type="library" name="Ceylon: com.intellij.util/current" level="project" />
     <orderEntry type="library" name="Ceylon: com.intellij.idea/current" level="project" />
     <orderEntry type="library" name="Ceylon: com.intellij.asm/current" level="project" />
