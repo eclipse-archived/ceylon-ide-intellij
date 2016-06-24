@@ -40,9 +40,7 @@ shared class CeylonQualifiedNameProvider() satisfies QualifiedNameProvider {
         return null;
     }
 
-    shared actual PsiElement? qualifiedNameToElement(String fqn, Project project) {
-        return null;
-    }
+    qualifiedNameToElement(String fqn, Project project) => null;
 
     shared actual void insertQualifiedName(String fqn, PsiElement element, Editor editor, Project project) {}
 }

@@ -42,7 +42,7 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
         data.editor.caretModel.moveToOffset(selection.end);
     }
     
-    shared actual String completionMode => "insert";
+    completionMode => "insert";
 }
 
 LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,

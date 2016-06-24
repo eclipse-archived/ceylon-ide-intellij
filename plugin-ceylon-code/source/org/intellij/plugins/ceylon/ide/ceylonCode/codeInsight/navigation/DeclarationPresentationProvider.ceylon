@@ -2,17 +2,13 @@ import com.intellij.navigation {
     ItemPresentationProvider,
     ItemPresentation
 }
-
-import javax.swing {
-    Icon
+import com.redhat.ceylon.model.typechecker.model {
+    ClassOrInterface,
+    Scope
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
-}
-import com.redhat.ceylon.model.typechecker.model {
-    ClassOrInterface,
-    Scope
 }
 
 shared class DeclarationPresentationProvider()
@@ -21,7 +17,7 @@ shared class DeclarationPresentationProvider()
     getPresentation(DeclarationNavigationItem item) 
             => object satisfies ItemPresentation {
 
-        shared actual Icon? getIcon(Boolean unused) 
+        getIcon(Boolean unused)
                 => icons.forDeclaration(item.decl);
 
         function locationAsString(Scope container)

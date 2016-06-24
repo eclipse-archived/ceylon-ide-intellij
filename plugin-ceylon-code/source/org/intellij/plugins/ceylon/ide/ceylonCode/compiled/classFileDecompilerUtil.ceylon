@@ -40,9 +40,7 @@ shared object classFileDecompilerUtil {
         return getCeylonBinaryData(file).ceylonCompiledFile;
     }
 
-    String ann(String className) {
-        return "L" + className.replace(".", "/") + ";";
-    }
+    String ann(String className) => "L" + className.replace(".", "/") + ";";
 
     shared CeylonBinaryData getCeylonBinaryData(VirtualFile file) {
         if (exists userData = file.getUserData(ceylonBinaryDataKey),
@@ -69,9 +67,7 @@ shared object classFileDecompilerUtil {
                 return super.visitAnnotation(desc, visible);
             }
 
-            shared actual void visitOuterClass(String owner, String name, String desc) {
-                isInner.set(true);
-            }
+            visitOuterClass(String owner, String name, String desc) => isInner.set(true);
 
             shared actual void visitInnerClass(String name, String \iouter, String inner, Integer access) {
                 if (className.equals(name)) {

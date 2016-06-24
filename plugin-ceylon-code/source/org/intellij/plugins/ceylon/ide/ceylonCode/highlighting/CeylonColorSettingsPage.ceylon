@@ -24,16 +24,11 @@ import com.intellij.openapi.options.colors {
 }
 
 import java.lang {
-    JString=String,
-    ObjectArray
+    JString=String
 }
 import java.util {
     JMap=Map,
     HashMap
-}
-
-import javax.swing {
-    Icon
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
@@ -69,11 +64,11 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
     ourTags.put(javaString("member"), ceylonHighlightingColors.member);
     ourTags.put(javaString("pkg"), ceylonHighlightingColors.packages);
     
-    shared actual JMap<JString,TextAttributesKey> additionalHighlightingTagToDescriptorMap => ourTags;
+    additionalHighlightingTagToDescriptorMap => ourTags;
     
-    shared actual ObjectArray<AttributesDescriptor> attributeDescriptors => createJavaObjectArray(ourDescriptors);
+    attributeDescriptors => createJavaObjectArray(ourDescriptors);
     
-    shared actual ObjectArray<ColorDescriptor> colorDescriptors => ColorDescriptor.\iEMPTY_ARRAY;
+    colorDescriptors => ColorDescriptor.\iEMPTY_ARRAY;
     
     shared actual String demoText => """import <pkg>ceylon</pkg>.<pkg>math</pkg>.<pkg>integer</pkg> { smallest }
                                         
@@ -92,9 +87,9 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
                                         }
                                       """;
     
-    shared actual String displayName => "Ceylon";
+    displayName => "Ceylon";
     
-    shared actual Icon icon => icons.ceylon;
+    icon => icons.ceylon;
     
 }
 
@@ -117,6 +112,5 @@ shared object ceylonHighlightingColors {
     shared TextAttributesKey member = createTextAttributesKey("CEYLON_MEMBER", DefaultLanguageHighlighterColors.instanceField);
 }
 
-shared TextAttributes textAttributes(TextAttributesKey key) {
-    return EditorColorsManager.instance.globalScheme.getAttributes(key);
-}
+shared TextAttributes textAttributes(TextAttributesKey key)
+        => EditorColorsManager.instance.globalScheme.getAttributes(key);

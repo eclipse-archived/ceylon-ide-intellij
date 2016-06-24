@@ -8,6 +8,9 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Editor
 }
+import com.redhat.ceylon.compiler.typechecker {
+    TypeChecker
+}
 import com.redhat.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
@@ -25,18 +28,11 @@ import com.redhat.ceylon.ide.common.settings {
     CompletionOptions
 }
 
-import java.util.regex {
-    Pattern
-}
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
-}
-import com.redhat.ceylon.compiler.typechecker {
-    TypeChecker
 }
 
 shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfies CompletionContext {
@@ -71,7 +67,7 @@ shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfi
     
     shared actual CompletionOptions options;
     
-    shared actual List<Pattern> proposalFilters => empty;
+    proposalFilters => empty;
     
     shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder();
 }

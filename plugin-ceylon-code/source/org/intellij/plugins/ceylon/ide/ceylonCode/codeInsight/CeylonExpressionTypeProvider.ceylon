@@ -26,15 +26,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class CeylonExpressionTypeProvider() extends ExpressionTypeProvider<CeylonPsi.TermPsi>() {
 
-    shared actual String? getInformationHint(CeylonPsi.TermPsi termPsi) {
-        if (exists node = termPsi.ceylonNode,
-            exists type = node.typeModel) {
-            return StringUtil.escapeXml(type.asString(node.unit));
-        }
-        else {
-            return null;
-        }
-    }
+    getInformationHint(CeylonPsi.TermPsi termPsi)
+            => if (exists node = termPsi.ceylonNode,
+                   exists type = node.typeModel)
+            then StringUtil.escapeXml(type.asString(node.unit))
+            else null;
 
     errorHint => "No expression found";
 

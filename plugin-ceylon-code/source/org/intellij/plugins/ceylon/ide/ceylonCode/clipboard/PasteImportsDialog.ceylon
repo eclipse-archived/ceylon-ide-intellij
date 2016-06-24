@@ -73,5 +73,5 @@ class PasteImportsDialog(Project project, {Item*} elements)
             => [ for (it in myList.selectedValuesList)
                  if (is Item it) it ];
 
-    shared actual void init() => super.init();
+    init() => super.init();
 }
