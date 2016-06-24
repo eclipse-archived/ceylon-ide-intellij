@@ -63,27 +63,37 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
         }
     }
 
-    shared ExternalPhasedUnit? findExternalPhasedUnit(CeylonFile|VirtualFile file) {
-        value path = if (is CeylonFile file) then file.virtualFile?.path else file.path;
-
+    shared [String, String]? parseExternalPhasedUnitFullPath(<CeylonFile|VirtualFile>? file) {
+        value path = if (is CeylonFile? file) then file?.virtualFile?.path else file.path;
+        
         if (exists path,
             exists offset = path.firstInclusion(JarFileSystem.jarSeparator)) {
-
+            
             value start = path.startsWith(JarFileSystem.protocolPrefix)
-                          then JarFileSystem.protocolPrefix.size
-                          else 0;
+            then JarFileSystem.protocolPrefix.size
+            else 0;
             value archivePath = path.span(start, offset - 1);
             value filePath = path.spanFrom(offset + JarFileSystem.jarSeparator.size);
-
-            return expand {
-                ceylonProjects*.modules.coalesced*.external*.find(
-                    (m) => if (exists sap=m.sourceArchivePath) then sap == archivePath else false
-                )
-            }.coalesced.map(
-                (m) => m.getPhasedUnitFromRelativePath(filePath)
-            ).coalesced.first;
+            return [archivePath, filePath];
         }
-
         return null;
     }
+
+    IdeModuleAlias? findModuleForParsedArchivePaths([String, String]? parsedArchivePaths) {
+        if (exists parsedArchivePaths) {
+            return expand(ceylonProjects*.modules.coalesced*.external)
+                    .filter((m) => if (exists sap=m.sourceArchivePath) then sap == parsedArchivePaths[0] else false)
+                    .find((m) => m.containsPhasedUnitWithRelativePath(parsedArchivePaths[1]));
+        }
+        return null;
+    }
+
+    shared IdeModuleAlias? findModuleForExternalPhasedUnit(<CeylonFile|VirtualFile>? file) =>
+            findModuleForParsedArchivePaths(parseExternalPhasedUnitFullPath(file));
+
+    shared ExternalPhasedUnit? findExternalPhasedUnit(<CeylonFile|VirtualFile>? file) =>
+            let(parsedArchivePaths = parseExternalPhasedUnitFullPath(file))
+            if (exists parsedArchivePaths)
+            then findModuleForParsedArchivePaths(parsedArchivePaths)?.getPhasedUnitFromRelativePath(parsedArchivePaths[1])
+            else null;
 }

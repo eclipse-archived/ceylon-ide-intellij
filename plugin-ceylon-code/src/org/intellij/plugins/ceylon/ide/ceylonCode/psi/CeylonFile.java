@@ -1,8 +1,6 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiClassOwner;
-import com.intellij.util.IncorrectOperationException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.CommonToken;
@@ -19,8 +17,11 @@ import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.text.BlockSupport;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -28,6 +29,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree.CompilationUnit;
 import com.redhat.ceylon.ide.common.model.BaseCeylonProject;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.ide.common.model.CeylonProjects;
+import com.redhat.ceylon.ide.common.model.IdeModule;
 import com.redhat.ceylon.ide.common.platform.CommonDocument;
 import com.redhat.ceylon.ide.common.platform.Status;
 import com.redhat.ceylon.ide.common.platform.platformUtils_;
@@ -36,8 +38,6 @@ import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult$impl;
 import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
 import com.redhat.ceylon.ide.common.vfs.BaseFileVirtualFile;
 import com.redhat.ceylon.model.typechecker.model.Cancellable;
-
-import java.util.ArrayList;
 
 public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     
@@ -83,6 +83,31 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
             if (ceylonVirtualFile != null) {
                 return ceylonProject.getParsedUnit(ceylonVirtualFile);
             }
+        }
+        return null;
+    }
+    
+    public TypeChecker getTypechecker() {
+        if (isInSourceArchive_.isInSourceArchive(realVirtualFile())) {
+            org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects ceylonProjects = getProject().getComponent(org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects.class);
+            IdeModule<Module, VirtualFile, VirtualFile, VirtualFile> mod = ceylonProjects.findModuleForExternalPhasedUnit(realVirtualFile());
+            if (mod != null) {
+                BaseCeylonProject ceylonProject = mod.getCeylonProject();
+                if (ceylonProject != null) {
+                    return ceylonProject.getTypechecker();
+                }
+            }
+            return null;
+        }
+        
+        ProjectPhasedUnit<?, ?, ?, ?> projectPhasedUnit = retrieveCorrespondingPhasedUnit();
+        if (projectPhasedUnit != null) {
+            return projectPhasedUnit.getTypeChecker();
+        }
+        
+        LocalAnalysisResult localAnalysisResult = getLocalAnalysisResult();
+        if (localAnalysisResult != null) {
+            return localAnalysisResult.getTypeChecker();
         }
         return null;
     }
@@ -160,7 +185,7 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
             }
         }
                 
-        platformUtils_.get_().log(Status.getStatus$_WARNING(), "localAnalysisResult requested, but was null");
+        platformUtils_.get_().log(Status.getStatus$_DEBUG(), "localAnalysisResult requested, but was null");
         return null;
     }
     
