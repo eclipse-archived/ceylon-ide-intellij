@@ -11,8 +11,10 @@ import com.intellij.psi.PsiElement;
 public abstract class MyLineMarkerProvider implements LineMarkerProvider {
 
     @Override
-    public void collectSlowLineMarkers(List<PsiElement> elements,
+    public final void collectSlowLineMarkers(List<PsiElement> elements,
             Collection<LineMarkerInfo> result) {
-        
+        collectLineMarkers(elements, (Collection) result);
     }
+
+    public void collectLineMarkers(List<PsiElement> elements,  Collection<LineMarkerInfo<?>> result) {}
 }
