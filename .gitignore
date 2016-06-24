@@ -7,6 +7,7 @@
 .idea/dictionaries/
 .idea/scopes/scope_settings.xml
 .idea/libraries/Ceylon_dependencies.xml
+.idea/libraries/Ceylon__*.xml
 testdata/CeylonTest/.idea/misc.xml
 testdata/CeylonTest/.idea/scopes/scope_settings.xml
 testdata/CeylonTest/.idea/workspace.xml
