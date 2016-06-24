@@ -120,8 +120,6 @@ public class IdeaCeylonParser extends IStubFileElementType {
         try {
             CompilationUnitTranslator translator = new CompilationUnitTranslator(file, tokens, verbose);
             
-            file.setHasLocalAnalysisResult(false);
-
             Tree.CompilationUnit parsedCompilationUnit = parser.compilationUnit();
             if (isInSourceArchive_.isInSourceArchive(virtualFile)
                     && localAnalyzer != null) {
@@ -132,7 +130,6 @@ public class IdeaCeylonParser extends IStubFileElementType {
                             ExternalPhasedUnit externalPu = (ExternalPhasedUnit) lastPhasedUnit;
                             ASTNode root = translator.translateToAstNode(externalPu.getCompilationUnit());
                             localAnalyzer.translatedExternalSource(lastCommittedDocument, externalPu);
-                            file.setHasLocalAnalysisResult(true);
                             return root;
                         }
                     }
@@ -142,7 +139,6 @@ public class IdeaCeylonParser extends IStubFileElementType {
                 ProjectPhasedUnit projectPhasedUnit = file.retrieveCorrespondingPhasedUnit();
                 if (projectPhasedUnit != null) {
                     ASTNode root = translator.translateToAstNode(projectPhasedUnit.getCompilationUnit());
-                    file.setHasLocalAnalysisResult(true);
                     return root;
                 }
             }

@@ -28,12 +28,20 @@ import com.intellij.openapi.progress {
 import com.intellij.openapi.project {
     Project
 }
+import com.intellij.openapi.util {
+    Computable
+}
 import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.intellij.psi {
     PsiManager,
-    PsiDocumentManager
+    PsiDocumentManager,
+    FileViewProvider,
+    SingleRootFileViewProvider
+}
+import com.intellij.psi.impl {
+    PsiDocumentManagerBase
 }
 import com.intellij.util {
     Alarm
@@ -95,6 +103,9 @@ import java.util.concurrent.locks {
 import org.antlr.runtime {
     CommonToken
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    CeylonLanguage
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
     concurrencyManager,
@@ -104,9 +115,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger,
     LogUtils
-}
-import com.intellij.openapi.util {
-    Computable
 }
 
 
@@ -587,16 +595,18 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     shared LocalAnalysisResult? result => result_;
     
     shared void scheduleReparse(VirtualFile virtualFile) {
-        if (is CeylonFile ceylonFile=
-            ApplicationManager.application.runReadAction(object satisfies Computable<PsiFile> { compute()
-            => PsiManager.getInstance(ideaProject).findFile(virtualFile);})) {
+        if (is SingleRootFileViewProvider fileViewProvider =
+            ApplicationManager.application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
+            => PsiManager.getInstance(ideaProject).findViewProvider(virtualFile);})) {
             ApplicationManager.application.invokeLater(JavaRunnable(() {
                 ApplicationManager.application.runWriteAction(JavaRunnable(() {
-                    ceylonFile.onContentReload();
+                    fileViewProvider.onContentReload();
                 }));
                 ApplicationManager.application.runReadAction(JavaRunnable(() {
-                    suppressWarnings("unusedDeclaration")
-                    value unused = ceylonFile.node.lastChildNode;
+                    if (exists cachedPsi = fileViewProvider.getCachedPsi(CeylonLanguage.instance)) {
+                        suppressWarnings("unusedDeclaration")
+                        value unused = cachedPsi.node.lastChildNode;
+                    }
                 }));
             })); 
         }
