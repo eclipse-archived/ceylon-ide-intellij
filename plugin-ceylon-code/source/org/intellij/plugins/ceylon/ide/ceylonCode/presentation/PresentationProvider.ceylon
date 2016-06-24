@@ -22,124 +22,119 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 shared class ClassPresentationProvider() 
         satisfies ItemPresentationProvider<CeylonClass> {
 
-    shared actual ItemPresentation getPresentation(CeylonClass item) {
-        return object satisfies ItemPresentation {
+    shared actual ItemPresentation getPresentation(CeylonClass item)
+            => object satisfies ItemPresentation {
 
-            shared actual String? presentableText {
-                if (exists model = item.ceylonNode?.declarationModel) {
-                    value text = StringBuilder().append(model.name);
-                    variable Scope container = model.container;
-                    while (is TypeDeclaration type = container) {
-                        text.append(" in ").append(type.name);
-                        container = container.container;
+                shared actual String? presentableText {
+                    if (exists model = item.ceylonNode?.declarationModel) {
+                        value text = StringBuilder().append(model.name);
+                        variable Scope container = model.container;
+                        while (is TypeDeclaration type = container) {
+                            text.append(" in ").append(type.name);
+                            container = container.container;
+                        }
+                        return text.string;
                     }
-                    return text.string;
+                    else {
+                        return item.ceylonNode?.identifier?.text;
+                    }
                 }
-                else {
-                    return item.ceylonNode?.identifier?.text;
-                }
-            }
 
-            locationString
-                    => if (exists node = item.ceylonNode) 
-                    then "(``node.unit.\ipackage.\imodule.nameAsString``)" 
-                    else null;
+                locationString
+                        => if (exists node = item.ceylonNode)
+                        then "(``node.unit.\ipackage.\imodule.nameAsString``)"
+                        else null;
 
-            getIcon(Boolean unused)
-                    => if (exists node = item.ceylonNode) 
-                    then icons.forDeclaration(node)
-                    else null;
-        };
-    }
+                getIcon(Boolean unused)
+                        => if (exists node = item.ceylonNode)
+                        then icons.forDeclaration(node)
+                        else null;
+            };
 }
 
 shared class DeclarationPresentationProvider() 
         satisfies ItemPresentationProvider<DeclarationPsiNameIdOwner> {
 
-    shared actual ItemPresentation getPresentation(DeclarationPsiNameIdOwner item) {
-        return object satisfies ItemPresentation {
+    shared actual ItemPresentation getPresentation(DeclarationPsiNameIdOwner item)
+            => object satisfies ItemPresentation {
 
-            shared actual String? presentableText {
-                if (exists model = item.ceylonNode?.declarationModel) {
-                    value name = model.name;
-                    if (is ClassOrInterface classOrInterface = model.container) {
-                        return classOrInterface.name + "." + name;
+                shared actual String? presentableText {
+                    if (exists model = item.ceylonNode?.declarationModel) {
+                        value name = model.name;
+                        if (is ClassOrInterface classOrInterface = model.container) {
+                            return classOrInterface.name + "." + name;
+                        } else {
+                            return name;
+                        }
                     } else {
-                        return name;
+                        return item.ceylonNode?.identifier?.text;
                     }
-                } else {
-                    return item.ceylonNode?.identifier?.text;
                 }
-            }
 
-            shared actual String? locationString {
-                if (exists model = item.ceylonNode?.declarationModel) {
-                    value dec 
-                        = if (is ClassOrInterface container = model.container)
-                        then container else model;
-                    value qualifiedNameString 
-                        = dec.container.qualifiedNameString;
-                    return qualifiedNameString.empty 
-                    then "(default module)" 
-                    else "(``qualifiedNameString``)";
+                shared actual String? locationString {
+                    if (exists model = item.ceylonNode?.declarationModel) {
+                        value dec
+                            = if (is ClassOrInterface container = model.container)
+                            then container else model;
+                        value qualifiedNameString
+                            = dec.container.qualifiedNameString;
+                        return qualifiedNameString.empty
+                        then "(default module)"
+                        else "(``qualifiedNameString``)";
+                    }
+                    else {
+                        return null;
+                    }
                 }
-                else {
-                    return null;
-                }
-            }
 
-            getIcon(Boolean unused)
-                    => if (exists node = item.ceylonNode) 
-                    then icons.forDeclaration(node) 
-                    else null;
-        };
-    }
+                getIcon(Boolean unused)
+                        => if (exists node = item.ceylonNode)
+                        then icons.forDeclaration(node)
+                        else null;
+            };
 }
 
 shared class SpecifierPresentationProvider() 
         satisfies ItemPresentationProvider<SpecifierStatementPsiIdOwner> {
 
-    shared actual ItemPresentation? getPresentation(SpecifierStatementPsiIdOwner item) {
-        if (! item.ceylonNode.refinement) {
-            return null;
-        }
-        return object satisfies ItemPresentation {
+    shared actual ItemPresentation? getPresentation(SpecifierStatementPsiIdOwner item)
+            => item.ceylonNode.refinement then
+            object satisfies ItemPresentation {
 
-            shared actual String? presentableText {
-                if (exists model = item.ceylonNode ?. declaration) {
-                    value name = model.name;
-                    if (is ClassOrInterface classOrInterface = model.container) {
-                        return classOrInterface.name + "." + name;
+                shared actual String? presentableText {
+                    if (exists model = item.ceylonNode ?. declaration) {
+                        value name = model.name;
+                        if (is ClassOrInterface classOrInterface = model.container) {
+                            return classOrInterface.name + "." + name;
+                        } else {
+                            return name;
+                        }
                     } else {
-                        return name;
+                        return null;
                     }
-                } else {
-                    return null;
                 }
-            }
 
-            shared actual String? locationString {
-                if (exists model = item.ceylonNode?. declaration) {
-                    value dec
-                        = if (is ClassOrInterface container = model.container)
-                        then container else model;
-                    value qualifiedNameString 
-                        = dec.container.qualifiedNameString;
-                    return if (qualifiedNameString.empty) 
-                    then "(default module)" 
-                    else "(``qualifiedNameString``)";
+                shared actual String? locationString {
+                    if (exists model = item.ceylonNode?. declaration) {
+                        value dec
+                            = if (is ClassOrInterface container = model.container)
+                            then container else model;
+                        value qualifiedNameString
+                            = dec.container.qualifiedNameString;
+                        return if (qualifiedNameString.empty)
+                        then "(default module)"
+                        else "(``qualifiedNameString``)";
+                    }
+                    else {
+                        return null;
+                    }
                 }
-                else {
-                    return null;
-                }
-            }
 
-            getIcon(Boolean unused)
-                    => if (exists node = item.ceylonNode)
-                    then icons.forDeclaration(node) 
-                    else null;
-            
-        };
-    }
+                getIcon(Boolean unused)
+                        => if (exists node = item.ceylonNode)
+                        then icons.forDeclaration(node)
+                        else null;
+
+            };
     
 }
