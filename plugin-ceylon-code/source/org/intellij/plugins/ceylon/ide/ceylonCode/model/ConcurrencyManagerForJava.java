@@ -3,8 +3,8 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.model;
 import java.util.concurrent.Callable;
 
 public class ConcurrencyManagerForJava {
-    public static Object needReadAccess(Callable<Object> func, int timeout) {
-        return concurrencyManagerForJava_.get_().needReadAccess(func, timeout);
+    public static <T> T needReadAccess(Callable<T> func, int timeout) {
+        return (T) concurrencyManagerForJava_.get_().needReadAccess((Callable<Object>)func, timeout);
     }
 
     public static <T> T tryReadAccess(Callable<T> func) {
