@@ -267,8 +267,8 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
         gt() => "&gt;";
     }
 
-    shared actual TypePrinter printer = MyPrinter(true);
-    shared actual TypePrinter verbosePrinter = MyPrinter(false);
+    printer = MyPrinter(true);
+    verbosePrinter = MyPrinter(false);
 
     showMembers => false;
     
@@ -278,9 +278,7 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
         builder.append("<html><head><style>``style``</style></head><body>");
     }
     
-    shared actual void appendPageEpilog(StringBuilder builder) {
-        builder.append("</body></html>");
-    }
+    appendPageEpilog(StringBuilder builder) => builder.append("</body></html>");
     
     getLiveValue(Declaration dec, Unit unit) => null;
 

@@ -57,5 +57,5 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         }
     }
     
-    shared actual Boolean toggleOverwrite => false;
+    toggleOverwrite => false;
 }

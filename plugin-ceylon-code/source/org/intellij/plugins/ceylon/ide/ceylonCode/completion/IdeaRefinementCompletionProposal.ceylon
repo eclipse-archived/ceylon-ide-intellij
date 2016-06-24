@@ -79,5 +79,5 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         }
     }
     
-    shared actual Boolean toggleOverwrite => false;
+    toggleOverwrite => false;
 }

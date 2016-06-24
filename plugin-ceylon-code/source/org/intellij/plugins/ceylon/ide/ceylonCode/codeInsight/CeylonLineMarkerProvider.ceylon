@@ -53,13 +53,21 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
     
-    Declaration? getModel(CeylonPsi.DeclarationPsi|CeylonPsi.SpecifierStatementPsi decl) {
-        if (is CeylonPsi.DeclarationPsi decl) {
-            return decl.ceylonNode.declarationModel;
+    Declaration? getModel(CeylonPsi.DeclarationPsi|CeylonPsi.SpecifierStatementPsi decl)
+            => if (is CeylonPsi.DeclarationPsi decl)
+            then decl.ceylonNode.declarationModel
+            else decl.ceylonNode.declaration;
+
+    function findParentDeclaration(PsiElement el) {
+        if (is CeylonPsi.DeclarationPsi decl = el.parent) {
+            return decl;
+        } else if (is CeylonPsi.SpecifierStatementPsi el) {
+            return el;
+        } else {
+            return null;
         }
-        return decl.ceylonNode.declaration;
     }
-    
+
     shared actual LineMarkerInfo<PsiElement>? getLineMarkerInfo(PsiElement element) {
         
         if (is CeylonFile file = element.containingFile) {
@@ -78,23 +86,13 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             assert(is Declaration parent = refined.container);
             value text = "Refines ``parent.getName(unit)``.``refined.getName(unit)``";
             value tooltip = object satisfies Function<PsiElement, JString> {
-                shared actual JString fun(PsiElement? param) => javaString(text);
+                fun(PsiElement? param) => javaString(text);
             };
             value icon = refined.formal then icons.refinement else icons.extendedType;
 
             return LineMarkerInfo(element of CeylonCompositeElement, element.textRange, icon,
                 Pass.\iUPDATE_ALL, tooltip, NavigationHandler(refined),
                 GutterIconRenderer.Alignment.\iLEFT);
-        }
-        
-        return null;
-    }
-    
-    <CeylonPsi.DeclarationPsi|CeylonPsi.SpecifierStatementPsi>? findParentDeclaration(PsiElement el) {
-        if (is CeylonPsi.DeclarationPsi decl = el.parent) {
-            return decl;
-        } else if (is CeylonPsi.SpecifierStatementPsi el) {
-            return el;
         }
         
         return null;
