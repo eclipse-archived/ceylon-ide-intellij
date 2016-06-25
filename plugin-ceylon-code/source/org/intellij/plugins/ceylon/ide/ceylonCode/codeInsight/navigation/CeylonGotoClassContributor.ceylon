@@ -174,9 +174,16 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
         return createJavaStringArray(names);
     }
 
-    getQualifiedName(NavigationItem? item) //apparently null is a possible argument here
-            => if (is DeclarationNavigationItem item)
-            then item.decl.qualifiedNameString else null;
+    shared actual String? getQualifiedName(NavigationItem item) {
+        //was getting NPEs here when using expression form
+        if (is DeclarationNavigationItem item) {
+            value declaration = item.declaration;
+            return declaration.qualifiedNameString;
+        }
+        else {
+            return null;
+        }
+    }
 
     qualifiedNameSeparator => ".";
 
