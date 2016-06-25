@@ -86,7 +86,7 @@ shared class CopiedReferences({<Declaration->String>*} references)
                 => [dec.unit.\ipackage.nameAsString, dec.name, al]);
 
     shared {<Declaration->String>*} resolve(CeylonFile file) {
-        if (exists tc = file.localAnalysisResult.typeChecker) {
+        if (exists tc = file.localAnalysisResult?.typeChecker) {
             value modules = tc.context.modules.listOfModules;
             return map {
                 for ([pname, name, al] in serializableState)
