@@ -28,7 +28,7 @@ import java.util.List;
  * From the decompiled file, we'll open the source file, then try to locate a PsiClass with
  * the same name as the .class file.
  */
-public class NavigationPsiClass implements PsiClass {
+public class NavigationPsiClass implements PsiSyntheticClass {
 
     public final CeylonPsi.DeclarationPsi decl;
 

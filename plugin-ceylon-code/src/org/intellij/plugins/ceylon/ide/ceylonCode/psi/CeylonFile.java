@@ -39,14 +39,15 @@ import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
 import com.redhat.ceylon.ide.common.vfs.BaseFileVirtualFile;
 import com.redhat.ceylon.model.typechecker.model.Cancellable;
 
+import static com.intellij.psi.util.PsiTreeUtil.getChildrenOfType;
+
 public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, CeylonLanguage.INSTANCE);
     }
 
-    private CeylonPsi.CompilationUnitPsi getCompilationUnitPsi() {                        // TODO Auto-generated method stub
-
+    private CeylonPsi.CompilationUnitPsi getCompilationUnitPsi() {
         return PsiTreeUtil.findChildOfType(this, CeylonPsi.CompilationUnitPsi.class);
     }
 
@@ -249,13 +250,13 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     public PsiClass[] getClasses() {
         List<PsiClass> classes = new ArrayList<>();
 
-
-//        CeylonPsi.DeclarationPsi[] decls = PsiTreeUtil.getChildrenOfType(getCompilationUnitPsi(), CeylonPsi.DeclarationPsi.class);
-//        if (decls != null) {
-//            for (CeylonPsi.DeclarationPsi decl : decls) {
-//                classes.add(new NavigationPsiClass(decl));
-//            }
-//        }
+        CeylonPsi.DeclarationPsi[] decls =
+                getChildrenOfType(getCompilationUnitPsi(), CeylonPsi.DeclarationPsi.class);
+        if (decls != null) {
+            for (CeylonPsi.DeclarationPsi decl : decls) {
+                classes.add(new NavigationPsiClass(decl));
+            }
+        }
 
         return classes.toArray(new PsiClass[classes.size()]);
     }
