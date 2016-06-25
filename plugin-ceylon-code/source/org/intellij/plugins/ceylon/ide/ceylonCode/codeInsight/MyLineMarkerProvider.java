@@ -16,5 +16,5 @@ public abstract class MyLineMarkerProvider implements LineMarkerProvider {
         collectLineMarkers(elements, (Collection) result);
     }
 
-    public void collectLineMarkers(List<PsiElement> elements,  Collection<LineMarkerInfo<?>> result) {}
+    public void collectLineMarkers(List<PsiElement> elements,  Collection<LineMarkerInfo<? extends PsiElement>> result) {}
 }

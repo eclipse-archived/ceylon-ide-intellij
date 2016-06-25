@@ -29,6 +29,9 @@ import com.intellij.openapi.fileEditor {
     FileEditorManager,
     TextEditor
 }
+import com.intellij.openapi.project {
+    Project
+}
 import com.intellij.openapi.util {
     TextRange
 }
@@ -78,21 +81,19 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-class CeylonLineMarkerInfo(PsiElement element,
-            TextRange range, Icon icon,
-            Integer updatePass,
-            String tooltip,
-            GutterIconRenderer.Alignment alignment,
-            GutterIconNavigationHandler<PsiElement> handler)
-        extends LineMarkerInfo<PsiElement>
-            (element, range, icon, updatePass,
-            object satisfies Function<PsiElement,JString> {
-                fun(PsiElement? param) => javaString(tooltip);
-            },
-            handler, alignment) {}
-
 shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
-    
+
+    class MarkerInfo(
+        PsiElement element, TextRange range, Icon icon, Integer updatePass,
+        String tooltip, GutterIconRenderer.Alignment alignment,
+        GutterIconNavigationHandler<PsiElement> handler)
+            extends LineMarkerInfo<PsiElement>(
+                element, range, icon, updatePass,
+                object satisfies Function<PsiElement,JString> {
+                    fun(PsiElement? param) => javaString(tooltip);
+                },
+                handler, alignment) {}
+
     Declaration? getModel(CeylonPsi.DeclarationPsi|CeylonPsi.SpecifierStatementPsi decl)
             => if (is CeylonPsi.DeclarationPsi decl)
             then decl.ceylonNode.declarationModel
@@ -132,7 +133,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             exists refined = types.getRefinedDeclaration(model)) {
             assert (is Declaration parent = refined.container);
 
-            return CeylonLineMarkerInfo {
+            return MarkerInfo {
                 element = element;
                 range = element.textRange;
                 icon = refined.formal then icons.refinement else icons.extendedType;
@@ -154,14 +155,13 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
         return null;
     }
 
-
     function editor(PsiElement element) {
         value file = element.containingFile;
         if (exists virtualFile = file.virtualFile) {
             value fileEditor
                     = FileEditorManager
-                .getInstance(file.project)
-                .getSelectedEditor(virtualFile);
+                        .getInstance(file.project)
+                        .getSelectedEditor(virtualFile);
             if (is TextEditor fileEditor) {
                 return fileEditor.editor;
             }
@@ -169,11 +169,11 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
         return null;
     }
 
-
     class Searcher(Editor editor) extends ImplementationSearcher() {
         value accept = TargetElementUtil.instance.acceptImplementationForReference;
+
         shared actual ObjectArray<PsiElement> filterElements
-        (PsiElement element, ObjectArray<PsiElement> targetElements, Integer offset) {
+                (PsiElement element, ObjectArray<PsiElement> targetElements, Integer offset) {
             value result = ArrayList<PsiElement>();
             for (targetElement in targetElements) {
                 value reference = TargetElementUtil.findReference(editor, offset);
@@ -183,6 +183,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             }
             return result.toArray(ObjectArray<PsiElement>(0));
         }
+
     }
 
     shared actual void collectLineMarkers(List<PsiElement> elements,
@@ -192,7 +193,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                 exists decl = findParentDeclaration(element),
                 model.formal || model.default) {
 
-                result.add(CeylonLineMarkerInfo {
+                result.add(MarkerInfo {
                     alignment = GutterIconRenderer.Alignment.right;
                     tooltip = "Refinements of ``model.name``";
                     updatePass = Pass.updateOverridenMarkers;
@@ -202,6 +203,24 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                     object handler
                             extends GotoImplementationHandler()
                             satisfies GutterIconNavigationHandler<PsiElement> {
+
+                        shared actual void invoke(Project project, Editor? editor, PsiFile file) {
+                            if (exists editor) {
+                                value document = editor.document;
+                                value before = editor.caretModel.offset;
+                                value lineStartOffset = document.getLineStartOffset(document.getLineNumber(decl.textOffset));
+                                editor.caretModel.moveToOffset(lineStartOffset);
+                                try {
+                                    super.invoke(project, editor, file);
+                                }
+                                finally {
+                                    editor.caretModel.moveToOffset(before);
+                                }
+                            }
+                            else {
+                                super.invoke(project, editor, file);
+                            }
+                        }
 
                         getSourceAndTargetElements(Editor editor, PsiFile file)
                                 => GotoData(decl,
