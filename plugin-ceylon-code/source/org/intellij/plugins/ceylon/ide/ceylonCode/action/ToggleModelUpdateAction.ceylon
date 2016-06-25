@@ -15,15 +15,20 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 shared class ToggleModelUpdateAction() extends AnAction() {
 
     shared actual void actionPerformed(AnActionEvent e) {
-        if (exists project = PlatformDataKeys.\iPROJECT.getData(e.dataContext),
-            exists modelManager = project.getComponent(javaClass<CeylonModelManager>())) {
-            modelManager.automaticModelUpdateEnabled = ! modelManager.automaticModelUpdateEnabled;
+        if (exists project
+                = PlatformDataKeys.project.getData(e.dataContext),
+            exists modelManager
+                = project.getComponent(javaClass<CeylonModelManager>())) {
+            modelManager.automaticModelUpdateEnabled
+                    = !modelManager.automaticModelUpdateEnabled;
         }
     }
 
     shared actual void update(AnActionEvent e) {
-        if (exists project = PlatformDataKeys.\iPROJECT.getData(e.dataContext),
-            exists modelManager = project.getComponent(javaClass<CeylonModelManager>())) {
+        if (exists project
+                = PlatformDataKeys.project.getData(e.dataContext),
+            exists modelManager
+                = project.getComponent(javaClass<CeylonModelManager>())) {
 
             e.presentation.enabled = true;
 
