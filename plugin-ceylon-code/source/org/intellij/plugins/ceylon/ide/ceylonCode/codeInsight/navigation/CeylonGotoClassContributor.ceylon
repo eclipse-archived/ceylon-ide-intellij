@@ -174,7 +174,7 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
         return createJavaStringArray(names);
     }
 
-    getQualifiedName(NavigationItem item)
+    getQualifiedName(NavigationItem? item) //apparently null is a possible argument here
             => if (is DeclarationNavigationItem item)
             then item.decl.qualifiedNameString else null;
 
