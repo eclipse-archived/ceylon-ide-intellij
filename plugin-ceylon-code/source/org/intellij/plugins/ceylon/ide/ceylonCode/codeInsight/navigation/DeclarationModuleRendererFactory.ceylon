@@ -70,10 +70,10 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
             return cmp;
         }
         if (is DeclarationNavigationItem val) {
-            value mod = val.decl.unit.\ipackage.\imodule;
+            value mod = val.declaration.unit.\ipackage.\imodule;
             value text = StringBuilder();
 
-            if (is AnyProjectSourceFile psf = val.decl.unit,
+            if (is AnyProjectSourceFile psf = val.declaration.unit,
                 is Module proj = psf.resourceProject) {
                 text.append(proj.name);
                 icon = icons.project;
