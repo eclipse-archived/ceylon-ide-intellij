@@ -6,7 +6,10 @@ import com.intellij.codeHighlighting {
     Pass
 }
 import com.intellij.codeInsight {
-    TargetElementUtil
+    TargetElementUtil {
+        referencedElementAccepted,
+        lookupItemAccepted
+    }
 }
 import com.intellij.codeInsight.daemon {
     LineMarkerInfo,
@@ -33,7 +36,8 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.openapi.util {
-    TextRange
+    TextRange,
+    Computable
 }
 import com.intellij.pom {
     Navigatable
@@ -79,6 +83,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
+}
+import com.intellij.openapi.application {
+    ApplicationManager
 }
 
 shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
@@ -184,6 +191,26 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             return result.toArray(ObjectArray<PsiElement>(0));
         }
 
+        "Became package-private in intellij-community@7b037bf so we had to copy it here."
+        shared ObjectArray<PsiElement> ourSearchImplementations(Editor editor, PsiElement? element, Integer offset) {
+            TargetElementUtil targetElementUtil = TargetElementUtil.instance;
+
+            value onRef = ApplicationManager.application.runReadAction(object satisfies Computable<Boolean> {
+                shared actual Boolean compute() {
+                    return !targetElementUtil.findTargetElement(editor,
+                        flags.and(referencedElementAccepted.or(lookupItemAccepted)),
+                        offset
+                    ) exists;
+                }
+            });
+
+            value onSelf = ApplicationManager.application.runReadAction(object satisfies Computable<Boolean> {
+                shared actual Boolean compute() {
+                    return !element exists||targetElementUtil.includeSelfInGotoImplementation(element);
+                }
+            });
+            return searchImplementations(element, editor, offset, onRef && onSelf, onRef);
+        }
     }
 
     shared actual void collectLineMarkers(List<PsiElement> elements,
@@ -224,7 +251,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
 
                         getSourceAndTargetElements(Editor editor, PsiFile file)
                                 => GotoData(decl,
-                                    Searcher(editor).searchImplementations(editor, decl of PsiElement, decl.textOffset),
+                                    Searcher(editor).ourSearchImplementations(editor, decl of PsiElement, decl.textOffset),
                                     Collections.emptyList<AdditionalAction>());
 
                         navigate(MouseEvent? mouseEvent, PsiElement id)
