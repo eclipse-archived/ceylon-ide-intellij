@@ -1623,19 +1623,19 @@ public class CeylonPsiImpl {
         @Override public Tree.TypedArgument getCeylonNode() { return (Tree.TypedArgument) super.getCeylonNode(); }
     }
 
-    public static class MethodArgumentPsiImpl extends TypedArgumentPsiImpl
+    public static class MethodArgumentPsiImpl extends TypedArgumentPsiNameIdOwner
             implements CeylonPsi.MethodArgumentPsi {
         public MethodArgumentPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.MethodArgument getCeylonNode() { return (Tree.MethodArgument) super.getCeylonNode(); }
     }
 
-    public static class AttributeArgumentPsiImpl extends TypedArgumentPsiImpl
+    public static class AttributeArgumentPsiImpl extends TypedArgumentPsiNameIdOwner
             implements CeylonPsi.AttributeArgumentPsi {
         public AttributeArgumentPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.AttributeArgument getCeylonNode() { return (Tree.AttributeArgument) super.getCeylonNode(); }
     }
 
-    public static class ObjectArgumentPsiImpl extends TypedArgumentPsiImpl
+    public static class ObjectArgumentPsiImpl extends TypedArgumentPsiNameIdOwner
             implements CeylonPsi.ObjectArgumentPsi {
         public ObjectArgumentPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.ObjectArgument getCeylonNode() { return (Tree.ObjectArgument) super.getCeylonNode(); }

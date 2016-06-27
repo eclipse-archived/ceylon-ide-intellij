@@ -37,19 +37,20 @@ shared String kind(PsiElement element) {
     } else if (is CeylonPsi.AnyInterfacePsi element) {
         return "interface";
     } else if (is CeylonPsi.AttributeDeclarationPsi element) {
-        return if (element.parent is CeylonPsi.ClassBodyPsi
-        || element.parent is CeylonPsi.InterfaceBodyPsi)
-        then "attribute" else "value";
+        return if (element.parent is CeylonPsi.ClassBodyPsi|CeylonPsi.InterfaceBodyPsi)
+            then "attribute" else "value";
     } else if (is CeylonPsi.AnyMethodPsi element) {
-        CeylonPsi.AnyMethodPsi methodPsi = element;
-        for (a in methodPsi.ceylonNode.annotationList.annotations) {
+        for (a in element.ceylonNode.annotationList.annotations) {
             if (a.primary.token.text.equals("annotation")) {
                 return "annotation";
             }
         }
-        return if (element.parent is CeylonPsi.ClassBodyPsi
-        || element.parent is CeylonPsi.InterfaceBodyPsi)
-        then "method" else "function";
+        return if (element.parent is CeylonPsi.ClassBodyPsi|CeylonPsi.InterfaceBodyPsi)
+            then "method" else "function";
+    } else if (is CeylonPsi.AttributeArgumentPsi element) {
+        return "value argument";
+    } else if (is CeylonPsi.MethodArgumentPsi element) {
+        return "function argument";
     } else if (is ParameterPsiIdOwner element) {
         return "function parameter";
     } else if (is CeylonPsi.ParameterPsi element) {
@@ -58,6 +59,8 @@ shared String kind(PsiElement element) {
         return "type parameter";
     } else if (is CeylonPsi.ObjectDefinitionPsi element) {
         return "object";
+    } else if (is CeylonPsi.ObjectArgumentPsi element) {
+        return "object argument";
     } else if (is CeylonPsi.ConstructorPsi element) {
         return "constructor";
     } else if (is CeylonPsi.EnumeratedPsi element) {
@@ -129,12 +132,16 @@ shared object descriptions {
         return result.string;
     }
     
-    shared String descriptionForNode(Tree.Declaration node, Boolean includeKeyword = true) {
+    shared String descriptionForNode(Tree.Declaration|Tree.TypedArgument node, Boolean includeKeyword = true) {
         value result = StringBuilder();
         if (includeKeyword) {
             result.append(nodeKeyword(node)).append(" ");
         }
-        result.append(node.identifier?.text else "new");
+        Tree.Identifier? id
+                = switch (node)
+                case (is Tree.Declaration) node.identifier
+                case (is Tree.TypedArgument) node.identifier;
+        result.append(id?.text else "new");
         switch (node)
         case (is Tree.AnyClass) {
             if (exists pl = node.parameterList) {
@@ -142,6 +149,11 @@ shared object descriptions {
             }
         }
         case (is Tree.AnyMethod) {
+            for (pl in node.parameterLists) {
+                appendTreeParameters(result, pl);
+            }
+        }
+        case (is Tree.MethodArgument) {
             for (pl in node.parameterLists) {
                 appendTreeParameters(result, pl);
             }
@@ -163,6 +175,7 @@ shared object descriptions {
         value decl =
             switch (node)
             case (is Tree.Declaration) node.declarationModel
+            case (is Tree.TypedArgument) node.declarationModel
             case (is Tree.SpecifierStatement) (node.refinement then node.declaration)
             else null;
 
@@ -175,7 +188,7 @@ shared object descriptions {
                 unit = node.unit else decl.unit;
             };
         }
-        else if (is Tree.Declaration node) {
+        else if (is Tree.Declaration|Tree.TypedArgument node) {
             return descriptionForNode(node, includeKeyword);
         }
         else {
@@ -201,15 +214,16 @@ shared object descriptions {
             else "";
     }
 
-    String nodeKeyword(Tree.Declaration declaration)
+    String nodeKeyword(Tree.Declaration|Tree.TypedArgument declaration)
             => switch (declaration)
-            case (is Tree.ObjectDefinition) "object"
+            case (is Tree.ObjectDefinition|Tree.ObjectArgument) "object"
             case (is Tree.AnyClass) "class"
             case (is Tree.AnyInterface) "interface"
-            case (is Tree.AnyAttribute) "value"
+            case (is Tree.AnyAttribute|Tree.AttributeArgument) "value"
             case (is Tree.TypeAliasDeclaration) "alias"
             case (is Tree.Constructor|Tree.Enumerated) "new"
             case (is Tree.AnyMethod) (declaration.type is Tree.VoidModifier then "void" else "function")
+            case (is Tree.MethodArgument) (declaration.type is Tree.VoidModifier then "void" else "function")
             else "";
 
     String parameterLists(Declaration decl, Unit unit) {

@@ -96,13 +96,21 @@ shared object icons {
     shared Icon problemsViewErrors => IconLoader.getIcon("/icons/ceylonProblemsErrors.png");
     shared Icon problemsViewWarnings => IconLoader.getIcon("/icons/ceylonProblemsWarnings.png");
 
-    shared Icon? getBaseIcon(Tree.Declaration|Tree.SpecifierStatement|Declaration obj) {
+    shared alias DeclarationNode
+            => Tree.Declaration
+             | Tree.TypedArgument
+             | Tree.SpecifierStatement
+             | Tree.ObjectExpression;
+
+    shared Icon? getBaseIcon(DeclarationNode|Declaration obj) {
         if (is Tree.SpecifierStatement obj, !obj.refinement) {
             return null;
         }
         value decl 
             = switch (obj) 
             case (is Tree.Declaration) (obj.declarationModel else obj)
+            case (is Tree.TypedArgument) (obj.declarationModel else obj)
+            case (is Tree.ObjectExpression) (obj.anonymousClass else obj)
             case (is Tree.SpecifierStatement) (obj.declaration else obj)
             else obj;
         return switch (decl)
@@ -139,11 +147,11 @@ shared object icons {
                 classes
             case (is Tree.AnyInterface)
                 interfaces
-            case (is Tree.AnyMethod)
+            case (is Tree.AnyMethod|Tree.MethodArgument)
                 methods
-            case (is Tree.AnyAttribute|Tree.Variable)
+            case (is Tree.AnyAttribute|Tree.Variable|Tree.AttributeArgument)
                 values
-            case (is Tree.ObjectDefinition)
+            case (is Tree.ObjectDefinition|Tree.ObjectArgument|Tree.ObjectExpression)
                 objects
             case (is Tree.Constructor|Tree.Enumerated)
                 constructors
@@ -156,7 +164,7 @@ shared object icons {
                 null;
     }
     
-    shared Icon? forDeclaration(Tree.Declaration|Tree.SpecifierStatement|Declaration obj) {
+    shared Icon? forDeclaration(DeclarationNode|Declaration obj) {
         value baseIcon = getBaseIcon(obj);
         if (!exists baseIcon) {
             print("Missing icon for ``obj``");
@@ -166,7 +174,9 @@ shared object icons {
         Declaration? model = 
             switch (obj) 
             case (is Tree.Declaration) obj.declarationModel
+            case (is Tree.TypedArgument) obj.declarationModel
             case (is Tree.SpecifierStatement) obj.declaration
+            case (is Tree.ObjectExpression) obj.anonymousClass
             else obj;
         
         if (exists model) {
@@ -210,9 +220,7 @@ shared object icons {
     shared Icon? forClass(ClsClassImpl cls) {
         Icon? baseIcon;
 
-        function has(String ann) {
-            return cls.modifierList.findAnnotation(ann) exists;
-        }
+        function has(String ann) => cls.modifierList.findAnnotation(ann) exists;
 
         if (has("com.redhat.ceylon.compiler.java.metadata.Module")) {
             baseIcon = moduleDescriptors;
@@ -231,9 +239,10 @@ shared object icons {
         }
 
         if (exists baseIcon) {
-            value visibility = if (cls.hasModifierProperty(PsiModifier.public))
-            then PlatformIcons.publicIcon
-            else PlatformIcons.privateIcon;
+            value visibility
+                    = if (cls.hasModifierProperty(PsiModifier.public))
+                    then PlatformIcons.publicIcon
+                    else PlatformIcons.privateIcon;
 
             value decorations = ArrayList<Icon>();
             if (cls.hasModifierProperty(PsiModifier.final)) {

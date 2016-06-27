@@ -71,6 +71,10 @@ extendsNode :
                 { print(" extends DeclarationPsiNameIdOwner"); }
               )
               |
+              { $n.text.equals("TYPED_ARGUMENT") }?=> (
+                { print(" extends TypedArgumentPsiNameIdOwner"); }
+              )
+              |
               { $n.text.equals("PARAMETER") }?=> (
                 { print(" extends ParameterPsiIdOwner"); }
               )
