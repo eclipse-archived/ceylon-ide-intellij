@@ -62,18 +62,21 @@ shared class CeylonGotoSuperHandler()
         satisfies LanguageCodeInsightActionHandler
                 & PresentableCodeInsightActionHandler {
 
+    value noAdditionalActions = Collections.emptyList<AdditionalAction>();
+
     alias SourceTypes
         => CeylonPsi.AnyClassPsi
          | CeylonPsi.AnyInterfacePsi
          | CeylonPsi.ObjectDefinitionPsi
-         | CeylonPsi.ObjectExpressionPsi;
+         | CeylonPsi.ObjectExpressionPsi
+         | CeylonPsi.ObjectArgumentPsi;
     alias SourceMembers
         => CeylonPsi.AnyAttributePsi
          | CeylonPsi.AnyMethodPsi
          | CeylonPsi.SpecifierStatementPsi;
     alias SourceConstructors
         => CeylonPsi.ConstructorPsi
-        | CeylonPsi.EnumeratedPsi;
+         | CeylonPsi.EnumeratedPsi;
 
     alias Source
         => SourceTypes | SourceMembers | SourceConstructors;
@@ -82,7 +85,7 @@ shared class CeylonGotoSuperHandler()
 
     getSourceAndTargetElements(Editor editor, PsiFile file)
             => if (exists source = findSource(editor, file))
-            then GotoData(source, findTargets(source), Collections.emptyList<AdditionalAction>())
+            then GotoData(source, findTargets(source), noAdditionalActions)
             else null;
 
     getChooserTitle(PsiElement sourceElement, String name, Integer length)
@@ -110,13 +113,15 @@ shared class CeylonGotoSuperHandler()
                 return psi;
             }
             return PsiTreeUtil.getParentOfType(element,
+                //TODO: this is awful, do something different
                 javaClass<CeylonPsi.AnyClassPsi>(),
                 javaClass<CeylonPsi.AnyInterfacePsi>(),
                 javaClass<CeylonPsi.AnyAttributePsi>(),
                 javaClass<CeylonPsi.AnyMethodPsi>(),
                 javaClass<CeylonPsi.ConstructorPsi>(),
                 javaClass<CeylonPsi.ObjectDefinitionPsi>(),
-                javaClass<CeylonPsi.ObjectExpressionPsi>());
+                javaClass<CeylonPsi.ObjectExpressionPsi>(),
+                javaClass<CeylonPsi.ObjectArgumentPsi>());
         }
         return null;
     }
@@ -176,6 +181,16 @@ shared class CeylonGotoSuperHandler()
             }
         }
         else if (is CeylonPsi.ObjectExpressionPsi e) {
+            if (exists cla = e.ceylonNode.anonymousClass) {
+                if (exists target = cla.extendedType ?. declaration) {
+                    list.add(target);
+                }
+                for (type in cla.satisfiedTypes) {
+                    list.add(type.declaration);
+                }
+            }
+        }
+        else if (is CeylonPsi.ObjectArgumentPsi e) {
             if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType ?. declaration) {
                     list.add(target);

@@ -137,7 +137,8 @@ shared abstract class AbstractMembersAction()
     alias TypeDecPsi 
             => CeylonPsi.ClassOrInterfacePsi
              | CeylonPsi.ObjectDefinitionPsi
-             | CeylonPsi.ObjectExpressionPsi;
+             | CeylonPsi.ObjectExpressionPsi
+             | CeylonPsi.ObjectArgumentPsi;
     
     shared actual void invoke(Project project, Editor editor, PsiFile file) {
 
@@ -204,6 +205,7 @@ shared abstract class AbstractMembersAction()
             ClassOrInterface? ci = 
                 if (is CeylonPsi.ObjectDefinitionPsi node) then node.ceylonNode.anonymousClass
                 else if (is CeylonPsi.ObjectExpressionPsi node) then node.ceylonNode.anonymousClass
+                else if (is CeylonPsi.ObjectArgumentPsi node) then node.ceylonNode.anonymousClass
                 else node.ceylonNode.declarationModel;
             if (!exists ci) {
                 return;
