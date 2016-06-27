@@ -196,18 +196,13 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             TargetElementUtil targetElementUtil = TargetElementUtil.instance;
 
             value onRef = ApplicationManager.application.runReadAction(object satisfies Computable<Boolean> {
-                shared actual Boolean compute() {
-                    return !targetElementUtil.findTargetElement(editor,
-                        flags.and(referencedElementAccepted.or(lookupItemAccepted)),
-                        offset
-                    ) exists;
-                }
+                compute() => !targetElementUtil.findTargetElement(editor,
+                                flags.and(referencedElementAccepted.or(lookupItemAccepted)),
+                                offset) exists;
             });
 
             value onSelf = ApplicationManager.application.runReadAction(object satisfies Computable<Boolean> {
-                shared actual Boolean compute() {
-                    return !element exists||targetElementUtil.includeSelfInGotoImplementation(element);
-                }
+                compute() => !element exists || targetElementUtil.includeSelfInGotoImplementation(element);
             });
             return searchImplementations(element, editor, offset, onRef && onSelf, onRef);
         }
