@@ -36,14 +36,17 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfies CompletionContext {
-    shared Editor editor;
+
     shared CeylonFile file;
-    
+    shared Editor editor;
+
     shared actual BaseCeylonProject? ceylonProject;
-    
+    shared actual CompletionOptions options;
+
     shared actual IdeaDocument commonDocument = IdeaDocument(editor.document);
-    
-    assert(exists localAnalysisResult = file.localAnalysisResult);
+    shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder();
+
+    assert (exists localAnalysisResult = file.localAnalysisResult);
 
     parsedRootNode => localAnalysisResult.parsedRootNode;
     tokens => localAnalysisResult.tokens;
@@ -63,21 +66,18 @@ shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfi
         assert (exists lastPhasedUnit = localAnalysisResult.lastPhasedUnit);
         return lastPhasedUnit;
     }
-    
-    
-    shared actual CompletionOptions options;
-    
+
     proposalFilters => empty;
     
-    shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder();
 }
 
 shared class IdeaProposalsHolder() satisfies ProposalsHolder {
     value _proposals = ArrayList<LookupElement>();
     
     shared List<LookupElement> proposals => _proposals;
-    
+
+    shared void add(LookupElement element) => _proposals.add(element);
+
     size => _proposals.size;
     
-    shared void add(LookupElement element) => _proposals.add(element);   
 }
