@@ -88,7 +88,10 @@ public class CeylonClassDecorator
                     return ((PsiLiteralExpression) value).getValue().toString();
                 }
             }
+        } else if (clsClass.getName().endsWith("_")) {
+            return clsClass.getName().substring(0, clsClass.getName().length() - 1);
         }
+
         return clsClass.getName();
     }
 
