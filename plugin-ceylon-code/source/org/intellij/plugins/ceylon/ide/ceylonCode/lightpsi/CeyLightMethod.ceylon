@@ -224,7 +224,8 @@ shared class CeyLightMethod(shared actual PsiClass containingClass, MethodMirror
             return PsiType.byte;
         } else if (type.qualifiedName.equals("java.lang.String")) {
             return PsiType.getJavaLangString(manager, GlobalSearchScope.allScope(project));
-        } else if (type.qualifiedName.equals("ceylon.language::Object")) {
+        } else if (type.qualifiedName.equals("ceylon.language::Object")
+            || type.qualifiedName.equals("java.lang.Object")) {
             return PsiType.getJavaLangObject(manager, GlobalSearchScope.allScope(project));
         }
         return CeyLightType(type, project);
