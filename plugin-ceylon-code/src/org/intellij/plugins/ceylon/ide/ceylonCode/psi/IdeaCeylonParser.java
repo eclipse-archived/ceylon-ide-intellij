@@ -355,7 +355,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
             while (index < targetIndex) {
                 Token token = tokens.remove();
                 String text = token.getText();
-                if (text.endsWith("\n")) {
+                if (token.getType()==CeylonLexer.LINE_COMMENT && text.endsWith("\n")) {
                     parent.rawAddChildrenWithoutNotifications(new LeafPsiElement(getElementType(token.getType()),
                             text.substring(0, text.length()-1)));
                     parent.rawAddChildrenWithoutNotifications(new PsiWhiteSpaceImpl("\n"));
