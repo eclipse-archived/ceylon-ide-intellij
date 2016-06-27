@@ -53,7 +53,7 @@ shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfi
     typecheckedRootNode => localAnalysisResult.typecheckedRootNode;
     
     shared actual TypeChecker typeChecker {
-        assert(exists existingTypeChecker = localAnalysisResult.typeChecker);
+        assert (exists existingTypeChecker = localAnalysisResult.typeChecker);
         return existingTypeChecker;
     }
 
