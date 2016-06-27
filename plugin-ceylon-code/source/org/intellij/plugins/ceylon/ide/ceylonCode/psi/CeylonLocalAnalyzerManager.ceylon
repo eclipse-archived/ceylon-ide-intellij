@@ -6,7 +6,9 @@ import com.intellij.openapi {
     Disposable
 }
 import com.intellij.openapi.application {
-    ApplicationManager
+    ApplicationManager {
+        application
+    }
 }
 import com.intellij.openapi.components {
     ProjectComponent
@@ -18,13 +20,18 @@ import com.intellij.openapi.fileEditor {
     FileEditorManager {
         fileEditorManagerInstance=getInstance
     },
-    FileEditorManagerEvent
+    FileEditorManagerEvent,
+    FileDocumentManager {
+        fileDocumentManager = instance
+    }
 }
 import com.intellij.openapi.\imodule {
     Module
 }
 import com.intellij.openapi.startup {
-    StartupManager
+    StartupManager {
+        startupManager = getInstance
+    }
 }
 import com.intellij.openapi.util {
     Computable
@@ -36,14 +43,19 @@ import com.intellij.openapi.vfs {
     VirtualFileMoveEvent,
     VirtualFilePropertyEvent,
     VirtualFileCopyEvent,
-    VirtualFileManager
+    VirtualFileManager {
+        virtualFileManager = instance
+    }
 }
 import com.intellij.psi {
     PsiManager {
         psiManager=getInstance
     },
     FileViewProvider,
-    SingleRootFileViewProvider
+    SingleRootFileViewProvider,
+    PsiDocumentManager {
+        psiDocumentManager = getInstance
+    }
 }
 import com.intellij.util.messages {
     MessageBusConnection
@@ -59,13 +71,23 @@ import com.redhat.ceylon.ide.common.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType,
-    CeylonLanguage
+    CeylonFileType {
+        ceylonFileType = instance
+    },
+    CeylonLanguage {
+        ceylonLanguage = instance
+    }
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
     concurrencyManager
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    CeylonLogger
+}
+
+CeylonLogger<CeylonLocalAnalyzerManager> ceylonLocalAnalyzerManagerLogger = CeylonLogger<CeylonLocalAnalyzerManager>();
+
 shared class CeylonLocalAnalyzerManager(model) 
         satisfies Correspondence<VirtualFile, CeylonLocalAnalyzer>
         & ProjectComponent
@@ -94,15 +116,15 @@ shared class CeylonLocalAnalyzerManager(model)
     shared actual void disposeComponent() {
         dispose();
         busConnection.disconnect();
-        VirtualFileManager.instance.removeVirtualFileListener(this);
+        virtualFileManager.removeVirtualFileListener(this);
         model.removeModelListener(this);
     }
     
     shared actual void projectOpened() {
-        StartupManager.getInstance(model.ideaProject)
+        startupManager(model.ideaProject)
                 .runWhenProjectIsInitialized(JavaRunnable(() {
-            value openedCeylonFiles = FileEditorManager.getInstance(model.ideaProject).openFiles.array.coalesced
-                    .filter((vf) => vf.fileType == CeylonFileType.instance);
+            value openedCeylonFiles = fileEditorManagerInstance(model.ideaProject).openFiles.array.coalesced
+                    .filter((vf) => vf.fileType == ceylonFileType);
             mutableMap.putAllKeys(openedCeylonFiles, newCeylonLocalAnalyzer, true);
         }));
     }
@@ -110,7 +132,7 @@ shared class CeylonLocalAnalyzerManager(model)
     shared actual void initComponent() {
         busConnection = model.ideaProject.messageBus.connect();
         busConnection.subscribe(fileEditorManagerTopic, this);
-        VirtualFileManager.instance.addVirtualFileListener(this);
+        virtualFileManager.addVirtualFileListener(this);
         model.addModelListener(this);
     }
     
@@ -136,7 +158,7 @@ shared class CeylonLocalAnalyzerManager(model)
     }
     
     shared actual void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile) {
-        if (virtualFile.fileType == CeylonFileType.instance) {
+        if (virtualFile.fileType == ceylonFileType) {
             mutableMap.putIfAbsent(virtualFile, () => newCeylonLocalAnalyzer(virtualFile));
         }
     }
@@ -176,14 +198,19 @@ shared class CeylonLocalAnalyzerManager(model)
 
     shared void scheduleReparse(VirtualFile virtualFile) {
         if (is SingleRootFileViewProvider fileViewProvider =
-            ApplicationManager.application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
-            => PsiManager.getInstance(model.ideaProject).findViewProvider(virtualFile);})) {
-            ApplicationManager.application.invokeLater(JavaRunnable(() {
-                ApplicationManager.application.runWriteAction(JavaRunnable(() {
+            application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
+            => psiManager(model.ideaProject).findViewProvider(virtualFile);})) {
+            application.invokeLater(JavaRunnable(() {
+                application.runWriteAction(JavaRunnable(() {
+                    value psiDocMgr = psiDocumentManager(model.ideaProject);
+                    if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
+                        psiDocMgr.isUncommited(cachedDocument)) {
+                        psiDocMgr.commitDocument(cachedDocument);
+                    }
                     fileViewProvider.onContentReload();
                 }));
-                ApplicationManager.application.runReadAction(JavaRunnable(() {
-                    if (exists cachedPsi = fileViewProvider.getCachedPsi(CeylonLanguage.instance)) {
+                application.runReadAction(JavaRunnable(() {
+                    if (exists cachedPsi = fileViewProvider.getCachedPsi(ceylonLanguage)) {
                         suppressWarnings("unusedDeclaration")
                         value unused = cachedPsi.node.lastChildNode;
                     }
