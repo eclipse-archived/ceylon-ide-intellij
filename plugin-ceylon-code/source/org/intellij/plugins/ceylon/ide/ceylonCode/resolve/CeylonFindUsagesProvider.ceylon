@@ -81,8 +81,7 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
                 case (is Tree.InitializerParameter) {
                     return node.identifier.text;
                 }
-                else if (exists declaration = nodes.findDeclaration(lastCompilationUnit, node),
-                         exists id = declaration.identifier) {
+                else if (exists id = nodes.findDeclaration(lastCompilationUnit, node)?.identifier) {
                     return id.text;
                 }
             }
