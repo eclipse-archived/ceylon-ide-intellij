@@ -24,7 +24,7 @@ shared class ShortcutRefinementIntention() extends AbstractIntention() {
     familyName => "Convert refinement to shortcut form";
     
     shared actual void checkAvailable(IdeaQuickFixData data, CeylonFile file, Integer offset) {
-        value statement = nodes.findStatement(data.rootNode, data.node);
+        value statement = nodes.findDeclaration(data.rootNode, data.node);
         verboseRefinementQuickFix.addShortcutRefinementProposal(data, statement);
     }
 }
