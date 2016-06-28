@@ -38,9 +38,8 @@ import com.redhat.ceylon.ide.common.model {
 shared class CeylonElementFinder() extends PsiElementFinder() {
 
     shared actual PsiClass? findClass(String fqName, GlobalSearchScope scope) {
-        value p = scope.project;
-        
-        if (exists projects = p.getComponent(javaClass<IdeaCeylonProjects>())) {
+        if (exists p = scope.project,
+            exists projects = p.getComponent(javaClass<IdeaCeylonProjects>())) {
             for (proj in projects.ceylonProjects) {
                 value ijMod = proj.ideArtifact;
 
