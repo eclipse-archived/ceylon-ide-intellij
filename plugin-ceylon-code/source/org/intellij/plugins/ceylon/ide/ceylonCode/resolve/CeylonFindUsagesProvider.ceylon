@@ -45,12 +45,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
 
 shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
 
-    Logger logger = Logger.getInstance(javaClass<CeylonFindUsagesProvider>());
+    value logger = Logger.getInstance(javaClass<CeylonFindUsagesProvider>());
 
     wordsScanner
             => DefaultWordsScanner(CeylonAntlrToIntellijLexerAdapter(),
-                TokenSet.create(TokenTypes.lidentifier.tokenType, TokenTypes.uidentifier.tokenType),
-                TokenSet.create(TokenTypes.multiComment.tokenType, TokenTypes.lineComment.tokenType),
+                TokenSet.create(TokenTypes.lidentifier.tokenType,
+                                TokenTypes.uidentifier.tokenType),
+                TokenSet.create(TokenTypes.multiComment.tokenType,
+                                TokenTypes.lineComment.tokenType),
                 TokenSet.create(TokenTypes.stringLiteral.tokenType));
 
     canFindUsagesFor(PsiElement psiElement)
@@ -64,8 +66,10 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
     shared actual String getDescriptiveName(PsiElement element) {
         if (is CeylonCompositeElement element) {
             assert (is CeylonFile file = element.containingFile);
-            if (exists localAnalysisResult = file.localAnalysisResult,
-                exists lastCompilationUnit = localAnalysisResult.lastCompilationUnit) {
+            if (exists localAnalysisResult
+                    = file.localAnalysisResult,
+                exists lastCompilationUnit
+                    = localAnalysisResult.lastCompilationUnit) {
                 value node = nodes.findNode {
                     node = lastCompilationUnit;
                     tokens = localAnalysisResult.tokens;
@@ -74,10 +78,10 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
                 };
                 if (exists node) {
                     if (is Tree.InitializerParameter node) {
-                        Tree.InitializerParameter initializerParameter = node;
-                        return initializerParameter.identifier.text;
+                        return node.identifier.text;
                     } else {
-                        if (exists declaration = nodes.findDeclaration(lastCompilationUnit, node)) {
+                        if (exists declaration
+                                = nodes.findDeclaration(lastCompilationUnit, node)) {
                             return declaration.identifier.text;
                         }
                     }
@@ -88,8 +92,7 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
         logger.warn("Descriptive name not implemented for " + className(element));
 
         if (is CeylonPsi.IdentifierPsi element) {
-            CeylonPsi.IdentifierPsi id = element;
-            return id.ceylonNode.text;
+            return element.ceylonNode.text;
         }
         return "<unknown>";
     }
