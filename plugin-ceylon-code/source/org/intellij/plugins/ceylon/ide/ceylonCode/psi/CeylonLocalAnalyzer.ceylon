@@ -28,9 +28,6 @@ import com.intellij.openapi.progress {
 import com.intellij.openapi.project {
     Project
 }
-import com.intellij.openapi.util {
-    Computable
-}
 import com.intellij.openapi.vfs {
     VirtualFile
 }
@@ -135,6 +132,8 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     assert(is IdeaCeylonProject? ceylonProject = 
         model.getProject(
             ModuleUtil.findModuleForFile(virtualFile, ideaProject) else null));
+    
+    variable ExternalPhasedUnit? externalPhasedUnitToTranslate = null;
     
     shared actual void dispose() {
         disposed = true;
@@ -281,12 +280,9 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         logger.debug(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
             ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
                 assert (is PsiDocumentManagerBase psiDocumentManager = PsiDocumentManager.getInstance(ideaProject));
-                value document = ApplicationManager.application.runReadAction(object satisfies Computable<Document> { compute()
-                    => psiDocumentManager.getLastCommittedDocument(FileDocumentManager.instance.getDocument(virtualFile));});
                 value phasedUnit = ideaProject.getComponent(javaClass<IdeaCeylonProjects>()).findExternalPhasedUnit(virtualFile);
                 if (exists phasedUnit) {
-                    value result = prepareLocalAnalysisResult(document, phasedUnit.compilationUnit, phasedUnit.tokens);
-                    result.finishedTypechecking(phasedUnit, phasedUnit.typeChecker);
+                    externalPhasedUnitToTranslate = phasedUnit;
                     manager.scheduleReparse(virtualFile);
                 } else {
                     logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
@@ -302,6 +298,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         submitLocalTypechecking(void () {
             completeExternalPhasedUnitTypechecking(phasedUnit, result, restarterCancellable);
         });
+        externalPhasedUnitToTranslate = null;
         logger.debug(()=>"Exit translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``");
     }
 

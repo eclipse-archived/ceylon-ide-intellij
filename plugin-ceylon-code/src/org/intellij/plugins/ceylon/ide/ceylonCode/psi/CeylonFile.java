@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,8 @@ import com.redhat.ceylon.ide.common.model.IdeModule;
 import com.redhat.ceylon.ide.common.platform.CommonDocument;
 import com.redhat.ceylon.ide.common.platform.Status;
 import com.redhat.ceylon.ide.common.platform.platformUtils_;
+import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
+import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult$impl;
 import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
@@ -75,7 +78,7 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     }
     
     @SuppressWarnings("unchecked")
-    ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile> retrieveCorrespondingPhasedUnit() {
+    ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile> retrieveProjectPhasedUnit() {
         Module module = ModuleUtil.findModuleForPsiElement(this);
         CeylonProjects<Module, VirtualFile, VirtualFile, VirtualFile> ceylonProjects = getProject().getComponent(org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects.class);
         CeylonProject<Module, VirtualFile, VirtualFile, VirtualFile> ceylonProject = ceylonProjects.getProject(module);
@@ -85,6 +88,17 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
                 return ceylonProject.getParsedUnit(ceylonVirtualFile);
             }
         }
+        return null;
+    }
+
+    ExternalPhasedUnit retrieveExternalPhasedUnit() {
+        WeakReference<ExternalPhasedUnit> externalPuRef = realVirtualFile().getUserData(uneditedExternalPhasedUnit_.get_());
+        ExternalPhasedUnit externalPu = null;
+        if (externalPuRef != null && 
+                (externalPu = externalPuRef.get()) != null) {
+            return externalPu;
+        }
+        
         return null;
     }
     
@@ -99,11 +113,11 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
                 }
             }
             return null;
-        }
-        
-        ProjectPhasedUnit<?, ?, ?, ?> projectPhasedUnit = retrieveCorrespondingPhasedUnit();
-        if (projectPhasedUnit != null) {
-            return projectPhasedUnit.getTypeChecker();
+        } else {
+            ProjectPhasedUnit<?, ?, ?, ?> projectPhasedUnit = retrieveProjectPhasedUnit();
+            if (projectPhasedUnit != null) {
+                return projectPhasedUnit.getTypeChecker();
+            }
         }
         
         LocalAnalysisResult localAnalysisResult = getLocalAnalysisResult();
@@ -133,56 +147,64 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
                 }
             }
         }
+        final IdePhasedUnit phasedUnit;
         if (! isInSourceArchive_.isInSourceArchive(realVirtualFile())) {
-            final ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile> projectPhasedUnit = retrieveCorrespondingPhasedUnit();
-            if (projectPhasedUnit != null 
-                    && projectPhasedUnit.isFullyTyped()) {
-                if (projectPhasedUnit.getCompilationUnit() == attachedCompilationUnit) {
-                    return new LocalAnalysisResult() {
-                        public boolean getUpToDate() {
-                            return true;
+            phasedUnit = retrieveProjectPhasedUnit();
+        }  else {
+            phasedUnit = retrieveExternalPhasedUnit();
+        }
+        if (phasedUnit != null 
+                && phasedUnit.isRefinementValidated()) {
+            if (phasedUnit.getCompilationUnit() == attachedCompilationUnit) {
+                return new LocalAnalysisResult() {
+                    public boolean getUpToDate() {
+                        return true;
+                    }
+                    @Override
+                    public CompilationUnit getTypecheckedRootNode() {
+                        return attachedCompilationUnit;
+                    }
+                    @Override
+                    public TypeChecker getTypeChecker() {
+                        return phasedUnit.getTypeChecker();
+                    }
+                    @Override
+                    public List<CommonToken> getTokens() {
+                        return phasedUnit.getTokens();
+                    }
+                    @Override
+                    public CompilationUnit getParsedRootNode() {
+                        return attachedCompilationUnit;
+                    }
+                    @Override
+                    public PhasedUnit getLastPhasedUnit() {
+                        return phasedUnit;
+                    }
+                    @Override
+                    public CompilationUnit getLastCompilationUnit() {
+                        return attachedCompilationUnit;
+                    }
+                    @Override
+                    public CommonDocument getCommonDocument() {
+                        return null;
+                    }
+                    @Override
+                    public BaseCeylonProject getCeylonProject() {
+                        if (phasedUnit instanceof ProjectPhasedUnit<?,?,?,?>) {
+                            return ((ProjectPhasedUnit<?,?,?,?>)phasedUnit).getCeylonProject();
+                        } else if (phasedUnit instanceof ExternalPhasedUnit) {
+                            return phasedUnit.getModuleSourceMapper().getCeylonProject();
                         }
-                        @Override
-                        public CompilationUnit getTypecheckedRootNode() {
-                            return attachedCompilationUnit;
-                        }
-                        @Override
-                        public TypeChecker getTypeChecker() {
-                            return projectPhasedUnit.getTypeChecker();
-                        }
-                        @Override
-                        public List<CommonToken> getTokens() {
-                            return projectPhasedUnit.getTokens();
-                        }
-                        @Override
-                        public CompilationUnit getParsedRootNode() {
-                            return attachedCompilationUnit;
-                        }
-                        @Override
-                        public PhasedUnit getLastPhasedUnit() {
-                            return projectPhasedUnit;
-                        }
-                        @Override
-                        public CompilationUnit getLastCompilationUnit() {
-                            return attachedCompilationUnit;
-                        }
-                        @Override
-                        public CommonDocument getCommonDocument() {
-                            return null;
-                        }
-                        @Override
-                        public BaseCeylonProject getCeylonProject() {
-                            return projectPhasedUnit.getCeylonProject();
-                        }
-                        LocalAnalysisResult$impl $impl = new LocalAnalysisResult$impl(this);
-                        @Override
-                        public LocalAnalysisResult$impl $com$redhat$ceylon$ide$common$typechecker$LocalAnalysisResult$impl() {
-                            return $impl;
-                        }
-                    };
-                } else {
-                    platformUtils_.get_().log(Status.getStatus$_WARNING(), "ProjectPhasedUnit.compilationUnit !== ceylonFile.compilationUnit ");
-                }
+                        return null;
+                    }
+                    LocalAnalysisResult$impl $impl = new LocalAnalysisResult$impl(this);
+                    @Override
+                    public LocalAnalysisResult$impl $com$redhat$ceylon$ide$common$typechecker$LocalAnalysisResult$impl() {
+                        return $impl;
+                    }
+                };
+            } else {
+                platformUtils_.get_().log(Status.getStatus$_WARNING(), "ProjectPhasedUnit.compilationUnit !== ceylonFile.compilationUnit ");
             }
         }
                 

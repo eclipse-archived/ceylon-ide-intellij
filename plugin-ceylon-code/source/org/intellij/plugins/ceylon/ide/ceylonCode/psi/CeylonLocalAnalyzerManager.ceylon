@@ -8,7 +8,8 @@ import com.intellij.openapi {
 import com.intellij.openapi.application {
     ApplicationManager {
         application
-    }
+    },
+    ModalityState
 }
 import com.intellij.openapi.components {
     ProjectComponent
@@ -34,7 +35,8 @@ import com.intellij.openapi.startup {
     }
 }
 import com.intellij.openapi.util {
-    Computable
+    Computable,
+    Key
 }
 import com.intellij.openapi.vfs {
     VirtualFileListener,
@@ -61,10 +63,12 @@ import com.intellij.util.messages {
     MessageBusConnection
 }
 import com.redhat.ceylon.ide.common.model {
-    ModelListenerAdapter
+    ModelListenerAdapter,
+    CeylonProject
 }
 import com.redhat.ceylon.ide.common.typechecker {
-    ProjectPhasedUnit
+    ProjectPhasedUnit,
+    ExternalPhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
     ImmutableMapWrapper
@@ -85,8 +89,16 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger
 }
+import com.intellij.openapi.progress {
+    ProgressManager
+}
+import java.lang.ref {
+    WeakReference
+}
 
 CeylonLogger<CeylonLocalAnalyzerManager> ceylonLocalAnalyzerManagerLogger = CeylonLogger<CeylonLocalAnalyzerManager>();
+
+shared Key<WeakReference<ExternalPhasedUnit>> uneditedExternalPhasedUnit = Key<WeakReference<ExternalPhasedUnit>>("CeylonPlugin.nativeFile_uneditedExternalPhasedUnit");
 
 shared class CeylonLocalAnalyzerManager(model) 
         satisfies Correspondence<VirtualFile, CeylonLocalAnalyzer>
@@ -96,19 +108,21 @@ shared class CeylonLocalAnalyzerManager(model)
         & FileEditorManagerListener
         & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;    
-    value mutableMap = ImmutableMapWrapper<VirtualFile, CeylonLocalAnalyzer>(emptyMap, map);
+    value editedFilesAnalyzersMap = ImmutableMapWrapper<VirtualFile, CeylonLocalAnalyzer>(emptyMap, map);
     
     late MessageBusConnection busConnection;
 
-    shared Map<VirtualFile, CeylonLocalAnalyzer> analyzers => mutableMap.immutable;
+    value logger => ceylonLocalAnalyzerManagerLogger;
+            
+    shared Map<VirtualFile, CeylonLocalAnalyzer> editedFilesAnalyzers => editedFilesAnalyzersMap.immutable;
 
-    defines(VirtualFile key) => analyzers.defines(key);
-    get(VirtualFile key) => analyzers[key];
+    defines(VirtualFile key) => editedFilesAnalyzers.defines(key);
+    get(VirtualFile key) => editedFilesAnalyzers[key];
 
     shared actual String componentName => "CeylonLocalAnalyzerManager";
     
     shared actual void dispose() {
-        mutableMap.clear().items.each((localAnalyzer) {
+        editedFilesAnalyzersMap.clear().items.each((localAnalyzer) {
            localAnalyzer.dispose(); 
         });
     }
@@ -125,7 +139,7 @@ shared class CeylonLocalAnalyzerManager(model)
                 .runWhenProjectIsInitialized(JavaRunnable(() {
             value openedCeylonFiles = fileEditorManagerInstance(model.ideaProject).openFiles.array.coalesced
                     .filter((vf) => vf.fileType == ceylonFileType);
-            mutableMap.putAllKeys(openedCeylonFiles, newCeylonLocalAnalyzer, true);
+            editedFilesAnalyzersMap.putAllKeys(openedCeylonFiles, newCeylonLocalAnalyzer, true);
         }));
     }
 
@@ -137,13 +151,13 @@ shared class CeylonLocalAnalyzerManager(model)
     }
     
     shared actual void projectClosed() {
-        mutableMap.clear().items.each((analyzer) => 
+        editedFilesAnalyzersMap.clear().items.each((analyzer) => 
             analyzer.dispose());
     }
     
     shared actual void fileClosed(FileEditorManager fileEditorManager, VirtualFile virtualFile) {
         if (!fileEditorManager.isFileOpen(virtualFile)) {
-            value analyzer = mutableMap.remove(virtualFile);
+            value analyzer = editedFilesAnalyzersMap.remove(virtualFile);
             if (exists analyzer) {
                 analyzer.dispose();
                 scheduleReparse(virtualFile);
@@ -159,19 +173,19 @@ shared class CeylonLocalAnalyzerManager(model)
     
     shared actual void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile) {
         if (virtualFile.fileType == ceylonFileType) {
-            mutableMap.putIfAbsent(virtualFile, () => newCeylonLocalAnalyzer(virtualFile));
+            editedFilesAnalyzersMap.putIfAbsent(virtualFile, () => newCeylonLocalAnalyzer(virtualFile));
         }
     }
     
     shared actual void fileDeleted(VirtualFileEvent virtualFileEvent) {
-        mutableMap.remove(virtualFileEvent.file)?.dispose();
+        editedFilesAnalyzersMap.remove(virtualFileEvent.file)?.dispose();
     }
 
     shared actual void contentsChanged(VirtualFileEvent virtualFileEvent) {
         value virtualFile = virtualFileEvent.file;
-        if (exists analyzer = analyzers[virtualFile],
+        if (exists analyzer = editedFilesAnalyzers[virtualFile],
             isInSourceArchive(virtualFile)) {
-            mutableMap.put(virtualFile, newCeylonLocalAnalyzer(virtualFile));
+            editedFilesAnalyzersMap.put(virtualFile, newCeylonLocalAnalyzer(virtualFile));
         }
     }
 
@@ -192,31 +206,58 @@ shared class CeylonLocalAnalyzerManager(model)
                 scheduleReparse(virtualFile);
             }
         }
-        
-        
+    }
+    
+    shared actual void ceylonModelParsed(CeylonProject<Module, VirtualFile, VirtualFile, VirtualFile> project) {
+        value ceylonEditedFiles = concurrencyManager.needReadAccess(() =>
+            fileEditorManagerInstance(model.ideaProject)
+                .openFiles.array.coalesced).sequence();
+        for (externalFile in ceylonEditedFiles.filter(isInSourceArchive)) {
+            if (exists analyzer = editedFilesAnalyzersMap.get(externalFile)) {
+                analyzer.scheduleExternalSourcePreparation(this);
+            }
+        }
+    }
+
+    shared actual void externalPhasedUnitsTypechecked({ExternalPhasedUnit*} typecheckedUnits, Boolean fullyTypechecked) {
+        for (unit in typecheckedUnits) {
+            if (exists virtualFile = CeylonTreeUtil.getDeclaringFile(unit.unit, model.ideaProject)?.virtualFile) {
+                virtualFile.putUserData(uneditedExternalPhasedUnit, WeakReference<ExternalPhasedUnit>(unit));
+                scheduleReparse(virtualFile);
+            }
+        }
     }
 
     shared void scheduleReparse(VirtualFile virtualFile) {
-        if (is SingleRootFileViewProvider fileViewProvider =
-            application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
-            => psiManager(model.ideaProject).findViewProvider(virtualFile);})) {
-            application.invokeLater(JavaRunnable(() {
-                application.runWriteAction(JavaRunnable(() {
-                    value psiDocMgr = psiDocumentManager(model.ideaProject);
-                    if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
-                        psiDocMgr.isUncommited(cachedDocument)) {
-                        psiDocMgr.commitDocument(cachedDocument);
-                    }
-                    fileViewProvider.onContentReload();
+        ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() {
+            if (is SingleRootFileViewProvider fileViewProvider =
+                application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
+                => psiManager(model.ideaProject).findViewProvider(virtualFile);})) {
+                
+                application.invokator.invokeLater(JavaRunnable(() {
+                    application.runWriteAction(JavaRunnable(() {
+                        value psiDocMgr = psiDocumentManager(model.ideaProject);
+                        if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
+                            psiDocMgr.isUncommited(cachedDocument)) {
+                            psiDocMgr.commitDocument(cachedDocument);
+                        }
+                        fileViewProvider.onContentReload();
+                    }));
+                }), 
+                ModalityState.any())
+                .doWhenDone(JavaRunnable(() {
+                    application.runReadAction(JavaRunnable(() {
+                        if (exists cachedPsi = fileViewProvider.getCachedPsi(ceylonLanguage)) {
+                            suppressWarnings("unusedDeclaration")
+                            value unused = cachedPsi.node.lastChildNode;
+                        }
+                    }));
+                }))
+                .doWhenRejected(JavaRunnable(void () {
+                    logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
                 }));
-                application.runReadAction(JavaRunnable(() {
-                    if (exists cachedPsi = fileViewProvider.getCachedPsi(ceylonLanguage)) {
-                        suppressWarnings("unusedDeclaration")
-                        value unused = cachedPsi.node.lastChildNode;
-                    }
-                }));
-            })); 
-        }
+            }
+        }));
     }
 
     selectionChanged(FileEditorManagerEvent? fileEditorManagerEvent) => noop();

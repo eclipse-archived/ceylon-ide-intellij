@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +34,6 @@ import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl;
 import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IStubFileElementType;
-import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.parser.LexError;
@@ -42,7 +42,6 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
 
 /**
@@ -121,22 +120,24 @@ public class IdeaCeylonParser extends IStubFileElementType {
             CompilationUnitTranslator translator = new CompilationUnitTranslator(file, tokens, verbose);
             
             Tree.CompilationUnit parsedCompilationUnit = parser.compilationUnit();
-            if (isInSourceArchive_.isInSourceArchive(virtualFile)
-                    && localAnalyzer != null) {
-                    LocalAnalysisResult localAnalysisResult = localAnalyzer.getResult();
-                    if (localAnalysisResult != null) {
-                        PhasedUnit lastPhasedUnit = localAnalysisResult.getLastPhasedUnit();
-                        if (lastPhasedUnit instanceof ExternalPhasedUnit) {
-                            ExternalPhasedUnit externalPu = (ExternalPhasedUnit) lastPhasedUnit;
-                            ASTNode root = translator.translateToAstNode(externalPu.getCompilationUnit());
-                            localAnalyzer.translatedExternalSource(lastCommittedDocument, externalPu);
-                            return root;
-                        }
-                    }
+            if (isInSourceArchive_.isInSourceArchive(virtualFile)) {
+                ASTNode root;
+                WeakReference<ExternalPhasedUnit> externalPuRef = virtualFile.getUserData(uneditedExternalPhasedUnit_.get_());
+                ExternalPhasedUnit externalPu = null;
+                if (externalPuRef != null && 
+                        (externalPu = externalPuRef.get()) != null) {
+                    root = translator.translateToAstNode(externalPu.getCompilationUnit());
+                    if (localAnalyzer != null) {
+                        localAnalyzer.translatedExternalSource(lastCommittedDocument, externalPu);
+                    }      
+                } else {
+                    root = translator.translateToAstNode(parsedCompilationUnit);
+                }
+                return root;
             }
 
             if (localAnalyzer == null) {
-                ProjectPhasedUnit projectPhasedUnit = file.retrieveCorrespondingPhasedUnit();
+                ProjectPhasedUnit projectPhasedUnit = file.retrieveProjectPhasedUnit();
                 if (projectPhasedUnit != null) {
                     ASTNode root = translator.translateToAstNode(projectPhasedUnit.getCompilationUnit());
                     return root;
