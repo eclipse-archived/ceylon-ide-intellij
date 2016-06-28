@@ -76,15 +76,14 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
                     startOffset = element.textRange.startOffset;
                     endOffset = element.textRange.endOffset;
                 };
-                if (exists node) {
-                    if (is Tree.InitializerParameter node) {
-                        return node.identifier.text;
-                    } else {
-                        if (exists declaration
-                                = nodes.findDeclaration(lastCompilationUnit, node)) {
-                            return declaration.identifier.text;
-                        }
-                    }
+                switch (node)
+                case (null) {}
+                case (is Tree.InitializerParameter) {
+                    return node.identifier.text;
+                }
+                else if (exists declaration = nodes.findDeclaration(lastCompilationUnit, node),
+                         exists id = declaration.identifier) {
+                    return id.text;
                 }
             }
         }
