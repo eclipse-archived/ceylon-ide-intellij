@@ -64,7 +64,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             
         final Tree.CompilationUnit compilationUnit = localAnalysisResult.getTypecheckedRootNode();
         if (compilationUnit == null) {
-            platformUtils_.get_().log(Status.getStatus$_ERROR(), "CeylonReference is not resolved because the file " + myElement.getContainingFile() + " is not typechecked and up-to-date");
+            platformUtils_.get_().log(Status.getStatus$_DEBUG(), "CeylonReference is not resolved because the file " + myElement.getContainingFile() + " is not typechecked and up-to-date");
             throw platformUtils_.get_().newOperationCanceledException();
         }
 

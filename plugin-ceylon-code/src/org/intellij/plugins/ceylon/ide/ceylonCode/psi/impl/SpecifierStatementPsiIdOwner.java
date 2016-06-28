@@ -73,7 +73,7 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
                     return new LocalSearchScope(getContainingFile());
                 }
             } else {
-                platformUtils_.get_().log(Status.getStatus$_ERROR(), "Local scope not added in getUseScope() because the file " + getContainingFile() + " is not typechecked and up-to-date");
+                platformUtils_.get_().log(Status.getStatus$_DEBUG(), "Local scope not added in getUseScope() because the file " + getContainingFile() + " is not typechecked and up-to-date");
                 throw platformUtils_.get_().newOperationCanceledException();
             }
 
