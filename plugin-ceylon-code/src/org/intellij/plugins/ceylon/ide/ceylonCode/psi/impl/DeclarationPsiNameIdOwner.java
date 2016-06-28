@@ -24,7 +24,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.DeclarationPsiImpl implements PsiNameIdentifierOwner {
+public abstract class DeclarationPsiNameIdOwner
+        extends CeylonPsiImpl.DeclarationPsiImpl
+        implements PsiNameIdentifierOwner {
+
     public DeclarationPsiNameIdOwner(ASTNode astNode) {
         super(astNode);
     }
@@ -60,25 +63,26 @@ public abstract class DeclarationPsiNameIdOwner extends CeylonPsiImpl.Declaratio
     @NotNull
     @Override
     public SearchScope getUseScope() {
-        LocalAnalysisResult localAnalysisResult = ((CeylonFile) getContainingFile()).getLocalAnalysisResult();
+        CeylonFile file = (CeylonFile) getContainingFile();
+        ProjectScopeBuilder builder = ProjectScopeBuilder.getInstance(getProject());
+        LocalAnalysisResult localAnalysisResult = file.getLocalAnalysisResult();
         if (localAnalysisResult != null) {
             if (localAnalysisResult.getUpToDate()) {
                 Declaration model = getCeylonNode().getDeclarationModel();
-                if (model != null && !isAffectingOtherFiles(model)) {
-                    return new LocalSearchScope(getContainingFile());
+                if (model!=null && !isAffectingOtherFiles(model)) {
+                    return new LocalSearchScope(file);
                 }
-            } else {
-                platformUtils_.get_().log(Status.getStatus$_DEBUG(), "Local scope not added in getUseScope() because the file " + getContainingFile() + " is not typechecked and up-to-date");
-                throw platformUtils_.get_().newOperationCanceledException();
             }
-                
+
+            //TODO: is this really the best way to detect a library?
             if (localAnalysisResult.getLastPhasedUnit() instanceof ExternalPhasedUnit) {
-                return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope()
-                        .union(new LocalSearchScope(getContainingFile()));
+                return new LocalSearchScope(file)
+                        .union(builder.buildProjectScope())
+                        .union(builder.buildLibrariesScope());
             }
         }
 
-        return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope();
+        return new LocalSearchScope(file).union(builder.buildProjectScope());
     }
 
     private boolean isAffectingOtherFiles(@NotNull  Declaration declaration) {

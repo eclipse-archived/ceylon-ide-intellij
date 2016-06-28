@@ -23,7 +23,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public abstract class TypedArgumentPsiNameIdOwner extends CeylonPsiImpl.TypedArgumentPsiImpl implements PsiNameIdentifierOwner {
+public abstract class TypedArgumentPsiNameIdOwner
+        extends CeylonPsiImpl.TypedArgumentPsiImpl
+        implements PsiNameIdentifierOwner {
+
     public TypedArgumentPsiNameIdOwner(ASTNode astNode) {
         super(astNode);
     }
@@ -59,32 +62,9 @@ public abstract class TypedArgumentPsiNameIdOwner extends CeylonPsiImpl.TypedArg
     @NotNull
     @Override
     public SearchScope getUseScope() {
-        LocalAnalysisResult localAnalysisResult = ((CeylonFile) getContainingFile()).getLocalAnalysisResult();
-        if (localAnalysisResult != null) {
-            if (localAnalysisResult.getUpToDate()) {
-                Declaration model = getCeylonNode().getDeclarationModel();
-                if (model != null && !isAffectingOtherFiles(model)) {
-                    return new LocalSearchScope(getContainingFile());
-                }
-            } else {
-                platformUtils_.get_().log(Status.getStatus$_ERROR(), "Local scope not added in getUseScope() because the file " + getContainingFile() + " is not typechecked and up-to-date");
-                throw platformUtils_.get_().newOperationCanceledException();
-            }
-                
-            if (localAnalysisResult.getLastPhasedUnit() instanceof ExternalPhasedUnit) {
-                return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope()
-                        .union(new LocalSearchScope(getContainingFile()));
-            }
-        }
-
-        return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope();
-    }
-
-    private boolean isAffectingOtherFiles(@NotNull Declaration declaration) {
-        //TODO: return true if it's an argument
-        //      to a parameter declared in the
-        //      same file
-        return false;
+        //never called, AFAICT
+        CeylonFile file = (CeylonFile) getContainingFile();
+        return new LocalSearchScope(file);
     }
 
     @Nullable
