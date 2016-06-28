@@ -26,9 +26,10 @@ shared abstract class AddAnnotationIntention() extends AbstractIntention() {
     shared void addContextualAnnotationProposals(IdeaQuickFixData data, Integer offset) {
 
         if (exists decNode = nodes.findDeclaration(data.rootNode, data.node),
-            exists idNode = nodes.getIdentifyingNode(decNode)) {
+            exists idNode = nodes.getIdentifyingNode(decNode),
+            exists start = idNode.startIndex) {
             value doc = data.document;
-            if (doc.getLineOfOffset(idNode.startIndex.intValue())
+            if (doc.getLineOfOffset(start.intValue())
                 != doc.getLineOfOffset(offset)) {
 
                 return;
