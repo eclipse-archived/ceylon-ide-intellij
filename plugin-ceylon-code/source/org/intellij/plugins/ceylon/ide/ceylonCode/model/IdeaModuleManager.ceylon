@@ -19,7 +19,8 @@ import com.redhat.ceylon.ide.common.model {
     BaseIdeModuleManager,
     BaseIdeModuleSourceMapper,
     BaseIdeModule,
-    BaseCeylonProject
+    BaseCeylonProject,
+    CeylonProjects
 }
 import com.redhat.ceylon.model.cmr {
     JDKUtils
@@ -31,10 +32,11 @@ import com.redhat.ceylon.model.typechecker.model {
 
 shared class IdeaModuleManager(
     shared RepositoryManager repositoryManager,
+    CeylonProjects<IJModule, VirtualFile, VirtualFile, VirtualFile> model,
     IdeaCeylonProject ceylonProject
 )
         extends IdeModuleManager<IJModule,VirtualFile,VirtualFile,VirtualFile>
-        (ceylonProject) {
+        (model, ceylonProject) {
     
     shared actual IdeaModelLoader newModelLoader(BaseIdeModuleManager self,
         BaseIdeModuleSourceMapper sourceMapper, Modules modules) {

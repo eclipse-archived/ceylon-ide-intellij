@@ -288,7 +288,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
             object satisfies ModuleManagerFactory {
         
                 createModuleManager(Context context)
-                        => IdeaModuleManager(context.repositoryManager, outer);
+                        => IdeaModuleManager(context.repositoryManager, model, outer);
                 
                 shared actual IdeaModuleSourceMapper
                 createModuleManagerUtil(Context context, TCModManager moduleManager) {
