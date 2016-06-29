@@ -148,12 +148,12 @@ shared abstract class AbstractMembersAction()
         //  isContainerNode(MemberChooserObject key) => key is Parent;
         //}
         
-        class Parent(ClassOrInterface container)
+        class Parent(PsiElement psiElement, ClassOrInterface container)
                 extends PsiElementMemberChooserObject(
-            //TODO: I hate resoving and passing this in here, but
+            //TODO: I hate resolving and passing this in here, but
             //      due to a packaging issue I could not refine
             //      MemberChooser.isContainerNode
-            CeylonReference.resolveDeclaration(container, project) else nothing,
+            psiElement,
             descriptions.descriptionForDeclaration {
                 decl = container;
                 includeContainer = false;
@@ -180,7 +180,10 @@ shared abstract class AbstractMembersAction()
             ClassOrInterface container;
             shared Declaration declaration;
 
-            parentNodeDelegate = Parent(container);
+            assert (exists containerPsi
+                        = CeylonReference.resolveDeclaration(container, project));
+
+            parentNodeDelegate = Parent(containerPsi, container);
             hash => declaration.hash;
             equals(Object that)
                     => if (is Member that)
