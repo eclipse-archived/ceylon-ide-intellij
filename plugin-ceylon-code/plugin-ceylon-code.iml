@@ -47,5 +47,6 @@
     <orderEntry type="library" name="Ceylon: com.intellij.asm/current" level="project" />
     <orderEntry type="library" name="Ceylon: org.jetbrains.plugins.gradle/current" level="project" />
     <orderEntry type="library" name="Ceylon: org.intellij.groovy/current" level="project" />
+    <orderEntry type="library" name="Ceylon: com.github.rjeschke.txtmark/0.13" level="project" />
   </component>
 </module>
