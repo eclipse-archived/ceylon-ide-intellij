@@ -1,52 +1,28 @@
-import com.intellij.lang {
-    Language,
-    ASTNode
-}
-import com.intellij.navigation {
-    ItemPresentation
-}
-import com.intellij.openapi.project {
-    Project
-}
 import com.intellij.openapi.util {
-    TextRange,
     Key,
     Pair
 }
 import com.intellij.psi {
     PsiTypeParameter,
     PsiMethod,
-    PsiTypeParameterListOwner,
     PsiAnnotation,
-    PsiModifierList,
     PsiManager,
     PsiClassInitializer,
-    PsiReferenceList,
     PsiReference,
     HierarchicalMethodSignature,
     PsiClass,
     PsiField,
     PsiClassType,
-    PsiIdentifier,
     ResolveState,
     PsiSubstitutor,
-    PsiFile,
     PsiElementVisitor,
-    PsiTypeParameterList,
     PsiElement
 }
 import com.intellij.psi.impl.light {
     LightEmptyImplementsList
 }
-import com.intellij.psi.javadoc {
-    PsiDocComment
-}
 import com.intellij.psi.scope {
     PsiScopeProcessor
-}
-import com.intellij.psi.search {
-    GlobalSearchScope,
-    SearchScope
 }
 import com.intellij.util {
     IncorrectOperationException
@@ -57,17 +33,10 @@ import com.redhat.ceylon.model.loader.mirror {
 
 import java.lang {
     CharSequence,
-    ObjectArray,
     CharArray
 }
 import java.util {
-    List,
-    Collection,
     Collections
-}
-
-import javax.swing {
-    Icon
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
@@ -81,161 +50,161 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     shared actual void acceptChildren(PsiElementVisitor? visitor) {}
     
-    shared actual PsiElement? add(PsiElement? element) => null;
+    add(PsiElement? element) => null;
     
-    shared actual PsiElement? addAfter(PsiElement? element, PsiElement? anchor)
+    addAfter(PsiElement? element, PsiElement? anchor)
             => null;
     
-    shared actual PsiAnnotation? addAnnotation(String? qualifiedName) => null;
+    addAnnotation(String? qualifiedName) => null;
     
-    shared actual PsiElement? addBefore(PsiElement? element, PsiElement? anchor) => null;
+    addBefore(PsiElement? element, PsiElement? anchor) => null;
     
-    shared actual PsiElement? addRange(PsiElement? first, PsiElement? last) => null;
+    addRange(PsiElement? first, PsiElement? last) => null;
     
-    shared actual PsiElement? addRangeAfter(PsiElement? first, PsiElement? last, PsiElement? anchor) => null;
+    addRangeAfter(PsiElement? first, PsiElement? last, PsiElement? anchor) => null;
     
-    shared actual PsiElement? addRangeBefore(PsiElement? first, PsiElement? last, PsiElement? anchor) => null;
+    addRangeBefore(PsiElement? first, PsiElement? last, PsiElement? anchor) => null;
     
-    shared actual ObjectArray<PsiField> allFields => PsiField.emptyArray;
+    allFields => PsiField.emptyArray;
     
-    shared actual ObjectArray<PsiClass> allInnerClasses => PsiClass.emptyArray;
+    allInnerClasses => PsiClass.emptyArray;
     
-    shared actual ObjectArray<PsiMethod> allMethods => PsiMethod.emptyArray;
+    allMethods => PsiMethod.emptyArray;
     
-    shared actual List<Pair<PsiMethod,PsiSubstitutor>> allMethodsAndTheirSubstitutors
+    allMethodsAndTheirSubstitutors
             => Collections.emptyList<Pair<PsiMethod,PsiSubstitutor>>();
     
-    shared actual Boolean annotationType => false;
+    annotationType => false;
     
-    shared actual ObjectArray<PsiAnnotation> annotations => PsiAnnotation.emptyArray;
+    annotations => PsiAnnotation.emptyArray;
     
-    shared actual ObjectArray<PsiAnnotation> applicableAnnotations => PsiAnnotation.emptyArray;
+    applicableAnnotations => PsiAnnotation.emptyArray;
     
-    shared actual Boolean canNavigate() => false;
+    canNavigate() => false;
     
-    shared actual Boolean canNavigateToSource() => false;
+    canNavigateToSource() => false;
     
     shared actual void checkAdd(PsiElement? element) {}
     
     shared actual void checkDelete() {}
     
-    shared actual ObjectArray<PsiElement> children => PsiElement.emptyArray;
+    children => PsiElement.emptyArray;
     
-    shared actual ObjectArray<PsiMethod> constructors => PsiMethod.emptyArray;
+    constructors => PsiMethod.emptyArray;
     
-    shared actual PsiClass? containingClass => null;
+    containingClass => null;
     
-    shared actual PsiFile? containingFile => null;
+    containingFile => null;
     
-    shared actual PsiElement? context => null;
+    context => null;
     
-    shared actual PsiElement? copy() => null;
+    copy() => null;
     
     shared actual void delete() {}
     
     shared actual void deleteChildRange(PsiElement? first, PsiElement? last) {}
     
-    shared actual Boolean deprecated => false;
+    deprecated => false;
     
-    shared actual PsiDocComment? docComment => null;
+    docComment => null;
     
-    shared actual Boolean enum => false;
+    enum => false;
     
     extendsList => LightEmptyImplementsList(manager);
     
-    shared actual ObjectArray<PsiClassType> extendsListTypes => PsiClassType.emptyArray;
+    extendsListTypes => PsiClassType.emptyArray;
     
-    shared actual ObjectArray<PsiField> fields => PsiField.emptyArray;
+    fields => PsiField.emptyArray;
     
-    shared actual PsiAnnotation? findAnnotation(String? qualifiedName) => null;
+    findAnnotation(String? qualifiedName) => null;
     
-    shared actual PsiElement? findElementAt(Integer offset) => null;
+    findElementAt(Integer offset) => null;
     
-    shared actual PsiField? findFieldByName(String? name, Boolean checkBases) => null;
+    findFieldByName(String? name, Boolean checkBases) => null;
     
-    shared actual PsiClass? findInnerClassByName(String? name, Boolean checkBases) => null;
+    findInnerClassByName(String? name, Boolean checkBases) => null;
     
-    shared actual PsiMethod? findMethodBySignature(PsiMethod? patternMethod, Boolean checkBases) => null;
+    findMethodBySignature(PsiMethod? patternMethod, Boolean checkBases) => null;
     
-    shared actual List<Pair<PsiMethod,PsiSubstitutor>> findMethodsAndTheirSubstitutorsByName(String? name, Boolean checkBases)
+    findMethodsAndTheirSubstitutorsByName(String? name, Boolean checkBases)
             => Collections.emptyList<Pair<PsiMethod,PsiSubstitutor>>();
     
-    shared actual ObjectArray<PsiMethod> findMethodsByName(String? name, Boolean checkBases) => PsiMethod.emptyArray;
+    findMethodsByName(String? name, Boolean checkBases) => PsiMethod.emptyArray;
     
-    shared actual PsiReference? findReferenceAt(Integer offset) => null;
+    findReferenceAt(Integer offset) => null;
     
-    shared actual PsiElement? firstChild => null;
+    firstChild => null;
     
     shared actual T? getCopyableUserData<T>(Key<T>? key)
             given T satisfies Object => null;
     
-    shared actual Icon? getIcon(Integer flags) => null;
+    getIcon(Integer flags) => null;
     
     shared actual T? getUserData<T>(Key<T>? key)
             given T satisfies Object => null;
     
-    shared actual Boolean hasModifierProperty(String? name) => false;
+    hasModifierProperty(String? name) => false;
     
-    shared actual Boolean hasTypeParameters() => false;
+    hasTypeParameters() => false;
     
-    shared actual PsiReferenceList? implementsList => null;
+    implementsList => null;
     
-    shared actual ObjectArray<PsiClassType> implementsListTypes => PsiClassType.emptyArray;
+    implementsListTypes => PsiClassType.emptyArray;
     
-    shared actual Integer index => 0;
+    index => 0;
     
-    shared actual ObjectArray<PsiClassInitializer> initializers => PsiClassInitializer.emptyArray;
+    initializers => PsiClassInitializer.emptyArray;
     
-    shared actual ObjectArray<PsiClass> innerClasses => PsiClass.emptyArray;
+    innerClasses => PsiClass.emptyArray;
     
-    shared actual Boolean \iinterface => false;
+    \iinterface => false;
     
-    shared actual ObjectArray<PsiClass> interfaces => PsiClass.emptyArray;
+    interfaces => PsiClass.emptyArray;
     
-    shared actual Boolean isEquivalentTo(PsiElement? another) => false;
+    isEquivalentTo(PsiElement? another) => false;
     
-    shared actual Boolean isInheritor(PsiClass? baseClass, Boolean checkDeep) => false;
+    isInheritor(PsiClass? baseClass, Boolean checkDeep) => false;
     
-    shared actual Boolean isInheritorDeep(PsiClass? baseClass, PsiClass? classToByPass) => false;
+    isInheritorDeep(PsiClass? baseClass, PsiClass? classToByPass) => false;
     
-    shared actual PsiElement? lBrace => null;
+    lBrace => null;
     
-    shared actual Language language => CeylonLanguage.instance;
+    language => CeylonLanguage.instance;
     
-    shared actual PsiElement? lastChild => null;
+    lastChild => null;
     
-    shared actual ObjectArray<PsiMethod> methods => PsiMethod.emptyArray;
+    methods => PsiMethod.emptyArray;
     
-    shared actual PsiModifierList? modifierList => null;
+    modifierList => null;
     
     shared actual String name => mirror.name;
     
-    shared actual PsiIdentifier? nameIdentifier => null;
+    nameIdentifier => null;
     
     shared actual void navigate(Boolean requestFocus) {}
     
     shared actual PsiElement? navigationElement => null;
     
-    shared actual PsiElement? nextSibling => null;
+    nextSibling => null;
     
-    shared actual ASTNode? node => null;
+    node => null;
     
-    shared actual PsiElement? originalElement => null;
+    originalElement => null;
     
-    shared actual PsiTypeParameterListOwner? owner => null;
+    owner => null;
     
-    shared actual PsiElement? parent => null;
+    parent => null;
     
-    shared actual Boolean physical => true;
+    physical => true;
     
-    shared actual ItemPresentation? presentation => null;
+    presentation => null;
     
-    shared actual PsiElement? prevSibling => null;
+    prevSibling => null;
     
-    shared actual Boolean processDeclarations(PsiScopeProcessor? processor, ResolveState? state, 
+    processDeclarations(PsiScopeProcessor? processor, ResolveState? state,
         PsiElement? lastParent, PsiElement? place) => false;
     
-    shared actual Project project => manager.project;
+    project => manager.project;
     
     shared actual void putCopyableUserData<T>(Key<T>? key, T? \ivalue)
             given T satisfies Object {}
@@ -243,64 +212,63 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     shared actual void putUserData<T>(Key<T>? key, T? \ivalue)
             given T satisfies Object {}
     
-    shared actual String qualifiedName => mirror.name;
+    qualifiedName => mirror.name;
     
-    shared actual PsiElement? rBrace => null;
+    rBrace => null;
     
-    shared actual PsiReference? reference => null;
+    reference => null;
     
-    shared actual ObjectArray<PsiReference> references => PsiReference.emptyArray;
+    references => PsiReference.emptyArray;
     
-    shared actual PsiElement? replace(PsiElement? newElement) => null;
+    replace(PsiElement? newElement) => null;
     
-    shared actual GlobalSearchScope? resolveScope => null;
+    resolveScope => null;
     
-    shared actual PsiElement? scope => null;
+    scope => null;
     
     shared actual PsiElement setName(String? name) {
         throw IncorrectOperationException("Not supported");
     }
     
-    shared actual Integer startOffsetInParent => 0;
+    startOffsetInParent => 0;
     
-    shared actual String string => "CeyLightTypeParameter";
+    string => "CeyLightTypeParameter";
     
-    shared actual PsiClass? superClass => null;
+    superClass => null;
     
-    shared actual ObjectArray<PsiClassType> superTypes => PsiClassType.emptyArray;
+    superTypes => PsiClassType.emptyArray;
     
-    shared actual ObjectArray<PsiClass> supers => PsiClass.emptyArray;
+    supers => PsiClass.emptyArray;
     
-    shared actual String? text => null;
+    text => null;
     
-    shared actual Boolean textContains(Character c) => false;
+    textContains(Character c) => false;
     
-    shared actual Integer textLength => 0;
+    textLength => 0;
     
     shared actual Boolean textMatches(CharSequence? text) => false;
     
     shared actual Boolean textMatches(PsiElement? element) => false;
     
-    shared actual Integer textOffset => 0;
+    textOffset => 0;
     
-    shared actual TextRange? textRange => null;
+    textRange => null;
     
-    shared actual CharArray textToCharArray() => CharArray(0);
+    textToCharArray() => CharArray(0);
     
-    shared actual PsiTypeParameterList? typeParameterList => null;
+    typeParameterList => null;
     
     typeParameters => PsiTypeParameter.emptyArray;
     
-    shared actual SearchScope? useScope => null;
-    
+    useScope => null;
+
+    shared actual Boolean writable => false;
+
     shared actual Boolean valid => true;
     
-    shared actual Collection<HierarchicalMethodSignature> visibleSignatures
-            => Collections.emptyList<HierarchicalMethodSignature>();
+    visibleSignatures => Collections.emptyList<HierarchicalMethodSignature>();
     
-    shared actual Boolean writable => false;
-    
-    shared actual ObjectArray<PsiMethod> findMethodsBySignature(PsiMethod? patternMethod, Boolean checkBases)
+    findMethodsBySignature(PsiMethod? patternMethod, Boolean checkBases)
             => PsiMethod.emptyArray;
     
 }
