@@ -46,12 +46,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaModuleManager
 }
 
-String getJavaName(Declaration decl) {
-    return switch(decl)
-    case (is Value) decl.name + "_"
-    case (is Function) if (decl.toplevel) then decl.name + "_" else decl.name
-    else decl.name;
-}
+String getJavaName(Declaration decl)
+        => switch(decl)
+        case (is Value) decl.name + "_"
+        case (is Function) if (decl.toplevel) then decl.name + "_" else decl.name
+        else decl.name;
 
 shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache() {
     
@@ -78,25 +77,23 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
         return createJavaObjectArray(classes);
     }
     
-    shared actual ObjectArray<JString> allFieldNames
+    allFieldNames
             => createJavaObjectArray<JString>({});
     
-    shared actual ObjectArray<JString> allMethodNames
+    allMethodNames
             => createJavaObjectArray<JString>({});
     
-    shared actual void getAllClassNames(HashSet<JString> hashSet)
+    getAllClassNames(HashSet<JString> hashSet)
             => allClassNames.array.coalesced.each(hashSet.add);
     
-    shared actual void getAllFieldNames(HashSet<JString> hashSet)
+    getAllFieldNames(HashSet<JString> hashSet)
             => allFieldNames.array.coalesced.each(hashSet.add);
     
-    shared actual void getAllMethodNames(HashSet<JString> hashSet)
+    getAllMethodNames(HashSet<JString> hashSet)
             => allMethodNames.array.coalesced.each(hashSet.add);
     
     void scanInners(ClassOrInterface|FunctionOrValue decl, String name, ArrayList<PsiClass> classes) {
-        value members = if (is ClassOrInterface decl) then decl.members else decl.members;
-        
-        for (member in members) {
+        for (member in decl.members) {
             if (is ClassOrInterface member) {
                 if (name == getJavaName(member)) {
                     classes.add(CeyLightClass(decl of Declaration, project));
@@ -135,18 +132,18 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
         return createJavaObjectArray(classes);
     }
     
-    shared actual ObjectArray<PsiField> getFieldsByName(String? string, GlobalSearchScope? globalSearchScope)
+    getFieldsByName(String? string, GlobalSearchScope? globalSearchScope)
             => createJavaObjectArray<PsiField>({});
     
-    shared actual ObjectArray<PsiField> getFieldsByNameIfNotMoreThan(String? string, GlobalSearchScope? globalSearchScope, Integer int)
+    getFieldsByNameIfNotMoreThan(String? string, GlobalSearchScope? globalSearchScope, Integer int)
             => createJavaObjectArray<PsiField>({});
     
-    shared actual ObjectArray<PsiMethod> getMethodsByName(String? string, GlobalSearchScope? globalSearchScope)
+    getMethodsByName(String? string, GlobalSearchScope? globalSearchScope)
             => createJavaObjectArray<PsiMethod>({});
     
-    shared actual ObjectArray<PsiMethod> getMethodsByNameIfNotMoreThan(String? string, GlobalSearchScope? globalSearchScope, Integer int)
+    getMethodsByNameIfNotMoreThan(String? string, GlobalSearchScope? globalSearchScope, Integer int)
             => createJavaObjectArray<PsiMethod>({});
     
-    shared actual Boolean processMethodsWithName(String? string, GlobalSearchScope? globalSearchScope, Processor<PsiMethod>? processor)
+    processMethodsWithName(String? string, GlobalSearchScope? globalSearchScope, Processor<PsiMethod>? processor)
             => false;
 }

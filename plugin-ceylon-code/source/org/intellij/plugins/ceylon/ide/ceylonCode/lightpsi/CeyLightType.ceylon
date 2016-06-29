@@ -1,3 +1,7 @@
+import ceylon.language {
+    nil=null
+}
+
 import com.intellij.openapi.project {
     Project
 }
@@ -7,7 +11,6 @@ import com.intellij.pom.java {
 import com.intellij.psi {
     PsiClassType,
     PsiClass,
-    PsiElement,
     PsiAnnotation,
     PsiTypeVisitor,
     PsiType
@@ -21,11 +24,17 @@ import com.intellij.psi.search {
 import com.intellij.util.containers {
     ContainerUtil
 }
+import com.redhat.ceylon.ide.common.model {
+    CeylonUnit
+}
 import com.redhat.ceylon.ide.common.model.asjava {
     AbstractClassMirror
 }
 import com.redhat.ceylon.model.loader.mirror {
     TypeMirror
+}
+import com.redhat.ceylon.model.loader.model {
+    LazyClass
 }
 
 import java.lang {
@@ -34,24 +43,16 @@ import java.lang {
 import java.util {
     ArrayList
 }
-import com.redhat.ceylon.ide.common.model {
-    CeylonUnit
-}
-import com.redhat.ceylon.model.loader.model {
-    LazyClass
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     PSIClass,
     PSIType
 }
 
-Null _null => null;
-
-PsiClassType createType(TypeMirror mirror, Project project) {
-    return if (is PSIType mirror, is PsiClassType t = mirror.psi)
-    then t
-    else CeyLightType(mirror, project);
-}
+PsiClassType createType(TypeMirror mirror, Project project)
+        => if (is PSIType mirror, is PsiClassType t = mirror.psi)
+        then t
+        else CeyLightType(mirror, project);
 
 class CeyLightType(TypeMirror mirror, Project project)
         extends PsiClassType(LanguageLevel.highest, PsiAnnotation.emptyArray) {
@@ -64,19 +65,16 @@ class CeyLightType(TypeMirror mirror, Project project)
 
     valid => true;
 
-    shared actual Boolean equalsToText(String text) {
-        return false;
-    }
+    equalsToText(String text) => false;
 
     resolveScope => GlobalSearchScope.emptyScope;
 
-    shared actual PsiClass? resolve() => _null;
+    resolve() => nil;
 
-    shared actual String className {
-        return if (exists cls = mirror.declaredClass)
-        then cls.name
-        else "unknown";
-    }
+    className
+            => if (exists cls = mirror.declaredClass)
+            then cls.name
+            else "unknown";
 
     shared actual ObjectArray<PsiType> parameters {
         value types = ArrayList<PsiType>();
@@ -89,12 +87,10 @@ class CeyLightType(TypeMirror mirror, Project project)
         return ContainerUtil.toArray(types, PsiType.arrayFactory);
     }
 
-    shared actual ObjectArray<PsiType> superTypes {
-        return PsiType.emptyArray;
-    }
+    superTypes => PsiType.emptyArray;
 
     variable LanguageLevel level = LanguageLevel.highest;
-    shared actual LanguageLevel languageLevel => level;
+    languageLevel => level;
 
     value classResolveResult = object satisfies ClassResolveResult {
 
@@ -109,23 +105,22 @@ class CeyLightType(TypeMirror mirror, Project project)
                 } 
             }
             
-            return _null;
+            return nil;
         }
 
         substitutor => EmptySubstitutorImpl();
         packagePrefixPackageReference => false;
         accessible => true;
         staticsScopeCorrect => true;
-        shared actual PsiElement? currentFileResolveScope => _null;
+        currentFileResolveScope => nil;
         validResult => true;
     };
 
     resolveGenerics() => classResolveResult;
 
     shared actual A accept<A>(PsiTypeVisitor<A> visitor)
-            given A satisfies Object {
-        return visitor.visitClassType(this);
-    }
+            given A satisfies Object
+            => visitor.visitClassType(this);
 
     rawType() => this;
 

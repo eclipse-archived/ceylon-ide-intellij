@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    CeylonIterable
+}
+
 import com.intellij.openapi.project {
     Project
 }
@@ -6,12 +10,12 @@ import com.intellij.openapi.util {
     Key,
     UserDataHolderBase
 }
+import com.intellij.pom {
+    Navigatable
+}
 import com.intellij.psi {
     PsiManager,
-    PsiModifierList,
-    PsiTypeParameterList,
     PsiTypeParameter,
-    PsiReferenceList,
     PsiClassType,
     PsiClass,
     PsiClassInitializer,
@@ -19,7 +23,6 @@ import com.intellij.psi {
     PsiMethod,
     PsiSubstitutor,
     PsiElement,
-    PsiIdentifier,
     HierarchicalMethodSignature,
     ResolveState
 }
@@ -34,9 +37,6 @@ import com.intellij.psi.impl.source {
     ClassInnerStuffCache,
     PsiExtensibleClass
 }
-import com.intellij.psi.javadoc {
-    PsiDocComment
-}
 import com.intellij.psi.scope {
     PsiScopeProcessor
 }
@@ -45,6 +45,9 @@ import com.intellij.psi.util {
 }
 import com.intellij.util {
     IncorrectOperationException
+}
+import com.redhat.ceylon.ide.common.model {
+    CeylonUnit
 }
 import com.redhat.ceylon.ide.common.model.asjava {
     AbstractClassMirror,
@@ -69,27 +72,18 @@ import java.util {
     List
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    CeylonLanguage
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi {
     CeyLightMethod,
     CeyLightTypeParameter
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTreeUtil
 }
-import com.redhat.ceylon.ide.common.model {
-    CeylonUnit
-}
-import com.intellij.pom {
-    Navigatable
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     IdeaNavigation
-}
-import ceylon.interop.java {
-    CeylonIterable
 }
 
 
@@ -116,48 +110,33 @@ shared class CeyLightClass extends LightElement
 
     shared new(Declaration decl, Project project)
             extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance) {
-        assert(is AbstractClassMirror mir = ceylonToJavaMapper.mapDeclaration(decl).first);
+        assert (is AbstractClassMirror mir = ceylonToJavaMapper.mapDeclaration(decl).first);
         this.mirror = mir;
-        "The declaration must be in a Ceylon unit"
-        assert(is CeylonUnit unit = mir.decl.unit);
     }
 
     shared new fromMirror(AbstractClassMirror mirror, Project project)
             extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance) {
-        "The declaration must be in a Ceylon unit"
-        assert(is CeylonUnit unit = mirror.decl.unit);
         this.mirror = mirror;
     }
 
-    shared actual Declaration declaration {
-        return mirror.decl;
-    }
+    "The declaration must be in a Ceylon unit"
+    assert (is CeylonUnit unit = mirror.decl.unit);
+
+    declaration => mirror.decl;
 
     value modifiers = CeylonIterable(toJavaModifiers(declaration));
 
-    shared actual PsiModifierList modifierList {
-        return LightModifierList(manager, language, *modifiers);
-    }
+    modifierList => LightModifierList(manager, language, *modifiers);
 
-    shared actual Boolean hasModifierProperty(String name) {
-        return modifiers.contains(name);
-    }
+    hasModifierProperty(String name) => modifiers.contains(name);
 
-    shared actual PsiDocComment? docComment {
-        return null;
-    }
+    docComment => null;
 
-    shared actual Boolean deprecated {
-        return mirror.decl.deprecated;
-    }
+    deprecated => mirror.decl.deprecated;
 
-    shared actual Boolean hasTypeParameters() {
-        return !mirror.typeParameters.empty;
-    }
+    hasTypeParameters() => !mirror.typeParameters.empty;
 
-    shared actual PsiTypeParameterList? typeParameterList {
-        return null;
-    }
+    typeParameterList => null;
 
     shared actual ObjectArray<PsiTypeParameter> typeParameters {
         List<TypeParameterMirror> list = mirror.typeParameters;
@@ -177,9 +156,9 @@ shared class CeyLightClass extends LightElement
 
     enum => mirror.enum;
 
-    shared actual PsiReferenceList? extendsList => null;
+    extendsList => null;
 
-    shared actual PsiReferenceList? implementsList => null;
+    implementsList => null;
 
     extendsListTypes => PsiClassType.emptyArray;
 
@@ -212,6 +191,9 @@ shared class CeyLightClass extends LightElement
         }
     }
 
+    value myInnersCache
+            => lazyInnersCache else (lazyInnersCache = ClassInnerStuffCache(this));
+
     fields => myInnersCache.fields;
 
     methods => myInnersCache.methods;
@@ -228,9 +210,9 @@ shared class CeyLightClass extends LightElement
 
     allInnerClasses => PsiClass.emptyArray;
 
-    shared actual PsiField? findFieldByName(String name, Boolean checkBases) => null;
+    findFieldByName(String name, Boolean checkBases) => null;
 
-    shared actual PsiMethod? findMethodBySignature(PsiMethod patternMethod, Boolean checkBases)
+    findMethodBySignature(PsiMethod patternMethod, Boolean checkBases)
             => null;
 
     findMethodsBySignature(PsiMethod patternMethod, Boolean checkBases) => PsiMethod.emptyArray;
@@ -243,21 +225,21 @@ shared class CeyLightClass extends LightElement
     allMethodsAndTheirSubstitutors
             => Collections.emptyList<Pair<PsiMethod,PsiSubstitutor>>();
 
-    shared actual PsiClass? findInnerClassByName(String name, Boolean checkBases) => null;
+    findInnerClassByName(String name, Boolean checkBases) => null;
 
-    shared actual PsiElement? lBrace => null;
+    lBrace => null;
 
-    shared actual PsiElement? rBrace => null;
+    rBrace => null;
 
-    shared actual PsiIdentifier? nameIdentifier => null;
+    nameIdentifier => null;
 
-    shared actual PsiElement? scope => null;
+    scope => null;
 
     isInheritor(PsiClass baseClass, Boolean checkDeep) => false;
 
     isInheritorDeep(PsiClass baseClass, PsiClass classToByPass) => false;
 
-    shared actual PsiClass? containingClass => null;
+    containingClass => null;
 
     visibleSignatures => Collections.emptyList<HierarchicalMethodSignature>();
 
@@ -271,9 +253,7 @@ shared class CeyLightClass extends LightElement
 
     string => "CeyLightClass:" + mirror.name;
 
-    shared actual List<PsiField> ownFields {
-        return Collections.emptyList<PsiField>();
-    }
+    ownFields => Collections.emptyList<PsiField>();
 
     shared actual List<PsiMethod> ownMethods {
         value methods = ArrayList<PsiMethod>();
@@ -292,15 +272,10 @@ shared class CeyLightClass extends LightElement
         return classes;
     }
 
-    ClassInnerStuffCache myInnersCache
-            => lazyInnersCache else (lazyInnersCache = ClassInnerStuffCache(this));
-
-    shared actual Boolean processDeclarations(PsiScopeProcessor processor, ResolveState state,
-        PsiElement lastParent, PsiElement place) {
-
-        return PsiClassImplUtil.processDeclarationsInClass(this, processor, state, null,
-            lastParent, place, PsiUtil.getLanguageLevel(place), false);
-    }
+    processDeclarations(PsiScopeProcessor processor, ResolveState state,
+        PsiElement lastParent, PsiElement place)
+            => PsiClassImplUtil.processDeclarationsInClass(this, processor, state, null,
+                    lastParent, place, PsiUtil.getLanguageLevel(place), false);
 
     shared actual void navigate(Boolean requestFocus) {
         if (is Navigatable nav = IdeaNavigation(project).gotoDeclaration(declaration)) {
@@ -318,12 +293,11 @@ shared class CeyLightClass extends LightElement
             => (super of UserDataHolderBase).getCopyableUserData(key);
 
     shared actual void putCopyableUserData<T>(Key<T>? key, T? val)
-            given T satisfies Object {
-        (super of UserDataHolderBase).putCopyableUserData(key, val);
-    }
+            given T satisfies Object
+            => (super of UserDataHolderBase).putCopyableUserData(key, val);
 
-    shared actual PsiElement? navigationElement => (super of LightElement).navigationElement;
-    assign navigationElement {
-        (super of LightElement).navigationElement = navigationElement;
-    }
+    shared actual PsiElement? navigationElement
+            => (super of LightElement).navigationElement;
+    assign navigationElement
+            => (super of LightElement).navigationElement = navigationElement;
 }

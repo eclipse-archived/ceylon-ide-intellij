@@ -13,6 +13,12 @@ import com.intellij.psi {
 import com.intellij.psi.search {
     GlobalSearchScope
 }
+import com.redhat.ceylon.ide.common.model {
+    CeylonUnit
+}
+import com.redhat.ceylon.ide.common.model.asjava {
+    getJavaQualifiedName
+}
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
     Value,
@@ -27,12 +33,6 @@ import java.lang {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects
-}
-import com.redhat.ceylon.ide.common.model.asjava {
-    getJavaQualifiedName
-}
-import com.redhat.ceylon.ide.common.model {
-    CeylonUnit
 }
 
 shared class CeylonElementFinder() extends PsiElementFinder() {
@@ -65,9 +65,8 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
         return null;
     }
     
-    shared actual ObjectArray<PsiClass> findClasses(String fqName, GlobalSearchScope scope) {
-        return javaObjectArray(Array<PsiClass?>({findClass(fqName, scope)}.coalesced));
-    }
+    findClasses(String fqName, GlobalSearchScope scope)
+            => javaObjectArray(Array<PsiClass?>({findClass(fqName, scope)}.coalesced));
     
     shared actual ObjectArray<PsiClass> getClasses(PsiPackage pkg, GlobalSearchScope scope) {
         value p = scope.project;

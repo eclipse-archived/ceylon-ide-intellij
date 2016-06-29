@@ -16,12 +16,9 @@ import com.intellij.psi {
     PsiManager,
     PsiSubstitutor,
     PsiMethod,
-    PsiReferenceList,
     HierarchicalMethodSignature,
-    PsiTypeParameterList,
     PsiElement,
     PsiField,
-    PsiIdentifier,
     PsiTypeParameter,
     PsiClassType,
     PsiClassInitializer,
@@ -35,9 +32,6 @@ import com.intellij.psi.impl {
 import com.intellij.psi.impl.light {
     LightElement,
     LightModifierList
-}
-import com.intellij.psi.javadoc {
-    PsiDocComment
 }
 import com.intellij.psi.scope {
     PsiScopeProcessor
@@ -73,55 +67,53 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTreeUtil
 }
 
-class CeyLightToplevelFunction extends LightElement satisfies PsiClass & CeylonLightElement {
+class CeyLightToplevelFunction(declaration, project)
+        extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance)
+        satisfies PsiClass & CeylonLightElement {
+
     shared actual Function declaration;
     Project project;
-    JToplevelFunctionMirror mirror;
 
-    shared new (Function declaration, Project project)
-            extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance) {
-        this.declaration = declaration;
-        this.project = project;
+    value mirror = ceylonToJavaMapper.mapDeclaration(declaration).first;
+    assert(is JToplevelFunctionMirror mirror);
 
-        assert(is JToplevelFunctionMirror m = ceylonToJavaMapper.mapDeclaration(declaration).first);
-        mirror = m;
-    }
-    
     allFields => createJavaObjectArray<PsiField>({});
     
     allInnerClasses => createJavaObjectArray<PsiClass>({});
 
-    allMethodsAndTheirSubstitutors => Collections.emptyList<Pair<PsiMethod, PsiSubstitutor>>();
+    allMethodsAndTheirSubstitutors
+            => Collections.emptyList<Pair<PsiMethod, PsiSubstitutor>>();
     
     annotationType => false;
     
     constructors => createJavaObjectArray<PsiMethod>({});
     
-    shared actual PsiClass? containingClass => null;
+    containingClass => null;
     
     deprecated => declaration.deprecated;
     
-    shared actual PsiDocComment? docComment => null;
+    docComment => null;
     
     enum => false;
     
-    shared actual PsiReferenceList? extendsList => null;
+    extendsList => null;
     
     extendsListTypes => createJavaObjectArray<PsiClassType>({});
     
     fields => createJavaObjectArray<PsiField>({});
     
-    shared actual PsiField? findFieldByName(String name, Boolean checkBases) => null;
+    findFieldByName(String name, Boolean checkBases) => null;
     
-    shared actual PsiClass? findInnerClassByName(String name, Boolean checkBases) => null;
+    findInnerClassByName(String name, Boolean checkBases) => null;
     
-    shared actual PsiMethod? findMethodBySignature(PsiMethod? patternMethod, Boolean checkBases)
+    findMethodBySignature(PsiMethod? patternMethod, Boolean checkBases)
             => null;
     
     findMethodsAndTheirSubstitutorsByName(String name, Boolean checkBases)
             => Collections.emptyList<Pair<PsiMethod, PsiSubstitutor>>();
     
-    findMethodsByName(String name, Boolean checkBases) => createJavaObjectArray<PsiMethod>({});
+    findMethodsByName(String name, Boolean checkBases)
+            => createJavaObjectArray<PsiMethod>({});
     
     findMethodsBySignature(PsiMethod? patternMethod, Boolean checkBases)
             => createJavaObjectArray<PsiMethod>({});
@@ -133,7 +125,7 @@ class CeyLightToplevelFunction extends LightElement satisfies PsiClass & CeylonL
     
     hasTypeParameters() => false;
     
-    shared actual PsiReferenceList? implementsList => null;
+    implementsList => null;
     
     implementsListTypes => createJavaObjectArray<PsiClassType>({});
     
@@ -148,32 +140,32 @@ class CeyLightToplevelFunction extends LightElement satisfies PsiClass & CeylonL
     isInheritor(PsiClass? baseClass, Boolean checkDeep) => false;
     
     isInheritorDeep(PsiClass? baseClass, PsiClass? classToByPass) => false;
-    
-    shared actual PsiElement? lBrace => null;
 
-    shared actual PsiIdentifier? nameIdentifier => null;
+    rBrace => null;
+    lBrace => null;
+
+    nameIdentifier => null;
     
     qualifiedName => mirror.qualifiedName;
-    
-    shared actual PsiElement? rBrace => null;
-    
-    shared actual PsiElement? scope => null;
+
+    scope => null;
     
     shared actual PsiElement setName(String? name) {
         throw IncorrectOperationException();
     }
     
-    shared actual String string => "CeyLightToplevelFunction:" + mirror.name;
+    string => "CeyLightToplevelFunction:" + mirror.name;
     
-    shared actual PsiClass? superClass => null;
+    superClass => null;
     
     superTypes => createJavaObjectArray<PsiClassType>({});
     
     supers => createJavaObjectArray<PsiClass>({
-        JavaPsiFacade.getInstance(project).findClass(CommonClassNames.javaLangObject, GlobalSearchScope.allScope(project))
+        JavaPsiFacade.getInstance(project)
+            .findClass(CommonClassNames.javaLangObject, GlobalSearchScope.allScope(project))
     });
     
-    shared actual PsiTypeParameterList? typeParameterList => null;
+    typeParameterList => null;
     
     typeParameters => createJavaObjectArray<PsiTypeParameter>({});
     
@@ -182,7 +174,8 @@ class CeyLightToplevelFunction extends LightElement satisfies PsiClass & CeylonL
     name => mirror.name;
 
     variable ObjectArray<PsiMethod>? lazyMethods = null;
-    shared actual ObjectArray<PsiMethod> allMethods
+
+    allMethods
             => lazyMethods else (lazyMethods = createJavaObjectArray(
                     CeylonIterable(mirror.directMethods)
                         .map((m) => CeyLightMethod(this, m, project))
@@ -201,21 +194,18 @@ class CeyLightToplevelFunction extends LightElement satisfies PsiClass & CeylonL
             => (super of UserDataHolderBase).getCopyableUserData(key);
 
     shared actual void putCopyableUserData<T>(Key<T>? key, T? val)
-            given T satisfies Object {
-        (super of UserDataHolderBase).putCopyableUserData(key, val);
-    }
+            given T satisfies Object
+            => (super of UserDataHolderBase).putCopyableUserData(key, val);
 
     containingFile => CeylonTreeUtil.getDeclaringFile(declaration.unit, project);
 
-    shared actual PsiElement? navigationElement => (super of LightElement).navigationElement;
-    assign navigationElement {
-        (super of LightElement).navigationElement = navigationElement;
-    }
+    shared actual PsiElement? navigationElement
+            => (super of LightElement).navigationElement;
+    assign navigationElement
+            => (super of LightElement).navigationElement = navigationElement;
 
-    shared actual Boolean processDeclarations(PsiScopeProcessor processor, ResolveState state,
-        PsiElement lastParent, PsiElement place) {
-
-        return PsiClassImplUtil.processDeclarationsInClass(this, processor, state, null,
-            lastParent, place, PsiUtil.getLanguageLevel(place), false);
-    }
+    processDeclarations(PsiScopeProcessor processor, ResolveState state,
+        PsiElement lastParent, PsiElement place)
+            => PsiClassImplUtil.processDeclarationsInClass(this, processor, state, null,
+                lastParent, place, PsiUtil.getLanguageLevel(place), false);
 }

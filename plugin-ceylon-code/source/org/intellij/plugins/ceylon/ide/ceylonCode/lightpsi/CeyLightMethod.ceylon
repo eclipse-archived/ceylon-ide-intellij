@@ -5,24 +5,19 @@ import com.intellij.openapi.util {
     Key,
     UserDataHolderBase
 }
+import com.intellij.pom {
+    Navigatable
+}
 import com.intellij.psi {
     PsiClass,
     PsiManager,
     PsiMethod,
     PsiType,
-    PsiTypeElement,
     PsiParameterList,
-    PsiReferenceList,
-    PsiCodeBlock,
     PsiSubstitutor,
-    PsiIdentifier,
-    PsiModifierList,
     PsiModifier,
     PsiElement,
-    HierarchicalMethodSignature,
-    PsiTypeParameterList,
-    PsiTypeParameter,
-    PsiFile
+    PsiTypeParameter
 }
 import com.intellij.psi.impl {
     PsiSuperMethodImplUtil
@@ -34,54 +29,50 @@ import com.intellij.psi.impl.light {
     LightEmptyImplementsList,
     LightModifierList
 }
-import com.intellij.psi.javadoc {
-    PsiDocComment
-}
 import com.intellij.psi.search {
     GlobalSearchScope
 }
 import com.intellij.psi.util {
-    MethodSignature,
     MethodSignatureBackedByPsiMethod
 }
 import com.intellij.util {
     IncorrectOperationException
+}
+import com.redhat.ceylon.ide.common.model.asjava {
+    AbstractMethodMirror,
+    GetMethod
 }
 import com.redhat.ceylon.model.loader.mirror {
     MethodMirror,
     TypeMirror,
     TypeKind
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration
+}
 
 import java.lang {
     ObjectArray
 }
 import java.util {
-    Collections,
-    List
+    Collections
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonLanguage
 }
-import com.redhat.ceylon.ide.common.model.asjava {
-    AbstractMethodMirror,
-    GetMethod
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Declaration
-}
-import com.intellij.pom {
-    Navigatable
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     IdeaNavigation
 }
 
-shared class CeyLightMethod(shared actual PsiClass containingClass, MethodMirror mirror, Project project)
+shared class CeyLightMethod(containingClass, mirror, project)
         extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance)
         satisfies PsiMethod & CeylonLightElement {
-    
+
+    shared actual PsiClass containingClass;
+    Project project;
+    MethodMirror mirror;
+
     shared actual Declaration declaration {
         if (is AbstractMethodMirror mirror) {
             return mirror.decl;
@@ -90,16 +81,9 @@ shared class CeyLightMethod(shared actual PsiClass containingClass, MethodMirror
         return mirror.declaration;
     }
 
-    shared actual PsiType? returnType {
-        if (mirror.declaredVoid) {
-            return PsiType.\ivoid;
-        }
-        return toPsiType(mirror.returnType);
-    }
+    returnType => mirror.declaredVoid then PsiType.\ivoid else toPsiType(mirror.returnType);
 
-    shared actual PsiTypeElement? returnTypeElement {
-        return null;
-    }
+    returnTypeElement => null;
 
     shared actual PsiParameterList parameterList {
         value builder = LightParameterListBuilder(manager, language);
@@ -109,25 +93,18 @@ shared class CeyLightMethod(shared actual PsiClass containingClass, MethodMirror
         return builder;
     }
 
-    shared actual PsiReferenceList throwsList {
-        return LightEmptyImplementsList(manager);
-    }
+    throwsList => LightEmptyImplementsList(manager);
 
-    shared actual PsiCodeBlock? body {
-        return null;
-    }
+    body => null;
 
     constructor => mirror.constructor;
 
     varArgs => mirror.variadic;
 
-    shared actual MethodSignature getSignature(PsiSubstitutor substitutor) {
-        return MethodSignatureBackedByPsiMethod.create(this, substitutor);
-    }
+    getSignature(PsiSubstitutor substitutor)
+            => MethodSignatureBackedByPsiMethod.create(this, substitutor);
 
-    shared actual PsiIdentifier? nameIdentifier {
-        return null;
-    }
+    nameIdentifier => null;
 
     shared actual ObjectArray<PsiMethod> findSuperMethods() {
         return PsiMethod.emptyArray;
@@ -141,64 +118,37 @@ shared class CeyLightMethod(shared actual PsiClass containingClass, MethodMirror
         return PsiMethod.emptyArray;
     }
 
-    shared actual List<MethodSignatureBackedByPsiMethod> findSuperMethodSignaturesIncludingStatic(Boolean checkAccess) {
-        return Collections.emptyList<MethodSignatureBackedByPsiMethod>();
-    }
+    findSuperMethodSignaturesIncludingStatic(Boolean checkAccess)
+            => Collections.emptyList<MethodSignatureBackedByPsiMethod>();
 
-    shared actual PsiMethod? findDeepestSuperMethod() {
-        return null;
-    }
+    findDeepestSuperMethod() => null;
 
-    shared actual ObjectArray<PsiMethod> findDeepestSuperMethods() {
-        return PsiMethod.emptyArray;
-    }
+    findDeepestSuperMethods() => PsiMethod.emptyArray;
 
-    shared actual PsiModifierList modifierList {
-        return LightModifierList(manager, language, "public");
-    }
+    modifierList => LightModifierList(manager, language, "public");
 
-    shared actual Boolean hasModifierProperty(String name) {
-        if (name.equals(PsiModifier.static)) {
-            return mirror.static;
-        }
-        return false;
-    }
+    hasModifierProperty(String name)
+            => name.equals(PsiModifier.static) then mirror.static else false;
 
     shared actual PsiElement setName(String name) {
         throw IncorrectOperationException("Not supported");
     }
 
-    shared actual HierarchicalMethodSignature hierarchicalMethodSignature {
-        return PsiSuperMethodImplUtil.getHierarchicalMethodSignature(this);
-    }
+    hierarchicalMethodSignature => PsiSuperMethodImplUtil.getHierarchicalMethodSignature(this);
 
-    shared actual PsiDocComment? docComment {
-        return null;
-    }
+    docComment => null;
 
-    shared actual Boolean deprecated {
-        return false;
-    }
+    deprecated => false;
 
-    shared actual Boolean hasTypeParameters() {
-        return false;
-    }
+    hasTypeParameters() => false;
 
-    shared actual PsiTypeParameterList? typeParameterList {
-        return null;
-    }
+    typeParameterList => null;
 
-    shared actual ObjectArray<PsiTypeParameter> typeParameters {
-        return ObjectArray<PsiTypeParameter>(0);
-    }
+    typeParameters => ObjectArray<PsiTypeParameter>(0);
 
-    shared actual String name {
-        return mirror.name;
-    }
+    name => mirror.name;
 
-    shared actual PsiFile containingFile {
-        return containingClass.containingFile;
-    }
+    containingFile => containingClass.containingFile;
 
     shared actual void navigate(Boolean requestFocus) {
         if (is Navigatable nav = IdeaNavigation(project).gotoDeclaration(declaration)) {
@@ -241,12 +191,11 @@ shared class CeyLightMethod(shared actual PsiClass containingClass, MethodMirror
             => (super of UserDataHolderBase).getCopyableUserData(key);
 
     shared actual void putCopyableUserData<T>(Key<T>? key, T? val)
-            given T satisfies Object {
-        (super of UserDataHolderBase).putCopyableUserData(key, val);
-    }
+            given T satisfies Object
+            => (super of UserDataHolderBase).putCopyableUserData(key, val);
 
-    shared actual PsiElement? navigationElement => (super of LightElement).navigationElement;
-    assign navigationElement {
-        (super of LightElement).navigationElement = navigationElement;
-    }
+    shared actual PsiElement? navigationElement
+            => (super of LightElement).navigationElement;
+    assign navigationElement
+            => (super of LightElement).navigationElement = navigationElement;
 }
