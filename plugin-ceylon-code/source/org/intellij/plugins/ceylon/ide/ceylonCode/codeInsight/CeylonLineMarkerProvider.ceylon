@@ -5,19 +5,13 @@ import ceylon.interop.java {
 import com.intellij.codeHighlighting {
     Pass
 }
-import com.intellij.codeInsight {
-    TargetElementUtil {
-        referencedElementAccepted,
-        lookupItemAccepted
-    }
-}
 import com.intellij.codeInsight.daemon {
     LineMarkerInfo,
     GutterIconNavigationHandler
 }
 import com.intellij.codeInsight.navigation {
     GotoImplementationHandler,
-    ImplementationSearcher
+    GotoTargetHandler
 }
 import com.intellij.icons {
     AllIcons
@@ -36,11 +30,7 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.openapi.util {
-    TextRange,
-    Computable
-}
-import com.intellij.pom {
-    Navigatable
+    TextRange
 }
 import com.intellij.psi {
     PsiElement,
@@ -53,39 +43,33 @@ import com.redhat.ceylon.ide.common.util {
     types
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    ClassOrInterface
 }
 
 import java.awt.event {
     MouseEvent
 }
 import java.lang {
-    JString=String,
-    ObjectArray
+    JString=String
 }
 import java.util {
     List,
-    Collection,
-    ArrayList,
-    Collections
+    Collection
 }
 
 import javax.swing {
     Icon
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonPsi,
-    CeylonFile
+import org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation {
+    CeylonGotoSuperHandler
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
-    CeylonReference
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
-}
-import com.intellij.openapi.application {
-    ApplicationManager
 }
 
 shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
@@ -134,16 +118,27 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
         return null;
     }
 
+    function editor(PsiElement element) {
+        value file = element.containingFile;
+        if (exists virtualFile = file.virtualFile) {
+            value fileEditor
+                    = FileEditorManager
+                .getInstance(file.project)
+                .getSelectedEditor(virtualFile);
+            if (is TextEditor fileEditor) {
+                return fileEditor.editor;
+            }
+        }
+        return null;
+    }
+
     shared actual LineMarkerInfo<PsiElement>? getLineMarkerInfo(PsiElement element) {
         if (exists model = findDeclaration(element),
+            exists offset = findParentDeclaration(element)?.textOffset,
             model.actual,
-            //TODO: getRefinedDeclaration() always returns a single result
-            //      but when extending Java types, there need not be a
-            //      unique single declaration right at the top of the
-            //      hierarchy - in that case we should pop up a list
-            //      like we do in CeylonGotoSuperHandler
-            exists refined = types.getRefinedDeclaration(model)) {
-            assert (is Declaration parent = refined.container);
+            //only needed for the icon!
+            exists refined = types.getRefinedDeclaration(model),
+            is ClassOrInterface parent = refined.container) {
 
             return MarkerInfo {
                 element = element;
@@ -152,72 +147,58 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                 updatePass = Pass.updateAll;
                 tooltip = "Refines ``parent.getName(model.unit)``.``refined.name``";
                 alignment = GutterIconRenderer.Alignment.left;
-                object handler satisfies GutterIconNavigationHandler<PsiElement> {
+                object handler
+                        extends CeylonGotoSuperHandler()
+                        satisfies GutterIconNavigationHandler<PsiElement> {
+
+                    shared actual void invoke(Project project, Editor editor, PsiFile file) {
+                        //move the caret to the start of the line (near the icon) temporarily
+                        value document = editor.document;
+                        value before = editor.caretModel.offset;
+                        value lineStartOffset
+                                = document.getLineStartOffset(document.getLineNumber(offset));
+                        editor.caretModel.moveToOffset(lineStartOffset);
+                        try {
+                            super.invoke(project, editor, file);
+                        }
+                        finally {
+                            //if we didn't navigate to a different position in the same file, move it back
+                            if (editor.caretModel.offset==lineStartOffset) {
+                                editor.caretModel.moveToOffset(before);
+                            }
+                        }
+                    }
+
+                    //use fully-qualified type here b/c of compiler bug!
+                    shared actual GotoTargetHandler.GotoData? getSourceAndTargetElements(Editor editor, PsiFile file) {
+                        //move the caret to the source declaration temporarily
+                        value before = editor.caretModel.offset;
+                        editor.caretModel.moveToOffset(offset);
+                        try {
+                            return super.getSourceAndTargetElements(editor, file);
+                        }
+                        finally {
+                            editor.caretModel.moveToOffset(before);
+                        }
+                    }
+
                     shared actual void navigate(MouseEvent? mouseEvent, PsiElement element) {
-                        assert(is CeylonFile ceylonFile = element.containingFile);
-                        if (is Navigatable psi
-                                = CeylonReference.resolveDeclaration(refined, element.project)) {
-                            psi.navigate(true);
+                        if (exists ed = editor(element)) {
+                            invoke(element.project, ed, element.containingFile);
                         }
                     }
                 }
             };
         }
-        
+
         return null;
-    }
-
-    function editor(PsiElement element) {
-        value file = element.containingFile;
-        if (exists virtualFile = file.virtualFile) {
-            value fileEditor
-                    = FileEditorManager
-                        .getInstance(file.project)
-                        .getSelectedEditor(virtualFile);
-            if (is TextEditor fileEditor) {
-                return fileEditor.editor;
-            }
-        }
-        return null;
-    }
-
-    class Searcher(Editor editor) extends ImplementationSearcher() {
-        value accept = TargetElementUtil.instance.acceptImplementationForReference;
-
-        shared actual ObjectArray<PsiElement> filterElements
-                (PsiElement element, ObjectArray<PsiElement> targetElements, Integer offset) {
-            value result = ArrayList<PsiElement>();
-            for (targetElement in targetElements) {
-                value reference = TargetElementUtil.findReference(editor, offset);
-                if (accept(reference, targetElement)) {
-                    result.add(targetElement);
-                }
-            }
-            return result.toArray(ObjectArray<PsiElement>(0));
-        }
-
-        "Became package-private in intellij-community@7b037bf so we had to copy it here."
-        shared ObjectArray<PsiElement> ourSearchImplementations(Editor editor, PsiElement? element, Integer offset) {
-            TargetElementUtil targetElementUtil = TargetElementUtil.instance;
-
-            value onRef = ApplicationManager.application.runReadAction(object satisfies Computable<Boolean> {
-                compute() => !targetElementUtil.findTargetElement(editor,
-                                flags.and(referencedElementAccepted.or(lookupItemAccepted)),
-                                offset) exists;
-            });
-
-            value onSelf = ApplicationManager.application.runReadAction(object satisfies Computable<Boolean> {
-                compute() => if (exists element) then targetElementUtil.includeSelfInGotoImplementation(element) else true;
-            });
-            return searchImplementations(element, editor, offset, onRef && onSelf, onRef);
-        }
     }
 
     shared actual void collectLineMarkers(List<PsiElement> elements,
             Collection<LineMarkerInfo<out PsiElement>> result) {
         for (element in elements) {
             if (exists model = findDeclaration(element),
-                exists decl = findParentDeclaration(element),
+                exists offset = findParentDeclaration(element)?.textOffset,
                 model.formal || model.default) {
 
                 result.add(MarkerInfo {
@@ -234,22 +215,34 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                             satisfies GutterIconNavigationHandler<PsiElement> {
 
                         shared actual void invoke(Project project, Editor editor, PsiFile file) {
+                            //move the caret to the start of the line (near the icon) temporarily
                             value document = editor.document;
                             value before = editor.caretModel.offset;
-                            value lineStartOffset = document.getLineStartOffset(document.getLineNumber(decl.textOffset));
+                            value lineStartOffset
+                                    = document.getLineStartOffset(document.getLineNumber(offset));
                             editor.caretModel.moveToOffset(lineStartOffset);
                             try {
                                 super.invoke(project, editor, file);
                             }
                             finally {
-                                editor.caretModel.moveToOffset(before);
+                                //if we didn't navigate to a different position in the same file, move it back
+                                if (editor.caretModel.offset==lineStartOffset) {
+                                    editor.caretModel.moveToOffset(before);
+                                }
                             }
                         }
 
-                        getSourceAndTargetElements(Editor editor, PsiFile file)
-                                => GotoData(decl,
-                                    Searcher(editor).ourSearchImplementations(editor, decl of PsiElement, decl.textOffset),
-                                    Collections.emptyList<AdditionalAction>());
+                        shared actual GotoData? getSourceAndTargetElements(Editor editor, PsiFile file) {
+                            //move the caret to the source declaration temporarily
+                            value before = editor.caretModel.offset;
+                            editor.caretModel.moveToOffset(offset);
+                            try {
+                                return super.getSourceAndTargetElements(editor, file);
+                            }
+                            finally {
+                                editor.caretModel.moveToOffset(before);
+                            }
+                        }
 
                         shared actual void navigate(MouseEvent? mouseEvent, PsiElement id) {
                             if (exists ed = editor(element)) {
