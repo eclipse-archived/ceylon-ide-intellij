@@ -92,7 +92,7 @@ class CeyLightType(TypeMirror mirror, Project project)
     variable LanguageLevel level = LanguageLevel.highest;
     languageLevel => level;
 
-    value classResolveResult = object satisfies ClassResolveResult {
+    object classResolveResult satisfies ClassResolveResult {
 
         shared actual PsiClass? element {
             if (is AbstractClassMirror mirror = mirror.declaredClass) {
@@ -114,7 +114,7 @@ class CeyLightType(TypeMirror mirror, Project project)
         staticsScopeCorrect => true;
         currentFileResolveScope => nil;
         validResult => true;
-    };
+    }
 
     resolveGenerics() => classResolveResult;
 
