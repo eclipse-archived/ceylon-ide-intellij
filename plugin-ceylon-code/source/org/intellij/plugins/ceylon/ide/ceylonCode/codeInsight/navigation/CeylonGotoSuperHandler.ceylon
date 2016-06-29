@@ -138,7 +138,7 @@ shared class CeylonGotoSuperHandler()
                 for (type in bottom.supertypeDeclarations) {
                     if (type!=bottom,
                         is Function dec
-                            = type.getDirectMember(fun.name, signature, false),
+                            = type.getDirectMember(fun.name, signature, false, true),
                         dec.shared) {
                         list.add(dec);
                     }
@@ -152,7 +152,7 @@ shared class CeylonGotoSuperHandler()
                 for (type in bottom.supertypeDeclarations) {
                     if (type!=bottom,
                         is Value dec
-                            = type.getDirectMember(val.name, null, false),
+                            = type.getDirectMember(val.name, null, false, true),
                         dec.shared) {
                         list.add(dec);
                     }
