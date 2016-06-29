@@ -1,3 +1,18 @@
+import com.intellij.lang {
+    Language,
+    ASTNode
+}
+import com.intellij.navigation {
+    ItemPresentation
+}
+import com.intellij.openapi.project {
+    Project
+}
+import com.intellij.openapi.util {
+    TextRange,
+    Key,
+    Pair
+}
 import com.intellij.psi {
     PsiTypeParameter,
     PsiMethod,
@@ -20,55 +35,43 @@ import com.intellij.psi {
     PsiTypeParameterList,
     PsiElement
 }
+import com.intellij.psi.impl.light {
+    LightEmptyImplementsList
+}
 import com.intellij.psi.javadoc {
     PsiDocComment
 }
 import com.intellij.psi.scope {
     PsiScopeProcessor
 }
-import com.intellij.openapi.project {
-    Project
+import com.intellij.psi.search {
+    GlobalSearchScope,
+    SearchScope
+}
+import com.intellij.util {
+    IncorrectOperationException
+}
+import com.redhat.ceylon.model.loader.mirror {
+    TypeParameterMirror
+}
+
+import java.lang {
+    CharSequence,
+    ObjectArray,
+    CharArray
 }
 import java.util {
     List,
     Collection,
     Collections
 }
-import com.intellij.lang {
-    Language,
-    ASTNode
-}
-import com.intellij.navigation {
-    ItemPresentation
-}
-import com.intellij.psi.search {
-    GlobalSearchScope,
-    SearchScope
-}
-import java.lang {
-    CharSequence,
-    ObjectArray,
-    CharArray
-}
-import com.intellij.openapi.util {
-    TextRange,
-    Key,
-    Pair
-}
+
 import javax.swing {
     Icon
 }
-import com.redhat.ceylon.model.loader.mirror {
-    TypeParameterMirror
-}
-import com.intellij.util {
-    IncorrectOperationException
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonLanguage
-}
-import com.intellij.psi.impl.light {
-    LightEmptyImplementsList
 }
 
 class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager manager)

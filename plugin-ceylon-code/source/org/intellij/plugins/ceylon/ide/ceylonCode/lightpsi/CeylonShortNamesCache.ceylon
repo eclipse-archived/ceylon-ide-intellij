@@ -78,10 +78,10 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
     }
     
     allFieldNames
-            => createJavaObjectArray<JString>({});
+            => ObjectArray<JString>(0);
     
     allMethodNames
-            => createJavaObjectArray<JString>({});
+            => ObjectArray<JString>(0);
     
     getAllClassNames(HashSet<JString> hashSet)
             => allClassNames.array.coalesced.each(hashSet.add);
@@ -133,16 +133,16 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
     }
     
     getFieldsByName(String? string, GlobalSearchScope? globalSearchScope)
-            => createJavaObjectArray<PsiField>({});
+            => ObjectArray<PsiField>(0);
     
     getFieldsByNameIfNotMoreThan(String? string, GlobalSearchScope? globalSearchScope, Integer int)
-            => createJavaObjectArray<PsiField>({});
+            => ObjectArray<PsiField>(0);
     
     getMethodsByName(String? string, GlobalSearchScope? globalSearchScope)
-            => createJavaObjectArray<PsiMethod>({});
+            => ObjectArray<PsiMethod>(0);
     
     getMethodsByNameIfNotMoreThan(String? string, GlobalSearchScope? globalSearchScope, Integer int)
-            => createJavaObjectArray<PsiMethod>({});
+            => ObjectArray<PsiMethod>(0);
     
     processMethodsWithName(String? string, GlobalSearchScope? globalSearchScope, Processor<PsiMethod>? processor)
             => false;

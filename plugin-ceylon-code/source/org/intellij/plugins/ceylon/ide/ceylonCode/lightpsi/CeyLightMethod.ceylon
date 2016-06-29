@@ -106,9 +106,7 @@ shared class CeyLightMethod(containingClass, mirror, project)
 
     nameIdentifier => null;
 
-    shared actual ObjectArray<PsiMethod> findSuperMethods() {
-        return PsiMethod.emptyArray;
-    }
+    shared actual ObjectArray<PsiMethod> findSuperMethods() => PsiMethod.emptyArray;
 
     shared actual ObjectArray<PsiMethod> findSuperMethods(Boolean checkAccess) {
         return PsiMethod.emptyArray;

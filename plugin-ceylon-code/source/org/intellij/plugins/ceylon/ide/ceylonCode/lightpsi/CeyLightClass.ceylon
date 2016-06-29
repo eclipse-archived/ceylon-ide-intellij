@@ -53,11 +53,6 @@ import com.redhat.ceylon.ide.common.model.asjava {
     AbstractClassMirror,
     ceylonToJavaMapper
 }
-import com.redhat.ceylon.model.loader.mirror {
-    MethodMirror,
-    TypeMirror,
-    TypeParameterMirror
-}
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     TypeDeclaration
@@ -139,10 +134,10 @@ shared class CeyLightClass extends LightElement
     typeParameterList => null;
 
     shared actual ObjectArray<PsiTypeParameter> typeParameters {
-        List<TypeParameterMirror> list = mirror.typeParameters;
-        ObjectArray<PsiTypeParameter> params = ObjectArray<PsiTypeParameter>(list.size());
+        value list = mirror.typeParameters;
+        value params = ObjectArray<PsiTypeParameter>(list.size());
         variable Integer i = 0;
-        for (TypeParameterMirror mirror in list) {
+        for (mirror in list) {
             params.set(i++, CeyLightTypeParameter(mirror, manager));
         }
         return params;
@@ -181,7 +176,7 @@ shared class CeyLightClass extends LightElement
         if (exists sup = mirror.superclass) {
             superTypes.add(createType(sup, project));
         }
-        for (TypeMirror intf in mirror.interfaces) {
+        for (intf in mirror.interfaces) {
             superTypes.add(createType(intf, project));
         }
         if (superTypes.size() == 0) {
@@ -257,7 +252,7 @@ shared class CeyLightClass extends LightElement
 
     shared actual List<PsiMethod> ownMethods {
         value methods = ArrayList<PsiMethod>();
-        for (MethodMirror meth in mirror.directMethods) {
+        for (meth in mirror.directMethods) {
             methods.add(CeyLightMethod(this, meth, project));
         }
         return methods;
@@ -266,7 +261,7 @@ shared class CeyLightClass extends LightElement
     shared actual List<PsiClass> ownInnerClasses {
         value classes = ArrayList<PsiClass>();
         for (cls in mirror.directInnerClasses) {
-            assert(is AbstractClassMirror cls);
+            assert (is AbstractClassMirror cls);
             classes.add(fromMirror(cls, project));
         }
         return classes;

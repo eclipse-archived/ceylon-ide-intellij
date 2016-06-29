@@ -77,16 +77,16 @@ class CeyLightToplevelFunction(declaration, project)
     value mirror = ceylonToJavaMapper.mapDeclaration(declaration).first;
     assert(is JToplevelFunctionMirror mirror);
 
-    allFields => createJavaObjectArray<PsiField>({});
+    allFields => ObjectArray<PsiField>(0);
     
-    allInnerClasses => createJavaObjectArray<PsiClass>({});
+    allInnerClasses => ObjectArray<PsiClass>(0);
 
     allMethodsAndTheirSubstitutors
             => Collections.emptyList<Pair<PsiMethod, PsiSubstitutor>>();
     
     annotationType => false;
     
-    constructors => createJavaObjectArray<PsiMethod>({});
+    constructors => ObjectArray<PsiMethod>(0);
     
     containingClass => null;
     
@@ -98,9 +98,9 @@ class CeyLightToplevelFunction(declaration, project)
     
     extendsList => null;
     
-    extendsListTypes => createJavaObjectArray<PsiClassType>({});
+    extendsListTypes => ObjectArray<PsiClassType>(0);
     
-    fields => createJavaObjectArray<PsiField>({});
+    fields => ObjectArray<PsiField>(0);
     
     findFieldByName(String name, Boolean checkBases) => null;
     
@@ -113,10 +113,10 @@ class CeyLightToplevelFunction(declaration, project)
             => Collections.emptyList<Pair<PsiMethod, PsiSubstitutor>>();
     
     findMethodsByName(String name, Boolean checkBases)
-            => createJavaObjectArray<PsiMethod>({});
+            => ObjectArray<PsiMethod>(0);
     
     findMethodsBySignature(PsiMethod? patternMethod, Boolean checkBases)
-            => createJavaObjectArray<PsiMethod>({});
+            => ObjectArray<PsiMethod>(0);
     
     hasModifierProperty(String name)
             => name == "public"
@@ -127,15 +127,15 @@ class CeyLightToplevelFunction(declaration, project)
     
     implementsList => null;
     
-    implementsListTypes => createJavaObjectArray<PsiClassType>({});
+    implementsListTypes => ObjectArray<PsiClassType>(0);
     
-    initializers => createJavaObjectArray<PsiClassInitializer>({});
+    initializers => ObjectArray<PsiClassInitializer>(0);
     
-    innerClasses => createJavaObjectArray<PsiClass>({});
+    innerClasses => ObjectArray<PsiClass>(0);
     
     \iinterface => false;
     
-    interfaces => createJavaObjectArray<PsiClass>({});
+    interfaces => ObjectArray<PsiClass>(0);
     
     isInheritor(PsiClass? baseClass, Boolean checkDeep) => false;
     
@@ -158,7 +158,7 @@ class CeyLightToplevelFunction(declaration, project)
     
     superClass => null;
     
-    superTypes => createJavaObjectArray<PsiClassType>({});
+    superTypes => ObjectArray<PsiClassType>(0);
     
     supers => createJavaObjectArray<PsiClass>({
         JavaPsiFacade.getInstance(project)
@@ -167,7 +167,7 @@ class CeyLightToplevelFunction(declaration, project)
     
     typeParameterList => null;
     
-    typeParameters => createJavaObjectArray<PsiTypeParameter>({});
+    typeParameters => ObjectArray<PsiTypeParameter>(0);
     
     visibleSignatures => Collections.emptyList<HierarchicalMethodSignature>();
     
