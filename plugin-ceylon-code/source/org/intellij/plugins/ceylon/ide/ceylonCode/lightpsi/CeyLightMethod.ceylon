@@ -39,8 +39,7 @@ import com.intellij.util {
     IncorrectOperationException
 }
 import com.redhat.ceylon.ide.common.model.asjava {
-    AbstractMethodMirror,
-    GetMethod
+    DeclarationMirror
 }
 import com.redhat.ceylon.model.loader.mirror {
     MethodMirror,
@@ -74,11 +73,11 @@ shared class CeyLightMethod(containingClass, mirror, project)
     MethodMirror mirror;
 
     shared actual Declaration declaration {
-        if (is AbstractMethodMirror mirror) {
-            return mirror.decl;
+        if (is DeclarationMirror mirror) {
+            return mirror.declaration;
         }
-        assert(is GetMethod mirror);
-        return mirror.declaration;
+
+        throw Exception("Unsupported mirror of type ``className(mirror)``");
     }
 
     returnType => mirror.declaredVoid then PsiType.\ivoid else toPsiType(mirror.returnType);

@@ -40,6 +40,9 @@ shared object classFileDecompilerUtil {
         if (ext != JavaClassFileType.instance.defaultExtension) {
             return false;
         }
+        if (!file.\iexists() || file.length == 0) {
+            return false;
+        }
 
         return getCeylonBinaryData(file).ceylonCompiledFile;
     }
