@@ -33,11 +33,8 @@ shared class ToggleModelUpdateAction() extends AnAction() {
             e.presentation.enabled = true;
 
             value what = " automatic update of the Ceylon model (``modelManager.delayBeforeUpdatingAfterChange/1000`` seconds after any change)";
-            if (modelManager.automaticModelUpdateEnabled) {
-                e.presentation.text = "Disable" + what;
-            } else {
-                e.presentation.text = "Enable" + what;
-            }
+            value action = modelManager.automaticModelUpdateEnabled then "Disable" else "Enable";
+            e.presentation.setText(action + what);
         } else {
             e.presentation.enabled = false;
         }
