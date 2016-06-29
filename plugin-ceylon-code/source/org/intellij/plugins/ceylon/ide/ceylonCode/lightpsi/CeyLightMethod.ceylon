@@ -87,7 +87,9 @@ shared class CeyLightMethod(containingClass, mirror, project)
     shared actual PsiParameterList parameterList {
         value builder = LightParameterListBuilder(manager, language);
         for (p in mirror.parameters) {
-            builder.addParameter(LightParameter(p.name, toPsiType(p.type), this, CeylonLanguage.instance));
+            if (exists type = toPsiType(p.type)) {
+                builder.addParameter(LightParameter(p.name, type, this, CeylonLanguage.instance));
+            }
         }
         return builder;
     }
@@ -183,15 +185,15 @@ shared class CeyLightMethod(containingClass, mirror, project)
 
     writable => (super of LightElement).writable;
 
-    shared actual T getCopyableUserData<T>(Key<T>? key)
+    shared actual T getCopyableUserData<T>(Key<T> key)
             given T satisfies Object
             => (super of UserDataHolderBase).getCopyableUserData(key);
 
-    shared actual void putCopyableUserData<T>(Key<T>? key, T? val)
+    shared actual void putCopyableUserData<T>(Key<T> key, T? val)
             given T satisfies Object
             => (super of UserDataHolderBase).putCopyableUserData(key, val);
 
-    shared actual PsiElement? navigationElement
+    shared actual PsiElement navigationElement
             => (super of LightElement).navigationElement;
     assign navigationElement
             => (super of LightElement).navigationElement = navigationElement;

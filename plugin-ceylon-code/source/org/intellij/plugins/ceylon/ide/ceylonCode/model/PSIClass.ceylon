@@ -67,10 +67,15 @@ shared class PSIClass(shared PsiClass psi)
     variable String? cacheKey = null;
     
     Boolean hasAnnotation(Annotations annotation)
-        => doWithLock(()
-            => psi.modifierList.annotations.array.coalesced.any(
-                (ann) =>ann.qualifiedName == annotation.klazz.canonicalName
-            ));
+        => doWithLock(() =>
+            if (exists mods = psi.modifierList,
+                mods.annotations.array.coalesced.any(
+                    (ann) => if (exists name = ann.qualifiedName,
+                                 name == annotation.klazz.canonicalName)
+                             then true else false
+               ))
+            then true else false
+           );
 
     abstract => PsiUtil.isAbstractClass(psi);
     
@@ -111,10 +116,15 @@ shared class PSIClass(shared PsiClass psi)
                 result.add(PSIMethod(m));
             });
 
-            if (psi.enum, is PsiExtensibleClass psi) {
+            if (psi.enum,
+                is PsiExtensibleClass psi) {
                 value cache = ClassInnerStuffCache(psi);
-                result.add(PSIMethod(cache.valueOfMethod));
-                result.add(PSIMethod(cache.valuesMethod));
+                if (exists valueOfMethod = cache.valueOfMethod) {
+                    result.add(PSIMethod(valueOfMethod));
+                }
+                if (exists valuesMethod = cache.valuesMethod) {
+                    result.add(PSIMethod(valuesMethod));
+                }
             }
 
             // unfortunately, IntelliJ does not include implicit default constructors in `psi.methods`
@@ -197,9 +207,9 @@ shared class PSIClass(shared PsiClass psi)
     
     fullPath => if (exists f = psi.containingFile)
                 then let (p = f.virtualFile.canonicalPath)
-                    if (exists i = p.firstInclusion("!/"))
+                    if (exists p, exists i = p.firstInclusion("!/"))
                     then p.spanFrom(i + 2)
-                    else p
+                    else "<unknown>"
                 else "<unknown>";
     
     isBinary => psi is ClsClassImpl;

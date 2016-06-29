@@ -86,8 +86,9 @@ class IdeaLinkedModeModel() {
     }
 
     shared void buildTemplate(Editor editor) {
-        PsiDocumentManager.getInstance(editor.project).commitDocument(editor.document);
-        value file = PsiDocumentManager.getInstance(editor.project).getPsiFile(editor.document);
+        assert(exists project = editor.project);
+        PsiDocumentManager.getInstance(project).commitDocument(editor.document);
+        assert(exists file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document));
         value builder = TemplateBuilderImpl(file.firstChild);
 
         for ([range,elements] in variables) {
@@ -132,9 +133,9 @@ class IdeaLinkedModeModel() {
         value template = builder.buildInlineTemplate();
         value listener = object extends TemplateEditingAdapter() {
             shared actual void currentVariableChanged(TemplateState? templateState, Template? template, Integer int, Integer int1) {
-                CustomLookupCellRenderer.install(editor.project);
+                CustomLookupCellRenderer.install(project);
             }
         };
-        TemplateManager.getInstance(editor.project).startTemplate(editor, template, listener);
+        TemplateManager.getInstance(project).startTemplate(editor, template, listener);
     }
 }

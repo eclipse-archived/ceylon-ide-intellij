@@ -106,13 +106,14 @@ class IdeaExtractValueRefactoring(CeylonFile file, PhasedUnit phasedUnit, List<C
     
     dupeRegions = ArrayList<TextRange>();
 
+    assert(exists mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project));
+
     editorData => object satisfies EditorData {
         tokens => theTokens;
         rootNode => phasedUnit.compilationUnit;
         node => outer.node;
         sourceVirtualFile
-                => VirtualFileVirtualFile(file.virtualFile, 
-                    ModuleUtil.findModuleForFile(file.virtualFile, file.project));
+                => VirtualFileVirtualFile(file.virtualFile, mod);
     };
     
     newRegion(Integer start, Integer length) => TextRange.from(start, length);

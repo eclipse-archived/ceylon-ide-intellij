@@ -33,7 +33,8 @@ import com.redhat.ceylon.model.loader.mirror {
 
 import java.lang {
     CharSequence,
-    CharArray
+    CharArray,
+    UnsupportedOperationException
 }
 import java.util {
     Collections
@@ -42,28 +43,33 @@ import java.util {
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonLanguage
 }
+import com.intellij.psi.search {
+    GlobalSearchScope
+}
 
 class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager manager)
         satisfies PsiTypeParameter {
     
-    shared actual void accept(PsiElementVisitor? visitor) {}
+    shared actual void accept(PsiElementVisitor visitor) {}
     
-    shared actual void acceptChildren(PsiElementVisitor? visitor) {}
+    shared actual void acceptChildren(PsiElementVisitor visitor) {}
     
-    add(PsiElement? element) => null;
+    add(PsiElement element) => null;
     
-    addAfter(PsiElement? element, PsiElement? anchor)
+    addAfter(PsiElement element, PsiElement? anchor)
             => null;
     
-    addAnnotation(String? qualifiedName) => null;
+    shared actual PsiAnnotation addAnnotation(String qualifiedName) {
+        throw UnsupportedOperationException();
+    }
     
-    addBefore(PsiElement? element, PsiElement? anchor) => null;
+    addBefore(PsiElement element, PsiElement? anchor) => null;
     
-    addRange(PsiElement? first, PsiElement? last) => null;
+    addRange(PsiElement first, PsiElement? last) => null;
     
-    addRangeAfter(PsiElement? first, PsiElement? last, PsiElement? anchor) => null;
+    addRangeAfter(PsiElement first, PsiElement last, PsiElement? anchor) => null;
     
-    addRangeBefore(PsiElement? first, PsiElement? last, PsiElement? anchor) => null;
+    addRangeBefore(PsiElement first, PsiElement last, PsiElement? anchor) => null;
     
     allFields => PsiField.emptyArray;
     
@@ -84,7 +90,7 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     canNavigateToSource() => false;
     
-    shared actual void checkAdd(PsiElement? element) {}
+    shared actual void checkAdd(PsiElement element) {}
     
     shared actual void checkDelete() {}
     
@@ -116,7 +122,7 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     fields => PsiField.emptyArray;
     
-    findAnnotation(String? qualifiedName) => null;
+    findAnnotation(String qualifiedName) => null;
     
     findElementAt(Integer offset) => null;
     
@@ -140,10 +146,10 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     getIcon(Integer flags) => null;
     
-    shared actual T? getUserData<T>(Key<T>? key)
+    shared actual T? getUserData<T>(Key<T> key)
             given T satisfies Object => null;
     
-    hasModifierProperty(String? name) => false;
+    hasModifierProperty(String name) => false;
     
     hasTypeParameters() => false;
     
@@ -161,9 +167,9 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     interfaces => PsiClass.emptyArray;
     
-    isEquivalentTo(PsiElement? another) => false;
+    isEquivalentTo(PsiElement another) => false;
     
-    isInheritor(PsiClass? baseClass, Boolean checkDeep) => false;
+    isInheritor(PsiClass baseClass, Boolean checkDeep) => false;
     
     isInheritorDeep(PsiClass? baseClass, PsiClass? classToByPass) => false;
     
@@ -201,15 +207,15 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     prevSibling => null;
     
-    processDeclarations(PsiScopeProcessor? processor, ResolveState? state,
-        PsiElement? lastParent, PsiElement? place) => false;
+    processDeclarations(PsiScopeProcessor processor, ResolveState state,
+        PsiElement? lastParent, PsiElement place) => false;
     
     project => manager.project;
     
-    shared actual void putCopyableUserData<T>(Key<T>? key, T? \ivalue)
+    shared actual void putCopyableUserData<T>(Key<T>? key, T? val)
             given T satisfies Object {}
     
-    shared actual void putUserData<T>(Key<T>? key, T? \ivalue)
+    shared actual void putUserData<T>(Key<T> key, T? val)
             given T satisfies Object {}
     
     qualifiedName => mirror.name;
@@ -220,13 +226,13 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     references => PsiReference.emptyArray;
     
-    replace(PsiElement? newElement) => null;
+    replace(PsiElement newElement) => null;
     
-    resolveScope => null;
+    resolveScope => GlobalSearchScope.emptyScope;
     
     scope => null;
     
-    shared actual PsiElement setName(String? name) {
+    shared actual PsiElement setName(String name) {
         throw IncorrectOperationException("Not supported");
     }
     
@@ -246,9 +252,9 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     textLength => 0;
     
-    shared actual Boolean textMatches(CharSequence? text) => false;
+    shared actual Boolean textMatches(CharSequence text) => false;
     
-    shared actual Boolean textMatches(PsiElement? element) => false;
+    shared actual Boolean textMatches(PsiElement element) => false;
     
     textOffset => 0;
     
@@ -260,7 +266,7 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     typeParameters => PsiTypeParameter.emptyArray;
     
-    useScope => null;
+    useScope => GlobalSearchScope.emptyScope;
 
     shared actual Boolean writable => false;
 

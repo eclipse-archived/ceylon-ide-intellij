@@ -16,7 +16,7 @@ object ideaDocumentServices satisfies DocumentServices {
     createCompositeChange(String desc) => IdeaCompositeChange();
     
     // TODO take the settings from the current project
-    indentSpaces => CodeStyleSettings().indentOptions.indentSize;
+    indentSpaces => CodeStyleSettings().indentOptions?.indentSize else 4;
     
     indentWithSpaces => true;
 }

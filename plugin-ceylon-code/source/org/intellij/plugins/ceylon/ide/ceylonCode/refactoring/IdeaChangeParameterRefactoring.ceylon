@@ -150,8 +150,9 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
         return null;
     }
 
-    shared actual void invoke(Project project, ObjectArray<PsiElement>? elements, DataContext ctx) {
-        if (exists editor = CommonDataKeys.\iEDITOR.getData(ctx),
+    shared actual void invoke(Project project, ObjectArray<PsiElement> elements, DataContext? ctx) {
+        if (exists ctx,
+            exists editor = CommonDataKeys.\iEDITOR.getData(ctx),
             exists file = CommonDataKeys.\iPSI_FILE.getData(ctx)) {
 
             invoke(project, editor, file, ctx);
@@ -176,7 +177,7 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
                         shared actual void invokeRefactoring(BaseRefactoringProcessor? processor) {
                             if (is IdeaCompositeChange chg = refacto.build(params)) {
                                 object extends WriteCommandAction<Nothing>(_project) {
-                                    shared actual void run(Result<Nothing>? result) {
+                                    shared actual void run(Result<Nothing> result) {
                                         chg.applyChanges(project);
                                     }
                                 }.execute();

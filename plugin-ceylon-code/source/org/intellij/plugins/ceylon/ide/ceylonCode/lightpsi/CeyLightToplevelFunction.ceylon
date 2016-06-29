@@ -137,7 +137,7 @@ class CeyLightToplevelFunction(declaration, project)
     
     interfaces => ObjectArray<PsiClass>(0);
     
-    isInheritor(PsiClass? baseClass, Boolean checkDeep) => false;
+    isInheritor(PsiClass baseClass, Boolean checkDeep) => false;
     
     isInheritorDeep(PsiClass? baseClass, PsiClass? classToByPass) => false;
 
@@ -150,7 +150,7 @@ class CeyLightToplevelFunction(declaration, project)
 
     scope => null;
     
-    shared actual PsiElement setName(String? name) {
+    shared actual PsiElement setName(String name) {
         throw IncorrectOperationException();
     }
     
@@ -189,17 +189,17 @@ class CeyLightToplevelFunction(declaration, project)
 
     writable => (super of LightElement).writable;
 
-    shared actual T getCopyableUserData<T>(Key<T>? key)
+    shared actual T getCopyableUserData<T>(Key<T> key)
             given T satisfies Object
             => (super of UserDataHolderBase).getCopyableUserData(key);
 
-    shared actual void putCopyableUserData<T>(Key<T>? key, T? val)
+    shared actual void putCopyableUserData<T>(Key<T> key, T? val)
             given T satisfies Object
             => (super of UserDataHolderBase).putCopyableUserData(key, val);
 
     containingFile => CeylonTreeUtil.getDeclaringFile(declaration.unit, project);
 
-    shared actual PsiElement? navigationElement
+    shared actual PsiElement navigationElement
             => (super of LightElement).navigationElement;
     assign navigationElement
             => (super of LightElement).navigationElement = navigationElement;

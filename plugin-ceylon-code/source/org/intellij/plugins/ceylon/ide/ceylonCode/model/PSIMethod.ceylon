@@ -3,7 +3,8 @@ import com.intellij.psi {
     PsiModifier,
     PsiType,
     PsiAnnotationMethod,
-    PsiParameter
+    PsiParameter,
+    PsiClass
 }
 import com.intellij.psi.search.searches {
     SuperMethodsSearch
@@ -30,9 +31,20 @@ shared class PSIMethod(shared PsiMethod psi)
         extends PSIAnnotatedMirror(psi)
         satisfies MethodMirror {
     
-    Boolean classIs(String cls) {
-        return doWithLock(() => psi.containingClass.qualifiedName == cls);
+    Return doWithContainingClass<Return>(Return(PsiClass) func, Return default) {
+        return doWithLock(() {
+            if (exists cc = psi.containingClass) {
+                return func(cc);
+            } else {
+                return default;
+            }
+        });
     }
+
+    Boolean classIs(String cls) =>
+            doWithContainingClass(
+                (cc) => (cc.qualifiedName else "") == cls, false
+            );
     
     variable Boolean? lazyIsOverriding = null;
     
@@ -57,15 +69,15 @@ shared class PSIMethod(shared PsiMethod psi)
         if (classIs("ceylon.language.Exception")) {
             return false;
         } else {
-            return doWithLock(() {
-                    return psi.containingClass.findMethodsByName(psi.name, true).iterable.coalesced.filter(
+            return doWithContainingClass((cc) {
+                    return cc.findMethodsByName(psi.name, true).iterable.coalesced.filter(
                         (m) => (m == psi) || ( 
                                !m.modifierList.hasModifierProperty("static")
                             && !m.modifierList.hasModifierProperty("private")
                             && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
                             && !MethodSignatureUtil.areOverrideEquivalent(psi, m)
                         )).size > 1;
-            });
+            }, false);
         }
     }
     
@@ -75,11 +87,11 @@ shared class PSIMethod(shared PsiMethod psi)
     
     abstract =>
         psi.hasModifierProperty(PsiModifier.abstract)
-        || doWithLock(() => psi.containingClass.\iinterface);
+        || doWithContainingClass((cc) => cc.\iinterface, false);
     
     constructor => psi.constructor;
     
-    declaredVoid => psi.returnType == PsiType.\ivoid;
+    declaredVoid => (psi.returnType else PsiType.null) == PsiType.\ivoid;
     
     default => if (is PsiAnnotationMethod psi)
                then doWithLock(() => psi.defaultValue exists)
@@ -87,7 +99,7 @@ shared class PSIMethod(shared PsiMethod psi)
     
     defaultAccess => !(public || protected || psi.hasModifierProperty(PsiModifier.private));
     
-    enclosingClass => PSIClass(doWithLock(() => psi.containingClass));
+    enclosingClass => doWithContainingClass((cc) => PSIClass(cc), null);
     
     final => psi.hasModifierProperty(PsiModifier.final);
     

@@ -119,7 +119,7 @@ shared class CeylonGotoSymbolContributor() extends CeylonGotoContributor() {
         for (mod in modules) {
             if (!mod.java,
                 is IdeaModule mod,
-                includeNonProjectItems || mod.isProjectModule) {
+                /*includeNonProjectItems ||*/ mod.isProjectModule) {
                 for (pu in mod.phasedUnits) {
                     for (declaration in pu.declarations) {
                         if (!declaration.unit is AnyJavaUnit,

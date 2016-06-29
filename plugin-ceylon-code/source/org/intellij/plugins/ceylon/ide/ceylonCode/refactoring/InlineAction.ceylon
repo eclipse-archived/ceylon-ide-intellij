@@ -99,7 +99,7 @@ shared class InlineAction() extends InlineActionHandler() {
                     refactoring.build(change);
 
                     object extends WriteCommandAction<Nothing>(_project, file) {
-                        shared actual void run(Result<Nothing>? result) {
+                        shared actual void run(Result<Nothing> result) {
                             change.applyChanges(project);
                         }
                     }.execute();

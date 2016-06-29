@@ -41,7 +41,9 @@ import com.intellij.openapi.util {
 import com.intellij.openapi.vfs {
     VirtualFile,
     VfsUtil,
-    VirtualFileManager,
+    VirtualFileManager {
+        virtualFileManager=instance
+    },
     JarFileSystem
 }
 import com.redhat.ceylon.cmr.api {
@@ -172,8 +174,9 @@ shared class IdeaCeylonProject(ideArtifact, model)
         Integer? lastSlash = path.lastOccurrence('/');
         if (exists lastSlash) {
             String parentPath = path.span(0, lastSlash);
-            return VirtualFileManager.instance
-                    .findFileByUrl("file://``parentPath``");
+            assert(exists file = virtualFileManager
+                .findFileByUrl("file://``parentPath``"));
+            return file;
         }
 
         if (application.unitTestMode) {
@@ -306,7 +309,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
             if (clear) {
                 for (e in mrm.orderEntries) {
                     if (is LibraryOrderEntry e,
-                        e.libraryName.startsWith("Ceylon: ") || e.libraryName == "Ceylon dependencies") {
+                        exists libName = e.libraryName,
+                        libName.startsWith("Ceylon: ") || libName == "Ceylon dependencies") {
                         mrm.removeOrderEntry(e);
                     }
                 }
@@ -323,16 +327,22 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             }
 
+
             value carFile = VirtualFileManager.instance
                 .findFileByUrl(JarFileSystem.protocolPrefix + artifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
 
-            updateUrl(OrderRootType.classes, carFile);
+            if (exists carFile) {
+                updateUrl(OrderRootType.classes, carFile);
+            }
 
             value sourceContext = ArtifactContext(null, artifact.name(), artifact.version(), ArtifactContext.src);
             if (exists sourceArtifact = repositoryManager.getArtifactResult(sourceContext)) {
                 value srcFile = VirtualFileManager.instance
                     .findFileByUrl(JarFileSystem.protocolPrefix + sourceArtifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
-                updateUrl(OrderRootType.sources, srcFile);
+                
+                if (exists srcFile) {
+                    updateUrl(OrderRootType.sources, srcFile);
+                }
             }
 
             if (!exists entry = mrm.findLibraryOrderEntry(lib)) {

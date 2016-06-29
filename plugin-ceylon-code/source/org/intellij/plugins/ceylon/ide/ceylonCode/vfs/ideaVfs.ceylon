@@ -41,7 +41,7 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
             return IdeaVirtualFolder(p, mod);
         }
 
-        throw Exception("File has no parent: ``file.canonicalPath``");
+        throw Exception("File has no parent: ``file.path``");
     }
     
     equals(Object that)
@@ -51,10 +51,12 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     
     hash => file.hash;
     
-    inputStream => doWithLock(() => ByteArrayInputStream(javaString(PsiManager.getInstance(mod.project).findViewProvider(file).contents.string).getBytes(file.charset.string)));
+    inputStream => doWithLock(() => 
+        let (contents = PsiManager.getInstance(mod.project).findViewProvider(file)?.contents?.string else "")
+        ByteArrayInputStream(javaString(contents).getBytes(file.charset.string)));
     
     name => file.name;
-    path => file.canonicalPath;
+    path => file.canonicalPath else file.path;
     nativeResource => file;
     charset => file.charset.string;
     
@@ -89,7 +91,7 @@ shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
               then IdeaVirtualFolder(parent, mod)
               else null;
     
-    path => folder.canonicalPath;
+    path => folder.canonicalPath else folder.path;
         
     hash => folder.hash;
     

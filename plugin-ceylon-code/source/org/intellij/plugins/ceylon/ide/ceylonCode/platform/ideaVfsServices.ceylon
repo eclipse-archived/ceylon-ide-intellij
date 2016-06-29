@@ -42,13 +42,18 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 
 object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,VirtualFile> {
     
+    function localFile(File file) {
+        assert(exists f = localFS.findFileByIoFile(file));
+        return f;
+    }
+
     createVirtualFile(VirtualFile file, Module project) => VirtualFileVirtualFile(file, project);
     
-    createVirtualFileFromProject(Module project, Path path) => VirtualFileVirtualFile(localFS.findFileByIoFile(path.file), project);
+    createVirtualFileFromProject(Module project, Path path) => VirtualFileVirtualFile(localFile(path.file), project);
     
     createVirtualFolder(VirtualFile folder, Module project) => IdeaVirtualFolder(folder, project);
     
-    createVirtualFolderFromProject(Module project, Path path) => IdeaVirtualFolder(localFS.findFileByIoFile(path.file), project);
+    createVirtualFolderFromProject(Module project, Path path) => IdeaVirtualFolder(localFile(path.file), project);
     
     existsOnDisk(VirtualFile resource) => resource.\iexists();
     
@@ -85,9 +90,11 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
         folder.putUserData(nativeFolderProperties(ceylonProject).root, r);
     }
     
-    toPackageName(VirtualFile resource, VirtualFile sourceDir) 
-        => VfsUtilCore.getRelativePath(resource, sourceDir)
-            .split(VfsUtilCore.\iVFS_SEPARATOR_CHAR.equals).sequence();
+    shared actual String[] toPackageName(VirtualFile resource, VirtualFile sourceDir) {
+        return if (exists path = VfsUtilCore.getRelativePath(resource, sourceDir))
+        then path.split(VfsUtilCore.vfsSeparatorChar.equals).sequence()
+        else [];
+    }
 
     findChild(VirtualFile|Module parent, Path path) => 
             if (is VirtualFile parent)
@@ -101,7 +108,7 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
 
     getVirtualFilePath(VirtualFile resource) => Path(getVirtualFilePathString(resource));
 
-    getVirtualFilePathString(VirtualFile resource) => resource.canonicalPath;
+    getVirtualFilePathString(VirtualFile resource) => resource.canonicalPath else "<unknown>";
 
     getProjectRelativePath(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>|Module project)
         => if (exists path = getProjectRelativePathString(resource, project))

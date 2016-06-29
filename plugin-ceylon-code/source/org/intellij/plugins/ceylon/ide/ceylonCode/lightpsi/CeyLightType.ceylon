@@ -118,7 +118,7 @@ class CeyLightType(TypeMirror mirror, Project project)
 
     resolveGenerics() => classResolveResult;
 
-    shared actual A accept<A>(PsiTypeVisitor<A> visitor)
+    shared actual A? accept<A>(PsiTypeVisitor<A> visitor)
             given A satisfies Object
             => visitor.visitClassType(this);
 

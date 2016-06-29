@@ -1,9 +1,6 @@
 import ceylon.collection {
     HashMap
 }
-import ceylon.interop.java {
-    javaString
-}
 
 import com.intellij.psi {
     PsiAnnotation,
@@ -21,6 +18,9 @@ import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
+import com.redhat.ceylon.ide.common.util {
+    toJavaString
+}
 import com.redhat.ceylon.model.loader.mirror {
     AnnotationMirror
 }
@@ -35,17 +35,17 @@ import java.util {
 
 class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
 
-    value values = HashMap<String, Object>();
+    value values = HashMap<String, Object?>();
 
     // somehow, IntelliJ returns a single value when it reads things like
     // `@MyAnnotation({...})`, so we have to make sure we return the correct type
-    Object toListIfNeeded(Object o, PsiType? type) {
+    Object? toListIfNeeded(Object? o, PsiType? type) {
         return if (is PsiArrayType type)
         then Collections.singletonList(o)
         else o;
     }
 
-    Object convert(PsiAnnotationMemberValue|PsiNameValuePair pair, String paramName) {
+    Object? convert(PsiAnnotationMemberValue|PsiNameValuePair pair, String paramName) {
         PsiType? type;
         if (exists ref = pair.reference,
             is PsiMethod method = ref.resolve()) {
@@ -66,13 +66,13 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
         } else if (is PsiAnnotation v) {
             return toListIfNeeded(PSIAnnotation(v), type);
         } else if (is PsiReferenceExpression v) {
-            return toListIfNeeded(javaString(v.referenceName), type);
+            return toListIfNeeded(toJavaString(v.referenceName), type);
         } else if (is PsiClassObjectAccessExpression v) {
             return PSIType(v.operand.type);
         } else if (is PsiLiteralExpression v) {
             // TODO this is super ultra ugly, but we can't get the type associated
             // to a PsiArrayInitializerMemberValue, and IJ parses shorts as ints :(
-            if (doWithLock(() => psi.qualifiedName) == "com.redhat.ceylon.compiler.java.metadata.AnnotationInstantiation",
+            if (doWithLock(() => psi.qualifiedName else "") == "com.redhat.ceylon.compiler.java.metadata.AnnotationInstantiation",
                 paramName == "arguments") {
 
                 return JShort(v.text);

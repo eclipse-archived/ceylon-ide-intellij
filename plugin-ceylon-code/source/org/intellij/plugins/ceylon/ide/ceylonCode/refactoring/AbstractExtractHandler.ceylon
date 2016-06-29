@@ -108,7 +108,8 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         }
         else {
             value visitor = FindContainingExpressionsVisitor(editor.caretModel.offset);
-            visitor.visitAny(PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()).ceylonNode);
+            assert(exists cu = PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()));
+            visitor.visitAny(cu.ceylonNode);
 
             value allParentExpressions
                 = psiElements<CeylonPsi.TermPsi> { file = file;
@@ -209,9 +210,10 @@ class ExtractedVariableRenameHandler(TextRange[] usages = [])
                     => noop();
 
             collectRefs(SearchScope referencesSearchScope)
-                    => JavaCollection(usages.collect((r)
-                        => elementToRename.containingFile
-                            .findReferenceAt(r.startOffset)));
+                    => JavaCollection(
+                        usages.collect(
+                            (r) => elementToRename.containingFile.findReferenceAt(r.startOffset)
+                        ).coalesced.sequence());
 
             checkLocalScope() => elementToRename.containingFile;
         };

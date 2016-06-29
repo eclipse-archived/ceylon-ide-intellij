@@ -260,13 +260,13 @@ shared class CeylonLocalAnalyzerManager(model)
         }));
     }
 
-    selectionChanged(FileEditorManagerEvent? fileEditorManagerEvent) => noop();
-    beforeContentsChange(VirtualFileEvent? virtualFileEvent) => noop();
-    beforeFileDeletion(VirtualFileEvent? virtualFileEvent) => noop();
-    beforeFileMovement(VirtualFileMoveEvent? virtualFileMoveEvent) => noop();
-    beforePropertyChange(VirtualFilePropertyEvent? virtualFilePropertyEvent) => noop();
-    fileCopied(VirtualFileCopyEvent? virtualFileCopyEvent) => noop();
-    fileCreated(VirtualFileEvent? virtualFileEvent) => noop();
-    fileMoved(VirtualFileMoveEvent? virtualFileMoveEvent) => noop();
-    propertyChanged(VirtualFilePropertyEvent? virtualFilePropertyEvent) => noop();
+    selectionChanged(FileEditorManagerEvent fileEditorManagerEvent) => noop();
+    beforeContentsChange(VirtualFileEvent virtualFileEvent) => noop();
+    beforeFileDeletion(VirtualFileEvent virtualFileEvent) => noop();
+    beforeFileMovement(VirtualFileMoveEvent virtualFileMoveEvent) => noop();
+    beforePropertyChange(VirtualFilePropertyEvent virtualFilePropertyEvent) => noop();
+    fileCopied(VirtualFileCopyEvent virtualFileCopyEvent) => noop();
+    fileCreated(VirtualFileEvent virtualFileEvent) => noop();
+    fileMoved(VirtualFileMoveEvent virtualFileMoveEvent) => noop();
+    propertyChanged(VirtualFilePropertyEvent virtualFilePropertyEvent) => noop();
 }

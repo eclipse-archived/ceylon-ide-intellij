@@ -48,7 +48,8 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
 
         assert (exists vfile);
 
-        doc = FileDocumentManager.instance.getDocument(vfile);
+        assert(exists d = FileDocumentManager.instance.getDocument(vfile));
+        doc = d;
     }
 
     addEdit(PlatformTextEdit edit) => edits.add(edit);

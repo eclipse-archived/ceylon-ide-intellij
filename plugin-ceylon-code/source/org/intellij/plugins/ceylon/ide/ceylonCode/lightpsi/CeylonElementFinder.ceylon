@@ -74,10 +74,10 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
             => javaObjectArray(Array<PsiClass?>({findClass(fqName, scope)}.coalesced));
     
     shared actual ObjectArray<PsiClass> getClasses(PsiPackage pkg, GlobalSearchScope scope) {
-        value p = scope.project;
         value fqName = pkg.qualifiedName;
         
-        if (exists projects = p.getComponent(javaClass<IdeaCeylonProjects>())) {
+        if (exists p = scope.project,
+            exists projects = p.getComponent(javaClass<IdeaCeylonProjects>())) {
             for (proj in projects.ceylonProjects) {
                 value ijMod = proj.ideArtifact;
                 

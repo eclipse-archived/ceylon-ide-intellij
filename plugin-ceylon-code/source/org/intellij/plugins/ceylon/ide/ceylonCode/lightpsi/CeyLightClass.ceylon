@@ -283,15 +283,15 @@ shared class CeyLightClass extends LightElement
 
     writable => (super of LightElement).writable;
 
-    shared actual T getCopyableUserData<T>(Key<T>? key)
+    shared actual T getCopyableUserData<T>(Key<T> key)
             given T satisfies Object
             => (super of UserDataHolderBase).getCopyableUserData(key);
 
-    shared actual void putCopyableUserData<T>(Key<T>? key, T? val)
+    shared actual void putCopyableUserData<T>(Key<T> key, T? val)
             given T satisfies Object
             => (super of UserDataHolderBase).putCopyableUserData(key, val);
 
-    shared actual PsiElement? navigationElement
+    shared actual PsiElement navigationElement
             => (super of LightElement).navigationElement;
     assign navigationElement
             => (super of LightElement).navigationElement = navigationElement;

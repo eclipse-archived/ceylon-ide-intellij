@@ -96,8 +96,9 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
     }
 
     shared actual String getNodeText(PsiElement element, Boolean useFullName) {
-        if (is PsiNamedElement element) {
-            return element.name;
+        if (is PsiNamedElement element,
+            exists name = element.name) {
+            return name;
         }
         throw UnsupportedOperationException();
     }

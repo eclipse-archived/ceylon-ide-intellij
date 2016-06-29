@@ -35,8 +35,8 @@ shared class CeylonRunLineMarkerContributor()
             // and are shared
             isShared(node)) {
             
-            return Info(AllIcons.RunConfigurations.\iApplication,
-                null, *ExecutorAction.getActions(0).iterable);
+            return Info(AllIcons.RunConfigurations.application,
+                null, *ExecutorAction.getActions(0).iterable.coalesced);
         }
         
         return null;

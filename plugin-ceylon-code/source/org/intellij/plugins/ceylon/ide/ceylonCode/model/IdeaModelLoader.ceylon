@@ -137,14 +137,15 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         }));
     }
     
-    shared actual String typeName(PsiClass type) => (type of PsiNamedElement).name;
+    shared actual String typeName(PsiClass type)
+            => (type of PsiNamedElement).name else "<unknown>";
 
     shared actual class PackageLoader(BaseIdeModule ideModule)
              extends super.PackageLoader(ideModule) {
         
         assert(is IdeaModule ideModule);
         assert(exists mod = ideModule.ceylonProject?.ideArtifact);
-        assert(exists project = mod.project);
+        value project = mod.project;
 
         value facade = javaPsiFacade(project);
         

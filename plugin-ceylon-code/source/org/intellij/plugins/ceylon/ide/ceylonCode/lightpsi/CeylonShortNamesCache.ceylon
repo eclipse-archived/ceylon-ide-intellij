@@ -132,18 +132,18 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
         return createJavaObjectArray(classes);
     }
     
-    getFieldsByName(String? string, GlobalSearchScope? globalSearchScope)
+    getFieldsByName(String string, GlobalSearchScope globalSearchScope)
             => ObjectArray<PsiField>(0);
     
-    getFieldsByNameIfNotMoreThan(String? string, GlobalSearchScope? globalSearchScope, Integer int)
+    getFieldsByNameIfNotMoreThan(String string, GlobalSearchScope globalSearchScope, Integer int)
             => ObjectArray<PsiField>(0);
     
-    getMethodsByName(String? string, GlobalSearchScope? globalSearchScope)
+    getMethodsByName(String string, GlobalSearchScope globalSearchScope)
             => ObjectArray<PsiMethod>(0);
     
-    getMethodsByNameIfNotMoreThan(String? string, GlobalSearchScope? globalSearchScope, Integer int)
+    getMethodsByNameIfNotMoreThan(String string, GlobalSearchScope globalSearchScope, Integer int)
             => ObjectArray<PsiMethod>(0);
     
-    processMethodsWithName(String? string, GlobalSearchScope? globalSearchScope, Processor<PsiMethod>? processor)
+    processMethodsWithName(String string, GlobalSearchScope globalSearchScope, Processor<PsiMethod> processor)
             => false;
 }

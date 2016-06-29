@@ -8,7 +8,9 @@ import com.intellij.psi {
     PsiClassType,
     PsiTypeParameter,
     PsiClass,
-    JavaPsiFacade,
+    JavaPsiFacade {
+        javaFacade=getInstance
+    },
     PsiNameHelper
 }
 import com.intellij.psi.impl.source {
@@ -103,13 +105,9 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
         assert(is PsiClassReferenceType psi);
         value scope = psi.resolveScope;
         
-        return  doWithLock(() {
-            if (exists p = psi.reference?.project) {
-                return JavaPsiFacade.getInstance(p)
-                        .findClass(name, scope);            
-            }
-            return null;
-        });
+        return doWithLock(() =>
+            javaFacade(psi.reference.project).findClass(name, scope)
+        );
     }
     
     String computedQualifiedName {
@@ -117,11 +115,12 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
 
         if (is PsiClassReferenceType psi) {
             if (exists cls = findClass(canonicalText)) {
-                return cls.qualifiedName; 
+                assert(exists qName = cls.qualifiedName);
+                return qName; 
             }
             
             value parts = canonicalText.split('.'.equals);
-            value facade = JavaPsiFacade.getInstance(psi.reference?.project);
+            value facade = javaFacade(psi.reference.project);
             value clsName = doWithLock(() {
                 variable value pkg = facade.findPackage("");
                 value sb = StringBuilder();
@@ -129,8 +128,9 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
                 
                 for (part in parts) {
                     if (lookingForPkg,
-                        exists subPkg = pkg.subPackages.array.coalesced.find(
-                        (el) => el.name == part)) {
+                        exists _pkg = pkg,
+                        exists subPkg = _pkg.subPackages.array.coalesced.find(
+                        (el) => (el.name else "") == part)) {
                         pkg = subPkg;
                     } else {
                         lookingForPkg = false;
@@ -141,15 +141,18 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
                 if (sb.endsWith(".")) {
                     sb.deleteTerminal(1);
                 }
-                if (exists cls = pkg.findClassByShortName(sb.string, psi.resolveScope).array.first) {
+                if (exists _pkg = pkg,
+                    exists cls = _pkg.findClassByShortName(sb.string, psi.resolveScope).array.first) {
                     return cls.qualifiedName;
                 }
                 // TODO not cool, we got an incorrect qualified name
-                if (sb.string.contains(".impl"),
-                    exists cls = pkg.findClassByShortName(sb.string.replace(".impl", "$impl"), psi.resolveScope).array.first) {
+                if (exists _pkg = pkg,
+                    sb.string.contains(".impl"),
+                    exists cls = _pkg.findClassByShortName(sb.string.replace(".impl", "$impl"), psi.resolveScope).array.first) {
                     return cls.qualifiedName;
                 }
-                if (exists cls = pkg.findClassByShortName(sb.string.replaceLast(".", "$"), psi.resolveScope).array.first) {
+                if (exists _pkg = pkg,
+                    exists cls = _pkg.findClassByShortName(sb.string.replaceLast(".", "$"), psi.resolveScope).array.first) {
                     return cls.qualifiedName;
                 }
                 return null;

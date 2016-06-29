@@ -74,7 +74,7 @@ shared class IdeaNavigation(Project project)
             return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(),
                javaClass<PsiElement>(), false);
         }
-        platformUtils.log(Status._WARNING, "Can't navigate to file " + file.canonicalPath);
+        platformUtils.log(Status._WARNING, "Can't navigate to file " + file.path);
         return null;
     }
     

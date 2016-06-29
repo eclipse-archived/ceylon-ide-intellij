@@ -28,7 +28,7 @@ class PSITypeParameter(PsiTypeParameter|PsiClassReferenceType psi) satisfies Typ
 
     shared actual String name;
     if (is PsiNamedElement psi) {
-        name = psi.name;
+        name = psi.name else "<unknown>";
     } else {
         name = psi.className;
     }
