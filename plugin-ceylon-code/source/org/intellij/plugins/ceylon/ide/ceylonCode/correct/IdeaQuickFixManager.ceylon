@@ -318,7 +318,7 @@ shared class IdeaQuickFixData(
                                 value change = resolution.change;
                                 value p = project;
                                 object extends WriteCommandAction<Nothing>(p, file) {
-                                    shared actual void run(Result<Nothing>? result) {
+                                    shared actual void run(Result<Nothing> result) {
                                         if (is PlatformTextChange change) {
                                             assert (is IdeaTextChange change);
                                             change.applyOnProject(project);
@@ -446,7 +446,7 @@ shared void showPopup(Editor editor, List<Resolution> candidates, String title, 
         .setItemChoosenCallback(JavaRunnable(() {
             if (exists candidate = candidates[list.selectedIndex]) {
                 object extends WriteCommandAction<Nothing>(editor.project) {
-                    shared actual void run(Result<Nothing>? result) {
+                    shared actual void run(Result<Nothing> result) {
                         switch (change = candidate.change)
                         case (is PlatformTextChange) {
                             change.apply();

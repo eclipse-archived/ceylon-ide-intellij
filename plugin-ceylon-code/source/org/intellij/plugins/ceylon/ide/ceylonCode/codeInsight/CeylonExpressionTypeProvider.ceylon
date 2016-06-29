@@ -30,7 +30,7 @@ shared class CeylonExpressionTypeProvider() extends ExpressionTypeProvider<Ceylo
             => if (exists node = termPsi.ceylonNode,
                    exists type = node.typeModel)
             then StringUtil.escapeXml(type.asString(node.unit))
-            else null;
+            else "";
 
     errorHint => "No expression found";
 

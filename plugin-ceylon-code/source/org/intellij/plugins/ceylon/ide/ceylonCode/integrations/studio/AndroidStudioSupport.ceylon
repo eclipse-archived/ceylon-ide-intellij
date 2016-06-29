@@ -111,7 +111,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     }
 
     Boolean addCeylonModule(Module mod) {
-        value src = VfsUtil.findRelativeFile(mod.moduleFile.parent, "src", "main", "ceylon");
+        assert (exists src = VfsUtil.findRelativeFile(mod.moduleFile?.parent, "src", "main", "ceylon"));
 
         variable value hasModule = false;
         VfsUtil.visitChildrenRecursively(src, object extends VirtualFileVisitor<Boolean>() {
@@ -128,7 +128,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             exists modName = groovyFileManipulator.findModuleName(buildFile)) {
 
             value dir = VfsUtil.createDirectoryIfMissing(src, modName[0].replace(".", "/"));
-            value psiDir = PsiManager.getInstance(mod.project).findDirectory(dir);
+            assert (exists psiDir = PsiManager.getInstance(mod.project).findDirectory(dir));
 
             ceylonFileFactory.createModuleDescriptor(psiDir, modName[0], modName[1], Backend.java, {
                 "java.base \"7\"",
@@ -147,7 +147,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
         variable Boolean wasModified = false;
 
         if (exists buildFile = findGradleBuild(mod)) {
-            VfsUtil.createDirectoryIfMissing(mod.moduleFile.parent, "src/main/ceylon");
+            VfsUtil.createDirectoryIfMissing(mod.moduleFile?.parent, "src/main/ceylon");
 
             wasModified ||= groovyFileManipulator.configureSourceSet(buildFile);
             wasModified ||= groovyFileManipulator.configureLint(buildFile);

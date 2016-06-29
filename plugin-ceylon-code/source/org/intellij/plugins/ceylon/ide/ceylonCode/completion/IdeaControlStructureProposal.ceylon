@@ -41,7 +41,9 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
                     value len = text.size - (prefix.size - nodeText.size) + 1; 
 
                     replaceInDoc(platformDoc, start, len, "");
-                    PsiDocumentManager.getInstance(ctx.editor.project).commitDocument(platformDoc.nativeDocument);
+                    assert (exists project = ctx.editor.project);
+                    PsiDocumentManager.getInstance(project)
+                        .commitDocument(platformDoc.nativeDocument);
                 }
                 
                 applyInternal(platformDoc);
@@ -52,7 +54,7 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         
     
     shared actual void newNameCompletion(ProposalsHolder proposals, String? name) {
-        if (is IdeaProposalsHolder proposals) {
+        if (is IdeaProposalsHolder proposals, exists name) {
             proposals.add(LookupElementBuilder.create(name));
         }
     }

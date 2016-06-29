@@ -202,7 +202,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             });
 
             value onSelf = ApplicationManager.application.runReadAction(object satisfies Computable<Boolean> {
-                compute() => !element exists || targetElementUtil.includeSelfInGotoImplementation(element);
+                compute() => if (exists element) then targetElementUtil.includeSelfInGotoImplementation(element) else true;
             });
             return searchImplementations(element, editor, offset, onRef && onSelf, onRef);
         }
@@ -228,21 +228,16 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                             extends GotoImplementationHandler()
                             satisfies GutterIconNavigationHandler<PsiElement> {
 
-                        shared actual void invoke(Project project, Editor? editor, PsiFile file) {
-                            if (exists editor) {
-                                value document = editor.document;
-                                value before = editor.caretModel.offset;
-                                value lineStartOffset = document.getLineStartOffset(document.getLineNumber(decl.textOffset));
-                                editor.caretModel.moveToOffset(lineStartOffset);
-                                try {
-                                    super.invoke(project, editor, file);
-                                }
-                                finally {
-                                    editor.caretModel.moveToOffset(before);
-                                }
-                            }
-                            else {
+                        shared actual void invoke(Project project, Editor editor, PsiFile file) {
+                            value document = editor.document;
+                            value before = editor.caretModel.offset;
+                            value lineStartOffset = document.getLineStartOffset(document.getLineNumber(decl.textOffset));
+                            editor.caretModel.moveToOffset(lineStartOffset);
+                            try {
                                 super.invoke(project, editor, file);
+                            }
+                            finally {
+                                editor.caretModel.moveToOffset(before);
                             }
                         }
 
@@ -251,8 +246,11 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                                     Searcher(editor).ourSearchImplementations(editor, decl of PsiElement, decl.textOffset),
                                     Collections.emptyList<AdditionalAction>());
 
-                        navigate(MouseEvent? mouseEvent, PsiElement id)
-                                => invoke(element.project, editor(element), element.containingFile);
+                        shared actual void navigate(MouseEvent? mouseEvent, PsiElement id) {
+                            if (exists ed = editor(element)) {
+                                invoke(element.project, ed, element.containingFile);
+                            }
+                        }
                     }
                 });
             }

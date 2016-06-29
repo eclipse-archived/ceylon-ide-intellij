@@ -33,7 +33,11 @@ shared object classFileDecompilerUtil {
     shared Key<CeylonBinaryData> ceylonBinaryDataKey = Key<CeylonBinaryData>("CEYLON_BINARY_DATA_KEY");
 
     shared Boolean isCeylonCompiledFile(VirtualFile file) {
-        if (file.extension != JavaClassFileType.instance.defaultExtension) {
+        value ext = file.extension;
+        if (!exists ext) {
+            return false;
+        }
+        if (ext != JavaClassFileType.instance.defaultExtension) {
             return false;
         }
 

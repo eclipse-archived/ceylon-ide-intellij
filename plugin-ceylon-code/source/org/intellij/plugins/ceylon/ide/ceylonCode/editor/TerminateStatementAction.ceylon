@@ -40,7 +40,7 @@ import org.antlr.runtime {
 
 shared class TerminateStatementAction() extends SmartEnterProcessor() {
 
-    shared actual Boolean process(Project? project, Editor editor, PsiFile? psiFile) {
+    shared actual Boolean process(Project project, Editor editor, PsiFile psiFile) {
         value line = editor.document.getLineNumber(editor.caretModel.offset);
         value handler = object extends AbstractTerminateStatementAction<IdeaDocument>() {
             shared actual [Tree.CompilationUnit, List<CommonToken>] parse(IdeaDocument doc) {

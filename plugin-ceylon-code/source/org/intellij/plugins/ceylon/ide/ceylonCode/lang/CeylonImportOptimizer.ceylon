@@ -31,15 +31,13 @@ shared class CeylonImportOptimizer()
     variable Project? project = null;
 
     shared actual Runnable processFile(PsiFile psiFile) {
-        value doc = psiFile.viewProvider.document;
+        assert (exists doc = psiFile.viewProvider.document);
         project = psiFile.project; //YUCK!!!
         assert (is CeylonFile psiFile);
         value cu = psiFile.compilationUnit;
         
         return object satisfies Runnable {
-            shared actual void run() {
-                cleanImports(cu, IdeaDocument(doc));
-            }
+            run() => cleanImports(cu, IdeaDocument(doc));
         };
     }
     

@@ -133,7 +133,8 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
         value isSecondLevel = parameters.invocationCount > 0 && parameters.invocationCount % 2 == 0;
         value element = parameters.originalPosition;
         value doc = parameters.editor.document;
-        assert(is CeylonFile ceylonFile = element.containingFile);
+        assert (exists element,
+                is CeylonFile ceylonFile = element.containingFile);
         value project = findProjectForFile(ceylonFile);
         value params = IdeaCompletionContext(ceylonFile, parameters.editor, project, options);
 

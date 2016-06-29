@@ -43,8 +43,9 @@ class IdeaFunctionCompletionProposal
             value lengthBeforeCaret = ctx.editor.caretModel.offset - startOfTextToErase; 
             value platformDoc = ctx.commonDocument;
             replaceInDoc(platformDoc, startOfTextToErase, lengthBeforeCaret, "");
-            
-            PsiDocumentManager.getInstance(ctx.editor.project).commitDocument(platformDoc.nativeDocument);
+
+            assert (exists project = ctx.editor.project);
+            PsiDocumentManager.getInstance(project).commitDocument(platformDoc.nativeDocument);
             
             value change = createChange(platformDoc);
             

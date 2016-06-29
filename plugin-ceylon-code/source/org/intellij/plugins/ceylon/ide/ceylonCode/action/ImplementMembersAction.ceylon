@@ -153,7 +153,7 @@ shared abstract class AbstractMembersAction()
             //TODO: I hate resoving and passing this in here, but
             //      due to a packaging issue I could not refine
             //      MemberChooser.isContainerNode
-            CeylonReference.resolveDeclaration(container, project),
+            CeylonReference.resolveDeclaration(container, project) else nothing,
             descriptions.descriptionForDeclaration {
                 decl = container;
                 includeContainer = false;

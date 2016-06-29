@@ -44,8 +44,10 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
                 // Undo IntelliJ's completion
                 value platformDoc = ctx.commonDocument;
                 replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
-                PsiDocumentManager.getInstance(ctx.editor.project).commitDocument(platformDoc.nativeDocument);
-                
+
+                assert (exists project = ctx.editor.project);
+                PsiDocumentManager.getInstance(project).commitDocument(platformDoc.nativeDocument);
+
                 value change = createChange(platformDoc);
                 
                 object extends WriteCommandAction<DefaultRegion?>(ctx.editor.project, ctx.file) {

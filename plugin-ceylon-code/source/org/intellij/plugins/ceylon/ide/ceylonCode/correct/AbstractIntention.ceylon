@@ -112,15 +112,15 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             value _node = nodes.findNode(typecheckedCompilationUnit,
                 localAnalysisResult.tokens, offset);
             
-            value mod = ModuleUtil.findModuleForFile(psiFile.virtualFile, project);
-            
-            if (exists _node,
+            if (exists mod = ModuleUtil.findModuleForFile(psiFile.virtualFile, project),
+                exists _node,
                 exists pr = project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod)) {
 
                 value outerProject = project;
+                assert (exists doc = psiFile.viewProvider.document);
                 value data = object extends IdeaQuickFixData(
                     dummyMsg, 
-                    psiFile.viewProvider.document,
+                    doc,
                     typecheckedCompilationUnit,
                     analyzedPhasedUnit,
                     _node,
@@ -151,8 +151,9 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
                     shared actual void addConvertToClassProposal(String description, Tree.ObjectDefinition declaration) {
                         makeAvailable(outerProject, description, null, null, (p, e, f) {
-                                value document = IdeaDocument(f.viewProvider.document);
-                                convertToClassQuickFix.applyChanges(document, declaration);
+                            assert (exists doc = f.viewProvider.document);
+                            value document = IdeaDocument(doc);
+                            convertToClassQuickFix.applyChanges(document, declaration);
                         });
                     }
                 };

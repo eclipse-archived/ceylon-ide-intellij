@@ -59,7 +59,9 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 value platformDoc = ctx.commonDocument;
                 value len = context.getOffset(CompletionInitializationContext.\iSELECTION_END_OFFSET) - offset;
                 replaceInDoc(platformDoc, offset, len, "");
-                PsiDocumentManager.getInstance(ctx.editor.project).commitDocument(platformDoc.nativeDocument);
+
+                assert (exists project = ctx.editor.project);
+                PsiDocumentManager.getInstance(project).commitDocument(platformDoc.nativeDocument);
                 
                 value change = createChange(platformDoc);
                 
