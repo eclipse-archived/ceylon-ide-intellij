@@ -13,6 +13,11 @@ import com.intellij.psi {
 import com.intellij.psi.search {
     GlobalSearchScope
 }
+import com.intellij.util.containers {
+    ContainerUtil {
+        newArrayList
+    }
+}
 import com.redhat.ceylon.ide.common.model {
     CeylonUnit
 }
@@ -47,8 +52,8 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     exists mods = proj.modules?.fromProject,
                     exists mod = mods.find((m) => fqName.startsWith(m.nameAsString))) {
                     
-                    for (pack in mod.packages) {
-                        for (dec in pack.members) {
+                    for (pack in newArrayList(mod.packages)) {
+                        for (dec in newArrayList(pack.members)) {
                             if (fqName == getJavaQualifiedName(dec)) {
                                 if (is ClassOrInterface|Value dec,
                                     is CeylonUnit unit = (dec of Declaration).unit) {
@@ -80,7 +85,7 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     exists mods = proj.modules?.fromProject,
                     exists mod = mods.find((m) => fqName.startsWith(m.nameAsString))) {
                     
-                    for (pack in mod.packages) {
+                    for (pack in newArrayList(mod.packages)) {
                         if (pack.qualifiedNameString == fqName) {
                             return createJavaObjectArray<PsiClass>(
                                 CeylonIterable(pack.members)
