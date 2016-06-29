@@ -36,7 +36,9 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     ModelUtil,
-    ClassOrInterface
+    ClassOrInterface,
+    Value,
+    Function
 }
 
 import java.lang {
@@ -130,23 +132,30 @@ shared class CeylonGotoSuperHandler()
         value list = ArrayList<Declaration>();
         if (is CeylonPsi.AnyMethodPsi e) {
             if (exists fun = e.ceylonNode.declarationModel,
-                exists root = fun.refinedDeclaration,
-                is ClassOrInterface bottom = fun.container,
-                is ClassOrInterface top = root.container) {
-                for (dec in ModelUtil.getInterveningRefinements(fun.name,
-                                ModelUtil.getSignature(fun), root, bottom, top)) {
-                    list.add(dec);
+                fun.actual,
+                is ClassOrInterface bottom = fun.container) {
+                value signature = ModelUtil.getSignature(fun);
+                for (type in bottom.supertypeDeclarations) {
+                    if (type!=bottom,
+                        is Function dec
+                            = type.getDirectMember(fun.name, signature, false),
+                        dec.shared) {
+                        list.add(dec);
+                    }
                 }
             }
         }
         else if (is CeylonPsi.AnyAttributePsi e) {
             if (exists val = e.ceylonNode.declarationModel,
-                exists root = val.refinedDeclaration,
-                is ClassOrInterface bottom = val.container,
-                is ClassOrInterface top = root.container) {
-                for (dec in ModelUtil.getInterveningRefinements(val.name,
-                                null, root, bottom, top)) {
-                    list.add(dec);
+                val.actual,
+                is ClassOrInterface bottom = val.container) {
+                for (type in bottom.supertypeDeclarations) {
+                    if (type!=bottom,
+                        is Value dec
+                            = type.getDirectMember(val.name, null, false),
+                        dec.shared) {
+                        list.add(dec);
+                    }
                 }
             }
         }

@@ -137,6 +137,11 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
     shared actual LineMarkerInfo<PsiElement>? getLineMarkerInfo(PsiElement element) {
         if (exists model = findDeclaration(element),
             model.actual,
+            //TODO: getRefinedDeclaration() always returns a single result
+            //      but when extending Java types, there need not be a
+            //      unique single declaration right at the top of the
+            //      hierarchy - in that case we should pop up a list
+            //      like we do in CeylonGotoSuperHandler
             exists refined = types.getRefinedDeclaration(model)) {
             assert (is Declaration parent = refined.container);
 
