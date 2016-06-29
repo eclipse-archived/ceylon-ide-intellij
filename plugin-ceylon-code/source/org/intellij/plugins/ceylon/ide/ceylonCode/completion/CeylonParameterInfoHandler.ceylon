@@ -29,6 +29,9 @@ import com.intellij.util {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
+import com.redhat.ceylon.ide.common.doc {
+    convertToHTML
+}
 import com.redhat.ceylon.model.typechecker.model {
     Functional,
     Unit,
@@ -56,9 +59,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
         PositionalArgumentListPsi,
         NamedArgumentListPsi
     }
-}
-import com.redhat.ceylon.ide.common.doc {
-    convertToHTML
 }
 
 shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<ArgumentListPsi, Functional> {
@@ -91,7 +91,6 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
     
     shared actual ArgumentListPsi? findElementForUpdatingParameterInfo(UpdateParameterInfoContext context) {
         value elementAtOffset = PsiUtilCore.getElementAtOffset(context.file, context.offset);
-
         return PsiTreeUtil.getParentOfType(elementAtOffset, javaClass<ArgumentListPsi>());
     }
     
@@ -103,11 +102,9 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
     
     parameterCloseChars => ParameterInfoUtils.defaultParameterCloseChars;
     
-    shared actual void showParameterInfo(ArgumentListPsi pal,
-        CreateParameterInfoContext context) {
-
-        context.showHint(pal, pal.textRange.startOffset, this);
-    }
+    showParameterInfo(ArgumentListPsi pal,
+        CreateParameterInfoContext context)
+            => context.showHint(pal, pal.textRange.startOffset, this);
     
     tracksParameterIndex() => true;
     
@@ -117,23 +114,24 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
         value offset = context.editor.caretModel.offset;
 
         if (is PositionalArgumentListPsi al) {
-            value index = ParameterInfoUtils.getCurrentParameterIndex(al.node, offset,
-                TokenTypes.comma.tokenType);
+            value index
+                    = ParameterInfoUtils.getCurrentParameterIndex(al.node, offset,
+                        TokenTypes.comma.tokenType);
             context.setCurrentParameter(index);
         } else if (is NamedArgumentListPsi al,
             exists model = al.ceylonNode.namedArgumentList) {
 
             if (inSequencedArgs(al, model, offset)) {
-                context.setCurrentParameter(model.parameterList.parameters.size() - 1);
+                context.setCurrentParameter(model.parameterList.parameters.size()-1);
             } else {
-                value arg = CeylonIterable(al.ceylonNode.namedArguments).find((a) {
-                    return a.startIndex.intValue() - 1 <= offset <= a.endIndex.intValue() + 1;
-                });
+                value arg
+                        = CeylonIterable(al.ceylonNode.namedArguments)
+                            .find((a) => a.startIndex.intValue()-1 <= offset <= a.endIndex.intValue()+1);
 
                 if (exists arg) {
-                    value index = CeylonIterable(model.parameterList.parameters)
-                        .indexed
-                        .find((idx -> param) => param.name == arg.identifier.text);
+                    value index
+                            = CeylonIterable(model.parameterList.parameters).indexed
+                                .find((idx -> param) => param.name == arg.identifier.text);
 
                     if (exists index) {
                         context.setCurrentParameter(index.key);
@@ -146,7 +144,6 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
     Boolean inSequencedArgs(NamedArgumentListPsi nal, NamedArgumentList model, Integer offset) {
 
         if (exists seq = nal.ceylonNode.sequencedArgument) {
-
             if (nal.ceylonNode.namedArguments.empty) {
                 return true;
             }
@@ -169,30 +166,29 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
         if (is Declaration fun,
             exists parameters = fun.firstParameterList?.parameters,
             parameters.size()>0) {
-            
+
+            value unit = (fun of Declaration).unit;
             for (param in parameters) {
-                value paramLabel = getParameterLabel(param, (fun of Declaration).unit)
-                    .replace("->", "→");
+                value paramLabel
+                        = getParameterLabel(param, unit)
+                            .replace("->", "→");
 
                 if (i == context.currentParameterIndex) {
                     highlightOffsetStart = builder.size;
-                    highlightOffsetEnd = builder.size +paramLabel.size;
+                    highlightOffsetEnd = builder.size + paramLabel.size;
                 }
                 builder.append(paramLabel).append(", ");
-                i ++;
+                i++;
             }
             builder.deleteTerminal(2);
             params = builder.string;
         }
         if (is ParameterInfoUIContextEx context) {
-            value htmlize = object satisfies IJFunction<JString, JString> {
-                fun(JString s) => javaString(
-                    if (s.string == convertToHTML(noparams))
-                    then s.string
-                    else highlighter.highlight(s.string, context.parameterOwner.project)
-                );
-            };
-            context.setEscapeFunction(htmlize);
+            context.setEscapeFunction(object satisfies IJFunction<JString, JString> {
+                fun(JString string)
+                        => string.string == convertToHTML(noparams) then string
+                        else javaString(highlighter.highlight(string.string, context.parameterOwner.project));
+            });
         }
         context.setupUIComponentPresentation(params, highlightOffsetStart, highlightOffsetEnd,
             false, false, false, context.defaultParameterColor);
@@ -205,7 +201,7 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
         
         if (is Function model = param.model) {
             builder.append("(");
-            for (Parameter parameter in model.firstParameterList.parameters) {
+            for (parameter in model.firstParameterList.parameters) {
                 builder.append(getParameterLabel(parameter, unit));
                 builder.append(", ");
             }
