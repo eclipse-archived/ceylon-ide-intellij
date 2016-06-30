@@ -86,5 +86,15 @@ shared class MutableLocalAnalysisResult(
     then lastRootNode
     else null;
 
-    
+    shared LocalAnalysisResult immutable => object 
+            satisfies LocalAnalysisResult {
+        ceylonProject = outer.ceylonProject;
+        commonDocument = outer.commonDocument;
+        lastCompilationUnit = outer.lastCompilationUnit;
+        lastPhasedUnit = outer.lastPhasedUnit;
+        parsedRootNode = outer.parsedRootNode;
+        tokens = outer.tokens;
+        typeChecker = outer.typeChecker;
+        typecheckedRootNode = outer.typecheckedRootNode;
+    };
 }

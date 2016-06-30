@@ -34,19 +34,21 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    LocalAnalysisResult
+}
 
-shared class IdeaCompletionContext(file, editor, ceylonProject, options) satisfies CompletionContext {
+shared class IdeaCompletionContext(file, localAnalysisResult, editor, options) satisfies CompletionContext {
 
     shared CeylonFile file;
     shared Editor editor;
+    LocalAnalysisResult localAnalysisResult;
 
-    shared actual BaseCeylonProject? ceylonProject;
     shared actual CompletionOptions options;
 
     shared actual IdeaDocument commonDocument = IdeaDocument(editor.document);
     shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder();
-
-    assert (exists localAnalysisResult = file.localAnalysisResult);
+    shared actual BaseCeylonProject? ceylonProject => localAnalysisResult.ceylonProject;
 
     parsedRootNode => localAnalysisResult.parsedRootNode;
     tokens => localAnalysisResult.tokens;

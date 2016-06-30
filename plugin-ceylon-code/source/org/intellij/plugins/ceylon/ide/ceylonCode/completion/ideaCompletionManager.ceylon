@@ -29,14 +29,14 @@ import com.intellij.psi.impl.source.tree {
 import com.intellij.util {
     ProcessingContext
 }
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
-}
 import com.redhat.ceylon.ide.common.completion {
     completionManager
 }
 import com.redhat.ceylon.ide.common.settings {
     CompletionOptions
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    LocalAnalysisResult
 }
 
 import java.lang {
@@ -45,7 +45,6 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    findProjectForFile,
     concurrencyManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
@@ -111,10 +110,11 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
             application.addApplicationListener(listener);
             try {
                 concurrencyManager.withAlternateResolution(() {
-                    if (exists element = parameters.originalPosition,
-                        is CeylonFile ceylonFile = element.containingFile,
-                        exists pu = ceylonFile.ensureTypechecked(progressMonitor)) {
-                        addCompletionsInternal(parameters, context, result, pu, options, progressMonitor);
+                    if (is CeylonFile ceylonFile = parameters.originalFile,
+                        exists localAnalyzer = ceylonFile.localAnalyzer,
+                        exists analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 5),
+                        analysisResult.upToDate) {
+                        addCompletionsInternal(parameters, context, result, analysisResult, options, progressMonitor);
                     }
                 });
             } catch(ProcessCanceledException e) {
@@ -127,19 +127,16 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
     
     void addCompletionsInternal(CompletionParameters parameters, 
         ProcessingContext context, CompletionResultSet result,
-        PhasedUnit pu, CompletionOptions options, ProgressIndicatorMonitor progressMonitor) {
-        
+        LocalAnalysisResult analysisResult, CompletionOptions options, ProgressIndicatorMonitor progressMonitor) {
         
         value isSecondLevel = parameters.invocationCount > 0 && parameters.invocationCount % 2 == 0;
         value element = parameters.originalPosition;
         value doc = parameters.editor.document;
         assert (exists element,
                 is CeylonFile ceylonFile = element.containingFile);
-        value project = findProjectForFile(ceylonFile);
-        value params = IdeaCompletionContext(ceylonFile, parameters.editor, project, options);
-
+        value params = IdeaCompletionContext(ceylonFile, analysisResult, parameters.editor, options);
         completionManager.getContentProposals {
-            typecheckedRootNode = pu.compilationUnit;
+            typecheckedRootNode = params.lastCompilationUnit;
             ctx = params;
             offset = parameters.editor.caretModel.offset;
             line = doc.getLineNumber(element.textOffset);

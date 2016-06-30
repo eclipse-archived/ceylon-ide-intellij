@@ -44,9 +44,6 @@ import com.intellij.util {
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
 }
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
-}
 import com.redhat.ceylon.compiler.typechecker.parser {
     RecognitionError
 }
@@ -348,14 +345,14 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         logger.debug(()=>"Exit scheduleForcedTypechecking(``0``, ``waitForModelInSeconds``) for file ``virtualFile.name``", 20);
     }
 
-    shared PhasedUnit? forceTypechecking(Cancellable? cancellable, Integer waitForModelInSeconds) =>
+    shared LocalAnalysisResult? forceTypechecking(Cancellable? cancellable, Integer waitForModelInSeconds) =>
             runTypechecking(cancellable, waitForModelInSeconds, true);
 
-    shared PhasedUnit? ensureTypechecked(Cancellable? cancellable, Integer waitForModelInSeconds) =>
+    shared LocalAnalysisResult? ensureTypechecked(Cancellable? cancellable, Integer waitForModelInSeconds) =>
             runTypechecking(cancellable, waitForModelInSeconds, false);
     
     "Synchronously perform the typechecking (if necessary)"
-    PhasedUnit? runTypechecking(Cancellable? cancellable, Integer waitForModelInSeconds, Boolean force) {
+    LocalAnalysisResult? runTypechecking(Cancellable? cancellable, Integer waitForModelInSeconds, Boolean force) {
         logger.debug(()=>"Enter runTypechecking(``cancellable else "<null>"``, ``waitForModelInSeconds``, ``force``) for file ``virtualFile.name``", 10);
 
         if (disposed) {
@@ -397,7 +394,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                 
                 if (!force && currentResult.typecheckedRootNode exists) {
                     logger.debug(()=>"The file `` virtualFile.name `` is already up-to-date so don't run the synchronous local typechecking");
-                    return currentResult.lastPhasedUnit;
+                    return currentResult;
                 }
                 
                 document = currentResult.document;
@@ -410,7 +407,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                 resultLock.unlock();
             }
             typecheckSourceFile(document, parsedRootNode, commonTokens, currentResult, waitForModelInSeconds, cancellable);
-            return currentResult.lastPhasedUnit;
+            return currentResult.immutable;
         } finally {
             backgroundAnalysisDisabled = false;
             if (exists toSubmitAgain = 

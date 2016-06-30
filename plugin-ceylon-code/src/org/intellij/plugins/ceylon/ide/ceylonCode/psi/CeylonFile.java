@@ -242,7 +242,7 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     private PhasedUnit ensureTypechecked(Cancellable cancellable, int timeoutSeconds) {
         CeylonLocalAnalyzer localAnalyzer = getLocalAnalyzer();
         if (localAnalyzer != null) {
-            return localAnalyzer.ensureTypechecked(cancellable, timeoutSeconds);
+            return localAnalyzer.ensureTypechecked(cancellable, timeoutSeconds).getLastPhasedUnit();
         }
         return null;
     }
