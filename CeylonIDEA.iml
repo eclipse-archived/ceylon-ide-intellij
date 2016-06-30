@@ -37,6 +37,8 @@
         <JAVADOC />
         <SOURCES>
           <root url="file://$MODULE_DIR$/plugin-ceylon-code/src" />
+          <root url="file://$MODULE_DIR$/plugin-ceylon-code/source" />
+          <root url="file://$MODULE_DIR$/plugin-ceylon-code/gen" />
         </SOURCES>
       </library>
     </orderEntry>
