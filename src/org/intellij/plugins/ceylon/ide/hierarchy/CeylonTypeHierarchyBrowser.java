@@ -8,6 +8,7 @@ import com.intellij.ide.hierarchy.TypeHierarchyBrowserBase;
 import com.intellij.ide.util.treeView.AlphaComparator;
 import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.SourceComparator;
+import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -278,29 +279,19 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
 
         private void label(PsiElement element) {
-            myHighlightedText = new CompositeAppearance();
-            String desc;
             if (element instanceof CeylonCompositeElement) {
+                myHighlightedText = new CompositeAppearance();
                 CeylonCompositeElement psi = (CeylonCompositeElement) element;
-                desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false));
-            }
-            else if (element instanceof PsiNamedElement) {
-                desc = ((PsiNamedElement) element).getName();
-            }
-            else {
-                desc = null;
-            }
-            if (desc == null) {
-                myHighlightedText.getEnding()
-                        .addText("object expression");
-            }
-            else {
-                highlighter_.get_()
-                        .highlightCompositeAppearance(myHighlightedText,
-                                "'" + desc + "'", project);
-            }
-            if (element instanceof CeylonCompositeElement) {
-                CeylonCompositeElement psi = (CeylonCompositeElement) element;
+                String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false));
+                if (desc == null) {
+                    myHighlightedText.getEnding()
+                            .addText("object expression");
+                }
+                else {
+                    highlighter_.get_()
+                            .highlightCompositeAppearance(myHighlightedText,
+                                    "'" + desc + "'", project);
+                }
                 Unit unit = psi.getCeylonNode().getUnit();
                 if (unit != null) {
                     String qualifiedNameString =
@@ -313,6 +304,17 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                             .addText(" (" + qualifiedNameString + ")",
                                     getPackageNameAttributes());
                 }
+            }
+            else if (element instanceof NavigationItem) {
+                myHighlightedText = new CompositeAppearance();
+                NavigationItem psi = (NavigationItem) element;
+                highlighter_.get_()
+                        .highlightCompositeAppearance(myHighlightedText,
+                                "'" + psi.getPresentation().getPresentableText() + "'",
+                                project);
+                myHighlightedText.getEnding()
+                        .addText(" " + psi.getPresentation().getLocationString(),
+                                getPackageNameAttributes());
             }
         }
     }
