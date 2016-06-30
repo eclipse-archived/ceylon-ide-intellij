@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
+import java.io.StringReader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,9 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.jetbrains.annotations.NotNull;
@@ -35,12 +34,11 @@ import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
-import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
-import com.redhat.ceylon.compiler.typechecker.parser.LexError;
-import com.redhat.ceylon.compiler.typechecker.parser.ParseError;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.Visitor;
+import com.redhat.ceylon.ide.common.model.parsing.ParseResult;
+import com.redhat.ceylon.ide.common.model.parsing.sourceCodeParser_;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
 
@@ -49,6 +47,7 @@ import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
  * the official parser into an ASTNode tree. Comments and whitespaces are not present in the Ceylon AST,
  * but we can retrieve them by synchronizing our transformation with a lexer.
  */
+@SuppressWarnings("rawtypes")
 public class IdeaCeylonParser extends IStubFileElementType {
 
     private static Logger LOGGER = Logger.getInstance(IdeaCeylonParser.class);
@@ -70,9 +69,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
     @Override
     protected ASTNode doParseContents(@NotNull ASTNode chameleon, @NotNull PsiElement psi) {
         CeylonFile file = (CeylonFile) psi;
-        final Queue<Token> tokens = new LinkedList<>();
         boolean verbose = false;
-        final Ref<CommonToken> lastToken = new Ref<>();
         
         PsiDocumentManager psiManager = PsiDocumentManager.getInstance(file.getProject());
         VirtualFile virtualFile;
@@ -86,82 +83,50 @@ public class IdeaCeylonParser extends IStubFileElementType {
         }
         CeylonLocalAnalyzer localAnalyzer = lastCommittedDocument == null ? null : file.getLocalAnalyzer();
                         
-        CeylonLexer lexer = new CeylonLexer(new ANTLRStringStream(file.getText())) {
-            @Override
-            public Token nextToken() {
-                CommonToken token = (CommonToken) super.nextToken();
-
-                if (token != null) {
-                    int lastStopIndex = -1;
-                    if (!lastToken.isNull()) {
-                        lastStopIndex = lastToken.get().getStopIndex();
-                    }
-                    if (token.getType() != EOF
-                            && lastStopIndex != token.getStartIndex() - 1) {
-                        CommonToken badToken = new CommonToken(token.getInputStream(), -2, 0,
-                                lastStopIndex + 1,
-                                token.getStartIndex() - 1);
-                        tokens.add(badToken);
-                    }
-                    tokens.add(token);
-                    lastToken.set(token);
-                }
-
-                return token;
-            }
-        };
-
-        CommonTokenStream stream = new CommonTokenStream(lexer);
-        stream.fill();
-
-        CeylonParser parser = new CeylonParser(stream);
-
         try {
-            CompilationUnitTranslator translator = new CompilationUnitTranslator(file, tokens, verbose);
-            
-            Tree.CompilationUnit parsedCompilationUnit = parser.compilationUnit();
+            CompilationUnitTranslator translator = new CompilationUnitTranslator(file, verbose);
             if (isInSourceArchive_.isInSourceArchive(virtualFile)) {
                 ASTNode root;
                 WeakReference<ExternalPhasedUnit> externalPuRef = virtualFile.getUserData(uneditedExternalPhasedUnit_.get_());
                 ExternalPhasedUnit externalPu = null;
                 if (externalPuRef != null && 
                         (externalPu = externalPuRef.get()) != null) {
-                    root = translator.translateToAstNode(externalPu.getCompilationUnit());
+                    root = translator.translateToAstNode(externalPu.getCompilationUnit(), externalPu.getTokens());
                     if (localAnalyzer != null) {
                         localAnalyzer.translatedExternalSource(lastCommittedDocument, externalPu);
                     }      
                 } else {
-                    root = translator.translateToAstNode(parsedCompilationUnit);
+                    ParseResult parseResult = sourceCodeParser_.get_().parseSourceCode(new StringReader(file.getText()));
+                    root = translator.translateToAstNode(parseResult.getCompilationUnit(), parseResult.getTokens());
                 }
                 return root;
             }
 
-            if (localAnalyzer == null) {
+            if (localAnalyzer == null && virtualFile != null) {
                 ProjectPhasedUnit projectPhasedUnit = file.retrieveProjectPhasedUnit();
                 if (projectPhasedUnit != null) {
-                    ASTNode root = translator.translateToAstNode(projectPhasedUnit.getCompilationUnit());
+                    ASTNode root = translator.translateToAstNode(projectPhasedUnit.getCompilationUnit(), projectPhasedUnit.getTokens());
                     return root;
                 }
             }
-            ASTNode root = translator.translateToAstNode(parsedCompilationUnit);
+            
+            ParseResult parseResult = sourceCodeParser_.get_().parseSourceCode(new StringReader(file.getText()));
+            ASTNode root = translator.translateToAstNode(parseResult.getCompilationUnit(), parseResult.getTokens());
             if (localAnalyzer != null
                     && !file.getText().contains(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED)) {
                 localAnalyzer.parsedProjectSource(
                         lastCommittedDocument,
-                        parsedCompilationUnit,
-                        stream.getTokens());
-            }
-
-            for (ParseError error : parser.getErrors()) {
-                parsedCompilationUnit.addParseError(error);
-            }
-            for (LexError error : lexer.getErrors()) {
-                parsedCompilationUnit.addLexError(error);
+                        parseResult.getCompilationUnit(),
+                        parseResult.getTokens());
             }
 
             return root;
-        } catch (RecognitionException e) {
-            e.printStackTrace();
+        } catch (RuntimeException re) {
+            if (re.getCause() instanceof RecognitionException) {
+                re.getCause().printStackTrace();
+            } else {
+                throw re;
+            }
         }
         return null;
     }
@@ -177,17 +142,37 @@ public class IdeaCeylonParser extends IStubFileElementType {
     private class CompilationUnitTranslator extends Visitor {
         private CompositeElement parent;
         private CeylonFile file;
-        private Queue<Token> tokens;
+        private Queue<CommonToken> customizedTokens;
         private boolean verbose;
         private int index = 0;
 
-        public CompilationUnitTranslator(CeylonFile file, Queue<Token> tokens, boolean verbose) {
+        public CompilationUnitTranslator(CeylonFile file, boolean verbose) {
             this.file = file;
-            this.tokens = tokens;
             this.verbose = verbose;
         }
 
-        public ASTNode translateToAstNode(Tree.CompilationUnit cu) {
+        public ASTNode translateToAstNode(Tree.CompilationUnit cu, List<CommonToken> originalTokens) {
+            customizedTokens = new LinkedList<>();
+            Ref<CommonToken> lastToken = new Ref<>();
+            
+            for (CommonToken token : originalTokens) {
+                if (token != null) {
+                    int lastStopIndex = -1;
+                    if (!lastToken.isNull()) {
+                        lastStopIndex = lastToken.get().getStopIndex();
+                    }
+                    if (token.getType() != CeylonLexer.EOF
+                            && lastStopIndex != token.getStartIndex() - 1) {
+                        CommonToken badToken = new CommonToken(token.getInputStream(), -2, 0,
+                                lastStopIndex + 1,
+                                token.getStartIndex() - 1);
+                        customizedTokens.add(badToken);
+                    }
+                    customizedTokens.add(token);
+                    lastToken.set(token);
+                }
+            }
+
             visit(cu);
 
             ASTNode root = parent;
@@ -201,8 +186,8 @@ public class IdeaCeylonParser extends IStubFileElementType {
         public void visit(Tree.CompilationUnit that) {
             super.visit(that);
 
-            while (!tokens.isEmpty()) {
-                Token token = tokens.remove();
+            while (!customizedTokens.isEmpty()) {
+                Token token = customizedTokens.remove();
 
                 if (token.getType() != CeylonLexer.EOF) {
                     parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), token));
@@ -258,9 +243,9 @@ public class IdeaCeylonParser extends IStubFileElementType {
             }
 
             if (that.getToken() != null && visitor.children.isEmpty()) {
-                Token peek = tokens.peek();
+                Token peek = customizedTokens.peek();
                 if (getTokenLength(peek) == that.getEndIndex() - that.getStartIndex()) {
-                    Token toRemove = tokens.remove();
+                    Token toRemove = customizedTokens.remove();
                     parent.rawAddChildrenWithoutNotifications(buildLeaf(that, type, toRemove));
                     if (verbose) {
                         System.out.println("t \"" + toRemove.getText() + "\"");
@@ -270,7 +255,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
                     CompositeElement comp = new CompositeElement(type);
 
                     while (index < that.getEndIndex()) {
-                        Token toRemove = tokens.remove();
+                        Token toRemove = customizedTokens.remove();
                         comp.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), toRemove));
                         if (verbose) {
                             System.out.println("t \"" + toRemove.getText() + "\"");
@@ -354,7 +339,7 @@ public class IdeaCeylonParser extends IStubFileElementType {
             }
 
             while (index < targetIndex) {
-                Token token = tokens.remove();
+                Token token = customizedTokens.remove();
                 String text = token.getText();
                 if (token.getType()==CeylonLexer.LINE_COMMENT && text.endsWith("\n")) {
                     parent.rawAddChildrenWithoutNotifications(new LeafPsiElement(getElementType(token.getType()),
