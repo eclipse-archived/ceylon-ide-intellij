@@ -49,8 +49,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
     @Override
     protected HierarchyTreeStructure createHierarchyTreeStructure(@NotNull String typeName,
                                                                   @NotNull PsiElement psiElement) {
-        final CeylonPsi.DeclarationPsi element =
-                (CeylonPsi.DeclarationPsi) psiElement;
+        CeylonCompositeElement element = (CeylonCompositeElement) psiElement;
         if (SUPERTYPES_HIERARCHY_TYPE.equals(typeName)) {
             return new SupertypesHierarchyTreeStructure(element);
         }
@@ -90,9 +89,18 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     @Override
     protected String getQualifiedName(PsiElement psiElement) {
-        return ((CeylonPsi.DeclarationPsi) psiElement).getCeylonNode()
-                .getDeclarationModel()
-                .getQualifiedNameString();
+        if (psiElement instanceof CeylonCompositeElement) {
+            CeylonCompositeElement psi =
+                    (CeylonCompositeElement) psiElement;
+            return getModel(psi).getQualifiedNameString();
+        }
+        else if (psiElement instanceof PsiMethod) {
+            PsiMethod method = (PsiMethod) psiElement;
+            return method.getContainingClass().getQualifiedName() + "." + method.getName();
+        }
+        else {
+            return null;
+        }
     }
 
     @Nullable
@@ -104,7 +112,8 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     @Override
     protected boolean isApplicableElement(@NotNull PsiElement psiElement) {
-        return psiElement instanceof CeylonPsi.DeclarationPsi;
+        return psiElement instanceof CeylonPsi.DeclarationPsi
+            || psiElement instanceof CeylonPsi.SpecifierStatementPsi;
     }
 
     @Nullable
@@ -262,7 +271,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private class SupertypesHierarchyTreeStructure extends HierarchyTreeStructure {
 
-        private SupertypesHierarchyTreeStructure(CeylonPsi.DeclarationPsi element) {
+        private SupertypesHierarchyTreeStructure(CeylonCompositeElement element) {
             super(CeylonMethodHierarchyBrowser.this.project,
                     new MethodHierarchyNodeDescriptor(element, getModel(element)));
         }
@@ -281,16 +290,9 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
     }
 
-    /*private MethodHierarchyNodeDescriptor root(MethodHierarchyNodeDescriptor child) {
-        MethodHierarchyNodeDescriptor parentDescriptor =
-                (MethodHierarchyNodeDescriptor)
-                        child.getParentDescriptor();
-        return parentDescriptor == null ? child : root(parentDescriptor);
-    }*/
-
     private class SubtypesHierarchyTreeStructure extends HierarchyTreeStructure {
 
-        private SubtypesHierarchyTreeStructure(CeylonPsi.DeclarationPsi element) {
+        private SubtypesHierarchyTreeStructure(CeylonCompositeElement element) {
             super(project, new MethodHierarchyNodeDescriptor(element, getModel(element)));
         }
 
@@ -345,7 +347,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                                 && directlyRefines(declaration, model)) {
                             PsiElement psiElement
                                     = CeylonReference.resolveDeclaration(declaration, project);
-                            if (psiElement instanceof CeylonPsi.DeclarationPsi) {
+                            if (psiElement!=null) {
                                 result.add(new MethodHierarchyNodeDescriptor(descriptor,
                                         psiElement, declaration));
                             }
