@@ -1,5 +1,12 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
+import java.util.Objects;
+import java.util.concurrent.Callable;
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
+import org.jetbrains.annotations.Nullable;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -13,12 +20,6 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.CeylonUnit;
 import com.redhat.ceylon.model.typechecker.model.Unit;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
-import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
-import java.util.concurrent.Callable;
 
 public class CeylonTreeUtil {
 
@@ -72,7 +73,7 @@ public class CeylonTreeUtil {
             String protocol = path.contains("!/") ? "jar://" : "file://";
             final VirtualFile vfile = VirtualFileManager.getInstance().findFileByUrl(protocol + path);
             if (vfile != null) {
-                return ConcurrencyManagerForJava.tryReadAccess(new Callable<PsiFile>() {
+                return ConcurrencyManagerForJava.needReadAccess(new Callable<PsiFile>() {
                     @Override
                     public PsiFile call() throws Exception {
                         return PsiManager.getInstance(project).findFile(vfile);

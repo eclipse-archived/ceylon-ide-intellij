@@ -79,7 +79,7 @@ shared class IndexNeededWithNoIndexStrategy()
 shared object concurrencyManager {
     value logger = CeylonLogger<\IconcurrencyManager>();
 
-    value deadLockDetectionTimeout = 30000;
+    shared Integer deadLockDetectionTimeout = 30000;
     
     value noIndexStrategy_ = ThreadLocal<NoIndexStrategy?>();
 
@@ -265,9 +265,6 @@ shared Return doWithLock<Return>(Return() func) => concurrencyManager.needReadAc
 object concurrencyManagerForJava {
     shared Anything needReadAccess(JCallable<Anything> func, Integer timeout)
             => concurrencyManager.needReadAccess(func.call, timeout);
-    
-    shared Anything tryReadAccess(JCallable<Anything> func)
-            => concurrencyManager.tryReadAccess(func.call);
     
     shared Anything withAlternateResolution(JCallable<Anything> func)
             => concurrencyManager.withAlternateResolution(func.call);
