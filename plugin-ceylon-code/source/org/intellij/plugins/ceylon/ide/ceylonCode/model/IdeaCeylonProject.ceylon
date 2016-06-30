@@ -104,6 +104,9 @@ import com.redhat.ceylon.model.cmr {
 import com.intellij.openapi.externalSystem.service.project {
     IdeModifiableModelsProviderImpl
 }
+import com.intellij.psi {
+    PsiFile
+}
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
@@ -398,9 +401,10 @@ shared class IdeaCeylonProject(ideArtifact, model)
     buildHooks => { addModuleArchiveHook };
 }
 
-shared IdeaCeylonProject? findProjectForFile(CeylonFile file) {
+shared IdeaCeylonProject? findProjectForFile(PsiFile file) {
 
-    if (is IdePhasedUnit pu = file.localAnalysisResult?.lastPhasedUnit,
+    if (is CeylonFile file,
+        is IdePhasedUnit pu = file.localAnalysisResult?.lastPhasedUnit,
         is IdeaModuleSourceMapper msm = pu.moduleSourceMapper,
         is IdeaCeylonProject project = msm.ceylonProject) {
 

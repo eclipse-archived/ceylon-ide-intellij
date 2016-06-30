@@ -6,7 +6,8 @@ import com.intellij.openapi.application {
     ApplicationManager
 }
 import com.intellij.psi {
-    PsiElement
+    PsiElement,
+    PsiClass
 }
 import com.intellij.psi.search.searches {
     DefinitionsScopedSearch {
@@ -62,7 +63,37 @@ shared class CeylonImplementationsSearch()
     }
 
     void findImplementors(PsiElement sourceElement, void consumer(PsiElement element)) {
-        if (is CeylonPsi.DeclarationPsi sourceElement,
+        if (is PsiClass sourceElement) {
+            object nameGetter satisfies Runnable {
+                shared variable String? qualifiedName = null;
+                run() => qualifiedName = sourceElement.qualifiedName;
+            }
+            ApplicationManager.application.runReadAction(nameGetter);
+
+            if (exists name = nameGetter.qualifiedName,
+                exists psiFile = sourceElement.containingFile,
+                exists project = findProjectForFile(psiFile),
+                exists modules = project.modules,
+                exists file = project.projectFileFromNative(psiFile.virtualFile),
+                exists unit = file.unit,
+                is TypeDeclaration|TypedDeclaration decl
+                        = CeylonIterable(unit.declarations)
+                            .find((d) => d.name exists
+                                      //TODO is this correct:
+                                      && d.qualifiedNameString.replaceLast("::", ".") == name)) {
+
+                if (exists pus = project.typechecker?.phasedUnits) {
+                    scanPhasedUnits {
+                        pus = CeylonIterable(pus.phasedUnits);
+                        decl = decl;
+                        node = null;
+                        sourceElement = sourceElement;
+                        consumer = consumer;
+                    };
+                }
+            }
+        }
+        else if (is CeylonPsi.DeclarationPsi sourceElement,
             exists node = sourceElement.ceylonNode,
             is TypeDeclaration|TypedDeclaration decl = node.declarationModel,
             is CeylonFile ceylonFile = sourceElement.containingFile,
@@ -93,8 +124,8 @@ shared class CeylonImplementationsSearch()
         }
     }
 
-    void scanPhasedUnits({PhasedUnit*} pus, TypeDeclaration|TypedDeclaration decl, Tree.Declaration node,
-        CeylonPsi.DeclarationPsi sourceElement, void consumer(PsiElement element)) {
+    void scanPhasedUnits({PhasedUnit*} pus, TypeDeclaration|TypedDeclaration decl, Tree.Declaration? node,
+        PsiElement sourceElement, void consumer(PsiElement element)) {
 
         for (pu in pus) {
             Set<Node> declarationNodes;
@@ -110,23 +141,26 @@ shared class CeylonImplementationsSearch()
                 declarationNodes = vis.declarationNodes;
             }
             for (dnode in declarationNodes) {
-                if (dnode!=node) {
+                if (exists node) {
+                    if (dnode==node) {
+                        continue;
+                    }
                     if (is Tree.Declaration dnode,
                         dnode.declarationModel.qualifiedNameString
                             == decl.qualifiedNameString) {
                         continue;
                     }
-                    object run satisfies Runnable {
-                        shared actual void run() {
-                            value declaringFile = getDeclaringFile(dnode.unit, sourceElement.project);
-                            if (is CeylonFile declaringFile) {
-                                declaringFile.ensureTypechecked();
-                            }
-                            consumer(findPsiElement(dnode, declaringFile));
-                        }
-                    }
-                    ApplicationManager.application.runReadAction(run);
                 }
+                object run satisfies Runnable {
+                    shared actual void run() {
+                        value declaringFile = getDeclaringFile(dnode.unit, sourceElement.project);
+                        if (is CeylonFile declaringFile) {
+                            declaringFile.ensureTypechecked();
+                        }
+                        consumer(findPsiElement(dnode, declaringFile));
+                    }
+                }
+                ApplicationManager.application.runReadAction(run);
             }
         }
     }
