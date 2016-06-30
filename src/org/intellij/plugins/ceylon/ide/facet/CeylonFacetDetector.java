@@ -13,7 +13,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
-import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**

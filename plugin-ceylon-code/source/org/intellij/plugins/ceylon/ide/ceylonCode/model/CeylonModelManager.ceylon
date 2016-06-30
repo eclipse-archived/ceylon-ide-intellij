@@ -127,6 +127,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings {
+    CeylonSettings
+}
 
 shared class CeylonModelManager(model) 
         satisfies ProjectComponent
@@ -138,7 +141,7 @@ shared class CeylonModelManager(model)
         & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
         & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;
-    shared variable Integer delayBeforeUpdatingAfterChange = 4000;
+    shared Integer delayBeforeUpdatingAfterChange => CeylonSettings.instance.autoUpdateInterval;
     variable value automaticModelUpdateEnabled_ = true;
     variable value ideaProjectReady = false;
     variable Boolean cancelledBecauseOfSyntaxErrors = false;

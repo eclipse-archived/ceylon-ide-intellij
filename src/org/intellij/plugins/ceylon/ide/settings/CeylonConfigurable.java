@@ -4,6 +4,7 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.options.*;
 import com.intellij.openapi.options.ex.Settings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 

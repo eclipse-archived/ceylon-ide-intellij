@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.settings;
+package org.intellij.plugins.ceylon.ide.ceylonCode.settings;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.*;
@@ -24,13 +24,15 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
     }
 
     @SuppressWarnings("WeakerAccess")
-    static class CeylonOptions {
+    public static class CeylonOptions {
         public String defaultTargetVm = "jvm";
         public String defaultSourceFolder = "source";
         public String defaultResourceFolder = "resource";
         public boolean useOutProcessBuild = true;
         public boolean makeCompilerVerbose = false;
         public String verbosityLevel = "";
+//        public boolean autoUpdateModel = true;
+        public int autoUpdateInterval = 4000;
     }
 
     public static CeylonSettings getInstance() {
@@ -66,6 +68,14 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
         return myOptions.verbosityLevel;
     }
 
+//    public boolean isAutoUpdateModel() {
+//        return myOptions.autoUpdateModel;
+//    }
+
+    public int getAutoUpdateInterval() {
+        return myOptions.autoUpdateInterval;
+    }
+
     public void setDefaultTargetVm(String defaultTargetVm) {
         myOptions.defaultTargetVm = defaultTargetVm;
     }
@@ -88,5 +98,13 @@ public class CeylonSettings implements PersistentStateComponent<CeylonSettings.C
 
     public void setVerbosityLevel(String verbosityLevel) {
         myOptions.verbosityLevel = verbosityLevel;
+    }
+
+//    public void setAutoUpdateModel(boolean autoUpdateModel) {
+//        myOptions.autoUpdateModel = autoUpdateModel;
+//    }
+
+    public void setAutoUpdateInterval(int autoUpdateInterval) {
+        myOptions.autoUpdateInterval = autoUpdateInterval;
     }
 }

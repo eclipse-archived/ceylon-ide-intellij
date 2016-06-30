@@ -15,7 +15,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.ProgressIndicatorMonitor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
-import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
 
 import java.io.File;
 import java.io.IOException;

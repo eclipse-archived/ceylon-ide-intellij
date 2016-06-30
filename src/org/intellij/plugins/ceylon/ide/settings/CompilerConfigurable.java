@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.settings;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
