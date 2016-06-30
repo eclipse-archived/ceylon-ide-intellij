@@ -94,7 +94,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
     @Nullable
     @Override
     protected HierarchyTreeStructure createHierarchyTreeStructure(@NotNull String typeName, @NotNull PsiElement psiElement) {
-        CeylonCompositeElement element = (CeylonCompositeElement) psiElement;
+        @NotNull CeylonCompositeElement element = (CeylonCompositeElement) psiElement;
         if (SUPERTYPES_HIERARCHY_TYPE.equals(typeName)) {
             return new SupertypesHierarchyTreeStructure(element);
         }
@@ -175,7 +175,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
     }
 
-    private TypeHierarchyNodeDescriptor build(PsiElement element, Declaration dec) {
+    private TypeHierarchyNodeDescriptor build(@NotNull PsiElement element, Declaration dec) {
         if (dec instanceof ClassOrInterface) {
             ClassOrInterface model = (ClassOrInterface) dec;
             Type extendedType = model.getExtendedType();
@@ -185,13 +185,15 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                 TypeDeclaration extended = extendedType.getDeclaration();
                 PsiElement psiElement
                         = CeylonReference.resolveDeclaration(extended, project);
-                TypeHierarchyNodeDescriptor parentDescriptor =
-                        build(psiElement, extended);
-                if (parentDescriptor!=null) { //should not happen but it does!!
-                    TypeHierarchyNodeDescriptor nodeDescriptor =
-                            new TypeHierarchyNodeDescriptor(parentDescriptor, element, model);
-                    parentDescriptor.children = new TypeHierarchyNodeDescriptor[]{nodeDescriptor};
-                    return nodeDescriptor;
+                if (psiElement!=null) {
+                    TypeHierarchyNodeDescriptor parentDescriptor =
+                            build(psiElement, extended);
+                    if (parentDescriptor != null) { //should not happen but it does!!
+                        TypeHierarchyNodeDescriptor nodeDescriptor =
+                                new TypeHierarchyNodeDescriptor(parentDescriptor, element, model);
+                        parentDescriptor.children = new TypeHierarchyNodeDescriptor[]{nodeDescriptor};
+                        return nodeDescriptor;
+                    }
                 }
                 return new TypeHierarchyNodeDescriptor(element, model);
             }
@@ -226,7 +228,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
         private TypeHierarchyNodeDescriptor[] children;
 
         private TypeHierarchyNodeDescriptor(@NotNull PsiElement element,
-                                            @NotNull TypeDeclaration model) {
+                                            TypeDeclaration model) {
             super(project, null, element, true);
             this.model = model;
             myName = name(element);
@@ -234,7 +236,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
 
         private TypeHierarchyNodeDescriptor(@NotNull NodeDescriptor parentDescriptor,
                                             @NotNull PsiElement element,
-                                            @NotNull TypeDeclaration model) {
+                                            TypeDeclaration model) {
             super(project, parentDescriptor, element, false);
             this.model = model;
             myName = name(element);
@@ -320,7 +322,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
     }
 
     private class SupertypesHierarchyTreeStructure extends HierarchyTreeStructure {
-        private SupertypesHierarchyTreeStructure(CeylonCompositeElement element) {
+        private SupertypesHierarchyTreeStructure(@NotNull CeylonCompositeElement element) {
             super(CeylonTypeHierarchyBrowser.this.project,
                     new TypeHierarchyNodeDescriptor(element, getModel(element)));
         }
@@ -337,7 +339,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private class SubtypesHierarchyTreeStructure extends HierarchyTreeStructure {
 
-        private SubtypesHierarchyTreeStructure(CeylonCompositeElement element) {
+        private SubtypesHierarchyTreeStructure(@NotNull CeylonCompositeElement element) {
             super(project, new TypeHierarchyNodeDescriptor(element, getModel(element)));
         }
 
@@ -357,7 +359,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private class TypeHierarchyTreeStructure extends HierarchyTreeStructure {
 
-        private TypeHierarchyTreeStructure(CeylonCompositeElement element) {
+        private TypeHierarchyTreeStructure(@NotNull CeylonCompositeElement element) {
             super(project, build(element, getModel(element)));
             setBaseElement(myBaseDescriptor);
         }

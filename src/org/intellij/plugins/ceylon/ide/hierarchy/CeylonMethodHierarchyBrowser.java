@@ -49,7 +49,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
     @Override
     protected HierarchyTreeStructure createHierarchyTreeStructure(@NotNull String typeName,
                                                                   @NotNull PsiElement psiElement) {
-        CeylonCompositeElement element = (CeylonCompositeElement) psiElement;
+        @NotNull CeylonCompositeElement element = (CeylonCompositeElement) psiElement;
         if (SUPERTYPES_HIERARCHY_TYPE.equals(typeName)) {
             return new SupertypesHierarchyTreeStructure(element);
         }
@@ -132,7 +132,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
     private MethodHierarchyNodeDescriptor build(@NotNull PsiElement element, Declaration model) {
         if (model==null) {
             //TODO: should not really happen, but it does...
-            return new MethodHierarchyNodeDescriptor(element, model);
+            return new MethodHierarchyNodeDescriptor(element, null);
         }
         Declaration refined = types_.get_().getRefinedDeclaration(model);
         if (refined == null || refined.equals(model)) {
@@ -141,8 +141,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
         else {
             PsiElement psiElement = CeylonReference.resolveDeclaration(refined, project);
             if (psiElement!=null) {
-                MethodHierarchyNodeDescriptor parentDescriptor =
-                        build(psiElement, refined);
+                MethodHierarchyNodeDescriptor parentDescriptor = build(psiElement, refined);
                 MethodHierarchyNodeDescriptor nodeDescriptor =
                         new MethodHierarchyNodeDescriptor(parentDescriptor, element, model);
                 parentDescriptor.children = new MethodHierarchyNodeDescriptor[] { nodeDescriptor };
@@ -192,7 +191,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
 
         private MethodHierarchyNodeDescriptor(@NotNull PsiElement element,
-                                              @NotNull Declaration model) {
+                                              Declaration model) {
             super(project, null, element, true);
             this.model = model;
             myName = name(element);
@@ -200,7 +199,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
         private MethodHierarchyNodeDescriptor(@NotNull NodeDescriptor parentDescriptor,
                                               @NotNull PsiElement element,
-                                              @NotNull Declaration model) {
+                                              Declaration model) {
             super(project, parentDescriptor, element, false);
             this.model = model;
             myName = name(element);
@@ -271,7 +270,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private class SupertypesHierarchyTreeStructure extends HierarchyTreeStructure {
 
-        private SupertypesHierarchyTreeStructure(CeylonCompositeElement element) {
+        private SupertypesHierarchyTreeStructure(@NotNull CeylonCompositeElement element) {
             super(CeylonMethodHierarchyBrowser.this.project,
                     new MethodHierarchyNodeDescriptor(element, getModel(element)));
         }
@@ -292,7 +291,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private class SubtypesHierarchyTreeStructure extends HierarchyTreeStructure {
 
-        private SubtypesHierarchyTreeStructure(CeylonCompositeElement element) {
+        private SubtypesHierarchyTreeStructure(@NotNull CeylonCompositeElement element) {
             super(project, new MethodHierarchyNodeDescriptor(element, getModel(element)));
         }
 
@@ -312,7 +311,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     private class TypeHierarchyTreeStructure extends HierarchyTreeStructure {
 
-        private TypeHierarchyTreeStructure(CeylonCompositeElement element) {
+        private TypeHierarchyTreeStructure(@NotNull CeylonCompositeElement element) {
             super(project, build(element, getModel(element)));
             setBaseElement(myBaseDescriptor);
         }
