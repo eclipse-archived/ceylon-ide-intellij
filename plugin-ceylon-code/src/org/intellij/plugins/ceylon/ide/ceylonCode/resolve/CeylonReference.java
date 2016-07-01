@@ -11,14 +11,12 @@ import com.intellij.psi.*;
 import com.redhat.ceylon.common.Backends;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.model.CeylonUnit;
 import com.redhat.ceylon.ide.common.model.IResourceAware;
 import com.redhat.ceylon.ide.common.model.SourceAware;
 import com.redhat.ceylon.ide.common.platform.Status;
 import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
-import com.redhat.ceylon.ide.common.util.FindReferencedNodeVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
@@ -38,6 +36,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
     public CeylonReference(T element, TextRange range, boolean soft) {
         super(element, range, soft);
+        this.backend = Backends.ANY;
     }
 
     public CeylonReference(T element, TextRange range, boolean soft, Backends backend) {
@@ -90,7 +89,8 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
                         .findTarget(compilationUnit,
                             localAnalysisResult.getTokens(),
                             new DefaultRegion(myElement.getTextRange().getStartOffset(),
-                                              myElement.getTextRange().getLength()));
+                                              myElement.getTextRange().getLength()),
+                            backend);
             }
         });
 
@@ -157,22 +157,15 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         if (location==null || location.getLanguage() != CeylonLanguage.INSTANCE) {
             return location;
         }
-
-        //TODO: workaround for bug in nodes.getReferencedNodeInUnit()
-        Unit unit = declaration.getUnit();
-        if (unit instanceof CeylonUnit) {
-            CeylonUnit ceylonUnit = (CeylonUnit) unit;
-            FindReferencedNodeVisitor visitor =
-                    new FindReferencedNodeVisitor(declaration);
-            ceylonUnit.getCompilationUnit().visit(visitor);
-            Node declarationNode = visitor.getDeclarationNode();
+        else {
+            Node declarationNode = nodes_.get_().getReferencedNode(declaration);
             if (declarationNode != null) {
-                return CeylonTreeUtil.findPsiElement(declarationNode,
-                        location.getContainingFile());
+                return CeylonTreeUtil.findPsiElement(declarationNode, location.getContainingFile());
+            }
+            else {
+                return null;
             }
         }
-        return null;
-
     }
 
     @NotNull
