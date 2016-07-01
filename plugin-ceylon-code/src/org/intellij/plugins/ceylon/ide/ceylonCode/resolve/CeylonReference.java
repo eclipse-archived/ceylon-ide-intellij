@@ -69,11 +69,11 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         }
 
         Node target = ConcurrencyManagerForJava.withAlternateResolution(
-            new Callable<Sequence>() {
+            new Callable<Node>() {
                 @Override
-                public Sequence call() throws Exception {
+                public Node call() throws Exception {
                 return new IdeaNavigation(project)
-                        .getTarget(compilationUnit, getNode(), getRegion(), backend);
+                        .getTarget(compilationUnit, getNode(), backend);
                 }
             });
 
@@ -144,12 +144,6 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
                     = (CeylonCompositeElement) myElement.getParent();
             return parent.getCeylonNode();
         }
-    }
-
-    @NotNull
-    private DefaultRegion getRegion() {
-        TextRange range = myElement.getTextRange();
-        return new DefaultRegion(range.getStartOffset(), range.getLength());
     }
 
     @Nullable
