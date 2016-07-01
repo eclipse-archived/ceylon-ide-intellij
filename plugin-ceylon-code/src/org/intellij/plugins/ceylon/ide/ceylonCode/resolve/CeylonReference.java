@@ -8,14 +8,17 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.*;
+import com.redhat.ceylon.common.Backends;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.ide.common.model.CeylonUnit;
 import com.redhat.ceylon.ide.common.model.IResourceAware;
 import com.redhat.ceylon.ide.common.model.SourceAware;
 import com.redhat.ceylon.ide.common.platform.Status;
 import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+import com.redhat.ceylon.ide.common.util.FindReferencedNodeVisitor;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
@@ -29,12 +32,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Callable;
 
-import static com.intellij.psi.util.PsiTreeUtil.getParentOfType;
-
 public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
+
+    private Backends backend;
 
     public CeylonReference(T element, TextRange range, boolean soft) {
         super(element, range, soft);
+    }
+
+    public CeylonReference(T element, TextRange range, boolean soft, Backends backend) {
+        super(element, range, soft);
+        this.backend = backend;
     }
 
     @Nullable
@@ -73,10 +81,12 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             throw platformUtils_.get_().newOperationCanceledException();
         }
 
+        final Project project = myElement.getProject();
+
         Sequence seq = ConcurrencyManagerForJava.withAlternateResolution(new Callable<Sequence>() {
             @Override
             public Sequence call() throws Exception {
-                return new IdeaNavigation(myElement.getProject())
+                return new IdeaNavigation(project)
                         .findTarget(compilationUnit,
                             localAnalysisResult.getTokens(),
                             new DefaultRegion(myElement.getTextRange().getStartOffset(),
@@ -98,15 +108,14 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             }
 
             if (file != null) {
-                PsiFile psiFile = PsiManager.getInstance(myElement.getProject()).findFile(file);
+                PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
                 if (psiFile instanceof CeylonFile) {
                     return CeylonTreeUtil.findPsiElement(target, psiFile);
                 }
             }
         }
 
-        
-        
+
         Node node;
         if (myElement instanceof CeylonPsi.ImportPathPsi) {
             node = ((CeylonPsi.ImportPathPsi) myElement).getCeylonNode();
@@ -116,40 +125,54 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
 
         Referenceable declaration
                 = nodes_.get_()
-                    .getReferencedExplicitDeclaration(node, compilationUnit);
+                    .getReferencedModel(node);
         if (declaration == null) {
             return null;
         }
 
-        Unit unit = declaration.getUnit();
-        PsiFile containingFile = myElement.getContainingFile();
-
-        if (unit != compilationUnit.getUnit()) {
-            return resolveDeclaration(declaration, myElement.getProject());
+        if (backend != null && declaration instanceof Declaration) {
+            Declaration dec = (Declaration) declaration;
+            if (dec.isNative()) {
+                Referenceable ref = ModelUtil.getNativeDeclaration(dec, backend);
+                //TODO: exactly why doesn't this work?
+                //Referenceable ref = new IdeaNavigation(project).resolveNative(dec, backend);
+                if (ref!=null) declaration = ref;
+            }
         }
 
-        Node declarationNode =
-                nodes_.get_()
-                    .getReferencedNode(declaration);
-
-        if (declarationNode != null) {
-            return CeylonTreeUtil.findPsiElement(declarationNode, containingFile);
+        PsiElement location = resolveDeclaration(declaration, project);
+        if (location == null) {
+            return myElement.getContainingFile();
         }
-        return containingFile;
+        else {
+            return location;
+        }
     }
 
     @Nullable
     public static PsiElement resolveDeclaration(Referenceable declaration, Project project) {
-        PsiElement location = new IdeaNavigation(project).gotoDeclaration(declaration);
-
-        PsiElement parent = location;
-        if (location != null &&
-                location.getLanguage() == CeylonLanguage.INSTANCE) {
-            parent = getParentOfType(location,
-                    CeylonPsi.SpecifierStatementPsi.class,
-                    PsiNameIdentifierOwner.class);
+        PsiElement location =
+                new IdeaNavigation(project)
+                        .gotoDeclaration(declaration);
+        if (location==null || location.getLanguage() != CeylonLanguage.INSTANCE) {
+            return location;
         }
-        return parent == null ? location : parent;
+
+        //TODO: workaround for bug in nodes.getReferencedNodeInUnit()
+        Unit unit = declaration.getUnit();
+        if (unit instanceof CeylonUnit) {
+            CeylonUnit ceylonUnit = (CeylonUnit) unit;
+            FindReferencedNodeVisitor visitor =
+                    new FindReferencedNodeVisitor(declaration);
+            ceylonUnit.getCompilationUnit().visit(visitor);
+            Node declarationNode = visitor.getDeclarationNode();
+            if (declarationNode != null) {
+                return CeylonTreeUtil.findPsiElement(declarationNode,
+                        location.getContainingFile());
+            }
+        }
+        return null;
+
     }
 
     @NotNull
