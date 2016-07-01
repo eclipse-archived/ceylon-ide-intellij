@@ -47,14 +47,11 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
     @Nullable
     @Override
     public PsiElement resolve() {
-        PsiElement parent = myElement.getParent();
-        if (parent instanceof CeylonPsi.DeclarationPsi) {
-            CeylonPsi.DeclarationPsi parentDecPsi =
-                    (CeylonPsi.DeclarationPsi) parent;
-            Tree.Declaration node = parentDecPsi.getCeylonNode();
+        final Node node = getNode();
 
-            //noinspection StatementWithEmptyBody
-            Declaration model = node.getDeclarationModel();
+        if (node instanceof Tree.Declaration) {
+            Declaration model =
+                    ((Tree.Declaration) node).getDeclarationModel();
             if (model instanceof TypedDeclaration
                     && ((TypedDeclaration) model).getOriginalDeclaration() != null) {
                 // we need to resolve the original declaration
@@ -65,13 +62,53 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             }
         }
 
-        final CeylonFile ceylonFile = (CeylonFile) myElement.getContainingFile();
-        final LocalAnalysisResult localAnalysisResult = ceylonFile.getLocalAnalysisResult();
+        final Project project = myElement.getProject();
+        final Tree.CompilationUnit compilationUnit = getCompilationUnit();
+        if (compilationUnit==null) {
+            return null;
+        }
+
+        Node target = ConcurrencyManagerForJava.withAlternateResolution(
+            new Callable<Sequence>() {
+                @Override
+                public Sequence call() throws Exception {
+                return new IdeaNavigation(project)
+                        .getTarget(compilationUnit, getNode(), getRegion(), backend);
+                }
+            });
+
+        if (target != null) {
+            VirtualFile file = getVirtualFile(target.getUnit());
+            if (file != null) {
+                PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+                return CeylonTreeUtil.findPsiElement(target, psiFile);
+            }
+        }
+
+        //for anything that's not a Ceylon declaration
+        Referenceable declaration
+                = nodes_.get_().getReferencedModel(node);
+        if (declaration == null) {
+            return null;
+        }
+
+        PsiElement location = resolveDeclaration(declaration, project);
+        return location == null ? myElement.getContainingFile() : location;
+    }
+
+    @Nullable
+    private Tree.CompilationUnit getCompilationUnit() {
+        CeylonFile ceylonFile
+                = (CeylonFile) myElement.getContainingFile();
+
+        LocalAnalysisResult localAnalysisResult
+                = ceylonFile.getLocalAnalysisResult();
         if (localAnalysisResult == null) {
             return null;
         }
-            
-        final Tree.CompilationUnit compilationUnit = localAnalysisResult.getTypecheckedRootNode();
+
+        final Tree.CompilationUnit compilationUnit
+                = localAnalysisResult.getTypecheckedRootNode();
         if (compilationUnit == null) {
             platformUtils_.get_().log(Status.getStatus$_DEBUG(),
                     "CeylonReference is not resolved because the file "
@@ -80,73 +117,39 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             throw platformUtils_.get_().newOperationCanceledException();
         }
 
-        final Project project = myElement.getProject();
+        return compilationUnit;
+    }
 
-        Sequence seq = ConcurrencyManagerForJava.withAlternateResolution(new Callable<Sequence>() {
-            @Override
-            public Sequence call() throws Exception {
-                return new IdeaNavigation(project)
-                        .findTarget(compilationUnit,
-                            localAnalysisResult.getTokens(),
-                            new DefaultRegion(myElement.getTextRange().getStartOffset(),
-                                              myElement.getTextRange().getLength()),
-                            backend);
-            }
-        });
-
-        if (seq != null) {
-            Node target = (Node) seq.get(new Integer(1));
-            VirtualFile file = null;
-            Unit unit = target.getUnit();
-            if (unit instanceof SourceAware) {
-                String path = ((SourceAware) unit).getSourceFullPath().toString();
-                file = VirtualFileManager.getInstance().findFileByUrl(
-                        (path.contains("!/") ? "jar" : "file") + "://" + path
-                );
-            } else if (unit instanceof IResourceAware) {
-                file = (VirtualFile) ((IResourceAware) unit).getResourceFile();
-            }
-
-            if (file != null) {
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-                if (psiFile instanceof CeylonFile) {
-                    return CeylonTreeUtil.findPsiElement(target, psiFile);
-                }
-            }
-        }
-
-
-        Node node;
-        if (myElement instanceof CeylonPsi.ImportPathPsi) {
-            node = ((CeylonPsi.ImportPathPsi) myElement).getCeylonNode();
+    @Nullable
+    private VirtualFile getVirtualFile(Unit unit) {
+        if (unit instanceof SourceAware) {
+            String path = ((SourceAware) unit).getSourceFullPath().toString();
+            return VirtualFileManager.getInstance().findFileByUrl(
+                    (path.contains("!/") ? "jar" : "file") + "://" + path
+            );
+        } else if (unit instanceof IResourceAware) {
+            return (VirtualFile) ((IResourceAware) unit).getResourceFile();
         } else {
-            node = ((CeylonCompositeElement) parent).getCeylonNode();
-        }
-
-        Referenceable declaration
-                = nodes_.get_()
-                    .getReferencedModel(node);
-        if (declaration == null) {
             return null;
         }
+    }
 
-        if (backend != null && declaration instanceof Declaration) {
-            Declaration dec = (Declaration) declaration;
-            if (dec.isNative()) {
-                Referenceable ref =
-                        new IdeaNavigation(project)
-                                .resolveNative(dec, backend);
-                if (ref!=null) declaration = ref;
-            }
+    private Node getNode() {
+        if (myElement instanceof CeylonPsi.ImportPathPsi) {
+            CeylonPsi.ImportPathPsi path
+                    = (CeylonPsi.ImportPathPsi) this.myElement;
+            return path.getCeylonNode();
+        } else {
+            CeylonCompositeElement parent
+                    = (CeylonCompositeElement) myElement.getParent();
+            return parent.getCeylonNode();
         }
+    }
 
-        PsiElement location = resolveDeclaration(declaration, project);
-        if (location == null) {
-            return myElement.getContainingFile();
-        }
-        else {
-            return location;
-        }
+    @NotNull
+    private DefaultRegion getRegion() {
+        TextRange range = myElement.getTextRange();
+        return new DefaultRegion(range.getStartOffset(), range.getLength());
     }
 
     @Nullable
