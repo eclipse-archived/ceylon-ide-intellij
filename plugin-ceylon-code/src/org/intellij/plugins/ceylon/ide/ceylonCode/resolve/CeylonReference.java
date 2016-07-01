@@ -12,16 +12,14 @@ import com.redhat.ceylon.compiler.typechecker.tree.Node;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.IResourceAware;
 import com.redhat.ceylon.ide.common.model.SourceAware;
+import com.redhat.ceylon.ide.common.platform.Status;
+import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
-import com.redhat.ceylon.ide.common.platform.Status;
-import com.redhat.ceylon.ide.common.platform.platformUtils_;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
-
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
@@ -42,12 +40,16 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
     @Nullable
     @Override
     public PsiElement resolve() {
-        if (myElement.getParent() instanceof CeylonPsi.DeclarationPsi) {
-            Tree.Declaration node = ((CeylonPsi.DeclarationPsi) myElement.getParent()).getCeylonNode();
+        PsiElement parent = myElement.getParent();
+        if (parent instanceof CeylonPsi.DeclarationPsi) {
+            CeylonPsi.DeclarationPsi parentDecPsi =
+                    (CeylonPsi.DeclarationPsi) parent;
+            Tree.Declaration node = parentDecPsi.getCeylonNode();
 
             //noinspection StatementWithEmptyBody
-            if (node.getDeclarationModel() instanceof TypedDeclaration
-                    && ((TypedDeclaration) node.getDeclarationModel()).getOriginalDeclaration() != null) {
+            Declaration model = node.getDeclarationModel();
+            if (model instanceof TypedDeclaration
+                    && ((TypedDeclaration) model).getOriginalDeclaration() != null) {
                 // we need to resolve the original declaration
             } else if (ApplicationInfo.getInstance().getBuild().getBaselineVersion() >= 145) {
                 // IntelliJ 15+ can show usages on ctrl-click, if we return null here
@@ -64,34 +66,39 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             
         final Tree.CompilationUnit compilationUnit = localAnalysisResult.getTypecheckedRootNode();
         if (compilationUnit == null) {
-            platformUtils_.get_().log(Status.getStatus$_DEBUG(), "CeylonReference is not resolved because the file " + myElement.getContainingFile() + " is not typechecked and up-to-date");
+            platformUtils_.get_().log(Status.getStatus$_DEBUG(),
+                    "CeylonReference is not resolved because the file "
+                            + myElement.getContainingFile()
+                            + " is not typechecked and up-to-date");
             throw platformUtils_.get_().newOperationCanceledException();
         }
 
         Sequence seq = ConcurrencyManagerForJava.withAlternateResolution(new Callable<Sequence>() {
             @Override
             public Sequence call() throws Exception {
-                return new IdeaNavigation(myElement.getProject()).findTarget(compilationUnit,
-                        localAnalysisResult.getTokens(),
-                        new DefaultRegion(myElement.getTextRange().getStartOffset(), myElement.getTextRange().getLength())
-                );
+                return new IdeaNavigation(myElement.getProject())
+                        .findTarget(compilationUnit,
+                            localAnalysisResult.getTokens(),
+                            new DefaultRegion(myElement.getTextRange().getStartOffset(),
+                                              myElement.getTextRange().getLength()));
             }
         });
 
         if (seq != null) {
             Node target = (Node) seq.get(new Integer(1));
-            VirtualFile vfile = null;
-            if (target.getUnit() instanceof SourceAware) {
-                String path = ((SourceAware) target.getUnit()).getSourceFullPath().toString();
-                vfile = VirtualFileManager.getInstance().findFileByUrl(
+            VirtualFile file = null;
+            Unit unit = target.getUnit();
+            if (unit instanceof SourceAware) {
+                String path = ((SourceAware) unit).getSourceFullPath().toString();
+                file = VirtualFileManager.getInstance().findFileByUrl(
                         (path.contains("!/") ? "jar" : "file") + "://" + path
                 );
-            } else if (target.getUnit() instanceof IResourceAware) {
-                vfile = (VirtualFile) ((IResourceAware) target.getUnit()).getResourceFile();
+            } else if (unit instanceof IResourceAware) {
+                file = (VirtualFile) ((IResourceAware) unit).getResourceFile();
             }
-            if (vfile != null) {
-                PsiFile psiFile = PsiManager.getInstance(myElement.getProject()).findFile(vfile);
 
+            if (file != null) {
+                PsiFile psiFile = PsiManager.getInstance(myElement.getProject()).findFile(file);
                 if (psiFile instanceof CeylonFile) {
                     return CeylonTreeUtil.findPsiElement(target, psiFile);
                 }
@@ -104,10 +111,12 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         if (myElement instanceof CeylonPsi.ImportPathPsi) {
             node = ((CeylonPsi.ImportPathPsi) myElement).getCeylonNode();
         } else {
-            node = ((CeylonCompositeElement) myElement.getParent()).getCeylonNode();
+            node = ((CeylonCompositeElement) parent).getCeylonNode();
         }
 
-        Referenceable declaration = nodes_.get_().getReferencedExplicitDeclaration(node, compilationUnit);
+        Referenceable declaration
+                = nodes_.get_()
+                    .getReferencedExplicitDeclaration(node, compilationUnit);
         if (declaration == null) {
             return null;
         }
@@ -119,7 +128,9 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             return resolveDeclaration(declaration, myElement.getProject());
         }
 
-        Node declarationNode = nodes_.get_().getReferencedNode(declaration);
+        Node declarationNode =
+                nodes_.get_()
+                    .getReferencedNode(declaration);
 
         if (declarationNode != null) {
             return CeylonTreeUtil.findPsiElement(declarationNode, containingFile);
@@ -132,9 +143,11 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         PsiElement location = new IdeaNavigation(project).gotoDeclaration(declaration);
 
         PsiElement parent = location;
-        if (location != null && location.getLanguage() == CeylonLanguage.INSTANCE) {
+        if (location != null &&
+                location.getLanguage() == CeylonLanguage.INSTANCE) {
             parent = getParentOfType(location,
-                    CeylonPsi.SpecifierStatementPsi.class, PsiNameIdentifierOwner.class);
+                    CeylonPsi.SpecifierStatementPsi.class,
+                    PsiNameIdentifierOwner.class);
         }
         return parent == null ? location : parent;
     }
@@ -148,30 +161,36 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
     @Override
     public boolean isReferenceTo(PsiElement element) {
         PsiElement resolved = resolve();
-        if (getElement().getManager().areElementsEquivalent(resolved, element)) {
+        PsiManager manager = getElement().getManager();
+        if (manager.areElementsEquivalent(resolved, element)) {
             return true;
         }
 
         // Make constructor references equivalent to their containing class
         if (resolved instanceof PsiMethod && ((PsiMethod) resolved).isConstructor()) {
             PsiClass parent = ((PsiMethod) resolved).getContainingClass();
-            return getElement().getManager().areElementsEquivalent(parent, element);
+            return manager.areElementsEquivalent(parent, element);
         }
         if (element instanceof PsiMethod && ((PsiMethod) element).isConstructor()) {
             PsiClass parent = ((PsiMethod) element).getContainingClass();
-            return getElement().getManager().areElementsEquivalent(resolved, parent);
+            return manager.areElementsEquivalent(resolved, parent);
         }
 
         // Make setters and getters equivalent
         if (element instanceof CeylonPsi.AttributeSetterDefinitionPsi) {
-            Setter setter = ((CeylonPsi.AttributeSetterDefinitionPsi) element).getCeylonNode().getDeclarationModel();
+            CeylonPsi.AttributeSetterDefinitionPsi setterPsi =
+                    (CeylonPsi.AttributeSetterDefinitionPsi) element;
+            Setter setter = setterPsi.getCeylonNode().getDeclarationModel();
 
             Value getter = null;
 
             if (resolved instanceof CeylonPsi.AttributeDeclarationPsi) {
-                getter = ((CeylonPsi.AttributeDeclarationPsi) resolved).getCeylonNode().getDeclarationModel();
+                CeylonPsi.AttributeDeclarationPsi attributePsi =
+                        (CeylonPsi.AttributeDeclarationPsi) resolved;
+                getter = attributePsi.getCeylonNode().getDeclarationModel();
             } else if (myElement instanceof CeylonPsi.IdentifierPsi) {
-                Scope scope = ((CeylonPsi.IdentifierPsi) myElement).getCeylonNode().getScope();
+                CeylonPsi.IdentifierPsi id = (CeylonPsi.IdentifierPsi) myElement;
+                Scope scope = id.getCeylonNode().getScope();
                 if (scope instanceof Value) {
                     getter = (Value) scope;
                 }
@@ -182,14 +201,19 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
             }
         }
         if (element instanceof CeylonPsi.AttributeDeclarationPsi) {
-            Value getter = ((CeylonPsi.AttributeDeclarationPsi) element).getCeylonNode().getDeclarationModel();
+            CeylonPsi.AttributeDeclarationPsi attPsi =
+                    (CeylonPsi.AttributeDeclarationPsi) element;
+            Value getter = attPsi.getCeylonNode().getDeclarationModel();
 
             Setter setter = null;
 
             if (resolved instanceof CeylonPsi.AttributeSetterDefinitionPsi) {
-                 setter = ((CeylonPsi.AttributeSetterDefinitionPsi) resolved).getCeylonNode().getDeclarationModel();
+                CeylonPsi.AttributeSetterDefinitionPsi setterPsi =
+                        (CeylonPsi.AttributeSetterDefinitionPsi) resolved;
+                setter = setterPsi.getCeylonNode().getDeclarationModel();
             } else if (myElement instanceof CeylonPsi.IdentifierPsi) {
-                Scope scope = ((CeylonPsi.IdentifierPsi) myElement).getCeylonNode().getScope();
+                CeylonPsi.IdentifierPsi id = (CeylonPsi.IdentifierPsi) myElement;
+                Scope scope = id.getCeylonNode().getScope();
                 if (scope instanceof Setter) {
                     setter = (Setter) scope;
                 }
