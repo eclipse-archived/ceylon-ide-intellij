@@ -79,7 +79,12 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     
     @SuppressWarnings("unchecked")
     ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile> retrieveProjectPhasedUnit() {
-        Module module = ModuleUtil.findModuleForPsiElement(this);
+        Module module = ApplicationManager.getApplication().runReadAction(new Computable<Module>() {
+            @Override
+            public Module compute() {
+                return ModuleUtil.findModuleForPsiElement(CeylonFile.this);
+            }
+        });
         CeylonProjects<Module, VirtualFile, VirtualFile, VirtualFile> ceylonProjects = getProject().getComponent(org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects.class);
         CeylonProject<Module, VirtualFile, VirtualFile, VirtualFile> ceylonProject = ceylonProjects.getProject(module);
         if (ceylonProject != null) {

@@ -231,7 +231,7 @@ shared class CeylonModelManager(model)
                             }
                             if (is FileVirtualFileContentChange firstChange,
                                 is CeylonFile ceylonFile = concurrencyManager.needReadAccess(() => psiManager(model.ideaProject).findFile(firstChange.resource.nativeResource) else null),
-                                exists cu = ceylonFile.localAnalysisResult?.parsedRootNode,
+                                exists cu = ceylonFile.localAnalyzer?.result?.parsedRootNode,
                                 ! cu.errors.empty) {
                                 return cu.errors ;
                             } else {
