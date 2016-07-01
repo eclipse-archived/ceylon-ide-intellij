@@ -42,9 +42,16 @@ public abstract class DeclarationPsiNameIdOwner
     @Override
     public PsiElement getNameIdentifier() {
         Tree.Identifier id = getCeylonNode().getIdentifier();
-        return id == null ?
-                PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) :
-                CeylonTreeUtil.findPsiElement(id, getContainingFile());
+        try {
+            return id == null ?
+                    PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) :
+                    CeylonTreeUtil.findPsiElement(id, getContainingFile());
+        }
+        catch (IllegalArgumentException iae) {
+            //this was happening with pattern variables in an anonymous function parameter list
+            //(surely because I do some funny business with the AST in that case)
+            return PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class);
+        }
     }
 
     @Override
