@@ -73,14 +73,15 @@ shared class DeclarationPresentationProvider()
 
                 shared actual String? locationString {
                     if (exists model = item.ceylonNode?.declarationModel) {
+                        value nat = model.native then "``model.nativeBackends`` " else "";
                         value dec
                             = if (is ClassOrInterface container = model.container)
                             then container else model;
                         value qualifiedNameString
                             = dec.container.qualifiedNameString;
                         return qualifiedNameString.empty
-                        then "(default module)"
-                        else "(``qualifiedNameString``)";
+                        then nat + "(default module)"
+                        else nat + "(``qualifiedNameString``)";
                     }
                     else {
                         return null;
