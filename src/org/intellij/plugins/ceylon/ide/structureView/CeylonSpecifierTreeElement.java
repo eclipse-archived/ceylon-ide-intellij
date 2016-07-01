@@ -57,6 +57,9 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
 
     @Override
     public String getLocationString() {
+        if (!isValid()) {
+            return null;
+        }
         Declaration model =
                 getElement()
                     .getCeylonNode()
@@ -78,12 +81,18 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
     @Nullable
     @Override
     public String getPresentableText() {
+        if (!isValid()) {
+            return "INVALID";
+        }
         return toJavaString(descriptions_.get_().descriptionForPsi(getElement(), false, false));
     }
 
     @NotNull
     @Override
     public String getAlphaSortKey() {
+        if (!isValid()) {
+            return "ZZZZZ";
+        }
         TypedDeclaration dec =
                 getElement()
                     .getCeylonNode()

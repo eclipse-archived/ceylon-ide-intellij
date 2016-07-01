@@ -79,6 +79,9 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
 
     @Override
     public String getLocationString() {
+        if (!isValid()) {
+            return null;
+        }
         Declaration model =
                 getElement()
                         .getCeylonNode()
@@ -107,17 +110,26 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
     @Nullable
     @Override
     public final String getPresentableText() {
+        if (!isValid()) {
+            return "INVALID";
+        }
         return toJavaString(descriptions_.get_().descriptionForPsi(getElement(), false, false));
     }
 
     @Override
     public final Icon getIcon(boolean open) {
+        if (!isValid()) {
+            return null;
+        }
         return icons_.get_().forDeclaration(getElement().getCeylonNode());
     }
 
     @NotNull
     @Override
     public String getAlphaSortKey() {
+        if (!isValid()) {
+            return "ZZZZZ";
+        }
         Tree.Identifier id = getElement().getCeylonNode().getIdentifier();
         return id==null ? "" : id.getText();
     }
