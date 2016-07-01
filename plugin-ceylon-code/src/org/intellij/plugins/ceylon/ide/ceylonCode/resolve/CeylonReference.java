@@ -133,9 +133,9 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         if (backend != null && declaration instanceof Declaration) {
             Declaration dec = (Declaration) declaration;
             if (dec.isNative()) {
-                Referenceable ref = ModelUtil.getNativeDeclaration(dec, backend);
-                //TODO: exactly why doesn't this work?
-                //Referenceable ref = new IdeaNavigation(project).resolveNative(dec, backend);
+                Referenceable ref =
+                        new IdeaNavigation(project)
+                                .resolveNative(dec, backend);
                 if (ref!=null) declaration = ref;
             }
         }
