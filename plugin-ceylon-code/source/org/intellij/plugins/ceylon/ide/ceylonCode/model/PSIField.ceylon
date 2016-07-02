@@ -16,15 +16,15 @@ class PSIField(PsiField psi)
     shared actual TypeMirror type = PSIType(doWithLock(() => psi.type));
     
     shared actual Boolean defaultAccess =>
-            let (private = psi.hasModifierProperty(\iPRIVATE))
+            let (private = psi.hasModifierProperty(private))
         !(private || protected || public);
     
-    shared actual Boolean final => psi.hasModifierProperty(\iFINAL);
+    shared actual Boolean final => psi.hasModifierProperty(final);
     
-    shared actual Boolean protected => psi.hasModifierProperty(\iPROTECTED);
+    shared actual Boolean protected => psi.hasModifierProperty(protected);
     
-    shared actual Boolean public => psi.hasModifierProperty(\iPUBLIC);
+    shared actual Boolean public => psi.hasModifierProperty(public);
     
-    shared actual Boolean static => psi.hasModifierProperty(\iSTATIC);
+    shared actual Boolean static => psi.hasModifierProperty(static);
     
 }

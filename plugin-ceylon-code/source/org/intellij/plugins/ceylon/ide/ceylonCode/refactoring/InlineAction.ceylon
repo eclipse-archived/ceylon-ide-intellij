@@ -108,7 +108,7 @@ shared class InlineAction() extends InlineActionHandler() {
         }
     }
 
-    shared actual Boolean isEnabledForLanguage(Language l) => l == CeylonLanguage.\iINSTANCE;
+    shared actual Boolean isEnabledForLanguage(Language l) => l == CeylonLanguage.instance;
 }
 
 class IdeaInlineRefactoring(PhasedUnit phasedUnit, List<CommonToken> theTokens, Node node, Declaration decl, Editor editor) 

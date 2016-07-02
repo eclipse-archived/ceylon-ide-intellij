@@ -1,7 +1,9 @@
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext,
-    CompletionInitializationContext
+    CompletionInitializationContext {
+        selectionEndOffset = SELECTION_END_OFFSET
+    }
 }
 import com.intellij.codeInsight.lookup {
     LookupElement
@@ -57,7 +59,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
             shared actual void handleInsert(InsertionContext context, LookupElement? t) {
                 // Undo IntelliJ's completion
                 value platformDoc = ctx.commonDocument;
-                value len = context.getOffset(CompletionInitializationContext.\iSELECTION_END_OFFSET) - offset;
+                value len = context.getOffset(selectionEndOffset) - offset;
                 replaceInDoc(platformDoc, offset, len, "");
 
                 assert (exists project = ctx.editor.project);

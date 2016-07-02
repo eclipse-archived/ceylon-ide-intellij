@@ -98,7 +98,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                             ideaModuleManager.ceylonProject?.ideArtifact?.project);
                         dumbService(project).queueTask(UnindexedFilesUpdater(project, false));
                     }
-                }, ModalityState.\iNON_MODAL);
+                }, ModalityState.nonModal);
         });
     }
 

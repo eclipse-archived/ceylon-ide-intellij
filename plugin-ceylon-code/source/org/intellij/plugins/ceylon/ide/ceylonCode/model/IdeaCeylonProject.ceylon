@@ -231,7 +231,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                      Do you want to remove the old output repository folder \
                      '`` oldOutputRepoFolder.path ``' and all its contents ?",
                     "Changing Ceylon output repository",
-                    Messages.questionIcon) == Messages.\iYES) {
+                    Messages.questionIcon) == Messages.yes) {
                 try {
                     object extends WriteAction<Void>() {
                         shared actual void run(Result<Void> result) {
@@ -283,7 +283,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     String interpolateVariablesInRepositoryPath(String repoPath) {
         String userHomePath = System.getProperty("user.home");
-        value ext = Extensions.getExtensions(ITypeCheckerInvoker.\iEP_NAME).get(0);
+        value ext = Extensions.getExtensions(ITypeCheckerInvoker.epName).get(0);
         String pluginRepoPath = ext.embeddedCeylonRepository.absolutePath;
         return repoPath.replace("${user.home}", userHomePath).replace("${ceylon.repo}", pluginRepoPath);
     }

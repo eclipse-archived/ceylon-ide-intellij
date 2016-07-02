@@ -15,7 +15,7 @@ import com.intellij.psi {
     SmartPsiElementPointer
 }
 import com.intellij.ui {
-    JBColor
+    JBColor { red=RED }
 }
 import com.intellij.ui.components {
     JBList
@@ -86,7 +86,7 @@ shared void showChooser<out T>
                         }``</html>";
                 }
             } else {
-                this.setForeground(JBColor.\iRED);
+                this.setForeground(red);
                 this.text = "Invalid";
             }
             return rendererComponent;

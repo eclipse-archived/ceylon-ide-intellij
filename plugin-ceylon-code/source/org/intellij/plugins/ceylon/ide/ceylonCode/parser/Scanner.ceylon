@@ -65,7 +65,7 @@ shared class CeylonAntlrToIntellijLexerAdapter() extends LexerBase() {
         locateToken();
         if (exists token = myToken) {
             if (token.type == - 2) {
-                return TokenType.\iBAD_CHARACTER;
+                return TokenType.badCharacter;
             }
             return if (exists eltType = TokenTypes.fromInt(token.type)) 
                 then eltType else TokenTypes.eof.tokenType;

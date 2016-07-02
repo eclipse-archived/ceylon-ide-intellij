@@ -168,7 +168,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     GroovyFile? findGradleBuild(Module mod) {
         value buildFile = File(
             File(mod.moduleFilePath).parentFile,
-            GradleConstants.\iDEFAULT_SCRIPT_NAME
+            GradleConstants.defaultScriptName
         );
 
         if (buildFile.file,
@@ -199,7 +199,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
 
             for (m in cls.declaredMethods) {
                 if (m.name == "syncProjectSynchronously") {
-                    m.invoke(instance, mod.project, JBoolean.\iTRUE, null);
+                    m.invoke(instance, mod.project, JBoolean.true, null);
                 }
             }
         } catch (ReflectiveOperationException exception) {
@@ -207,7 +207,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             Notifications.Bus.notify(Notification("ceylon", "Configure Ceylon",
                 "The gradle project could not be synced automatically, please sync it manually "
                 + "to apply changes.",
-                NotificationType.\iERROR
+                NotificationType.error
             ));
         }
     }
@@ -229,7 +229,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             Notifications.Bus.notify(Notification("ceylon", "Configure Ceylon",
                 "The gradle project could not be built automatically, please build it manually "
                 + "to apply changes.",
-                NotificationType.\iERROR
+                NotificationType.error
             ));
         }
     }

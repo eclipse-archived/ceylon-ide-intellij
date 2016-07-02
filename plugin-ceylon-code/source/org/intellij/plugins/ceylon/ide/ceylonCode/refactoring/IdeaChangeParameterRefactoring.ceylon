@@ -152,8 +152,8 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
 
     shared actual void invoke(Project project, ObjectArray<PsiElement> elements, DataContext? ctx) {
         if (exists ctx,
-            exists editor = CommonDataKeys.\iEDITOR.getData(ctx),
-            exists file = CommonDataKeys.\iPSI_FILE.getData(ctx)) {
+            exists editor = CommonDataKeys.editor.getData(ctx),
+            exists file = CommonDataKeys.psiFile.getData(ctx)) {
 
             invoke(project, editor, file, ctx);
         }
@@ -183,7 +183,7 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
                                 }.execute();
                             }
 
-                            close(DialogWrapper.\iOK_EXIT_CODE);
+                            close(DialogWrapper.okExitCode);
                         }
                     };
 
@@ -258,7 +258,7 @@ class MyMethodDescriptor(params, project) satisfies MethodDescriptor<MyParameter
 
     params.parameters.each((p) => parameters.add(MyParameterInfo(p)));
 
-    canChangeReturnType() => ReadWriteOption.\iNone;
+    canChangeReturnType() => ReadWriteOption.none;
 
     parametersCount => params.size;
 
@@ -272,7 +272,7 @@ class MyParameterTableModel(IdeaChangeParameterRefactoring.ParameterList params,
 
     class MyNameColumn() extends NameColumn<MyParameterInfo, MyParameterTableModelItem>(project) {
     }
-    class MyTypeColumn() extends TypeColumn<MyParameterInfo, MyParameterTableModelItem>(project, CeylonFileType.\iINSTANCE) {
+    class MyTypeColumn() extends TypeColumn<MyParameterInfo, MyParameterTableModelItem>(project, CeylonFileType.instance) {
         isCellEditable(MyParameterTableModelItem model) => model.parameter.param.position == -1;
     }
 
@@ -361,7 +361,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
     createVisibilityControl()
         => ComboBoxVisibilityPanel("", createJavaObjectArray<Object>({}), createJavaStringArray({}));
 
-    fileType => CeylonFileType.\iINSTANCE;
+    fileType => CeylonFileType.instance;
 
     shared actual ValidationInfo? doValidate() {
         for (item in myParametersTableModel.items) {
@@ -386,7 +386,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
         value text = param.model.type.asString() + " " + param.name
             + (if (exists a = param.defaultArgs) then " = " + a else "");
 
-        return JBListTable.createEditorTextFieldPresentation(project, CeylonFileType.\iINSTANCE,
+        return JBListTable.createEditorTextFieldPresentation(project, CeylonFileType.instance,
             text, selected, focused);
     }
 

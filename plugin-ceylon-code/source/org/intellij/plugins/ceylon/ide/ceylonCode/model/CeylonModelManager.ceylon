@@ -267,7 +267,7 @@ shared class CeylonModelManager(model)
                             model.ideaProject,
                             "ceylon model update",
                             true,
-                            PerformInBackgroundOption.\iALWAYS_BACKGROUND) {
+                            PerformInBackgroundOption.alwaysBackground) {
                             
                             shared actual void run(ProgressIndicator progressIndicator) {
                                 value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);

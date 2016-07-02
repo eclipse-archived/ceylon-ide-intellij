@@ -72,7 +72,7 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
 
     shared actual {VirtualFile*} resourceNativeFolders(CeylonProjectAlias ceylonProject) {
         value roots = doWithLock(() => moduleRootManager(ceylonProject.ideArtifact)
-            ?.getSourceRoots(JavaResourceRootType.\iRESOURCE));
+            ?.getSourceRoots(JavaResourceRootType.resource));
 
         return if (exists roots) then CeylonIterable(roots) else empty;
     }
@@ -86,7 +86,7 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
 
     shared actual {VirtualFile*} sourceNativeFolders(CeylonProjectAlias ceylonProject) {
         value roots = doWithLock(() => moduleRootManager(ceylonProject.ideArtifact)
-            ?.getSourceRoots(JavaSourceRootType.\iSOURCE));
+            ?.getSourceRoots(JavaSourceRootType.source));
 
         return if (exists roots) then CeylonIterable(roots) else empty;
     }

@@ -27,7 +27,7 @@ import com.redhat.ceylon.ide.common.doc {
 }
 
 import java.awt {
-    ...
+    Font { bold=BOLD, italic=ITALIC }
 }
 import java.lang {
     StringBuffer
@@ -190,12 +190,12 @@ shared object highlighter {
 
     shared String toColoredHtml(String token, TextAttributes attr) {
         String? color =
-        if (exists fg = attr.foregroundColor, !fg.equals(JBColor.\iBLACK))
-        then "<font color='#" + ColorUtil.toHex(attr.foregroundColor) + "'>"
-        else null;
+            if (exists fg = attr.foregroundColor, fg!=JBColor.black)
+            then "<font color='#" + ColorUtil.toHex(attr.foregroundColor) + "'>"
+            else null;
 
-        Boolean isBold = attr.fontType.and(Font.\iBOLD) != 0;
-        Boolean isItalic = attr.fontType.and(Font.\iITALIC) != 0;
+        Boolean isBold = attr.fontType.and(bold) != 0;
+        Boolean isItalic = attr.fontType.and(italic) != 0;
 
         value builder = StringBuilder();
 

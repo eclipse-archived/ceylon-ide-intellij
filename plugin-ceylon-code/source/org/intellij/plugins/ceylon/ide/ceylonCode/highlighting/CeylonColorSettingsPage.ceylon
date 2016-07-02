@@ -4,7 +4,9 @@ import ceylon.interop.java {
 }
 
 import com.intellij.openapi.editor {
-    DefaultLanguageHighlighterColors
+    DefaultLanguageHighlighterColors {
+        strings = STRING
+    }
 }
 import com.intellij.openapi.editor.colors {
     TextAttributesKey {
@@ -68,7 +70,7 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
     
     attributeDescriptors => createJavaObjectArray(ourDescriptors);
     
-    colorDescriptors => ColorDescriptor.\iEMPTY_ARRAY;
+    colorDescriptors => ColorDescriptor.emptyArray;
     
     shared actual String demoText => """import <pkg>ceylon</pkg>.<pkg>math</pkg>.<pkg>integer</pkg> { smallest }
                                         
@@ -100,10 +102,10 @@ shared object ceylonHighlightingColors {
     shared TextAttributesKey keyword = createTextAttributesKey("CEYLON_KEYWORD", DefaultLanguageHighlighterColors.keyword);
     shared TextAttributesKey number = createTextAttributesKey("CEYLON_NUMBER", DefaultLanguageHighlighterColors.number);
     shared TextAttributesKey comment = createTextAttributesKey("CEYLON_COMMENT", DefaultLanguageHighlighterColors.docComment);
-    shared TextAttributesKey strings = createTextAttributesKey("CEYLON_STRING", DefaultLanguageHighlighterColors.\iSTRING);
-    shared TextAttributesKey char = createTextAttributesKey("CEYLON_CHAR", DefaultLanguageHighlighterColors.\iSTRING);
+    shared TextAttributesKey strings = createTextAttributesKey("CEYLON_STRING", DefaultLanguageHighlighterColors.strings);
+    shared TextAttributesKey char = createTextAttributesKey("CEYLON_CHAR", DefaultLanguageHighlighterColors.strings);
     shared TextAttributesKey interp = createTextAttributesKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
-    shared TextAttributesKey annotationString = createTextAttributesKey("CEYLON_ANNOTATION_STRING", DefaultLanguageHighlighterColors.\iSTRING);
+    shared TextAttributesKey annotationString = createTextAttributesKey("CEYLON_ANNOTATION_STRING", DefaultLanguageHighlighterColors.strings);
     shared TextAttributesKey annotation = createTextAttributesKey("CEYLON_ANNOTATION", DefaultLanguageHighlighterColors.metadata);
     shared TextAttributesKey todo = createTextAttributesKey("CEYLON_TODO", CodeInsightColors.todoDefaultAttributes);
     shared TextAttributesKey semi = createTextAttributesKey("CEYLON_SEMI", DefaultLanguageHighlighterColors.semicolon);

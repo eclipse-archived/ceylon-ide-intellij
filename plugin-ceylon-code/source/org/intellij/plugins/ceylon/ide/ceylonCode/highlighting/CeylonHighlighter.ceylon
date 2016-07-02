@@ -41,9 +41,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     TokenTypes
 }
 
-shared class CeylonHighlighter() extends SyntaxHighlighterBase() {
+shared object ceylonHighlighter extends SyntaxHighlighterBase() {
 
-    Map<IElementType,TextAttributesKey> keys = HashMap<IElementType,TextAttributesKey>();
+    value keys = HashMap<IElementType,TextAttributesKey>();
 
     TokenSet keywords = TokenSet.create(
         TokenTypes.\iASSEMBLY.tokenType,
@@ -94,27 +94,27 @@ shared class CeylonHighlighter() extends SyntaxHighlighterBase() {
         keys.put(kw, ceylonHighlightingColors.keyword);
     }
 
-    keys.put(TokenTypes.\iMULTI_COMMENT.tokenType, ceylonHighlightingColors.comment);
-    keys.put(TokenTypes.\iLINE_COMMENT.tokenType, ceylonHighlightingColors.comment);
-    keys.put(TokenTypes.\iNATURAL_LITERAL.tokenType, ceylonHighlightingColors.number);
-    keys.put(TokenTypes.\iFLOAT_LITERAL.tokenType, ceylonHighlightingColors.number);
-    keys.put(TokenTypes.\iCHAR_LITERAL.tokenType, ceylonHighlightingColors.char);
-    keys.put(CeylonTokens.\iSTRING_START, ceylonHighlightingColors.strings);
-    keys.put(CeylonTokens.\iSTRING_MID, ceylonHighlightingColors.strings);
-    keys.put(CeylonTokens.\iSTRING_END, ceylonHighlightingColors.strings);
-    keys.put(CeylonTokens.\iSTRING_LITERAL, ceylonHighlightingColors.strings);
-    keys.put(CeylonTokens.\iSTRING_INTERP, ceylonHighlightingColors.strings);
-    keys.put(CeylonTokens.\iVERBATIM_STRING, ceylonHighlightingColors.strings);
-    keys.put(TokenTypes.\iLPAREN.tokenType, ceylonHighlightingColors.brace);
-    keys.put(TokenTypes.\iRPAREN.tokenType, ceylonHighlightingColors.brace);
-    keys.put(TokenTypes.\iLBRACE.tokenType, ceylonHighlightingColors.brace);
-    keys.put(TokenTypes.\iRBRACE.tokenType, ceylonHighlightingColors.brace);
-    keys.put(TokenTypes.\iLBRACKET.tokenType, ceylonHighlightingColors.brace);
-    keys.put(TokenTypes.\iRBRACKET.tokenType, ceylonHighlightingColors.brace);
-    keys.put(TokenTypes.\iSEMICOLON.tokenType, ceylonHighlightingColors.semi);
-    keys.put(TokenTypes.\iUIDENTIFIER.tokenType, ceylonHighlightingColors.type);
-    keys.put(TokenTypes.\iLIDENTIFIER.tokenType, ceylonHighlightingColors.identifier);
-    keys.put(TokenType.\iBAD_CHARACTER, HighlighterColors.\iBAD_CHARACTER);
+    keys.put(TokenTypes.multiComment.tokenType, ceylonHighlightingColors.comment);
+    keys.put(TokenTypes.lineComment.tokenType, ceylonHighlightingColors.comment);
+    keys.put(TokenTypes.naturalLiteral.tokenType, ceylonHighlightingColors.number);
+    keys.put(TokenTypes.floatLiteral.tokenType, ceylonHighlightingColors.number);
+    keys.put(TokenTypes.charLiteral.tokenType, ceylonHighlightingColors.char);
+    keys.put(CeylonTokens.stringStart, ceylonHighlightingColors.strings);
+    keys.put(CeylonTokens.stringMid, ceylonHighlightingColors.strings);
+    keys.put(CeylonTokens.stringEnd, ceylonHighlightingColors.strings);
+    keys.put(CeylonTokens.stringLiteral, ceylonHighlightingColors.strings);
+    keys.put(CeylonTokens.stringInterp, ceylonHighlightingColors.strings);
+    keys.put(CeylonTokens.verbatimString, ceylonHighlightingColors.strings);
+    keys.put(TokenTypes.lparen.tokenType, ceylonHighlightingColors.brace);
+    keys.put(TokenTypes.rparen.tokenType, ceylonHighlightingColors.brace);
+    keys.put(TokenTypes.lbrace.tokenType, ceylonHighlightingColors.brace);
+    keys.put(TokenTypes.rbrace.tokenType, ceylonHighlightingColors.brace);
+    keys.put(TokenTypes.lbracket.tokenType, ceylonHighlightingColors.brace);
+    keys.put(TokenTypes.rbracket.tokenType, ceylonHighlightingColors.brace);
+    keys.put(TokenTypes.semicolon.tokenType, ceylonHighlightingColors.semi);
+    keys.put(TokenTypes.uidentifier.tokenType, ceylonHighlightingColors.type);
+    keys.put(TokenTypes.lidentifier.tokenType, ceylonHighlightingColors.identifier);
+    keys.put(TokenType.badCharacter, HighlighterColors.badCharacter);
 
     highlightingLexer => CeylonAntlrToIntellijLexerAdapter();
 
@@ -127,9 +127,9 @@ shared class CeylonFileHighlightFilter() satisfies Condition<VirtualFile> {
 }
 
 shared class CeylonHighlighterFactory() extends SyntaxHighlighterFactory() {
-    getSyntaxHighlighter(Project project, VirtualFile virtualFile) => CeylonHighlighter();
+    getSyntaxHighlighter(Project project, VirtualFile virtualFile) => ceylonHighlighter;
 }
 
 shared class CeylonColorSettingsPage() extends AbstractCeylonColorSettingsPage() {
-    highlighter => CeylonHighlighter();
+    highlighter => ceylonHighlighter;
 }

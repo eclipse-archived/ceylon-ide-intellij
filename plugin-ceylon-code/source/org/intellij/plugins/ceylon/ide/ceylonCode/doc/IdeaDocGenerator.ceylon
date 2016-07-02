@@ -57,7 +57,7 @@ import com.redhat.ceylon.model.typechecker.util {
 }
 
 import java.awt {
-    Font
+    Font { bold=BOLD, italic=ITALIC }
 }
 import java.lang {
     JStringBuilder=StringBuilder
@@ -122,10 +122,10 @@ shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
     shared actual String color(Object? what, Colors how) {
         value attributes = textAttributes(getAttributes(how));
         value color = "color:``hexColor(attributes.foregroundColor.red, attributes.foregroundColor.green, attributes.foregroundColor.blue)``";
-        value bold = if (attributes.fontType.and(Font.\iBOLD) != 0) then "font-weight: bold" else "";
-        value italic = if (attributes.fontType.and(Font.\iITALIC) != 0) then "font-size: italic" else "";
+        value fontBold = if (attributes.fontType.and(bold) != 0) then "font-weight: bold" else "";
+        value fontItalic = if (attributes.fontType.and(italic) != 0) then "font-size: italic" else "";
 
-        return "<code style='``color``; ``bold``; ``italic``'>``what else "<error>"``</code>";
+        return "<code style='``color``; ``fontBold``; ``fontItalic``'>``what else "<error>"``</code>";
     }
 
     Icon? getIconUrl(Icons|Referenceable thing) 

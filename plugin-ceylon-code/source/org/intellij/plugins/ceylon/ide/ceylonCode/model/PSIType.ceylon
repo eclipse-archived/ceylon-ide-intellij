@@ -60,29 +60,29 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
                else unknownClassMirror;
 
     TypeKind primitiveKind(PsiPrimitiveType psi) {
-        return if (psi == PsiType.\iBOOLEAN) then TypeKind.\iBOOLEAN
-        else if (psi == PsiType.\iBYTE) then TypeKind.\iBYTE
-        else if (psi == PsiType.\iCHAR) then TypeKind.\iCHAR
-        else if (psi == PsiType.\iSHORT) then TypeKind.\iSHORT
+        return if (psi == PsiType.boolean) then TypeKind.boolean
+        else if (psi == PsiType.byte) then TypeKind.byte
+        else if (psi == PsiType.char) then TypeKind.char
+        else if (psi == PsiType.short) then TypeKind.short
+        else if (psi == PsiType.double) then TypeKind.double
+        else if (psi == PsiType.int) then TypeKind.int
+        else if (psi == PsiType.float) then TypeKind.float
+        else if (psi == PsiType.long) then TypeKind.long
         else if (psi == PsiType.\iVOID) then TypeKind.\iVOID
-        else if (psi == PsiType.\iDOUBLE) then TypeKind.\iDOUBLE
-        else if (psi == PsiType.\iINT) then TypeKind.\iINT
-        else if (psi == PsiType.\iFLOAT) then TypeKind.\iFLOAT
-        else if (psi == PsiType.\iLONG) then TypeKind.\iLONG
-        else TypeKind.\iNULL;
+        else TypeKind.null;
     }
     
     shared actual TypeKind kind {
         value kind = 
-        if (is PsiArrayType psi) then TypeKind.\iARRAY
-        else if (is PsiTypeVariable psi) then TypeKind.\iTYPEVAR
+        if (is PsiArrayType psi) then TypeKind.array
+        else if (is PsiTypeVariable psi) then TypeKind.typevar
         else if (is PsiClassReferenceType psi,
                  is PsiTypeParameter tp = doWithLock(() => psi.resolve() of PsiClass?))
-            then TypeKind.\iTYPEVAR 
-        else if (is PsiWildcardType psi) then TypeKind.\iWILDCARD
+            then TypeKind.typevar
+        else if (is PsiWildcardType psi) then TypeKind.wildcard
         else if (is PsiClassReferenceType|PsiMethodReferenceType psi)
-            then TypeKind.\iDECLARED
-        else if (is PsiClassType psi) then TypeKind.\iDECLARED
+            then TypeKind.declared
+        else if (is PsiClassType psi) then TypeKind.declared
         else if (is PsiPrimitiveType psi) then primitiveKind(psi)
         else null;
         
