@@ -13,6 +13,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -242,12 +243,19 @@ public class NavigationPsiClass implements PsiSyntheticClass {
     @Nullable
     @Override
     public String getName() {
-        String suffix = decl instanceof CeylonPsi.AnyMethodPsi
-                || decl instanceof CeylonPsi.ObjectDefinitionPsi
-                || decl instanceof CeylonPsi.AnyAttributePsi
+        Tree.Identifier identifier
+                = decl.getCeylonNode().getIdentifier();
+        if (identifier==null) {
+            return null;
+        }
+
+        String suffix
+                = decl instanceof CeylonPsi.ObjectDefinitionPsi
+               || decl instanceof CeylonPsi.AnyMethodPsi
+               || decl instanceof CeylonPsi.AnyAttributePsi
                 ? "_"
                 : "";
-        return decl.getCeylonNode().getIdentifier().getText() + suffix;
+        return identifier.getText() + suffix;
     }
 
     @Override
