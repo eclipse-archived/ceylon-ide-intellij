@@ -158,10 +158,11 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                 = ModelUtil.getInterveningRefinements(
                     subtype.getName(),
                     ModelUtil.getSignature(subtype),
-                    supertype, //TODO: check that this is OK!
+                    supertype.getRefinedDeclaration(),
                     (TypeDeclaration) subtype.getContainer(),
                     (TypeDeclaration) supertype.getContainer());
-        return interveningRefinements.size()==1;
+        interveningRefinements.remove(supertype);
+        return interveningRefinements.isEmpty();
     }
 
     private class MethodHierarchyNodeDescriptor extends HierarchyNodeDescriptor {
@@ -221,47 +222,76 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             if (element instanceof CeylonCompositeElement) {
                 myHighlightedText = new CompositeAppearance();
                 CeylonCompositeElement psi = (CeylonCompositeElement) element;
-                String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false));
-                if (desc != null) {
-                    highlighter_.get_()
-                            .highlightCompositeAppearance(myHighlightedText,
-                                    "'" + desc + "'", project);
-                }
-                Unit unit = psi.getCeylonNode().getUnit();
-                if (unit != null) {
-                    String qualifiedNameString =
-                            unit.getPackage()
-                                    .getQualifiedNameString();
-                    if (qualifiedNameString==null || qualifiedNameString.isEmpty()) {
-                        qualifiedNameString = "default package";
-                    }
-                    myHighlightedText.getEnding()
-                            .addText(" (" + qualifiedNameString + ")",
-                                    getPackageNameAttributes());
-                }
+                appendDescription(psi);
+                Node node = psi.getCeylonNode();
+                appendNative(node);
+                appendLocation(node);
             }
             else if (element instanceof PsiMethod) {
                 myHighlightedText = new CompositeAppearance();
                 PsiMethod psi = (PsiMethod) element;
-                PsiClass psiClass = psi.getContainingClass();
-                highlighter_.get_()
-                        .highlightCompositeAppearance(myHighlightedText,
-                                "'" + psiClass.getName() + "." +
-                                psi.getPresentation().getPresentableText() + "'",
-                                project);
-                myHighlightedText.getEnding()
-                        .addText(" " + psiClass.getPresentation().getLocationString(),
-                                getPackageNameAttributes());
+                appendDescriptionAndLocation(psi);
             }
             else if (element instanceof NavigationItem) {
                 myHighlightedText = new CompositeAppearance();
                 NavigationItem psi = (NavigationItem) element;
+                appendPresentation(psi);
+            }
+        }
+
+        private void appendPresentation(NavigationItem psi) {
+            highlighter_.get_()
+                    .highlightCompositeAppearance(myHighlightedText,
+                            "'" + psi.getPresentation().getPresentableText() + "'",
+                            project);
+            myHighlightedText.getEnding()
+                    .addText(" " + psi.getPresentation().getLocationString(),
+                            getPackageNameAttributes());
+        }
+
+        private void appendDescriptionAndLocation(PsiMethod psi) {
+            PsiClass psiClass = psi.getContainingClass();
+            highlighter_.get_()
+                    .highlightCompositeAppearance(myHighlightedText,
+                            "'" + psiClass.getName() + "." +
+                            psi.getPresentation().getPresentableText() + "'",
+                            project);
+            myHighlightedText.getEnding()
+                    .addText(" " + psiClass.getPresentation().getLocationString(),
+                            getPackageNameAttributes());
+        }
+
+        private void appendDescription(CeylonCompositeElement psi) {
+            String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false));
+            if (desc != null) {
                 highlighter_.get_()
                         .highlightCompositeAppearance(myHighlightedText,
-                                "'" + psi.getPresentation().getPresentableText() + "'",
-                                project);
+                                "'" + desc + "'", project);
+            }
+        }
+
+        private void appendNative(Node node) {
+            if (node instanceof Tree.Declaration) {
+                Declaration dec = ((Tree.Declaration) node).getDeclarationModel();
+                if (dec != null && dec.isNative()) {
+                    myHighlightedText.getEnding()
+                            .addText(" " + dec.getNativeBackends(),
+                                    getPackageNameAttributes());
+                }
+            }
+        }
+
+        private void appendLocation(Node node) {
+            Unit unit = node.getUnit();
+            if (unit != null) {
+                String qualifiedNameString =
+                        unit.getPackage()
+                                .getQualifiedNameString();
+                if (qualifiedNameString==null || qualifiedNameString.isEmpty()) {
+                    qualifiedNameString = "default package";
+                }
                 myHighlightedText.getEnding()
-                        .addText(" " + psi.getPresentation().getLocationString(),
+                        .addText(" (" + qualifiedNameString + ")",
                                 getPackageNameAttributes());
             }
         }
@@ -343,6 +373,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                     if (declaration.isClassOrInterfaceMember() &&
                         declaration.isActual()) {
                         if (declaration.refines(model)
+                                && !declaration.equals(model)
                                 && directlyRefines(declaration, model)) {
                             PsiElement psiElement
                                     = CeylonReference.resolveDeclaration(declaration, project);

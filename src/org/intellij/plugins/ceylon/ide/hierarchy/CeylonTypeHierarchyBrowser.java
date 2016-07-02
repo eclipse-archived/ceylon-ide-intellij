@@ -284,39 +284,65 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             if (element instanceof CeylonCompositeElement) {
                 myHighlightedText = new CompositeAppearance();
                 CeylonCompositeElement psi = (CeylonCompositeElement) element;
-                String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false));
-                if (desc == null) {
-                    myHighlightedText.getEnding()
-                            .addText("object expression");
-                }
-                else {
-                    highlighter_.get_()
-                            .highlightCompositeAppearance(myHighlightedText,
-                                    "'" + desc + "'", project);
-                }
-                Unit unit = psi.getCeylonNode().getUnit();
-                if (unit != null) {
-                    String qualifiedNameString =
-                            unit.getPackage()
-                                    .getQualifiedNameString();
-                    if (qualifiedNameString==null || qualifiedNameString.isEmpty()) {
-                        qualifiedNameString = "default package";
-                    }
-                    myHighlightedText.getEnding()
-                            .addText(" (" + qualifiedNameString + ")",
-                                    getPackageNameAttributes());
-                }
+                Node node = psi.getCeylonNode();
+                appendDescription(psi);
+                appendNative(node);
+                appendPackage(node);
             }
             else if (element instanceof NavigationItem) {
                 myHighlightedText = new CompositeAppearance();
                 NavigationItem psi = (NavigationItem) element;
+                appendPresentation(psi);
+            }
+        }
+
+        private void appendPresentation(NavigationItem psi) {
+            highlighter_.get_()
+                    .highlightCompositeAppearance(myHighlightedText,
+                            "'" + psi.getPresentation().getPresentableText() + "'",
+                            project);
+            myHighlightedText.getEnding()
+                    .addText(" " + psi.getPresentation().getLocationString(),
+                            getPackageNameAttributes());
+        }
+
+        private void appendPackage(Node node) {
+            Unit unit = node.getUnit();
+            if (unit != null) {
+                String qualifiedNameString =
+                        unit.getPackage()
+                                .getQualifiedNameString();
+                if (qualifiedNameString==null
+                        || qualifiedNameString.isEmpty()) {
+                    qualifiedNameString = "default package";
+                }
+                myHighlightedText.getEnding()
+                        .addText(" (" + qualifiedNameString + ")",
+                                getPackageNameAttributes());
+            }
+        }
+
+        private void appendNative(Node node) {
+            if (node instanceof Tree.Declaration) {
+                Declaration dec = ((Tree.Declaration) node).getDeclarationModel();
+                if (dec != null && dec.isNative()) {
+                    myHighlightedText.getEnding()
+                            .addText(" " + dec.getNativeBackends(),
+                                    getPackageNameAttributes());
+                }
+            }
+        }
+
+        private void appendDescription(CeylonCompositeElement psi) {
+            String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false));
+            if (desc == null) {
+                myHighlightedText.getEnding()
+                        .addText("object expression");
+            }
+            else {
                 highlighter_.get_()
                         .highlightCompositeAppearance(myHighlightedText,
-                                "'" + psi.getPresentation().getPresentableText() + "'",
-                                project);
-                myHighlightedText.getEnding()
-                        .addText(" " + psi.getPresentation().getLocationString(),
-                                getPackageNameAttributes());
+                                "'" + desc + "'", project);
             }
         }
     }
