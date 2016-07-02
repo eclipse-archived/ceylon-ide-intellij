@@ -3,11 +3,13 @@ import com.intellij.psi {
     PsiModifier,
     PsiType,
     PsiAnnotationMethod,
-    PsiParameter,
     PsiClass
 }
 import com.intellij.psi.search.searches {
     SuperMethodsSearch
+}
+import com.intellij.psi.util {
+    MethodSignatureUtil
 }
 import com.redhat.ceylon.model.loader {
     AbstractModelLoader
@@ -15,79 +17,49 @@ import com.redhat.ceylon.model.loader {
 import com.redhat.ceylon.model.loader.mirror {
     MethodMirror,
     TypeParameterMirror,
-    VariableMirror,
-    TypeMirror
+    VariableMirror
 }
 
 import java.util {
-    List,
-    ArrayList
-}
-import com.intellij.psi.util {
-    MethodSignatureUtil
+    Arrays
 }
 
 shared class PSIMethod(shared PsiMethod psi)
         extends PSIAnnotatedMirror(psi)
         satisfies MethodMirror {
     
-    Return doWithContainingClass<Return>(Return(PsiClass) func, Return default) {
-        return doWithLock(() {
-            if (exists cc = psi.containingClass) {
-                return func(cc);
-            } else {
-                return default;
-            }
-        });
-    }
+    Return doWithContainingClass<Return>(Return(PsiClass) func, Return default)
+            => doWithLock(() => if (exists cc = psi.containingClass) then func(cc) else default);
 
-    Boolean classIs(String cls) =>
-            doWithContainingClass(
-                (cc) => (cc.qualifiedName else "") == cls, false
-            );
-    
+    Boolean classIs(String cls)
+            => doWithContainingClass((cc) => (cc.qualifiedName else "") == cls, false);
+
+    Boolean computedIsOverriding
+            =>  (classIs("ceylon.language.Identifiable") && psi.name in ["equals", "hashCode"])
+            || !(classIs("ceylon.language.Object") && psi.name in ["equals", "hashCode", "toString"])
+                && SuperMethodsSearch.search(psi, null, true, false).findFirst() exists;
+
     variable Boolean? lazyIsOverriding = null;
-    
-    Boolean computedIsOverriding {
-        if (classIs("ceylon.language.Identifiable"),
-            psi.name in ["equals", "hashCode"]) {
-            
-            return true;
-        } else if (classIs("ceylon.language.Object"),
-            psi.name in ["equals", "hashCode", "toString"]) {
-            
-            return false;
-        } else {
-            return SuperMethodsSearch.search(psi, null, true, false)
-                    .findFirst() exists;
-        }
-    }
-
     shared Boolean isOverriding => lazyIsOverriding else (lazyIsOverriding = computedIsOverriding);
 
-    Boolean computedIsOverloading {
-        if (classIs("ceylon.language.Exception")) {
-            return false;
-        } else {
-            return doWithContainingClass((cc) {
-                    return cc.findMethodsByName(psi.name, true).iterable.coalesced.filter(
-                        (m) => (m == psi) || ( 
-                               !m.modifierList.hasModifierProperty("static")
-                            && !m.modifierList.hasModifierProperty("private")
-                            && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
-                            && !MethodSignatureUtil.areOverrideEquivalent(psi, m)
-                        )).size > 1;
-            }, false);
-        }
-    }
+    Boolean computedIsOverloading
+            => !classIs("ceylon.language.Exception")
+            && doWithContainingClass((cc)
+                => count { for (m in cc.findMethodsByName(psi.name, true))
+                        m == psi ||
+                           !m.modifierList.hasModifierProperty("static")
+                        && !m.modifierList.hasModifierProperty("private")
+                        && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
+                        && !MethodSignatureUtil.areOverrideEquivalent(psi, m)
+                     } > 1,
+                false);
     
     variable Boolean? lazyIsOverloading = null;
-    
     shared Boolean isOverloading => lazyIsOverloading else (lazyIsOverloading = computedIsOverloading);
     
     abstract =>
         psi.hasModifierProperty(PsiModifier.abstract)
-        || doWithContainingClass((cc) => cc.\iinterface, false);
+        || doWithContainingClass(PsiClass.\iinterface, false);
     
     constructor => psi.constructor;
     
@@ -99,34 +71,30 @@ shared class PSIMethod(shared PsiMethod psi)
     
     defaultAccess => !(public || protected || psi.hasModifierProperty(PsiModifier.private));
     
-    enclosingClass => doWithContainingClass((cc) => PSIClass(cc), null);
+    enclosingClass => doWithContainingClass(PSIClass, null);
     
     final => psi.hasModifierProperty(PsiModifier.final);
     
-    parameters => doWithLock(() =>
-        mirror<VariableMirror,PsiParameter>(psi.parameterList.parameters, PSIVariable)
-    );
+    parameters
+            => doWithLock(()
+                => Arrays.asList<VariableMirror>(
+                    for (p in psi.parameterList.parameters)
+                        PSIVariable(p)));
     
     protected => psi.hasModifierProperty(PsiModifier.protected);
     
     public => psi.hasModifierProperty(PsiModifier.public);
     
-    shared actual TypeMirror? returnType
-            => doWithLock(() => if (exists t = psi.returnType) then PSIType(t) else null);
+    returnType => doWithLock(() => if (exists t = psi.returnType) then PSIType(t) else null);
     
     static => psi.hasModifierProperty(PsiModifier.static);
     
     staticInit => false;
     
-    shared actual List<TypeParameterMirror> typeParameters {
-        value result = ArrayList<TypeParameterMirror>();
-         
-        psi.typeParameters.array.coalesced.each(
-            (tp) => result.add(PSITypeParameter(tp))
-        );
-        
-        return result;
-    }
+    typeParameters
+            => Arrays.asList<TypeParameterMirror>(
+                for (tp in psi.typeParameters)
+                    PSITypeParameter(tp));
     
     variadic => psi.varArgs;
 

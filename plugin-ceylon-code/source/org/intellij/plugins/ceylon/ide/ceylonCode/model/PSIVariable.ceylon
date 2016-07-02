@@ -2,15 +2,14 @@ import com.intellij.psi {
     PsiParameter
 }
 import com.redhat.ceylon.model.loader.mirror {
-    VariableMirror,
-    TypeMirror
+    VariableMirror
 }
 
 class PSIVariable(PsiParameter psi) 
         extends PSIAnnotatedMirror(psi)
         satisfies VariableMirror {
     
-    shared actual TypeMirror type => PSIType(doWithLock(() => psi.type));
+    type => PSIType(doWithLock(() => psi.type));
     
     string => "PSIVariable[``name``]";
 }

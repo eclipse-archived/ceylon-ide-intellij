@@ -19,41 +19,42 @@ import com.intellij.psi.impl.source {
 import com.redhat.ceylon.ide.common.model {
     unknownClassMirror
 }
-import com.redhat.ceylon.model.loader.mirror {
-    TypeMirror,
-    TypeParameterMirror,
-    ClassMirror,
-    TypeKind
-}
-
-import java.lang {
-    ObjectArray
-}
-import java.util {
-    List,
-    Collections,
-    IdentityHashMap,
-    Map
-}
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
+import com.redhat.ceylon.model.loader.mirror {
+    TypeMirror,
+    TypeParameterMirror,
+    TypeKind
+}
 
-shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
-        = IdentityHashMap<PsiType,PSIType?>(), PSIType? enclosing = null)
+import java.util {
+    IdentityHashMap,
+    Map,
+    Arrays
+}
+
+shared class PSIType(psi,
+    originatingTypes = IdentityHashMap<PsiType,PSIType?>(),
+    enclosing = null)
         satisfies TypeMirror {
+
+    shared PsiType psi;
+
+    PSIType? enclosing;
+    Map<PsiType,PSIType?> originatingTypes;
 
     variable String? cachedQualifiedName = null;
     
-   originatingTypes.put(psi, null);
+    originatingTypes.put(psi, null);
    
-   shared actual TypeMirror? componentType
+    componentType
             => if (is PsiArrayType psi)
                then PSIType(psi.componentType)
                else null;
     
-    shared actual ClassMirror? declaredClass
+    declaredClass
             => if (is PsiClassType psi,
                    exists cls = doWithLock(() => psi.resolve() else null))
                then PSIClass(cls)
@@ -68,41 +69,44 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
         else if (psi == PsiType.int) then TypeKind.int
         else if (psi == PsiType.float) then TypeKind.float
         else if (psi == PsiType.long) then TypeKind.long
-        else if (psi == PsiType.\iVOID) then TypeKind.\iVOID
+        else if (psi == PsiType.\ivoid) then TypeKind.\ivoid
         else TypeKind.null;
     }
     
     shared actual TypeKind kind {
-        value kind = 
-        if (is PsiArrayType psi) then TypeKind.array
-        else if (is PsiTypeVariable psi) then TypeKind.typevar
-        else if (is PsiClassReferenceType psi,
-                 is PsiTypeParameter tp = doWithLock(() => psi.resolve() of PsiClass?))
-            then TypeKind.typevar
-        else if (is PsiWildcardType psi) then TypeKind.wildcard
-        else if (is PsiClassReferenceType|PsiMethodReferenceType psi)
-            then TypeKind.declared
-        else if (is PsiClassType psi) then TypeKind.declared
-        else if (is PsiPrimitiveType psi) then primitiveKind(psi)
-        else null;
+        value kind
+                = switch (psi)
+                case (is PsiArrayType) TypeKind.array
+                case (is PsiTypeVariable) TypeKind.typevar
+                case (is PsiClassType)
+                    if (is PsiClassReferenceType psi,
+                        doWithLock(() => psi.resolve() is PsiTypeParameter))
+                    then TypeKind.typevar
+                    else TypeKind.declared
+                case (is PsiWildcardType) TypeKind.wildcard
+                case (is PsiMethodReferenceType) TypeKind.declared
+                case (is PsiPrimitiveType) primitiveKind(psi)
+                else null;
         
         if (exists kind) {
             return kind;
         }
-        throw Exception("Unknown PsiType " + className(psi));
+        else {
+            throw Exception("Unknown PsiType " +className(psi));
+        }
     }
 
-    shared actual TypeMirror? lowerBound = 
+    lowerBound =
             if (is PsiWildcardType psi,
                 psi.\isuper,
                 exists lower = psi.bound)
             then PSIType(lower)
             else null;
     
-    shared actual Boolean primitive => psi is PsiPrimitiveType;
+    primitive => psi is PsiPrimitiveType;
     
     PsiClass? findClass(String name) {
-        assert(is PsiClassReferenceType psi);
+        assert (is PsiClassReferenceType psi);
         value scope = psi.resolveScope;
         
         return doWithLock(() =>
@@ -166,21 +170,17 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
         return canonicalText;
     }
 
-    shared actual String qualifiedName
-            => cachedQualifiedName else (cachedQualifiedName = doWithLock(() => computedQualifiedName));
+    qualifiedName => cachedQualifiedName else (cachedQualifiedName = doWithLock(() => computedQualifiedName));
     
     // TODO
-    shared actual TypeMirror? qualifyingType => null; //enclosing;
+    qualifyingType => null; //enclosing;
     
-    shared actual Boolean raw =
-            if (is PsiClassType psi)
-            then doWithLock(() => psi.raw) else false;
+    raw = if (is PsiClassType psi) then doWithLock(() => psi.raw) else false;
     
-    ObjectArray<PsiType>? getTypeArguments(PsiType type) {
-        return switch(type)
-        case (is PsiClassType) doWithLock(() => type.parameters)
-        else null;
-    }
+    function getTypeArguments(PsiType type)
+            => if (is PsiClassType type)
+                then doWithLock(() => type.parameters)
+                else null;
 
     shared actual TypeParameterMirror? typeParameter {
         if (is PsiTypeParameter|PsiClassReferenceType psi) {
@@ -192,19 +192,17 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
         }
     }
     
-    shared actual TypeMirror? upperBound =
-            if (is PsiWildcardType psi,
-                psi.\iextends,
+    upperBound =
+            if (is PsiWildcardType psi, psi.\iextends,
                 exists upper = psi.bound)
             then PSIType(upper)
             else null;
 
-    shared actual List<TypeMirror> typeArguments
-            => if (exists types = getTypeArguments(psi))
-               then mirror<TypeMirror,PsiType>(types,
-                    (t) => PSIType(t, originatingTypes, this)
-               )
-               else Collections.emptyList<TypeMirror>();
+    typeArguments
+            => Arrays.asList<TypeMirror>(
+                if (exists types = getTypeArguments(psi))
+                for (t in types)
+                    PSIType(t, originatingTypes, this));
 
     string => "PSIType[``qualifiedName``]";
     

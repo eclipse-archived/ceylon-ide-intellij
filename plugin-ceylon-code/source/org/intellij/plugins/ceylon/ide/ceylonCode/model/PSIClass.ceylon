@@ -11,8 +11,6 @@ import com.intellij.psi {
     PsiAnonymousClass,
     PsiMethod,
     PsiTypeParameter,
-    PsiField,
-    PsiClassType,
     PsiManager,
     PsiNameIdentifierOwner
 }
@@ -21,6 +19,10 @@ import com.intellij.psi.impl.compiled {
 }
 import com.intellij.psi.impl.light {
     LightMethodBuilder
+}
+import com.intellij.psi.impl.source {
+    PsiExtensibleClass,
+    ClassInnerStuffCache
 }
 import com.intellij.psi.util {
     PsiUtil,
@@ -47,16 +49,9 @@ import com.redhat.ceylon.model.typechecker.model {
     Module
 }
 
-import java.lang {
-    ObjectArray
-}
 import java.util {
-    List,
-    ArrayList
-}
-import com.intellij.psi.impl.source {
-    PsiExtensibleClass,
-    ClassInnerStuffCache
+    ArrayList,
+    Arrays
 }
 
 // TODO investigate why psi.containingFile is sometimes null
@@ -67,15 +62,14 @@ shared class PSIClass(shared PsiClass psi)
     variable String? cacheKey = null;
     
     Boolean hasAnnotation(Annotations annotation)
-        => doWithLock(() =>
-            if (exists mods = psi.modifierList,
-                mods.annotations.array.coalesced.any(
-                    (ann) => if (exists name = ann.qualifiedName,
-                                 name == annotation.klazz.canonicalName)
-                             then true else false
-               ))
-            then true else false
-           );
+        => let (cn = annotation.klazz.canonicalName)
+            doWithLock(() =>
+            any {
+                if (exists mods = psi.modifierList)
+                for (ann in mods.annotations)
+                if (exists name = ann.qualifiedName)
+                    name == cn
+            });
 
     abstract => PsiUtil.isAbstractClass(psi);
     
@@ -89,32 +83,39 @@ shared class PSIClass(shared PsiClass psi)
     
     ceylonToplevelObject => !innerClass && hasAnnotation(Annotations.\iobject);
     
-    defaultAccess => let (private = psi.hasModifierProperty(PsiModifier.private))
-                     !(public || protected || private);
+    defaultAccess
+            => let (private = psi.hasModifierProperty(PsiModifier.private))
+                 !(public || protected || private);
+
+    typeParameters
+            => doWithLock(()
+                => Arrays.asList<TypeParameterMirror>(
+                    for (tp in psi.typeParameters)
+                        PSITypeParameter(tp)));
+
+    directFields
+            => doWithLock(()
+                => Arrays.asList<FieldMirror>(
+                    for (f in psi.fields)
+                    if (!f.hasModifierProperty(PsiModifier.private)) // TODO !f.synthetic?
+                        PSIField(f)));
     
-    directFields => doWithLock(() =>
-        mirror<FieldMirror,PsiField>(
-            psi.fields.iterable.coalesced.filter(
-                (f) => !f.hasModifierProperty(PsiModifier.private) // TODO !f.synthetic?
-            ),
-            PSIField
-        )
-    );
-    
-    directInnerClasses => doWithLock(() =>
-        mirror<ClassMirror,PsiClass>(psi.innerClasses, PSIClass)
-    );
+    directInnerClasses
+            => doWithLock(()
+                => Arrays.asList<ClassMirror>(
+                    for (ic in psi.innerClasses)
+                        PSIClass(ic)));
     
     directMethods => doWithLock(() {
             value result = ArrayList<MethodMirror>();
             variable value hasCtor = false;
 
-            psi.methods.array.coalesced.each((m) {
+            for (m in psi.methods) {
                 if (m.constructor) {
                     hasCtor = true;
                 }
                 result.add(PSIMethod(m));
-            });
+            }
 
             if (psi.enum,
                 is PsiExtensibleClass psi) {
@@ -129,22 +130,25 @@ shared class PSIClass(shared PsiClass psi)
 
             // unfortunately, IntelliJ does not include implicit default constructors in `psi.methods`
             if (!hasCtor) {
-                value builder = LightMethodBuilder(PsiManager.getInstance(psi.project),
-                    JavaLanguage.instance,
-                    (psi of PsiNameIdentifierOwner).name
-                ).addModifier("public").setConstructor(true);
+                value builder
+                        = LightMethodBuilder(
+                            PsiManager.getInstance(psi.project),
+                            JavaLanguage.instance,
+                            (psi of PsiNameIdentifierOwner).name)
+                        .addModifier("public")
+                        .setConstructor(true);
                 result.add(PSIMethod(builder));
             }
             return result;
         });
     
-    shared actual ClassMirror? enclosingClass =>
-            if (exists outerClass = getContextOfType(psi, javaClass<PsiClass>()))
+    enclosingClass
+            => if (exists outerClass = getContextOfType(psi, javaClass<PsiClass>()))
             then PSIClass(outerClass)
             else null;
     
-    shared actual MethodMirror? enclosingMethod =>
-            if (exists outerMeth = getContextOfType(psi, javaClass<PsiMethod>()))
+    enclosingMethod
+            => if (exists outerMeth = getContextOfType(psi, javaClass<PsiMethod>()))
             then PSIMethod(outerMeth)
             else null;
     
@@ -161,13 +165,15 @@ shared class PSIClass(shared PsiClass psi)
 
     \iinterface => psi.\iinterface;
     
-    interfaces => doWithLock(() =>
-        if (psi.\iinterface)
-        then mirror<TypeMirror,PsiClassType>(psi.extendsListTypes, PSIType)
-        else mirror<TypeMirror,PsiClassType>(psi.implementsListTypes, PSIType)
-    );
+    interfaces => doWithLock(()
+            => let (supertypes = psi.\iinterface
+                    then psi.extendsListTypes
+                    else psi.implementsListTypes)
+                Arrays.asList<TypeMirror>(
+                    for (t in supertypes)
+                        PSIType(t)));
     
-    javaSource => concurrencyManager.needReadAccess(()=> psi.containingFile else null)?.name?.endsWith(".java") else false;
+    javaSource => concurrencyManager.needReadAccess(() => psi.containingFile else null)?.name?.endsWith(".java") else false;
     
     loadedFromSource => javaSource;
     
@@ -190,18 +196,10 @@ shared class PSIClass(shared PsiClass psi)
         if (psi.\iinterface || qualifiedName == "java.lang.Object") {
             return null;
         }
-        
-        return doWithLock(() {
-            value superTypes = psi.superTypes.array.coalesced;
-            
+        return doWithLock(()
             // TODO check that the first element is always the superclass
-            return if (exists st = superTypes.first) then PSIType(st) else null; 
-        });
+            => if (exists st = psi.superTypes[0]) then PSIType(st) else null);
     }
-    
-    typeParameters => doWithLock(() =>
-        mirror<TypeParameterMirror,PsiTypeParameter>(psi.typeParameters, PSITypeParameter)
-    );
     
     fileName => psi.containingFile?.name else "<unknown>";
     
@@ -216,15 +214,4 @@ shared class PSIClass(shared PsiClass psi)
     
     isCeylon => hasAnnotation(Annotations.ceylon);
     
-}
-
-List<Out> mirror<Out,In>(ObjectArray<In>|{In*} array, Out transform(In val)) given In satisfies Object {
-    value it = if (is ObjectArray<In> array) then array.iterable.coalesced else array;
-    value result = ArrayList<Out>(it.size);
-    
-    it.coalesced.each(
-        (v) => result.add(transform(v))
-    );
-    
-    return result;
 }

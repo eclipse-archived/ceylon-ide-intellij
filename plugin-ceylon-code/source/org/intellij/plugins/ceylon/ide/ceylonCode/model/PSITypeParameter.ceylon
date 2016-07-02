@@ -1,11 +1,3 @@
-import com.redhat.ceylon.model.loader.mirror {
-    TypeParameterMirror,
-    TypeMirror
-}
-import java.util {
-    List,
-    ArrayList
-}
 import com.intellij.psi {
     PsiTypeParameter,
     PsiNamedElement
@@ -13,16 +5,24 @@ import com.intellij.psi {
 import com.intellij.psi.impl.source {
     PsiClassReferenceType
 }
+import com.redhat.ceylon.model.loader.mirror {
+    TypeParameterMirror,
+    TypeMirror
+}
+
+import java.util {
+    ArrayList
+}
 
 class PSITypeParameter(PsiTypeParameter|PsiClassReferenceType psi) satisfies TypeParameterMirror {
     
-    shared actual List<TypeMirror> bounds = ArrayList<TypeMirror>();
+    bounds = ArrayList<TypeMirror>();
 
     if (is PsiTypeParameter psi) {
         doWithLock(() {
-                psi.extendsList.referencedTypes.array.coalesced.each(
-                    (bound) => bounds.add(PSIType(bound))
-                );
+            for (bound in psi.extendsList.referencedTypes) {
+                bounds.add(PSIType(bound));
+            }
         });
     }
 
