@@ -60,7 +60,7 @@ shared void showChooser<out T>
     for (expr in expressions) {
         model.addElement(SmartPointerManager.getInstance(expr.project).createSmartPsiElementPointer(expr));
     }
-    JBList myList = JBList(model);
+    value myList = JBList(model);
 
     myList.selectionModel.selectionMode = ListSelectionModel.singleSelection;
     if (exists selection) {
@@ -69,10 +69,10 @@ shared void showChooser<out T>
 
     myList.setCellRenderer(object extends DefaultListCellRenderer() {
         shared actual Component getListCellRendererComponent(JList<out Object> list,
-                Object \ivalue, Integer index, Boolean isSelected, Boolean cellHasFocus) {
+                Object pointer, Integer index, Boolean isSelected, Boolean cellHasFocus) {
             Component rendererComponent =
-                super.getListCellRendererComponent(list, \ivalue, index, isSelected, cellHasFocus);
-            assert (is SmartPsiElementPointer<out Anything> pointer = \ivalue);
+                super.getListCellRendererComponent(list, pointer, index, isSelected, cellHasFocus);
+            assert (is SmartPsiElementPointer<out Anything> pointer);
             if (is T expr = pointer.element) {
                 value text = renderer(expr).normalized;
                 value rawText = text.longerThan(100) then text.spanTo(100) + "..." else text;
