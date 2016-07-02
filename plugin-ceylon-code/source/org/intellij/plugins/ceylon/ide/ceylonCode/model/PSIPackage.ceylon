@@ -2,22 +2,22 @@ import com.intellij.psi {
     PsiClass,
     PsiJavaFile
 }
-import com.redhat.ceylon.model.loader.mirror {
-    PackageMirror
-}
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
+}
+import com.redhat.ceylon.model.loader.mirror {
+    PackageMirror
 }
 
 class PSIPackage(PsiClass psi) 
     satisfies PackageMirror {
     
-    variable String? _name = null;
+    variable String? name = null;
     
     shared actual String qualifiedName { 
-        if (!_name exists) {
-            _name = doWithLock(() {
+        if (!name exists) {
+            name = doWithLock(() {
                 if (is PsiJavaFile f = psi.containingFile) {
                     return f.packageName;
                 }
@@ -27,6 +27,6 @@ class PSIPackage(PsiClass psi)
             });
         }
         
-        return _name else "";
+        return name else "";
     }
 }
