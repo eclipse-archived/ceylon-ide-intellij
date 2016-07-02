@@ -94,9 +94,7 @@ shared object concurrencyManager {
     shared Return needReadAccess<Return>(Return() func, Integer timeout = deadLockDetectionTimeout) {
         if (application.readAccessAllowed) {
             value ref = Ref<Return>();
-            ProgressManager.instance.executeNonCancelableSection(JavaRunnable(void () {
-                ref.set(func());
-            }));
+            ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() => ref.set(func())));
             return ref.get();
         } else {
             "This method is copied on 
@@ -147,9 +145,7 @@ shared object concurrencyManager {
             value ref = Ref<Return>();
             
             value allowedWaitingTime = System.currentTimeMillis() + timeout;
-            while(!runInReadActionWithWriteActionPriority(JavaRunnable {
-                run() => ref.set(func());
-            })) {
+            while(!runInReadActionWithWriteActionPriority(JavaRunnable(() => ref.set(func())))) {
                 try {
                     if (System.currentTimeMillis() > allowedWaitingTime) {
                         if (timeout == deadLockDetectionTimeout) {
@@ -222,9 +218,7 @@ shared object concurrencyManager {
         value ds = dumbService(p);
         
         value ref = Ref<Return>();
-        value runnable = JavaRunnable {
-            run() => ref.set(func());
-        };
+        value runnable = JavaRunnable(() => ref.set(func()));
         
         switch(indexStragey = noIndexStrategy_.get())
         case(NoIndexStrategy.useAlternateResolution) {

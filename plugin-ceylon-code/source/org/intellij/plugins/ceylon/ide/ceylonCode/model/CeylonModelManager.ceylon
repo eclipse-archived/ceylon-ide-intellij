@@ -214,7 +214,7 @@ shared class CeylonModelManager(model)
             (automaticModelUpdateEnabled_ || force)) {
             buildTriggeringAlarm.cancelAllRequests();
             buildTriggeringAlarm.addRequest(JavaRunnable {
-                void run () {
+                void run() {
                     cancelledBecauseOfSyntaxErrors = false;
                     buildTriggeringAlarm.cancelAllRequests();
                     
@@ -298,12 +298,8 @@ shared class CeylonModelManager(model)
                                     }
                                 }
                             }
-                            shared actual void onSuccess() {
-                                bakgroundBuildLatch.countDown();
-                            }
-                            shared actual void onCancel() {
-                                bakgroundBuildLatch.countDown();
-                            }
+                            onSuccess() => bakgroundBuildLatch.countDown();
+                            onCancel() => bakgroundBuildLatch.countDown();
                         });
                     }, ModalityState.any());
                     if (! bakgroundBuildLatch.await(5, TimeUnit.minutes)) {
