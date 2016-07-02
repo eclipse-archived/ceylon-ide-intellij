@@ -245,7 +245,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                             "'" + psi.getPresentation().getPresentableText() + "'",
                             project);
             myHighlightedText.getEnding()
-                    .addText(" " + psi.getPresentation().getLocationString(),
+                    .addText("  " + psi.getPresentation().getLocationString(),
                             getPackageNameAttributes());
         }
 
@@ -257,12 +257,12 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                             psi.getPresentation().getPresentableText() + "'",
                             project);
             myHighlightedText.getEnding()
-                    .addText(" " + psiClass.getPresentation().getLocationString(),
+                    .addText("  " + psiClass.getPresentation().getLocationString(),
                             getPackageNameAttributes());
         }
 
         private void appendDescription(CeylonCompositeElement psi) {
-            String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false));
+            String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false, true, false, true));
             if (desc != null) {
                 highlighter_.get_()
                         .highlightCompositeAppearance(myHighlightedText,
@@ -275,7 +275,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                 Declaration dec = ((Tree.Declaration) node).getDeclarationModel();
                 if (dec != null && dec.isNative()) {
                     myHighlightedText.getEnding()
-                            .addText(" " + dec.getNativeBackends(),
+                            .addText("  " + dec.getNativeBackends(),
                                     getPackageNameAttributes());
                 }
             }
@@ -291,7 +291,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                     qualifiedNameString = "default package";
                 }
                 myHighlightedText.getEnding()
-                        .addText(" (" + qualifiedNameString + ")",
+                        .addText("  (" + qualifiedNameString + ")",
                                 getPackageNameAttributes());
             }
         }

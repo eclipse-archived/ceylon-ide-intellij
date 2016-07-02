@@ -302,7 +302,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                             "'" + psi.getPresentation().getPresentableText() + "'",
                             project);
             myHighlightedText.getEnding()
-                    .addText(" " + psi.getPresentation().getLocationString(),
+                    .addText("  " + psi.getPresentation().getLocationString(),
                             getPackageNameAttributes());
         }
 
@@ -317,7 +317,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                     qualifiedNameString = "default package";
                 }
                 myHighlightedText.getEnding()
-                        .addText(" (" + qualifiedNameString + ")",
+                        .addText("  (" + qualifiedNameString + ")",
                                 getPackageNameAttributes());
             }
         }
@@ -327,14 +327,14 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                 Declaration dec = ((Tree.Declaration) node).getDeclarationModel();
                 if (dec != null && dec.isNative()) {
                     myHighlightedText.getEnding()
-                            .addText(" " + dec.getNativeBackends(),
+                            .addText("  " + dec.getNativeBackends(),
                                     getPackageNameAttributes());
                 }
             }
         }
 
         private void appendDescription(CeylonCompositeElement psi) {
-            String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false));
+            String desc = toJavaString(descriptions_.get_().descriptionForPsi(psi, false, true, false, false));
             if (desc == null) {
                 myHighlightedText.getEnding()
                         .addText("object expression");

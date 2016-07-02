@@ -104,6 +104,7 @@ shared object descriptions {
             Boolean includeKeyword = true,
             Boolean includeContainer = true,
             Boolean includeReturnType = true,
+            Boolean includeParameters = true,
             Unit unit = decl.unit) {
         value result = StringBuilder();
         if (includeKeyword) {
@@ -112,8 +113,10 @@ shared object descriptions {
         if (includeContainer) {
             result.append(container(decl));
         }
-        result.append(decl.name else "new")
-                .append(parameterLists(decl, unit));
+        result.append(decl.name else "new");
+        if (includeParameters) {
+            result.append(parameterLists(decl, unit));
+        }
         if (includeReturnType,
             is TypedDeclaration decl,
             !ModelUtil.isConstructor(decl)) {
@@ -132,7 +135,9 @@ shared object descriptions {
         return result.string;
     }
     
-    shared String descriptionForNode(Tree.Declaration|Tree.TypedArgument node, Boolean includeKeyword = true) {
+    shared String descriptionForNode(Tree.Declaration|Tree.TypedArgument node,
+            Boolean includeKeyword = true,
+            Boolean includeParameters = true) {
         value result = StringBuilder();
         if (includeKeyword) {
             result.append(nodeKeyword(node)).append(" ");
@@ -142,35 +147,39 @@ shared object descriptions {
                 case (is Tree.Declaration) node.identifier
                 case (is Tree.TypedArgument) node.identifier;
         result.append(id?.text else "new");
-        switch (node)
-        case (is Tree.AnyClass) {
-            if (exists pl = node.parameterList) {
-                appendTreeParameters(result, pl);
+
+        if (includeParameters) {
+            switch (node)
+            case (is Tree.AnyClass) {
+                if (exists pl = node.parameterList) {
+                    appendTreeParameters(result, pl);
+                }
             }
-        }
-        case (is Tree.AnyMethod) {
-            for (pl in node.parameterLists) {
-                appendTreeParameters(result, pl);
+            case (is Tree.AnyMethod) {
+                for (pl in node.parameterLists) {
+                    appendTreeParameters(result, pl);
+                }
             }
-        }
-        case (is Tree.MethodArgument) {
-            for (pl in node.parameterLists) {
-                appendTreeParameters(result, pl);
+            case (is Tree.MethodArgument) {
+                for (pl in node.parameterLists) {
+                    appendTreeParameters(result, pl);
+                }
             }
-        }
-        case (is Tree.Constructor) {
-            if (exists pl = node.parameterList) {
-                appendTreeParameters(result, pl);
+            case (is Tree.Constructor) {
+                if (exists pl = node.parameterList) {
+                    appendTreeParameters(result, pl);
+                }
             }
+            else {}
         }
-        else {}
         return result.string;
     }
 
     shared String? descriptionForPsi(CeylonCompositeElement element,
         Boolean includeKeyword = true,
         Boolean includeContainer = true,
-        Boolean includeReturnType = true) {
+        Boolean includeReturnType = true,
+        Boolean includeParameters = true) {
         value node = element.ceylonNode;
         value decl =
             switch (node)
@@ -185,11 +194,16 @@ shared object descriptions {
                 includeKeyword = includeKeyword;
                 includeContainer = includeContainer;
                 includeReturnType = includeReturnType;
+                includeParameters = includeParameters;
                 unit = node.unit else decl.unit;
             };
         }
         else if (is Tree.Declaration|Tree.TypedArgument node) {
-            return descriptionForNode(node, includeKeyword);
+            return descriptionForNode {
+                node = node;
+                includeKeyword = includeKeyword;
+                includeParameters = includeParameters;
+            };
         }
         else {
             return null;
