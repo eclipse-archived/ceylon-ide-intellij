@@ -17,6 +17,9 @@ import com.intellij.openapi.fileTypes {
 import com.intellij.openapi.project {
     Project
 }
+import com.intellij.openapi.roots.ui.util {
+    CompositeAppearance
+}
 import com.intellij.ui {
     ColorUtil,
     JBColor,
@@ -27,16 +30,16 @@ import com.redhat.ceylon.ide.common.doc {
 }
 
 import java.awt {
-    Font { bold=BOLD, italic=ITALIC }
+    Font {
+        bold=BOLD,
+        italic=ITALIC
+    }
 }
 import java.lang {
     StringBuffer
 }
 import java.util {
     StringTokenizer
-}
-import com.intellij.openapi.roots.ui.util {
-    CompositeAppearance
 }
 
 shared object highlighter {
@@ -191,7 +194,7 @@ shared object highlighter {
     shared String toColoredHtml(String token, TextAttributes attr) {
         String? color =
             if (exists fg = attr.foregroundColor, fg!=JBColor.black)
-            then "<font color='#" + ColorUtil.toHex(attr.foregroundColor) + "'>"
+            then "<font color='#``ColorUtil.toHex(attr.foregroundColor)``'>"
             else null;
 
         Boolean isBold = attr.fontType.and(bold) != 0;
@@ -211,7 +214,7 @@ shared object highlighter {
 
         builder.append(convertToHTML(token));
 
-        value endsWithNewLine = if ((builder.last else ' ') == '\n') then true else false;
+        value endsWithNewLine = (builder.last else ' ') == '\n';
         if (endsWithNewLine) {
             builder.deleteTerminal(1);
         }

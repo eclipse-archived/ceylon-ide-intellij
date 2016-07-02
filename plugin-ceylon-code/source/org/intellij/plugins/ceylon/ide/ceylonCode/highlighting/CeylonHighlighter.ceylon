@@ -26,7 +26,6 @@ import com.intellij.psi.tree {
 }
 
 import java.util {
-    Map,
     HashMap
 }
 

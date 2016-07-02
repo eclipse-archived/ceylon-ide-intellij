@@ -57,7 +57,10 @@ import com.redhat.ceylon.model.typechecker.util {
 }
 
 import java.awt {
-    Font { bold=BOLD, italic=ITALIC }
+    Font {
+        bold=BOLD,
+        italic=ITALIC
+    }
 }
 import java.lang {
     JStringBuilder=StringBuilder

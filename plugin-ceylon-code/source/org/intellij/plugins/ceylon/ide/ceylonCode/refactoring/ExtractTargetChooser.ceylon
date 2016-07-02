@@ -15,7 +15,9 @@ import com.intellij.psi {
     SmartPsiElementPointer
 }
 import com.intellij.ui {
-    JBColor { red=RED }
+    JBColor {
+        red=RED
+    }
 }
 import com.intellij.ui.components {
     JBList
