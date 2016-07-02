@@ -1,30 +1,27 @@
 import com.intellij.psi {
     PsiField,
-    PsiModifier {
-        ...
-    }
+    PsiModifier
 }
 import com.redhat.ceylon.model.loader.mirror {
-    FieldMirror,
-    TypeMirror
+    FieldMirror
 }
 
 class PSIField(PsiField psi)
         extends PSIAnnotatedMirror(psi)
         satisfies FieldMirror {
     
-    shared actual TypeMirror type = PSIType(doWithLock(() => psi.type));
+    type = PSIType(doWithLock(() => psi.type));
     
-    shared actual Boolean defaultAccess =>
-            let (private = psi.hasModifierProperty(private))
-        !(private || protected || public);
+    defaultAccess =>
+            let (private = psi.hasModifierProperty(PsiModifier.private))
+                !(private || protected || public);
     
-    shared actual Boolean final => psi.hasModifierProperty(final);
+    final => psi.hasModifierProperty(PsiModifier.final);
     
-    shared actual Boolean protected => psi.hasModifierProperty(protected);
+    protected => psi.hasModifierProperty(PsiModifier.protected);
     
-    shared actual Boolean public => psi.hasModifierProperty(public);
+    public => psi.hasModifierProperty(PsiModifier.public);
     
-    shared actual Boolean static => psi.hasModifierProperty(static);
+    static => psi.hasModifierProperty(PsiModifier.static);
     
 }
