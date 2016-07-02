@@ -41,7 +41,7 @@ shared String kind(PsiElement element) {
             then "attribute" else "value";
     } else if (is CeylonPsi.AnyMethodPsi element) {
         for (a in element.ceylonNode.annotationList.annotations) {
-            if (a.primary.token.text.equals("annotation")) {
+            if (a.primary.token.text=="annotation") {
                 return "annotation";
             }
         }

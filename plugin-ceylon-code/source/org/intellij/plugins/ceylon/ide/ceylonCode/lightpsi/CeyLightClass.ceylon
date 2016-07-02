@@ -123,7 +123,7 @@ shared class CeyLightClass extends LightElement
 
     modifierList => LightModifierList(manager, language, *modifiers);
 
-    hasModifierProperty(String name) => modifiers.contains(name);
+    hasModifierProperty(String name) => name in modifiers;
 
     docComment => null;
 

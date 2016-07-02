@@ -154,7 +154,7 @@ class CeylonBlockEmitter(Project project) satisfies BlockEmitter {
             
             value code = "\n".join(CeylonIterable(lines)) + "\n";
             
-            if (exists meta, (meta.empty || "ceylon".equals(meta))) {
+            if (exists meta, meta.empty || "ceylon"==meta) {
                 builder.append(highlighter.highlight(code.string, project));
             } else {
                 builder.append(code.string);

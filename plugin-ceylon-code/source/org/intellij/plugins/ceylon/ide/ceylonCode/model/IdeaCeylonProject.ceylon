@@ -325,7 +325,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
             value libModel = provider.getModifiableLibraryModel(lib);
 
             void updateUrl(OrderRootType type, VirtualFile file) {
-                if (!libModel.getUrls(type).iterable.contains(javaString(file.string))) {
+                if (!javaString(file.string) in libModel.getUrls(type).iterable) {
                     libModel.addRoot(file, type);
                 }
             }
@@ -376,7 +376,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     value repoPath => "./build/intermediates/ceylon-android/repository";
 
     shared void setupForAndroid(String jdkProvider) {
-        if (!configuration.projectSourceDirectories.contains(srcPath)) {
+        if (!srcPath in configuration.projectSourceDirectories) {
             configuration.projectSourceDirectories = {
                 srcPath,
                 otherSrcPath,
@@ -384,7 +384,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
             };
         }
 
-        if (!configuration.projectLocalRepos.contains(repoPath)) {
+        if (!repoPath in configuration.projectLocalRepos) {
             configuration.projectLocalRepos = {
                 repoPath,
                 *configuration.projectLocalRepos

@@ -198,14 +198,10 @@ object groovyFileManipulator {
 
     GrClosableBlock? getBlockByName(PsiElement parent, String name) {
         if (exists allExpressions = PsiTreeUtil.getChildrenOfType(parent, javaClass<GrMethodCallExpression>())) {
-            for (GrMethodCallExpression expression in allExpressions) {
-                value invokedExpression = expression.invokedExpression;
-                if (expression.closureArguments.size == 0) {
-                    continue;
-                }
-                String expressionText = invokedExpression.text;
-                if (expressionText.equals(name)) {
-                    return expression.closureArguments.get(0);
+            for (expression in allExpressions) {
+                if (exists closureArg = expression.closureArguments[0],
+                    expression.invokedExpression.text == name) {
+                    return closureArg;
                 }
             }
         }
@@ -213,7 +209,7 @@ object groovyFileManipulator {
     }
 
     Boolean addExpressionInBlockIfNeeded(String text, GrClosableBlock block, Boolean isFirst) {
-        if (block.text.contains(text)) {
+        if (text in block.text) {
             return false;
         }
         value newStatement = GroovyPsiElementFactory.getInstance(block.project)
@@ -240,19 +236,18 @@ object groovyFileManipulator {
             => getBlockOrCreate(file, "dependencies");
 
     Boolean isRepositoryConfigured(GrClosableBlock repositoriesBlock)
-            => repositoriesBlock.text.contains(repositoryName);
+            => repositoryName in repositoriesBlock.text;
 
     Boolean containsDirective(String fileText, String directive) {
-        return fileText.contains(directive)
-            || fileText.contains(directive.replace("\"", "'"))
-            || fileText.contains(directive.replace("'", "\""));
+        return directive in fileText
+            || directive.replace("\"", "'") in fileText
+            || directive.replace("'", "\"") in fileText;
     }
 
     GrApplicationStatement? getApplyStatement(GroovyFile file) {
         if (exists applyStatement = PsiTreeUtil.getChildrenOfType(file, javaClass<GrApplicationStatement>())) {
             for (callExpression in applyStatement) {
-                value invokedExpression = callExpression.invokedExpression;
-                if (invokedExpression.text.equals("apply")) {
+                if (callExpression.invokedExpression.text=="apply") {
                     return callExpression;
                 }
             }

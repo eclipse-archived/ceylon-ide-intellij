@@ -125,7 +125,7 @@ shared class IdeaNavigation(Project project)
         
         if (exists strPath = path?.string,
             exists file = VirtualFileManager.instance.findFileByUrl(
-                (strPath.contains("!/") then "jar" else "file") + "://" + strPath),
+                ("!/" in strPath then "jar" else "file") + "://" + strPath),
             is CeylonFile psiFile = PsiManager.getInstance(project).findFile(file)) {
 
             return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(),

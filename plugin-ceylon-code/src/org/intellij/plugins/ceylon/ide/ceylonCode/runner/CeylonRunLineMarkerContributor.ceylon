@@ -29,7 +29,7 @@ shared class CeylonRunLineMarkerContributor()
             exists node = parent.ceylonNode,
             is CeylonFile file = psiElement.containingFile,
             // that are toplevel
-            file.compilationUnit.declarations.contains(node),
+            node in file.compilationUnit.declarations,
             // have no parameter
             (parameterList(node)?.parameters?.size() else -1) == 0,
             // and are shared

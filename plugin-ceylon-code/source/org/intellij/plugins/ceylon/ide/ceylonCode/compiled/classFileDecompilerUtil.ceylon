@@ -76,8 +76,8 @@ shared object classFileDecompilerUtil {
 
             visitOuterClass(String owner, String name, String desc) => isInner.set(true);
 
-            shared actual void visitInnerClass(String name, String \iouter, String inner, Integer access) {
-                if (className.equals(name)) {
+            shared actual void visitInnerClass(String name, String outerString, String inner, Integer access) {
+                if (className==name) {
                     isInner.set(true);
                 }
             }

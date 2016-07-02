@@ -127,7 +127,7 @@ shared class CeyLightMethod(containingClass, mirror, project)
     modifierList => LightModifierList(manager, language, "public");
 
     hasModifierProperty(String name)
-            => name.equals(PsiModifier.static) then mirror.static else false;
+            => name==PsiModifier.static then mirror.static else false;
 
     shared actual PsiElement setName(String name) {
         throw IncorrectOperationException("Not supported");
@@ -171,10 +171,10 @@ shared class CeyLightMethod(containingClass, mirror, project)
             return PsiType.int;
         } else if (type.kind == TypeKind.byte) {
             return PsiType.byte;
-        } else if (type.qualifiedName.equals("java.lang.String")) {
+        } else if (type.qualifiedName=="java.lang.String") {
             return PsiType.getJavaLangString(manager, GlobalSearchScope.allScope(project));
-        } else if (type.qualifiedName.equals("ceylon.language::Object")
-            || type.qualifiedName.equals("java.lang.Object")) {
+        } else if (type.qualifiedName=="ceylon.language::Object"
+                || type.qualifiedName=="java.lang.Object") {
             return PsiType.getJavaLangObject(manager, GlobalSearchScope.allScope(project));
         }
         return CeyLightType(type, project);

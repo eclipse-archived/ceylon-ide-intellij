@@ -50,11 +50,11 @@ shared class PSIMethod(shared PsiMethod psi)
     
     Boolean computedIsOverriding {
         if (classIs("ceylon.language.Identifiable"),
-            ["equals", "hashCode"].contains(psi.name)) {
+            psi.name in ["equals", "hashCode"]) {
             
             return true;
         } else if (classIs("ceylon.language.Object"),
-            ["equals", "hashCode", "toString"].contains(psi.name)) {
+            psi.name in ["equals", "hashCode", "toString"]) {
             
             return false;
         } else {

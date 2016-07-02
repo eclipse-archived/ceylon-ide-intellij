@@ -67,7 +67,7 @@ shared class IdeaModuleManager(
         value mod = ceylonProject.ideArtifact;
         value roots = ArrayList<VirtualFile>();
         
-        if (moduleName.equals(CeylonModule.defaultModuleName)) {
+        if (moduleName==CeylonModule.defaultModuleName) {
             roots.addAll(ModuleRootManager.getInstance(mod)
                     .getSourceRoots(true).array.coalesced);
         } else {

@@ -147,7 +147,7 @@ shared class PSIType(shared PsiType psi, Map<PsiType,PSIType?> originatingTypes
                 }
                 // TODO not cool, we got an incorrect qualified name
                 if (exists _pkg = pkg,
-                    sb.string.contains(".impl"),
+                    ".impl" in sb.string,
                     exists cls = _pkg.findClassByShortName(sb.string.replace(".impl", "$impl"), psi.resolveScope).array.first) {
                     return cls.qualifiedName;
                 }
