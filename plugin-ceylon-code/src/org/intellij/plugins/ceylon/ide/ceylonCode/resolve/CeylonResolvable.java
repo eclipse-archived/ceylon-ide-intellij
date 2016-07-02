@@ -47,8 +47,8 @@ public class CeylonResolvable extends CeylonCompositeElementImpl implements PsiN
             if (model!=null && model.isNative()) {
                 ArrayList<PsiReference> list = new ArrayList<>();
                 addBackend(list, Backends.HEADER);
-                addBackend(list, Backends.JAVA); //TODO check that it is available
-                addBackend(list, Backends.JS); //TODO check that it is available
+                addBackend(list, Backends.JAVA);
+                addBackend(list, Backends.JS);
                 return list.toArray(new PsiReference[0]);
             }
         }
