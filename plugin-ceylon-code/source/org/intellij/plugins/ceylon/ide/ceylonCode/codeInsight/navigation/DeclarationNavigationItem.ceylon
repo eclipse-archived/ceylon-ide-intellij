@@ -26,9 +26,12 @@ import com.intellij.psi {
     PsiNameIdentifierOwner
 }
 
-shared class DeclarationNavigationItem(shared Declaration declaration, shared Project project)
+shared class DeclarationNavigationItem(declaration, project)
         satisfies NavigationItem
                 & DataProvider {
+
+    shared Declaration declaration;
+    shared Project project;
 
     canNavigate() => true;
 
@@ -67,15 +70,17 @@ shared class DeclarationNavigationItem(shared Declaration declaration, shared Pr
     shared actual Object? getData(String dataId) {
         if (dataId == CommonDataKeys.psiElement.name,
             exists psi = CeylonReference.resolveDeclaration(declaration, project)) {
-
             if (is PsiNameIdentifierOwner psi,
                 exists id = psi.nameIdentifier) {
-
                 return id;
             }
-            return psi;
+            else {
+                return psi;
+            }
         }
-        return null;
+        else {
+            return null;
+        }
     }
 
 }

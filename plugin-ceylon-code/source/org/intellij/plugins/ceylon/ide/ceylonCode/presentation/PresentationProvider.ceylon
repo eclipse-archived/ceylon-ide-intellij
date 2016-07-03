@@ -2,6 +2,9 @@ import com.intellij.navigation {
     ItemPresentation,
     ItemPresentationProvider
 }
+import com.intellij.psi {
+    PsiElement
+}
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
     Scope,
@@ -9,7 +12,8 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonClass
+    CeylonClass,
+    CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     DeclarationPsiNameIdOwner,
@@ -34,16 +38,33 @@ shared class ClassPresentationProvider()
                             container = container.container;
                         }
                         return text.string;
-                    }
-                    else {
-                        return item.ceylonNode?.identifier?.text;
+                    } else {
+                        if (exists id = item.ceylonNode?.identifier?.text) {
+                            value text = StringBuilder().append(id);
+                            variable PsiElement container = item.parent;
+                            while (is CeylonPsi.ClassOrInterfacePsi classOrInterface = item.parent) {
+                                if (exists typeName = classOrInterface.ceylonNode?.identifier?.text) {
+                                    text.append(" in ").append(typeName);
+                                }
+                                container = container.parent;
+                            }
+                            return text.string;
+                        }
+                        return null;
                     }
                 }
 
-                locationString
-                        => if (exists node = item.ceylonNode)
-                        then "(``node.unit.\ipackage.\imodule.nameAsString``)"
-                        else null;
+                shared actual String? locationString {
+                    if (exists node = item.ceylonNode) {
+                        value nameAsString = node.unit.\ipackage.nameAsString;
+                        return nameAsString.empty
+                            then "(default package)"
+                            else "(``nameAsString``)";
+                    }
+                    else {
+                        return null;
+                    }
+                }
 
                 getIcon(Boolean unused)
                         => if (exists node = item.ceylonNode)
@@ -67,7 +88,16 @@ shared class DeclarationPresentationProvider()
                             return name;
                         }
                     } else {
-                        return item.ceylonNode?.identifier?.text;
+                        if (exists name = item.ceylonNode?.identifier?.text) {
+                            if (is CeylonPsi.ClassOrInterfacePsi classOrInterface = item.parent) {
+                                if (exists typeName = classOrInterface.ceylonNode?.identifier?.text) {
+                                    return typeName + "." + name;
+                                }
+                            } else {
+                                return name;
+                            }
+                        }
+                        return null;
                     }
                 }
 
@@ -77,13 +107,16 @@ shared class DeclarationPresentationProvider()
                         value dec
                             = if (is ClassOrInterface container = model.container)
                             then container else model;
-                        value qualifiedNameString
-                            = dec.container.qualifiedNameString;
+                        value qualifiedNameString = dec.container.qualifiedNameString;
                         return qualifiedNameString.empty
-                        then nat + "(default module)"
-                        else nat + "(``qualifiedNameString``)";
-                    }
-                    else {
+                            then nat + "(default package)"
+                            else nat + "(``qualifiedNameString``)";
+                    } else if (exists unit = item.ceylonNode?.unit) {
+                        value nameAsString = unit.\ipackage.nameAsString;
+                        return nameAsString.empty
+                            then "(default package)"
+                            else "(``nameAsString``)";
+                    } else {
                         return null;
                     }
                 }
@@ -103,7 +136,7 @@ shared class SpecifierPresentationProvider()
             object satisfies ItemPresentation {
 
                 shared actual String? presentableText {
-                    if (exists model = item.ceylonNode ?. declaration) {
+                    if (exists model = item.ceylonNode?.declaration) {
                         value name = model.name;
                         if (is ClassOrInterface classOrInterface = model.container) {
                             return classOrInterface.name + "." + name;
@@ -111,20 +144,33 @@ shared class SpecifierPresentationProvider()
                             return name;
                         }
                     } else {
+                        if (exists text = item.ceylonNode?.baseMemberExpression?.text) {
+                            if (is CeylonPsi.ClassOrInterfacePsi classOrInterface = item.parent) {
+                                if (exists typeName = classOrInterface.ceylonNode?.identifier?.text) {
+                                    return typeName + "." + text;
+                                }
+                            } else {
+                                return text;
+                            }
+                        }
                         return null;
                     }
                 }
 
                 shared actual String? locationString {
-                    if (exists model = item.ceylonNode?. declaration) {
+                    if (exists model = item.ceylonNode?.declaration) {
                         value dec
                             = if (is ClassOrInterface container = model.container)
                             then container else model;
-                        value qualifiedNameString
-                            = dec.container.qualifiedNameString;
+                        value qualifiedNameString = dec.container.qualifiedNameString;
                         return if (qualifiedNameString.empty)
-                        then "(default module)"
-                        else "(``qualifiedNameString``)";
+                            then "(default package)"
+                            else "(``qualifiedNameString``)";
+                    } else if (exists unit = item.ceylonNode?.unit) {
+                        value nameAsString = unit.\ipackage.nameAsString;
+                        return nameAsString.empty
+                            then "(default package)"
+                            else "(``nameAsString``)";
                     }
                     else {
                         return null;

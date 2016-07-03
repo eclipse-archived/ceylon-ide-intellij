@@ -287,7 +287,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                 Node node = psi.getCeylonNode();
                 appendDescription(psi);
                 appendNative(node);
-                appendPackage(node);
+                appendLocation(node);
             }
             else if (element instanceof NavigationItem) {
                 myHighlightedText = new CompositeAppearance();
@@ -295,6 +295,8 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                 appendPresentation(psi);
             }
         }
+
+        //TODO: refactor out code copy/pasted to CeylonMethodHierarchyBrowser
 
         private void appendPresentation(NavigationItem psi) {
             highlighter_.get_()
@@ -306,14 +308,33 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                             getPackageNameAttributes());
         }
 
-        private void appendPackage(Node node) {
+        private void appendLocation(Node node) {
+            String qualifiedNameString = null;
+            Declaration dec = null;
+            if (node instanceof Tree.Declaration) {
+                Tree.Declaration decNode = (Tree.Declaration) node;
+                dec = decNode.getDeclarationModel();
+            }
+            else if (node instanceof Tree.SpecifierStatement) {
+                Tree.SpecifierStatement decNode = (Tree.SpecifierStatement) node;
+                dec = decNode.getDeclaration();
+            }
             Unit unit = node.getUnit();
-            if (unit != null) {
-                String qualifiedNameString =
+            if (dec!=null) {
+                if (dec.isClassOrInterfaceMember()) {
+                    dec = (Declaration) dec.getContainer();
+                }
+                qualifiedNameString =
+                        dec.getContainer()
+                                .getQualifiedNameString();
+            }
+            else if (unit != null) {
+                qualifiedNameString =
                         unit.getPackage()
                                 .getQualifiedNameString();
-                if (qualifiedNameString==null
-                        || qualifiedNameString.isEmpty()) {
+            }
+            if (qualifiedNameString!=null) {
+                if (qualifiedNameString.isEmpty()) {
                     qualifiedNameString = "default package";
                 }
                 myHighlightedText.getEnding()
@@ -324,7 +345,8 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
 
         private void appendNative(Node node) {
             if (node instanceof Tree.Declaration) {
-                Declaration dec = ((Tree.Declaration) node).getDeclarationModel();
+                Tree.Declaration decNode = (Tree.Declaration) node;
+                Declaration dec = decNode.getDeclarationModel();
                 if (dec != null && dec.isNative()) {
                     myHighlightedText.getEnding()
                             .addText("  " + dec.getNativeBackends(),

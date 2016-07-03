@@ -239,6 +239,21 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             }
         }
 
+        private void appendDescriptionAndLocation(PsiMethod psi) {
+            PsiClass psiClass = psi.getContainingClass();
+            highlighter_.get_()
+                    .highlightCompositeAppearance(myHighlightedText,
+                            "'" + psiClass.getName() + "." +
+                                    psi.getPresentation().getPresentableText() + "'",
+                            project);
+            myHighlightedText.getEnding()
+                    .addText("  " + psiClass.getPresentation().getLocationString(),
+                            getPackageNameAttributes());
+        }
+
+
+        //TODO: refactor out code copy/pasted from CeylonTypeHierarchyBrowser
+
         private void appendPresentation(NavigationItem psi) {
             highlighter_.get_()
                     .highlightCompositeAppearance(myHighlightedText,
@@ -246,18 +261,6 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                             project);
             myHighlightedText.getEnding()
                     .addText("  " + psi.getPresentation().getLocationString(),
-                            getPackageNameAttributes());
-        }
-
-        private void appendDescriptionAndLocation(PsiMethod psi) {
-            PsiClass psiClass = psi.getContainingClass();
-            highlighter_.get_()
-                    .highlightCompositeAppearance(myHighlightedText,
-                            "'" + psiClass.getName() + "." +
-                            psi.getPresentation().getPresentableText() + "'",
-                            project);
-            myHighlightedText.getEnding()
-                    .addText("  " + psiClass.getPresentation().getLocationString(),
                             getPackageNameAttributes());
         }
 
@@ -282,12 +285,32 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
         }
 
         private void appendLocation(Node node) {
+            String qualifiedNameString = null;
+            Declaration dec = null;
+            if (node instanceof Tree.Declaration) {
+                Tree.Declaration decNode = (Tree.Declaration) node;
+                dec = decNode.getDeclarationModel();
+            }
+            else if (node instanceof Tree.SpecifierStatement) {
+                Tree.SpecifierStatement decNode = (Tree.SpecifierStatement) node;
+                dec = decNode.getDeclaration();
+            }
             Unit unit = node.getUnit();
-            if (unit != null) {
-                String qualifiedNameString =
+            if (dec!=null) {
+                if (dec.isClassOrInterfaceMember()) {
+                    dec = (Declaration) dec.getContainer();
+                }
+                qualifiedNameString =
+                        dec.getContainer()
+                                .getQualifiedNameString();
+            }
+            else if (unit != null) {
+                qualifiedNameString =
                         unit.getPackage()
                                 .getQualifiedNameString();
-                if (qualifiedNameString==null || qualifiedNameString.isEmpty()) {
+            }
+            if (qualifiedNameString!=null) {
+                if (qualifiedNameString.isEmpty()) {
                     qualifiedNameString = "default package";
                 }
                 myHighlightedText.getEnding()
@@ -295,6 +318,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                                 getPackageNameAttributes());
             }
         }
+
     }
 
 
