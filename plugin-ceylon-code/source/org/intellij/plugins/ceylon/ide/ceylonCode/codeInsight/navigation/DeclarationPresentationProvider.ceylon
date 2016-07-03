@@ -4,7 +4,8 @@ import com.intellij.navigation {
 }
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
-    Scope
+    Scope,
+    Declaration
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
@@ -14,25 +15,23 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 shared class DeclarationPresentationProvider()
         satisfies ItemPresentationProvider<DeclarationNavigationItem> {
 
-    getPresentation(DeclarationNavigationItem item) 
+    String nestedName(Declaration dec)
+            => if (is ClassOrInterface type = dec.container)
+            then nestedName(type) + "." + dec.name
+            else dec.name;
+
+    function locationAsString(Scope container)
+            => "(``container.qualifiedNameString else "default package"``)";
+
+    String nestedLocation(Declaration dec)
+            => if (is ClassOrInterface type = dec.container)
+            then nestedLocation(type)
+            else locationAsString(dec.container);
+
+    getPresentation(DeclarationNavigationItem item)
             => object satisfies ItemPresentation {
-
-        getIcon(Boolean unused)
-                => icons.forDeclaration(item.declaration);
-
-        function locationAsString(Scope container)
-                => "(``container.qualifiedNameString else "default package"``)";
-
-        locationString
-                => let (dec = item.declaration)
-                if (is ClassOrInterface type = dec.container)
-                then locationAsString(type.container)
-                else locationAsString(dec.container);
-
-        presentableText 
-                => let (dec = item.declaration)
-                if (is ClassOrInterface type = dec.container)
-                then type.name + "." + dec.name
-                else dec.name;
+        getIcon(Boolean unused) => icons.forDeclaration(item.declaration);
+        locationString => nestedLocation(item.declaration);
+        presentableText => nestedName(item.declaration);
     };
 }
