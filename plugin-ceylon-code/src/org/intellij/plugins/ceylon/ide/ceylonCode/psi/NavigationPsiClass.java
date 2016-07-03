@@ -12,6 +12,7 @@ import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -126,7 +128,22 @@ public class NavigationPsiClass implements PsiSyntheticClass {
     @NotNull
     @Override
     public PsiClass[] getInnerClasses() {
-        return new PsiClass[0];
+        if (decl instanceof CeylonPsi.ClassOrInterfacePsi) {
+            CeylonPsi.BodyPsi body = PsiTreeUtil.findChildOfType(decl, CeylonPsi.BodyPsi.class);
+            if (body != null) {
+                Collection<CeylonPsi.ClassOrInterfacePsi> children =
+                        PsiTreeUtil.findChildrenOfType(body, CeylonPsi.ClassOrInterfacePsi.class);
+
+                List<PsiClass> inners = new ArrayList<>(children.size());
+
+                for (CeylonPsi.ClassOrInterfacePsi child : children) {
+                    inners.add(new NavigationPsiClass(child));
+                }
+
+                return inners.toArray(new PsiClass[children.size()]);
+            }
+        }
+        return PsiClass.EMPTY_ARRAY;
     }
 
     @NotNull
