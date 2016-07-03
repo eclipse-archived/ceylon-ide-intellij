@@ -33,7 +33,9 @@ import com.redhat.ceylon.ide.common.model {
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
-    Module
+    Module,
+    Scope,
+    ClassOrInterface
 }
 
 import java.lang {
@@ -56,6 +58,22 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 
 shared class CeylonGotoClassContributor() extends CeylonGotoContributor() {
 
+    Boolean scanMembers(Scope scope, IdeaModule mod, Boolean(Declaration) consumer) {
+        for (declaration in newArrayList(scope.members)) {
+            if (!declaration.unit is AnyJavaUnit,
+                includeDeclaration(mod, declaration)) {
+                if (!consumer(declaration)) {
+                    return false;
+                }
+                if (is ClassOrInterface declaration,
+                    !scanMembers(declaration, mod, consumer)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     shared actual void scanModules(TypeChecker typechecker, Set<Module> modules,
             Boolean includeNonProjectItems, Boolean(Declaration) consumer) {
         for (mod in newArrayList(modules)) {
@@ -63,12 +81,9 @@ shared class CeylonGotoClassContributor() extends CeylonGotoContributor() {
                 is IdeaModule mod,
                 /*includeNonProjectItems ||*/ mod.isProjectModule) {
                 for (pack in newArrayList(mod.packages)) {
-                    for (declaration in newArrayList(pack.members)) {
-                        if (!declaration.unit is AnyJavaUnit,
-                            includeDeclaration(mod, declaration),
-                                !consumer(declaration)) {
-                            return;
-                        }
+                    if (mod.isProjectModule || pack.shared, //ignore unshared packages in binaries
+                        !scanMembers(pack, mod, consumer)) {
+                        return;
                     }
                 }
             }
@@ -79,12 +94,13 @@ shared class CeylonGotoClassContributor() extends CeylonGotoContributor() {
         try {
             value visibleFromSourceModules
                 = dec.toplevel
-                then dec.shared || mod.isProjectModule
-                else dec.shared;
-            return visibleFromSourceModules
-                && isPresentable(dec);
+                //ignore unshared declarations in binaries
+                then mod.isProjectModule || dec.shared
+                //include shared nested types
+                else dec is ClassOrInterface && dec.shared;
+            return visibleFromSourceModules && isPresentable(dec);
         }
-        catch (Exception e) {
+        catch (e) {
             e.printStackTrace();
             return false;
         }
