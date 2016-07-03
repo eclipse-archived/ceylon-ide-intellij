@@ -43,13 +43,15 @@ public class CeylonResolvable extends CeylonCompositeElementImpl implements PsiN
             CeylonPsi.MemberOrTypeExpressionPsi refPsi =
                     (CeylonPsi.MemberOrTypeExpressionPsi) parent;
             Tree.MemberOrTypeExpression node = refPsi.getCeylonNode();
-            Declaration model = node.getDeclaration();
-            if (model!=null && model.isNative()) {
-                ArrayList<PsiReference> list = new ArrayList<>();
-                addBackend(list, Backends.HEADER);
-                addBackend(list, Backends.JAVA);
-                addBackend(list, Backends.JS);
-                return list.toArray(new PsiReference[0]);
+            if (node!=null) {
+                Declaration model = node.getDeclaration();
+                if (model != null && model.isNative()) {
+                    ArrayList<PsiReference> list = new ArrayList<>();
+                    addBackend(list, Backends.HEADER);
+                    addBackend(list, Backends.JAVA);
+                    addBackend(list, Backends.JS);
+                    return list.toArray(new PsiReference[0]);
+                }
             }
         }
         return super.getReferences();
