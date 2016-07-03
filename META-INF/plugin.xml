@@ -125,6 +125,7 @@
         <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.ide.lang.CeylonQuoteHandler"/>
         <lang.foldingBuilder language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonFoldingBuilder"/>
         <lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.formatting.CeylonFormattingModelBuilder"/>
+        <statementUpDownMover implementation="org.intellij.plugins.ceylon.ide.lang.CeylonStatementUpDownMover"/>
         <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.structureView.CeylonStructureViewFactory"/>
         <treeStructureProvider implementation="org.intellij.plugins.ceylon.ide.projectView.ModuleTreeStructureProvider" order="last"/>
         <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.codeInsight.EnterInStringHandler"/>
