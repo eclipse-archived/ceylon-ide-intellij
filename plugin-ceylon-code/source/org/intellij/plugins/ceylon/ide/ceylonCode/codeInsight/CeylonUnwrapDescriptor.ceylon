@@ -26,7 +26,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
-    value statementClass = javaClass<CeylonPsi.StatementOrArgumentPsi>();
+    value controlStatementClass = javaClass<CeylonPsi.ControlStatementPsi>();
     value blockClass = javaClass<CeylonPsi.BlockPsi>();
 
     shared class Context() extends AbstractContext() {
@@ -35,73 +35,46 @@ shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
 
         shared void extractStatements(PsiElement parent, PsiElement clause) {
             if (exists block = PsiTreeUtil.getChildOfType(clause, blockClass),
-                exists statements = PsiTreeUtil.getChildrenOfType(block, statementClass)?.array) {
+                block.children.size>0) {
+                value statements = block.children.array;
                 extract(statements.first, statements.last, parent);
                 delete(parent);
             }
         }
     }
 
-    object ifUnwrapper extends AbstractUnwrapper<Context>("Unwrap 'if' block") {
+    object unwrapper extends AbstractUnwrapper<Context>("Unwrap block") {
 
         createContext() => Context();
 
-        shared actual PsiElement collectAffectedElements(PsiElement element, List<PsiElement> toExtract) {
-            super.collectAffectedElements(element, toExtract);
-            return element.parent;
+        getDescription(PsiElement element)
+                => if (is CeylonPsi.ControlClausePsi element)
+                then "Unwrap '``element.ceylonNode.mainToken.text``' block"
+                else super.getDescription(element);
+
+        function controlStatementParent(PsiElement element) {
+            assert (exists parent = PsiTreeUtil.getParentOfType(element, controlStatementClass));
+            return parent;
         }
-
-        shared actual void doUnwrap(PsiElement element, Context context) {
-            if (is CeylonPsi.IfClausePsi element) {
-                context.extractStatements(element.parent, element);
-            }
-        }
-
-        isApplicableTo(PsiElement element) => element is CeylonPsi.IfClausePsi;
-
-    }
-
-    object elseUnwrapper extends AbstractUnwrapper<Context>("Unwrap 'else' block") {
-
-        createContext() => Context();
 
         shared actual PsiElement collectAffectedElements(PsiElement element, List<PsiElement> toExtract) {
             super.collectAffectedElements(element, toExtract);
-            return element.parent;
+            return controlStatementParent(element);
         }
 
         shared actual void doUnwrap(PsiElement element, Context context) {
-            if (is CeylonPsi.ElseClausePsi element) {
-                context.extractStatements(element.parent, element);
+            if (is CeylonPsi.ControlClausePsi element) {
+                context.extractStatements(controlStatementParent(element), element);
             }
         }
 
-        isApplicableTo(PsiElement element) => element is CeylonPsi.ElseClausePsi;
-
+        isApplicableTo(PsiElement element)
+                => if (element is CeylonPsi.ControlClausePsi,
+                       exists block = PsiTreeUtil.getChildOfType(element, blockClass))
+                then block.children.size>0
+                else false;
     }
 
-    object forUnwrapper extends AbstractUnwrapper<Context>("Unwrap 'for' block") {
-
-        shared actual String getDescription(PsiElement? e) => super.getDescription(e);
-
-        createContext() => Context();
-
-        shared actual PsiElement collectAffectedElements(PsiElement element, List<PsiElement> toExtract) {
-            super.collectAffectedElements(element, toExtract);
-            return element.parent;
-        }
-
-        shared actual void doUnwrap(PsiElement element, Context context) {
-            if (is CeylonPsi.ForClausePsi element) {
-                context.extractStatements(element.parent, element);
-            }
-        }
-
-        isApplicableTo(PsiElement element) => element is CeylonPsi.ForClausePsi;
-
-    }
-
-    createUnwrappers() => createJavaObjectArray { ifUnwrapper, elseUnwrapper, forUnwrapper };
-
+    createUnwrappers() => createJavaObjectArray { unwrapper };
 
 }
