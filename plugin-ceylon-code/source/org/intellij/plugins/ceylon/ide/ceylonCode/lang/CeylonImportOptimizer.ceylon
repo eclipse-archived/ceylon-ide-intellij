@@ -1,9 +1,6 @@
 import com.intellij.lang {
     ImportOptimizer
 }
-import com.intellij.openapi.project {
-    Project
-}
 import com.intellij.psi {
     PsiFile
 }
@@ -28,16 +25,19 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 shared class CeylonImportOptimizer()
         satisfies AbstractImportsCleaner & ImportOptimizer {
 
-    variable Project? project = null;
+//    variable Project? project = null;
 
     shared actual Runnable processFile(PsiFile psiFile) {
         assert (exists doc = psiFile.viewProvider.document);
-        project = psiFile.project; //YUCK!!!
+//        project = psiFile.project; //YUCK!!!
         assert (is CeylonFile psiFile);
         value cu = psiFile.compilationUnit;
-        
-        return object satisfies Runnable {
-            run() => cleanImports(cu, IdeaDocument(doc));
+        return object satisfies CollectingInfoRunnable {
+            variable value workDone = false;
+            run() => workDone = cleanImports(cu, IdeaDocument(doc));
+            userNotificationInfo => workDone
+                    then "Imports optimized"
+                    else "Nothing to optimize";
         };
     }
     
