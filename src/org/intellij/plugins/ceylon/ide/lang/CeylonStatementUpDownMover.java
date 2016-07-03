@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +16,14 @@ import org.jetbrains.annotations.NotNull;
  * Created by gavin on 7/3/16.
  */
 public class CeylonStatementUpDownMover extends StatementUpDownMover {
+
+    private Condition<PsiElement> condition = new Condition<PsiElement>() {
+        @Override
+        public boolean value(PsiElement element) {
+            return element instanceof CeylonPsi.StatementOrArgumentPsi;
+        }
+    };
+
     @Override
     public boolean checkAvailable(@NotNull Editor editor, @NotNull PsiFile psiFile, @NotNull MoveInfo moveInfo, boolean down) {
 
@@ -22,25 +31,14 @@ public class CeylonStatementUpDownMover extends StatementUpDownMover {
         int selectionEnd = editor.getSelectionModel().getSelectionEnd();
         PsiElement start = psiFile.findElementAt(selectionStart);
         PsiElement end = psiFile.findElementAt(selectionEnd);
-        while (start instanceof PsiWhiteSpace) {
-            start = start.getNextSibling();
-            if (start==null) {
-                return false;
-            }
+        if (start instanceof PsiWhiteSpace) {
+            start = PsiTreeUtil.getNextSiblingOfType(start,
+                    CeylonCompositeElement.class);
         }
-        while (end instanceof PsiWhiteSpace) {
-            end = end.getPrevSibling();
-            if (end==null) {
-                return false;
-            }
+        if (end instanceof PsiWhiteSpace) {
+            end = PsiTreeUtil.getPrevSiblingOfType(end,
+                    CeylonCompositeElement.class);
         }
-
-        Condition<PsiElement> condition = new Condition<PsiElement>() {
-            @Override
-            public boolean value(PsiElement psiElement) {
-                return psiElement instanceof CeylonPsi.StatementOrArgumentPsi;
-            }
-        };
 
         CeylonPsi.StatementOrArgumentPsi first
                 = (CeylonPsi.StatementOrArgumentPsi)
@@ -55,22 +53,20 @@ public class CeylonStatementUpDownMover extends StatementUpDownMover {
         moveInfo.toMove = new LineRange(first, last);
 
         if (down) {
-            PsiElement next = last.getNextSibling();
-            while (!(next instanceof CeylonPsi.StatementOrArgumentPsi)) {
-                if (next==null) {
-                    return false;
-                }
-                next = next.getNextSibling();
+            PsiElement next =
+                    PsiTreeUtil.getNextSiblingOfType(last,
+                        CeylonPsi.StatementOrArgumentPsi.class);
+            if (next==null) {
+                return false;
             }
             moveInfo.toMove2 = new LineRange(next);
         }
         else {
-            PsiElement prev = first.getPrevSibling();
-            while (!(prev instanceof CeylonPsi.StatementOrArgumentPsi)) {
-                if (prev==null) {
-                    return false;
-                }
-                prev = prev.getPrevSibling();
+            PsiElement prev =
+                    PsiTreeUtil.getPrevSiblingOfType(first,
+                        CeylonPsi.StatementOrArgumentPsi.class);
+            if (prev==null) {
+                return false;
             }
             moveInfo.toMove2 = new LineRange(prev);
         }
