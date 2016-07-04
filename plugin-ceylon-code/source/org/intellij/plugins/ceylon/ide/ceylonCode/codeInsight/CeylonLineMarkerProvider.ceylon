@@ -7,8 +7,7 @@ import com.intellij.codeHighlighting {
 }
 import com.intellij.codeInsight.daemon {
     LineMarkerInfo,
-    GutterIconNavigationHandler,
-    LineMarkerProvider
+    GutterIconNavigationHandler
 }
 import com.intellij.codeInsight.navigation {
     GotoImplementationHandler,
@@ -73,7 +72,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-shared class CeylonLineMarkerProvider() satisfies LineMarkerProvider {
+shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
 
     class MarkerInfo(
         PsiElement element, TextRange range, Icon icon, Integer updatePass,
@@ -195,7 +194,7 @@ shared class CeylonLineMarkerProvider() satisfies LineMarkerProvider {
         return null;
     }
 
-    shared actual void collectSlowLineMarkers(List<PsiElement> elements,
+    shared actual void collectLineMarkers(List<PsiElement> elements,
             Collection<LineMarkerInfo<out PsiElement>> result) {
         for (element in elements) {
             if (exists model = findDeclaration(element),
