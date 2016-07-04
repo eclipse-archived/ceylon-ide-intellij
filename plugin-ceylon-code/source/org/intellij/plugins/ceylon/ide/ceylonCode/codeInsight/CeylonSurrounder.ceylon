@@ -339,11 +339,12 @@ object withForSurrounder extends AbstractSurrounder() satisfies Surrounder {
 
 shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
 
-    value condition = object satisfies Condition<PsiElement> {
-        \ivalue(PsiElement element) => element is CeylonPsi.StatementPsi
-                                    && !element is CeylonPsi.VariablePsi
-                                                 | CeylonPsi.TypeParameterDeclarationPsi;
-    };
+    object condition satisfies Condition<PsiElement> {
+        \ivalue(PsiElement element)
+                => element is CeylonPsi.StatementPsi
+                && !element is CeylonPsi.VariablePsi
+                             | CeylonPsi.TypeParameterDeclarationPsi;
+    }
 
     shared actual ObjectArray<PsiElement> getElementsToSurround(PsiFile file,
             Integer selectionStart, Integer selectionEnd) {
