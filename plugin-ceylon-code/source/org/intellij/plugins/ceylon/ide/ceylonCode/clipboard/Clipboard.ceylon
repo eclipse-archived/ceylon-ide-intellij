@@ -57,9 +57,7 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    CeylonCellRenderer {
-        Item
-    }
+    CeylonListItem
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     ceylonHighlightingColors,
@@ -160,17 +158,19 @@ shared class CeylonCopyPastePostProcessor()
                     if (dec.unit.\ipackage != pack,
                         every { for (i in unit.imports) i.declaration != dec })
                     let (p = dec.unit.\ipackage, m = p.\imodule)
-                    Item(icons.forDeclaration(dec),
-                        color(dec),
-                        dec.name,
-                        p.nameAsString,
-                        "``m.nameAsString`` \"``m.version``\"",
-                        dec->al)
+                    CeylonListItem {
+                        icon = icons.forDeclaration(dec);
+                        color = color(dec);
+                        label = dec.name;
+                        qualifier = p.nameAsString;
+                        extraQualifier = "``m.nameAsString`` \"``m.version``\"";
+                        payload = dec->al;
+                    }
                 };
                 if (!items.empty) {
                     value dialog
                         = PasteImportsDialog(project,
-                            items.sort(byIncreasing(Item.label)));
+                            items.sort(byIncreasing(CeylonListItem.label)));
                     dialog.init();
                     if (dialog.showAndGet()) {
                         value insertEdits = pasteImports {

@@ -413,8 +413,17 @@ shared class Resolution(description, icon, change, qualifiedNameIsPath, qualifie
 }
 
 shared void showPopup(Editor editor, List<Resolution> candidates, String title, Project project) {
+
     value list = JBList(JavaList(candidates.collect((c)
-            => CeylonCellRenderer.Item(c.icon, c.color, c.description, c.qualifier, c.change))));
+            => CeylonListItem {
+                icon = c.icon;
+                color = c.color;
+                label = c.description;
+                qualifier = c.qualifier;
+                extraQualifier = null;
+                payload = c.change;
+            })));
+
     list.setCellRenderer(CeylonCellRenderer());
 
     /*list.installCellRenderer(object satisfies NotNullFunction<Resolution, JComponent> {

@@ -34,12 +34,11 @@ import javax.swing {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
-    CeylonCellRenderer {
-        Item
-    }
+    CeylonCellRenderer,
+    CeylonListItem
 }
 
-class PasteImportsDialog(Project project, {Item*} elements)
+class PasteImportsDialog(Project project, {CeylonListItem*} elements)
         extends DialogWrapper(project, true) {
 
     value myList = JBList(*elements);
@@ -69,9 +68,9 @@ class PasteImportsDialog(Project project, {Item*} elements)
 //    dimensionServiceKey
 //            => "#com.intellij.codeInsight.editorActions.RestoreReferencesDialog";
 
-    shared List<Item> selectedElements
+    shared List<CeylonListItem> selectedElements
             => [ for (it in myList.selectedValuesList)
-                 if (is Item it) it ];
+                 if (is CeylonListItem it) it ];
 
     init() => super.init();
 }
