@@ -20,7 +20,10 @@ public class CeylonStatementUpDownMover extends StatementUpDownMover {
     private Condition<PsiElement> condition = new Condition<PsiElement>() {
         @Override
         public boolean value(PsiElement element) {
-            return element instanceof CeylonPsi.StatementOrArgumentPsi;
+            return element instanceof CeylonPsi.StatementOrArgumentPsi
+                && !(element instanceof CeylonPsi.VariablePsi)
+                && !(element instanceof CeylonPsi.TypeParameterDeclarationPsi)
+                && !(element instanceof CeylonPsi.ForIteratorPsi);
         }
     };
 

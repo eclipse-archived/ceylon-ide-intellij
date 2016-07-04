@@ -340,7 +340,9 @@ object withForSurrounder extends AbstractSurrounder() satisfies Surrounder {
 shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
 
     value condition = object satisfies Condition<PsiElement> {
-        \ivalue(PsiElement element) => element is CeylonPsi.StatementOrArgumentPsi;
+        \ivalue(PsiElement element) => element is CeylonPsi.StatementPsi
+                                    && !element is CeylonPsi.VariablePsi
+                                                 | CeylonPsi.TypeParameterDeclarationPsi;
     };
 
     shared actual ObjectArray<PsiElement> getElementsToSurround(PsiFile file,
@@ -368,19 +370,19 @@ shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
 
         value first = PsiTreeUtil.findFirstParent(start, condition);
         value last = PsiTreeUtil.findFirstParent(end, condition);
-        if (!is CeylonPsi.StatementOrArgumentPsi first) {
+        if (!is CeylonPsi.StatementPsi first) {
             return PsiElement.emptyArray;
         }
-        if (!is CeylonPsi.StatementOrArgumentPsi last) {
+        if (!is CeylonPsi.StatementPsi last) {
             return PsiElement.emptyArray;
         }
 
         value list = ArrayList<PsiElement>();
-        variable CeylonPsi.StatementOrArgumentPsi? current = first;
+        variable CeylonPsi.StatementPsi? current = first;
         while (exists statement = current, statement!=last) {
             list.add(statement);
             current = PsiTreeUtil.getNextSiblingOfType(current,
-                        javaClass<CeylonPsi.StatementOrArgumentPsi>());
+                        javaClass<CeylonPsi.StatementPsi>());
         }
         list.add(last);
         return list.toArray(PsiElement.emptyArray);
