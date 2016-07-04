@@ -1,3 +1,10 @@
+import ceylon.collection {
+    ArrayList
+}
+import ceylon.interop.java {
+    createJavaObjectArray
+}
+
 import com.intellij.lang {
     ASTNode
 }
@@ -20,10 +27,6 @@ import com.intellij.psi.util {
 
 import java.lang {
     ObjectArray
-}
-import java.util {
-    ArrayList,
-    List
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
@@ -55,33 +58,33 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
     shared actual ObjectArray<FoldingDescriptor> buildFoldRegions(PsiElement root,
             Document document, Boolean quick) {
         value descriptors = ArrayList<FoldingDescriptor>();
-        appendDescriptors(root, descriptors);
-        return descriptors.toArray(ObjectArray<FoldingDescriptor>(descriptors.size()));
+        appendDescriptors(root, descriptors.add);
+        return createJavaObjectArray(descriptors);
     }
 
-    void foldElement(PsiElement element, List<FoldingDescriptor> descriptors)
-            => descriptors.add(FoldingDescriptor(element.node, element.textRange));
+    void foldElement(PsiElement element, void add(FoldingDescriptor d))
+            => add(FoldingDescriptor(element.node, element.textRange));
 
-    void foldRange(Integer[2] range, PsiElement element, List<FoldingDescriptor> descriptors)
-            => descriptors.add(FoldingDescriptor(element.node, TextRange(*range)));
+    void foldRange(Integer[2] range, PsiElement element, void add(FoldingDescriptor d))
+            => add(FoldingDescriptor(element.node, TextRange(*range)));
 
-    void foldAfterFirstLine(PsiElement element, List<FoldingDescriptor> descriptors) {
+    void foldAfterFirstLine(PsiElement element, void add(FoldingDescriptor d)) {
         if (exists newLine = element.text.firstOccurrence('\n')) {
             value start = element.textRange.startOffset + newLine;
             value end = element.textRange.endOffset;
-            foldRange([start, end], element, descriptors);
+            foldRange([start, end], element, add);
         }
     }
 
-    void appendDescriptors(PsiElement element, List<FoldingDescriptor> descriptors) {
+    void appendDescriptors(PsiElement element, void add(FoldingDescriptor d)) {
         if (element is CeylonPsi.BodyPsi) {
-            foldElement(element, descriptors);
+            foldElement(element, add);
         }
         else if (element is CeylonPsi.ImportModuleListPsi ) {
-            foldElement(element, descriptors);
+            foldElement(element, add);
         }
         else if (element.node.elementType == CeylonTokens.multiComment) {
-            foldAfterFirstLine(element, descriptors);
+            foldAfterFirstLine(element, add);
         }
         else if (element.node.elementType == CeylonTokens.lineComment) {
             value prev = PsiTreeUtil.prevVisibleLeaf(element);
@@ -98,12 +101,12 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
                 if (lastComment != element) {
                     value start = element.textRange.endOffset-1;
                     value end = lastComment.textRange.endOffset-1;
-                    foldRange([start, end], element, descriptors);
+                    foldRange([start, end], element, add);
                 }
             }
         }
         else if (element is CeylonPsi.StringLiteralPsi) {
-            foldAfterFirstLine(element, descriptors);
+            foldAfterFirstLine(element, add);
         }
         else if (element is CeylonPsi.ImportListPsi,
                  element.textLength>0) {
@@ -111,11 +114,11 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
                     = element.textRange.startOffset
                     + (element.text.startsWith("import ") then 7 else 0);
             value end = element.textRange.endOffset;
-            foldRange([start, end], element, descriptors);
+            foldRange([start, end], element, add);
         }
         variable PsiElement? child = element.firstChild;
         while (exists ch = child) {
-            appendDescriptors(ch, descriptors);
+            appendDescriptors(ch, add);
             child = ch.nextSibling;
         }
     }
