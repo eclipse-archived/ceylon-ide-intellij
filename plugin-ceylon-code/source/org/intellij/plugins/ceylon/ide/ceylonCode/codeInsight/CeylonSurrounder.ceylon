@@ -225,6 +225,80 @@ object withTryFinallySurrounder extends AbstractSurrounder() satisfies Surrounde
 
 }
 
+object withTryResourcesSurrounder extends AbstractSurrounder() satisfies Surrounder {
+
+    String content = "void a(){try(){throw;}}";
+
+    templateDescription => "'try' statement with resource list";
+
+    shared actual TextRange surroundElements(Project project, Editor editor,
+    ObjectArray<PsiElement> elements) {
+
+        value file = createDummyFile(project, content);
+
+        assert (exists tryStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
+                    javaClass<CeylonPsi.TryCatchStatementPsi>(), true));
+        assert (exists block
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 14,
+                    javaClass<CeylonPsi.BlockPsi>(), true));
+        assert (exists throwStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 15,
+                    javaClass<CeylonPsi.ThrowPsi>(), true));
+
+        value formatted = surround(elements, tryStatement, block, throwStatement);
+
+        assert (exists tc
+                = PsiTreeUtil.findChildOfType(formatted,
+                    javaClass<CeylonPsi.TryClausePsi>(), true));
+        assert (exists rl
+                = PsiTreeUtil.findChildOfType(tc,
+                    javaClass<CeylonPsi.ResourceListPsi>(), true));
+
+        value loc = rl.textOffset + 1;
+        value len = rl.textLength - 2;
+        return TextRange(loc, loc + len);
+    }
+
+}
+
+object withWhileSurrounder extends AbstractSurrounder() satisfies Surrounder {
+
+    String content = "void a(){while(true){throw;break;}}";
+
+    templateDescription => "'while' statement";
+
+    shared actual TextRange surroundElements(Project project, Editor editor,
+    ObjectArray<PsiElement> elements) {
+
+        value file = createDummyFile(project, content);
+
+        assert (exists tryStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
+                    javaClass<CeylonPsi.WhileStatementPsi>(), true));
+        assert (exists block
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 20,
+                    javaClass<CeylonPsi.BlockPsi>(), true));
+        assert (exists throwStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 21,
+                    javaClass<CeylonPsi.ThrowPsi>(), true));
+
+        value formatted = surround(elements, tryStatement, block, throwStatement);
+
+        assert (exists wc
+                = PsiTreeUtil.findChildOfType(formatted,
+                    javaClass<CeylonPsi.WhileClausePsi>(), true));
+        assert (exists cl
+                = PsiTreeUtil.findChildOfType(wc,
+                    javaClass<CeylonPsi.ConditionListPsi>(), true));
+
+        value loc = cl.textOffset + 1;
+        value len = cl.textLength - 2;
+        return TextRange(loc, loc + len);
+    }
+
+}
+
 object withForSurrounder extends AbstractSurrounder() satisfies Surrounder {
 
     String content = "void a(){for(i in 0..0){throw;}}";
@@ -317,7 +391,9 @@ shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
         withIfElseSurrounder,
         withTryCatchSurrounder,
         withTryFinallySurrounder,
-        withForSurrounder
+        withTryResourcesSurrounder,
+        withForSurrounder,
+        withWhileSurrounder
     };
 
     exclusive => false;
