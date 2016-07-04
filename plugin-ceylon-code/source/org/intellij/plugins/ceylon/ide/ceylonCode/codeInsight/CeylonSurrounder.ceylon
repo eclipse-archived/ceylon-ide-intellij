@@ -47,8 +47,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
 }
 
-shared class CeylonWithIfSurrounder()
-        satisfies Surrounder & SurroundDescriptor {
+object withIfSurrounder satisfies Surrounder {
 
     templateDescription => "'if' statement";
 
@@ -59,19 +58,19 @@ shared class CeylonWithIfSurrounder()
 
         value file
                 = PsiFileFactory.getInstance(project)
-                    .createFileFromText("dummy.ceylon",
-                                        CeylonFileType.instance,
-                                        JString(content));
+            .createFileFromText("dummy.ceylon",
+            CeylonFileType.instance,
+            JString(content));
 
         assert (exists ifStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
-                    javaClass<CeylonPsi.IfStatementPsi>(), true));
+            javaClass<CeylonPsi.IfStatementPsi>(), true));
         assert (exists block
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 17,
-                    javaClass<CeylonPsi.BlockPsi>(), true));
+            javaClass<CeylonPsi.BlockPsi>(), true));
         assert (exists throwStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 18,
-                    javaClass<CeylonPsi.ThrowPsi>(), true));
+            javaClass<CeylonPsi.ThrowPsi>(), true));
 
         assert (exists firstElement = elements[0]);
         value parent = firstElement.parent;
@@ -87,11 +86,15 @@ shared class CeylonWithIfSurrounder()
         }
 
         value formatted = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(result);
-        value loc = formatted.textOffset + formatted.text.indexOf("true");
+        value loc = formatted.textOffset +formatted.text.indexOf("true");
         return TextRange(loc, loc + 4);
     }
 
-   value condition = object satisfies Condition<PsiElement> {
+}
+
+shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
+
+    value condition = object satisfies Condition<PsiElement> {
         \ivalue(PsiElement element) => element is CeylonPsi.StatementOrArgumentPsi;
     };
 
@@ -137,7 +140,7 @@ shared class CeylonWithIfSurrounder()
         return list.toArray(PsiElement.emptyArray);
     }
 
-    surrounders => createJavaObjectArray<Surrounder>({ this });
+    surrounders => createJavaObjectArray { withIfSurrounder };
 
     exclusive => false;
 }
