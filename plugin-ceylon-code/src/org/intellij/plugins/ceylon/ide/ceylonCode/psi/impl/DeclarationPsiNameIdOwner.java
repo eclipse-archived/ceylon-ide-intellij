@@ -59,11 +59,11 @@ public abstract class DeclarationPsiNameIdOwner
     public PsiElement setName(@NonNls @NotNull String name)
             throws IncorrectOperationException {
         PsiElement id = findChildByType(CeylonTypes.IDENTIFIER);
-        CeylonPsi.DeclarationPsi decl =
-                CeylonTreeUtil.createDeclarationFromText(getProject(),
-                        "void " + name + "(){}");
         if (id != null) {
-            id.replace(decl.getChildren()[0]);
+            CeylonPsi.DeclarationPsi decl =
+                    CeylonTreeUtil.createDeclarationFromText(getProject(),
+                            "void " + name + "(){}");
+            id.replace(decl.getFirstChild());
         }
         return this;
     }
