@@ -9,13 +9,10 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.platform.Status;
-import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
+import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.FunctionOrValue;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
 import org.jetbrains.annotations.NonNls;
@@ -41,7 +38,11 @@ public abstract class DeclarationPsiNameIdOwner
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        Tree.Identifier id = getCeylonNode().getIdentifier();
+        Tree.Declaration node = getCeylonNode();
+        if (node==null) {
+            return null;
+        }
+        Tree.Identifier id = node.getIdentifier();
         try {
             return id == null ?
                     PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) :
