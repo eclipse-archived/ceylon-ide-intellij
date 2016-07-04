@@ -35,8 +35,7 @@ import java.lang {
     JString=String
 }
 import java.util {
-    ArrayList,
-    List
+    ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
@@ -47,20 +46,45 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
 }
 
-object withIfSurrounder satisfies Surrounder {
+abstract class AbstractSurrounder() satisfies Surrounder {
+
+    isApplicable(ObjectArray<PsiElement> elements) => elements.size!=0;
+
+    shared PsiFile createDummyFile(Project project, String content)
+            => PsiFileFactory.getInstance(project)
+                .createFileFromText("dummy.ceylon",
+                                    CeylonFileType.instance,
+                                    JString(content));
+
+    shared PsiElement surround(ObjectArray<PsiElement> elements,
+                CeylonPsi.StatementOrArgumentPsi surroundingStatement,
+                CeylonPsi.BodyPsi block,
+                CeylonPsi.StatementOrArgumentPsi targetPosition) {
+        assert (exists firstElement = elements[0]);
+        value parent = firstElement.parent;
+        for (element in elements) {
+            block.addBefore(element, targetPosition);
+        }
+        targetPosition.delete();
+        value result = parent.addBefore(surroundingStatement, firstElement);
+        for (element in elements) {
+            element.delete();
+        }
+        return CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(result);
+    }
+
+}
+
+object withIfSurrounder extends AbstractSurrounder() satisfies Surrounder {
+
+    String content = "void a(){if(true){throw;}}";
 
     templateDescription => "'if' statement";
 
-    isApplicable(ObjectArray<PsiElement> elements) => true;
+    shared actual TextRange surroundElements(Project project, Editor editor,
+            ObjectArray<PsiElement> elements) {
 
-    shared actual TextRange surroundElements(Project project, Editor editor, ObjectArray<PsiElement> elements) {
-        String content = "void a(){if(true){throw;}}";
-
-        value file
-                = PsiFileFactory.getInstance(project)
-            .createFileFromText("dummy.ceylon",
-            CeylonFileType.instance,
-            JString(content));
+        value file = createDummyFile(project, content);
 
         assert (exists ifStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
@@ -72,25 +96,172 @@ object withIfSurrounder satisfies Surrounder {
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 18,
             javaClass<CeylonPsi.ThrowPsi>(), true));
 
-        assert (exists firstElement = elements[0]);
-        value parent = firstElement.parent;
+        value formatted = surround(elements, ifStatement, block, throwStatement);
 
-        for (element in elements) {
-            block.addBefore(element, throwStatement);
-        }
-        throwStatement.delete();
+        assert (exists ic
+                = PsiTreeUtil.findChildOfType(formatted,
+                    javaClass<CeylonPsi.IfClausePsi>(), true));
+        assert (exists cl
+                = PsiTreeUtil.findChildOfType(ic,
+                    javaClass<CeylonPsi.ConditionListPsi>(), true));
 
-        value result = parent.addBefore(ifStatement, firstElement);
-        for (element in elements) {
-            element.delete();
-        }
-
-        value formatted = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(result);
-        value loc = formatted.textOffset +formatted.text.indexOf("true");
-        return TextRange(loc, loc + 4);
+        value loc = cl.textOffset + 1;
+        value len = cl.textLength - 2;
+        return TextRange(loc, loc + len);
     }
 
 }
+
+object withIfElseSurrounder extends AbstractSurrounder() satisfies Surrounder {
+
+    String content = "void a(){if(true){throw;}else{}}";
+
+    templateDescription => "'if'/'else' statement";
+
+    shared actual TextRange surroundElements(Project project, Editor editor,
+    ObjectArray<PsiElement> elements) {
+
+        value file = createDummyFile(project, content);
+
+        assert (exists ifStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
+            javaClass<CeylonPsi.IfStatementPsi>(), true));
+        assert (exists block
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 17,
+            javaClass<CeylonPsi.BlockPsi>(), true));
+        assert (exists throwStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 18,
+            javaClass<CeylonPsi.ThrowPsi>(), true));
+
+        value formatted = surround(elements, ifStatement, block, throwStatement);
+
+        assert (exists ic
+                = PsiTreeUtil.findChildOfType(formatted,
+                    javaClass<CeylonPsi.IfClausePsi>(), true));
+        assert (exists cl
+                = PsiTreeUtil.findChildOfType(ic,
+                    javaClass<CeylonPsi.ConditionListPsi>(), true));
+
+        value loc = cl.textOffset + 1;
+        value len = cl.textLength - 2;
+        return TextRange(loc, loc + len);
+    }
+
+}
+
+object withTryCatchSurrounder extends AbstractSurrounder() satisfies Surrounder {
+
+    String content = "void a(){try{throw;}catch(e){e.printStackTrace();}}";
+
+    templateDescription => "'try'/'catch' statement";
+
+    shared actual TextRange surroundElements(Project project, Editor editor,
+            ObjectArray<PsiElement> elements) {
+
+        value file = createDummyFile(project, content);
+
+        assert (exists tryStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
+                    javaClass<CeylonPsi.TryCatchStatementPsi>(), true));
+        assert (exists block
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 12,
+                    javaClass<CeylonPsi.BlockPsi>(), true));
+        assert (exists throwStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 13,
+                    javaClass<CeylonPsi.ThrowPsi>(), true));
+
+        value formatted = surround(elements, tryStatement, block, throwStatement);
+
+        assert (exists ct
+                = PsiTreeUtil.findChildOfType(formatted,
+                    javaClass<CeylonPsi.CatchClausePsi>(), true));
+        assert (exists bl
+                = PsiTreeUtil.findChildOfType(ct,
+                    javaClass<CeylonPsi.BlockPsi>(), true));
+        assert (exists pst
+                = PsiTreeUtil.findChildOfType(ct,
+                    javaClass<CeylonPsi.ExpressionStatementPsi>(), true));
+
+        value loc = pst.textOffset;
+        value len = pst.textLength - 1;
+        return TextRange(loc, loc + len);
+    }
+
+}
+
+object withTryFinallySurrounder extends AbstractSurrounder() satisfies Surrounder {
+
+    String content = "void a(){try{throw;}finally{}}";
+
+    templateDescription => "'try'/'finally' statement";
+
+    shared actual TextRange surroundElements(Project project, Editor editor,
+            ObjectArray<PsiElement> elements) {
+
+        value file = createDummyFile(project, content);
+
+        assert (exists tryStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
+                    javaClass<CeylonPsi.TryCatchStatementPsi>(), true));
+        assert (exists block
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 12,
+                    javaClass<CeylonPsi.BlockPsi>(), true));
+        assert (exists throwStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 13,
+                    javaClass<CeylonPsi.ThrowPsi>(), true));
+
+        value formatted = surround(elements, tryStatement, block, throwStatement);
+
+        assert (exists fin
+                = PsiTreeUtil.findChildOfType(formatted,
+                    javaClass<CeylonPsi.FinallyClausePsi>(), true));
+        assert (exists bl
+                = PsiTreeUtil.findChildOfType(fin,
+                    javaClass<CeylonPsi.BlockPsi>(), true));
+
+        value loc = bl.textOffset + 1;
+        return TextRange(loc, loc);
+    }
+
+}
+
+object withForSurrounder extends AbstractSurrounder() satisfies Surrounder {
+
+    String content = "void a(){for(i in 0..0){throw;}}";
+
+    templateDescription => "'for' statement";
+
+    shared actual TextRange surroundElements(Project project, Editor editor,
+    ObjectArray<PsiElement> elements) {
+
+        value file = createDummyFile(project, content);
+
+        assert (exists forStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
+                    javaClass<CeylonPsi.ForStatementPsi>(), true));
+        assert (exists block
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 23,
+                    javaClass<CeylonPsi.BlockPsi>(), true));
+        assert (exists throwStatement
+                = PsiTreeUtil.findElementOfClassAtOffset(file, 24,
+                    javaClass<CeylonPsi.ThrowPsi>(), true));
+
+        value formatted = surround(elements, forStatement, block, throwStatement);
+
+        assert (exists fr
+                = PsiTreeUtil.findChildOfType(formatted,
+                    javaClass<CeylonPsi.ForClausePsi>(), true));
+        assert (exists it
+                = PsiTreeUtil.findChildOfType(fr,
+                    javaClass<CeylonPsi.ForIteratorPsi>(), true));
+
+        value loc = it.textOffset + 1;
+        value len = it.textLength - 2;
+        return TextRange(loc, loc + len);
+    }
+
+}
+
 
 shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
 
@@ -98,7 +269,8 @@ shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
         \ivalue(PsiElement element) => element is CeylonPsi.StatementOrArgumentPsi;
     };
 
-    shared actual ObjectArray<PsiElement> getElementsToSurround(PsiFile file, Integer selectionStart, Integer selectionEnd) {
+    shared actual ObjectArray<PsiElement> getElementsToSurround(PsiFile file,
+            Integer selectionStart, Integer selectionEnd) {
 
         value startElem = file.findElementAt(selectionStart);
         value endElem = file.findElementAt(selectionEnd);
@@ -129,7 +301,7 @@ shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
             return PsiElement.emptyArray;
         }
 
-        List<PsiElement> list = ArrayList<PsiElement>();
+        value list = ArrayList<PsiElement>();
         variable CeylonPsi.StatementOrArgumentPsi? current = first;
         while (exists statement = current, statement!=last) {
             list.add(statement);
@@ -140,7 +312,13 @@ shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
         return list.toArray(PsiElement.emptyArray);
     }
 
-    surrounders => createJavaObjectArray { withIfSurrounder };
+    surrounders => createJavaObjectArray {
+        withIfSurrounder,
+        withIfElseSurrounder,
+        withTryCatchSurrounder,
+        withTryFinallySurrounder,
+        withForSurrounder
+    };
 
     exclusive => false;
 }
