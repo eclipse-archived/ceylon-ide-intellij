@@ -177,7 +177,6 @@
         <refactoring.elementListenerProvider implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringListener"/>
         <inlineActionHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.InlineAction"/>
         <lang.importOptimizer language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonImportOptimizer"/>
-        <lang.surroundDescriptor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.templates.CeylonWithIfSurrounder"/>
         <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonElementDescriptionProvider"/>
         <iconProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.presentation.CeylonIconProvider"/>
         <codeInsight.lineMarkerProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonLineMarkerProvider"/>
