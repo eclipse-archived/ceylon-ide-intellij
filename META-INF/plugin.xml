@@ -122,7 +122,7 @@
 
         <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonCommenter"/>
         <lang.braceMatcher language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonBraceMatcher"/>
-        <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.ide.lang.CeylonQuoteHandler"/>
+        <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonQuoteHandler"/>
         <lang.foldingBuilder language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonFoldingBuilder"/>
         <lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.formatting.CeylonFormattingModelBuilder"/>
         <statementUpDownMover implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonStatementUpDownMover"/>
