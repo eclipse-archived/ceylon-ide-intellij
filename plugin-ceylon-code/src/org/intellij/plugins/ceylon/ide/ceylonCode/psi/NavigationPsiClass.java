@@ -316,7 +316,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
 
     @Override
     public void navigate(boolean requestFocus) {
-
+        decl.navigate(requestFocus);
     }
 
     @Override
@@ -390,7 +390,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
 
     @Override
     public PsiFile getContainingFile() throws PsiInvalidElementAccessException {
-        return null;
+        return decl.getContainingFile();
     }
 
     @Override
