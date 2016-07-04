@@ -116,10 +116,9 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
             value end = element.textRange.endOffset;
             foldRange([start, end], element, add);
         }
-        variable PsiElement? child = element.firstChild;
-        while (exists ch = child) {
-            appendDescriptors(ch, add);
-            child = ch.nextSibling;
+
+        for (child in element.children) {
+            appendDescriptors(child, add);
         }
     }
 
