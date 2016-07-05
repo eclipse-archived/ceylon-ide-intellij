@@ -83,6 +83,8 @@ shared object concurrencyManager {
     
     value noIndexStrategy_ = ThreadLocal<NoIndexStrategy?>();
 
+    shared NoIndexStrategy? noIndexStrategy => noIndexStrategy_.get();
+    
     shared Return|ProcessCanceledException tryReadAccess<Return>(Return() func) {
         try {
             return needReadAccess(func, 0);
