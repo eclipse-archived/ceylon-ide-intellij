@@ -77,7 +77,7 @@ shared class InlineAction() extends InlineActionHandler() {
         return false;
     }
 
-    shared actual void inlineElement(Project _project, Editor editor, PsiElement element) {
+    shared actual void inlineElement(Project proj, Editor editor, PsiElement element) {
         if (is CeylonFile file = element.containingFile,
             exists localAnalysisResult = file.localAnalysisResult,
             exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode, 
@@ -92,13 +92,13 @@ shared class InlineAction() extends InlineActionHandler() {
                 is Declaration decl = nodes.getReferencedDeclaration(node)) {
 
                 value refactoring = IdeaInlineRefactoring(phasedUnit, localAnalysisResult.tokens, node, decl, editor);
-                value dialog = InlineDialog(_project, element, refactoring);
-
+                value dialog = InlineDialog(proj, element, refactoring);
+                dialog.init();
                 if (dialog.showAndGet()) {
                     value change = IdeaCompositeChange();
                     refactoring.build(change);
 
-                    object extends WriteCommandAction<Nothing>(_project, file) {
+                    object extends WriteCommandAction<Nothing>(proj, file) {
                         shared actual void run(Result<Nothing> result) {
                             change.applyChanges(project);
                         }
@@ -116,7 +116,7 @@ class IdeaInlineRefactoring(PhasedUnit phasedUnit, List<CommonToken> theTokens, 
 
     editorPhasedUnit => phasedUnit;
 
-    class IdeaInlineData() satisfies InlineData {
+    shared class IdeaInlineData() satisfies InlineData {
         shared actual Declaration declaration => decl;
         
         shared actual variable Boolean delete = true;
@@ -134,7 +134,7 @@ class IdeaInlineRefactoring(PhasedUnit phasedUnit, List<CommonToken> theTokens, 
         shared actual List<CommonToken> tokens => theTokens;
     }
     
-    shared actual InlineData editorData = IdeaInlineData();
+    shared actual IdeaInlineData editorData = IdeaInlineData();
     
     shared actual List<PhasedUnit> getAllUnits() => ArrayList<PhasedUnit>();
     

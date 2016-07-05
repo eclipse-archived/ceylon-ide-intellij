@@ -1,9 +1,6 @@
 import ceylon.collection {
     HashMap
 }
-import ceylon.interop.java {
-    JavaIterable
-}
 
 import com.redhat.ceylon.ide.common.model {
     Severity
@@ -51,6 +48,5 @@ class ProblemsModel() {
     shared Integer countErrors()
             => problemsByProject.items.fold(0)((sum, item) => sum + item.countErrors());
 
-    shared JavaIterable<BuildMsg> allMessages
-        => JavaIterable(expand(problemsByProject.items.map(Problems.allMessages)));
+    shared {BuildMsg*} allMessages => expand(problemsByProject.items.map(Problems.allMessages));
 }
