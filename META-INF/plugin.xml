@@ -131,7 +131,7 @@
         <lang.surroundDescriptor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonSurroundDescriptor"/>
         <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.structureView.CeylonStructureViewFactory"/>
         <treeStructureProvider implementation="org.intellij.plugins.ceylon.ide.projectView.ModuleTreeStructureProvider" order="last"/>
-        <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.codeInsight.EnterInStringHandler"/>
+        <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.EnterInStringHandler"/>
         <!--referenceImporter implementation="org.intellij.plugins.ceylon.ide.ceylonCode.imports.CeylonReferenceImporter"/-->
 
         <defaultLiveTemplatesProvider implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplatesProvider"/>
