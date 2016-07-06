@@ -50,7 +50,7 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType
+    ceylonFileType
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
@@ -251,7 +251,7 @@ shared class CeylonGotoSuperHandler()
     startInWriteAction() => false;
 
     isValidFor(Editor editor, PsiFile file)
-            => file.fileType==CeylonFileType.instance;
+            => file.fileType==ceylonFileType;
 
     shared actual void update(Editor editor, PsiFile file, Presentation presentation) {
         presentation.enabled = true;

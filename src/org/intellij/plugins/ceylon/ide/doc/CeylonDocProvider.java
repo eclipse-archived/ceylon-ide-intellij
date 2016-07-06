@@ -33,7 +33,7 @@ import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonLightElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
@@ -274,7 +274,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         @NotNull
         @Override
         public Language getLanguage() {
-            return CeylonLanguage.INSTANCE;
+            return ceylonLanguage_.get_();
         }
 
         @NotNull

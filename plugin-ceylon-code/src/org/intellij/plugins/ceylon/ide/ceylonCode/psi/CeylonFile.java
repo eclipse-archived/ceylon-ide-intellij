@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.CommonToken;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonFileType_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
 import org.jetbrains.annotations.NotNull;
 
 import com.intellij.extapi.psi.PsiFileBase;
@@ -47,7 +47,7 @@ import static com.intellij.psi.util.PsiTreeUtil.getChildrenOfType;
 public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
-        super(viewProvider, CeylonLanguage.INSTANCE);
+        super(viewProvider, ceylonLanguage_.get_());
     }
 
     private CeylonPsi.CompilationUnitPsi getCompilationUnitPsi() {
@@ -220,7 +220,7 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     @NotNull
     @Override
     public FileType getFileType() {
-        return CeylonFileType.INSTANCE;
+        return ceylonFileType_.get_();
     }
 
     @SuppressWarnings("unchecked")

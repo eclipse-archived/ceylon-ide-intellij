@@ -119,7 +119,7 @@ import org.antlr.runtime {
     CommonToken
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType
+    ceylonFileType
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
@@ -270,9 +270,9 @@ class MyParameterTableModel(IdeaChangeParameterRefactoring.ParameterList params,
         extends ParameterTableModelBase<MyParameterInfo, MyParameterTableModelItem>
         (null, null) {
 
-    class MyNameColumn() extends NameColumn<MyParameterInfo, MyParameterTableModelItem>(project) {
-    }
-    class MyTypeColumn() extends TypeColumn<MyParameterInfo, MyParameterTableModelItem>(project, CeylonFileType.instance) {
+    class MyNameColumn() extends NameColumn<MyParameterInfo, MyParameterTableModelItem>(project) {}
+
+    class MyTypeColumn() extends TypeColumn<MyParameterInfo, MyParameterTableModelItem>(project, ceylonFileType) {
         isCellEditable(MyParameterTableModelItem model) => model.parameter.param.position == -1;
     }
 
@@ -361,7 +361,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
     createVisibilityControl()
         => ComboBoxVisibilityPanel("", createJavaObjectArray<Object>({}), createJavaStringArray({}));
 
-    fileType => CeylonFileType.instance;
+    fileType => ceylonFileType;
 
     shared actual ValidationInfo? doValidate() {
         for (item in myParametersTableModel.items) {
@@ -386,7 +386,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
         value text = param.model.type.asString() + " " + param.name
             + (if (exists a = param.defaultArgs) then " = " + a else "");
 
-        return JBListTable.createEditorTextFieldPresentation(project, CeylonFileType.instance,
+        return JBListTable.createEditorTextFieldPresentation(project, ceylonFileType,
             text, selected, focused);
     }
 

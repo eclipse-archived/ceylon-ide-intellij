@@ -29,15 +29,15 @@ import java.util {
     HashMap
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.parser {
     CeylonAntlrToIntellijLexerAdapter
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTokens,
     TokenTypes
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    ceylonFileType
 }
 
 shared object ceylonHighlighter extends SyntaxHighlighterBase() {
@@ -122,7 +122,7 @@ shared object ceylonHighlighter extends SyntaxHighlighterBase() {
 }
 
 shared class CeylonFileHighlightFilter() satisfies Condition<VirtualFile> {
-    \ivalue(VirtualFile virtualFile) => virtualFile.fileType is CeylonFileType;
+    \ivalue(VirtualFile virtualFile) => virtualFile.fileType == ceylonFileType;
 }
 
 shared class CeylonHighlighterFactory() extends SyntaxHighlighterFactory() {

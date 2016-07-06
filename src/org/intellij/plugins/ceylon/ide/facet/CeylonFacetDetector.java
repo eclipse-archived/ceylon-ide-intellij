@@ -10,10 +10,10 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonFileType_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
-import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,7 +33,7 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
     @NotNull
     @Override
     public FileType getFileType() {
-        return CeylonFileType.INSTANCE;
+        return ceylonFileType_.get_();
     }
 
     @NotNull
@@ -46,7 +46,7 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
     public void setupFacet(@NotNull CeylonFacet facet, ModifiableRootModel model) {
         IdeaCeylonProjects ceylonModel = facet.getModule().getProject().getComponent(IdeaCeylonProjects.class);
         IdeaCeylonProject project = (IdeaCeylonProject) ceylonModel.getProject(facet.getModule());
-        String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
+        String defaultVm = ceylonSettings_.get_().getDefaultTargetVm();
         project.getIdeConfiguration().setCompileToJs(ceylon.language.Boolean.instance(!defaultVm.equals("js")));
         project.getIdeConfiguration().setCompileToJvm(ceylon.language.Boolean.instance(!defaultVm.equals("jvm")));
         project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(false));

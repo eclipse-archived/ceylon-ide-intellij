@@ -9,7 +9,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +17,7 @@ public class CeylonFormattingModelBuilder implements FormattingModelBuilder {
     @NotNull
     @Override
     public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
-        PsiFile containingFile = element.getContainingFile().getViewProvider().getPsi(CeylonLanguage.INSTANCE);
+        PsiFile containingFile = element.getContainingFile().getViewProvider().getPsi(ceylonLanguage_.get_());
         ASTNode fileNode = containingFile.getNode();
         CeylonBlock block = new CeylonBlock(fileNode, Indent.getAbsoluteNoneIndent());
 

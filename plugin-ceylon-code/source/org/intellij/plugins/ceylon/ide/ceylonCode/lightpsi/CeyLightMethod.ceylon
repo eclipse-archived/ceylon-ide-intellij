@@ -58,14 +58,14 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
+    ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     IdeaNavigation
 }
 
 shared class CeyLightMethod(containingClass, mirror, project)
-        extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance)
+        extends LightElement(PsiManager.getInstance(project), ceylonLanguage)
         satisfies PsiMethod & CeylonLightElement {
 
     shared actual PsiClass containingClass;
@@ -88,7 +88,7 @@ shared class CeyLightMethod(containingClass, mirror, project)
         value builder = LightParameterListBuilder(manager, language);
         for (p in mirror.parameters) {
             if (exists type = toPsiType(p.type)) {
-                builder.addParameter(LightParameter(p.name, type, this, CeylonLanguage.instance));
+                builder.addParameter(LightParameter(p.name, type, this, ceylonLanguage));
             }
         }
         return builder;

@@ -17,17 +17,18 @@ import java.lang {
     UnsupportedOperationException
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    ceylonLanguage
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsiFactory,
     CeylonTypes,
-    TokenTypes
+    TokenTypes,
+    IdeaCeylonParser
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     SpecifierStatementPsiIdOwner
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub {
-    CeylonStubTypes
 }
 
 shared class CeylonParserDefinition() satisfies ParserDefinition {
@@ -35,7 +36,7 @@ shared class CeylonParserDefinition() satisfies ParserDefinition {
     createLexer(Project project)
             => CeylonAntlrToIntellijLexerAdapter();
 
-    fileNodeType => CeylonStubTypes.ceylonFile;
+    fileNodeType = IdeaCeylonParser(ceylonLanguage);
 
     whitespaceTokens
             = TokenSet.create(TokenTypes.ws.tokenType);

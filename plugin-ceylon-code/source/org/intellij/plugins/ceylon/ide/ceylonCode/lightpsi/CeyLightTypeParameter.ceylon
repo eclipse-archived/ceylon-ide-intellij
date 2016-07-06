@@ -41,7 +41,7 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
+    ceylonLanguage
 }
 import com.intellij.psi.search {
     GlobalSearchScope
@@ -175,7 +175,7 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     
     lBrace => null;
     
-    language => CeylonLanguage.instance;
+    language => ceylonLanguage;
     
     lastChild => null;
     

@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +24,7 @@ import com.redhat.ceylon.model.typechecker.model.Unit;
 public class CeylonTreeUtil {
 
     public static CeylonPsi.DeclarationPsi createDeclarationFromText(Project project, String code) {
-        PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(CeylonLanguage.INSTANCE, code);
+        PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(ceylonLanguage_.get_(), code);
         return PsiTreeUtil.getParentOfType(file.findElementAt(0), CeylonPsi.DeclarationPsi.class);
     }
 

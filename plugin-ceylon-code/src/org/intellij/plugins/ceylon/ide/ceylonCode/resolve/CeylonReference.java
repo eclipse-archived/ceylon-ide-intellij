@@ -19,7 +19,7 @@ import com.redhat.ceylon.ide.common.refactoring.DefaultRegion;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.ide.common.util.nodes_;
 import com.redhat.ceylon.model.typechecker.model.*;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
@@ -151,7 +151,7 @@ public class CeylonReference<T extends PsiElement> extends PsiReferenceBase<T> {
         PsiElement location =
                 new IdeaNavigation(project)
                         .gotoDeclaration(declaration);
-        if (location==null || location.getLanguage() != CeylonLanguage.INSTANCE) {
+        if (location==null || location.getLanguage() != ceylonLanguage_.get_()) {
             return location;
         }
         else {

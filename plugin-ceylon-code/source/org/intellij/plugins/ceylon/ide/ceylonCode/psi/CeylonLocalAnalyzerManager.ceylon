@@ -75,12 +75,8 @@ import com.redhat.ceylon.ide.common.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType {
-        ceylonFileType = instance
-    },
-    CeylonLanguage {
-        ceylonLanguage = instance
-    }
+    ceylonFileType,
+    ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,

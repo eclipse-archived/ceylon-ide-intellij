@@ -12,14 +12,14 @@ import com.intellij.psi.impl.compiled.ClsFileImpl;
 import com.intellij.psi.impl.file.PsiBinaryFileImpl;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.CeylonBinaryData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class CeylonClassFileFileViewProvider extends SingleRootFileViewProvider {
     CeylonClassFileFileViewProvider(@NotNull PsiManager manager, @NotNull VirtualFile virtualFile,
                            boolean eventSystemEnabled) {
-        super(manager, virtualFile, eventSystemEnabled, CeylonLanguage.INSTANCE);
+        super(manager, virtualFile, eventSystemEnabled, ceylonLanguage_.get_());
     }
 
     @NotNull

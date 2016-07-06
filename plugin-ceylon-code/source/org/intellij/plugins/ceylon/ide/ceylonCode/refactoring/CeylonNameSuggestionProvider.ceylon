@@ -24,7 +24,7 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
+    ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
@@ -34,7 +34,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
 
     shared actual SuggestedNameInfo? getSuggestedNames(PsiElement element, PsiElement nameSuggestionContext, Set<JString> result) {
-        if (element.language.isKindOf(CeylonLanguage.instance),
+        if (element.language.isKindOf(ceylonLanguage),
             is CeylonFile file = element.containingFile,
             is CeylonPsi.DeclarationPsi element) {
             nodes.renameProposals(element.ceylonNode, file.compilationUnit).map(javaString).each(result.add);

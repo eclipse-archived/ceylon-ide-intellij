@@ -101,6 +101,7 @@ import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
+
 import java.lang {
     Runnable,
     InterruptedException
@@ -128,7 +129,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings {
-    CeylonSettings
+    ceylonSettings
 }
 
 shared class CeylonModelManager(model) 
@@ -140,8 +141,9 @@ shared class CeylonModelManager(model)
         & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile>
         & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
         & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
+
     shared IdeaCeylonProjects model;
-    shared Integer delayBeforeUpdatingAfterChange => CeylonSettings.instance.autoUpdateInterval;
+    shared Integer delayBeforeUpdatingAfterChange => ceylonSettings.autoUpdateInterval;
     variable value automaticModelUpdateEnabled_ = true;
     variable value ideaProjectReady = false;
     variable Boolean cancelledBecauseOfSyntaxErrors = false;

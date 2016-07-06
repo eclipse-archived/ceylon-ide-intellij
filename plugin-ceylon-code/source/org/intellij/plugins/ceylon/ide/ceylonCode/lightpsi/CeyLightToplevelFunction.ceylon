@@ -61,14 +61,14 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
+    ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTreeUtil
 }
 
 class CeyLightToplevelFunction(declaration, project)
-        extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance)
+        extends LightElement(PsiManager.getInstance(project), ceylonLanguage)
         satisfies PsiClass & CeylonLightElement {
 
     shared actual Function declaration;

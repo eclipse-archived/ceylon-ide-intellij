@@ -1,11 +1,11 @@
 package org.intellij.plugins.ceylon.ide.templates;
 
 import com.intellij.codeInsight.template.FileTypeBasedContextType;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonFileType_;
 
 public class CeylonLiveTemplateContext extends FileTypeBasedContextType {
 
     protected CeylonLiveTemplateContext() {
-        super("CEYLON", "&Ceylon", CeylonFileType.INSTANCE);
+        super("CEYLON", "&Ceylon", ceylonFileType_.get_());
     }
 }

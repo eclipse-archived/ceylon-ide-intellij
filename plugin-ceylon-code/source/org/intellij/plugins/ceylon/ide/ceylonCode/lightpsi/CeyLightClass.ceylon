@@ -68,7 +68,7 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
+    ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi {
     CeyLightMethod,
@@ -104,13 +104,13 @@ shared class CeyLightClass extends LightElement
     variable ClassInnerStuffCache? lazyInnersCache = null;
 
     shared new(Declaration decl, Project project)
-            extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance) {
+            extends LightElement(PsiManager.getInstance(project), ceylonLanguage) {
         assert (is AbstractClassMirror mir = ceylonToJavaMapper.mapDeclaration(decl).first);
         this.mirror = mir;
     }
 
     shared new fromMirror(AbstractClassMirror mirror, Project project)
-            extends LightElement(PsiManager.getInstance(project), CeylonLanguage.instance) {
+            extends LightElement(PsiManager.getInstance(project), ceylonLanguage) {
         this.mirror = mirror;
     }
 

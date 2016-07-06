@@ -12,7 +12,7 @@ import com.intellij.psi {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
+    ceylonLanguage
 }
 import com.intellij.testFramework {
     LightVirtualFile
@@ -38,7 +38,7 @@ shared class CeylonSourceFileViewProviderFactory()
     
     
     shared actual FileViewProvider createFileViewProvider(VirtualFile virtualFile, Language? language, PsiManager psiManager, Boolean eventSystemEnabled) {
-        if (exists language, language != CeylonLanguage.instance ) {
+        if (exists language, language != ceylonLanguage) {
             return SingleRootFileViewProvider(psiManager, virtualFile, eventSystemEnabled);
         }
         

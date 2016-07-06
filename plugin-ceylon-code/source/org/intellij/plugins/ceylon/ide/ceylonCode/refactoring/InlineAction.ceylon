@@ -52,7 +52,7 @@ import org.antlr.runtime {
     CommonToken
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonLanguage
+    ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -108,7 +108,7 @@ shared class InlineAction() extends InlineActionHandler() {
         }
     }
 
-    shared actual Boolean isEnabledForLanguage(Language l) => l == CeylonLanguage.instance;
+    shared actual Boolean isEnabledForLanguage(Language l) => l == ceylonLanguage;
 }
 
 class IdeaInlineRefactoring(PhasedUnit phasedUnit, List<CommonToken> theTokens, Node node, Declaration decl, Editor editor) 

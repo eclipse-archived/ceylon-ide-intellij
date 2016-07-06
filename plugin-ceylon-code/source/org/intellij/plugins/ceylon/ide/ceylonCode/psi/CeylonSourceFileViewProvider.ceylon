@@ -7,8 +7,8 @@ import com.intellij.psi {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType,
-    CeylonLanguage
+    ceylonFileType,
+    ceylonLanguage
 }
 
 shared class CeylonSourceFileViewProvider(
@@ -19,6 +19,6 @@ shared class CeylonSourceFileViewProvider(
         manager, 
         virtualFile, 
         eventSystemEnabled, 
-        CeylonLanguage.instance, 
-        CeylonFileType.instance) {
+        ceylonLanguage,
+        ceylonFileType) {
 }

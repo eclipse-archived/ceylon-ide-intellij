@@ -38,12 +38,12 @@ import java.util {
     ArrayList
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
     CeylonPsi
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    ceylonFileType
 }
 
 abstract class AbstractSurrounder() satisfies Surrounder {
@@ -53,7 +53,7 @@ abstract class AbstractSurrounder() satisfies Surrounder {
     shared PsiFile createDummyFile(Project project, String content)
             => PsiFileFactory.getInstance(project)
                 .createFileFromText("dummy.ceylon",
-                                    CeylonFileType.instance,
+                                    ceylonFileType,
                                     JString(content));
 
     shared PsiElement surround(ObjectArray<PsiElement> elements,
