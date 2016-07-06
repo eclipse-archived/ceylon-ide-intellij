@@ -57,20 +57,16 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared PsiElement? resolveDeclaration(Referenceable declaration, Project project) {
-    value location = IdeaNavigation(project).gotoDeclaration(declaration);
-    if (!exists location) {
-        return null;
-    }
-    if (location.language != ceylonLanguage) {
-        return location;
-    }
-    else {
-        if (exists declarationNode = nodes.getReferencedNode(declaration)) {
+    if (exists location
+            = IdeaNavigation(project).gotoDeclaration(declaration)) {
+        if (location.language != ceylonLanguage) {
+            return location;
+        }
+        else if (exists declarationNode = nodes.getReferencedNode(declaration)) {
             return CeylonTreeUtil.findPsiElement(declarationNode, location.containingFile);
-        } else {
-            return null;
         }
     }
+    return null;
 }
 
 shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
