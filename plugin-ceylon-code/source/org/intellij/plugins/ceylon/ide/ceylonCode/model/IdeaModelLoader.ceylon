@@ -16,6 +16,9 @@ import com.intellij.openapi.project {
         dumbService=getInstance
     }
 }
+import com.intellij.openapi.util {
+    Ref
+}
 import com.intellij.openapi.vfs {
     VirtualFile
 }
@@ -48,13 +51,52 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
-    Runnable
+    Runnable,
+    ThreadLocal
+}
+import java.util.concurrent {
+    Callable
 }
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     IdeaModuleSourceMapper ideaModuleSourceMapper, Modules modules)
         extends IdeModelLoader<IJModule,VirtualFile,VirtualFile,VirtualFile,PsiClass,PsiClass>
         (ideaModuleManager, ideaModuleSourceMapper, modules) {
+
+    value isSynchronizing = object extends ThreadLocal<Boolean>() {
+        initialValue() => false;
+    };
+    
+    shared actual T? embeddingSync<T>(Callable<T> action)
+            given T satisfies Object {
+        value ref = Ref<T?>();
+        ref.set(null);
+        Boolean synchronizing = isSynchronizing.get();
+        if (! synchronizing) {
+            isSynchronizing.set(true);
+            try {
+                if (exists currentStrategy = concurrencyManager.noIndexStrategy,
+                    currentStrategy == NoIndexStrategy.waitForIndexes) {
+                    updateIndexIfnecessary();
+                    assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
+                    concurrencyManager.needIndexes(project, () => 
+                        ApplicationManager.application.runReadAction(JavaRunnable(() 
+                        => concurrencyManager.outsideDumbMode(() {
+                        ref.set(action.call() else null);
+                    }))));
+                } else {
+                    ApplicationManager.application.runReadAction(JavaRunnable(() {
+                        ref.set(action.call() else null);
+                    }));
+                }
+            } finally {
+                isSynchronizing.set(false);
+            }
+        } else {
+            ref.set(action.call() else null);
+        }
+        return  ref.get();
+    }
 
     shared actual void addModuleToClasspathInternal(ArtifactResult? artifact) {
         if (exists artifact,
