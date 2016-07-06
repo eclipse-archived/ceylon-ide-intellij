@@ -15,7 +15,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.ProgressIndicatorMonitor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
-import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class CeylonBuilder implements CompileTask {
 
                     project.getBuild().performBuild(monitor);
 
-                    if (CeylonSettings.getInstance().isUseOutProcessBuild()) {
+                    if (ceylonSettings_.get_().isUseOutProcessBuild()) {
                         project.getBuild().performBinaryGeneration(monitor, project.getBuild().new BinaryGenerator() {
                             @Override
                             public boolean build(CeylonProjectBuild<Module, VirtualFile, VirtualFile, VirtualFile> build,
