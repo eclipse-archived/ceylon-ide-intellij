@@ -150,7 +150,7 @@ shared class CeylonCopyPastePostProcessor()
         if (!references.empty,
             is CeylonFile file = PsiUtilBase.getPsiFileInEditor(editor, project),
             exists reference = references[0]) {
-            if (exists phasedUnit = file.localAnalysisResult.lastPhasedUnit) {
+            if (exists phasedUnit = file.localAnalysisResult?.lastPhasedUnit) {
                 value pack = phasedUnit.\ipackage;
                 value unit = phasedUnit.unit;
                 value items = {
