@@ -93,7 +93,7 @@ shared class InlineAction() extends InlineActionHandler() {
 
                 value refactoring = IdeaInlineRefactoring(phasedUnit, localAnalysisResult.tokens, node, decl, editor);
                 value dialog = InlineDialog(proj, element, refactoring);
-                dialog.init();
+
                 if (dialog.showAndGet()) {
                     value change = IdeaCompositeChange();
                     refactoring.build(change);

@@ -14,11 +14,10 @@ import com.redhat.ceylon.model.typechecker.model {
 class InlineDialog(Project project, PsiElement element, IdeaInlineRefactoring refactoring)
         extends InlineOptionsDialog(project, true, element) {
 
-    shared actual void init() {
-        value occurrences = refactoring.countDeclarationOccurrences();
-        myInvokedOnReference = occurrences>1 && refactoring.isReference;
-        super.init();
-    }
+    value occurrences = refactoring.countDeclarationOccurrences();
+    myInvokedOnReference = occurrences>1 && refactoring.isReference;
+
+    init();
 
     shared actual String nameLabelText {
         Integer occurrences = refactoring.countDeclarationOccurrences();

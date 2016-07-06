@@ -72,5 +72,6 @@ class PasteImportsDialog(Project project, {CeylonListItem*} elements)
             => [ for (it in myList.selectedValuesList)
                  if (is CeylonListItem it) it ];
 
-    init() => super.init();
+    init();
+
 }

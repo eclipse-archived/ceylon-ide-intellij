@@ -171,7 +171,7 @@ shared class CeylonCopyPastePostProcessor()
                     value dialog
                         = PasteImportsDialog(project,
                             items.sort(byIncreasing(CeylonListItem.label)));
-                    dialog.init();
+
                     if (dialog.showAndGet()) {
                         value insertEdits = pasteImports {
                             references = map {
