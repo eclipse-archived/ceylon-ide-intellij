@@ -9,7 +9,6 @@ import com.intellij.ide.hierarchy {
     HierarchyBrowserManager
 }
 import com.intellij.ide.util.treeView {
-    NodeDescriptor,
     AlphaComparator,
     SourceComparator
 }
@@ -112,16 +111,16 @@ Set<PhasedUnit> collectPhasedUnits(Project project) {
     return result;
 }
 
-class CeylonHierarchyNodeDescriptor(element, model, parentDescriptor = null)
-        extends HierarchyNodeDescriptor(element.project, null, element, true) {
+class CeylonHierarchyNodeDescriptor(element, model, parent = null)
+        extends HierarchyNodeDescriptor(element.project, parent, element, true) {
 
+    CeylonHierarchyNodeDescriptor? parent;
     PsiElement element;
     shared Declaration? model;
-    NodeDescriptor<out Object>? parentDescriptor;
 
-    shared variable ObjectArray<HierarchyNodeDescriptor>? children = null;
+    shared variable ObjectArray<CeylonHierarchyNodeDescriptor>? children = null;
 
-    String? name(PsiElement element) {
+    function name(PsiElement element) {
         if (is CeylonCompositeElement element) {
             switch (node = element.ceylonNode)
             case (is Tree.Declaration) {
@@ -255,7 +254,7 @@ class CeylonHierarchyNodeDescriptor(element, model, parentDescriptor = null)
             includeKeyword = false;
             includeContainer = true;
             includeReturnType = false;
-            includeParameters = false; //TODO: true for method hierarchy
+            includeParameters = psi is CeylonPsi.AnyMethodPsi|CeylonPsi.SpecifierStatementPsi;
         },
             exists project = this.project) {
             highlighter.highlightCompositeAppearance(myHighlightedText, "'``desc``'", project);

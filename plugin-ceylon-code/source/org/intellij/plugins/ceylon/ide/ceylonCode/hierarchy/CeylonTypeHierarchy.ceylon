@@ -15,7 +15,8 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.psi {
-    PsiElement
+    PsiElement,
+    PsiMethod
 }
 import com.redhat.ceylon.model.typechecker.model {
     ...
@@ -50,12 +51,27 @@ class CeylonTypeHierarchyBrowser(Project project, PsiElement element)
 
     isApplicableElement(PsiElement psiElement) => psiElement is TypeDec;
 
+    function skipConstructor(TypeDeclaration extended)
+            => if (is Constructor extended)
+            then extended.extendedType.declaration
+            else extended;
+
+    function skipConstructorElement(PsiElement psiElement) {
+        if (is PsiMethod psiElement) {
+            assert (psiElement.constructor,
+                exists cl = psiElement.containingClass);
+            return cl;
+        }
+        else {
+            return psiElement;
+        }
+    }
     shared actual CeylonHierarchyNodeDescriptor? build(PsiElement element, Declaration? dec) {
         if (is ClassOrInterface dec) {
             if (exists extendedType = dec.extendedType) {
-                value extended = extendedType.declaration;
+                value extended = skipConstructor(extendedType.declaration);
                 if (exists psiElement = resolveDeclaration(extended, project)) {
-                    if (exists parentDescriptor = build(psiElement, extended)) {
+                    if (exists parentDescriptor = build(skipConstructorElement(psiElement), extended)) {
                         value nodeDescriptor
                                 = CeylonHierarchyNodeDescriptor(element, dec, parentDescriptor);
                         parentDescriptor.children = createJavaObjectArray { nodeDescriptor };
@@ -77,23 +93,26 @@ class CeylonTypeHierarchyBrowser(Project project, PsiElement element)
             for (unit in phasedUnits) {
                 for (declaration in unit.declarations) {
                     if (is ClassOrInterface declaration) {
-                        if (is Class model) {
+                        switch (model)
+                        case (is Class) {
                             if (exists extendedType = declaration.extendedType,
-                                extendedType.declaration == model) {
+                                skipConstructor(extendedType.declaration) == model) {
                                 if (exists psiElement = resolveDeclaration(declaration, project)) {
                                     result.add(CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor));
                                 }
                             }
                         }
-                        if (is Interface model) {
-                            for (Type? satisfiedType in declaration.satisfiedTypes) {
-                                if (exists satisfiedType,
-                                    satisfiedType.declaration == model) {
+                        case (is Interface) {
+                            for (satisfiedType in declaration.satisfiedTypes) {
+                                if (satisfiedType.declaration == model) {
                                     if (exists psiElement = resolveDeclaration(declaration, project)) {
                                         result.add(CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor));
                                     }
                                 }
                             }
+                        }
+                        else {
+                            assert (false);
                         }
                     }
                 }
@@ -106,16 +125,16 @@ class CeylonTypeHierarchyBrowser(Project project, PsiElement element)
             CeylonHierarchyNodeDescriptor descriptor) {
         value result = ArrayList<HierarchyNodeDescriptor>();
         if (is ClassOrInterface model = descriptor.model) {
-            if (exists cl = model.extendedType) {
-                TypeDeclaration td = cl.declaration;
-                if (exists psiElement = resolveDeclaration(td, project)) {
-                    result.add(CeylonHierarchyNodeDescriptor(psiElement, td, descriptor));
+            if (exists extendedType = model.extendedType) {
+                value extended = skipConstructor(extendedType.declaration);
+                if (exists psiElement = resolveDeclaration(extended, project)) {
+                    result.add(CeylonHierarchyNodeDescriptor(skipConstructorElement(psiElement), extended, descriptor));
                 }
             }
             for (type in model.satisfiedTypes) {
-                TypeDeclaration td = type.declaration;
-                if (exists psiElement = resolveDeclaration(td, project)) {
-                    result.add(CeylonHierarchyNodeDescriptor(psiElement, td, descriptor));
+                value satisfied = type.declaration;
+                if (exists psiElement = resolveDeclaration(satisfied, project)) {
+                    result.add(CeylonHierarchyNodeDescriptor(psiElement, satisfied, descriptor));
                 }
             }
         }

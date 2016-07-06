@@ -55,7 +55,7 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
                 value parentDescriptor = build(psiElement, refined);
                 value nodeDescriptor
                         = CeylonHierarchyNodeDescriptor(element, model, parentDescriptor);
-                parentDescriptor.children =createJavaObjectArray { nodeDescriptor };
+                parentDescriptor.children = createJavaObjectArray { nodeDescriptor };
                 return nodeDescriptor;
             }
         }
@@ -105,7 +105,7 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
             model.actual) {
             value signature = ModelUtil.getSignature(model);
             for (supertype in container.supertypeDeclarations) {
-                if (exists declaration  = supertype.getDirectMember(model.name, signature, false, true),
+                if (exists declaration = supertype.getDirectMember(model.name, signature, false, true),
                     declaration.default || declaration.formal) {
                     if (model.refines(declaration), directlyRefines(model, declaration)) {
                         if (exists psiElement = resolveDeclaration(declaration, project)) {
