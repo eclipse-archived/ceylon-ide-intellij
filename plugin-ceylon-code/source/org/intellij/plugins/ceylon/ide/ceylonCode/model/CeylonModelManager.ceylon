@@ -190,9 +190,8 @@ shared class CeylonModelManager(model)
     
     shared Boolean modelUpdateWasCannceledBecauseOfSyntaxErrors => cancelledBecauseOfSyntaxErrors;
     
-    void scheduleSubmitChanges() {
-        submitChangesFuture = application.executeOnPooledThread(submitChangesTask);
-    }
+    void scheduleSubmitChanges()
+            => submitChangesFuture = application.executeOnPooledThread(submitChangesTask);
     
     shared Boolean automaticModelUpdateEnabled => automaticModelUpdateEnabled_;
     assign automaticModelUpdateEnabled {
@@ -363,9 +362,7 @@ shared class CeylonModelManager(model)
         scheduleSubmitChanges();
     }));
     
-    shared actual void projectClosed() {
-        ideaProjectReady = false;
-    }
+    projectClosed() => ideaProjectReady = false;
     
     /***************************************************************************
       VirtualFileListener implementation that notifies the file changes
@@ -439,10 +436,9 @@ shared class CeylonModelManager(model)
         );
     }
     
-    shared actual void propertyChanged(VirtualFilePropertyEvent evt) {
-        // TODO: Also manage the file rename
-        noop();
-    }
+    propertyChanged(VirtualFilePropertyEvent evt)
+            // TODO: Also manage the file rename
+            => noop();
 
     transactionStarted(Document doc, PsiFile file) => noop();
 
@@ -463,7 +459,7 @@ shared class CeylonModelManager(model)
     
     fileOpened(FileEditorManager manager, VirtualFile file) => noop();
     
-    shared actual void selectionChanged(FileEditorManagerEvent evt) => scheduleModelUpdate(0);
+    selectionChanged(FileEditorManagerEvent evt) => scheduleModelUpdate(0);
     
     /***************************************************************************
       Utility functions
