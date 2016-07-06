@@ -29,6 +29,9 @@ import com.redhat.ceylon.ide.common.platform {
     Status,
     platformUtils
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    LocalAnalysisResult
+}
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
@@ -51,9 +54,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsi,
     CeylonTreeUtil
-}
-import com.redhat.ceylon.ide.common.typechecker {
-    LocalAnalysisResult
 }
 
 shared PsiElement? resolveDeclaration(Referenceable declaration, Project project) {
@@ -117,8 +117,8 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
 
     shared actual PsiElement? resolve() {
         if (is Tree.Declaration node = this.node) {
-            Declaration model = (node).declarationModel;
-            if (is TypedDeclaration model, model.originalDeclaration exists) {
+            if (is TypedDeclaration model = node.declarationModel,
+                model.originalDeclaration exists) {
                 //noop
                 // we need to resolve the original declaration
             } else if (ApplicationInfo.instance.build.baselineVersion >= 145) {
@@ -137,18 +137,17 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         Node? target = ConcurrencyManagerForJava.withAlternateResolution(object satisfies Callable<Node> {
             call() => IdeaNavigation(project).getTarget(compilationUnit, node, backend);
         });
-        if (exists target) {
-            if (exists file = getVirtualFile(target.unit)) {
-                value psiFile = PsiManager.getInstance(project).findFile(file);
-                return CeylonTreeUtil.findPsiElement(target, psiFile);
-            }
+        if (exists target, exists file = getVirtualFile(target.unit)) {
+            value psiFile = PsiManager.getInstance(project).findFile(file);
+            return CeylonTreeUtil.findPsiElement(target, psiFile);
         }
         value declaration = nodes.getReferencedModel(node);
         if (!exists declaration) {
             return null;
         }
-        value location = resolveDeclaration(declaration, project);
-        return if (!exists location) then myElement.containingFile else location;
+
+        return if (exists location = resolveDeclaration(declaration, project))
+            then location else myElement.containingFile;
     }
 
     variants => PsiElement.emptyArray;
