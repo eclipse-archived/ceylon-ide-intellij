@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide;
+package org.intellij.plugins.ceylon.ide.ceylonCode.lang;
 
 import com.intellij.ide.highlighter.ArchiveFileType;
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
@@ -11,7 +11,7 @@ public class CeylonFileTypeFactory extends FileTypeFactory {
 
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer consumer) {
-        CeylonFileType type = ceylonFileType_.get_();
+        CeylonFileType type = CeylonFileType.INSTANCE;
         consumer.consume(type, type.getDefaultExtension());
         consumer.consume(ArchiveFileType.INSTANCE, "src;car");
     }

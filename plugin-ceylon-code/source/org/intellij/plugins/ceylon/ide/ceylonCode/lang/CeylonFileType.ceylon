@@ -1,4 +1,4 @@
-import com.intellij.openapi.fileTypes {
+/*import com.intellij.openapi.fileTypes {
     LanguageFileType
 }
 
@@ -15,6 +15,6 @@ shared class CeylonFileType() extends LanguageFileType(ceylonLanguage) {
     defaultExtension => "ceylon";
 
     icon => icons.file;
-}
+}*/
 
-shared CeylonFileType ceylonFileType = CeylonFileType();
+shared CeylonFileType ceylonFileType = CeylonFileType.instance;

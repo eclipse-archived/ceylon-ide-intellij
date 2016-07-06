@@ -107,7 +107,7 @@
         <ApplicationLoadListener implementation="org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin"/>
         <lang.documentationProvider implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonDocProvider" language="Ceylon"/>
 
-        <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.CeylonFileTypeFactory"/>
+        <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileTypeFactory"/>
         <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.parser.CeylonParserDefinition"/>
 
         <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonHighlighterFactory"/>
