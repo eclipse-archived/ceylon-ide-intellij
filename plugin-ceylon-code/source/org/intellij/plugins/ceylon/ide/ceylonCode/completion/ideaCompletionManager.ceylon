@@ -117,7 +117,7 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
                         addCompletionsInternal(parameters, context, result, analysisResult, options, progressMonitor);
                     }
                 });
-            } catch(ProcessCanceledException e) {
+            } catch (ProcessCanceledException e) {
                 noop();// for debugging purposes
             } finally {
                 application.removeApplicationListener(listener);
@@ -127,9 +127,12 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
     
     void addCompletionsInternal(CompletionParameters parameters, 
         ProcessingContext context, CompletionResultSet result,
-        LocalAnalysisResult analysisResult, CompletionOptions options, ProgressIndicatorMonitor progressMonitor) {
+        LocalAnalysisResult analysisResult, CompletionOptions options,
+        ProgressIndicatorMonitor progressMonitor) {
         
-        value isSecondLevel = parameters.invocationCount > 0 && parameters.invocationCount % 2 == 0;
+        value isSecondLevel
+                = parameters.invocationCount > 0
+                && parameters.invocationCount % 2 == 0;
         value element = parameters.originalPosition;
         value doc = parameters.editor.document;
         assert (exists element,
@@ -146,7 +149,8 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
             returnedParamInfo = true;
         };
         
-        CustomLookupCellRenderer.install(parameters.editor.project);
+        assert (exists project = parameters.editor.project);
+        installCustomLookupCellRenderer(project);
         
         for (completion in params.proposals.proposals) {
             result.addElement(completion);

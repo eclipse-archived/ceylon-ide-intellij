@@ -12,7 +12,6 @@ import com.intellij.codeInsight.template {
     TemplateManager,
     ExpressionContext,
     Expression,
-    TemplateResult=Result,
     TextResult,
     TemplateBuilderImpl,
     TemplateEditingAdapter,
@@ -38,13 +37,9 @@ import com.redhat.ceylon.ide.common.platform {
     LinkedMode
 }
 
-import java.lang {
-    ObjectArray
-}
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    CustomLookupCellRenderer,
-    IdeaProposalsHolder
+    IdeaProposalsHolder,
+    installCustomLookupCellRenderer
 }
 
 shared class IdeaLinkedMode(IdeaDocument document) extends LinkedMode(document) {
@@ -77,15 +72,14 @@ class IdeaLinkedModeModel() {
     value variables = ArrayList<[TextRange, LookupElement[]]>();
     value multiVariables = ArrayList<{TextRange+}>();
 
-    shared void addEditableRegion(Integer start, Integer len, LookupElement[] proposals) {
-        variables.add([TextRange.from(start, len), proposals]);
-    }
+    shared void addEditableRegion(Integer start, Integer len, LookupElement[] proposals)
+            => variables.add([TextRange.from(start, len), proposals]);
 
-    shared void addEditableRegions({TextRange+} ranges) {
-        multiVariables.add(ranges);
-    }
+    shared void addEditableRegions({TextRange+} ranges)
+            => multiVariables.add(ranges);
 
     shared void buildTemplate(Editor editor) {
+
         assert(exists project = editor.project);
         PsiDocumentManager.getInstance(project).commitDocument(editor.document);
         assert(exists file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document));
@@ -94,10 +88,10 @@ class IdeaLinkedModeModel() {
         for ([range,elements] in variables) {
             value text = editor.document.getText(range);
             value proposals = object extends Expression() {
-                shared actual ObjectArray<LookupElement> calculateLookupItems(ExpressionContext? expressionContext)
+                calculateLookupItems(ExpressionContext? expressionContext)
                         => createJavaObjectArray(elements);
-                shared actual TemplateResult? calculateQuickResult(ExpressionContext? expressionContext) => TextResult(text);
-                shared actual TemplateResult? calculateResult(ExpressionContext? expressionContext) => TextResult(text);
+                calculateQuickResult(ExpressionContext? expressionContext) => TextResult(text);
+                calculateResult(ExpressionContext? expressionContext) => TextResult(text);
             };
             builder.replaceRange(range, proposals);
         }
@@ -110,11 +104,9 @@ class IdeaLinkedModeModel() {
             variable value j = 0;
             for (range in ranges) {
                 value expr = object extends Expression() {
-                    shared actual ObjectArray<LookupElement>? calculateLookupItems(ExpressionContext? expressionContext)
-                            => null;
-                    shared actual TemplateResult? calculateQuickResult(ExpressionContext ctx) => null;
-                    shared actual TemplateResult? calculateResult(ExpressionContext ctx)
-                            => TextResult(text);
+                    calculateLookupItems(ExpressionContext? expressionContext) => null;
+                    calculateQuickResult(ExpressionContext ctx) => null;
+                    calculateResult(ExpressionContext ctx) => TextResult(text);
                 };
 
                 if (j == 0) {
@@ -132,9 +124,8 @@ class IdeaLinkedModeModel() {
 
         value template = builder.buildInlineTemplate();
         value listener = object extends TemplateEditingAdapter() {
-            shared actual void currentVariableChanged(TemplateState? templateState, Template? template, Integer int, Integer int1) {
-                CustomLookupCellRenderer.install(project);
-            }
+            currentVariableChanged(TemplateState? templateState, Template? template, Integer int, Integer int1)
+                    => installCustomLookupCellRenderer(project);
         };
         TemplateManager.getInstance(project).startTemplate(editor, template, listener);
     }
