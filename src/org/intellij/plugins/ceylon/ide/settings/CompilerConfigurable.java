@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.settings;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -86,18 +87,18 @@ public class CompilerConfigurable implements SearchableConfigurable, Configurabl
 
     @Override
     public boolean isModified() {
-        CeylonSettings settings = CeylonSettings.getInstance();
+        CeylonSettings settings = ceylonSettings_.get_();
 
         return (
-                outProcessMode.isSelected() != settings.isUseOutProcessBuild()
-                || verboseCheckbox.isSelected() != settings.isCompilerVerbose()
+                outProcessMode.isSelected() != settings.getUseOutProcessBuild()
+                || verboseCheckbox.isSelected() != settings.getCompilerVerbose()
                 || !Objects.equals(getVerbosityLevel(), settings.getVerbosityLevel())
         );
     }
 
     @Override
     public void apply() throws ConfigurationException {
-        CeylonSettings settings = CeylonSettings.getInstance();
+        CeylonSettings settings = ceylonSettings_.get_();
         settings.setUseOutProcessBuild(outProcessMode.isSelected());
         settings.setCompilerVerbose(verboseCheckbox.isSelected());
         settings.setVerbosityLevel(getVerbosityLevel());
@@ -105,10 +106,10 @@ public class CompilerConfigurable implements SearchableConfigurable, Configurabl
 
     @Override
     public void reset() {
-        CeylonSettings settings = CeylonSettings.getInstance();
-        outProcessMode.setSelected(settings.isUseOutProcessBuild());
-        inProcessMode.setSelected(!settings.isUseOutProcessBuild());
-        verboseCheckbox.setSelected(settings.isCompilerVerbose());
+        CeylonSettings settings = ceylonSettings_.get_();
+        outProcessMode.setSelected(settings.getUseOutProcessBuild());
+        inProcessMode.setSelected(!settings.getUseOutProcessBuild());
+        verboseCheckbox.setSelected(settings.getCompilerVerbose());
         setVerbosityLevel(settings.getVerbosityLevel());
     }
 

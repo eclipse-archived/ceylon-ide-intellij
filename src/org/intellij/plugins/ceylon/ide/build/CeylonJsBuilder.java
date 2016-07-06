@@ -17,7 +17,7 @@ import com.redhat.ceylon.compiler.typechecker.tree.Message;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
-import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class CeylonJsBuilder implements CompileTask {
 
     @Override
     public boolean execute(CompileContext context) {
-        if (CeylonSettings.getInstance().isUseOutProcessBuild()) {
+        if (ceylonSettings_.get_().getUseOutProcessBuild()) {
             return true;
         }
         IdeaCeylonProjects projects = context.getProject().getComponent(IdeaCeylonProjects.class);

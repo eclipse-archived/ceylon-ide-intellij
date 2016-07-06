@@ -17,24 +17,24 @@ shared CeylonSettings ceylonSettings
         then CeylonSettings()
         else ServiceManager.getService(javaClass<CeylonSettings>());
 
+shared class CeylonOptions() {
+    shared variable String defaultTargetVm = "jvm";
+    shared variable String defaultSourceFolder = "source";
+    shared variable String defaultResourceFolder = "resource";
+    shared variable Boolean useOutProcessBuild = true;
+    shared variable Boolean makeCompilerVerbose = false;
+    shared variable String verbosityLevel = "";
+    shared variable Integer autoUpdateInterval = 4000;
+}
+
 state {
     name = "CeylonSettings";
     storages = { storage("$APP_CONFIG$/ceylon.xml") };
 }
 shared class CeylonSettings
-        satisfies PersistentStateComponent<CeylonSettings.CeylonOptions> {
+        satisfies PersistentStateComponent<CeylonOptions> {
 
     shared new() {}
-
-    shared class CeylonOptions() {
-        shared variable String defaultTargetVm = "jvm";
-        shared variable String defaultSourceFolder = "source";
-        shared variable String defaultResourceFolder = "resource";
-        shared variable Boolean useOutProcessBuild = true;
-        shared variable Boolean makeCompilerVerbose = false;
-        shared variable String verbosityLevel = "";
-        shared variable Integer autoUpdateInterval = 4000;
-    }
 
     variable CeylonOptions myOptions = CeylonOptions();
 

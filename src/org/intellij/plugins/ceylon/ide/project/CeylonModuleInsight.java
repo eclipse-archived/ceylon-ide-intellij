@@ -32,7 +32,7 @@ public class CeylonModuleInsight extends ModuleInsight {
 
     @Override
     protected boolean isSourceFile(File file) {
-        return file.isFile() && file.getName().endsWith(CeylonFileType.DEFAULT_EXTENSION);
+        return file.isFile() && file.getName().endsWith(CeylonFileType.INSTANCE.getDefaultExtension());
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide.settings;
 import com.intellij.openapi.options.BaseConfigurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.util.ui.UIUtil;
-import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,19 +43,19 @@ public class EditorConfigurable extends BaseConfigurable {
 
     @Override
     public void apply() throws ConfigurationException {
-        CeylonSettings.getInstance()
+        ceylonSettings_.get_()
                 .setAutoUpdateInterval(Integer.valueOf(modelUpdateDelay.getText()) * 1000);
     }
 
     @Override
     public void reset() {
         modelUpdateDelay.setText(String.valueOf(
-                CeylonSettings.getInstance().getAutoUpdateInterval() / 1000));
+                ceylonSettings_.get_().getAutoUpdateInterval() / 1000));
     }
 
     @Override
     public boolean isModified() {
-        return CeylonSettings.getInstance()
+        return ceylonSettings_.get_()
                 .getAutoUpdateInterval() != Integer.valueOf(modelUpdateDelay.getText()) * 1000;
     }
 

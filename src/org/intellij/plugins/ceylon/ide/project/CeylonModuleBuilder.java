@@ -17,7 +17,7 @@ import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
-import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -111,7 +111,7 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
     public List<Pair<String, String>> getSourcePaths() {
         if (mySourcePaths == null) {
             final List<Pair<String, String>> paths = new ArrayList<>();
-            String folder = CeylonSettings.getInstance().getDefaultSourceFolder();
+            String folder = ceylonSettings_.get_().getDefaultSourceFolder();
             @NonNls final String path = getContentEntryPath() + File.separator + folder;
             new File(path).mkdirs();
             paths.add(Pair.create(path, ""));

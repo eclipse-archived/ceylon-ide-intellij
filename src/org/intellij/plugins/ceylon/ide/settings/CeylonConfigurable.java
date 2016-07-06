@@ -4,7 +4,9 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.options.*;
 import com.intellij.openapi.options.ex.Settings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonOptions;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +37,7 @@ public class CeylonConfigurable extends BaseConfigurable {
         restoreDefaultsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CeylonSettings.getInstance().loadState(new CeylonSettings.CeylonOptions());
+                ceylonSettings_.get_().loadState(new CeylonOptions());
                 reset();
             }
         });
@@ -61,7 +63,7 @@ public class CeylonConfigurable extends BaseConfigurable {
 
     @Override
     public void apply() throws ConfigurationException {
-        CeylonSettings settings = CeylonSettings.getInstance();
+        CeylonSettings settings = ceylonSettings_.get_();
 
         settings.setDefaultTargetVm(getTargetVm());
         settings.setDefaultSourceFolder(sourceName.getText());
@@ -79,7 +81,7 @@ public class CeylonConfigurable extends BaseConfigurable {
 
     @Override
     public void reset() {
-        CeylonSettings settings = CeylonSettings.getInstance();
+        CeylonSettings settings = ceylonSettings_.get_();
 
         switch (settings.getDefaultTargetVm()) {
             case "jvm":
@@ -98,7 +100,7 @@ public class CeylonConfigurable extends BaseConfigurable {
 
     @Override
     public boolean isModified() {
-        CeylonSettings settings = CeylonSettings.getInstance();
+        CeylonSettings settings = ceylonSettings_.get_();
 
         return !(
                 settings.getDefaultTargetVm().equals(getTargetVm())

@@ -43,7 +43,7 @@ public class CeylonBuilder implements CompileTask {
 
                     project.getBuild().performBuild(monitor);
 
-                    if (ceylonSettings_.get_().isUseOutProcessBuild()) {
+                    if (ceylonSettings_.get_().getUseOutProcessBuild()) {
                         project.getBuild().performBinaryGeneration(monitor, project.getBuild().new BinaryGenerator() {
                             @Override
                             public boolean build(CeylonProjectBuild<Module, VirtualFile, VirtualFile, VirtualFile> build,

@@ -1,7 +1,7 @@
 package org.intellij.plugins.ceylon.ide.project;
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
-import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 
 import javax.swing.*;
 
@@ -12,7 +12,7 @@ public class PageOne implements CeylonConfigForm {
     private JCheckBox workOffline;
 
     public PageOne() {
-        String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
+        String defaultVm = ceylonSettings_.get_().getDefaultTargetVm();
         compileForJvm.setSelected(!defaultVm.equals("js"));
         compileToJs.setSelected(!defaultVm.equals("jvm"));
     }
@@ -41,7 +41,7 @@ public class PageOne implements CeylonConfigForm {
 
     @Override
     public void load(IdeaCeylonProject project) {
-        String defaultVm = CeylonSettings.getInstance().getDefaultTargetVm();
+        String defaultVm = ceylonSettings_.get_().getDefaultTargetVm();
         compileForJvm.setSelected(safeNullBoolean(project.getIdeConfiguration().getCompileToJvm(), !defaultVm.equals("js")));
         compileToJs.setSelected(safeNullBoolean(project.getIdeConfiguration().getCompileToJs(), !defaultVm.equals("jvm")));
         workOffline.setSelected(safeNullBoolean(project.getConfiguration().getProjectOffline(), false));
