@@ -161,10 +161,10 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
             return manager.areElementsEquivalent(resolved, element.containingClass);
         }
         if (is CeylonPsi.AttributeSetterDefinitionPsi element) {
-            Setter setter = element.ceylonNode.declarationModel;
+            Setter? setter = element.ceylonNode?.declarationModel;
             Value? getter;
             if (is CeylonPsi.AttributeDeclarationPsi resolved) {
-                getter = resolved.ceylonNode.declarationModel;
+                getter = resolved.ceylonNode?.declarationModel;
             } else if (is CeylonPsi.IdentifierPsi myElement,
                     is Value scope = myElement.ceylonNode.scope) {
                 getter = scope;
@@ -172,15 +172,15 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
             else {
                 getter = null;
             }
-            if (exists s = setter.getter, exists g = getter) {
+            if (exists s = setter?.getter, exists g = getter) {
                 return s == g;
             }
         }
         if (is CeylonPsi.AttributeDeclarationPsi element) {
-            Value getter = element.ceylonNode.declarationModel;
+            Value? getter = element.ceylonNode?.declarationModel;
             Setter? setter;
             if (is CeylonPsi.AttributeSetterDefinitionPsi resolved) {
-                setter = resolved.ceylonNode.declarationModel;
+                setter = resolved.ceylonNode?.declarationModel;
             } else if (is CeylonPsi.IdentifierPsi myElement,
                     is Setter scope = myElement.ceylonNode.scope) {
                 setter = scope;
@@ -188,7 +188,7 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
             else {
                 setter = null;
             }
-            if (exists g = getter.setter, exists s = setter) {
+            if (exists g = getter?.setter, exists s = setter) {
                 return s == g;
             }
         }
