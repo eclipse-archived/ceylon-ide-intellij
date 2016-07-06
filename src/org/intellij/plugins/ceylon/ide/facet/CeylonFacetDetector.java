@@ -10,7 +10,7 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonFileType_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
@@ -33,7 +33,7 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
     @NotNull
     @Override
     public FileType getFileType() {
-        return ceylonFileType_.get_();
+        return CeylonFileType.INSTANCE;
     }
 
     @NotNull

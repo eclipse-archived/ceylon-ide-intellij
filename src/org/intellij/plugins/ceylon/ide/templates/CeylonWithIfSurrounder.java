@@ -11,7 +11,7 @@ import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.IncorrectOperationException;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonFileType_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +31,7 @@ class CeylonWithIfSurrounder implements Surrounder {
     @Override
     public TextRange surroundElements(@NotNull Project project, @NotNull Editor editor, @NotNull PsiElement[] elements) throws IncorrectOperationException {
         String content = "void a(){if(true){\n}}";
-        PsiFile file = PsiFileFactory.getInstance(project).createFileFromText("dummy.ceylon", ceylonFileType_.get_(), content);
+        PsiFile file = PsiFileFactory.getInstance(project).createFileFromText("dummy.ceylon", CeylonFileType.INSTANCE, content);
 
         CeylonPsi.BooleanConditionPsi condition = PsiTreeUtil.getParentOfType(PsiUtilCore.getElementAtOffset(file, 12), CeylonPsi.BooleanConditionPsi.class);
         CeylonPsi.IfStatementPsi ifStatement = PsiTreeUtil.getParentOfType(condition, CeylonPsi.IfStatementPsi.class);

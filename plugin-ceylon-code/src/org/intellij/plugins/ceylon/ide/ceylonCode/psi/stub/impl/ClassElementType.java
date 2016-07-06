@@ -2,7 +2,7 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.*;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
@@ -16,7 +16,7 @@ import java.io.IOException;
 public class ClassElementType extends IStubElementType<ClassStub, CeylonClass> {
 
     public ClassElementType(@NotNull @NonNls String debugName) {
-        super(debugName, ceylonLanguage_.get_());
+        super(debugName, CeylonLanguage.INSTANCE);
     }
 
     @Override

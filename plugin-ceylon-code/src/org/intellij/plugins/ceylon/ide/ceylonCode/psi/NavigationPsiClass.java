@@ -15,7 +15,7 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -349,7 +349,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
     @NotNull
     @Override
     public Language getLanguage() {
-        return ceylonLanguage_.get_();
+        return CeylonLanguage.INSTANCE;
     }
 
     @Override

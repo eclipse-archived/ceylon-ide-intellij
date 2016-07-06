@@ -28,7 +28,7 @@ import com.redhat.ceylon.ide.common.util.FindNodeVisitor;
 import com.redhat.ceylon.model.typechecker.model.Type;
 import com.redhat.ceylon.model.typechecker.model.Unit;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonFileType_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
@@ -45,7 +45,7 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
         public PsiElement createExpression(@NotNull PsiElement context, @NotNull String prefix, @NotNull String suffix) {
             String expression = prefix + context.getText() + suffix;
             String content = "void z(){if(" + expression + ")}";
-            PsiFile file = PsiFileFactory.getInstance(context.getProject()).createFileFromText("dummy.ceylon", ceylonFileType_.get_(), content);
+            PsiFile file = PsiFileFactory.getInstance(context.getProject()).createFileFromText("dummy.ceylon", CeylonFileType.INSTANCE, content);
 
             return PsiTreeUtil.getParentOfType(PsiUtilCore.getElementAtOffset(file, 12), CeylonPsi.ExistsConditionPsi.class);
         }

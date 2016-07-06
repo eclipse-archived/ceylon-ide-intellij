@@ -33,7 +33,7 @@ import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct.IdeaQuickFixData;
 import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonLightElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
@@ -51,7 +51,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
-import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference.resolveDeclaration;
+import static org.intellij.plugins.ceylon.ide.ceylonCode.resolve.resolveDeclaration_.resolveDeclaration;
 
 public class CeylonDocProvider extends AbstractDocumentationProvider {
 
@@ -155,7 +155,6 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
             Object first = ((Tuple) object).getFirst();
             if (first instanceof Declaration) {
                 PsiElement target = resolveDeclaration((Declaration) first, element.getProject());
-
                 if (target instanceof DeclarationPsiNameIdOwner) {
                     return ((DeclarationPsiNameIdOwner) target).getNameIdentifier();
                 }
@@ -213,7 +212,6 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
                 return new DummyPsiElement(target, context.getContainingFile());
             } else if (link.startsWith("dec:")) {
                 PsiElement psiDecl = resolveDeclaration(target, context.getProject());
-
                 if (psiDecl != null && psiDecl instanceof Navigatable) {
                     ((Navigatable) psiDecl).navigate(true);
                 }
@@ -274,7 +272,7 @@ public class CeylonDocProvider extends AbstractDocumentationProvider {
         @NotNull
         @Override
         public Language getLanguage() {
-            return ceylonLanguage_.get_();
+            return CeylonLanguage.INSTANCE;
         }
 
         @NotNull

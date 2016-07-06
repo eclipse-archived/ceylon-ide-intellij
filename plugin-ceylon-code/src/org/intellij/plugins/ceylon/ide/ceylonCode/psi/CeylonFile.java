@@ -1,14 +1,5 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.antlr.runtime.CommonToken;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonFileType_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang.ceylonLanguage_;
-import org.jetbrains.annotations.NotNull;
-
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileTypes.FileType;
@@ -34,20 +25,24 @@ import com.redhat.ceylon.ide.common.model.IdeModule;
 import com.redhat.ceylon.ide.common.platform.CommonDocument;
 import com.redhat.ceylon.ide.common.platform.Status;
 import com.redhat.ceylon.ide.common.platform.platformUtils_;
-import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
-import com.redhat.ceylon.ide.common.typechecker.IdePhasedUnit;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult$impl;
-import com.redhat.ceylon.ide.common.typechecker.ProjectPhasedUnit;
+import com.redhat.ceylon.ide.common.typechecker.*;
 import com.redhat.ceylon.ide.common.vfs.BaseFileVirtualFile;
 import com.redhat.ceylon.model.typechecker.model.Cancellable;
+import org.antlr.runtime.CommonToken;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.intellij.psi.util.PsiTreeUtil.getChildrenOfType;
 
 public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     
     public CeylonFile(@NotNull FileViewProvider viewProvider) {
-        super(viewProvider, ceylonLanguage_.get_());
+        super(viewProvider, CeylonLanguage.INSTANCE);
     }
 
     private CeylonPsi.CompilationUnitPsi getCompilationUnitPsi() {
@@ -220,7 +215,7 @@ public class CeylonFile extends PsiFileBase implements PsiClassOwner {
     @NotNull
     @Override
     public FileType getFileType() {
-        return ceylonFileType_.get_();
+        return CeylonFileType.INSTANCE;
     }
 
     @SuppressWarnings("unchecked")
