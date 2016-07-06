@@ -17,7 +17,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
-import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference;
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.resolveDeclaration_;
 import org.jetbrains.annotations.NotNull;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
@@ -130,7 +130,7 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider
                 Node node = visitor.getDeclarationNode();
 
                 if (node == null) {
-                    PsiElement idOwner = CeylonReference.resolveDeclaration(declaration, myFile.getProject());
+                    PsiElement idOwner = resolveDeclaration_.resolveDeclaration(declaration, myFile.getProject());
                     if (idOwner instanceof CeylonCompositeElement) {
                         node = ((CeylonCompositeElement) idOwner).getCeylonNode();
                     }

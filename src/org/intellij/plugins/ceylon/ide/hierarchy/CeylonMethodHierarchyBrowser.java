@@ -25,7 +25,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.descriptions_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference;
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.resolveDeclaration_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -139,7 +139,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
             return new MethodHierarchyNodeDescriptor(element, model);
         }
         else {
-            PsiElement psiElement = CeylonReference.resolveDeclaration(refined, project);
+            PsiElement psiElement = resolveDeclaration_.resolveDeclaration(refined, project);
             if (psiElement!=null) {
                 MethodHierarchyNodeDescriptor parentDescriptor = build(psiElement, refined);
                 MethodHierarchyNodeDescriptor nodeDescriptor =
@@ -400,7 +400,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                                 && !declaration.equals(model)
                                 && directlyRefines(declaration, model)) {
                             PsiElement psiElement
-                                    = CeylonReference.resolveDeclaration(declaration, project);
+                                    = resolveDeclaration_.resolveDeclaration(declaration, project);
                             if (psiElement!=null) {
                                 result.add(new MethodHierarchyNodeDescriptor(descriptor,
                                         psiElement, declaration));
@@ -431,7 +431,7 @@ class CeylonMethodHierarchyBrowser extends TypeHierarchyBrowserBase {
                     if (model.refines(declaration)
                             && directlyRefines(model, declaration)) {
                         PsiElement psiElement
-                                = CeylonReference.resolveDeclaration(declaration, project);
+                                = resolveDeclaration_.resolveDeclaration(declaration, project);
                         if (psiElement!=null) {
                             result.add(new MethodHierarchyNodeDescriptor(descriptor,
                                     psiElement, declaration));

@@ -33,6 +33,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.descriptions_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonReference;
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.resolveDeclaration_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -184,7 +185,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             } else {
                 TypeDeclaration extended = extendedType.getDeclaration();
                 PsiElement psiElement
-                        = CeylonReference.resolveDeclaration(extended, project);
+                        = resolveDeclaration_.resolveDeclaration(extended, project);
                 if (psiElement!=null) {
                     TypeHierarchyNodeDescriptor parentDescriptor =
                             build(psiElement, extended);
@@ -442,7 +443,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                             if (extendedType != null
                                     && extendedType.getDeclaration().equals(model)) {
                                 PsiElement psiElement
-                                        = CeylonReference.resolveDeclaration(ci, project);
+                                        = resolveDeclaration_.resolveDeclaration(ci, project);
                                 if (psiElement!=null) {
                                     result.add(new TypeHierarchyNodeDescriptor(descriptor,
                                             psiElement, ci));
@@ -454,7 +455,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
                                 if (satisfiedType != null
                                         && satisfiedType.getDeclaration().equals(model)) {
                                     PsiElement psiElement
-                                            = CeylonReference.resolveDeclaration(ci, project);
+                                            = resolveDeclaration_.resolveDeclaration(ci, project);
                                     if (psiElement!=null) {
                                         result.add(new TypeHierarchyNodeDescriptor(descriptor,
                                                 psiElement, ci));
@@ -480,7 +481,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             if (cl != null) {
                 TypeDeclaration td = cl.getDeclaration();
                 PsiElement psiElement
-                        = CeylonReference.resolveDeclaration(td, project);
+                        = resolveDeclaration_.resolveDeclaration(td, project);
                 if (psiElement!=null) {
                     result.add(new TypeHierarchyNodeDescriptor(parent, psiElement, td));
                 }
@@ -488,7 +489,7 @@ class CeylonTypeHierarchyBrowser extends TypeHierarchyBrowserBase {
             for (Type type : ci.getSatisfiedTypes()) {
                 TypeDeclaration td = type.getDeclaration();
                 PsiElement psiElement
-                        = CeylonReference.resolveDeclaration(td, project);
+                        = resolveDeclaration_.resolveDeclaration(td, project);
                 if (psiElement!=null) {
                     result.add(new TypeHierarchyNodeDescriptor(parent, psiElement, td));
                 }

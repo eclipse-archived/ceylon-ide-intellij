@@ -56,7 +56,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
-    CeylonReference
+    resolveDeclaration
 }
 
 shared class CeylonGotoSuperHandler()
@@ -241,7 +241,7 @@ shared class CeylonGotoSuperHandler()
         value result = ArrayList<PsiElement>();
         for (target in list) {
             if (exists targetNode 
-                    = CeylonReference.resolveDeclaration(target, e.project)) {
+                    = resolveDeclaration(target, e.project)) {
                 result.add(targetNode);
             }
         }

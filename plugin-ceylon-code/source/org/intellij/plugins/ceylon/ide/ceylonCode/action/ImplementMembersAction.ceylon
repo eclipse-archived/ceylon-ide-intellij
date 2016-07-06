@@ -69,7 +69,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     descriptions
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
-    CeylonReference
+    resolveDeclaration
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
@@ -181,7 +181,7 @@ shared abstract class AbstractMembersAction()
             shared Declaration declaration;
 
             assert (exists containerPsi
-                        = CeylonReference.resolveDeclaration(container, project));
+                        = resolveDeclaration(container, project));
 
             parentNodeDelegate = Parent(containerPsi, container);
             hash => declaration.hash;

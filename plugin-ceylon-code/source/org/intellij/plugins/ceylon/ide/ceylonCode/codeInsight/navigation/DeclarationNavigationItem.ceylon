@@ -2,11 +2,18 @@ import com.intellij.navigation {
     NavigationItem,
     ItemPresentationProviders
 }
+import com.intellij.openapi.actionSystem {
+    DataProvider,
+    CommonDataKeys
+}
 import com.intellij.openapi.project {
     Project
 }
 import com.intellij.pom {
     Navigatable
+}
+import com.intellij.psi {
+    PsiNameIdentifierOwner
 }
 import com.redhat.ceylon.ide.common.model {
     SourceFile
@@ -16,14 +23,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
-    CeylonReference
-}
-import com.intellij.openapi.actionSystem {
-    DataProvider,
-    CommonDataKeys
-}
-import com.intellij.psi {
-    PsiNameIdentifierOwner
+    resolveDeclaration
 }
 
 shared class DeclarationNavigationItem(declaration, project)
@@ -40,7 +40,7 @@ shared class DeclarationNavigationItem(declaration, project)
     name => declaration.name;
 
     shared actual void navigate(Boolean requestFocus) {
-        if (exists resolved = CeylonReference.resolveDeclaration(declaration, project),
+        if (exists resolved = resolveDeclaration(declaration, project),
             is Navigatable resolved) {
             resolved.navigate(requestFocus);
         } else if (is SourceFile unit = declaration.unit) {
@@ -69,7 +69,7 @@ shared class DeclarationNavigationItem(declaration, project)
 
     shared actual Object? getData(String dataId) {
         if (dataId == CommonDataKeys.psiElement.name,
-            exists psi = CeylonReference.resolveDeclaration(declaration, project)) {
+            exists psi = resolveDeclaration(declaration, project)) {
             if (is PsiNameIdentifierOwner psi,
                 exists id = psi.nameIdentifier) {
                 return id;

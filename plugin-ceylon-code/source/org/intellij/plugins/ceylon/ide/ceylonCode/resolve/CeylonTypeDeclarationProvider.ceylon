@@ -46,19 +46,19 @@ shared class CeylonTypeDeclarationProvider() satisfies TypeDeclarationProvider {
         if (is UnionType typeDec) {
             value list = ArrayList<PsiElement>();
             for (t in typeDec.caseTypes) {
-                list.add(CeylonReference.resolveDeclaration(t.declaration, project));
+                list.add(resolveDeclaration(t.declaration, project));
             }
             return list.toArray(ObjectArray<PsiElement>(0));
         }
         if (is IntersectionType typeDec) {
             value list = ArrayList<PsiElement>();
             for (t in typeDec.satisfiedTypes) {
-                list.add(CeylonReference.resolveDeclaration(t.declaration, project));
+                list.add(resolveDeclaration(t.declaration, project));
             }
             return list.toArray(ObjectArray<PsiElement>(0));
         }
         value array = ObjectArray<PsiElement>(1);
-        array.set(0, CeylonReference.resolveDeclaration(typeDec, project));
+        array.set(0, resolveDeclaration(typeDec, project));
         return array;
     }
 
