@@ -2,6 +2,8 @@ package org.intellij.plugins.ceylon.ide.settings;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.*;
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion.completionOptions_;
+
 import com.redhat.ceylon.ide.common.settings.CompletionOptions;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,17 +13,15 @@ import org.jetbrains.annotations.Nullable;
 )
 public class CompletionSettings implements PersistentStateComponent<CompletionOptions> {
 
-    private CompletionOptions myOptions = new CompletionOptions();
-
     @Nullable
     @Override
     public CompletionOptions getState() {
-        return myOptions;
+        return completionOptions_.get_();
     }
 
     @Override
     public void loadState(CompletionOptions state) {
-        myOptions = state;
+        completionOptions_.set_(state);
     }
 
     public static CompletionSettings getInstance() {
@@ -34,6 +34,6 @@ public class CompletionSettings implements PersistentStateComponent<CompletionOp
     }
 
     public CompletionOptions getOptions() {
-        return myOptions;
+        return completionOptions_.get_();
     }
 }
