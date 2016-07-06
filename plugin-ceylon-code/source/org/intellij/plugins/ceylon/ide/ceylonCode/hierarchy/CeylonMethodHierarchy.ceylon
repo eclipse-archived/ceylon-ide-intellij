@@ -2,6 +2,14 @@ import ceylon.interop.java {
     createJavaObjectArray
 }
 
+import com.intellij.ide.hierarchy {
+    HierarchyBrowser,
+    HierarchyProvider
+}
+import com.intellij.openapi.actionSystem {
+    DataContext,
+    CommonDataKeys
+}
 import com.intellij.openapi.project {
     Project
 }
@@ -15,14 +23,16 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     ClassOrInterface,
     TypeDeclaration,
-    ModelUtil
+    ModelUtil,
+    Type
 }
 
 import java.lang {
     ObjectArray
 }
 import java.util {
-    ArrayList
+    ArrayList,
+    List
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
@@ -30,14 +40,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     resolveDeclaration
-}
-import com.intellij.ide.hierarchy {
-    HierarchyBrowser,
-    HierarchyProvider
-}
-import com.intellij.openapi.actionSystem {
-    DataContext,
-    CommonDataKeys
 }
 
 alias MemberDec => CeylonPsi.DeclarationPsi | CeylonPsi.SpecifierStatementPsi;
@@ -67,9 +69,9 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
             is TypeDeclaration supertypeScope = supertype.container);
         value interveningRefinements
                 = ModelUtil.getInterveningRefinements(subtype.name,
-            ModelUtil.getSignature(subtype),
-            supertype.refinedDeclaration,
-            subtypeScope, supertypeScope);
+                    ModelUtil.getSignature(subtype),
+                    supertype.refinedDeclaration,
+                    subtypeScope, supertypeScope);
         interveningRefinements.remove(supertype);
         return interveningRefinements.empty;
     }
@@ -84,7 +86,7 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
                 for (declaration in unit.declarations) {
                     if (declaration.classOrInterfaceMember, declaration.actual) {
                         if (declaration.refines(model),
-                            declaration!=model,
+                            declaration != model,
                             directlyRefines(declaration, model)) {
                             if (exists psiElement = resolveDeclaration(declaration, project)) {
                                 result.add(CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor));
@@ -103,11 +105,12 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
         if (exists model = descriptor.model,
             is ClassOrInterface container = model.container,
             model.actual) {
-            value signature = ModelUtil.getSignature(model);
+            List<Type>? signature = ModelUtil.getSignature(model);
             for (supertype in container.supertypeDeclarations) {
                 if (exists declaration = supertype.getDirectMember(model.name, signature, false, true),
                     declaration.default || declaration.formal) {
-                    if (model.refines(declaration), directlyRefines(model, declaration)) {
+                    if (model.refines(declaration),
+                        directlyRefines(model, declaration)) {
                         if (exists psiElement = resolveDeclaration(declaration, project)) {
                             result.add(CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor));
                         }

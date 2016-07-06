@@ -95,10 +95,10 @@ Set<PhasedUnit> collectPhasedUnits(Project project) {
                 indicator.indeterminate = true;
                 if (exists ceylonProject = ceylonProjects.getProject(mod),
                     exists modules = ceylonProject.modules) {
-                    value listOfModules = modules.typecheckerModules.listOfModules;
                     if (exists typechecker = ceylonProject.typechecker) {
                         result.addAll(typechecker.phasedUnits.phasedUnits);
                     }
+                    value listOfModules = modules.typecheckerModules.listOfModules;
                     for (m in listOfModules) {
                         indicator.text2 = "Indexing module " + m.nameAsString;
                         assert (is BaseIdeModule m);
