@@ -1,6 +1,11 @@
+import ceylon.collection {
+    HashSet
+}
 import ceylon.interop.java {
     JavaRunnable,
-    CeylonIterable
+    CeylonIterable,
+    javaClass,
+    javaClassFromInstance
 }
 
 import com.intellij.notification {
@@ -73,10 +78,7 @@ import com.intellij.openapi.vfs {
     VirtualFileManager
 }
 import com.intellij.psi {
-    PsiFile,
-    PsiManager {
-        psiManager=getInstance
-    }
+    PsiFile
 }
 import com.intellij.psi.impl {
     PsiDocumentTransactionListener {
@@ -95,7 +97,8 @@ import com.intellij.util.messages {
 import com.redhat.ceylon.ide.common.model {
     ChangeAware,
     ModelAliases,
-    ModelListenerAdapter
+    ModelListenerAdapter,
+    deltaBuilderFactory
 }
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
@@ -104,11 +107,11 @@ import com.redhat.ceylon.ide.common.platform {
 
 import java.lang {
     Runnable,
-    InterruptedException
+    InterruptedException,
+    Error
 }
 import java.util {
-    JHashSet=HashSet,
-    Collections
+    JHashSet=HashSet
 }
 import java.util.concurrent {
     TimeUnit,
@@ -126,10 +129,15 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     ProgressIndicatorMonitor
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
+    CeylonLocalAnalyzerManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings {
     ceylonSettings
+}
+
+final class ChangesInProject of noChange | changesThatAlwaysRequireModelUpdate {
+    shared new noChange {}
+    shared new changesThatAlwaysRequireModelUpdate {}
 }
 
 shared class CeylonModelManager(model) 
@@ -224,41 +232,81 @@ shared class CeylonModelManager(model)
                         return;
                     }
 
-                    function syntaxErrorsWhenOnlyOneCeylonChange(CeylonProjectAlias ceylonProject) {
+                    FileEditorManager mgr = FileEditorManager.getInstance(model.ideaProject);
+                    function isThereOnlyOneCeylonFileContentChange(CeylonProjectAlias ceylonProject) {
                         value fileChangesToAnalyze = ceylonProject.build.fileChangesToAnalyze;
                         if (exists firstChange = fileChangesToAnalyze.first) {
                             if (fileChangesToAnalyze.rest.first exists) {
-                                return null; // more than 1 changes
+                                return ChangesInProject.changesThatAlwaysRequireModelUpdate; // more than 1 changes
                             }
-                            if (is FileVirtualFileContentChange firstChange,
-                                is CeylonFile ceylonFile = concurrencyManager.needReadAccess(() => psiManager(model.ideaProject).findFile(firstChange.resource.nativeResource) else null),
-                                exists cu = ceylonFile.localAnalyzer?.result?.parsedRootNode,
-                                ! cu.errors.empty) {
-                                return cu.errors ;
+                            if (is FileVirtualFileContentChange firstChange) {
+                                value virtualFile = firstChange.resource.nativeResource;
+                                if (virtualFile in mgr.selectedFiles.array) {
+                                    return virtualFile;
+                                } else {
+                                    return ChangesInProject.changesThatAlwaysRequireModelUpdate; // change in a file that is not currently edited
+                                }
                             } else {
-                                return null; // other type of change (non-source, non-Ceylon, etc ...)
+                                return ChangesInProject.changesThatAlwaysRequireModelUpdate; // other type of change (non-source, non-Ceylon, etc ...)
                             }
                         } else {
-                            return Collections.emptyList();
+                            return ChangesInProject.noChange;
                         }
                     }
                     
                     if (! force) {
-                        variable value shouldCancel = false;
+                        value changedCurrentlyEditedFiles = HashSet<VirtualFile>();
                         for (p in model.ceylonProjects) {
-                            if (exists syntaxErrors = syntaxErrorsWhenOnlyOneCeylonChange(p)) {
-                                if (! syntaxErrors.empty) {
-                                    shouldCancel = true;
-                                }
-                            } else {
-                                shouldCancel = false;
+                            switch(answer = isThereOnlyOneCeylonFileContentChange(p))
+                            case(ChangesInProject.changesThatAlwaysRequireModelUpdate) {
+                                changedCurrentlyEditedFiles.clear();
                                 break;
+                            }
+                            case(ChangesInProject.noChange) {
+                            }
+                            case(is VirtualFile) {
+                                changedCurrentlyEditedFiles.add(answer);
                             }
                         }
                         
-                        if (shouldCancel) {
-                            cancelledBecauseOfSyntaxErrors = true;
-                            return;
+                        if (exists changedFile = changedCurrentlyEditedFiles.first,
+                            changedCurrentlyEditedFiles.rest.empty) {
+                            value analyzerManager = model.ideaProject.getComponent(javaClass<CeylonLocalAnalyzerManager>());
+                            if (exists localAnalysisResult = analyzerManager[changedFile]?.result) {
+                                variable value shouldCancel = false;
+                                if (! localAnalysisResult.parsedRootNode.errors.empty) {
+                                    shouldCancel = true;
+                                } else {
+                                    if (exists lastPhasedUnit = localAnalysisResult.lastPhasedUnit,
+                                        is IdeaCeylonProject ceylonProject = localAnalysisResult.ceylonProject,
+                                        exists projectFile = ceylonProject.projectFileFromNative(changedFile),
+                                        exists modelPhasedUnit = ceylonProject.getParsedUnit(projectFile)) {
+                                        
+                                        try {
+                                            value deltas = deltaBuilderFactory.buildDeltas(
+                                                modelPhasedUnit, lastPhasedUnit);
+                                            if (deltas.changes.empty && 
+                                                deltas.childrenDeltas.empty) {
+                                                shouldCancel = true;
+                                            }
+                                        } catch(Exception e) {
+                                        } catch(AssertionError e) {
+                                            e.printStackTrace();
+                                        } catch(Error e) {
+                                            if (javaClassFromInstance(e).name == 
+                                                "com.redhat.ceylon.compiler.java.runtime.metamodel.ModelError") {
+                                                e.printStackTrace();
+                                            } else {
+                                                throw e;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (shouldCancel) {
+                                    cancelledBecauseOfSyntaxErrors = true;
+                                    return;
+                                }
+                            }
                         }
                     }
                     
