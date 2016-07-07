@@ -11,6 +11,7 @@ import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+import com.redhat.ceylon.ide.common.util.escaping_;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.FunctionOrValue;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
@@ -31,8 +32,14 @@ public abstract class DeclarationPsiNameIdOwner
 
     @Override
     public String getName() {
-        Tree.Identifier id = getCeylonNode().getIdentifier();
-        return id == null ? null : id.getText();
+        CeylonPsi.IdentifierPsi identifierPsi
+                = PsiTreeUtil.getChildOfType(this, CeylonPsi.IdentifierPsi.class);
+        if (identifierPsi!=null) {
+            return identifierPsi.getText();
+        }
+        else {
+            return null;
+        }
     }
 
     @Nullable
@@ -60,9 +67,10 @@ public abstract class DeclarationPsiNameIdOwner
             throws IncorrectOperationException {
         PsiElement id = findChildByType(CeylonTypes.IDENTIFIER);
         if (id != null) {
+            String quoted = escaping_.get_().escape(name);
             CeylonPsi.DeclarationPsi decl =
                     CeylonTreeUtil.createDeclarationFromText(getProject(),
-                            "void " + name + "(){}");
+                            "void " + quoted + "(){}");
             id.replace(decl.getChildren()[0]);
         }
         return this;
