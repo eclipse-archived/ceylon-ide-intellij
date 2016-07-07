@@ -18,8 +18,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class IdentifierElementManipulator()
         extends AbstractElementManipulator<CeylonPsi.IdentifierPsi>() {
-    shared actual CeylonPsi.IdentifierPsi? handleContentChange(CeylonPsi.IdentifierPsi element, TextRange range, String newContent) {
-        PsiFile file = PsiFileFactory.getInstance(element.project).createFileFromText(CeylonLanguage.instance, JString(newContent));
+    shared actual CeylonPsi.IdentifierPsi? handleContentChange(CeylonPsi.IdentifierPsi element,
+            TextRange range, String newContent) {
+        value file
+                = PsiFileFactory.getInstance(element.project)
+                    .createFileFromText(CeylonLanguage.instance,
+                        JString(newContent));
         if (exists identifier = file.findElementAt(0)) {
             assert (is CeylonPsi.IdentifierPsi? idPsi
                     = element.replace(identifier.parent));
