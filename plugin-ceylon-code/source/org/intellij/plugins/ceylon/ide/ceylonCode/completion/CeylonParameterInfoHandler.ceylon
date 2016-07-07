@@ -71,17 +71,20 @@ shared class CeylonParameterInfoHandler()
     shared actual ArgumentListPsi? findElementForParameterInfo(CreateParameterInfoContext context) {
         if (is CeylonFile file = context.file) {
 
-            value elementAtOffset = PsiUtilCore.getElementAtOffset(context.file,
-                context.editor.caretModel.offset);
+            value elementAtOffset
+                    = PsiUtilCore.getElementAtOffset(context.file,
+                        context.editor.caretModel.offset);
 
             if (exists args = getParentOfType(elementAtOffset, javaClass<CeylonPsi.ArgumentListPsi>()),
                 exists invocation = getParentOfType(args, javaClass<CeylonPsi.InvocationExpressionPsi>()),
-                exists argList = invocation.ceylonNode.positionalArgumentList
-                    else invocation.ceylonNode.namedArgumentList,
-                is Tree.MemberOrTypeExpression mot = invocation.ceylonNode.primary,
+                exists node = invocation.ceylonNode,
+                exists argList
+                        = node.positionalArgumentList
+                        else node.namedArgumentList,
+                is Tree.MemberOrTypeExpression mot = node.primary,
                 is Functional declaration = mot.declaration) {
                 
-                context.itemsToShow = createJavaObjectArray({declaration});
+                context.itemsToShow = createJavaObjectArray { declaration };
 
                 return args;
             }
@@ -92,7 +95,7 @@ shared class CeylonParameterInfoHandler()
     
     shared actual ArgumentListPsi? findElementForUpdatingParameterInfo(UpdateParameterInfoContext context) {
         value elementAtOffset = PsiUtilCore.getElementAtOffset(context.file, context.offset);
-        return PsiTreeUtil.getParentOfType(elementAtOffset, javaClass<ArgumentListPsi>());
+        return getParentOfType(elementAtOffset, javaClass<ArgumentListPsi>());
     }
     
     getParametersForDocumentation(Functional? p, ParameterInfoContext? context)
