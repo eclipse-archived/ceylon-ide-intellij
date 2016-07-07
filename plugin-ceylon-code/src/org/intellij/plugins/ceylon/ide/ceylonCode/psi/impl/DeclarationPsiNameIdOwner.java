@@ -63,7 +63,7 @@ public abstract class DeclarationPsiNameIdOwner
             CeylonPsi.DeclarationPsi decl =
                     CeylonTreeUtil.createDeclarationFromText(getProject(),
                             "void " + name + "(){}");
-            id.replace(decl.getFirstChild());
+            id.replace(decl.getChildren()[0]);
         }
         return this;
     }
