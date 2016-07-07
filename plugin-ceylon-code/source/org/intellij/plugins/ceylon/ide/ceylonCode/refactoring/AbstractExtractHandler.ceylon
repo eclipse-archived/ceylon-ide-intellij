@@ -71,6 +71,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     FindMatchingPsiNodeVisitor
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    CeylonModelManager
+}
 
 shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandler {
 
@@ -86,8 +89,16 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             };
 
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile, DataContext dataContext) {
-        if (is CeylonFile psiFile, psiFile.ensureTypechecked() exists) {
-            extractSelectedExpression(project, editor, psiFile);
+        value modelManager = project.getComponent(javaClass<CeylonModelManager>());
+        try {
+            modelManager.pauseAutomaticModelUpdate();
+            
+            if (is CeylonFile psiFile, psiFile.ensureTypechecked() exists) {
+                extractSelectedExpression(project, editor, psiFile);
+            }
+
+        } finally {
+            modelManager.resumeAutomaticModelUpdate();
         }
     }
 

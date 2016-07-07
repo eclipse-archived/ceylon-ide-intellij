@@ -45,7 +45,8 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    concurrencyManager
+    concurrencyManager,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     ProgressIndicatorMonitor
@@ -53,6 +54,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonTokens
+}
+import ceylon.interop.java {
+    javaClass
 }
 
 
@@ -63,65 +67,72 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
     
     shared actual void addCompletions(CompletionParameters parameters, 
         ProcessingContext context, variable CompletionResultSet result) {
+        assert (exists project = parameters.editor.project);
+        value modelManager = project.getComponent(javaClass<CeylonModelManager>());
+        try {
+            modelManager.pauseAutomaticModelUpdate();
         
-        value sorter = completionService.emptySorter().weigh(
-            object extends LookupElementWeigher("keepInitialOrderWeigher", false, false) {
-                variable Integer i = 0;
-                
-                shared actual Comparable<JInteger> weigh(LookupElement element) {
-                    i++;
-                    return JInteger(i);
-                }
-            }
-        );
-        
-        result = result.withRelevanceSorter(sorter);
-
-        if (is LeafPsiElement position = parameters.position) {
-            if (position.elementType == CeylonTokens.astringLiteral) {
-                result = result.withPrefixMatcher("");
-            }
-            if (position.elementType == CeylonTokens.pidentifier) {
-                // In case of a package identifier like `ceylon.collection`, we compute a reference
-                // on the whold path, which will lead IntelliJ to create prefixes like `ceylon.col`
-                // whereas completionManager will return things like `collection`, which won't match
-                // the prefix. We thus have to change the prefix to what's after the dot.
-                value prefix = position.text.spanTo(position.text.size
-                    - CompletionInitializationContext.dummyIdentifierTrimmed.size - 1);
-                result = result.withPrefixMatcher(prefix);
-            }
-        }
-        
-        value progressMonitor = ProgressIndicatorMonitor.wrap {
-            object monitor extends EmptyProgressIndicator() {
-                // hashCode() seems to be quite slow when used in CoreProgressManager.threadsUnderIndicator
-                hash => 43;
-                
-            }
-        };
-        object listener extends ApplicationAdapter() {
-            shared actual void beforeWriteActionStart(Object action) {
-                if (!progressMonitor.cancelled) {
-                    progressMonitor.wrapped.cancel();
-                }
-            }
-        }
-        if (! application.writeActionPending) {
-            application.addApplicationListener(listener);
-            try {
-                concurrencyManager.withAlternateResolution(() {
-                    if (is CeylonFile ceylonFile = parameters.originalFile,
-                        exists localAnalyzer = ceylonFile.localAnalyzer,
-                        exists analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 5),
-                        analysisResult.upToDate) {
-                        addCompletionsInternal(parameters, context, result, analysisResult, options, progressMonitor);
+            value sorter = completionService.emptySorter().weigh(
+                object extends LookupElementWeigher("keepInitialOrderWeigher", false, false) {
+                    variable Integer i = 0;
+                    
+                    shared actual Comparable<JInteger> weigh(LookupElement element) {
+                        i++;
+                        return JInteger(i);
                     }
-                });
-            } catch (ProcessCanceledException e) {
-                noop();// for debugging purposes
-            } finally {
-                application.removeApplicationListener(listener);
+                }
+            );
+            
+            result = result.withRelevanceSorter(sorter);
+    
+            if (is LeafPsiElement position = parameters.position) {
+                if (position.elementType == CeylonTokens.astringLiteral) {
+                    result = result.withPrefixMatcher("");
+                }
+                if (position.elementType == CeylonTokens.pidentifier) {
+                    // In case of a package identifier like `ceylon.collection`, we compute a reference
+                    // on the whold path, which will lead IntelliJ to create prefixes like `ceylon.col`
+                    // whereas completionManager will return things like `collection`, which won't match
+                    // the prefix. We thus have to change the prefix to what's after the dot.
+                    value prefix = position.text.spanTo(position.text.size
+                        - CompletionInitializationContext.dummyIdentifierTrimmed.size - 1);
+                    result = result.withPrefixMatcher(prefix);
+                }
             }
+            
+            value progressMonitor = ProgressIndicatorMonitor.wrap {
+                object monitor extends EmptyProgressIndicator() {
+                    // hashCode() seems to be quite slow when used in CoreProgressManager.threadsUnderIndicator
+                    hash => 43;
+                    
+                }
+            };
+            object listener extends ApplicationAdapter() {
+                shared actual void beforeWriteActionStart(Object action) {
+                    if (!progressMonitor.cancelled) {
+                        progressMonitor.wrapped.cancel();
+                    }
+                }
+            }
+            if (! application.writeActionPending) {
+                application.addApplicationListener(listener);
+                try {
+                    concurrencyManager.withAlternateResolution(() {
+                        if (is CeylonFile ceylonFile = parameters.originalFile,
+                            exists localAnalyzer = ceylonFile.localAnalyzer,
+                            exists analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 5),
+                            analysisResult.upToDate) {
+                            addCompletionsInternal(parameters, context, result, analysisResult, options, progressMonitor);
+                        }
+                    });
+                } catch (ProcessCanceledException e) {
+                    noop();// for debugging purposes
+                } finally {
+                    application.removeApplicationListener(listener);
+                }
+            }
+        } finally {
+            modelManager.resumeAutomaticModelUpdate();
         }
     }
     

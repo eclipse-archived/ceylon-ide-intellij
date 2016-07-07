@@ -123,7 +123,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
-    IdeaCeylonProjects
+    IdeaCeylonProjects,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -151,11 +152,19 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
     }
 
     shared actual void invoke(Project project, ObjectArray<PsiElement> elements, DataContext? ctx) {
-        if (exists ctx,
-            exists editor = CommonDataKeys.editor.getData(ctx),
-            exists file = CommonDataKeys.psiFile.getData(ctx)) {
+        value modelManager = project.getComponent(javaClass<CeylonModelManager>());
+        try {
+            modelManager.pauseAutomaticModelUpdate();
 
-            invoke(project, editor, file, ctx);
+            if (exists ctx,
+                exists editor = CommonDataKeys.editor.getData(ctx),
+                exists file = CommonDataKeys.psiFile.getData(ctx)) {
+                
+                invoke(project, editor, file, ctx);
+            }
+
+        } finally {
+            modelManager.resumeAutomaticModelUpdate();
         }
     }
 

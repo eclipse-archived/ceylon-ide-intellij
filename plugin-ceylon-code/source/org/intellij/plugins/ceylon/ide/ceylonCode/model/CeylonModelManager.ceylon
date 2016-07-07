@@ -134,6 +134,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings {
     ceylonSettings
 }
+import java.util.concurrent.atomic {
+    AtomicInteger
+}
 
 final class ChangesInProject of noChange | changesThatAlwaysRequireModelUpdate {
     shared new noChange {}
@@ -150,16 +153,32 @@ shared class CeylonModelManager(model)
         & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
         & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
 
+    value pauseRequests = AtomicInteger();
+    pauseRequests.set(0);
+    
     shared IdeaCeylonProjects model;
     shared Integer delayBeforeUpdatingAfterChange => ceylonSettings.autoUpdateInterval;
     variable value automaticModelUpdateEnabled_ = true;
     variable value ideaProjectReady = false;
     variable Boolean cancelledBecauseOfSyntaxErrors = false;
+    variable Boolean cancelledBecauseOfAPause = false;
     late variable Alarm buildTriggeringAlarm;
     
     value accumulatedChanges = LinkedBlockingQueue<NativeResourceChange>();
     variable Future<out Anything>? submitChangesFuture = null;
 
+    shared void pauseAutomaticModelUpdate() {
+        pauseRequests.incrementAndGet();
+    }
+
+    shared void resumeAutomaticModelUpdate() {
+        if (pauseRequests.decrementAndGet() == 0) {
+            if (cancelledBecauseOfAPause) {
+                scheduleModelUpdate();
+            }
+        }
+    }
+    
     object submitChangesTask satisfies Runnable { 
         shared actual void run() {
             variable NativeResourceChange? firstChange = null;
@@ -212,7 +231,7 @@ shared class CeylonModelManager(model)
         }
         automaticModelUpdateEnabled_ = automaticModelUpdateEnabled;
         if (needsRestart) {
-            scheduleModelUpdate(0);
+            scheduleModelUpdate(delayBeforeUpdatingAfterChange);
         }
     }
     
@@ -220,11 +239,12 @@ shared class CeylonModelManager(model)
     
     shared void scheduleModelUpdate(Integer delay = delayBeforeUpdatingAfterChange, Boolean force = false) {
         if (ideaProjectReady && 
-            (automaticModelUpdateEnabled_ || force)) {
+            ((automaticModelUpdateEnabled_) || force)) {
             buildTriggeringAlarm.cancelAllRequests();
             buildTriggeringAlarm.addRequest(JavaRunnable {
                 void run() {
                     cancelledBecauseOfSyntaxErrors = false;
+                    cancelledBecauseOfAPause = false;
                     buildTriggeringAlarm.cancelAllRequests();
                     
                     if (! model.ceylonProjects.any((ceylonProject)
@@ -232,29 +252,34 @@ shared class CeylonModelManager(model)
                         return;
                     }
 
-                    FileEditorManager mgr = FileEditorManager.getInstance(model.ideaProject);
-                    function isThereOnlyOneCeylonFileContentChange(CeylonProjectAlias ceylonProject) {
-                        value fileChangesToAnalyze = ceylonProject.build.fileChangesToAnalyze;
-                        if (exists firstChange = fileChangesToAnalyze.first) {
-                            if (fileChangesToAnalyze.rest.first exists) {
-                                return ChangesInProject.changesThatAlwaysRequireModelUpdate; // more than 1 changes
-                            }
-                            if (is FileVirtualFileContentChange firstChange) {
-                                value virtualFile = firstChange.resource.nativeResource;
-                                if (virtualFile in mgr.selectedFiles.array) {
-                                    return virtualFile;
+                    if (! force) {
+                        if (pauseRequests.get() > 0) {
+                            cancelledBecauseOfAPause = true;
+                            return;
+                        }
+                        
+                        FileEditorManager mgr = FileEditorManager.getInstance(model.ideaProject);
+                        function isThereOnlyOneCeylonFileContentChange(CeylonProjectAlias ceylonProject) {
+                            value fileChangesToAnalyze = ceylonProject.build.fileChangesToAnalyze;
+                            if (exists firstChange = fileChangesToAnalyze.first) {
+                                if (fileChangesToAnalyze.rest.first exists) {
+                                    return ChangesInProject.changesThatAlwaysRequireModelUpdate; // more than 1 changes
+                                }
+                                if (is FileVirtualFileContentChange firstChange) {
+                                    value virtualFile = firstChange.resource.nativeResource;
+                                    if (virtualFile in mgr.selectedFiles.array) {
+                                        return virtualFile;
+                                    } else {
+                                        return ChangesInProject.changesThatAlwaysRequireModelUpdate; // change in a file that is not currently edited
+                                    }
                                 } else {
-                                    return ChangesInProject.changesThatAlwaysRequireModelUpdate; // change in a file that is not currently edited
+                                    return ChangesInProject.changesThatAlwaysRequireModelUpdate; // other type of change (non-source, non-Ceylon, etc ...)
                                 }
                             } else {
-                                return ChangesInProject.changesThatAlwaysRequireModelUpdate; // other type of change (non-source, non-Ceylon, etc ...)
+                                return ChangesInProject.noChange;
                             }
-                        } else {
-                            return ChangesInProject.noChange;
                         }
-                    }
-                    
-                    if (! force) {
+                        
                         value changedCurrentlyEditedFiles = HashSet<VirtualFile>();
                         for (p in model.ceylonProjects) {
                             switch(answer = isThereOnlyOneCeylonFileContentChange(p))

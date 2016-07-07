@@ -62,7 +62,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
+    IdeaCeylonProjects,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -82,16 +83,25 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     value dummyMsg = UsageWarning(null, null, null);
     
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
-        if (is IdeaTextChange chg = change) {
-            chg.applyOnProject(project);
-        } else if (is Anything() callback = change) {
-            callback();
+        value modelManager = project.getComponent(javaClass<CeylonModelManager>());
+        try {
+            modelManager.pauseAutomaticModelUpdate();
+            
+            if (is IdeaTextChange chg = change) {
+                chg.applyOnProject(project);
+            } else if (is Anything() callback = change) {
+                callback();
+            }
+            if (exists sel = selection) {
+                editor.selectionModel.setSelection(sel.startOffset, sel.endOffset);
+                editor.caretModel.moveToOffset(sel.endOffset);
+            }
+            callback(project, editor, psiFile);
+
+        } finally {
+            modelManager.resumeAutomaticModelUpdate();
         }
-        if (exists sel = selection) {
-            editor.selectionModel.setSelection(sel.startOffset, sel.endOffset);
-            editor.caretModel.moveToOffset(sel.endOffset);
-        }
-        callback(project, editor, psiFile);
+                
     }
     
     shared actual Boolean isAvailable(Project project, Editor _editor, PsiFile psiFile) {

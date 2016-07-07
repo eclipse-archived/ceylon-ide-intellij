@@ -62,6 +62,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonCompositeElement
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    CeylonModelManager
+}
+import ceylon.interop.java {
+    javaClass
+}
 
 shared class InlineAction() extends InlineActionHandler() {
 
@@ -78,33 +84,41 @@ shared class InlineAction() extends InlineActionHandler() {
     }
 
     shared actual void inlineElement(Project proj, Editor editor, PsiElement element) {
-        if (is CeylonFile file = element.containingFile,
-            exists localAnalysisResult = file.localAnalysisResult,
-            exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode, 
-            exists phasedUnit = localAnalysisResult.lastPhasedUnit) {
-            value node = nodes.findNode(
-                typecheckedRootNode, localAnalysisResult.tokens,
-                editor.selectionModel.selectionStart,
-                editor.selectionModel.selectionEnd
-            );
+        value modelManager = proj.getComponent(javaClass<CeylonModelManager>());
+        try {
+            modelManager.pauseAutomaticModelUpdate();
 
-            if (exists node,
-                is Declaration decl = nodes.getReferencedDeclaration(node)) {
-
-                value refactoring = IdeaInlineRefactoring(phasedUnit, localAnalysisResult.tokens, node, decl, editor);
-                value dialog = InlineDialog(proj, element, refactoring);
-
-                if (dialog.showAndGet()) {
-                    value change = IdeaCompositeChange();
-                    refactoring.build(change);
-
-                    object extends WriteCommandAction<Nothing>(proj, file) {
-                        shared actual void run(Result<Nothing> result) {
-                            change.applyChanges(project);
-                        }
-                    }.execute();
+            if (is CeylonFile file = element.containingFile,
+                exists localAnalysisResult = file.localAnalysisResult,
+                exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode, 
+                exists phasedUnit = localAnalysisResult.lastPhasedUnit) {
+                value node = nodes.findNode(
+                    typecheckedRootNode, localAnalysisResult.tokens,
+                    editor.selectionModel.selectionStart,
+                    editor.selectionModel.selectionEnd
+                );
+                
+                if (exists node,
+                    is Declaration decl = nodes.getReferencedDeclaration(node)) {
+                    
+                    value refactoring = IdeaInlineRefactoring(phasedUnit, localAnalysisResult.tokens, node, decl, editor);
+                    value dialog = InlineDialog(proj, element, refactoring);
+                    
+                    if (dialog.showAndGet()) {
+                        value change = IdeaCompositeChange();
+                        refactoring.build(change);
+                        
+                        object extends WriteCommandAction<Nothing>(proj, file) {
+                            shared actual void run(Result<Nothing> result) {
+                                change.applyChanges(project);
+                            }
+                        }.execute();
+                    }
                 }
             }
+
+        } finally {
+            modelManager.resumeAutomaticModelUpdate();
         }
     }
 

@@ -421,93 +421,99 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
 
     void typecheckSourceFile(Document document, Tree.CompilationUnit parsedRootNode, List<CommonToken> tokens, MutableLocalAnalysisResult result, Integer waitForModelInSeconds, Cancellable? cancellable) {
-        checkCancelled(cancellable);
-        if (exists ceylonProject) {
-            ceylonProject.withSourceModel(true, () {
-                TypeChecker typechecker;
-                FileVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> fileVirtualFileToTypecheck;
-                FolderVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> srcDir;
-                ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile>? centralModelPhasedUnit;
-                Package pkg;
-
-                if (! ceylonProject.typechecked) {
-                    throw platformUtils.newOperationCanceledException();
-                }
-                
-                if(exists theTypechecker = ceylonProject.typechecker) {
-                    typechecker = theTypechecker;
-                } else {
-                    throw platformUtils.newOperationCanceledException();
-                    // the CeylonProject typechecker is not accesssible: this means that a global model parse is being performed
-                }
-                
-                checkCancelled(cancellable);
-                
-                if (exists sourceFileVirtualFile = ceylonProject.projectFilesMap.get(virtualFile)) {
-                    fileVirtualFileToTypecheck = sourceFileVirtualFile;
-                    value existingSrcDir = sourceFileVirtualFile.rootFolder;
-                    if (! exists existingSrcDir) {
-                        platformUtils.log(Status._ERROR, "the `rootFolder` is null for FileVirtualFile: `` sourceFileVirtualFile `` during local typechecking");
+        value modelManager = model.ideaProject.getComponent(javaClass<CeylonModelManager>());
+        try {
+            modelManager.pauseAutomaticModelUpdate();
+            checkCancelled(cancellable);
+            if (exists ceylonProject) {
+                ceylonProject.withSourceModel(true, () {
+                    TypeChecker typechecker;
+                    FileVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> fileVirtualFileToTypecheck;
+                    FolderVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> srcDir;
+                    ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile>? centralModelPhasedUnit;
+                    Package pkg;
+    
+                    if (! ceylonProject.typechecked) {
                         throw platformUtils.newOperationCanceledException();
                     }
-
-                    checkCancelled(cancellable);
                     
-                    srcDir = existingSrcDir;
-                    centralModelPhasedUnit = ceylonProject.getParsedUnit(sourceFileVirtualFile);
-
-                    checkCancelled(cancellable);
-                    
-                    value existingPackage = sourceFileVirtualFile.ceylonPackage;
-                    if (! exists existingPackage) {
-                        platformUtils.log(Status._ERROR, "The `ceylonPackage` is null for FileVirtualFile: `` sourceFileVirtualFile `` during local typechecking");
+                    if(exists theTypechecker = ceylonProject.typechecker) {
+                        typechecker = theTypechecker;
+                    } else {
                         throw platformUtils.newOperationCanceledException();
+                        // the CeylonProject typechecker is not accesssible: this means that a global model parse is being performed
                     }
-                    pkg = existingPackage;
-                } else {
-                    fileVirtualFileToTypecheck = SourceCodeVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> (document.text, Path(virtualFile.path), ceylonProject.ideArtifact, virtualFile, virtualFile.charset.name());
-
+                    
                     checkCancelled(cancellable);
                     
-                    srcDir = DummyFolder<Module, VirtualFile, VirtualFile, VirtualFile>(virtualFile.parent?.path else "");
-
+                    if (exists sourceFileVirtualFile = ceylonProject.projectFilesMap.get(virtualFile)) {
+                        fileVirtualFileToTypecheck = sourceFileVirtualFile;
+                        value existingSrcDir = sourceFileVirtualFile.rootFolder;
+                        if (! exists existingSrcDir) {
+                            platformUtils.log(Status._ERROR, "the `rootFolder` is null for FileVirtualFile: `` sourceFileVirtualFile `` during local typechecking");
+                            throw platformUtils.newOperationCanceledException();
+                        }
+    
+                        checkCancelled(cancellable);
+                        
+                        srcDir = existingSrcDir;
+                        centralModelPhasedUnit = ceylonProject.getParsedUnit(sourceFileVirtualFile);
+    
+                        checkCancelled(cancellable);
+                        
+                        value existingPackage = sourceFileVirtualFile.ceylonPackage;
+                        if (! exists existingPackage) {
+                            platformUtils.log(Status._ERROR, "The `ceylonPackage` is null for FileVirtualFile: `` sourceFileVirtualFile `` during local typechecking");
+                            throw platformUtils.newOperationCanceledException();
+                        }
+                        pkg = existingPackage;
+                    } else {
+                        fileVirtualFileToTypecheck = SourceCodeVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> (document.text, Path(virtualFile.path), ceylonProject.ideArtifact, virtualFile, virtualFile.charset.name());
+    
+                        checkCancelled(cancellable);
+                        
+                        srcDir = DummyFolder<Module, VirtualFile, VirtualFile, VirtualFile>(virtualFile.parent?.path else "");
+    
+                        checkCancelled(cancellable);
+                        
+                        pkg = typechecker.context.modules.defaultModule.packages.get(0);
+                        centralModelPhasedUnit = null;
+                    }
+    
                     checkCancelled(cancellable);
                     
-                    pkg = typechecker.context.modules.defaultModule.packages.get(0);
-                    centralModelPhasedUnit = null;
-                }
-
-                checkCancelled(cancellable);
-                
-                result.finishedTypechecking {
-                    typechecker = typechecker; 
-                    phasedUnit = createPhasedUnitAndTypecheck(typechecker, parsedRootNode, tokens, fileVirtualFileToTypecheck, srcDir, pkg, centralModelPhasedUnit, cancellable); 
-                };
-                
-                if (result.parsedRootNode.errors.empty) {
-                    value modelManager =
-                            ceylonProject.model.ideaProject.getComponent(javaClass<CeylonModelManager>());
-                    if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
-                        modelManager.scheduleModelUpdate();
+                    result.finishedTypechecking {
+                        typechecker = typechecker; 
+                        phasedUnit = createPhasedUnitAndTypecheck(typechecker, parsedRootNode, tokens, fileVirtualFileToTypecheck, srcDir, pkg, centralModelPhasedUnit, cancellable); 
+                    };
+                    
+                    if (result.parsedRootNode.errors.empty) {
+                        value modelManager =
+                                ceylonProject.model.ideaProject.getComponent(javaClass<CeylonModelManager>());
+                        if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
+                            modelManager.scheduleModelUpdate();
+                        }
                     }
-                }
-            }, waitForModelInSeconds);
-        } else {
-            // Case of a virtual file that is not linked to any Idea module 
-            // though not being from an external source archive
-            // (ex. Ceylon document in a non-ceylon project,
-            //    document inside a compare editor ?,
-            //    ceylon file loaded from anywhere on the disk, etc ...)
-            //
-            // This is not supported for now, but will be implemented with something like:
-            // 
-            // typechecker = createStandaloneTypechecker(virtualFile);
-            // Module ideaModule = ModuleUtil.getModuleForFile(virtualFile, ideaProject)
-            // fileVirtualFileToTypecheck = SourceCodeVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> (document.text, Path(virtualFile.path), ideaModule, virtualFile, virtualFile.charset.name());
-            // srcDir = DummyFolder<Module, VirtualFile, VirtualFile, VirtualFile>(virtualFile.parent?.path else "");
-            // pkg = typechecker.context.modules.defaultModule.packages.get(0);
-            // centralModelPhasedUnit = null;
-            // createPhasedUnitAndTypecheck(typechecker, fileVirtualFileToTypecheck, srcDir, pkg, centralModelPhasedUnit);
+                }, waitForModelInSeconds);
+            } else {
+                // Case of a virtual file that is not linked to any Idea module 
+                // though not being from an external source archive
+                // (ex. Ceylon document in a non-ceylon project,
+                //    document inside a compare editor ?,
+                //    ceylon file loaded from anywhere on the disk, etc ...)
+                //
+                // This is not supported for now, but will be implemented with something like:
+                // 
+                // typechecker = createStandaloneTypechecker(virtualFile);
+                // Module ideaModule = ModuleUtil.getModuleForFile(virtualFile, ideaProject)
+                // fileVirtualFileToTypecheck = SourceCodeVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> (document.text, Path(virtualFile.path), ideaModule, virtualFile, virtualFile.charset.name());
+                // srcDir = DummyFolder<Module, VirtualFile, VirtualFile, VirtualFile>(virtualFile.parent?.path else "");
+                // pkg = typechecker.context.modules.defaultModule.packages.get(0);
+                // centralModelPhasedUnit = null;
+                // createPhasedUnitAndTypecheck(typechecker, fileVirtualFileToTypecheck, srcDir, pkg, centralModelPhasedUnit);
+            }
+        } finally {
+            modelManager.resumeAutomaticModelUpdate();
         }
     }
 
