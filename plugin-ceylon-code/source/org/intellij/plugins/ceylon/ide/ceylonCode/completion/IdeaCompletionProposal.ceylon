@@ -1,6 +1,3 @@
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    IdeaDocument
-}
 import ceylon.interop.java {
     javaString
 }
@@ -27,6 +24,10 @@ import javax.swing {
     Icon
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    IdeaDocument
+}
+
 
 
 shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
@@ -49,7 +50,7 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
     InsertHandler<LookupElement>? handler = null, TextRange? selection = null,
     Object? obj = null) {
     
-    variable Integer? cutOffset = null;
+    Integer? cutOffset;
     
     Integer? parenOffset = desc.firstOccurrence('(');
     
@@ -61,14 +62,16 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
         }
     } else if (exists parenOffset) {
         cutOffset = parenOffset;
+    } else {
+        cutOffset = null;
     }
 
-    String newText = if (exists o = cutOffset) then text.spanTo(o - 1) else text;
+    String newText = if (exists cutOffset) then text.spanTo(cutOffset-1) else text;
     Basic&InsertHandler<LookupElement> newHandler = object satisfies InsertHandler<LookupElement>{
         shared actual void handleInsert(InsertionContext insertionContext, LookupElement? t) {
-            if (exists o = cutOffset) {
+            if (exists cutOffset) {
                 insertionContext.document.replaceString(insertionContext.tailOffset,
-                    insertionContext.tailOffset, javaString(text.spanFrom(o))); 
+                    insertionContext.tailOffset, javaString(text.spanFrom(cutOffset)));
             }
             
             if (exists handler) {
@@ -83,10 +86,9 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
         }
     };
     
-    variable LookupElementBuilder builder = LookupElementBuilder.create(obj else text, newText)
+    return LookupElementBuilder.create(obj else text, newText)
             .withPresentableText(desc)
             .withIcon(icon)
             .withInsertHandler(newHandler);
     
-    return builder;
 }
