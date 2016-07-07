@@ -1,3 +1,4 @@
+/*
 package org.intellij.plugins.ceylon.ide.refactoring;
 
 import com.intellij.openapi.application.Result;
@@ -40,3 +41,4 @@ public class CeylonRefactoringListener implements RefactoringElementListenerProv
         return null;
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package org.intellij.plugins.ceylon.ide.refactoring;
 
 import com.intellij.openapi.editor.Editor;
@@ -38,3 +39,4 @@ public class CeylonRenamePsiProcessor extends RenamePsiElementProcessor {
         };
     }
 }
+*/

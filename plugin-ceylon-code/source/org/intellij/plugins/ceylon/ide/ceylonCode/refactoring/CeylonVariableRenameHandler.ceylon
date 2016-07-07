@@ -36,7 +36,6 @@ shared class CeylonVariableRenameHandler()
         assert (is PsiNamedElement elementToRename);
 
         return object extends VariableInplaceRenamer(elementToRename, editor) {
-            
             shared actual void finish(Boolean success) {
                 super.finish(success);
                 if (success, is CeylonFile file = elementToRename.containingFile) {
