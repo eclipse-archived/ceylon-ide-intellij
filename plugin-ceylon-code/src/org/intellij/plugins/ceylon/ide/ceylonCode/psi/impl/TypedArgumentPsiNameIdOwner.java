@@ -4,18 +4,11 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.LocalSearchScope;
-import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.search.SearchScope;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.platform.Status;
-import com.redhat.ceylon.ide.common.platform.platformUtils_;
-import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
-import com.redhat.ceylon.model.typechecker.model.Declaration;
-import com.redhat.ceylon.model.typechecker.model.FunctionOrValue;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -33,29 +26,19 @@ public abstract class TypedArgumentPsiNameIdOwner
 
     @Override
     public String getName() {
-        Tree.Identifier id = getCeylonNode().getIdentifier();
-        return id == null ? null : id.getText();
+        return DeclarationPsiNameIdOwner.getElementText(getNameIdentifier());
     }
 
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        Tree.Identifier id = getCeylonNode().getIdentifier();
-        return id == null ?
-                PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) :
-                CeylonTreeUtil.findPsiElement(id, getContainingFile());
+        return findChildByClass(CeylonPsi.IdentifierPsi.class);
     }
 
     @Override
     public PsiElement setName(@NonNls @NotNull String name)
             throws IncorrectOperationException {
-        PsiElement id = findChildByType(CeylonTypes.IDENTIFIER);
-        CeylonPsi.DeclarationPsi decl =
-                CeylonTreeUtil.createDeclarationFromText(getProject(),
-                        "void " + name + "(){}");
-        if (id != null) {
-            id.replace(decl.getChildren()[0]);
-        }
+        DeclarationPsiNameIdOwner.setElementName(name, getNameIdentifier(), getProject());
         return this;
     }
 
@@ -76,6 +59,6 @@ public abstract class TypedArgumentPsiNameIdOwner
     @Override
     public int getTextOffset() {
         PsiElement id = getNameIdentifier();
-        return id != null ? id.getTextOffset() : super.getTextOffset();
+        return id == null ? super.getTextOffset() : id.getTextOffset();
     }
 }

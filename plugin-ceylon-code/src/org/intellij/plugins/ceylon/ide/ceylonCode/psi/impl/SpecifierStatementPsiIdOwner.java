@@ -1,15 +1,5 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl;
 
-import javax.swing.Icon;
-
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
-import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
@@ -23,6 +13,15 @@ import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
+import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStatementPsiImpl
         implements PsiNameIdentifierOwner {
@@ -33,22 +32,20 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
 
     @Override
     public String getName() {
-        PsiElement id = getNameIdentifier();
-        return id == null ? null : id.getText();
+        return DeclarationPsiNameIdOwner.getElementText(getNameIdentifier());
     }
 
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        //TODO: this looks wrong for case of ParameterizedExpression
-        return CeylonTreeUtil.findPsiElement(getCeylonNode().getBaseMemberExpression(),
-                getContainingFile());
+        return findChildByClass(CeylonPsi.BaseMemberExpressionPsi.class).getChildren()[0];
     }
 
     @Override
     public PsiElement setName(@NonNls @NotNull String name)
             throws IncorrectOperationException {
-        return null;
+        DeclarationPsiNameIdOwner.setElementName(name, getNameIdentifier(), getProject());
+        return this;
     }
 
     @Nullable
@@ -73,7 +70,10 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
                     return new LocalSearchScope(getContainingFile());
                 }
             } else {
-                platformUtils_.get_().log(Status.getStatus$_DEBUG(), "Local scope not added in getUseScope() because the file " + getContainingFile() + " is not typechecked and up-to-date");
+                platformUtils_.get_().log(Status.getStatus$_DEBUG(),
+                        "Local scope not added in getUseScope() because the file "
+                                + getContainingFile()
+                                + " is not typechecked and up-to-date");
                 throw platformUtils_.get_().newOperationCanceledException();
             }
 

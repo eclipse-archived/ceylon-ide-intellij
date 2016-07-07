@@ -10,8 +10,8 @@ import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ObjectUtils;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.IdeaCeylonParser;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.IdeaCeylonParser;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassStub;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,9 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
 
     public CeylonClassImpl(ASTNode node) {
         super(node);
-        specClassDecl = (Tree.ClassOrInterface) node.getUserData(IdeaCeylonParser.CEYLON_NODE_KEY);
+        specClassDecl =
+                (Tree.ClassOrInterface)
+                    node.getUserData(IdeaCeylonParser.CEYLON_NODE_KEY);
     }
 
     public CeylonClassImpl(ClassStub stub, IStubElementType nodeType) {
@@ -88,6 +90,7 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
 
     @Override
     public String toString() {
-        return (isInterface() ? "Interface " : "Class ") + ObjectUtils.notNull(getName(), " (unnamed)");
+        return (isInterface() ? "Interface " : "Class ")
+                + ObjectUtils.notNull(getName(), " (unnamed)");
     }
 }

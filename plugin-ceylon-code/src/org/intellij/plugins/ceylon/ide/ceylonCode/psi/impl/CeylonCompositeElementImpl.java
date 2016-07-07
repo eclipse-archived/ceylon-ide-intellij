@@ -24,7 +24,7 @@ public class CeylonCompositeElementImpl extends ASTWrapperPsiElement implements 
 
     @Override
     public String toString() {
-        return getNode().getElementType().toString();
+        return getNode().toString();
     }
 
     @Override

@@ -1,20 +1,24 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.search.SearchScope;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import com.redhat.ceylon.ide.common.util.escaping_;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.FunctionOrValue;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.*;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -32,48 +36,43 @@ public abstract class DeclarationPsiNameIdOwner
 
     @Override
     public String getName() {
-        CeylonPsi.IdentifierPsi identifierPsi
-                = PsiTreeUtil.getChildOfType(this, CeylonPsi.IdentifierPsi.class);
-        if (identifierPsi!=null) {
-            return identifierPsi.getText();
-        }
-        else {
-            return null;
-        }
+        final PsiElement identifierPsi = getNameIdentifier();
+        return getElementText(identifierPsi);
+    }
+
+    @Nullable
+    public static String getElementText(final PsiElement identifierPsi) {
+        return identifierPsi==null ? null :
+                ApplicationManager.getApplication()
+                        .runReadAction(new Computable<String>() {
+                    @Override
+                    public String compute() {
+                        return identifierPsi.getText();
+                    }
+                });
     }
 
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        Tree.Declaration node = getCeylonNode();
-        if (node==null) {
-            return null;
-        }
-        Tree.Identifier id = node.getIdentifier();
-        try {
-            return id == null ?
-                    PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class) :
-                    CeylonTreeUtil.findPsiElement(id, getContainingFile());
-        }
-        catch (IllegalArgumentException iae) {
-            //this was happening with pattern variables in an anonymous function parameter list
-            //(surely because I do some funny business with the AST in that case)
-            return PsiTreeUtil.findChildOfType(this, CeylonPsi.IdentifierPsi.class);
-        }
+        return findChildByClass(CeylonPsi.IdentifierPsi.class);
     }
 
     @Override
     public PsiElement setName(@NonNls @NotNull String name)
             throws IncorrectOperationException {
-        PsiElement id = findChildByType(CeylonTypes.IDENTIFIER);
+        setElementName(name, getNameIdentifier(), getProject());
+        return this;
+    }
+
+    public static void setElementName(@NonNls @NotNull String name, PsiElement id, Project project) {
         if (id != null) {
             String quoted = escaping_.get_().escape(name);
             CeylonPsi.DeclarationPsi decl =
-                    CeylonTreeUtil.createDeclarationFromText(getProject(),
+                    CeylonTreeUtil.createDeclarationFromText(project,
                             "void " + quoted + "(){}");
             id.replace(decl.getChildren()[0]);
         }
-        return this;
     }
 
     @NotNull
@@ -124,6 +123,6 @@ public abstract class DeclarationPsiNameIdOwner
     @Override
     public int getTextOffset() {
         PsiElement id = getNameIdentifier();
-        return id != null ? id.getTextOffset() : super.getTextOffset();
+        return id == null ? super.getTextOffset() : id.getTextOffset();
     }
 }
