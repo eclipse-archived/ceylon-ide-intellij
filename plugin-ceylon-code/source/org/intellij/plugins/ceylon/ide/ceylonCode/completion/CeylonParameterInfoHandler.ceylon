@@ -61,7 +61,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     }
 }
 
-shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<ArgumentListPsi, Functional> {
+shared class CeylonParameterInfoHandler()
+        satisfies ParameterInfoHandler<ArgumentListPsi, Functional> {
     
     value printer = TypePrinter(true, true, false, true, false);
 
@@ -119,7 +120,7 @@ shared class CeylonParameterInfoHandler() satisfies ParameterInfoHandler<Argumen
                         TokenTypes.comma.tokenType);
             context.setCurrentParameter(index);
         } else if (is NamedArgumentListPsi al,
-            exists model = al.ceylonNode.namedArgumentList) {
+            exists model = al.ceylonNode?.namedArgumentList) {
 
             if (inSequencedArgs(al, model, offset)) {
                 context.setCurrentParameter(model.parameterList.parameters.size()-1);
