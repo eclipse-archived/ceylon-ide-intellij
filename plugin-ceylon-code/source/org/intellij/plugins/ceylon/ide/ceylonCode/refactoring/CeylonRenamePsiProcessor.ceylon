@@ -30,7 +30,8 @@ shared class CeylonRenamePsiProcessor() extends RenamePsiElementProcessor() {
                             outer.searchInComments, outer.searchInNonJavaFiles) {
                         shared actual void performPsiSpoilingRefactoring() {
                             super.performPsiSpoilingRefactoring();
-                            if (is CeylonFile file, file != element.containingFile) {
+                            if (is CeylonFile file,
+                                !(element.containingFile?.equals(file) else true)) {
                                 file.forceReparse();
                             }
                         }
