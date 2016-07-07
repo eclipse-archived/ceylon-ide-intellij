@@ -66,8 +66,9 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
         cutOffset = null;
     }
 
-    String newText = if (exists cutOffset) then text.spanTo(cutOffset-1) else text;
-    Basic&InsertHandler<LookupElement> newHandler = object satisfies InsertHandler<LookupElement>{
+    value newText = if (exists cutOffset) then text.spanTo(cutOffset-1) else text;
+
+    object newHandler satisfies InsertHandler<LookupElement>{
         shared actual void handleInsert(InsertionContext insertionContext, LookupElement? t) {
             if (exists cutOffset) {
                 insertionContext.document.replaceString(insertionContext.tailOffset,
@@ -84,7 +85,7 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
                 insertionContext.editor.caretModel.moveToOffset(selection.endOffset);
             }
         }
-    };
+    }
     
     return LookupElementBuilder.create(obj else text, newText)
             .withPresentableText(desc)
