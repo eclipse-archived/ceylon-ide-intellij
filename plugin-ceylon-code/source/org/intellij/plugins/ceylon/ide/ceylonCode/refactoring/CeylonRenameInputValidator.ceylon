@@ -42,8 +42,11 @@ shared class CeylonRenameTypeInputValidator() satisfies RenameInputValidatorEx {
         if (newName.empty) {
             return "missing identifier";
         }
-        if (!Pattern.matches("^[a-zA-Z_]\\w*$", JString(newName))) {
+        if (!Pattern.matches("""^(\\I\w|[a-zA-Z_])\w*$""", JString(newName))) {
             return "'``newName``' is not a legal identifier";
+        }
+        if (newName.startsWith("""\I""")) {
+            return null;
         }
 //        if (escaping.isKeyword(newName)) {
 //            return "'``newName``' is a keyword";
@@ -68,8 +71,11 @@ shared class CeylonRenameTypedInputValidator() satisfies RenameInputValidatorEx 
         if (newName.empty) {
             return "missing identifier";
         }
-        if (!Pattern.matches("^[a-zA-Z_]\\w*$", JString(newName))) {
+        if (!Pattern.matches("""^(\\i\w|[a-zA-Z_])\w*$""", JString(newName))) {
             return "'``newName``' is not a legal identifier";
+        }
+        if (newName.startsWith("""\i""")) {
+            return null;
         }
         if (escaping.isKeyword(newName)) {
             return "'``newName``' is a keyword";
@@ -92,7 +98,7 @@ shared class CeylonNamesValidator() satisfies NamesValidator {
 
     isIdentifier(String string, Project project)
             => !string.empty
-            && Pattern.matches("^[a-zA-Z_]\\w*$", JString(string))
+            && Pattern.matches("""^(\\i\w|\\I\w|[a-zA-Z_])\w*$""", JString(string))
             && !escaping.isKeyword(string);
 
     isKeyword(String string, Project project)
