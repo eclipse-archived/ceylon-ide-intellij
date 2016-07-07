@@ -167,7 +167,7 @@
         <typeHierarchyProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.hierarchy.CeylonTypeHierarchyProvider"/>
         <methodHierarchyProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.hierarchy.CeylonMethodHierarchyProvider"/>
 
-        <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
+        <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonRefactoringSupportProvider"/>
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonVariableRenameHandler"/>
         <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonRenameTypeInputValidator"/>
         <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.CeylonRenameTypedInputValidator"/>
@@ -197,7 +197,7 @@
         <usageTypeProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonUsageTypeProvider"/>
         <typeDeclarationProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonTypeDeclarationProvider"/>
         <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi$IdentifierPsi"
-                                 implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
+                                 implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.refactoring.IdentifierElementManipulator"/>
         <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonTargetElementEvaluator"/>
         <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.GotoTargetRenderer"/>
