@@ -25,13 +25,6 @@ import com.redhat.ceylon.ide.common.model {
     IResourceAware,
     SourceAware
 }
-import com.redhat.ceylon.ide.common.platform {
-    Status,
-    platformUtils
-}
-import com.redhat.ceylon.ide.common.typechecker {
-    LocalAnalysisResult
-}
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
@@ -99,20 +92,6 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         }
     }
 
-    value compilationUnit {
-        assert (is CeylonFile ceylonFile = myElement.containingFile);
-        LocalAnalysisResult? localAnalysisResult = ceylonFile.localAnalysisResult;
-        if (!exists localAnalysisResult) {
-            return null;
-        }
-        if (!exists compilationUnit = localAnalysisResult.typecheckedRootNode) {
-            platformUtils.log(Status._DEBUG,
-                "CeylonReference is not resolved because the file ``myElement.containingFile`` is not typechecked and up-to-date");
-            throw platformUtils.newOperationCanceledException();
-        }
-        return localAnalysisResult.typecheckedRootNode;
-    }
-
     shared actual PsiElement? resolve() {
         if (is Tree.Declaration node = this.node) {
             if (is TypedDeclaration model = node.declarationModel,
@@ -127,31 +106,28 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         }
 
         value project = myElement.project;
-        value compilationUnit = this.compilationUnit;
-        if (!exists compilationUnit) {
-            return null;
+        assert (is CeylonFile ceylonFile = myElement.containingFile);
+
+        if (exists rootNode = ceylonFile.localAnalysisResult?.typecheckedRootNode) {
+            object callable satisfies Callable<Node> {
+                call() => IdeaNavigation(project).getTarget(rootNode, node, backend);
+            }
+            if (exists target = ConcurrencyManagerForJava.withAlternateResolution(callable),
+                exists file = getVirtualFile(target.unit)) {
+                value psiFile = PsiManager.getInstance(project).findFile(file);
+                return CeylonTreeUtil.findPsiElement(target, psiFile);
+            }
         }
 
-        Node? target = ConcurrencyManagerForJava.withAlternateResolution(object satisfies Callable<Node> {
-            call() => IdeaNavigation(project).getTarget(compilationUnit, node, backend);
-        });
-        if (exists target, exists file = getVirtualFile(target.unit)) {
-            value psiFile = PsiManager.getInstance(project).findFile(file);
-            return CeylonTreeUtil.findPsiElement(target, psiFile);
-        }
-        value declaration = nodes.getReferencedModel(node);
-        if (!exists declaration) {
-            return null;
-        }
-
-        return if (exists location = resolveDeclaration(declaration, project))
+        return if (exists declaration = nodes.getReferencedModel(node),
+                   exists location = resolveDeclaration(declaration, project))
             then location else myElement.containingFile;
     }
 
     variants => PsiElement.emptyArray;
 
     shared actual Boolean isReferenceTo(PsiElement element) {
-        PsiElement? resolved = resolve();
+        value resolved = resolve();
         PsiManager manager = element.manager;
         if (manager.areElementsEquivalent(resolved, element)) {
             return true;
