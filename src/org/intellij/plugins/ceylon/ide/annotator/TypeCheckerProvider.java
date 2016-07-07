@@ -87,30 +87,6 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
         ceylonModel.addProject(module);
     }
 
-
-    @Nullable
-    public static TypeChecker getFor(PsiElement element) {
-        if (element.getContainingFile() instanceof CeylonFile) {
-            CeylonFile ceylonFile = (CeylonFile) element.getContainingFile();
-            TypeChecker typechecker = ceylonFile.getTypechecker();
-            if (typechecker != null) {
-                return typechecker;
-            }
-
-            //LOGGER.warn("CeylonFile has no IdePhasedUnit: " + ceylonFile.getVirtualFile().getCanonicalPath());
-
-            // TODO .ceylon files loaded from .src archives don't belong to any module, what should we do?
-            Module module = ModuleUtil.findModuleForFile(ceylonFile.getVirtualFile(), ceylonFile.getProject());
-
-            if (module != null) {
-                ITypeCheckerProvider provider = module.getComponent(ITypeCheckerProvider.class);
-                return provider.getTypeChecker();
-            }
-        }
-
-        return null;
-    }
-
     @Nullable
     public IdeaCeylonProject getCeylonProject() {
         return (IdeaCeylonProject) ceylonModel.getProject(module);
