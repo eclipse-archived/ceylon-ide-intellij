@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    createJavaObjectArray
+}
+
 import com.intellij.lang {
     ASTNode
 }
@@ -5,8 +9,7 @@ import com.intellij.openapi.util {
     TextRange
 }
 import com.intellij.psi {
-    PsiElement,
-    PsiReference
+    PsiElement
 }
 import com.redhat.ceylon.common {
     Backends {
@@ -15,11 +18,7 @@ import com.redhat.ceylon.common {
 }
 
 import java.lang {
-    ObjectArray,
     UnsupportedOperationException
-}
-import java.util {
-    ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
@@ -32,43 +31,44 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
 shared class CeylonResolvable(ASTNode node)
         extends CeylonNamedCompositeElementImpl(node) {
 
-    shared actual PsiReference reference {
-        if (is CeylonPsi.ImportPathPsi parent = this.parent) {
-            TextRange parentRange = TextRange.from(0, parent.textLength);
-            return CeylonReference(parent, parentRange, true);
-        } else {
-            TextRange range = TextRange.from(0, textLength);
-            return CeylonReference(this, range, true);
-        }
-    }
+    reference
+            => if (is CeylonPsi.ImportPathPsi parent = this.parent)
+            then CeylonReference {
+                element = parent;
+                range = TextRange.from(0, parent.textLength);
+                soft = true;
+            }
+            else CeylonReference {
+                element = this;
+                range = TextRange.from(0, textLength);
+                soft = true;
+            };
 
-    shared actual ObjectArray<PsiReference> references {
-        if (is CeylonPsi.MemberOrTypeExpressionPsi parent = this.parent,
-            exists node = parent.ceylonNode,
-            exists model = node.declaration, model.native) {
-            value list = ArrayList<PsiReference>();
-            addBackend(list, Backends.header);
-            addBackend(list, Backends.java);
-            addBackend(list, Backends.js);
-            return list.toArray(ObjectArray<PsiReference>(0));
-        }
-        return super.references;
-    }
+    function backendRef(Backends backend)
+            => CeylonReference {
+                element = this;
+                range = TextRange.from(0, textLength);
+                soft = true;
+                backend = backend;
+            };
 
-    void addBackend(ArrayList<PsiReference> list, Backends backend) {
-        TextRange range = TextRange.from(0, textLength);
-        list.add(CeylonReference(this, range, true, backend));
-    }
+    references
+            => if (is CeylonPsi.MemberOrTypeExpressionPsi parent = this.parent,
+                    exists model = parent.ceylonNode?.declaration,
+                    model.native)
+            //for native decs we need a ref per backend
+            then createJavaObjectArray {
+                backendRef(Backends.header),
+                backendRef(Backends.java),
+                backendRef(Backends.js)
+            }
+            //otherwise there is just one
+            else createJavaObjectArray { reference };
 
-    shared actual String? name {
-        if (this is CeylonPsi.IdentifierPsi) {
-            return text;
-        } else {
-            return null;
-        }
-    }
+    name => this is CeylonPsi.IdentifierPsi then text;
 
     shared actual PsiElement setName(String name) {
         throw UnsupportedOperationException("Not yet");
     }
+
 }
