@@ -56,14 +56,16 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTreeUtil
 }
 
-shared PsiElement? resolveDeclaration(Referenceable declaration, Project project) {
+shared PsiElement? resolveDeclaration(Referenceable? declaration, Project project) {
     if (exists location
             = IdeaNavigation(project).gotoDeclaration(declaration)) {
-        if (location.language != ceylonLanguage) {
-            return location;
+        if (location.language == ceylonLanguage,
+            exists file = location.containingFile,
+            exists declarationNode = nodes.getReferencedNode(declaration)) {
+            return CeylonTreeUtil.findPsiElement(declarationNode, file);
         }
-        else if (exists declarationNode = nodes.getReferencedNode(declaration)) {
-            return CeylonTreeUtil.findPsiElement(declarationNode, location.containingFile);
+        else {
+            return location;
         }
     }
     return null;
