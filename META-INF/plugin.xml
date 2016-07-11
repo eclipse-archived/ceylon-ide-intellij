@@ -132,6 +132,7 @@
         <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.structureView.CeylonStructureViewFactory"/>
         <treeStructureProvider implementation="org.intellij.plugins.ceylon.ide.projectView.ModuleTreeStructureProvider" order="last"/>
         <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.EnterInStringHandler"/>
+        <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.EnterInCommentHandler"/>
         <!--referenceImporter implementation="org.intellij.plugins.ceylon.ide.ceylonCode.imports.CeylonReferenceImporter"/-->
 
         <defaultLiveTemplatesProvider implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplatesProvider"/>
@@ -207,7 +208,7 @@
 
         <buildProcess.parametersProvider
                 implementation="org.intellij.plugins.ceylon.ide.build.BuildClasspathProvider"/>
-        <compileServer.plugin classpath=""/>
+        <compileServer.plugin/>
         <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonBuilder" execute="BEFORE"/>
         <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonJsBuilder" execute="AFTER"/>
 
