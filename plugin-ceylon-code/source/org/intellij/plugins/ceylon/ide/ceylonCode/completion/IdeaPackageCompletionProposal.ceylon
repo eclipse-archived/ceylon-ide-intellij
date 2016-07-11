@@ -31,8 +31,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
-                String fullPackageName, IdeaCompletionContext ctx, Package candidate)
+class IdeaImportedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname,
+        Boolean withBody, String fullPackageName, IdeaCompletionContext ctx, Package candidate)
         extends ImportedModulePackageProposal
         (offset, prefix, memberPackageSubname, withBody, fullPackageName, candidate, ctx)
         satisfies IdeaCompletionProposal {
@@ -52,16 +52,17 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
         }
     );
     
-    shared actual void newPackageMemberCompletionProposal(ProposalsHolder proposals, Declaration d, DefaultRegion selection, LinkedMode lm) {
+    shared actual void newPackageMemberCompletionProposal(ProposalsHolder proposals,
+            Declaration d, DefaultRegion selection, LinkedMode lm) {
         if (is IdeaProposalsHolder proposals) {
              proposals.add(LookupElementBuilder.create(d.name).withIcon(icons.forDeclaration(d)));
         }
     }
 }
 
-class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname, Boolean withBody,
-    String fullPackageName, IdeaCompletionContext completionCtx, ModuleVersionDetails version, Unit unit,
-    ModuleSearchResult.ModuleDetails md)
+class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname,
+        Boolean withBody, String fullPackageName, IdeaCompletionContext completionCtx,
+        ModuleVersionDetails version, Unit unit, ModuleSearchResult.ModuleDetails md)
         extends PackageCompletionProposal
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
         satisfies IdeaCompletionProposal {

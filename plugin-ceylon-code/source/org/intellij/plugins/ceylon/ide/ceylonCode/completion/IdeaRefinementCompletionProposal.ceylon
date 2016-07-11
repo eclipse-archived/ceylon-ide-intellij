@@ -18,9 +18,6 @@ import com.redhat.ceylon.ide.common.completion {
     RefinementCompletionProposal,
     ProposalsHolder
 }
-import com.redhat.ceylon.ide.common.refactoring {
-    DefaultRegion
-}
 import com.redhat.ceylon.model.typechecker.model {
     Reference,
     Declaration,
@@ -32,8 +29,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference pr,
-        String desc, String text, IdeaCompletionContext ctx,
-        Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType)
+        String desc, String text, IdeaCompletionContext ctx, Declaration dec, Scope scope,
+        Boolean fullType, Boolean explicitReturnType)
         extends RefinementCompletionProposal
         (offset, prefix, pr, desc, text, ctx, dec, scope, fullType, explicitReturnType) 
         satisfies IdeaCompletionProposal {
@@ -50,10 +47,8 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
 
                 value change = createChange(platformDoc);
                 
-                object extends WriteCommandAction<DefaultRegion?>(ctx.editor.project, ctx.file) {
-                    shared actual void run(Result<DefaultRegion?> result) {
-                        change.apply();
-                    }
+                object extends WriteCommandAction<Nothing>(ctx.editor.project, ctx.file) {
+                    run(Result<Nothing> result) => change.apply();
                 }.execute();
                 
                 adjustSelection(ctx);

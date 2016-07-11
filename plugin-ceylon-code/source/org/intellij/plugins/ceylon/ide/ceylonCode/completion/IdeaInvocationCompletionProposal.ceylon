@@ -2,7 +2,7 @@ import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext,
     CompletionInitializationContext {
-        selectionEndOffset = SELECTION_END_OFFSET
+        selectionEndOffset=\iSELECTION_END_OFFSET
     }
 }
 import com.intellij.codeInsight.lookup {
@@ -21,9 +21,6 @@ import com.redhat.ceylon.ide.common.completion {
     InvocationCompletionProposal,
     ProposalsHolder
 }
-import com.redhat.ceylon.ide.common.refactoring {
-    DefaultRegion
-}
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     Scope,
@@ -35,24 +32,25 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text, Declaration declaration, Reference? producedReference,
-    Scope scope, Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
-    Boolean inherited, Boolean qualified, Declaration? qualifyingValue, IdeaCompletionContext ctx)
-        extends InvocationCompletionProposal(offset, prefix, desc, text, declaration, producedReference, scope, ctx.lastCompilationUnit, includeDefaulted,
-    positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue)
+class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text,
+        Declaration declaration, Reference? producedReference, Scope scope,
+        Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
+        Boolean inherited, Boolean qualified, Declaration? qualifyingValue,
+        IdeaCompletionContext ctx)
+        extends InvocationCompletionProposal(offset, prefix, desc, text, declaration,
+            producedReference, scope, ctx.lastCompilationUnit, includeDefaulted,
+            positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue)
         satisfies IdeaCompletionProposal {
     
     shared actual variable Boolean toggleOverwrite = false;
     
-    String? greyText = " (``declaration.container.qualifiedNameString``)";
+    value greyText = " (``declaration.container.qualifiedNameString``)";
     
-    String? returnType {
-        if (is TypedDeclaration declaration, exists type = declaration.type) {
-            return type.asString();
-        }
-        
-        return null;
-    }
+    value returnType
+            => if (is TypedDeclaration declaration,
+                    exists type = declaration.type)
+            then type.asString()
+            else null;
 
     shared LookupElement lookupElement => newLookup(desc, text, icons.forDeclaration(declaration),
         object satisfies InsertHandler<LookupElement> {
@@ -67,10 +65,8 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 
                 value change = createChange(platformDoc);
                 
-                object extends WriteCommandAction<DefaultRegion?>(ctx.editor.project, ctx.file) {
-                    shared actual void run(Result<DefaultRegion?> result) {
-                        change.apply();
-                    }
+                object extends WriteCommandAction<Nothing>(ctx.editor.project, ctx.file) {
+                    run(Result<Nothing> result) => change.apply();
                 }.execute();
                 
                 adjustSelection(ctx);
@@ -85,8 +81,9 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         Declaration dec, Declaration? qualifier, Integer loc, Integer index, Boolean basic, String op) {
         
         if (is IdeaProposalsHolder proposals) {
-            value desc = getNestedCompletionText(op, ctx.lastCompilationUnit.unit, dec, qualifier, basic, true);
-            value text = getNestedCompletionText(op, ctx.lastCompilationUnit.unit, dec, qualifier, basic, false);
+            value unit = ctx.lastCompilationUnit.unit;
+            value desc = getNestedCompletionText(op, unit, dec, qualifier, basic, true);
+            value text = getNestedCompletionText(op, unit, dec, qualifier, basic, false);
             
             proposals.add(newLookup(desc, text, icons.forDeclaration(dec)));
         }

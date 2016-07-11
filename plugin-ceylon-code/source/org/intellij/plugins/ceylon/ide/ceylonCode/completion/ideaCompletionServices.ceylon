@@ -53,19 +53,36 @@ shared object ideaCompletionServices satisfies CompletionServices {
         String prefix, String desc, String text, List<Type> argTypes, Node node, Unit unit) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(prefix + desc, prefix + text, icons.correction));
+            ctx.proposals.add(newLookup {
+                desc = prefix + desc;
+                text = prefix + text;
+                icon = icons.correction;
+            });
         }
     }
     
-    shared actual void newInvocationCompletion(CompletionContext ctx, Integer offset, String prefix,
-        String desc, String text, Declaration dec, Reference? pr, Scope scope,
+    shared actual void newInvocationCompletion(CompletionContext ctx, Integer offset,
+        String prefix, String desc, String text, Declaration dec, Reference? pr, Scope scope,
         Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation, 
         Boolean inherited, Boolean qualified, Declaration? qualifyingDec) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(IdeaInvocationCompletionProposal(offset, prefix, desc, text, dec, pr, scope,
-                includeDefaulted, positionalInvocation, namedInvocation, 
-                inherited, qualified, qualifyingDec, ctx).lookupElement);
+            ctx.proposals.add(IdeaInvocationCompletionProposal {
+                offset = offset;
+                prefix = prefix;
+                desc = desc;
+                text = text;
+                declaration = dec;
+                producedReference = pr;
+                scope = scope;
+                includeDefaulted = includeDefaulted;
+                positionalInvocation = positionalInvocation;
+                namedInvocation = namedInvocation;
+                inherited = inherited;
+                qualified = qualified;
+                qualifyingValue = qualifyingDec;
+                ctx = ctx;
+            }.lookupElement);
         }
     }
     
@@ -75,101 +92,167 @@ shared object ideaCompletionServices satisfies CompletionServices {
         
         assert(exists pr);
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(IdeaRefinementCompletionProposal(offset, prefix, pr, desc, text,
-                ctx, dec, scope, fullType, explicitReturnType).lookupElement);
+            ctx.proposals.add(IdeaRefinementCompletionProposal {
+                offset = offset;
+                prefix = prefix;
+                pr = pr;
+                desc = desc;
+                text = text;
+                ctx = ctx;
+                dec = dec;
+                scope = scope;
+                fullType = fullType;
+                explicitReturnType = explicitReturnType;
+            }.lookupElement);
         }
     }
     
-    shared actual void newPackageDescriptorProposal(CompletionContext ctx, Integer offset, String prefix, String desc, String text) {
+    shared actual void newPackageDescriptorProposal(CompletionContext ctx, Integer offset,
+            String prefix, String desc, String text) {
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(desc, text, icons.packageDescriptors));
+            ctx.proposals.add(newLookup {
+                desc = desc;
+                text = text;
+                icon = icons.packageDescriptors;
+            });
         }
     }
     
     shared actual void newImportedModulePackageProposal(Integer offset, String prefix,
-        String memberPackageSubname, Boolean withBody,
-        String fullPackageName, CompletionContext ctx,
-        Package candidate) {
+            String memberPackageSubname, Boolean withBody, String fullPackageName,
+            CompletionContext ctx, Package candidate) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(IdeaImportedModulePackageProposal(offset, prefix, memberPackageSubname,
-                withBody, fullPackageName, ctx, candidate).lookupElement);
+            ctx.proposals.add(IdeaImportedModulePackageProposal {
+                offset = offset;
+                prefix = prefix;
+                memberPackageSubname = memberPackageSubname;
+                withBody = withBody;
+                fullPackageName = fullPackageName;
+                ctx = ctx;
+                candidate = candidate;
+            }.lookupElement);
         }
     }
     
     shared actual void newQueriedModulePackageProposal(Integer offset, String prefix,
-        String memberPackageSubname, Boolean withBody,
-        String fullPackageName, CompletionContext ctx,
-        ModuleVersionDetails version, Unit unit, ModuleSearchResult.ModuleDetails md) {
+            String memberPackageSubname, Boolean withBody, String fullPackageName,
+            CompletionContext ctx, ModuleVersionDetails version, Unit unit,
+            ModuleSearchResult.ModuleDetails md) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(IdeaQueriedModulePackageProposal(offset, prefix, memberPackageSubname, withBody,
-                fullPackageName, ctx, version, unit, md).lookupElement);
+            ctx.proposals.add(IdeaQueriedModulePackageProposal {
+                offset = offset;
+                prefix = prefix;
+                memberPackageSubname = memberPackageSubname;
+                withBody = withBody;
+                fullPackageName = fullPackageName;
+                completionCtx = ctx;
+                version = version;
+                unit = unit;
+                md = md;
+            }.lookupElement);
         }
     }       
     
     shared actual void newModuleProposal(Integer offset, String prefix, Integer len, 
-        String versioned, ModuleSearchResult.ModuleDetails mod, Boolean withBody,
-        ModuleVersionDetails version, String name, Node node, CompletionContext ctx) {
+            String versioned, ModuleSearchResult.ModuleDetails mod, Boolean withBody,
+            ModuleVersionDetails version, String name, Node node, CompletionContext ctx) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(IdeaModuleCompletionProposal(offset, prefix, len, versioned,
-                mod, withBody, version, name, node, ctx).lookupElement);
+            ctx.proposals.add(IdeaModuleCompletionProposal {
+                offset = offset;
+                prefix = prefix;
+                len = len;
+                versioned = versioned;
+                mod = mod;
+                withBody = withBody;
+                version = version;
+                name = name;
+                node = node;
+                ctx = ctx;
+            }.lookupElement);
         }
     }
     
-    shared actual void newModuleDescriptorProposal(CompletionContext ctx, Integer offset, String prefix, String desc,
-        String text, Integer selectionStart, Integer selectionLength) {
+    shared actual void newModuleDescriptorProposal(CompletionContext ctx, Integer offset,
+            String prefix, String desc, String text,
+            Integer selectionStart, Integer selectionLength) {
         
         value selection = TextRange.from(selectionStart, selectionLength); 
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(desc, text, icons.moduleDescriptors, null, selection));
+            ctx.proposals.add(newLookup {
+                desc = desc;
+                text = text;
+                icon = icons.moduleDescriptors;
+                handler = null;
+                selection = selection;
+            });
         }
     }
     
-    shared actual void newJDKModuleProposal(CompletionContext ctx, Integer offset, String prefix, Integer len, 
-        String versioned, String name) {
+    shared actual void newJDKModuleProposal(CompletionContext ctx, Integer offset,
+            String prefix, Integer len, String versioned, String name) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(newLookup(versioned, versioned.spanFrom(len), icons.moduleArchives));
+            ctx.proposals.add(newLookup {
+                desc = versioned;
+                text = versioned.spanFrom(len);
+                icon = icons.moduleArchives;
+            });
         }
     }
     
     // Not supported in IntelliJ (see CeylonParameterInfoHandler instead)
     shared actual void newParameterInfo(CompletionContext ctx, Integer offset, Declaration dec, 
-        Reference producedReference, Scope scope, Boolean namedInvocation) {}
+            Reference producedReference, Scope scope, Boolean namedInvocation) {}
     
     shared actual void newFunctionCompletionProposal(Integer offset, String prefix,
-        String desc, String text, Declaration dec, Unit unit, CompletionContext ctx) {
+            String desc, String text, Declaration dec, Unit unit, CompletionContext ctx) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(IdeaFunctionCompletionProposal(offset, prefix, desc, text, dec, ctx).lookupElement);
+            ctx.proposals.add(IdeaFunctionCompletionProposal {
+                offset = offset;
+                prefix = prefix;
+                desc = desc;
+                text = text;
+                decl = dec;
+                ctx = ctx;
+            }.lookupElement);
         }
     }
     
-    shared actual void newControlStructureCompletionProposal(Integer offset,
-        String prefix, String desc, String text, Declaration dec,
-        CompletionContext ctx, Node? node) {
+    shared actual void newControlStructureCompletionProposal(Integer offset, String prefix,
+            String desc, String text, Declaration dec, CompletionContext ctx, Node? node) {
         
         if (is IdeaCompletionContext ctx) {
-            ctx.proposals.add(IdeaControlStructureProposal(offset, prefix, desc, text, 
-                dec, ctx, node).lookupElement);
+            ctx.proposals.add(IdeaControlStructureProposal {
+                offset = offset;
+                prefix = prefix;
+                desc = desc;
+                text = text;
+                declaration = dec;
+                ctx = ctx;
+                node = node;
+            }.lookupElement);
         }
     }
     
-    shared actual void newTypeProposal(ProposalsHolder ctx, Integer offset, Type? type, String text, String desc, Tree.CompilationUnit rootNode) {
+    shared actual void newTypeProposal(ProposalsHolder ctx, Integer offset, Type? type,
+            String text, String desc, Tree.CompilationUnit rootNode) {
         if (is IdeaProposalsHolder ctx) {
-            ctx.add(
-                newLookup(desc, text)
-                    .withIcon(if (exists type) then icons.forDeclaration(type.declaration) else null)
-            );
+            value icon
+                    = if (exists type)
+                    then icons.forDeclaration(type.declaration)
+                    else null;
+            ctx.add(newLookup(desc, text).withIcon(icon));
         }
     }
     
     createProposalsHolder() => IdeaProposalsHolder();
     
     shared actual void addNestedProposal(ProposalsHolder proposals, Icons|Declaration icon,
-        String description, DefaultRegion region, String text) {
+            String description, DefaultRegion region, String text) {
         
         if (is IdeaProposalsHolder proposals) {
             value myIcon = switch(icon)
@@ -180,22 +263,23 @@ shared object ideaCompletionServices satisfies CompletionServices {
         }
     }
     
-    shared actual void addProposal(CompletionContext ctx, Integer offset, 
-        String prefix, Icons|Declaration icon, String description, String text,
-        ProposalKind kind, TextChange? additionalChange, DefaultRegion? selection) {
+    shared actual void addProposal(CompletionContext ctx, Integer offset, String prefix,
+            Icons|Declaration icon, String description, String text, ProposalKind kind,
+            TextChange? additionalChange, DefaultRegion? selection) {
         
         if (is IdeaCompletionContext ctx) {
             value myIcon = switch(icon)
             case (is Icons) null
             else icons.forDeclaration(icon);
             
-            value myRange = if (exists selection)
-            then TextRange.from(selection.start, selection.length)
-            else null;
+            value myRange
+                    = if (exists selection)
+                    then TextRange.from(selection.start, selection.length)
+                    else null;
             
             value myHandler = if (is IdeaTextChange additionalChange)
             then object satisfies InsertHandler<LookupElement> {
-                handleInsert(InsertionContext ic, LookupElement? t)
+                handleInsert(InsertionContext context, LookupElement? element)
                         => additionalChange.apply();
             }
             else null;

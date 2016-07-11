@@ -41,7 +41,7 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
     shared LookupElement lookupElement => newLookup(versioned, versioned.spanFrom(len),
        icons.moduleArchives, object satisfies InsertHandler<LookupElement> {
            shared actual void handleInsert(InsertionContext insertionContext,
-               LookupElement? t) {
+               LookupElement? element) {
                
                // Undo IntelliJ's completion
                value platformDoc = ctx.commonDocument;
@@ -52,10 +52,17 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         }
     );
     
-    shared actual void newModuleProposal(ProposalsHolder proposals, ModuleVersionDetails d, DefaultRegion selection, LinkedMode lm) {
+    shared actual void newModuleProposal(ProposalsHolder proposals,
+            ModuleVersionDetails details, DefaultRegion selection, LinkedMode linkedMode) {
         if (is IdeaProposalsHolder proposals) {
             // TODO icon
-            proposals.add(newLookup(d.version, d.version, null, null, TextRange.from(selection.start, selection.length)));
+            proposals.add(newLookup {
+                desc = details.version;
+                text = details.version;
+                icon = null;
+                handler = null;
+                selection = TextRange.from(selection.start, selection.length);
+            });
         }
     }
     
