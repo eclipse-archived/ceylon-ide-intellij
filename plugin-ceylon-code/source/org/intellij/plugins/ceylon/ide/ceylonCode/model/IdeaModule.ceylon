@@ -89,10 +89,10 @@ shared class IdeaModule(
                 = ArtifactContext(null,
                                   mod.nameAsString, mod.version,
                                   ArtifactContext.car);
-        if (exists artifact  = provider.getArtifact(carCtx)) {
+        if (exists artifact = provider.getArtifact(carCtx)) {
             return artifact;
         }
-        else if (exists artifact  = provider.getArtifact(jarCtx)) {
+        else if (exists artifact = provider.getArtifact(jarCtx)) {
             return artifact;
         }
         else {
