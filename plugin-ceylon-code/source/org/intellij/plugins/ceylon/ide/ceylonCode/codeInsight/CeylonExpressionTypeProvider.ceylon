@@ -43,12 +43,12 @@ shared class CeylonExpressionTypeProvider()
 
     shared actual List<CeylonPsi.TermPsi> getExpressionsAt(PsiElement psiElement) {
         value list = ArrayList<CeylonPsi.TermPsi>();
-        variable value expression = getParentOfType(psiElement, termType);
-        while (exists ex = expression) {
+        variable value expression = psiElement;
+        while (exists ex = getParentOfType(expression, termType)) {
             if (!ex is CeylonPsi.ExpressionPsi, !ex in list) {
-                list.add(expression);
+                list.add(ex);
             }
-            expression = getParentOfType(expression, termType);
+            expression = ex;
         }
         return list;
     }
