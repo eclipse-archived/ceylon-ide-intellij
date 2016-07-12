@@ -80,6 +80,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     IdeaNavigation
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    PSIClass,
+    PSIMethod
+}
 
 
 List<String> toJavaModifiers(Declaration decl) {
@@ -253,7 +257,11 @@ shared class CeyLightClass extends LightElement
     shared actual List<PsiMethod> ownMethods {
         value methods = ArrayList<PsiMethod>();
         for (meth in mirror.directMethods) {
-            methods.add(CeyLightMethod(this, meth, project));
+            if (is PSIMethod meth) {
+                methods.add(meth.psi);
+            } else {
+                methods.add(CeyLightMethod(this, meth, project));
+            }
         }
         return methods;
     }
@@ -261,8 +269,11 @@ shared class CeyLightClass extends LightElement
     shared actual List<PsiClass> ownInnerClasses {
         value classes = ArrayList<PsiClass>();
         for (cls in mirror.directInnerClasses) {
-            assert (is AbstractClassMirror cls);
-            classes.add(fromMirror(cls, project));
+            if (is AbstractClassMirror cls) {
+                classes.add(fromMirror(cls, project));
+            } else if (is PSIClass cls) {
+                classes.add(cls.psi);
+            }
         }
         return classes;
     }
