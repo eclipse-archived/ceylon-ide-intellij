@@ -208,7 +208,7 @@
 
         <buildProcess.parametersProvider
                 implementation="org.intellij.plugins.ceylon.ide.build.BuildClasspathProvider"/>
-        <compileServer.plugin/>
+        <compileServer.plugin classpath=""/>
         <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonBuilder" execute="BEFORE"/>
         <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonJsBuilder" execute="AFTER"/>
 
