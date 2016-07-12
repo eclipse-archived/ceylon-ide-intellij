@@ -16,8 +16,7 @@ import com.intellij.openapi.util {
     Ref
 }
 import com.intellij.psi {
-    PsiFile,
-    PsiElement
+    PsiFile
 }
 import com.intellij.psi.util {
     PsiUtilCore
