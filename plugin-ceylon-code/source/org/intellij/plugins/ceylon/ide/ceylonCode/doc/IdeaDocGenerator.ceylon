@@ -32,12 +32,6 @@ import com.redhat.ceylon.ide.common.doc {
     Colors,
     Icons
 }
-import com.redhat.ceylon.ide.common.model {
-    BaseCeylonProject
-}
-import com.redhat.ceylon.ide.common.platform {
-    CommonDocument
-}
 import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult,
     IdePhasedUnit
@@ -58,24 +52,18 @@ import com.redhat.ceylon.model.typechecker.util {
 
 import java.awt {
     Font {
-        bold=BOLD,
-        italic=ITALIC
+        bold=\iBOLD,
+        italic=\iITALIC
     }
 }
 import java.lang {
     JStringBuilder=StringBuilder
-}
-import java.util {
-    JList=List
 }
 
 import javax.swing {
     Icon
 }
 
-import org.antlr.runtime {
-    CommonToken
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     ceylonHighlightingColors,
     highlighter,
@@ -90,20 +78,24 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 String psiProtocol = "psi_element://";
 
-shared class IdeaDocGenerator(TypeChecker tc) satisfies DocGenerator {
+shared class IdeaDocGenerator(TypeChecker typechecker)
+        satisfies DocGenerator {
 
-    shared class DocParams(PhasedUnit pu, Project p) satisfies LocalAnalysisResult {
-        assert(is IdePhasedUnit pu);
+    shared class DocParams(lastPhasedUnit, ideaProject)
+            satisfies LocalAnalysisResult {
 
-        shared actual Tree.CompilationUnit lastCompilationUnit => pu.compilationUnit;
-        shared actual Tree.CompilationUnit parsedRootNode => lastCompilationUnit;
-        shared actual Tree.CompilationUnit? typecheckedRootNode => lastCompilationUnit;
-        shared actual PhasedUnit lastPhasedUnit => pu;
-        shared actual JList<CommonToken> tokens => pu.tokens;
-        shared actual TypeChecker typeChecker => tc;
-        shared actual BaseCeylonProject? ceylonProject => pu.moduleSourceMapper?.ceylonProject;
-        shared Project ideaProject => p;
-        shared actual CommonDocument commonDocument => nothing;
+        shared actual PhasedUnit lastPhasedUnit;
+        assert(is IdePhasedUnit lastPhasedUnit);
+        shared Project ideaProject;
+        shared actual Tree.CompilationUnit lastCompilationUnit
+                => lastPhasedUnit.compilationUnit;
+
+        parsedRootNode => lastCompilationUnit;
+        typecheckedRootNode => lastCompilationUnit;
+        tokens => lastPhasedUnit.tokens;
+        typeChecker => outer.typechecker;
+        ceylonProject => lastPhasedUnit.moduleSourceMapper?.ceylonProject;
+        commonDocument => nothing;
     }
 
     String hexColor(Integer red, Integer green, Integer blue) 
