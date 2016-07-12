@@ -61,7 +61,9 @@ shared PsiElement? resolveDeclaration(Referenceable? declaration, Project projec
             return location;
         }
     }
-    return null;
+    else {
+        return null;
+    }
 }
 
 shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
@@ -74,9 +76,11 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
             assert (exists path = unit.sourceFullPath?.string);
             value prefix = "!/" in path then "jar" else "file";
             return VirtualFileManager.instance.findFileByUrl(prefix + "://" + path);
-        } else if (is IResourceAware<out Anything, VirtualFile, VirtualFile> unit) {
+        }
+        else if (is IResourceAware<out Anything, VirtualFile, VirtualFile> unit) {
             return unit.resourceFile;
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -84,7 +88,8 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
     value node {
         if (is CeylonPsi.ImportPathPsi myElement) {
             return myElement.ceylonNode;
-        } else if (is CeylonCompositeElement parent = myElement.parent) {
+        }
+        else if (is CeylonCompositeElement parent = myElement.parent) {
             return parent.ceylonNode;
         }
         else {
@@ -98,7 +103,8 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
                 model.originalDeclaration exists) {
                 //noop
                 // we need to resolve the original declaration
-            } else if (ApplicationInfo.instance.build.baselineVersion >= 145) {
+            }
+            else if (ApplicationInfo.instance.build.baselineVersion >= 145) {
                 // IntelliJ 15+ can show usages on ctrl-click, if we return null here
                 // For older versions, we have to continue resolving
                 return null;
