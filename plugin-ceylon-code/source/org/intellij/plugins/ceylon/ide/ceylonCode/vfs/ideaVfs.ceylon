@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    javaClass,
     javaString
 }
 
@@ -27,8 +26,8 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects,
-    doWithLock
+    doWithLock,
+    getCeylonProjects
 }
 
 shared alias IdeaResource => ResourceVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>;
@@ -60,7 +59,7 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     nativeResource => file;
     charset => file.charset.string;
     
-    ceylonProject => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod);
+    ceylonProject => getCeylonProjects(mod.project)?.getProject(mod);
     
     nativeProject => mod;
 }
@@ -100,7 +99,7 @@ shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
             then that.folder == folder
             else false;
     
-    ceylonProject => mod.project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod);
+    ceylonProject => getCeylonProjects(mod.project)?.getProject(mod);
     
     nativeProject => mod;
 }

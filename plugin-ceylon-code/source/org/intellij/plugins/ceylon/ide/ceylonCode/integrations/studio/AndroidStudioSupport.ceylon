@@ -57,8 +57,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerProvider
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects,
-    IdeaCeylonProject
+    IdeaCeylonProject,
+    getCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     ceylonFileFactory
@@ -82,9 +82,9 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     value applyCeylonAndroidPlugin = "apply plugin: 'com.redhat.ceylon.gradle.android'";
 
     shared actual void setupModule(Module mod) {
-        value projects = mod.project.getComponent(javaClass<IdeaCeylonProjects>());
+        assert (exists projects = getCeylonProjects(mod.project));
         projects.addProject(mod);
-        assert(is IdeaCeylonProject ceylonProject = projects.getProject(mod));
+        assert (is IdeaCeylonProject ceylonProject = projects.getProject(mod));
 
         CommandProcessor.instance.executeCommand(object satisfies Runnable {
             shared actual void run() {
@@ -102,9 +102,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                 }
 
                 object extends WriteCommandAction<Nothing>(mod.project) {
-                    shared actual void run(Result<Nothing> result) {
-                        addFacet(ceylonProject);
-                    }
+                    run(Result<Nothing> result) => addFacet(ceylonProject);
                 }.execute();
             }
         }, "Configure Ceylon", null);

@@ -1,6 +1,5 @@
 import ceylon.interop.java {
     javaObjectArray,
-    javaClass,
     CeylonIterable,
     createJavaObjectArray
 }
@@ -37,14 +36,14 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
+    getCeylonProjects
 }
 
 shared class CeylonElementFinder() extends PsiElementFinder() {
 
     shared actual PsiClass? findClass(String fqName, GlobalSearchScope scope) {
         if (exists p = scope.project,
-            exists projects = p.getComponent(javaClass<IdeaCeylonProjects>())) {
+            exists projects = getCeylonProjects(p)) {
             for (proj in projects.ceylonProjects) {
                 value ijMod = proj.ideArtifact;
 
@@ -77,7 +76,7 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
         value fqName = pkg.qualifiedName;
         
         if (exists p = scope.project,
-            exists projects = p.getComponent(javaClass<IdeaCeylonProjects>())) {
+            exists projects = getCeylonProjects(p)) {
             for (proj in projects.ceylonProjects) {
                 value ijMod = proj.ideArtifact;
                 

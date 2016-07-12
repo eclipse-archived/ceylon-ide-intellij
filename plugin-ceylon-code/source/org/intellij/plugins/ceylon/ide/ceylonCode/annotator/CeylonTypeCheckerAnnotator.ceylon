@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.codeInspection {
     ProblemHighlightType
 }
@@ -69,7 +65,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
-    concurrencyManager
+    concurrencyManager,
+    getCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
@@ -139,8 +136,7 @@ shared class CeylonTypeCheckerAnnotator()
                 exists mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project),
                 exists pu = file.localAnalysisResult.lastPhasedUnit);
         
-        if (is IdeaCeylonProjects projects
-                = file.project.getComponent(javaClass<IdeaCeylonProjects>()),
+        if (is IdeaCeylonProjects projects = getCeylonProjects(file.project),
             exists project = projects.getProject(mod),
             exists tc = project.typechecker,
             exists node = nodes.findNode {
@@ -175,11 +171,11 @@ shared class CeylonTypeCheckerAnnotator()
             is CeylonFile ceylonFile = psiElement.containingFile) {
             if (exists pu = ceylonFile.upToDatePhasedUnit) {
                 if (exists cu = pu.compilationUnit,
-                    ! (pu is ExternalPhasedUnit)) {
+                    !pu is ExternalPhasedUnit) {
                      value ceylonMessages 
                          = ErrorsVisitor(cu, ceylonFile)
                              .extractMessages();
-                     
+
                      /*DaemonCodeAnalyzer.getInstance(ceylonFile.project)
                              .resetImportHintsEnabledForProject();*/
                      
@@ -196,7 +192,7 @@ shared class CeylonTypeCheckerAnnotator()
                                  hasErrors ||= result;
                              })
                          );
-                             
+
                      if (hasErrors) {
                          value problems = object extends ArrayList<Problem>() {
                              empty => false;
@@ -216,6 +212,3 @@ shared class CeylonTypeCheckerAnnotator()
         }
     }
 }
-
-
-

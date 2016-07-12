@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.actionSystem {
     AnAction,
     AnActionEvent,
@@ -9,26 +5,22 @@ import com.intellij.openapi.actionSystem {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    CeylonModelManager
+    getModelManager
 }
 
 shared class ToggleModelUpdateAction() extends AnAction() {
 
     shared actual void actionPerformed(AnActionEvent e) {
-        if (exists project
-                = PlatformDataKeys.project.getData(e.dataContext),
-            exists modelManager
-                = project.getComponent(javaClass<CeylonModelManager>())) {
+        if (exists project = PlatformDataKeys.project.getData(e.dataContext),
+            exists modelManager = getModelManager(project)) {
             modelManager.automaticModelUpdateEnabled
                     = !modelManager.automaticModelUpdateEnabled;
         }
     }
 
     shared actual void update(AnActionEvent e) {
-        if (exists project
-                = PlatformDataKeys.project.getData(e.dataContext),
-            exists modelManager
-                = project.getComponent(javaClass<CeylonModelManager>())) {
+        if (exists project = PlatformDataKeys.project.getData(e.dataContext),
+            exists modelManager = getModelManager(project)) {
 
             e.presentation.enabled = true;
 

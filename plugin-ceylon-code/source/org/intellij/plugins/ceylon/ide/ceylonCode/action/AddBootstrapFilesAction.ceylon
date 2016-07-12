@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    javaClass,
     createJavaStringArray
 }
 
@@ -32,14 +31,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerInvoker
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
+    getCeylonProjects
 }
 
 shared class AddBootstrapFilesAction() extends AnAction() {
     
     shared actual void actionPerformed(AnActionEvent evt) {
-        assert(exists mod = DataKeys.moduleContext.getData(evt.dataContext));
-        value projects = mod.project.getComponent(javaClass<IdeaCeylonProjects>());
+        assert (exists mod = DataKeys.moduleContext.getData(evt.dataContext),
+                exists projects = getCeylonProjects(mod.project));
         value versions = versionsAvailableForBoostrap;
         
         if (exists project = projects.getProject(mod),

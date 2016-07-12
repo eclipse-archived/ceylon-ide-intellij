@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.codeInsight.intention.impl {
     BaseIntentionAction
 }
@@ -62,8 +58,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects,
-    CeylonModelManager
+    getCeylonProjects,
+    getModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -83,7 +79,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
     value dummyMsg = UsageWarning(null, null, null);
     
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
-        value modelManager = project.getComponent(javaClass<CeylonModelManager>());
+        assert (exists modelManager = getModelManager(project));
         try {
             modelManager.pauseAutomaticModelUpdate();
             
@@ -124,7 +120,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             
             if (exists mod = ModuleUtil.findModuleForFile(psiFile.virtualFile, project),
                 exists _node,
-                exists pr = project.getComponent(javaClass<IdeaCeylonProjects>()).getProject(mod)) {
+                exists pr = getCeylonProjects(project)?.getProject(mod)) {
 
                 value outerProject = project;
                 assert (exists doc = psiFile.viewProvider.document);

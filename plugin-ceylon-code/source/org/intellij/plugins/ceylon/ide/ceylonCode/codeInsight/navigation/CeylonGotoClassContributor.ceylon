@@ -50,9 +50,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation {
     CeylonGotoContributor
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects,
     IdeaModule,
-    concurrencyManager
+    concurrencyManager,
+    getCeylonProjects
 }
 
 
@@ -208,7 +208,7 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
 
     void processDeclarations(Project project, Boolean includeNonProjectItems, Boolean(Declaration) consumer) {
         concurrencyManager.withAlternateResolution(() {
-            if (exists ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>())) {
+            if (exists ceylonProjects = getCeylonProjects(project)) {
                 for (mod in ModuleManager.getInstance(project).modules) {
                     if (exists ceylonProject = ceylonProjects.getProject(mod),
                         exists modules = ceylonProject.modules,

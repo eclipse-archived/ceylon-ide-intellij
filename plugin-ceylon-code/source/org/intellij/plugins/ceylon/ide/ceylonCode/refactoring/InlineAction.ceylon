@@ -54,6 +54,9 @@ import org.antlr.runtime {
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     ceylonLanguage
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    getModelManager
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
     IdeaCompositeChange
@@ -61,12 +64,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonCompositeElement
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    CeylonModelManager
-}
-import ceylon.interop.java {
-    javaClass
 }
 
 shared class InlineAction() extends InlineActionHandler() {
@@ -84,7 +81,7 @@ shared class InlineAction() extends InlineActionHandler() {
     }
 
     shared actual void inlineElement(Project proj, Editor editor, PsiElement element) {
-        value modelManager = proj.getComponent(javaClass<CeylonModelManager>());
+        assert (exists modelManager = getModelManager(proj));
         try {
             modelManager.pauseAutomaticModelUpdate();
 

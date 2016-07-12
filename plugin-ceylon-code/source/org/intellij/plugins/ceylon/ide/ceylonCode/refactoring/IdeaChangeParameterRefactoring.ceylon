@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    javaClass,
     createJavaObjectArray,
     createJavaStringArray,
     javaString,
@@ -22,9 +21,6 @@ import com.intellij.openapi.editor {
 import com.intellij.openapi.editor.event {
     DocumentListener,
     DocumentEvent
-}
-import com.intellij.openapi.\imodule {
-    ModuleUtil
 }
 import com.intellij.openapi.project {
     Project
@@ -123,8 +119,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
-    IdeaCeylonProjects,
-    CeylonModelManager
+    getCeylonProject,
+    getModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -135,15 +131,19 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
-    shared actual PsiElement? findTargetMember(PsiFile file, Editor editor) {
-        return findTargetMember(file.findElementAt(editor.caretModel.offset));
-    }
+
+    shared actual PsiElement? findTargetMember(PsiFile file, Editor editor)
+            => findTargetMember(file.findElementAt(editor.caretModel.offset));
 
     shared actual PsiElement? findTargetMember(PsiElement? element) {
         if (exists element,
             is CeylonFile file = element.containingFile,
             exists localAnalysisResult = file.localAnalysisResult,
-            exists node = nodes.findNode(localAnalysisResult.parsedRootNode, localAnalysisResult.tokens, element.textOffset)) {
+            exists node = nodes.findNode {
+                node = localAnalysisResult.parsedRootNode;
+                tokens = localAnalysisResult.tokens;
+                startOffset = element.textOffset;
+            }) {
 
             return element;
         }
@@ -152,7 +152,7 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
     }
 
     shared actual void invoke(Project project, ObjectArray<PsiElement> elements, DataContext? ctx) {
-        value modelManager = project.getComponent(javaClass<CeylonModelManager>());
+        assert (exists modelManager = getModelManager(project));
         try {
             modelManager.pauseAutomaticModelUpdate();
 
@@ -168,38 +168,32 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
         }
     }
 
-    shared actual void invoke(Project _project, Editor editor, PsiFile file, DataContext? dataContext) {
+    shared actual void invoke(Project p, Editor editor, PsiFile file, DataContext? dataContext) {
         if (is CeylonFile file,
             exists localAnalysisResult = file.localAnalysisResult,
             exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode,
-            exists phasedUnit = localAnalysisResult.lastPhasedUnit) {
-            value projects = _project.getComponent(javaClass<IdeaCeylonProjects>());
+            exists phasedUnit = localAnalysisResult.lastPhasedUnit,
+            exists ceylonProject = getCeylonProject(file)) {
 
-            if (exists mod = ModuleUtil.findModuleForFile(file.virtualFile, _project),
-                is IdeaCeylonProject ceylonProject = projects.getProject(mod)) {
+            value refacto = IdeaChangeParameterRefactoring(phasedUnit, localAnalysisResult.tokens, editor, ceylonProject);
+            if (refacto.enabled,
+                exists params = refacto.computeParameters()) {
 
-                value refacto = IdeaChangeParameterRefactoring(phasedUnit, localAnalysisResult.tokens, editor, ceylonProject);
-                if (refacto.enabled,
-                    exists params = refacto.computeParameters()) {
-
-                    value dialog = object extends ChangeParameterDialog(params, _project) {
-                        shared actual void invokeRefactoring(BaseRefactoringProcessor? processor) {
-                            if (is IdeaCompositeChange chg = refacto.build(params)) {
-                                object extends WriteCommandAction<Nothing>(_project) {
-                                    shared actual void run(Result<Nothing> result) {
-                                        chg.applyChanges(project);
-                                    }
-                                }.execute();
-                            }
-
-                            close(DialogWrapper.okExitCode);
+                value dialog = object extends ChangeParameterDialog(params, p) {
+                    shared actual void invokeRefactoring(BaseRefactoringProcessor processor) {
+                        if (is IdeaCompositeChange chg = refacto.build(params)) {
+                            object extends WriteCommandAction<Nothing>(p) {
+                                run(Result<Nothing> result) => chg.applyChanges(project);
+                            }.execute();
                         }
-                    };
 
-                    dialog.show();
-                }
+                        close(DialogWrapper.okExitCode);
+                    }
+                };
 
+                dialog.show();
             }
+
         }
     }
 

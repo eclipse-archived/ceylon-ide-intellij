@@ -46,7 +46,7 @@ import java.lang {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     concurrencyManager,
-    CeylonModelManager
+    getModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     ProgressIndicatorMonitor
@@ -54,9 +54,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonTokens
-}
-import ceylon.interop.java {
-    javaClass
 }
 
 
@@ -67,8 +64,8 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
     
     shared actual void addCompletions(CompletionParameters parameters, 
         ProcessingContext context, variable CompletionResultSet result) {
-        assert (exists project = parameters.editor.project);
-        value modelManager = project.getComponent(javaClass<CeylonModelManager>());
+        assert (exists project = parameters.editor.project,
+                exists modelManager = getModelManager(project));
         try {
             modelManager.pauseAutomaticModelUpdate();
         

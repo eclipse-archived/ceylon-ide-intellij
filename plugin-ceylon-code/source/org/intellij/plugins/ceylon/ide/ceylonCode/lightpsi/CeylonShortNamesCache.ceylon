@@ -3,7 +3,6 @@ import ceylon.collection {
 }
 import ceylon.interop.java {
     createJavaObjectArray,
-    javaClass,
     CeylonIterable
 }
 
@@ -42,8 +41,8 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects,
-    IdeaModuleManager
+    IdeaModuleManager,
+    getCeylonProjects
 }
 
 String getJavaName(Declaration decl)
@@ -57,7 +56,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
     shared actual ObjectArray<JString> allClassNames {
         value classes = ArrayList<JString>();
         
-        if (exists projects = project.getComponent(javaClass<IdeaCeylonProjects>())) {
+        if (exists projects = getCeylonProjects(project)) {
             for (proj in projects.ceylonProjects) {
                 for (mod in proj.modules?.fromProject else []) {
                     for (pack in mod.packages) {
@@ -106,7 +105,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
     shared actual ObjectArray<PsiClass> getClassesByName(String name, GlobalSearchScope scope) {
         value classes = ArrayList<PsiClass>();
 
-        if (exists projects = project.getComponent(javaClass<IdeaCeylonProjects>())) {
+        if (exists projects = getCeylonProjects(project)) {
             for (proj in projects.ceylonProjects) {
                 value ijMod = proj.ideArtifact;
                 

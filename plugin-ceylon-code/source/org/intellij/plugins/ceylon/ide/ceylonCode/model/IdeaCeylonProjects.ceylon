@@ -21,9 +21,6 @@ import com.redhat.ceylon.ide.common.model {
 import com.redhat.ceylon.ide.common.typechecker {
     ExternalPhasedUnit
 }
-import com.redhat.ceylon.ide.common.util {
-    unsafeCast
-}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     ideaPlatformServices
@@ -38,8 +35,10 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
     ideaPlatformServices.register();
     
     object ceylonProjectCleaner satisfies ModelListenerAdapter<IdeaModule,VirtualFile,VirtualFile,VirtualFile> {
-        ceylonProjectRemoved(CeylonProjectAlias ceylonProject) =>
-                unsafeCast<IdeaCeylonProject>(ceylonProject).clean();
+        shared actual void ceylonProjectRemoved(CeylonProjectAlias ceylonProject) {
+            assert (is IdeaCeylonProject ceylonProject);
+            ceylonProject.clean();
+        }
     }
     
     newNativeProject(IdeaModule ideArtifact) => IdeaCeylonProject(ideArtifact, this);
@@ -50,9 +49,7 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
     disposeComponent() => removeModelListener(ceylonProjectCleaner);
 
 
-    shared actual void projectClosed() {
-        clearProjects();
-    }
+    projectClosed() => clearProjects();
 
     shared actual void projectOpened() {
 
@@ -69,9 +66,10 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
         if (exists path,
             exists offset = path.firstInclusion(JarFileSystem.jarSeparator)) {
             
-            value start = path.startsWith(JarFileSystem.protocolPrefix)
-            then JarFileSystem.protocolPrefix.size
-            else 0;
+            value start
+                    = path.startsWith(JarFileSystem.protocolPrefix)
+                    then JarFileSystem.protocolPrefix.size
+                    else 0;
             value archivePath = path.span(start, offset - 1);
             value filePath = path.spanFrom(offset + JarFileSystem.jarSeparator.size);
             return [archivePath, filePath];
@@ -88,12 +86,13 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
         return null;
     }
 
-    shared IdeModuleAlias? findModuleForExternalPhasedUnit(<CeylonFile|VirtualFile>? file) =>
-            findModuleForParsedArchivePaths(parseExternalPhasedUnitFullPath(file));
+    shared IdeModuleAlias? findModuleForExternalPhasedUnit(<CeylonFile|VirtualFile>? file)
+            => findModuleForParsedArchivePaths(parseExternalPhasedUnitFullPath(file));
 
-    shared ExternalPhasedUnit? findExternalPhasedUnit(<CeylonFile|VirtualFile>? file) =>
-            let(parsedArchivePaths = parseExternalPhasedUnitFullPath(file))
+    shared ExternalPhasedUnit? findExternalPhasedUnit(<CeylonFile|VirtualFile>? file)
+            => let (parsedArchivePaths = parseExternalPhasedUnitFullPath(file))
             if (exists parsedArchivePaths)
-            then findModuleForParsedArchivePaths(parsedArchivePaths)?.getPhasedUnitFromRelativePath(parsedArchivePaths[1])
+            then findModuleForParsedArchivePaths(parsedArchivePaths)
+                    ?.getPhasedUnitFromRelativePath(parsedArchivePaths[1])
             else null;
 }

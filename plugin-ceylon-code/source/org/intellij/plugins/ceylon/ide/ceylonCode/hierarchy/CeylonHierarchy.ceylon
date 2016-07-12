@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.ide.hierarchy {
     HierarchyNodeDescriptor,
     TypeHierarchyBrowserBase,
@@ -73,7 +69,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
+    getCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     descriptions,
@@ -89,7 +85,7 @@ Set<PhasedUnit> collectPhasedUnits(Project project) {
     ProgressManager.instance.runProcessWithProgressSynchronously(object satisfies Runnable {
         shared actual void run() {
             value indicator = ProgressManager.instance.progressIndicator;
-            value ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>());
+            assert (exists ceylonProjects = getCeylonProjects(project));
             for (mod in ModuleManager.getInstance(project).modules) {
                 indicator.text = "Indexing project " + mod.name + "...";
                 indicator.indeterminate = true;

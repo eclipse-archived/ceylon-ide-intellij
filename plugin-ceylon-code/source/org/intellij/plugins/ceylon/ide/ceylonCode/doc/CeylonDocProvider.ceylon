@@ -88,7 +88,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     ConcurrencyManagerForJava,
-    IdeaCeylonProjects
+    getCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
@@ -236,9 +236,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     shared actual void run(Result<Nothing> result) {
                         assert (exists doc = file.viewProvider.document,
                                 exists mod = moduleForFile(file),
-                                exists ceylonProj
-                                    = mod.project.getComponent(javaClass<IdeaCeylonProjects>())
-                                        .getProject(mod));
+                                exists ceylonProj = getCeylonProjects(mod.project)?.getProject(mod));
                         value data = IdeaQuickFixData {
                             message = UnexpectedError(null, null);
                             nativeDoc = doc;

@@ -5,6 +5,9 @@ import ceylon.interop.java {
 import com.intellij.openapi.\imodule {
     ModuleUtil
 }
+import com.intellij.openapi.project {
+    Project
+}
 import com.intellij.psi {
     PsiFile,
     PsiJavaFile,
@@ -24,8 +27,22 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration
 }
 
+import java.lang {
+    Class
+}
+
+Class<IdeaCeylonProjects> ceylonProjectsClass = javaClass<IdeaCeylonProjects>();
+
+shared IdeaCeylonProjects? getCeylonProjects(Project project)
+        => project.getComponent(ceylonProjectsClass);
+
+Class<CeylonModelManager> modelManagerClass = javaClass<CeylonModelManager>();
+
+shared CeylonModelManager? getModelManager(Project project)
+        => project.getComponent(modelManagerClass);
+
 shared IdeaCeylonProject? getCeylonProject(PsiFile psiFile) {
-    if (exists projects = psiFile.project.getComponent(javaClass<IdeaCeylonProjects>()),
+    if (exists projects = getCeylonProjects(psiFile.project),
         exists mod = ModuleUtil.findModuleForFile(psiFile.virtualFile, psiFile.project),
         is IdeaCeylonProject project = projects.getProject(mod)) {
         return project;

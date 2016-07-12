@@ -18,9 +18,11 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.extensions {
     Extensions
 }
+import com.intellij.openapi.externalSystem.service.project {
+    IdeModifiableModelsProviderImpl
+}
 import com.intellij.openapi.\imodule {
-    Module,
-    ModuleUtil
+    Module
 }
 import com.intellij.openapi.project {
     DumbService {
@@ -45,6 +47,9 @@ import com.intellij.openapi.vfs {
         virtualFileManager=instance
     },
     JarFileSystem
+}
+import com.intellij.psi {
+    PsiFile
 }
 import com.redhat.ceylon.cmr.api {
     ArtifactContext
@@ -72,6 +77,9 @@ import com.redhat.ceylon.ide.common.typechecker {
 import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitorChild
 }
+import com.redhat.ceylon.model.cmr {
+    ArtifactResult
+}
 import com.redhat.ceylon.model.typechecker.model {
     Package
 }
@@ -97,15 +105,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     IdeaVirtualFolder
-}
-import com.redhat.ceylon.model.cmr {
-    ArtifactResult
-}
-import com.intellij.openapi.externalSystem.service.project {
-    IdeModifiableModelsProviderImpl
-}
-import com.intellij.psi {
-    PsiFile
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -402,20 +401,13 @@ shared class IdeaCeylonProject(ideArtifact, model)
 }
 
 shared IdeaCeylonProject? findProjectForFile(PsiFile file) {
-
     if (is CeylonFile file,
         is IdePhasedUnit pu = file.localAnalysisResult?.lastPhasedUnit,
         is IdeaModuleSourceMapper msm = pu.moduleSourceMapper,
         is IdeaCeylonProject project = msm.ceylonProject) {
-
         return project;
     }
-    if (exists projects = file.project.getComponent(javaClass<IdeaCeylonProjects>()),
-        exists mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project),
-        is IdeaCeylonProject project = projects.getProject(mod)) {
-        
-        return project;
+    else {
+        return getCeylonProject(file);
     }
-    
-    return null;
 }

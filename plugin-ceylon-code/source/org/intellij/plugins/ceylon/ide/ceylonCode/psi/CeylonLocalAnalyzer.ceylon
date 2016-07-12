@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    JavaRunnable,
-    javaClass
+    JavaRunnable
 }
 
 import com.intellij.codeInsight.daemon {
@@ -98,8 +97,8 @@ import org.antlr.runtime {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
     concurrencyManager,
-    CeylonModelManager,
-    IdeaCeylonProjects
+    getCeylonProjects,
+    getModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger,
@@ -125,10 +124,9 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
     
     value localTypecheckingAlarm = Alarm(Alarm.ThreadToUse.pooledThread, ideaProject);
-    value model = ideaProject.getComponent(javaClass<IdeaCeylonProjects>());
-    assert(is IdeaCeylonProject? ceylonProject = 
-        model.getProject(
-            ModuleUtil.findModuleForFile(virtualFile, ideaProject) else null));
+    assert (exists model = getCeylonProjects(ideaProject));
+    assert (is IdeaCeylonProject? ceylonProject
+            = model.getProject(ModuleUtil.findModuleForFile(virtualFile, ideaProject)));
     
     variable ExternalPhasedUnit? externalPhasedUnitToTranslate = null;
     
@@ -277,7 +275,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         logger.debug(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
             ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
                 assert (is PsiDocumentManagerBase psiDocumentManager = PsiDocumentManager.getInstance(ideaProject));
-                value phasedUnit = ideaProject.getComponent(javaClass<IdeaCeylonProjects>()).findExternalPhasedUnit(virtualFile);
+                value phasedUnit = getCeylonProjects(ideaProject)?.findExternalPhasedUnit(virtualFile);
                 if (exists phasedUnit) {
                     externalPhasedUnitToTranslate = phasedUnit;
                     manager.scheduleReparse(virtualFile);
@@ -421,7 +419,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
 
     void typecheckSourceFile(Document document, Tree.CompilationUnit parsedRootNode, List<CommonToken> tokens, MutableLocalAnalysisResult result, Integer waitForModelInSeconds, Cancellable? cancellable) {
-        value modelManager = model.ideaProject.getComponent(javaClass<CeylonModelManager>());
+        assert (exists modelManager = getModelManager(model.ideaProject));
         try {
             modelManager.pauseAutomaticModelUpdate();
             checkCancelled(cancellable);
@@ -488,8 +486,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                     };
                     
                     if (result.parsedRootNode.errors.empty) {
-                        value modelManager =
-                                ceylonProject.model.ideaProject.getComponent(javaClass<CeylonModelManager>());
+                        assert (exists modelManager = getModelManager(ceylonProject.model.ideaProject));
                         if (modelManager.modelUpdateWasCannceledBecauseOfSyntaxErrors) {
                             modelManager.scheduleModelUpdate();
                         }
