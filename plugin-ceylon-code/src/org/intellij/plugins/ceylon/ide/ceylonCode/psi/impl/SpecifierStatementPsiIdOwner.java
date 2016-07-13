@@ -23,6 +23,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+import static com.intellij.psi.util.PsiTreeUtil.findChildOfType;
+
 public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStatementPsiImpl
         implements PsiNameIdentifierOwner {
 
@@ -38,7 +40,18 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
     @Nullable
     @Override
     public PsiElement getNameIdentifier() {
-        return findChildByClass(CeylonPsi.BaseMemberExpressionPsi.class).getChildren()[0];
+        CeylonPsi.BaseMemberExpressionPsi baseExpr;
+        CeylonPsi.ParameterizedExpressionPsi pExpr = findChildByClass(CeylonPsi.ParameterizedExpressionPsi.class);
+
+        if (pExpr != null) {
+            baseExpr = findChildOfType(pExpr, CeylonPsi.BaseMemberExpressionPsi.class);
+        } else {
+            baseExpr = findChildByClass(CeylonPsi.BaseMemberExpressionPsi.class);
+        }
+        if (baseExpr != null) {
+            return baseExpr.getChildren()[0];
+        }
+        return null;
     }
 
     @Override
