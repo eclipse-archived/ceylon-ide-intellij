@@ -75,19 +75,22 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         if (! synchronizing) {
             isSynchronizing.set(true);
             try {
-                if (exists currentStrategy = concurrencyManager.noIndexStrategy,
-                    currentStrategy == NoIndexStrategy.waitForIndexes) {
-                    updateIndexIfnecessary();
-                    assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
-                    concurrencyManager.needIndexes(project, () => 
-                        ApplicationManager.application.runReadAction(JavaRunnable(() 
-                        => concurrencyManager.outsideDumbMode(() {
-                        ref.set(action.call() else null);
-                    }))));
+                if (application.readAccessAllowed) {
+                    
                 } else {
-                    ApplicationManager.application.runReadAction(JavaRunnable(() {
-                        ref.set(action.call() else null);
-                    }));
+                    if (exists currentStrategy = concurrencyManager.noIndexStrategy,
+                        currentStrategy == NoIndexStrategy.waitForIndexes) {
+                        updateIndexIfnecessary();
+                        assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
+                        dumbService(project).runReadActionInSmartMode(JavaRunnable(()
+                            => concurrencyManager.outsideDumbMode(() {
+                                ref.set(action.call() else null);
+                        })));
+                    } else {
+                        application.runReadAction(JavaRunnable(() {
+                            ref.set(action.call() else null);
+                        }));
+                    }
                 }
             } finally {
                 isSynchronizing.set(false);
@@ -155,7 +158,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             value name = packageName + "." + className;
             value scope = ideaModule.getModuleScope(true);
             value facade = javaPsiFacade(ideaModule.project);
-            return concurrencyManager.needIndexes(ideaModule.project, () => doWithLock(() 
+            return concurrencyManager.needIndexes(ideaModule.project, () => concurrencyManager.needReadAccess(() 
                 => facade.findClass(name, scope) exists));
         }
         
@@ -166,7 +169,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
         
         updateIndexIfnecessary();
-        return concurrencyManager.needIndexes(project, () => doWithLock(() {
+        return concurrencyManager.needIndexes(project, () => concurrencyManager.needReadAccess(() {
             if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) { 
                 value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
                 value facade = javaPsiFacade(m.project);
@@ -192,10 +195,10 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         value facade = javaPsiFacade(project);
         
         shared actual Boolean packageExists(String quotedPackageName) 
-            => doWithLock(() => facade.findPackage(quotedPackageName) exists);
+            => concurrencyManager.needReadAccess(() => facade.findPackage(quotedPackageName) exists);
         
         shared actual {PsiClass*}? packageMembers(String quotedPackageName)
-            => doWithLock(() {
+            => concurrencyManager.needReadAccess(() {
                 if (exists pkg = facade.findPackage(quotedPackageName)) {
                     value classes = pkg.getClasses(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(mod));
                     

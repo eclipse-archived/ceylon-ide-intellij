@@ -234,19 +234,23 @@ shared object concurrencyManager {
             if (application.readAccessAllowed) {
                 throw CannotWaitForIndexesInReadAccessError();
             }
-            ds.repeatUntilPassesInSmartMode(runnable);
+            ds.runReadActionInSmartMode(runnable);
             return ref.get();
         }
         case (NoIndexStrategy.ousideDumbMode) {
             if (ds.dumb) {
-                throw DumbModeNotSupported();
+                value exception = DumbModeNotSupported();
+                logger.errorThrowable(exception);
+                throw exception;
             } else {
                 return func();
             }
         }
         case(null) {
             if (ds.dumb) {
-                throw IndexNeededWithNoIndexStrategy();
+                value exception = IndexNeededWithNoIndexStrategy();
+                logger.errorThrowable(exception);
+                throw exception;
             } else {
                 logger.debug(()=>noIndexStrategyMessage, 20);
                 return func();
@@ -254,9 +258,6 @@ shared object concurrencyManager {
         }
     }
 }
-
-shared Return doWithIndex<Return>(Project p, Return() func) => concurrencyManager.needIndexes(p, func);
-shared Return doWithLock<Return>(Return() func) => concurrencyManager.needReadAccess(func);
 
 object concurrencyManagerForJava {
     shared Anything needReadAccess(JCallable<Anything> func, Integer timeout)
