@@ -575,8 +575,10 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
 
     void completeExternalPhasedUnitTypechecking(ExternalPhasedUnit phasedUnit, MutableLocalAnalysisResult result, Cancellable cancellable) {
-        phasedUnit.analyseTypes(cancelDidYouMeanSearch);
-        phasedUnit.analyseUsage();
+        concurrencyManager.withUpToDateIndexes(() {
+            phasedUnit.analyseTypes(cancelDidYouMeanSearch);
+            phasedUnit.analyseUsage();
+        });
         if (exists typechecker = phasedUnit.typeChecker) {
             result.finishedTypechecking(phasedUnit, typechecker);
         } else {
