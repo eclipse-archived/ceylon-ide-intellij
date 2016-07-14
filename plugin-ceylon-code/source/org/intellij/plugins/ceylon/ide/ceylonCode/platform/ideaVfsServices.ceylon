@@ -33,11 +33,15 @@ import java.lang.ref {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProject
+    IdeaCeylonProject,
+    IdeaCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     IdeaVirtualFolder,
     VirtualFileVirtualFile
+}
+import ceylon.interop.java {
+    javaClass
 }
 
 object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,VirtualFile> {
@@ -115,10 +119,24 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
            then Path(path)
            else null;
 
-    getProjectRelativePathString(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>|Module project)
-        => if (is IdeaCeylonProject project)
-           then VfsUtil.getRelativePath(resource, project.moduleRoot)
-           else null;
+    shared actual String? getProjectRelativePathString(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>|Module project) {
+        IdeaCeylonProject ceylonProject;
+        if (is Module project) {
+            value model = project.project.getComponent(javaClass<IdeaCeylonProjects>());
+            value existingCeylonProject = model.getProject(project);
+            if (is IdeaCeylonProject existingCeylonProject) {
+                ceylonProject = existingCeylonProject;
+            } else {
+                return null;
+            }
+                    
+        } else if (is IdeaCeylonProject project) {
+            ceylonProject = project;
+        } else {
+            return null;
+        }
+        return VfsUtil.getRelativePath(resource, ceylonProject.moduleRoot);
+    }
 
     shared actual void removePackagePropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder) {
         folder.putUserData(nativeFolderProperties(ceylonProject).packageModel, null);
