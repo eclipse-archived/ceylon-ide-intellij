@@ -117,7 +117,7 @@ shared class CeylonCopyPastePostProcessor()
             value visitor = SelectedImportsVisitor {
                 offset = selection.selectionStart;
                 length = selection.selectionEnd
-                - selection.selectionStart;
+                       - selection.selectionStart;
             };
             visitor.visit(file.compilationUnit); //TODO: check with David which is correct here
             value result = CopiedReferences(visitor.copiedReferences);
