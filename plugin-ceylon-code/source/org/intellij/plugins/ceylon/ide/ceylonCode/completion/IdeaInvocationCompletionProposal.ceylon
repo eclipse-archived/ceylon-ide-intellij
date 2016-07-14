@@ -2,7 +2,7 @@ import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext,
     CompletionInitializationContext {
-        selectionEndOffset=\iSELECTION_END_OFFSET
+        selectionEndOffset=SELECTION_END_OFFSET
     }
 }
 import com.intellij.codeInsight.lookup {
@@ -44,7 +44,10 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     
     shared actual variable Boolean toggleOverwrite = false;
     
-    value greyText = " (``declaration.container.qualifiedNameString``)";
+    value containerName
+            = declaration.container.qualifiedNameString;
+            //+ (declaration.container is Function then "()" else "");
+    value greyText = " (``containerName.empty then "default package" else containerName``)";
     
     value returnType
             => if (is TypedDeclaration declaration,
