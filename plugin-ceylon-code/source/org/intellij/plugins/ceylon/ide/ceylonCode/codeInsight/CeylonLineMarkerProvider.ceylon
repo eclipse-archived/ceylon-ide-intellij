@@ -110,6 +110,8 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
         }*/
 
         if (is CeylonPsi.IdentifierPsi|CeylonPsi.SpecifierStatementPsi element,
+            if (is CeylonPsi.SpecifierStatementPsi element)
+                then element.ceylonNode.refinement else true,
             exists decl = findParentDeclaration(element),
             exists model = getModel(decl)) {
             return model;
