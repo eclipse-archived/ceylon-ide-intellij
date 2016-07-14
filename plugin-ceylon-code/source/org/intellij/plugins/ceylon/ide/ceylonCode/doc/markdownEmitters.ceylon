@@ -117,11 +117,12 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
         
         if (exists s = scope, !declName.empty) {
             value declNames = declName.split('.'.equals);
-            variable Declaration? decl = s.getMemberOrParameter(unit, declNames.first, null, false);
+            variable Declaration? decl
+                    = s.getMemberOrParameter(unit, declNames.first, null, false);
             
             for (name in declNames.skip(1)) {
                 if (is Scope d = decl) {
-                    decl = (d of Scope).getMember(name, null, false);
+                    decl = d.getMember(name, null, false);
                 } else {
                     return null;
                 }

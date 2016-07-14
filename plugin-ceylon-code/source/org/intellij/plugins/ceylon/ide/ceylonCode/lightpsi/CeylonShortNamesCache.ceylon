@@ -63,7 +63,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
                         classes.addAll(
                             CeylonIterable(pack.members)
                                 .narrow<ClassOrInterface|FunctionOrValue>()
-                                .filter((c) => (c of Declaration).unit is CeylonUnit)
+                                .filter((c) => c.unit is CeylonUnit)
                                 .map((c) => JString(getJavaName(c)))
                         );
                     }
@@ -95,7 +95,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
         for (member in decl.members) {
             if (is ClassOrInterface member) {
                 if (name == getJavaName(member)) {
-                    classes.add(CeyLightClass(decl of Declaration, project));
+                    classes.add(CeyLightClass(decl, project));
                 }
                 scanInners(member, name, classes);
             }
@@ -115,7 +115,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
                     for (declName->source in mm.modelLoader.sourceDeclarations) {
                         if (is ClassOrInterface|Value decl = source.modelDeclaration) {
                             if (name == getJavaName(decl)) {
-                                classes.add(CeyLightClass(decl of Declaration, project));
+                                classes.add(CeyLightClass(decl, project));
                             }
                             
                             scanInners(decl, name, classes);

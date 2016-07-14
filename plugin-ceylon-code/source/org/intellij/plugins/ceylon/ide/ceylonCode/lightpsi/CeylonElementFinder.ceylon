@@ -26,7 +26,6 @@ import com.redhat.ceylon.ide.common.model.asjava {
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
     Value,
-    Declaration,
     FunctionOrValue,
     Function
 }
@@ -55,8 +54,8 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                         for (dec in newArrayList(pack.members)) {
                             if (fqName == getJavaQualifiedName(dec)) {
                                 if (is ClassOrInterface|Value dec,
-                                    is CeylonUnit unit = (dec of Declaration).unit) {
-                                    return CeyLightClass(dec of Declaration, p);
+                                    is CeylonUnit unit = dec.unit) {
+                                    return CeyLightClass(dec, p);
                                 } else if (is Function dec, dec.toplevel) {
                                     return CeyLightToplevelFunction(dec, p);
                                 }
@@ -89,11 +88,11 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                             return createJavaObjectArray<PsiClass>(
                                 CeylonIterable(pack.members)
                                     .narrow<ClassOrInterface|FunctionOrValue>()
-                                    .filter((element) => (element of Declaration).unit is CeylonUnit)
+                                    .filter((element) => element.unit is CeylonUnit)
                                     .map(
                                         (dec) => if (is Function dec)
                                                  then CeyLightToplevelFunction(dec, p)
-                                                 else CeyLightClass(dec of Declaration, p)
+                                                 else CeyLightClass(dec, p)
                                     )
                             );
                         }

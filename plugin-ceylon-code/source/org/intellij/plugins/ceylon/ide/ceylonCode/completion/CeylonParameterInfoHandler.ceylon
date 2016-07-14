@@ -171,7 +171,7 @@ shared class CeylonParameterInfoHandler()
             exists parameters = fun.firstParameterList?.parameters,
             parameters.size()>0) {
 
-            value unit = (fun of Declaration).unit;
+            value unit = fun.unit;
             for (param in parameters) {
                 value paramLabel
                         = getParameterLabel(param, unit)
