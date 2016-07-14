@@ -51,6 +51,12 @@ shared class IdeaModule(
             (Unit unit, String startingWith, Integer proximity, Cancellable? canceller)
             => super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
 
+    shared actual void encloseOnTheFlyTypechecking(void typechecking()) {
+        concurrencyManager.withUpToDateIndexes(() { 
+            typechecking();
+        });
+    }
+    
     shared actual Set<String> listPackages() {
         value name = nameAsString;
         if (JDKUtils.isJDKModule(name)) {
