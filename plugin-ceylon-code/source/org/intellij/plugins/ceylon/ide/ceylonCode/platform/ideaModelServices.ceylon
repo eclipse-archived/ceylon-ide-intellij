@@ -4,8 +4,7 @@ import ceylon.interop.java {
 
 import com.intellij.openapi.\imodule {
     Module,
-    ModuleManager,
-    ModuleUtil
+    ModuleManager
 }
 import com.intellij.openapi.roots {
     ModuleRootManager {
@@ -41,9 +40,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.jetbrains.jps.model.java {
     JavaResourceRootType,
     JavaSourceRootType
-}
-import com.redhat.ceylon.ide.common.util {
-    equalsWithNulls
 }
 
 shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, VirtualFile,VirtualFile> {
