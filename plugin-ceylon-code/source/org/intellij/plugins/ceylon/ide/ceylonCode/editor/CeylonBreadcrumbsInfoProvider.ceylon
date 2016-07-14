@@ -17,20 +17,25 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
     CeylonPsi
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
-    highlighter
+import com.redhat.ceylon.model.typechecker.model {
+    Function
 }
 shared class CeylonBreadcrumbsInfoProvider()
         extends JavaBreadcrumbsInfoProvider() {
 
     acceptElement(PsiElement e)
-            => e is CeylonPsi.DeclarationPsi
-                  | CeylonPsi.TypedArgumentPsi
-                  | CeylonPsi.ObjectExpressionPsi
-                  | CeylonPsi.FunctionArgumentPsi;
+            => if (is CeylonPsi.SpecifierStatementPsi e)
+            then e.ceylonNode.refinement
+            else e is CeylonPsi.DeclarationPsi
+                    | CeylonPsi.TypedArgumentPsi
+                    | CeylonPsi.ObjectExpressionPsi
+                    | CeylonPsi.FunctionArgumentPsi;
 
     getElementInfo(PsiElement e)
-            => if (is CeylonPsi.FunctionArgumentPsi e)
+            => if (is CeylonPsi.SpecifierStatementPsi e,
+                   exists dec = e.ceylonNode?.declaration)
+                then dec.name + (dec is Function then "()" else "")
+            else if (is CeylonPsi.FunctionArgumentPsi e)
                 then "anonymous function"
             else if (is CeylonPsi.ObjectExpressionPsi e)
                 then "object expression"
