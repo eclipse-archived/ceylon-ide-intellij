@@ -102,6 +102,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <breadcrumbsInfoProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.editor.CeylonBreadcrumbsInfoProvider"/>
         <lang.fileViewProviderFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonSourceFileViewProviderFactory"/>
     
         <ApplicationLoadListener implementation="org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin"/>
