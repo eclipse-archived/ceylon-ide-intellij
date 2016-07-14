@@ -4,7 +4,8 @@ import ceylon.interop.java {
 
 import com.intellij.openapi.\imodule {
     Module,
-    ModuleManager
+    ModuleManager,
+    ModuleUtil
 }
 import com.intellij.openapi.roots {
     ModuleRootManager {
@@ -35,11 +36,14 @@ import com.redhat.ceylon.ide.common.typechecker {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    doWithLock
+    concurrencyManager
 }
 import org.jetbrains.jps.model.java {
     JavaResourceRootType,
     JavaSourceRootType
+}
+import com.redhat.ceylon.ide.common.util {
+    equalsWithNulls
 }
 
 shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, VirtualFile,VirtualFile> {
@@ -54,9 +58,9 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
 
     // TODO : review this to use : ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(virtualFile);
     shared actual Boolean isResourceContainedInProject(VirtualFile resource, CeylonProjectAlias ceylonProject) =>
-            doWithLock(() => 
+            concurrencyManager.needReadAccess(() => 
                 moduleRootManager(ceylonProject.ideArtifact)
-                    .sourceRoots.array.coalesced.any((root) 
+                    .contentRoots.array.coalesced.any((root) 
                             => VfsUtil.isAncestor(root, resource, true)));
 
 
@@ -64,14 +68,14 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
     nativeProjectIsAccessible(Module nativeProject) => true;
 
     referencedNativeProjects(Module mod)
-            => doWithLock(() => moduleRootManager(mod).dependencies.array.coalesced);
+            => concurrencyManager.needReadAccess(() => moduleRootManager(mod).dependencies.array.coalesced);
 
     referencingNativeProjects(Module mod)
-            => CeylonIterable(doWithLock(() => ModuleManager.getInstance(mod.project)
+            => CeylonIterable(concurrencyManager.needReadAccess(() => ModuleManager.getInstance(mod.project)
                     .getModuleDependentModules(mod)));
 
     shared actual {VirtualFile*} resourceNativeFolders(CeylonProjectAlias ceylonProject) {
-        value roots = doWithLock(() => moduleRootManager(ceylonProject.ideArtifact)
+        value roots = concurrencyManager.needReadAccess(() => moduleRootManager(ceylonProject.ideArtifact)
             ?.getSourceRoots(JavaResourceRootType.resource));
 
         return if (exists roots) then CeylonIterable(roots) else empty;
@@ -85,7 +89,7 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
         );
 
     shared actual {VirtualFile*} sourceNativeFolders(CeylonProjectAlias ceylonProject) {
-        value roots = doWithLock(() => moduleRootManager(ceylonProject.ideArtifact)
+        value roots = concurrencyManager.needReadAccess(() => moduleRootManager(ceylonProject.ideArtifact)
             ?.getSourceRoots(JavaSourceRootType.source));
 
         return if (exists roots) then CeylonIterable(roots) else empty;
