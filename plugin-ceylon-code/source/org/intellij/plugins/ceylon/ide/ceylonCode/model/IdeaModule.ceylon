@@ -24,7 +24,8 @@ import com.redhat.ceylon.model.cmr {
 }
 import com.redhat.ceylon.model.typechecker.model {
     DeclarationWithProximity,
-    Cancellable
+    Cancellable,
+    Unit
 }
 
 import java.io {
@@ -47,8 +48,8 @@ shared class IdeaModule(
 
     //TODO: go to the IntelliJ index to get declarations we can import!
     shared actual JMap<JString,DeclarationWithProximity> getAvailableDeclarations
-            (String startingWith, Integer proximity, Cancellable? canceller)
-            => super.getAvailableDeclarations(startingWith, proximity, canceller);
+            (Unit unit, String startingWith, Integer proximity, Cancellable? canceller)
+            => super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
 
     shared actual Set<String> listPackages() {
         value name = nameAsString;
