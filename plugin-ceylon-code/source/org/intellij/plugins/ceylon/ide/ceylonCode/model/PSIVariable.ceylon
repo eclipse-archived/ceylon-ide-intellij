@@ -9,7 +9,7 @@ class PSIVariable(PsiParameter psi)
         extends PSIAnnotatedMirror(psi)
         satisfies VariableMirror {
     
-    type => PSIType(doWithLock(() => psi.type));
+    type => PSIType(concurrencyManager.needReadAccess(() => psi.type));
     
     string => "PSIVariable[``name``]";
 }

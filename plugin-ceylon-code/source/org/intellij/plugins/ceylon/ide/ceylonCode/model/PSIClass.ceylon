@@ -63,7 +63,7 @@ shared class PSIClass(shared PsiClass psi)
     
     Boolean hasAnnotation(Annotations annotation)
         => let (cn = annotation.klazz.canonicalName)
-            doWithLock(() =>
+            concurrencyManager.needReadAccess(() =>
             any {
                 if (exists mods = psi.modifierList)
                 for (ann in mods.annotations)
@@ -88,25 +88,25 @@ shared class PSIClass(shared PsiClass psi)
                  !(public || protected || private);
 
     typeParameters
-            => doWithLock(()
+            => concurrencyManager.needReadAccess(()
                 => Arrays.asList<TypeParameterMirror>(
                     for (tp in psi.typeParameters)
                         PSITypeParameter(tp)));
 
     directFields
-            => doWithLock(()
+            => concurrencyManager.needReadAccess(()
                 => Arrays.asList<FieldMirror>(
                     for (f in psi.fields)
                     if (!f.hasModifierProperty(PsiModifier.private)) // TODO !f.synthetic?
                         PSIField(f)));
     
     directInnerClasses
-            => doWithLock(()
+            => concurrencyManager.needReadAccess(()
                 => Arrays.asList<ClassMirror>(
                     for (ic in psi.innerClasses)
                         PSIClass(ic)));
     
-    directMethods => doWithLock(() {
+    directMethods => concurrencyManager.needReadAccess(() {
             value result = ArrayList<MethodMirror>();
             variable value hasCtor = false;
 
@@ -156,7 +156,7 @@ shared class PSIClass(shared PsiClass psi)
     
     final => psi.hasModifierProperty(PsiModifier.final);
     
-    flatName => doWithLock(() => psi.qualifiedName else "");
+    flatName => concurrencyManager.needReadAccess(() => psi.qualifiedName else "");
    
     getCacheKey(Module mod) 
             => cacheKey else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
@@ -165,7 +165,7 @@ shared class PSIClass(shared PsiClass psi)
 
     \iinterface => psi.\iinterface;
     
-    interfaces => doWithLock(()
+    interfaces => concurrencyManager.needReadAccess(()
             => let (supertypes = psi.\iinterface
                     then psi.extendsListTypes
                     else psi.implementsListTypes)
@@ -188,7 +188,7 @@ shared class PSIClass(shared PsiClass psi)
     qualifiedName => 
             if (is PsiTypeParameter psi)
             then \ipackage.qualifiedName + "." + name
-            else (doWithLock(() => psi.qualifiedName else ""));
+            else (concurrencyManager.needReadAccess(() => psi.qualifiedName else ""));
     
     static => psi.hasModifierProperty(PsiModifier.static);
     
@@ -196,7 +196,7 @@ shared class PSIClass(shared PsiClass psi)
         if (psi.\iinterface || qualifiedName == "java.lang.Object") {
             return null;
         }
-        return doWithLock(()
+        return concurrencyManager.needReadAccess(()
             // TODO check that the first element is always the superclass
             => if (exists st = psi.superTypes[0]) then PSIType(st) else null);
     }

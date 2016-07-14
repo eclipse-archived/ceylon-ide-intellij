@@ -56,7 +56,7 @@ shared class PSIType(psi,
     
     declaredClass
             => if (is PsiClassType psi,
-                   exists cls = doWithLock(() => psi.resolve() else null))
+                   exists cls = concurrencyManager.needReadAccess(() => psi.resolve() else null))
                then PSIClass(cls)
                else unknownClassMirror;
 
@@ -80,7 +80,7 @@ shared class PSIType(psi,
                 case (is PsiTypeVariable) TypeKind.typevar
                 case (is PsiClassType)
                     if (is PsiClassReferenceType psi,
-                        doWithLock(() => psi.resolve() is PsiTypeParameter))
+                        concurrencyManager.needReadAccess(() => psi.resolve() is PsiTypeParameter))
                     then TypeKind.typevar
                     else TypeKind.declared
                 case (is PsiWildcardType) TypeKind.wildcard
@@ -109,7 +109,7 @@ shared class PSIType(psi,
         assert (is PsiClassReferenceType psi);
         value scope = psi.resolveScope;
         
-        return doWithLock(() =>
+        return concurrencyManager.needReadAccess(() =>
             javaFacade(psi.reference.project).findClass(name, scope)
         );
     }
@@ -125,7 +125,7 @@ shared class PSIType(psi,
             
             value parts = canonicalText.split('.'.equals);
             value facade = javaFacade(psi.reference.project);
-            value clsName = doWithLock(() {
+            value clsName = concurrencyManager.needReadAccess(() {
                 variable value pkg = facade.findPackage("");
                 value sb = StringBuilder();
                 variable value lookingForPkg = true;
@@ -170,16 +170,16 @@ shared class PSIType(psi,
         return canonicalText;
     }
 
-    qualifiedName => cachedQualifiedName else (cachedQualifiedName = doWithLock(() => computedQualifiedName));
+    qualifiedName => cachedQualifiedName else (cachedQualifiedName = concurrencyManager.needReadAccess(() => computedQualifiedName));
     
     // TODO
     qualifyingType => null; //enclosing;
     
-    raw = if (is PsiClassType psi) then doWithLock(() => psi.raw) else false;
+    raw = if (is PsiClassType psi) then concurrencyManager.needReadAccess(() => psi.raw) else false;
     
     function getTypeArguments(PsiType type)
             => if (is PsiClassType type)
-                then doWithLock(() => type.parameters)
+                then concurrencyManager.needReadAccess(() => type.parameters)
                 else null;
 
     shared actual TypeParameterMirror? typeParameter {

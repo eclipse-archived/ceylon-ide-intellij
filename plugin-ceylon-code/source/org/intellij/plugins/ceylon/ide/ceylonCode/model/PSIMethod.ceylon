@@ -29,7 +29,7 @@ shared class PSIMethod(shared PsiMethod psi)
         satisfies MethodMirror {
     
     Return doWithContainingClass<Return>(Return(PsiClass) func, Return default)
-            => doWithLock(() => if (exists cc = psi.containingClass) then func(cc) else default);
+            => concurrencyManager.needReadAccess(() => if (exists cc = psi.containingClass) then func(cc) else default);
 
     Boolean classIs(String cls)
             => doWithContainingClass((cc) => (cc.qualifiedName else "") == cls, false);
@@ -66,7 +66,7 @@ shared class PSIMethod(shared PsiMethod psi)
     declaredVoid => (psi.returnType else PsiType.null) == PsiType.\ivoid;
     
     default => if (is PsiAnnotationMethod psi)
-               then doWithLock(() => psi.defaultValue exists)
+               then concurrencyManager.needReadAccess(() => psi.defaultValue exists)
                else false;
     
     defaultAccess => !(public || protected || psi.hasModifierProperty(PsiModifier.private));
@@ -76,7 +76,7 @@ shared class PSIMethod(shared PsiMethod psi)
     final => psi.hasModifierProperty(PsiModifier.final);
     
     parameters
-            => doWithLock(()
+            => concurrencyManager.needReadAccess(()
                 => Arrays.asList<VariableMirror>(
                     for (p in psi.parameterList.parameters)
                         PSIVariable(p)));
@@ -85,7 +85,7 @@ shared class PSIMethod(shared PsiMethod psi)
     
     public => psi.hasModifierProperty(PsiModifier.public);
     
-    returnType => doWithLock(() => if (exists t = psi.returnType) then PSIType(t) else null);
+    returnType => concurrencyManager.needReadAccess(() => if (exists t = psi.returnType) then PSIType(t) else null);
     
     static => psi.hasModifierProperty(PsiModifier.static);
     

@@ -10,7 +10,7 @@ class PSIField(PsiField psi)
         extends PSIAnnotatedMirror(psi)
         satisfies FieldMirror {
     
-    type = PSIType(doWithLock(() => psi.type));
+    type = PSIType(concurrencyManager.needReadAccess(() => psi.type));
     
     defaultAccess =>
             let (private = psi.hasModifierProperty(PsiModifier.private))

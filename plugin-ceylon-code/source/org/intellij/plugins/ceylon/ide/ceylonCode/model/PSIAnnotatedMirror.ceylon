@@ -20,7 +20,7 @@ shared class PSIAnnotatedMirror(psi)
     variable Map<String,AnnotationMirror>? annotationMap = null;
     value annotations
             => annotationMap
-            else (annotationMap = doWithLock(()
+            else (annotationMap = concurrencyManager.needReadAccess(()
                     => map {
                         if (exists ml = psi.modifierList)
                         for (a in ml.annotations)
@@ -36,5 +36,5 @@ shared class PSIAnnotatedMirror(psi)
 
     annotationNames => JavaMap(JavaStringMap(annotations)).keySet();
 
-    name = doWithLock(() => psi.name else "unknown");
+    name = concurrencyManager.needReadAccess(() => psi.name else "unknown");
 }

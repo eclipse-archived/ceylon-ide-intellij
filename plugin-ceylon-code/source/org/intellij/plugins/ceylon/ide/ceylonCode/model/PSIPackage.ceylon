@@ -17,7 +17,7 @@ class PSIPackage(PsiClass psi)
     
     shared actual String qualifiedName { 
         if (!name exists) {
-            name = doWithLock(() {
+            name = concurrencyManager.needReadAccess(() {
                 if (is PsiJavaFile f = psi.containingFile) {
                     return f.packageName;
                 }

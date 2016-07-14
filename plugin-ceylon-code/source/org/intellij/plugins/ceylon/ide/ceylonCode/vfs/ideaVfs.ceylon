@@ -26,8 +26,8 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    doWithLock,
-    getCeylonProjects
+    getCeylonProjects,
+    concurrencyManager
 }
 
 shared alias IdeaResource => ResourceVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>;
@@ -50,7 +50,7 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     
     hash => file.hash;
     
-    inputStream => doWithLock(() => 
+    inputStream => concurrencyManager.needReadAccess(() => 
         let (contents = PsiManager.getInstance(mod.project).findViewProvider(file)?.contents?.string else "")
         ByteArrayInputStream(javaString(contents).getBytes(file.charset.string)));
     

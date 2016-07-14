@@ -19,7 +19,7 @@ class PSITypeParameter(PsiTypeParameter|PsiClassReferenceType psi) satisfies Typ
     bounds = ArrayList<TypeMirror>();
 
     if (is PsiTypeParameter psi) {
-        doWithLock(() {
+        concurrencyManager.needReadAccess(() {
             for (bound in psi.extendsList.referencedTypes) {
                 bounds.add(PSIType(bound));
             }
