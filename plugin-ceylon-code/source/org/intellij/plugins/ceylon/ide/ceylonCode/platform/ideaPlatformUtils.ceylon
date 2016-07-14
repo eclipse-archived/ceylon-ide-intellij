@@ -12,6 +12,9 @@ import java.lang {
 import com.intellij.openapi.progress {
     ProcessCanceledException
 }
+import ceylon.interop.java {
+    javaClassFromInstance
+}
 
 shared object ideaPlatformUtils satisfies IdeUtils {
     
@@ -44,4 +47,7 @@ shared object ideaPlatformUtils satisfies IdeUtils {
     class OperationCanceledException(String message)
             extends RuntimeException(message) {
     }
+    
+    pluginClassLoader => javaClassFromInstance(this).classLoader;
+    
 }
