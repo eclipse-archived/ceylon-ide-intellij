@@ -331,7 +331,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
 
             value carFile = VirtualFileManager.instance
-                .findFileByUrl(JarFileSystem.protocolPrefix + artifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
+                .refreshAndFindFileByUrl(JarFileSystem.protocolPrefix + artifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
 
             if (exists carFile) {
                 updateUrl(OrderRootType.classes, carFile);
