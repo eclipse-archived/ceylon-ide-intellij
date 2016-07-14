@@ -108,7 +108,8 @@ import com.redhat.ceylon.ide.common.platform {
 import java.lang {
     Runnable,
     InterruptedException,
-    Error
+    Error,
+    Thread
 }
 import java.util {
     JHashSet=HashSet
@@ -186,12 +187,12 @@ shared class CeylonModelManager(model)
                 firstChange = accumulatedChanges.take();
             } catch(InterruptedException ie) {
             }
+            value changeSet = JHashSet<NativeResourceChange>();
+            if (exists first=firstChange) {
+                changeSet.add(first);
+            }
+            accumulatedChanges.drainTo(changeSet);
             try {
-                value changeSet = JHashSet<NativeResourceChange>();
-                if (exists first=firstChange) {
-                    changeSet.add(first);
-                }
-                accumulatedChanges.drainTo(changeSet);
                 if (! changeSet.empty) {
                     platformUtils.log(Status._DEBUG, "Submitting ``changeSet.size()`` changes to the model");
                     model.fileTreeChanged(CeylonIterable(changeSet));
@@ -207,6 +208,8 @@ shared class CeylonModelManager(model)
                 if (! e is ProcessCanceledException) {
                     platformUtils.log(Status._WARNING, "An exception as thrown during the change submission task", e);
                 }
+                accumulatedChanges.addAll(changeSet);
+                Thread.sleep(1000);
             }
             
             if (ideaProjectReady) {
