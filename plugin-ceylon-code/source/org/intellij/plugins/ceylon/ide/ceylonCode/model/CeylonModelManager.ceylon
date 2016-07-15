@@ -342,14 +342,14 @@ shared class CeylonModelManager(model)
                     application.invokeAndWait(JavaRunnable {
                         run() => progressManager.run(object extends Backgroundable(
                             model.ideaProject,
-                            "ceylon model update",
+                            "Ceylon model update",
                             true,
                             PerformInBackgroundOption.alwaysBackground) {
                             
                             shared actual void run(ProgressIndicator progressIndicator) {
                                 value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
                                 value ticks = model.ceylonProjectNumber * 1000;
-                                try (progress = monitor.Progress(ticks, "Updating Ceylon Model")) {
+                                try (progress = monitor.Progress(ticks, "Updating Ceylon model")) {
                                     concurrencyManager.withUpToDateIndexes(() {
                                         for (ceylonProject in model
                                                 .ceylonProjectsInTopologicalOrder.sequence()
@@ -365,7 +365,7 @@ shared class CeylonModelManager(model)
 
                                         Notification(
                                             "Ceylon Model Update",
-                                            "Ceylon Model Update failed",
+                                            "Ceylon model update failed",
                                             "The Ceylon model update triggered an unexpected exception: `` t `` that will be reported in the Event View.
                                                    To avoid performance issues the automatic update of the Ceylon model has been disabled.
                                                    You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
@@ -383,7 +383,7 @@ shared class CeylonModelManager(model)
                         automaticModelUpdateEnabled_ = false;
                         Notification(
                             "Ceylon Model Update",
-                            "Ceylon Model Update stalled",
+                            "Ceylon model update stalled",
                             "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
                              You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
                             warning).notify(model.ideaProject);
