@@ -2,11 +2,14 @@ import ceylon.interop.java {
     createJavaObjectArray
 }
 
-import com.intellij.lang.java {
-    JavaBreadcrumbsInfoProvider
-}
 import com.intellij.psi {
     PsiElement
+}
+import com.intellij.xml.breadcrumbs {
+    BreadcrumbsInfoProvider
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Function
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
@@ -17,11 +20,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
     CeylonPsi
 }
-import com.redhat.ceylon.model.typechecker.model {
-    Function
-}
+
 shared class CeylonBreadcrumbsInfoProvider()
-        extends JavaBreadcrumbsInfoProvider() {
+        extends BreadcrumbsInfoProvider() {
 
     acceptElement(PsiElement e)
             => if (is CeylonPsi.SpecifierStatementPsi e)
@@ -55,5 +56,4 @@ shared class CeylonBreadcrumbsInfoProvider()
             else null;
 
     languages = createJavaObjectArray { CeylonLanguage.instance };
-
 }
