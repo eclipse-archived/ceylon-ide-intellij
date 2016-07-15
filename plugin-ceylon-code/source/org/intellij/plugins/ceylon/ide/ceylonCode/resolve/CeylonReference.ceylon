@@ -119,7 +119,8 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
                 call() => IdeaNavigation(project).getTarget(rootNode, node, backend);
             }
             if (exists target = ConcurrencyManagerForJava.withAlternateResolution(callable),
-                exists file = getVirtualFile(target.unit)) {
+                exists unit = target.unit,
+                exists file = getVirtualFile(unit)) {
                 value psiFile = PsiManager.getInstance(project).findFile(file);
                 return CeylonTreeUtil.findPsiElement(target, psiFile);
             }
