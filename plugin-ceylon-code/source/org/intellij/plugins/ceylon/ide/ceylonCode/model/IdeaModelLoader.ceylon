@@ -76,7 +76,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             isSynchronizing.set(true);
             try {
                 if (application.readAccessAllowed) {
-                    
+                    ref.set(action.call() else null);
                 } else {
                     if (exists currentStrategy = concurrencyManager.noIndexStrategy,
                         currentStrategy == NoIndexStrategy.waitForIndexes) {
