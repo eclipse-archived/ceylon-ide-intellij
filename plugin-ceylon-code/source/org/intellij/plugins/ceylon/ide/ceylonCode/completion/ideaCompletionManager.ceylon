@@ -56,9 +56,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTokens
 }
 
-
-
-shared abstract class IdeaCompletionProvider() extends CompletionProvider<CompletionParameters>()  {
+shared abstract class IdeaCompletionProvider()
+        extends CompletionProvider<CompletionParameters>()  {
     
     shared formal CompletionOptions options;
     
@@ -119,7 +118,14 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
                             exists localAnalyzer = ceylonFile.localAnalyzer,
                             exists analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 5),
                             analysisResult.upToDate) {
-                            addCompletionsInternal(parameters, context, result, analysisResult, options, progressMonitor);
+                            addCompletionsInternal {
+                                parameters = parameters;
+                                context = context;
+                                result = result;
+                                analysisResult = analysisResult;
+                                options = options;
+                                progressMonitor = progressMonitor;
+                            };
                         }
                     });
                 } catch (ProcessCanceledException e) {
@@ -138,34 +144,41 @@ shared abstract class IdeaCompletionProvider() extends CompletionProvider<Comple
         LocalAnalysisResult analysisResult, CompletionOptions options,
         ProgressIndicatorMonitor progressMonitor) {
         
-        value isSecondLevel
-                = parameters.invocationCount > 0
-                && parameters.invocationCount % 2 == 0;
-        value element = parameters.originalPosition;
-        value doc = parameters.editor.document;
-        assert (exists element,
-                is CeylonFile ceylonFile = element.containingFile);
-        value params = IdeaCompletionContext(ceylonFile, analysisResult, parameters.editor, options);
-        completionManager.getContentProposals {
-            typecheckedRootNode = params.lastCompilationUnit;
-            ctx = params;
-            offset = parameters.editor.caretModel.offset;
-            line = doc.getLineNumber(element.textOffset);
-            secondLevel = isSecondLevel;
-            monitor = progressMonitor;
-            // The parameters tooltip has nothing to do with code completion, so we bypass it
-            returnedParamInfo = true;
-        };
-        
-        assert (exists project = parameters.editor.project);
-        installCustomLookupCellRenderer(project);
-        
-        for (completion in params.proposals.proposals) {
-            result.addElement(completion);
-        }
-        
-        if (!isSecondLevel) {
-            result.addLookupAdvertisement("Call again to toggle second-level completions");
+        if (exists element = parameters.originalPosition) {
+            assert (is CeylonFile ceylonFile = element.containingFile,
+                    exists project = parameters.editor.project);
+
+            value isSecondLevel
+                    = parameters.invocationCount > 0
+                    && parameters.invocationCount % 2 == 0;
+
+            value params = IdeaCompletionContext {
+                file = ceylonFile;
+                localAnalysisResult = analysisResult;
+                editor = parameters.editor;
+                options = options;
+            };
+            value doc = parameters.editor.document;
+            completionManager.getContentProposals {
+                typecheckedRootNode = params.lastCompilationUnit;
+                ctx = params;
+                offset = parameters.editor.caretModel.offset;
+                line = doc.getLineNumber(element.textOffset);
+                secondLevel = isSecondLevel;
+                monitor = progressMonitor;
+                // The parameters tooltip has nothing to do with code completion, so we bypass it
+                returnedParamInfo = true;
+            };
+
+            installCustomLookupCellRenderer(project);
+
+            for (completion in params.proposals.proposals) {
+                result.addElement(completion);
+            }
+
+            if (!isSecondLevel) {
+                result.addLookupAdvertisement("Call again to toggle second-level completions");
+            }
         }
     }
 }
