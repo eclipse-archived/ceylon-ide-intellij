@@ -31,9 +31,9 @@ shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
     object condition satisfies Condition<PsiElement> {
         \ivalue(PsiElement element)
                 => element is CeylonPsi.StatementOrArgumentPsi
-                && !(element is CeylonPsi.VariablePsi
-                              | CeylonPsi.TypeParameterDeclarationPsi
-                              | CeylonPsi.ForIteratorPsi);
+                && !element is CeylonPsi.VariablePsi
+                             | CeylonPsi.TypeParameterDeclarationPsi
+                             | CeylonPsi.ForIteratorPsi;
     }
 
     shared actual Boolean checkAvailable(Editor editor, PsiFile psiFile, MoveInfo moveInfo, Boolean down) {
