@@ -28,6 +28,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
     value controlStatementClass = javaClass<CeylonPsi.ControlStatementPsi>();
     value blockClass = javaClass<CeylonPsi.BlockPsi>();
+    value bodyClass = javaClass<CeylonPsi.BodyPsi>();
 
     shared class Context() extends AbstractContext() {
 
@@ -70,8 +71,9 @@ shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
 
         isApplicableTo(PsiElement element)
                 => if (element is CeylonPsi.ControlClausePsi,
-                       exists block = PsiTreeUtil.getChildOfType(element, blockClass))
-                then block.children.size>0
+                       exists block = PsiTreeUtil.getChildOfType(element, blockClass),
+                       exists body = PsiTreeUtil.getParentOfType(element, bodyClass))
+                then block.children.size>0 && body.ceylonNode.text == "{}"
                 else false;
     }
 
