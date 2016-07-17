@@ -28,7 +28,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
     value controlStatementClass = javaClass<CeylonPsi.ControlStatementPsi>();
     value blockClass = javaClass<CeylonPsi.BlockPsi>();
-    value bodyClass = javaClass<CeylonPsi.BodyPsi>();
 
     shared class Context() extends AbstractContext() {
 
@@ -54,8 +53,15 @@ shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
                 else super.getDescription(element);
 
         function controlStatementParent(PsiElement element) {
-            assert (exists parent = PsiTreeUtil.getParentOfType(element, controlStatementClass));
-            return parent;
+            assert (exists immediate = PsiTreeUtil.getParentOfType(element, controlStatementClass));
+            variable value result = immediate;
+            //jump up to the top of a chain of if/elses
+            while (is CeylonPsi.BodyPsi body = result.parent,
+                body.ceylonNode.text != "{}",
+                exists parent = PsiTreeUtil.getParentOfType(result, controlStatementClass)) {
+                result = parent;
+            }
+            return result;
         }
 
         shared actual PsiElement collectAffectedElements(PsiElement element, List<PsiElement> toExtract) {
@@ -71,9 +77,8 @@ shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
 
         isApplicableTo(PsiElement element)
                 => if (element is CeylonPsi.ControlClausePsi,
-                       exists block = PsiTreeUtil.getChildOfType(element, blockClass),
-                       exists body = PsiTreeUtil.getParentOfType(element, bodyClass))
-                then block.children.size>0 && body.ceylonNode.text == "{}"
+                       exists block = PsiTreeUtil.getChildOfType(element, blockClass))
+                then block.children.size>0
                 else false;
     }
 
