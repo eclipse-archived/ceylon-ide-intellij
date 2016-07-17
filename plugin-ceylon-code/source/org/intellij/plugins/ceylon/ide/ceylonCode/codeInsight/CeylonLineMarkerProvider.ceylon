@@ -87,8 +87,8 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
 
     Declaration? getModel(CeylonPsi.DeclarationPsi|CeylonPsi.SpecifierStatementPsi decl)
             => if (is CeylonPsi.DeclarationPsi decl)
-            then decl.ceylonNode.declarationModel
-            else decl.ceylonNode.declaration;
+            then decl.ceylonNode?.declarationModel
+            else decl.ceylonNode?.declaration;
 
     function findParentDeclaration(PsiElement el) {
         if (is CeylonPsi.DeclarationPsi decl = el.parent) {
