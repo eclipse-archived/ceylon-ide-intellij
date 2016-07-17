@@ -14,19 +14,21 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiElement,
-    PsiFile,
-    PsiWhiteSpace
+    PsiFile
 }
 import com.intellij.psi.util {
-    PsiTreeUtil
+    PsiTreeUtil {
+        ...
+    }
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonCompositeElement,
     CeylonPsi
 }
 
 shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
+
+    value statementClass = javaClass<CeylonPsi.StatementOrArgumentPsi>();
 
     object condition satisfies Condition<PsiElement> {
         \ivalue(PsiElement element)
@@ -38,24 +40,13 @@ shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
 
     shared actual Boolean checkAvailable(Editor editor, PsiFile psiFile, MoveInfo moveInfo, Boolean down) {
 
-        Integer selectionStart = editor.selectionModel.selectionStart;
-        Integer selectionEnd = editor.selectionModel.selectionEnd;
+        value pair = getElementRange(editor, psiFile, getLineRangeFromSelection(editor));
+        if (!exists pair) {
+            return false;
+        }
 
-        value startElement = psiFile.findElementAt(selectionStart);
-        value endElement = psiFile.findElementAt(selectionEnd);
-        value start
-                = if (is PsiWhiteSpace startElement)
-                then PsiTreeUtil.getNextSiblingOfType(startElement,
-                        javaClass<CeylonCompositeElement>())
-                else startElement;
-        value end
-                = if (is PsiWhiteSpace endElement)
-                then PsiTreeUtil.getPrevSiblingOfType(endElement,
-                        javaClass<CeylonCompositeElement>())
-                else endElement;
-
-        value first = PsiTreeUtil.findFirstParent(start, condition);
-        value last = PsiTreeUtil.findFirstParent(end, condition);
+        value first = findFirstParent(pair.first, condition);
+        value last = findFirstParent(pair.second, condition);
         if (!is CeylonPsi.StatementOrArgumentPsi first) {
             return false;
         }
@@ -63,22 +54,15 @@ shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
             return false;
         }
 
-        moveInfo.toMove = LineRange(first, last);
-        if (down) {
-            if (exists next
-                    = PsiTreeUtil.getNextSiblingOfType(last,
-                        javaClass<CeylonPsi.StatementOrArgumentPsi>())) {
-                moveInfo.toMove2 = LineRange(next);
-                return true;
-            }
-        } else {
-            if (exists prev
-                = PsiTreeUtil.getPrevSiblingOfType(first,
-                    javaClass<CeylonPsi.StatementOrArgumentPsi>())) {
-                moveInfo.toMove2 = LineRange(prev);
-                return true;
-            }
+        if (exists other = if (down)
+                then getNextSiblingOfType(last, statementClass)
+                else getPrevSiblingOfType(first, statementClass)) {
+            moveInfo.toMove = LineRange(first, last);
+            moveInfo.toMove2 = LineRange(other);
+            return true;
         }
-        return false;
+        else {
+            return false;
+        }
     }
 }
