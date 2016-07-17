@@ -29,6 +29,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
 
     value statementClass = javaClass<CeylonPsi.StatementOrArgumentPsi>();
+    value blockClass = javaClass<CeylonPsi.BlockPsi>();
 
     object condition satisfies Condition<PsiElement> {
         \ivalue(PsiElement element)
@@ -59,6 +60,13 @@ shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
                 else getPrevSiblingOfType(first, statementClass)) {
             moveInfo.toMove = LineRange(first, last);
             moveInfo.toMove2 = LineRange(other);
+            if (other is CeylonPsi.ControlStatementPsi) {
+                value blocks = { for (block in findChildrenOfType(other, blockClass)) block };
+                if (exists block = if (down) then blocks.first else blocks.last,
+                    exists brace = if (down) then block.firstChild else block.lastChild) {
+                    moveInfo.toMove2 = LineRange(brace);
+                }
+            }
             return true;
         }
         else {
