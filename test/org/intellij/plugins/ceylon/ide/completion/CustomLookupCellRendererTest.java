@@ -8,11 +8,13 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.containers.EmptyIterable;
-import static org.intellij.plugins.ceylon.ide.ceylonCode.completion.mergeHighlightAndMatches_.mergeHighlightAndMatches;
+import com.redhat.ceylon.compiler.java.language.AbstractCallable;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.*;
 
+import static org.intellij.plugins.ceylon.ide.ceylonCode.completion.mergeHighlightAndMatches_.mergeHighlightAndMatches;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -24,13 +26,25 @@ public class CustomLookupCellRendererTest {
     private static final SimpleTextAttributes IDENTIFIER = new SimpleTextAttributes(0, JBColor.GREEN);
     private static final SimpleTextAttributes NORMAL = new SimpleTextAttributes(0, JBColor.BLACK);
 
+    @NotNull
+    public AbstractCallable<TextRange> getNextMatch(final Iterable<TextRange> matches) {
+        return new AbstractCallable<TextRange>(null, null, "", (short)-1) {
+            Iterator<TextRange> it = matches.iterator();
+            @Override
+            public TextRange $call$() {
+                return it.hasNext() ? it.next() : null;
+            }
+        };
+    }
+
     @Test
     public void testMergeHighlightAndMatches_noMatches() {
         EmptyIterable<TextRange> matches = new EmptyIterable<>();
 
         List<PresentableNodeDescriptor.ColoredFragment> sample = highlight();
         List<PresentableNodeDescriptor.ColoredFragment> actual;
-        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, sample), matches, MATCH));
+        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, sample),
+                getNextMatch(matches), MATCH));
 
         assertHighlights(sample, actual);
     }
@@ -40,7 +54,8 @@ public class CustomLookupCellRendererTest {
         Iterable<TextRange> matches = Collections.singletonList(new TextRange(1, 3));
 
         List<PresentableNodeDescriptor.ColoredFragment> actual;
-        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()), matches, MATCH));
+        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()),
+                getNextMatch(matches), MATCH));
 
         List<PresentableNodeDescriptor.ColoredFragment> expected = Arrays.asList(
                 fragment("s", ANNOTATION),
@@ -58,7 +73,8 @@ public class CustomLookupCellRendererTest {
         Iterable<TextRange> matches = Collections.singletonList(new TextRange(0, 3));
 
         List<PresentableNodeDescriptor.ColoredFragment> actual;
-        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()), matches, MATCH));
+        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()),
+                getNextMatch(matches), MATCH));
 
         List<PresentableNodeDescriptor.ColoredFragment> expected = Arrays.asList(
                 fragment("sha", MATCH),
@@ -75,7 +91,8 @@ public class CustomLookupCellRendererTest {
         Iterable<TextRange> matches = Collections.singletonList(new TextRange(4, 7));
 
         List<PresentableNodeDescriptor.ColoredFragment> actual;
-        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()), matches, MATCH));
+        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()),
+                getNextMatch(matches), MATCH));
 
         List<PresentableNodeDescriptor.ColoredFragment> expected = Arrays.asList(
                 fragment("shar", ANNOTATION),
@@ -92,7 +109,8 @@ public class CustomLookupCellRendererTest {
         Iterable<TextRange> matches = Collections.singletonList(new TextRange(3, 9));
 
         List<PresentableNodeDescriptor.ColoredFragment> actual;
-        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()), matches, MATCH));
+        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()),
+                getNextMatch(matches), MATCH));
 
         List<PresentableNodeDescriptor.ColoredFragment> expected = Arrays.asList(
                 fragment("sha", ANNOTATION),
@@ -110,7 +128,8 @@ public class CustomLookupCellRendererTest {
         Iterable<TextRange> matches = Collections.singletonList(new TextRange(3, 15));
 
         List<PresentableNodeDescriptor.ColoredFragment> actual;
-        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()), matches, MATCH));
+        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, highlight()),
+                getNextMatch(matches), MATCH));
 
         List<PresentableNodeDescriptor.ColoredFragment> expected = Arrays.asList(
                 fragment("sha", ANNOTATION),
@@ -133,7 +152,8 @@ public class CustomLookupCellRendererTest {
         List<PresentableNodeDescriptor.ColoredFragment> actual;
         List<PresentableNodeDescriptor.ColoredFragment> sample = Collections.singletonList(fragment("printStackTrace", NORMAL));
 
-        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, sample), matches, MATCH));
+        actual = new JavaList(null, mergeHighlightAndMatches(new CeylonList(null, sample),
+                getNextMatch(matches), MATCH));
 
         List<PresentableNodeDescriptor.ColoredFragment> expected = Arrays.asList(
                 fragment("print", NORMAL),

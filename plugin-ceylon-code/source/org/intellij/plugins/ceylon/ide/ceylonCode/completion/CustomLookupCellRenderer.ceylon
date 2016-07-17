@@ -153,7 +153,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
 }
 
-List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
+shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
         TextRange? nextMatch(), SimpleTextAttributes highlighted) {
 
     value merged = ArrayList<Fragment>();
