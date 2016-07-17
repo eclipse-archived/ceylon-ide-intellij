@@ -38,9 +38,9 @@ shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
                              | CeylonPsi.ForIteratorPsi;
     }
 
-    shared actual Boolean checkAvailable(Editor editor, PsiFile psiFile, MoveInfo moveInfo, Boolean down) {
+    shared actual Boolean checkAvailable(Editor editor, PsiFile file, MoveInfo moveInfo, Boolean down) {
 
-        value pair = getElementRange(editor, psiFile, getLineRangeFromSelection(editor));
+        value pair = getElementRange(editor, file, getLineRangeFromSelection(editor));
         if (!exists pair) {
             return false;
         }
