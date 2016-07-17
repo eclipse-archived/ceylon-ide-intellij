@@ -46,8 +46,7 @@ import java.awt {
 import java.lang {
     ReflectiveOperationException,
     JString=String,
-    Math,
-    Iterable
+    Math
 }
 
 import javax.swing {
@@ -111,8 +110,14 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                     then selectedPrefixForegroundColor
                     else prefixForegroundColor);
         value colorsWithPrefix =
-            if (prefix.size>0, exists ranges = getMatchingFragments(prefix, name))
-            then mergeHighlightAndMatches(colors, ranges, highlightedPrefixColor)
+            if (prefix.size>0,
+                exists ranges = getMatchingFragments(prefix, name))
+            then let (it = ranges.iterator())
+            mergeHighlightAndMatches {
+                highlight = colors;
+                nextMatch() => it.hasNext() then it.next();
+                highlighted = highlightedPrefixColor;
+            }
             else colors;
 
         for (color in colorsWithPrefix) {
@@ -148,12 +153,11 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
 }
 
-shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
-        Iterable<TextRange> matches, SimpleTextAttributes highlighted) {
+List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
+        TextRange? nextMatch(), SimpleTextAttributes highlighted) {
 
     value merged = ArrayList<Fragment>();
-    value iterator = matches.iterator();
-    variable TextRange? currentRange = iterator.hasNext() then iterator.next();
+    variable TextRange? currentRange = nextMatch();
     variable Integer currentIndex = 0;
     variable Integer consumedFromRange = 0;
     for (fragment in highlight) {
@@ -163,7 +167,8 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
         }
         else if (currentIndex + fragment.text.size<range.startOffset) {
             merged.add(fragment);
-        } else {
+        }
+        else {
             variable Integer substart = 0;
             variable Integer sublength = 0;
             variable String subtext;
@@ -179,17 +184,19 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
                     merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
                     consumedFromRange += fragment.text.size - sublength;
                     rangeIsApplicable = false;
-                } else {
+                }
+                else {
                     if (consumedFromRange>0) {
                         Integer toConsume = range.length - consumedFromRange;
                         subtext = fragment.text.substring(0, Math.min(toConsume, fragment.text.size));
                         sublength = toConsume;
-                    } else {
+                    }
+                    else {
                         subtext = fragment.text.substring(sublength, sublength + range.length);
                         sublength += range.length;
                     }
                     merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
-                    currentRange = iterator.hasNext() then iterator.next();
+                    currentRange = nextMatch();
                     consumedFromRange = 0;
                     value bool
                             = if (exists r = currentRange)
