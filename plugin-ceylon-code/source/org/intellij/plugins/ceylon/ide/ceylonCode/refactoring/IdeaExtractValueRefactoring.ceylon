@@ -8,7 +8,7 @@ import com.intellij.openapi.editor {
     Editor
 }
 import com.intellij.openapi.\imodule {
-    ModuleUtil
+    ModuleUtilCore
 }
 import com.intellij.openapi.project {
     Project
@@ -106,7 +106,7 @@ class IdeaExtractValueRefactoring(CeylonFile file, PhasedUnit phasedUnit, List<C
     
     dupeRegions = ArrayList<TextRange>();
 
-    assert(exists mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project));
+    assert(exists mod = ModuleUtilCore.findModuleForFile(file.virtualFile, file.project));
 
     editorData => object satisfies EditorData {
         tokens => theTokens;

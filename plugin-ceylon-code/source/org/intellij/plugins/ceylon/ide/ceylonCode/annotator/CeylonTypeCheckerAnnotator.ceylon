@@ -11,7 +11,7 @@ import com.intellij.openapi.application {
     ApplicationManager
 }
 import com.intellij.openapi.\imodule {
-    ModuleUtil
+    ModuleUtilCore
 }
 import com.intellij.openapi.project {
     DumbAware
@@ -133,7 +133,7 @@ shared class CeylonTypeCheckerAnnotator()
 
     void addQuickFixes(TextRange range, Message error, Annotation annotation, AnnotationHolder annotationHolder) {
         assert (is CeylonFile file = annotationHolder.currentAnnotationSession.file,
-                exists mod = ModuleUtil.findModuleForFile(file.virtualFile, file.project),
+                exists mod = ModuleUtilCore.findModuleForFile(file.virtualFile, file.project),
                 exists pu = file.localAnalysisResult.lastPhasedUnit);
         
         if (is IdeaCeylonProjects projects = getCeylonProjects(file.project),

@@ -1,7 +1,7 @@
 import com.intellij.openapi.actionSystem {
     AnAction,
     AnActionEvent,
-    PlatformDataKeys
+    CommonDataKeys
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
@@ -12,7 +12,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 shared class ResetModelAction() extends AnAction() {
 
     shared actual void actionPerformed(AnActionEvent e) {
-        if (exists project = PlatformDataKeys.project.getData(e.dataContext),
+        if (exists project = CommonDataKeys.project.getData(e.dataContext),
             exists projects = getCeylonProjects(project)) {
 
             for (p in projects.ceylonProjects) {
@@ -27,7 +27,7 @@ shared class ResetModelAction() extends AnAction() {
     }
 
     shared actual void update(AnActionEvent e) {
-        if (exists project = PlatformDataKeys.project.getData(e.dataContext),
+        if (exists project = CommonDataKeys.project.getData(e.dataContext),
             exists projects = getCeylonProjects(project),
             !projects.ceylonProjects.empty) {
 

@@ -10,7 +10,7 @@ import com.intellij.notification {
 import com.intellij.openapi.actionSystem {
     AnAction,
     AnActionEvent,
-    DataKeys
+    LangDataKeys
 }
 import com.intellij.openapi.extensions {
     Extensions
@@ -37,7 +37,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 shared class AddBootstrapFilesAction() extends AnAction() {
     
     shared actual void actionPerformed(AnActionEvent evt) {
-        assert (exists mod = DataKeys.moduleContext.getData(evt.dataContext),
+        assert (exists mod = LangDataKeys.moduleContext.getData(evt.dataContext),
                 exists projects = getCeylonProjects(mod.project));
         value versions = versionsAvailableForBoostrap;
         
@@ -101,7 +101,7 @@ shared class AddBootstrapFilesAction() extends AnAction() {
         value pres = evt.presentation;
         
         if (exists mod
-                = DataKeys.moduleContext
+                = LangDataKeys.moduleContext
                     .getData(evt.dataContext)) {
             pres.enabled = true;
             pres.visible = true;

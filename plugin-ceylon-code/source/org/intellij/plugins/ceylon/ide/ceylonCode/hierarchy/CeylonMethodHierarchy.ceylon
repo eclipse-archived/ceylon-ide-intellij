@@ -4,7 +4,8 @@ import ceylon.interop.java {
 
 import com.intellij.ide.hierarchy {
     HierarchyBrowser,
-    HierarchyProvider
+    HierarchyProvider,
+    TypeHierarchyBrowserBase
 }
 import com.intellij.openapi.actionSystem {
     DataContext,
@@ -127,7 +128,7 @@ shared class CeylonMethodHierarchyProvider() satisfies HierarchyProvider {
 
     shared actual void browserActivated(HierarchyBrowser hierarchyBrowser) {
         assert (is CeylonHierarchyBrowser hierarchyBrowser);
-        hierarchyBrowser.changeView(CeylonMethodHierarchyBrowser.typeHierarchyType);
+        hierarchyBrowser.changeView(TypeHierarchyBrowserBase.typeHierarchyType);
     }
 
     shared actual PsiElement? getTarget(DataContext dataContext) {

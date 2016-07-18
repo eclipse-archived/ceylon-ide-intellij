@@ -3,7 +3,7 @@ import ceylon.interop.java {
 }
 
 import com.intellij.openapi.\imodule {
-    ModuleUtil
+    ModuleUtilCore
 }
 import com.intellij.openapi.project {
     Project
@@ -44,7 +44,7 @@ shared CeylonModelManager? getModelManager(Project project)
 shared IdeaCeylonProject? getCeylonProject(PsiFile psiFile) {
     if (exists projects = getCeylonProjects(psiFile.project),
         exists file = psiFile.virtualFile,
-        exists mod = ModuleUtil.findModuleForFile(file, psiFile.project),
+        exists mod = ModuleUtilCore.findModuleForFile(file, psiFile.project),
         is IdeaCeylonProject project = projects.getProject(mod)) {
         return project;
     }

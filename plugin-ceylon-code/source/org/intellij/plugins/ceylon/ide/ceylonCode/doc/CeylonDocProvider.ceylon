@@ -24,7 +24,7 @@ import com.intellij.openapi.editor {
     Editor
 }
 import com.intellij.openapi.\imodule {
-    ModuleUtil
+    ModuleUtilCore
 }
 import com.intellij.openapi.util {
     Key
@@ -132,7 +132,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
     }
 
     function moduleForFile(CeylonFile file)
-            => ModuleUtil.findModuleForFile(file.virtualFile, file.project);
+            => ModuleUtilCore.findModuleForFile(file.virtualFile, file.project);
 
     function typeCheckerForElement(PsiElement element) {
         if (is CeylonFile file = element.containingFile ) {

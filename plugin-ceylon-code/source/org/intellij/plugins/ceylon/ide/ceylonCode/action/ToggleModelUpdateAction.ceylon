@@ -1,7 +1,7 @@
 import com.intellij.openapi.actionSystem {
     AnAction,
     AnActionEvent,
-    PlatformDataKeys
+    CommonDataKeys
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
@@ -11,7 +11,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 shared class ToggleModelUpdateAction() extends AnAction() {
 
     shared actual void actionPerformed(AnActionEvent e) {
-        if (exists project = PlatformDataKeys.project.getData(e.dataContext),
+        if (exists project = CommonDataKeys.project.getData(e.dataContext),
             exists modelManager = getModelManager(project)) {
             modelManager.automaticModelUpdateEnabled
                     = !modelManager.automaticModelUpdateEnabled;
@@ -19,7 +19,7 @@ shared class ToggleModelUpdateAction() extends AnAction() {
     }
 
     shared actual void update(AnActionEvent e) {
-        if (exists project = PlatformDataKeys.project.getData(e.dataContext),
+        if (exists project = CommonDataKeys.project.getData(e.dataContext),
             exists modelManager = getModelManager(project)) {
 
             e.presentation.enabled = true;

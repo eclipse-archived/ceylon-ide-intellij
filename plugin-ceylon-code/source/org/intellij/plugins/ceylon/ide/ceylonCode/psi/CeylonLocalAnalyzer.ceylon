@@ -19,7 +19,7 @@ import com.intellij.openapi.fileEditor {
 }
 import com.intellij.openapi.\imodule {
     Module,
-    ModuleUtil
+    ModuleUtilCore
 }
 import com.intellij.openapi.progress {
     ProcessCanceledException
@@ -126,7 +126,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     value localTypecheckingAlarm = Alarm(Alarm.ThreadToUse.pooledThread, ideaProject);
     assert (exists model = getCeylonProjects(ideaProject));
     assert (is IdeaCeylonProject? ceylonProject
-            = model.getProject(ModuleUtil.findModuleForFile(virtualFile, ideaProject)));
+            = model.getProject(ModuleUtilCore.findModuleForFile(virtualFile, ideaProject)));
     
     variable ExternalPhasedUnit? externalPhasedUnitToTranslate = null;
     

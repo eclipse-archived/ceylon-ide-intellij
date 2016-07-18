@@ -5,7 +5,7 @@ import com.intellij.openapi.editor {
     Editor
 }
 import com.intellij.openapi.\imodule {
-    ModuleUtil
+    ModuleUtilCore
 }
 import com.intellij.openapi.project {
     Project
@@ -118,7 +118,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             value _node = nodes.findNode(typecheckedCompilationUnit,
                 localAnalysisResult.tokens, offset);
             
-            if (exists mod = ModuleUtil.findModuleForFile(psiFile.virtualFile, project),
+            if (exists mod = ModuleUtilCore.findModuleForFile(psiFile.virtualFile, project),
                 exists _node,
                 exists pr = getCeylonProjects(project)?.getProject(mod)) {
 

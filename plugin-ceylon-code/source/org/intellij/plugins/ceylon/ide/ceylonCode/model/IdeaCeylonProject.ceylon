@@ -46,7 +46,8 @@ import com.intellij.openapi.vfs {
     VirtualFileManager {
         virtualFileManager=instance
     },
-    JarFileSystem
+    JarFileSystem,
+    VfsUtilCore
 }
 import com.intellij.psi {
     PsiFile
@@ -92,7 +93,6 @@ import java.io {
     IOException
 }
 import java.lang {
-    Void,
     System,
     Thread
 }
@@ -196,7 +196,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                         else defaultRoot;
 
     shared actual File rootDirectory
-            => VfsUtil.virtualToIoFile(moduleRoot);
+            => VfsUtilCore.virtualToIoFile(moduleRoot);
 
     VirtualFile? findModuleFile(String moduleRelativePath)
             => moduleRoot.findFileByRelativePath(moduleRelativePath);
@@ -206,10 +206,9 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
     shared actual void createNewOutputFolder(String relativePath) {
         function createDirectory()
-            =>  object extends WriteAction<Void>() {
-                    shared actual void run(Result<Void> result) {
-                        VfsUtil.createDirectoryIfMissing(moduleRoot, relativePath);
-                    }
+            =>  object extends WriteAction<Nothing>() {
+                    run(Result<Nothing> result)
+                            => VfsUtil.createDirectoryIfMissing(moduleRoot, relativePath);
                 }.execute().throwException();
 
         if (exists outputFolder = findModuleFileWithRefresh(relativePath)) {
@@ -223,8 +222,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     }
 
     shared actual void deleteOldOutputFolder(String folderProjectRelativePath) {
-        VirtualFile? oldOutputRepoFolder = findModuleFile(folderProjectRelativePath);
-        if(exists oldOutputRepoFolder) {
+        if (exists oldOutputRepoFolder = findModuleFile(folderProjectRelativePath)) {
             if (Messages.showYesNoDialog(ideaModule.project,
                     "The Ceylon output repository has changed.
                      Do you want to remove the old output repository folder \
@@ -232,10 +230,9 @@ shared class IdeaCeylonProject(ideArtifact, model)
                     "Changing Ceylon output repository",
                     Messages.questionIcon) == Messages.yes) {
                 try {
-                    object extends WriteAction<Void>() {
-                        shared actual void run(Result<Void> result) {
-                            oldOutputRepoFolder.delete(outer);
-                        }
+                    object extends WriteAction<Nothing>() {
+                        run(Result<Nothing> result)
+                                => oldOutputRepoFolder.delete(outer);
                     }.execute().throwException();
                 } catch (IOException e) {
                     e.printStackTrace();
