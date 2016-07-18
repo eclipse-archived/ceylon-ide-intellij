@@ -44,7 +44,7 @@ shared object ceylonHighlighter extends SyntaxHighlighterBase() {
 
     value keys = HashMap<IElementType,TextAttributesKey>();
 
-    TokenSet keywords = TokenSet.create(
+    shared TokenSet keywords = TokenSet.create(
         TokenTypes.\iASSEMBLY.tokenType,
         TokenTypes.\iMODULE.tokenType,
         TokenTypes.\iPACKAGE.tokenType,

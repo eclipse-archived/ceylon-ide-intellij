@@ -6,6 +6,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.FormatterUtil;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
@@ -53,10 +55,10 @@ class CeylonBlock implements Block {
             CeylonTypes.EXTENDED_TYPE, CeylonTypes.SATISFIED_TYPES, CeylonTypes.CASE_TYPES,
             CeylonTypes.LAZY_SPECIFIER_EXPRESSION, CeylonTypes.SPECIFIER_EXPRESSION
     );
-    public static final List<IElementType> MEMBER_OPS = Arrays.asList(
+    private static final List<IElementType> MEMBER_OPS = Arrays.asList(
             CeylonTypes.MEMBER_OP, CeylonTokens.MEMBER_OP, CeylonTypes.SAFE_MEMBER_OP
     );
-    public static final List<IElementType> TYPES_REQUIRING_NO_SPACING = Arrays.asList(
+    private static final List<IElementType> TYPES_REQUIRING_NO_SPACING = Arrays.asList(
             CeylonTypes.TYPE_ARGUMENT_LIST, CeylonTypes.TYPE_PARAMETER_LIST,
             CeylonTypes.SEQUENCED_TYPE, CeylonTypes.INDEX_EXPRESSION
     );
@@ -96,14 +98,15 @@ class CeylonBlock implements Block {
     private static final Collection<IElementType> TYPES_REQUIRING_EMPTY_LINE = Arrays.asList(
             CeylonTypes.IMPORT_LIST, CeylonTypes.CLASS_DEFINITION, CeylonTypes.METHOD_DEFINITION
     );
-    public static final List<IElementType> CLASS_OR_INTERFACE = Arrays.asList(
+    private static final List<IElementType> CLASS_OR_INTERFACE = Arrays.asList(
             CeylonTypes.CLASS_DEFINITION, CeylonTypes.INTERFACE_DEFINITION
     );
-    public static final List<IElementType> INLINE_KEYWORDS = Arrays.asList(
+    private static final List<IElementType> INLINE_KEYWORDS = Arrays.asList(
             CeylonTypes.IMPORT_MEMBER, CeylonTypes.IMPORT,
             CeylonTypes.THROW, CeylonTypes.RETURN, CeylonTypes.ASSERTION,
             CeylonTypes.SATISFIED_TYPES, CeylonTypes.EXTENDED_TYPE, CeylonTypes.CASE_TYPES
     );
+    private TokenSet keywords = ceylonHighlighter_.get_().getKeywords();
 
 
     CeylonBlock(ASTNode node, Indent indent) {
@@ -213,56 +216,58 @@ class CeylonBlock implements Block {
         } else if ((type1 == CeylonTokens.UNION_OP || type2 == CeylonTokens.UNION_OP)
                 && nodeType == CeylonTypes.CASE_TYPES) {
             result = SINGLE_SPACE_SPACING;
-        } else if (TYPES_REQUIRING_NO_RIGHT_SPACING.contains(type1)
-                || TYPES_REQUIRING_NO_LEFT_SPACING.contains(type2)
-                || (type1 == CeylonTypes.SMALLER_OP && type2 == CeylonTypes.TYPE_PARAMETER_DECLARATION)
-                || (type1 == CeylonTypes.TYPE_PARAMETER_LITERAL && type2 == CeylonTypes.LARGER_OP)
-                || (type2 == CeylonTypes.POSITIONAL_ARGUMENT_LIST && nodeType != CeylonTypes.ANNOTATION)
-                ) {
-            result = NO_SPACING;
-        } else if ((SMALLER_OP.contains(type1) && isType(block2))
-                || (LARGER_OP.contains(type2) && isType(block1))) {
-            result = NO_SPACING;
-        } else if (MEMBER_OPS.contains(type2)) {
-            result = nodeType == CeylonTypes.QUALIFIED_MEMBER_EXPRESSION ? NO_SPACE_ALLOW_NEWLINE : NO_SPACING;
-        } else if (TYPES_REQUIRING_NO_SPACING.contains(nodeType)) {
-            result = NO_SPACING;
-        } else if (type1 == CeylonTokens.LBRACE && type2 == CeylonTokens.RBRACE) {
-            result = NO_SPACING;
-        } else if (CeylonTypes.SPREAD_ARGUMENT.equals(nodeType) && CeylonTokens.PRODUCT_OP.equals(type1)) {
-            result = NO_SPACING;
-        } else if (CeylonTypes.FUNCTION_TYPE.equals(nodeType)) {
-            result = CeylonTokens.COMMA.equals(type1) ? SINGLE_SPACE_SPACING : NO_SPACING;
-        } else if (type1 == CeylonTypes.ANNOTATION_LIST) {
-            result = KEEP_SOME_SPACE;
-        } else if (INLINE_KEYWORDS.contains(nodeType)) {
-            result = SINGLE_SPACE_SPACING_INLINE;
-        } else if (nodeType == CeylonTypes.ANNOTATION_LIST && type1 == CeylonTypes.STRING_LITERAL) {
-            result = NEW_LINE_SPACING;
-        } else if (CeylonTypes.METHOD_DEFINITION.equals(nodeType) && type2 == CeylonTypes.BLOCK) {
-            result = SINGLE_SPACE_SPACING_INLINE;
-        } else if (bothTypes.contains(CeylonTypes.IDENTIFIER) && CLASS_OR_INTERFACE.contains(nodeType)) {
-            result = SINGLE_SPACE_SPACING_INLINE;
-        } else if (INDENT_CHILDREN_NORMAL.contains(nodeType)
-                && (type2 == CeylonTokens.RBRACE && type1 != CeylonTokens.LBRACE)) {
-            result = NEW_LINE_SPACING_STRICT;
-        } else if (INDENT_CHILDREN_NORMAL.contains(nodeType)
-                && (type1 == CeylonTokens.LBRACE && type2 != CeylonTokens.RBRACE)) {
-            result = NEW_LINE_SPACING;
-        } else if (isStatement(block1) && isStatement(block2)) {
-            result = NEW_LINE_SPACING;
-        } else if (isMetaLiteral(this) && bothTypes.contains(CeylonTokens.BACKTICK)) {
-            result = NO_SPACING;
-        } else if (nodeType == CeylonTypes.ANNOTATION && type1 == CeylonTypes.IDENTIFIER) {
-            result = SINGLE_SPACE_SPACING;
-        } else if ((bothTypes.contains(CeylonTokens.ELSE_CLAUSE) || bothTypes.contains(CeylonTypes.ELSE_CLAUSE))) {
-            result = nodeType == CeylonTypes.SWITCH_CASE_LIST ? NEW_LINE_SPACING_STRICT : SINGLE_SPACE_SPACING_INLINE;
-        } else if (nodeType == CeylonTypes.STRING_TEMPLATE) {
-            result = NO_SPACE_ALLOW_NEWLINE; // TODO: spacing for longer expressions
-        } else if (nodeType == CeylonTypes.ITERABLE_TYPE) {
-            result = NO_SPACING;
         } else {
-            result = SINGLE_SPACE_SPACING;
+            if (TYPES_REQUIRING_NO_RIGHT_SPACING.contains(type1)
+                    || (TYPES_REQUIRING_NO_LEFT_SPACING.contains(type2) && !keywords.contains(type1))
+                    || (type1 == CeylonTypes.SMALLER_OP && type2 == CeylonTypes.TYPE_PARAMETER_DECLARATION)
+                    || (type1 == CeylonTypes.TYPE_PARAMETER_LITERAL && type2 == CeylonTypes.LARGER_OP)
+                    || (type2 == CeylonTypes.POSITIONAL_ARGUMENT_LIST && nodeType != CeylonTypes.ANNOTATION)
+                    ) {
+                result = NO_SPACING;
+            } else if ((SMALLER_OP.contains(type1) && isType(block2))
+                    || (LARGER_OP.contains(type2) && isType(block1))) {
+                result = NO_SPACING;
+            } else if (MEMBER_OPS.contains(type2)) {
+                result = nodeType == CeylonTypes.QUALIFIED_MEMBER_EXPRESSION ? NO_SPACE_ALLOW_NEWLINE : NO_SPACING;
+            } else if (TYPES_REQUIRING_NO_SPACING.contains(nodeType)) {
+                result = NO_SPACING;
+            } else if (type1 == CeylonTokens.LBRACE && type2 == CeylonTokens.RBRACE) {
+                result = NO_SPACING;
+            } else if (CeylonTypes.SPREAD_ARGUMENT.equals(nodeType) && CeylonTokens.PRODUCT_OP.equals(type1)) {
+                result = NO_SPACING;
+            } else if (CeylonTypes.FUNCTION_TYPE.equals(nodeType)) {
+                result = CeylonTokens.COMMA.equals(type1) ? SINGLE_SPACE_SPACING : NO_SPACING;
+            } else if (type1 == CeylonTypes.ANNOTATION_LIST) {
+                result = KEEP_SOME_SPACE;
+            } else if (INLINE_KEYWORDS.contains(nodeType)) {
+                result = SINGLE_SPACE_SPACING_INLINE;
+            } else if (nodeType == CeylonTypes.ANNOTATION_LIST && type1 == CeylonTypes.STRING_LITERAL) {
+                result = NEW_LINE_SPACING;
+            } else if (CeylonTypes.METHOD_DEFINITION.equals(nodeType) && type2 == CeylonTypes.BLOCK) {
+                result = SINGLE_SPACE_SPACING_INLINE;
+            } else if (bothTypes.contains(CeylonTypes.IDENTIFIER) && CLASS_OR_INTERFACE.contains(nodeType)) {
+                result = SINGLE_SPACE_SPACING_INLINE;
+            } else if (INDENT_CHILDREN_NORMAL.contains(nodeType)
+                    && (type2 == CeylonTokens.RBRACE && type1 != CeylonTokens.LBRACE)) {
+                result = NEW_LINE_SPACING_STRICT;
+            } else if (INDENT_CHILDREN_NORMAL.contains(nodeType)
+                    && (type1 == CeylonTokens.LBRACE && type2 != CeylonTokens.RBRACE)) {
+                result = NEW_LINE_SPACING;
+            } else if (isStatement(block1) && isStatement(block2)) {
+                result = NEW_LINE_SPACING;
+            } else if (isMetaLiteral(this) && bothTypes.contains(CeylonTokens.BACKTICK)) {
+                result = NO_SPACING;
+            } else if (nodeType == CeylonTypes.ANNOTATION && type1 == CeylonTypes.IDENTIFIER) {
+                result = SINGLE_SPACE_SPACING;
+            } else if ((bothTypes.contains(CeylonTokens.ELSE_CLAUSE) || bothTypes.contains(CeylonTypes.ELSE_CLAUSE))) {
+                result = nodeType == CeylonTypes.SWITCH_CASE_LIST ? NEW_LINE_SPACING_STRICT : SINGLE_SPACE_SPACING_INLINE;
+            } else if (nodeType == CeylonTypes.STRING_TEMPLATE) {
+                result = NO_SPACE_ALLOW_NEWLINE; // TODO: spacing for longer expressions
+            } else if (nodeType == CeylonTypes.ITERABLE_TYPE) {
+                result = NO_SPACING;
+            } else {
+                result = SINGLE_SPACE_SPACING;
+            }
         }
 
 //        if (NO_SPACING != result) {
