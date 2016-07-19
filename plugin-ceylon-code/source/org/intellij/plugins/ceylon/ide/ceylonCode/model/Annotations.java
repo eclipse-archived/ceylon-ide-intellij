@@ -5,6 +5,7 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.model;
  */
 public enum Annotations {
     attribute(com.redhat.ceylon.compiler.java.metadata.Attribute.class),
+    annotationInstantiation(com.redhat.ceylon.compiler.java.metadata.AnnotationInstantiation.class),
     object(com.redhat.ceylon.compiler.java.metadata.Object.class),
     method(com.redhat.ceylon.compiler.java.metadata.Method.class),
     container(com.redhat.ceylon.compiler.java.metadata.Container.class),

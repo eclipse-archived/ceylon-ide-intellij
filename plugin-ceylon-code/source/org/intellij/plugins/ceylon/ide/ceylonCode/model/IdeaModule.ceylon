@@ -3,6 +3,10 @@ import ceylon.collection {
     MutableSet,
     MutableList
 }
+import ceylon.language {
+    langNull=null,
+    langFalse=false
+}
 
 import com.intellij.openapi.\imodule {
     Module
@@ -35,28 +39,37 @@ import java.lang {
     JString=String
 }
 import java.util {
-    JMap=Map
+    JMap=Map,
+    Collections
 }
 
 shared class IdeaModule(
     shared actual IdeaModuleManager moduleManager,
-    shared actual IdeaModuleSourceMapper moduleSourceMapper, 
+    shared actual IdeaModuleSourceMapper moduleSourceMapper,
     MutableList<VirtualFile> arrayList)
         extends IdeModule<Module,VirtualFile,VirtualFile,VirtualFile>() {
 
     value packageList = HashSet<String>();
 
-    //TODO: go to the IntelliJ index to get declarations we can import!
     shared actual JMap<JString,DeclarationWithProximity> getAvailableDeclarations
-            (Unit unit, String startingWith, Integer proximity, Cancellable? canceller)
-            => super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
+            (Unit unit, String startingWith, Integer proximity, Cancellable? canceller) {
+
+        if (canceller?.cancelled else false) {
+            return Collections.emptyMap<JString,DeclarationWithProximity>();
+        }
+
+        if (exists mod = moduleSourceMapper.ceylonProject?.ideArtifact) {
+            return scanJavaIndex(this, moduleManager, mod, startingWith);
+        }
+        return super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
+    }
 
     shared actual void encloseOnTheFlyTypechecking(void typechecking()) {
-        concurrencyManager.withUpToDateIndexes(() { 
+        concurrencyManager.withUpToDateIndexes(() {
             typechecking();
         });
     }
-    
+
     shared actual Set<String> listPackages() {
         value name = nameAsString;
         if (JDKUtils.isJDKModule(name)) {
@@ -75,10 +88,10 @@ shared class IdeaModule(
             packageList.empty) {
             scanPackages(mod.ideArtifact, packageList);
         }
-        
+
         return packageList;
     }
-    
+
     // TODO copy paste from CeylonProjectModulesContainer, should be in ide-common
     File? getModuleArtifact(RepositoryManager provider, BaseIdeModule mod) {
 
@@ -87,7 +100,7 @@ shared class IdeaModule(
             moduleFile.\iexists()) {
             return moduleFile;
         }
-        
+
         value carCtx
                 = ArtifactContext(null,
                                   mod.nameAsString, mod.version,
@@ -115,10 +128,10 @@ shared class IdeaModule(
             listPackagesInternal(vfile, packageList);
         }
     }
-    
+
     void listPackagesInternal(VirtualFile vfile, MutableSet<String> packageList,
         String parentPackage = "") {
-        
+
         vfile.children.array.coalesced
             .filter((file) => file.directory)
             .each((child) {
@@ -132,7 +145,7 @@ shared class IdeaModule(
     }
 
     modelLoader => moduleManager.modelLoader;
-    
+
     shared actual void refreshJavaModel() {
         // TODO
         print("TODO Refresh model");
