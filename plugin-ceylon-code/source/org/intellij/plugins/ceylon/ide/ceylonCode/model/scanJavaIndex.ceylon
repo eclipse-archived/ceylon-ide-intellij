@@ -58,6 +58,9 @@ import java.util {
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
     classFileDecompilerUtil
 }
+import com.redhat.ceylon.ide.common.model.asjava {
+    getJavaQualifiedName
+}
 
 HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit sourceUnit,
     IdeaModuleManager moduleManager, Module mod, String startingWith) {
@@ -88,11 +91,11 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
             if (exists qName = cls.qualifiedName) {
                 value imported = CeylonIterable(sourceUnit.imports).find(
-                    (imp) => imp.declaration.qualifiedNameString.replace("::", ".") == qName
+                    (imp) => getJavaQualifiedName(imp.declaration) == qName
                 );
 
                 if (exists imported) {
-                    return imported.declaration;
+                    return null;
                 }
             }
 
@@ -164,8 +167,10 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
                 value lightModel = findOrCreateDeclaration(cls, modifiers, pkg);
 
-                value dwp = DeclarationWithProximity(lightModel of Declaration, 0);
-                if (exists qname = cls.qualifiedName) {
+                if (exists lightModel,
+                    exists qname = cls.qualifiedName) {
+
+                    value dwp = DeclarationWithProximity(lightModel of Declaration, 0);
                     result.put(javaString(qname), dwp);
                 }
             }
