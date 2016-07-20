@@ -54,14 +54,14 @@ import java.lang {
     ReflectiveOperationException,
     JString=String,
     Math,
-    Iterable,
     Runnable
 }
 
 import javax.swing {
     JPanel,
     Icon,
-    JList
+    JList,
+    ListCellRenderer
 }
 
 shared void installCustomLookupCellRenderer(Project project) {
@@ -97,10 +97,9 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                     field.accessible = false;
                     value method
                             = javaClass<JList<out Object>>()
-                            .getDeclaredMethod("setCellRenderer");
-                    method.accessible = true;
+                            .getDeclaredMethod("setCellRenderer",
+                                javaClass<ListCellRenderer<out Object>>());
                     method.invoke(lookup.list, outer);
-                    method.accessible = false;
                 }
                 catch (ReflectiveOperationException e) {
                     e.printStackTrace();
