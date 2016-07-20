@@ -28,6 +28,9 @@ import com.intellij.ide.util.treeView {
 import com.intellij.openapi.application {
     ApplicationManager
 }
+import com.intellij.openapi.editor.markup {
+    EffectType
+}
 import com.intellij.openapi.fileTypes {
     FileTypeManager
 }
@@ -118,11 +121,10 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
     void customize(Component comp, LookupElement element, Boolean isSelected) {
         if (is JPanel comp,
-            is SimpleColoredComponent firstChild = comp.getComponent(0)) {
+            is SimpleColoredComponent coloredComponent = comp.getComponent(0)) {
             value pres = LookupElementPresentation();
             element.renderElement(pres);
             assert (exists text = pres.itemText);
-            value coloredComponent = firstChild;
             try {
                 resetColoredComponent(coloredComponent);
                 renderItemName {
@@ -130,6 +132,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                     selected = isSelected && lookup.focused;
                     name = text;
                     nameComponent = coloredComponent;
+                    strikeout = pres.strikeout;
                 };
             }
             catch (ReflectiveOperationException e) {
@@ -139,32 +142,37 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
     }
 
     void renderItemName(LookupElement item, Boolean selected, String name,
-            SimpleColoredComponent nameComponent) {
+            SimpleColoredComponent nameComponent, Boolean strikeout) {
 
-        value colors =
-                if (selected)
+        value style
+                = strikeout
+                then SimpleTextAttributes.styleStrikeout
+                else SimpleTextAttributes.stylePlain;
+        value colors
+                = selected
                 then Singleton(createFragment(name,
-                        SimpleTextAttributes(SimpleTextAttributes.stylePlain, JBColor.white)))
-                else highlight(name, project);
+                        SimpleTextAttributes(style, JBColor.white)))
+                else highlight(name, project, strikeout);
 
         String prefix
-                = if (item is EmptyLookupItem) then ""
+                = item is EmptyLookupItem
+                then ""
                 else lookup.itemPattern(item);
         value highlightedPrefixColor
-                = SimpleTextAttributes(SimpleTextAttributes.stylePlain,
+                = SimpleTextAttributes(style,
                     selected
-                    then selectedPrefixForegroundColor
-                    else prefixForegroundColor);
-        value colorsWithPrefix =
-            if (prefix.size>0,
-                exists ranges = getMatchingFragments(prefix, name))
-            then let (it = ranges.iterator())
-            mergeHighlightAndMatches {
-                highlight = colors;
-                nextMatch() => it.hasNext() then it.next();
-                highlighted = highlightedPrefixColor;
-            }
-            else colors;
+                        then selectedPrefixForegroundColor
+                        else prefixForegroundColor);
+        value colorsWithPrefix
+                = if (prefix.size>0,
+                      exists ranges = getMatchingFragments(prefix, name))
+                then let (it = ranges.iterator())
+                mergeHighlightAndMatches {
+                    highlight = colors;
+                    nextMatch() => it.hasNext() then it.next();
+                    highlighted = highlightedPrefixColor;
+                }
+                else colors;
 
         for (color in colorsWithPrefix) {
             nameComponent.append(color.text, color.attributes);
@@ -179,7 +187,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         coloredComponent.ipad = ipad;
     }
 
-    List<Fragment> highlight(String text, Project project) {
+    List<Fragment> highlight(String text, Project project, Boolean strikeout) {
         value highlighter
                 = HighlighterFactory.createHighlighter(project,
                     FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
@@ -187,10 +195,14 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         value iterator = highlighter.createIterator(0);
         value fragments = ArrayList<Fragment>();
         while (!iterator.atEnd()) {
-            value attr = iterator.textAttributes;
             String subtext = text.substring(iterator.start, iterator.end);
-            fragments.add(createFragment(subtext,
-                SimpleTextAttributes.fromTextAttributes(attr)));
+            value attr = iterator.textAttributes;
+            if (strikeout) {
+                attr.effectType = EffectType.strikeout;
+                attr.effectColor = Color.black;
+            }
+            value attributes = SimpleTextAttributes.fromTextAttributes(attr);
+            fragments.add(createFragment(subtext, attributes));
             iterator.advance();
         }
         return fragments;

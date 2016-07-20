@@ -48,7 +48,7 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
 
 LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
     InsertHandler<LookupElement>? handler = null, TextRange? selection = null,
-    Object? obj = null) {
+    Object? obj = null, Boolean deprecated = false) {
     
     Integer? cutOffset;
     
@@ -90,6 +90,7 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
     return LookupElementBuilder.create(obj else text, newText)
             .withPresentableText(desc)
             .withIcon(icon)
+            .withStrikeoutness(deprecated)
             .withInsertHandler(newHandler);
     
 }

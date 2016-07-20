@@ -55,8 +55,13 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
             then type.asString()
             else null;
 
-    shared LookupElement lookupElement => newLookup(desc, text, icons.forDeclaration(declaration),
-        object satisfies InsertHandler<LookupElement> {
+    shared LookupElement lookupElement => newLookup {
+        desc = desc;
+        text = text;
+        icon = icons.forDeclaration(declaration);
+        deprecated = declaration.deprecated;
+        obj = [declaration, text];
+        handler = object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext context, LookupElement? t) {
                 // Undo IntelliJ's completion
                 value platformDoc = ctx.commonDocument;
@@ -65,20 +70,20 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
 
                 assert (exists project = ctx.editor.project);
                 PsiDocumentManager.getInstance(project).commitDocument(platformDoc.nativeDocument);
-                
+
                 value change = createChange(platformDoc);
-                
+
                 object extends WriteCommandAction<Nothing>(ctx.editor.project, ctx.file) {
                     run(Result<Nothing> result) => change.apply();
                 }.execute();
-                
+
                 adjustSelection(ctx);
                 activeLinkedMode(platformDoc, ctx);
             }
-        }
-    , null, [declaration, text])
-            .withTailText(greyText, true)
-            .withTypeText(returnType);
+        };
+    }
+    .withTailText(greyText, true)
+    .withTypeText(returnType);
     
     shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
         Declaration dec, Declaration? qualifier, Integer loc, Integer index, Boolean basic, String op) {
