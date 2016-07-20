@@ -18,7 +18,8 @@ import com.redhat.ceylon.common {
     Backend
 }
 import com.redhat.ceylon.ide.common.util {
-    toJavaStringList
+    toJavaStringList,
+    escaping
 }
 
 import java.lang {
@@ -81,7 +82,13 @@ shared object ceylonFileFactory {
         value tplManager = fileTemplateManager(dir.project);
         value props = HashMap<JString,Object>();
 
-        props.put(javaString("UNIT_NAME"), javaString(unitName));
+        value escaped = switch (templateName)
+            case ("function"|"object")
+            escaping.escapeInitialLowercase(unitName)
+            case ("class"|"interface")
+            escaping.escapeInitialUppercase(unitName)
+            else unitName;
+        props.put(javaString("UNIT_NAME"), javaString(escaped));
 
         return createFromTemplate(
             tplManager.getInternalTemplate(templateName + ".ceylon"),

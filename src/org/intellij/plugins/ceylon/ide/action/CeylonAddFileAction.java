@@ -80,8 +80,7 @@ public class CeylonAddFileAction extends CreateFromTemplateAction<PsiElement> {
 
             return StringUtils.isNotBlank(inputString)
                     && inputString.matches("(\\w|-)+")
-                    && directory.findChild(getCompleteFileName(inputString)) == null
-                    && !escaping_.get_().isKeyword(inputString);
+                    && directory.findChild(getCompleteFileName(inputString)) == null;
         }
 
         @Nullable
@@ -93,8 +92,6 @@ public class CeylonAddFileAction extends CreateFromTemplateAction<PsiElement> {
                 return message("ceylon.file.wizard.error.blank");
             } else if (!inputString.matches("(\\w|-)+")) {
                 return message("ceylon.file.wizard.error.illegal", inputString);
-            } else if (escaping_.get_().isKeyword(inputString)) {
-                return "'" + inputString + "' is a reserved keyword";
             } else {
 
                 if (directory.findChild(completeFileName) != null) {
