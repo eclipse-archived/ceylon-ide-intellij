@@ -1,6 +1,9 @@
 import ceylon.collection {
     ArrayList
 }
+import ceylon.interop.java {
+    javaClass
+}
 
 import com.intellij.codeInsight.completion {
     CompletionProgressIndicator,
@@ -13,13 +16,17 @@ import com.intellij.codeInsight.lookup {
 }
 import com.intellij.codeInsight.lookup.impl {
     EmptyLookupItem,
-    LookupImpl
+    LookupImpl,
+    LookupCellRenderer
 }
 import com.intellij.ide.highlighter {
     HighlighterFactory
 }
 import com.intellij.ide.util.treeView {
     PresentableNodeDescriptor
+}
+import com.intellij.openapi.application {
+    ApplicationManager
 }
 import com.intellij.openapi.fileTypes {
     FileTypeManager
@@ -46,12 +53,15 @@ import java.awt {
 import java.lang {
     ReflectiveOperationException,
     JString=String,
-    Math
+    Math,
+    Iterable,
+    Runnable
 }
 
 import javax.swing {
     JPanel,
-    Icon
+    Icon,
+    JList
 }
 
 shared void installCustomLookupCellRenderer(Project project) {
@@ -69,25 +79,62 @@ Fragment createFragment(String text, SimpleTextAttributes atts)
         => PresentableNodeDescriptor<Anything>.ColoredFragment(text, atts);
 
 shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
-        extends MyLookupCellRenderer(lookup) {
+        extends LookupCellRenderer(lookup) {
 
     value prefixForegroundColor = JBColor(Color(176, 0, 176), Color(209, 122, 214));
     value selectedPrefixForegroundColor = JBColor(Color(249, 209, 211), Color(209, 122, 214));
 
-    shared actual void customize(Component comp, LookupElement element, Boolean isSelected) {
-        if (is JPanel comp) {
-            if (is SimpleColoredComponent firstChild = comp.getComponent(0)) {
-                value pres = LookupElementPresentation();
-                element.renderElement(pres);
-                assert (exists text = pres.itemText);
-                value coloredComponent = firstChild;
+    shared void install()
+            => ApplicationManager.application
+                .invokeLater(object satisfies Runnable {
+            shared actual void run() {
                 try {
-                    resetColoredComponent(coloredComponent);
-                    renderItemName(element, isSelected && lookup.focused, text, coloredComponent);
+                    value field
+                            = javaClass<LookupImpl>()
+                            .getDeclaredField("myCellRenderer");
+                    field.accessible = true;
+                    field.set(lookup, outer);
+                    field.accessible = false;
+                    value method
+                            = javaClass<JList<out Object>>()
+                            .getDeclaredMethod("setCellRenderer");
+                    method.accessible = true;
+                    method.invoke(lookup.list, outer);
+                    method.accessible = false;
                 }
                 catch (ReflectiveOperationException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+    shared actual Component getListCellRendererComponent(JList<out Object>? list,
+            Object? element, Integer index, Boolean isSelected, Boolean hasFocus) {
+        Component component
+                = super.getListCellRendererComponent(list, element, index, isSelected, hasFocus);
+        assert (is LookupElement element);
+        customize(component, element, isSelected);
+        return component;
+    }
+
+    void customize(Component comp, LookupElement element, Boolean isSelected) {
+        if (is JPanel comp,
+            is SimpleColoredComponent firstChild = comp.getComponent(0)) {
+            value pres = LookupElementPresentation();
+            element.renderElement(pres);
+            assert (exists text = pres.itemText);
+            value coloredComponent = firstChild;
+            try {
+                resetColoredComponent(coloredComponent);
+                renderItemName {
+                    item = element;
+                    selected = isSelected && lookup.focused;
+                    name = text;
+                    nameComponent = coloredComponent;
+                };
+            }
+            catch (ReflectiveOperationException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -149,7 +196,6 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         }
         return fragments;
     }
-
 
 }
 
