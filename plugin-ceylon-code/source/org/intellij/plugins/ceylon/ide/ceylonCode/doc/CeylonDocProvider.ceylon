@@ -158,7 +158,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
             value generator = IdeaDocGenerator(typeChecker);
             if (is DummyPsiElement element) {
-                assert (exists pu = element.containingFile.localAnalysisResult.lastPhasedUnit);
+                assert (exists pu = element.containingFile.localAnalysisResult?.lastPhasedUnit);
                 return generator.getDocumentationText {
                     model = element.referenceable;
                     node = null;

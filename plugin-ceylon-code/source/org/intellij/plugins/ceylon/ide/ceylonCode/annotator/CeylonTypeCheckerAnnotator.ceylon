@@ -134,7 +134,7 @@ shared class CeylonTypeCheckerAnnotator()
     void addQuickFixes(TextRange range, Message error, Annotation annotation, AnnotationHolder annotationHolder) {
         assert (is CeylonFile file = annotationHolder.currentAnnotationSession.file,
                 exists mod = ModuleUtilCore.findModuleForFile(file.virtualFile, file.project),
-                exists pu = file.localAnalysisResult.lastPhasedUnit);
+                exists pu = file.localAnalysisResult?.lastPhasedUnit);
         
         if (is IdeaCeylonProjects projects = getCeylonProjects(file.project),
             exists project = projects.getProject(mod),
