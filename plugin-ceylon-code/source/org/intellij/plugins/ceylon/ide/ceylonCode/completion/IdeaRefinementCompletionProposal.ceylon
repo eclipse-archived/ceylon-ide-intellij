@@ -35,7 +35,8 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         (offset, prefix, pr, desc, text, ctx, dec, scope, fullType, explicitReturnType) 
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => newLookup(desc, text, icons.forDeclaration(dec),
+    shared LookupElement lookupElement => newLookup(desc, text,
+        dec.formal then icons.refinement else icons.extendedType,
         object satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                 // Undo IntelliJ's completion
