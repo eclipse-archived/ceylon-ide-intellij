@@ -78,7 +78,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         icon = icons.forDeclaration(declaration);
         deprecated = declaration.deprecated;
         obj = [declaration, text];
-        handler = object satisfies InsertHandler<LookupElement> {
+        object handler satisfies InsertHandler<LookupElement> {
             shared actual void handleInsert(InsertionContext context, LookupElement? t) {
                 // Undo IntelliJ's completion
                 value platformDoc = ctx.commonDocument;
@@ -97,7 +97,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 adjustSelection(ctx);
                 activeLinkedMode(platformDoc, ctx);
             }
-        };
+        }
     }
     .withTailText(greyText, true)
     .withTypeText(returnType);
