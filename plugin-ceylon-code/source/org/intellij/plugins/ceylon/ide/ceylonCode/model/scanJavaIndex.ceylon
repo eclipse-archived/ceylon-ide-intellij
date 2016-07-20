@@ -120,6 +120,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     Function? realFunction => lazyRealFunction else (lazyRealFunction =computeRealClass());
 
                     parameterLists => realFunction?.parameterLists else Collections.emptyList<ParameterList>();
+                    type => realFunction?.type;
                 };
             } else {
                 lightModel = object extends Class() {
@@ -142,6 +143,8 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     objectClass => modifiers.findAnnotation(Annotations.\iobject.className) exists;
                     anonymous => objectClass || annotation;
                     annotation => modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
+                    abstract => modifiers.hasModifierProperty(PsiModifier.abstract);
+                    final => modifiers.hasModifierProperty(PsiModifier.final);
                 };
 
                 lightModel.annotation = modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
