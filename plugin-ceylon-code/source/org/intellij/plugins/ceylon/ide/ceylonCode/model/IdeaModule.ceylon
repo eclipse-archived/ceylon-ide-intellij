@@ -59,7 +59,7 @@ shared class IdeaModule(
         }
 
         if (exists mod = moduleSourceMapper.ceylonProject?.ideArtifact) {
-            return scanJavaIndex(this, moduleManager, mod, startingWith);
+            return scanJavaIndex(this, unit, moduleManager, mod, startingWith);
         }
         return super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
     }
