@@ -25,7 +25,9 @@ import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     Scope,
     Reference,
-    TypedDeclaration
+    Value,
+    Function,
+    ModelUtil
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
@@ -43,17 +45,32 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         satisfies IdeaCompletionProposal {
     
     shared actual variable Boolean toggleOverwrite = false;
-    
-    value containerName
-            = declaration.container.qualifiedNameString;
+
+    value greyText {
+        if (qualified) {
+            return null;
+        } else {
+            value containerName = declaration.container.qualifiedNameString;
             //+ (declaration.container is Function then "()" else "");
-    value greyText = " (``containerName.empty then "default package" else containerName``)";
+            return " (``containerName.empty then "default package" else containerName``)";
+        }
+    }
     
-    value returnType
-            => if (is TypedDeclaration declaration,
-                    exists type = declaration.type)
-            then type.asString()
+    value returnType {
+        if (ModelUtil.isConstructor(declaration)) {
+            return "new";
+        }
+        else {
+            return switch (declaration)
+            case (is Value)
+                declaration.type?.asString()
+            case (is Function)
+                if (declaration.declaredVoid)
+                then "void"
+            else declaration.type?.asString()
             else null;
+        }
+    }
 
     shared LookupElement lookupElement => newLookup {
         desc = desc;
