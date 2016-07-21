@@ -60,7 +60,8 @@ import java.util {
     HashMap,
     Collections {
         emptyList
-    }
+    },
+    JList=List
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
@@ -108,8 +109,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
             if (cls.\iinterface) {
                 lightModel = Interface();
-            } else if (modifiers.findAnnotation(Annotations.method.className) exists,
-                !modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists) {
+            } else if (modifiers.findAnnotation(Annotations.method.className) exists) {
                 lightModel = object extends Function() {
                     variable Function? lazyRealFunction = langNull;
 
@@ -125,7 +125,11 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     Function? realFunction => lazyRealFunction else (lazyRealFunction =computeRealClass());
 
                     parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
-                    type => realFunction?.type;
+                    shared actual Type? type => realFunction?.type;
+                    assign type {}
+
+                    annotation = modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
+                    anonymous = annotation;
                 };
             } else {
                 lightModel = object extends Class() {
@@ -143,14 +147,14 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     Class? realClass => lazyRealClass else (lazyRealClass =computeRealClass());
 
                     parameterLists => realClass?.parameterLists else emptyList<ParameterList>();
-                    typeParameters => realClass?.typeParameters else emptyList<TypeParameter>();
+                    shared actual JList<TypeParameter> typeParameters => realClass?.typeParameters else emptyList<TypeParameter>();
+                    assign typeParameters {}
                     type => realClass?.type;
 
-                    objectClass => modifiers.findAnnotation(Annotations.\iobject.className) exists;
-                    annotation => modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
-                    anonymous => objectClass || annotation;
-                    abstract => modifiers.hasModifierProperty(PsiModifier.abstract);
-                    final => modifiers.hasModifierProperty(PsiModifier.final);
+                    objectClass = modifiers.findAnnotation(Annotations.\iobject.className) exists;
+                    anonymous = objectClass;
+                    abstract = modifiers.hasModifierProperty(PsiModifier.abstract);
+                    final = modifiers.hasModifierProperty(PsiModifier.final);
                 };
             }
 
