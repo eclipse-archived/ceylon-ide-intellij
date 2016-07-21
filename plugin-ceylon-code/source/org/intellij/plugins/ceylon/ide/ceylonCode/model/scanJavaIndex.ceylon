@@ -7,6 +7,7 @@ import ceylon.language {
     langTrue=true,
     langFalse=false
 }
+
 import com.intellij.codeInsight.completion {
     AllClassesGetter
 }
@@ -33,6 +34,9 @@ import com.intellij.psi {
 import com.intellij.util {
     Processor
 }
+import com.redhat.ceylon.ide.common.model.asjava {
+    getJavaQualifiedName
+}
 import com.redhat.ceylon.model.typechecker.model {
     TypeParameter,
     DeclarationWithProximity,
@@ -45,6 +49,7 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit,
     Package
 }
+
 import java.io {
     File
 }
@@ -53,17 +58,17 @@ import java.lang {
 }
 import java.util {
     HashMap,
-    Collections
+    Collections {
+        emptyList
+    }
 }
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
     classFileDecompilerUtil
 }
-import com.redhat.ceylon.ide.common.model.asjava {
-    getJavaQualifiedName
-}
 
 HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit sourceUnit,
-    IdeaModuleManager moduleManager, Module mod, String startingWith) {
+    IdeaModuleManager moduleManager, Module mod, String startingWith, Integer proximity) {
 
     value result = HashMap<JString,DeclarationWithProximity>();
     value allDependencies = that.transitiveDependencies
@@ -109,7 +114,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     variable Function? lazyRealFunction = langNull;
 
                     Function? computeRealClass() {
-                        if (is Function decl = pkg.getMember((cls of PsiNamedElement).name, Collections.emptyList<Type>(), langFalse)) {
+                        if (is Function decl = pkg.getMember((cls of PsiNamedElement).name, emptyList<Type>(), langFalse)) {
 
                             return decl;
                         }
@@ -119,7 +124,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
                     Function? realFunction => lazyRealFunction else (lazyRealFunction =computeRealClass());
 
-                    parameterLists => realFunction?.parameterLists else Collections.emptyList<ParameterList>();
+                    parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
                     type => realFunction?.type;
                 };
             } else {
@@ -127,7 +132,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     variable Class? lazyRealClass = langNull;
 
                     Class? computeRealClass() {
-                        if (is Class decl = pkg.getMember((cls of PsiNamedElement).name, Collections.emptyList<Type>(), langFalse)) {
+                        if (is Class decl = pkg.getMember((cls of PsiNamedElement).name, emptyList<Type>(), langFalse)) {
 
                             return decl;
                         }
@@ -137,8 +142,9 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
                     Class? realClass => lazyRealClass else (lazyRealClass =computeRealClass());
 
-                    parameterLists => realClass?.parameterLists else Collections.emptyList<ParameterList>();
-                    typeParameters => realClass?.typeParameters else Collections.emptyList<TypeParameter>();
+                    parameterLists => realClass?.parameterLists else emptyList<ParameterList>();
+                    typeParameters => realClass?.typeParameters else emptyList<TypeParameter>();
+                    type => realClass?.type;
 
                     objectClass => modifiers.findAnnotation(Annotations.\iobject.className) exists;
                     annotation => modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
@@ -150,6 +156,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
             lightModel.name = findName(cls);
             lightModel.container = pkg;
+            lightModel.deprecated = cls.deprecated;
 
             value unit = Unit();
             unit.\ipackage = pkg;
@@ -171,7 +178,9 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 if (exists lightModel,
                     exists qname = cls.qualifiedName) {
 
-                    value dwp = DeclarationWithProximity(lightModel of Declaration, 0);
+                    value langPackage = pkg.languagePackage;
+                    value prox = that.getProximity(proximity, langPackage, lightModel.name);
+                    value dwp = DeclarationWithProximity(lightModel of Declaration, prox);
                     result.put(javaString(qname), dwp);
                 }
             }
