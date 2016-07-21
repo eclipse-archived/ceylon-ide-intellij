@@ -144,7 +144,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                         return langNull;
                     }
 
-                    Class? realClass => lazyRealClass else (lazyRealClass =computeRealClass());
+                    Class? realClass => lazyRealClass else (lazyRealClass = computeRealClass());
 
                     parameterLists => realClass?.parameterLists else emptyList<ParameterList>();
                     shared actual JList<TypeParameter> typeParameters => realClass?.typeParameters else emptyList<TypeParameter>();
