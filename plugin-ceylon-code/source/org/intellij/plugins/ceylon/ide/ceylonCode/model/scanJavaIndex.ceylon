@@ -81,7 +81,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
     object processor satisfies Processor<PsiClass> {
         String? findName(PsiClass cls) {
-            value defaultName = cls.name;
+            value defaultName = (cls of PsiNamedElement).name;
 
             if (exists defaultName,
                 defaultName.endsWith("_"),
@@ -114,7 +114,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     variable Function? lazyRealFunction = langNull;
 
                     Function? computeRealClass() {
-                        if (is Function decl = pkg.getMember(cls.name, emptyList<Type>(), langFalse)) {
+                        if (is Function decl = pkg.getMember((cls of PsiNamedElement).name, emptyList<Type>(), langFalse)) {
 
                             return decl;
                         }
@@ -122,7 +122,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                         return langNull;
                     }
 
-                    Function? realFunction => lazyRealFunction else (lazyRealFunction = computeRealClass());
+                    Function? realFunction => lazyRealFunction else (lazyRealFunction =computeRealClass());
 
                     parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
                     shared actual Type? type => realFunction?.type;
@@ -136,7 +136,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     variable Class? lazyRealClass = langNull;
 
                     Class? computeRealClass() {
-                        if (is Class decl = pkg.getMember(cls.name, emptyList<Type>(), langFalse)) {
+                        if (is Class decl = pkg.getMember((cls of PsiNamedElement).name, emptyList<Type>(), langFalse)) {
 
                             return decl;
                         }
