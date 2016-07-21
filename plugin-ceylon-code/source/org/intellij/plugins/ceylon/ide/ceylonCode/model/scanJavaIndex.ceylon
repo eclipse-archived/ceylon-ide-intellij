@@ -122,7 +122,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                         return langNull;
                     }
 
-                    Function? realFunction => lazyRealFunction else (lazyRealFunction =computeRealClass());
+                    Function? realFunction => lazyRealFunction else (lazyRealFunction = computeRealClass());
 
                     parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
                     shared actual Type? type => realFunction?.type;
