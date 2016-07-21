@@ -190,7 +190,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
             }
             return langTrue;
         }
-    };
+    }
     object scope extends ModuleWithDependenciesScope(mod, ModuleWithDependenciesScope.libraries) {
         shared actual Boolean contains(VirtualFile file) {
             if (exists jar = JarFileSystem.instance.getVirtualFileForJar(file)) {
@@ -230,7 +230,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
             }
             return false;
         }
-    };
+    }
 
     value before = system.milliseconds;
     AllClassesGetter.processJavaClasses(CamelHumpMatcher(startingWith), mod.project, scope, processor);
