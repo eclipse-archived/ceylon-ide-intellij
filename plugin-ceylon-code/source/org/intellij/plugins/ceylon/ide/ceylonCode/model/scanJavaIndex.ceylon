@@ -3,9 +3,9 @@ import ceylon.interop.java {
     CeylonIterable
 }
 import ceylon.language {
-    langNull = null,
-    langTrue = true,
-    langFalse = false
+    langNull=null,
+    langTrue=true,
+    langFalse=false
 }
 import com.intellij.codeInsight.completion {
     AllClassesGetter
@@ -49,7 +49,7 @@ import java.io {
     File
 }
 import java.lang {
-    JString = String
+    JString=String
 }
 import java.util {
     HashMap,
@@ -141,13 +141,11 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     typeParameters => realClass?.typeParameters else Collections.emptyList<TypeParameter>();
 
                     objectClass => modifiers.findAnnotation(Annotations.\iobject.className) exists;
-                    anonymous => objectClass || annotation;
                     annotation => modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
+                    anonymous => objectClass || annotation;
                     abstract => modifiers.hasModifierProperty(PsiModifier.abstract);
                     final => modifiers.hasModifierProperty(PsiModifier.final);
                 };
-
-                lightModel.annotation = modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
             }
 
             lightModel.name = findName(cls);
