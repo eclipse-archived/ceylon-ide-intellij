@@ -54,17 +54,31 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
         return getPresentableText();
     }
 
+    private Declaration getModel() {
+        return getElement()
+                .getCeylonNode()
+                .getDeclarationModel();
+    }
+
     @Nullable
     @Override
     public TextAttributesKey getTextAttributesKey() {
-        return isInherited ? CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES : null;
+        if (isInherited) {
+            return CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES;
+        }
+        else {
+            Declaration model = getModel();
+            if (model!=null && model.isDeprecated()) {
+                return CodeInsightColors.DEPRECATED_ATTRIBUTES;
+            }
+            else {
+                return null;
+            }
+        }
     }
 
     ClassOrInterface getType() {
-        Declaration model =
-                getElement()
-                    .getCeylonNode()
-                    .getDeclarationModel();
+        Declaration model = getModel();
         if (model!=null && model.isClassOrInterfaceMember()) {
             if (isInherited) {
                 return (ClassOrInterface) model.getContainer();
@@ -82,10 +96,7 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
         if (!isValid()) {
             return null;
         }
-        Declaration model =
-                getElement()
-                        .getCeylonNode()
-                        .getDeclarationModel();
+        Declaration model = getModel();
         if (model != null) {
             if (isInherited
                     && model.isClassOrInterfaceMember()) {
@@ -139,10 +150,7 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
         if (isInherited) {
             return PsiUtil.ACCESS_LEVEL_PUBLIC;
         }
-        Declaration model =
-                getElement()
-                    .getCeylonNode()
-                    .getDeclarationModel();
+        Declaration model = getModel();
         if (model != null && model.isShared()) {
             return PsiUtil.ACCESS_LEVEL_PUBLIC;
         }
