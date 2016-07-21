@@ -128,6 +128,7 @@ shared object icons {
                 if (ModelUtil.isConstructor(decl)) then constructors
                 else if (decl.parameter) then param
                 else if (decl.formal) then formalMethods
+                else if (decl.annotation) then annotationClasses
                 else methods
             case (is Value)
                 if (ModelUtil.isConstructor(decl)) then constructors
