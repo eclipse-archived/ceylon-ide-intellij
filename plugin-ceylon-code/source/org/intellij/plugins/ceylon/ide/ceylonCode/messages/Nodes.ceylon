@@ -45,7 +45,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-alias Build => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>;
+alias Build => CeylonProjectBuild<out Anything,out Anything,out Anything,out Anything>;
 
 String severityString(Severity severity)
         => switch (severity)
@@ -84,11 +84,10 @@ class FileNode(Project project, VirtualFile file, Severity severity,
     shared actual Collection<out AbstractTreeNode<out Object>> children {
         value nodes = ArrayList<AbstractTreeNode<out Object>>();
         for (message in messages) {
-            if (is Build.SourceFileMessage message) {
-                if (message.severity == severity,
-                    message.file == file) {
-                    nodes.add(ProblemNode(myProject, message));
-                }
+            if (is Build.SourceFileMessage message,
+                message.severity == severity,
+                exists f = message.file, f == file) {
+                nodes.add(ProblemNode(myProject, message));
             }
         }
         return nodes;
@@ -142,8 +141,9 @@ class ProblemNode(Project project, Build.BuildMessage message)
     canNavigateToSource() => canNavigate();
 
     shared actual void navigate(Boolean requestFocus) {
-        if (is Build.SourceFileMessage message) {
-            OpenFileDescriptor(myProject, message.file, message.startLine-1, message.startCol)
+        if (is Build.SourceFileMessage message,
+            is VirtualFile file = message.file) {
+            OpenFileDescriptor(myProject, file, message.startLine-1, message.startCol)
                 .navigate(requestFocus);
         }
     }
@@ -164,8 +164,9 @@ class SummaryNode(Project project, ProblemsModel model, Severity severity)
         value files = HashSet<VirtualFile>();
         for (message in msgs) {
             if (message.severity == severity) {
-                if (is Build.SourceFileMessage message) {
-                    files.add(message.file);
+                if (is Build.SourceFileMessage message,
+                    is VirtualFile file = message.file) {
+                    files.add(file);
                 } else {
                     nodes.add(ProblemNode(myProject, message));
                 }
