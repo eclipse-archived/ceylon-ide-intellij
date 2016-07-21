@@ -79,7 +79,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
     value ceylonDependency = if (is IdeaModule lang = that.languageModule) then lang.artifact else null;
 
-    value processor = object satisfies Processor<PsiClass> {
+    object processor satisfies Processor<PsiClass> {
         String? findName(PsiClass cls) {
             value defaultName = (cls of PsiNamedElement).name;
 
@@ -191,7 +191,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
             return langTrue;
         }
     };
-    value scope = object extends ModuleWithDependenciesScope(mod, ModuleWithDependenciesScope.libraries) {
+    object scope extends ModuleWithDependenciesScope(mod, ModuleWithDependenciesScope.libraries) {
         shared actual Boolean contains(VirtualFile file) {
             if (exists jar = JarFileSystem.instance.getVirtualFileForJar(file)) {
                 // skip inner and internal classes
