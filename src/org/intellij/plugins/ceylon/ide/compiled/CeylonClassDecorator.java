@@ -117,11 +117,17 @@ public class CeylonClassDecorator
                     @Nullable
                     @Override
                     public String getLocationString() {
-                        PsiQualifiedNamedElement container = item.getContainer();
+                        PsiQualifiedNamedElement container = getContainer();
                         if (container != null) {
                             return "(" + container.getQualifiedName() + ")";
                         }
                         return null;
+                    }
+
+                    private PsiQualifiedNamedElement getContainer() {
+                        PsiFile file = item.getContainingFile();
+                        PsiDirectory dir;
+                        return file == null?null:((dir = file.getContainingDirectory()) == null?null:JavaDirectoryService.getInstance().getPackage(dir));
                     }
 
                     @Nullable
