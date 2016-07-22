@@ -173,6 +173,13 @@ public class IdeaCeylonParser extends IStubFileElementType {
                 }
             }
 
+            if (lastToken.get().getStopIndex() < file.getTextLength()) {
+                CommonToken badToken = new CommonToken(lastToken.get().getInputStream(), -2, 0,
+                        lastToken.get().getStopIndex() + 1,
+                        file.getTextLength() - 1);
+                customizedTokens.add(badToken);
+            }
+
             visit(cu);
 
             ASTNode root = parent;
