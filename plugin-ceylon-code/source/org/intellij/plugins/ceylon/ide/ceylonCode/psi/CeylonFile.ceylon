@@ -60,7 +60,8 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
-    ObjectArray
+    ObjectArray,
+    JBoolean=Boolean
 }
 import java.util {
     ArrayList
@@ -76,9 +77,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
 }
+import com.intellij.psi.text {
+    BlockSupport
+}
 
 shared class CeylonFile(FileViewProvider viewProvider)
         extends PsiFileBase(viewProvider, CeylonLanguage.instance) satisfies PsiClassOwner {
+
+    putUserData(BlockSupport.treeDepthLimitExceeded, JBoolean.true);
 
     value compilationUnitPsi {
         value psi = PsiTreeUtil.findChildOfType(this, javaClass<CeylonPsi.CompilationUnitPsi>());
@@ -137,7 +143,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
             return projectPhasedUnit.typeChecker;
         }
 
-        return localAnalysisResult ?. typeChecker;
+        return localAnalysisResult?.typeChecker;
     }
 
     shared LocalAnalysisResult? localAnalysisResult {
@@ -197,15 +203,6 @@ shared class CeylonFile(FileViewProvider viewProvider)
 
     shared actual FileType fileType {
         return CeylonFileType.instance;
-    }
-
-    shared actual T? getUserData<T>(Key<T> key) given T satisfies Object {
-//        if (BlockSupport.treeDepthLimitExceeded.equals(key)) {
-//            // This prevents ReparsedSuccessfullyException from ever being thrown so we can bind AST nodes to Ceylon Spec nodes in CeylonIdeaParser.
-//            //noinspection unchecked
-//            return JBoolean.true;
-//        }
-        return super.getUserData(key);
     }
 
     shared PhasedUnit? upToDatePhasedUnit {
