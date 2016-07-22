@@ -62,7 +62,7 @@ shared class PSIClass(shared PsiClass psi)
     variable String? cacheKey = null;
     
     Boolean hasAnnotation(Annotations annotation)
-        => let (cn = annotation.klazz.canonicalName)
+        => let (cn = annotation.className)
             concurrencyManager.needReadAccess(() =>
             any {
                 if (exists mods = psi.modifierList)
