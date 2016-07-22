@@ -9,10 +9,14 @@ import com.intellij.openapi.util {
     IconLoader
 }
 import com.intellij.psi {
-    PsiModifier
+    PsiModifier,
+    CommonClassNames
 }
 import com.intellij.psi.impl.compiled {
     ClsClassImpl
+}
+import com.intellij.psi.util {
+    InheritanceUtil
 }
 import com.intellij.ui {
     RowIcon,
@@ -44,6 +48,7 @@ import com.redhat.ceylon.model.typechecker.model {
 import javax.swing {
     Icon
 }
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     Annotations
 }
@@ -223,7 +228,8 @@ shared object icons {
     }
 
     function isException(ClsClassImpl cls)
-            => cls.findMethodsByName("printStackTrace", true).size>0;
+            => InheritanceUtil.isInheritor(cls,
+                    CommonClassNames.javaLangThrowable);
 
     shared Icon? forClass(ClsClassImpl cls) {
         Icon? baseIcon;
