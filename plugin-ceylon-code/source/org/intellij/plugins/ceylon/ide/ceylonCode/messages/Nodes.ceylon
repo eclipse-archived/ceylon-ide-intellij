@@ -157,7 +157,7 @@ class SummaryNode(Project project, ProblemsModel model, Severity severity)
         value msgs = model.allMessages;
         value nodes = ArrayList<FileNode|ProblemNode>();
         value files = HashSet<VirtualFile>();
-        for (BuildMessage message in msgs) {
+        for (message in msgs) {
             if (message.severity == severity) {
                 if (is SourceFileMessage message,
                     is VirtualFile file = message.file) {
