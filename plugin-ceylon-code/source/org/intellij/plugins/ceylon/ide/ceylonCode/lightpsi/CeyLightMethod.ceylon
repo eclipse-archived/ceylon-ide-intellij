@@ -39,7 +39,8 @@ import com.intellij.util {
     IncorrectOperationException
 }
 import com.redhat.ceylon.ide.common.model.asjava {
-    DeclarationMirror
+    DeclarationMirror,
+    AbstractMethodMirror
 }
 import com.redhat.ceylon.model.loader.mirror {
     MethodMirror,
@@ -70,7 +71,7 @@ shared class CeyLightMethod(containingClass, mirror, project)
 
     shared actual PsiClass containingClass;
     Project project;
-    MethodMirror mirror;
+    AbstractMethodMirror mirror;
 
     shared actual Declaration declaration {
         if (is DeclarationMirror mirror) {
@@ -137,7 +138,7 @@ shared class CeyLightMethod(containingClass, mirror, project)
 
     docComment => null;
 
-    deprecated => false;
+    deprecated => mirror.decl.deprecated;
 
     hasTypeParameters() => false;
 

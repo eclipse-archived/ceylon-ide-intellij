@@ -51,7 +51,8 @@ import com.redhat.ceylon.ide.common.model {
 }
 import com.redhat.ceylon.ide.common.model.asjava {
     AbstractClassMirror,
-    ceylonToJavaMapper
+    ceylonToJavaMapper,
+    AbstractMethodMirror
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
@@ -260,6 +261,7 @@ shared class CeyLightClass extends LightElement
             if (is PSIMethod meth) {
                 methods.add(meth.psi);
             } else {
+                assert (is AbstractMethodMirror meth);
                 methods.add(CeyLightMethod(this, meth, project));
             }
         }
