@@ -234,26 +234,27 @@ shared object icons {
     shared Icon? forClass(ClsClassImpl cls) {
         Icon? baseIcon;
 
-        function has(String ann) => cls.modifierList.findAnnotation(ann) exists;
+        function has(Annotations ann)
+                => cls.modifierList.findAnnotation(ann.className) exists;
 
-        if (has(Annotations.moduleDescriptor.className)) {
+        if (has(Annotations.moduleDescriptor)) {
             baseIcon = moduleDescriptors;
-        } else if (has(Annotations.packageDescriptor.className)) {
+        } else if (has(Annotations.packageDescriptor)) {
             baseIcon = packageDescriptors;
         } else if (cls.\iinterface) {
             baseIcon = interfaces;
-        } else if (has(Annotations.\iobject.className)) {
+        } else if (has(Annotations.\iobject)) {
             baseIcon = objects;
-        } else if (has(Annotations.method.className)) {
+        } else if (has(Annotations.method)) {
             baseIcon
-                    = if(has(Annotations.annotationInstantiation.className))
+                    = if(has(Annotations.annotationInstantiation))
                     then annotations
                     else methods;
-        } else if (has(Annotations.attribute.className)) {
+        } else if (has(Annotations.attribute)) {
             baseIcon = attributes;
         } else {
             baseIcon
-                    = if (has(Annotations.annotationType.className))
+                    = if (has(Annotations.annotationType))
                     then annotationClasses
                     else if (cls.hasModifierProperty(PsiModifier.abstract))
                     then (isException(cls) then abstractExceptions else abstractClasses)
