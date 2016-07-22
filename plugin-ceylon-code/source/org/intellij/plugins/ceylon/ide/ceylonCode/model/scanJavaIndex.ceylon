@@ -109,6 +109,8 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
             if (cls.\iinterface) {
                 lightModel = Interface();
+                lightModel.deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
+                //TODO type parameters of the interface!
             } else if (modifiers.findAnnotation(Annotations.method.className) exists) {
                 lightModel = object extends Function() {
                     variable Function? lazyRealFunction = langNull;
@@ -125,11 +127,12 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     Function? realFunction => lazyRealFunction else (lazyRealFunction = computeRealClass());
 
                     parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
+
                     shared actual Type? type => realFunction?.type;
                     assign type {}
 
                     annotation = modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
-                    anonymous = annotation;
+                    deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
                 };
             } else {
                 lightModel = object extends Class() {
@@ -147,14 +150,19 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     Class? realClass => lazyRealClass else (lazyRealClass = computeRealClass());
 
                     parameterLists => realClass?.parameterLists else emptyList<ParameterList>();
-                    shared actual JList<TypeParameter> typeParameters => realClass?.typeParameters else emptyList<TypeParameter>();
+
+                    shared actual JList<TypeParameter> typeParameters
+                            => realClass?.typeParameters else emptyList<TypeParameter>();
                     assign typeParameters {}
+
                     type => realClass?.type;
 
                     objectClass = modifiers.findAnnotation(Annotations.\iobject.className) exists;
                     anonymous = objectClass;
                     abstract = modifiers.hasModifierProperty(PsiModifier.abstract);
                     final = modifiers.hasModifierProperty(PsiModifier.final);
+                    annotation = modifiers.findAnnotation(Annotations.annotationType.className) exists;
+                    deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
                 };
             }
 
