@@ -16,8 +16,7 @@ import com.intellij.openapi.\imodule {
     ModuleUtil
 }
 import com.intellij.openapi.util {
-    Computable,
-    Key
+    Computable
 }
 import com.intellij.openapi.vfs {
     VirtualFile
