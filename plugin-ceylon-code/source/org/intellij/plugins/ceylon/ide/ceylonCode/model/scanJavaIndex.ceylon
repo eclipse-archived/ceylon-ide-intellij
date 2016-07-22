@@ -48,7 +48,8 @@ import com.redhat.ceylon.model.typechecker.model {
     Interface,
     Unit,
     Package,
-    Value
+    Value,
+    TypeAlias
 }
 
 import java.io {
@@ -67,6 +68,17 @@ import java.util {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
     classFileDecompilerUtil
+}
+import com.redhat.ceylon.model.loader {
+    AbstractModelLoader {
+        ceylonTypeAliasAnnotation,
+        ceylonContainerAnnotation,
+        ceylonIgnoreAnnotation,
+        ceylonMethodAnnotation,
+        ceylonAnnotationInstantiationAnnotation,
+        ceylonObjectAnnotation,
+        ceylonAttributeAnnotation
+    }
 }
 
 HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit sourceUnit,
@@ -108,8 +120,8 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     return null;
                 }
             }
-            if (modifiers.findAnnotation(Annotations.container.className) exists
-                || modifiers.findAnnotation(Annotations.ignore.className) exists) {
+            if (modifiers.findAnnotation(ceylonContainerAnnotation) exists
+                || modifiers.findAnnotation(ceylonIgnoreAnnotation) exists) {
                 return null;
             }
 
@@ -135,7 +147,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     shared actual Type? type => realIntf?.type;
                 };
 
-            } else if (modifiers.findAnnotation(Annotations.method.className) exists) {
+            } else if (modifiers.findAnnotation(ceylonMethodAnnotation) exists) {
                 lightModel = object extends Function() {
                     variable Function? lazyRealFunction = langNull;
 
@@ -154,10 +166,10 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     shared actual Type? type => realFunction?.type;
                     assign type {}
 
-                    annotation = modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
+                    annotation = modifiers.findAnnotation(ceylonAnnotationInstantiationAnnotation) exists;
                 };
-            } else if (modifiers.findAnnotation(Annotations.\iobject.className) exists
-                        || modifiers.findAnnotation(Annotations.attribute.className) exists) {
+            } else if (modifiers.findAnnotation(ceylonObjectAnnotation) exists
+                        || modifiers.findAnnotation(ceylonAttributeAnnotation) exists) {
                 lightModel = object extends Value() {
                     variable Value? lazyRealValue = langNull;
 
@@ -173,8 +185,23 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     shared actual Type? type => realValue ?. type;
                     assign type {}
                 };
-            } else if (modifiers.findAnnotation("com.redhat.ceylon.compiler.java.metadata.TypeAlias") exists) {
-                return null; // TODO map to a TypeAlias
+            } else if (modifiers.findAnnotation(ceylonTypeAliasAnnotation) exists) {
+                lightModel = object extends TypeAlias() {
+                    variable TypeAlias? lazyRealAlias = langNull;
+
+                    TypeAlias? computeRealAlias() {
+                        if (is TypeAlias decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                            return decl;
+                        }
+                        return langNull;
+                    }
+
+                    TypeAlias? realAlias => lazyRealAlias else (lazyRealAlias = computeRealAlias());
+
+                    shared actual JList<TypeParameter> typeParameters
+                            => realAlias?.typeParameters else emptyList<TypeParameter>();
+                    assign typeParameters {}
+                };
             } else {
                 lightModel = object extends Class() {
                     variable Class? lazyRealClass = langNull;
