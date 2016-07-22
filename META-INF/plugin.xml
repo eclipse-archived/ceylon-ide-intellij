@@ -140,7 +140,7 @@
         <liveTemplateContext implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplateContext"/>
         <!--<codeInsight.template.postfixTemplateProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.templates.CeylonPostfixTemplateProvider"/>-->
 
-        <psi.classFileDecompiler implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler"/>
+        <psi.classFileDecompiler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.compiled.CeylonDecompiler"/>
         <psi.clsCustomNavigationPolicy implementation="org.intellij.plugins.ceylon.ide.ceylonCode.compiled.CeylonClsNavigationPolicy"/>
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes"/>
         <stubIndex implementation="org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.ClassIndex"/>
@@ -153,9 +153,9 @@
         <codeInsight.typeInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonExpressionTypeProvider"/>
         <codeInsight.gotoSuper language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.navigation.CeylonGotoSuperHandler"/>
 
-        <projectViewNodeDecorator implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonClassDecorator"/>
+        <projectViewNodeDecorator implementation="org.intellij.plugins.ceylon.ide.ceylonCode.compiled.CeylonClassDecorator"/>
         <itemPresentationProvider forClass="com.intellij.psi.impl.compiled.ClsClassImpl" order="first"
-                                  implementationClass="org.intellij.plugins.ceylon.ide.compiled.CeylonClassDecorator"/>
+                                  implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.compiled.CeylonClassDecorator"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass"
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.presentation.ClassPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner"

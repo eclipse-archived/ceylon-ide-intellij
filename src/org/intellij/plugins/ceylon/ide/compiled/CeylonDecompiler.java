@@ -1,3 +1,4 @@
+/*
 package org.intellij.plugins.ceylon.ide.compiled;
 
 import com.intellij.ide.highlighter.JavaClassFileType;
@@ -11,10 +12,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+*/
 /**
  * This decompiler tries to determine if a class was compiled by the Ceylon compiler.
  * It will also ignore "internal" classes ($impl, anonymous classes etc).
- */
+ *//*
+
 public class CeylonDecompiler extends ClassFileDecompilers.Full {
 
     private CeylonClsStubBuilder stubBuilder = new CeylonClsStubBuilder();
@@ -41,3 +44,4 @@ public class CeylonDecompiler extends ClassFileDecompilers.Full {
         return classFileDecompilerUtil_.get_().isCeylonCompiledFile(file);
     }
 }
+*/

@@ -1,5 +1,3 @@
-
-
 shared class Annotations {
     
     shared actual String string;
@@ -61,4 +59,8 @@ shared class Annotations {
     shared
     new moduleDescriptor extends create("moduleDescriptor",
         "com.redhat.ceylon.compiler.java.metadata.Module") {}
+
+    shared
+    new name extends create("name",
+        "com.redhat.ceylon.compiler.java.metadata.Name") {}
 }

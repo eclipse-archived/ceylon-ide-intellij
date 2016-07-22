@@ -1,3 +1,4 @@
+/*
 package org.intellij.plugins.ceylon.ide.compiled;
 
 import com.intellij.openapi.components.ServiceManager;
@@ -93,4 +94,4 @@ class CeylonClsFile extends ClsFileImpl {
         }
         return super.getNavigationElement();
     }
-}
+}*/

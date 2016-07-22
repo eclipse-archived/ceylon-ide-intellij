@@ -1,3 +1,4 @@
+/*
 package org.intellij.plugins.ceylon.ide.compiled;
 
 import com.intellij.ide.projectView.PresentationData;
@@ -23,9 +24,11 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.lang.Class;
 
+*/
 /**
  * Decorates nodes in the Project View and other declarations that represent a compiled Ceylon class.
- */
+ *//*
+
 public class CeylonClassDecorator
         implements ProjectViewNodeDecorator, ItemPresentationProvider<ClsClassImpl> {
 
@@ -137,3 +140,4 @@ public class CeylonClassDecorator
         return new ClassPresentationProvider().getPresentation(item);
     }
 }
+*/

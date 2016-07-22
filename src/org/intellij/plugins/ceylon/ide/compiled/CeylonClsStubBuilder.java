@@ -1,3 +1,4 @@
+/*
 package org.intellij.plugins.ceylon.ide.compiled;
 
 import com.intellij.openapi.vfs.VirtualFile;
@@ -85,3 +86,4 @@ class CeylonClsStubBuilder extends ClsStubBuilder {
         }
     };
 }
+*/
