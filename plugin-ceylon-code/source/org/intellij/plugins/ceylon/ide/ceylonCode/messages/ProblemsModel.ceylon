@@ -14,16 +14,17 @@ class ProblemsModel() {
     value problemsByProject = HashMap<IdeaCeylonProject, Problems>();
 
     class Problems(project, frontendMessages, backendMessages, projectMessages) {
+
         IdeaCeylonProject project;
+
         {SourceMsg*}? frontendMessages;
         {SourceMsg*}? backendMessages;
         {ProjectMsg*}? projectMessages;
 
         shared Integer count(Severity s)
             => [frontendMessages, backendMessages, projectMessages].coalesced.fold(0)(
-                (Integer initial, {BuildMsg*} messages)
-                        => initial + messages.count((msg) => msg.severity == s)
-            );
+                (initial, messages)
+                        => initial + messages.count((msg) => msg.severity == s));
 
         shared Integer countWarnings() => count(Severity.warning);
 
@@ -36,7 +37,12 @@ class ProblemsModel() {
     shared void updateProblems(IdeaCeylonProject project, {SourceMsg*}? frontendMessages,
         {SourceMsg*}? backendMessages, {ProjectMsg*}? projectMessages) {
 
-        problemsByProject.put(project, Problems(project, frontendMessages, backendMessages, projectMessages));
+        problemsByProject.put(project, Problems {
+            project = project;
+            frontendMessages = frontendMessages;
+            backendMessages = backendMessages;
+            projectMessages = projectMessages;
+        });
     }
 
     shared Integer count(Severity s)

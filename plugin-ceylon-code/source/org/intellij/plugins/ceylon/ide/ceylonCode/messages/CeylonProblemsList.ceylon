@@ -51,7 +51,8 @@ shared alias BuildMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,Virtu
 shared alias SourceMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.SourceFileMessage;
 shared alias ProjectMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.ProjectMessage;
 
-class CeylonProblemsList(Project project) extends SimpleToolWindowPanel(false, true) {
+class CeylonProblemsList(Project project)
+        extends SimpleToolWindowPanel(false, true) {
 
     value myTree = JTree();
     late ProblemsModel model;
