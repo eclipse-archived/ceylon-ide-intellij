@@ -155,7 +155,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
         if (exists la = localAnalyzer,
             exists result = la.result) {
 
-            if (result.parsedRootNode == attachedCompilationUnit) {
+            if (result.parsedRootNode === attachedCompilationUnit) {
                 return result;
             } else {
                 platformUtils.log(Status._WARNING, "LocalAnalysisResult.parsedRootNode !== ceylonFile.compilationUnit ");
@@ -168,7 +168,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
         if (exists phasedUnit,
             phasedUnit.refinementValidated) {
 
-            if (phasedUnit.compilationUnit == attachedCompilationUnit) {
+            if (phasedUnit.compilationUnit === attachedCompilationUnit) {
                 return object satisfies LocalAnalysisResult {
 
                     typecheckedRootNode => attachedCompilationUnit;

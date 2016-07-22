@@ -11,11 +11,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.ide.common.model.CeylonProjectBuild;
 import com.redhat.ceylon.ide.common.vfs.FileVirtualFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing.ProgressIndicatorMonitor;
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.vfs.VirtualFileVirtualFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class CeylonBuilder implements CompileTask {
 
@@ -36,25 +38,30 @@ public class CeylonBuilder implements CompileTask {
                 final IdeaCeylonProject project = (IdeaCeylonProject) projects.getProject(mod);
 
                 if (project != null && project.getCompileToJava()) {
-                    ProgressIndicatorMonitor monitor = new ProgressIndicatorMonitor(
+                    final ProgressIndicatorMonitor monitor = new ProgressIndicatorMonitor(
                             ProgressIndicatorMonitor.wrap_,
                             compileContext.getProgressIndicator()
                     );
 
-                    project.getBuild().performBuild(monitor);
-
-                    if (ceylonSettings_.get_().getUseOutProcessBuild()) {
-                        project.getBuild().performBinaryGeneration(monitor, project.getBuild().new BinaryGenerator() {
-                            @Override
-                            public boolean build(CeylonProjectBuild<Module, VirtualFile, VirtualFile, VirtualFile> build,
-                                                 Set<? extends FileVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile>> files) {
-                                registerFilesToCompile(compileContext.getProject(), files);
-                                return true;
+                    return (Boolean)ConcurrencyManagerForJava.withUpToDateIndexes(new Callable<Object>() {
+                        @Override
+                        public Object call() throws Exception {
+                            project.getBuild().performBuild(monitor);
+                            if (ceylonSettings_.get_().getUseOutProcessBuild()) {
+                                project.getBuild().performBinaryGeneration(monitor, project.getBuild().new BinaryGenerator() {
+                                    @Override
+                                    public boolean build(CeylonProjectBuild<Module, VirtualFile, VirtualFile, VirtualFile> build,
+                                                         Set<? extends FileVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile>> files) {
+                                        registerFilesToCompile(compileContext.getProject(), files);
+                                        return true;
+                                    }
+                                });
+                            } else {
+                                // TODO default binary generation
                             }
-                        });
-                    } else {
-                        // TODO default binary generation
-                    }
+                            return Boolean.TRUE;
+                        }
+                    });
                 }
             }
         }

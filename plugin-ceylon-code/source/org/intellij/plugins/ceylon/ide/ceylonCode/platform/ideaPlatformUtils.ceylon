@@ -15,6 +15,12 @@ import com.intellij.openapi.progress {
 import ceylon.interop.java {
     javaClassFromInstance
 }
+import com.intellij.openapi.project {
+    IndexNotReadyException
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    ConcurrencyError
+}
 
 shared object ideaPlatformUtils satisfies IdeUtils {
     
@@ -38,12 +44,16 @@ shared object ideaPlatformUtils satisfies IdeUtils {
             logger.warn(message, e);
         }
     }
-    
+
     newOperationCanceledException(String message) => ProcessCanceledException(OperationCanceledException(message));
-    
+
+
     isOperationCanceledException(Exception exception)
             => exception is ProcessCanceledException;
-    
+
+    isExceptionToPropagateInVisitors(Exception exception)
+            => exception is IndexNotReadyException | ConcurrencyError;
+
     class OperationCanceledException(String message)
             extends RuntimeException(message) {
     }

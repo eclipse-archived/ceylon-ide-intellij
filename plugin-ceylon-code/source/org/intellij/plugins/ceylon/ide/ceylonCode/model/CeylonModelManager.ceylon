@@ -56,7 +56,8 @@ import com.intellij.openapi.progress {
 import com.intellij.openapi.project {
     ProjectCoreUtil {
         isProjectOrWorkspaceFile
-    }
+    },
+    DumbService
 }
 import com.intellij.openapi.roots {
     ProjectRootManager {
@@ -338,6 +339,7 @@ shared class CeylonModelManager(model)
                         }
                     }
                     
+                    DumbService.getInstance(model.ideaProject).waitForSmartMode();
                     value bakgroundBuildLatch = CountDownLatch(1);
                     application.invokeAndWait(JavaRunnable {
                         run() => progressManager.run(object extends Backgroundable(

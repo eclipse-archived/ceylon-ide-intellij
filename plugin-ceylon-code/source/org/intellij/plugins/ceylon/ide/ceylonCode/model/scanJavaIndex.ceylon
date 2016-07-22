@@ -47,7 +47,8 @@ import com.redhat.ceylon.model.typechecker.model {
     ParameterList,
     Interface,
     Unit,
-    Package
+    Package,
+    Value
 }
 
 import java.io {
@@ -95,6 +96,9 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
 
         function findOrCreateDeclaration(PsiClass cls, PsiModifierList modifiers, Package pkg) {
 
+            if (!pkg.shared) {
+                return null;
+            }
             if (exists qName = cls.qualifiedName) {
                 value imported = CeylonIterable(sourceUnit.imports).find(
                     (imp) => getJavaQualifiedName(imp.declaration) == qName
@@ -104,27 +108,46 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     return null;
                 }
             }
+            if (modifiers.findAnnotation(Annotations.container.className) exists
+                || modifiers.findAnnotation(Annotations.ignore.className) exists) {
+                return null;
+            }
 
+            value clsName = findName(cls);
             Declaration lightModel;
 
             if (cls.\iinterface) {
-                lightModel = Interface();
-                lightModel.deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
-                //TODO type parameters of the interface!
-            } else if (modifiers.findAnnotation(Annotations.method.className) exists) {
-                lightModel = object extends Function() {
-                    variable Function? lazyRealFunction = langNull;
+                lightModel = object extends Interface() {
+                    variable Interface? lazyRealIntf = langNull;
 
-                    Function? computeRealClass() {
-                        if (is Function decl = pkg.getMember((cls of PsiNamedElement).name, emptyList<Type>(), langFalse)) {
-
+                    Interface? computeRealIntf() {
+                        if (is Interface decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
                             return decl;
                         }
 
                         return langNull;
                     }
 
-                    Function? realFunction => lazyRealFunction else (lazyRealFunction = computeRealClass());
+                    Interface? realIntf => lazyRealIntf else (lazyRealIntf = computeRealIntf());
+
+                    shared actual JList<TypeParameter> typeParameters => realIntf?.typeParameters else emptyList<TypeParameter>();
+                    assign typeParameters {}
+                    shared actual Type? type => realIntf?.type;
+                };
+
+            } else if (modifiers.findAnnotation(Annotations.method.className) exists) {
+                lightModel = object extends Function() {
+                    variable Function? lazyRealFunction = langNull;
+
+                    Function? computeRealFunction() {
+                        if (is Function decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                            return decl;
+                        }
+
+                        return langNull;
+                    }
+
+                    Function? realFunction => lazyRealFunction else (lazyRealFunction = computeRealFunction());
 
                     parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
 
@@ -132,18 +155,38 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     assign type {}
 
                     annotation = modifiers.findAnnotation(Annotations.annotationInstantiation.className) exists;
-                    deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
                 };
+            } else if (modifiers.findAnnotation(Annotations.\iobject.className) exists
+                        || modifiers.findAnnotation(Annotations.attribute.className) exists) {
+                lightModel = object extends Value() {
+                    variable Value? lazyRealValue = langNull;
+
+                    Value? computeRealValue() {
+                        if (is Value decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                            return decl;
+                        }
+                        return langNull;
+                    }
+
+                    Value? realValue => lazyRealValue else (lazyRealValue =computeRealValue());
+
+                    shared actual Type? type => realValue ?. type;
+                    assign type {}
+                };
+            } else if (modifiers.findAnnotation("com.redhat.ceylon.compiler.java.metadata.TypeAlias") exists) {
+                return null; // TODO map to a TypeAlias
             } else {
                 lightModel = object extends Class() {
                     variable Class? lazyRealClass = langNull;
 
                     Class? computeRealClass() {
-                        if (is Class decl = pkg.getMember((cls of PsiNamedElement).name, emptyList<Type>(), langFalse)) {
-
-                            return decl;
+                        if (exists decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                            if (is Class decl) {
+                                return decl;
+                            } else {
+                                print("Expected member of type Class but was ``className(decl)``");
+                            }
                         }
-
                         return langNull;
                     }
 
@@ -155,20 +198,17 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                             => realClass?.typeParameters else emptyList<TypeParameter>();
                     assign typeParameters {}
 
-                    type => realClass?.type;
+                    shared actual Type? type => realClass?.type;
 
-                    objectClass = modifiers.findAnnotation(Annotations.\iobject.className) exists;
-                    anonymous = objectClass;
                     abstract = modifiers.hasModifierProperty(PsiModifier.abstract);
                     final = modifiers.hasModifierProperty(PsiModifier.final);
                     annotation = modifiers.findAnnotation(Annotations.annotationType.className) exists;
-                    deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
                 };
             }
 
-            lightModel.name = findName(cls);
+            lightModel.name = clsName;
             lightModel.container = pkg;
-            lightModel.deprecated = cls.deprecated;
+            lightModel.deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
 
             value unit = Unit();
             unit.\ipackage = pkg;

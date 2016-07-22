@@ -189,6 +189,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
             logger.debug(()=>"Typechecking task `` taskId `` selected by the Alarm as the running Request");
             localTypecheckingAlarm.cancelAllRequests();
             if (backgroundAnalysisDisabled) {
+                taskSubmittedWhileBackgroundTypecheckingWasDisabled = typecheckingTask;
                 logger.debug(()=>"Background Analysis is disabled, don't run the typechecking task `` taskId ``");
                 return;
             }
