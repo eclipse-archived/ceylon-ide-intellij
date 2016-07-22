@@ -24,7 +24,8 @@ import com.intellij.ui {
     SimpleTextAttributes
 }
 import com.redhat.ceylon.ide.common.model {
-    Severity
+    Severity,
+    CeylonProjectBuild
 }
 
 import java.util {
@@ -57,6 +58,9 @@ void setSeverityIcon(Severity severity, PresentationData presentation) {
     }
 }
 
+alias BuildMessage => CeylonProjectBuild<out Anything,out Anything,out Anything,out Anything>.BuildMessage;
+alias SourceFileMessage => CeylonProjectBuild<out Anything,out Anything,out Anything,out Anything>.SourceFileMessage;
+
 class ProblemsRootNode(Project project, ProblemsModel model)
         extends AbstractTreeNode<Object>(project, true) {
 
@@ -70,15 +74,15 @@ class ProblemsRootNode(Project project, ProblemsModel model)
 }
 
 class FileNode(Project project, VirtualFile file, Severity severity,
-            {BuildMsg*} messages)
-        extends AbstractTreeNode<Object>(project, file.path) {
+            {BuildMessage*} messages)
+        extends AbstractTreeNode<String>(project, file.path) {
 
     shared actual value children {
-        value nodes = ArrayList<AbstractTreeNode<out Object>>();
+        value nodes = ArrayList<ProblemNode>();
         for (message in messages) {
-            if (is SourceMsg message,
-                message.severity == severity,
-                message.file == file) {
+            if (message.severity == severity,
+                is SourceFileMessage message,
+                exists f = message.file, f == file) {
                 nodes.add(ProblemNode(myProject, message));
             }
         }
@@ -107,15 +111,15 @@ class FileNode(Project project, VirtualFile file, Severity severity,
 
 }
 
-class ProblemNode(Project project, BuildMsg message)
-        extends AbstractTreeNode<BuildMsg>(project, message) {
+class ProblemNode(Project project, BuildMessage message)
+        extends AbstractTreeNode<BuildMessage>(project, message) {
 
     children => Collections.emptyList();
 
     shared actual void update(PresentationData presentation) {
         setSeverityIcon(message.severity, presentation);
 
-        if (is SourceMsg message) {
+        if (is SourceFileMessage message) {
             presentation.addText(message.startLine.string + " ",
                     SimpleTextAttributes.grayedAttributes);
             highlighter.highlightPresentationData {
@@ -127,13 +131,14 @@ class ProblemNode(Project project, BuildMsg message)
         presentation.presentableText = message.message;
     }
 
-    canNavigate() => message is SourceMsg;
+    canNavigate() => message is SourceFileMessage;
 
     canNavigateToSource() => canNavigate();
 
     shared actual void navigate(Boolean requestFocus) {
-        if (is SourceMsg message) {
-            OpenFileDescriptor(myProject, message.file, message.startLine-1, message.startCol)
+        if (is SourceFileMessage message,
+            is VirtualFile file = message.file) {
+            OpenFileDescriptor(myProject, file, message.startLine-1, message.startCol)
                 .navigate(requestFocus);
         }
     }
@@ -150,12 +155,13 @@ class SummaryNode(Project project, ProblemsModel model, Severity severity)
 
     shared actual value children {
         value msgs = model.allMessages;
-        value nodes = ArrayList<AbstractTreeNode<out Object>>();
+        value nodes = ArrayList<FileNode|ProblemNode>();
         value files = HashSet<VirtualFile>();
-        for (message in msgs) {
+        for (BuildMessage message in msgs) {
             if (message.severity == severity) {
-                if (is SourceMsg message) {
-                    files.add(message.file);
+                if (is SourceFileMessage message,
+                    is VirtualFile file = message.file) {
+                    files.add(file);
                 } else {
                     nodes.add(ProblemNode(myProject, message));
                 }
