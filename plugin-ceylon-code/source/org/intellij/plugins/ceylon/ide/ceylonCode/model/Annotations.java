@@ -13,13 +13,16 @@ public enum Annotations {
             return "ceylon.language.AnnotationAnnotation.annotation$";
         }
     },
+    clazz(com.redhat.ceylon.compiler.java.metadata.Class.class),
     object(com.redhat.ceylon.compiler.java.metadata.Object.class),
     method(com.redhat.ceylon.compiler.java.metadata.Method.class),
     container(com.redhat.ceylon.compiler.java.metadata.Container.class),
     localContainer(com.redhat.ceylon.compiler.java.metadata.LocalContainer.class),
     ceylon(com.redhat.ceylon.compiler.java.metadata.Ceylon.class),
     ignore(com.redhat.ceylon.compiler.java.metadata.Ignore.class),
-    deprecated(java.lang.Deprecated.class);
+    deprecated(java.lang.Deprecated.class),
+    packageDescriptor(com.redhat.ceylon.compiler.java.metadata.Package.class),
+    moduleDescriptor(com.redhat.ceylon.compiler.java.metadata.Module.class);
 
     final Class<?> klazz;
 

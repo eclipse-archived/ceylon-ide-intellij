@@ -57,19 +57,22 @@ public class CeylonClassDecorator
 
     @Nullable
     private String getPresentableText(ClsClassImpl clsClass) {
-        if (is(clsClass, Module.class)) {
-            return "module.ceylon";
-        } else if (is(clsClass, Package.class)) {
-            return "package.ceylon";
-        } else if (is(clsClass, Method.class)) {
-            String text = clsClass.getName();
-            return text.substring(0, text.length() - 1);
-        } else if (is(clsClass, Object.class)) {
-            return getName(clsClass);
-        } else if (is(clsClass, Attribute.class)) {
-            return getName(clsClass);
+        if (is(clsClass, Ceylon.class)) {
+            if (is(clsClass, Module.class)) {
+                return "module.ceylon";
+            } else if (is(clsClass, Package.class)) {
+                return "package.ceylon";
+            } else if (is(clsClass, Method.class)) {
+                String text = clsClass.getName();
+                return text.substring(0, text.length() - 1);
+            } else if (is(clsClass, Object.class)) {
+                return getName(clsClass);
+            } else if (is(clsClass, Attribute.class)) {
+                return getName(clsClass);
+            } else {
+                return getName(clsClass);
+            }
         }
-
         return null;
     }
 

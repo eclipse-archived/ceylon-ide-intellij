@@ -44,6 +44,9 @@ import com.redhat.ceylon.model.typechecker.model {
 import javax.swing {
     Icon
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    Annotations
+}
 
 shared object icons {
     
@@ -219,25 +222,36 @@ shared object icons {
         }
     }
 
+    function isException(ClsClassImpl cls)
+            => cls.findMethodsByName("printStackTrace", true).size>0;
+
     shared Icon? forClass(ClsClassImpl cls) {
         Icon? baseIcon;
 
         function has(String ann) => cls.modifierList.findAnnotation(ann) exists;
 
-        if (has("com.redhat.ceylon.compiler.java.metadata.Module")) {
+        if (has(Annotations.moduleDescriptor.className)) {
             baseIcon = moduleDescriptors;
-        } else if (has("com.redhat.ceylon.compiler.java.metadata.Package")) {
+        } else if (has(Annotations.packageDescriptor.className)) {
             baseIcon = packageDescriptors;
-        } else if (has("com.redhat.ceylon.compiler.java.metadata.Method")) {
-            baseIcon = methods;
-        } else if (has("com.redhat.ceylon.compiler.java.metadata.Object")) {
-            baseIcon = objects;
-        } else if (has("com.redhat.ceylon.compiler.java.metadata.Attribute")) {
-            baseIcon = attributes;
         } else if (cls.\iinterface) {
             baseIcon = interfaces;
+        } else if (has(Annotations.\iobject.className)) {
+            baseIcon = objects;
+        } else if (has(Annotations.method.className)) {
+            baseIcon
+                    = if(has(Annotations.annotationInstantiation.className))
+                    then annotations
+                    else methods;
+        } else if (has(Annotations.attribute.className)) {
+            baseIcon = attributes;
         } else {
-            baseIcon = classes;
+            baseIcon
+                    = if (has(Annotations.annotationType.className))
+                    then annotationClasses
+                    else if (cls.hasModifierProperty(PsiModifier.abstract))
+                    then (isException(cls) then abstractExceptions else abstractClasses)
+                    else (isException(cls) then exceptions else classes);
         }
 
         if (exists baseIcon) {
