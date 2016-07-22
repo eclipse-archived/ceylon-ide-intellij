@@ -39,16 +39,11 @@ import com.intellij.util {
     IncorrectOperationException
 }
 import com.redhat.ceylon.ide.common.model.asjava {
-    DeclarationMirror,
     AbstractMethodMirror
 }
 import com.redhat.ceylon.model.loader.mirror {
-    MethodMirror,
     TypeMirror,
     TypeKind
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Declaration
 }
 
 import java.lang {
@@ -73,13 +68,7 @@ shared class CeyLightMethod(containingClass, mirror, project)
     Project project;
     AbstractMethodMirror mirror;
 
-    shared actual Declaration declaration {
-        if (is DeclarationMirror mirror) {
-            return mirror.declaration;
-        }
-
-        throw Exception("Unsupported mirror of type ``className(mirror)``");
-    }
+    declaration => mirror.declaration;
 
     returnType => mirror.declaredVoid then PsiType.\ivoid else toPsiType(mirror.returnType);
 
@@ -110,13 +99,9 @@ shared class CeyLightMethod(containingClass, mirror, project)
 
     shared actual ObjectArray<PsiMethod> findSuperMethods() => PsiMethod.emptyArray;
 
-    shared actual ObjectArray<PsiMethod> findSuperMethods(Boolean checkAccess) {
-        return PsiMethod.emptyArray;
-    }
+    shared actual ObjectArray<PsiMethod> findSuperMethods(Boolean checkAccess) => PsiMethod.emptyArray;
 
-    shared actual ObjectArray<PsiMethod> findSuperMethods(PsiClass parentClass) {
-        return PsiMethod.emptyArray;
-    }
+    shared actual ObjectArray<PsiMethod> findSuperMethods(PsiClass parentClass) => PsiMethod.emptyArray;
 
     findSuperMethodSignaturesIncludingStatic(Boolean checkAccess)
             => Collections.emptyList<MethodSignatureBackedByPsiMethod>();

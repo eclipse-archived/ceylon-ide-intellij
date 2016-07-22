@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    createJavaObjectArray,
-    CeylonIterable
+    createJavaObjectArray
 }
 
 import com.intellij.openapi.project {
@@ -47,7 +46,8 @@ import com.intellij.util {
 }
 import com.redhat.ceylon.ide.common.model.asjava {
     ceylonToJavaMapper,
-    JToplevelFunctionMirror
+    JToplevelFunctionMirror,
+    AbstractMethodMirror
 }
 import com.redhat.ceylon.model.typechecker.model {
     Function
@@ -176,10 +176,11 @@ class CeyLightToplevelFunction(declaration, project)
     variable ObjectArray<PsiMethod>? lazyMethods = null;
 
     allMethods
-            => lazyMethods else (lazyMethods = createJavaObjectArray(
-                    CeylonIterable(mirror.directMethods)
-                        .map((m) => CeyLightMethod(this, m, project))
-                ));
+            => lazyMethods else (lazyMethods = createJavaObjectArray {
+            for (m in mirror.directMethods)
+            if (is AbstractMethodMirror m)
+            CeyLightMethod(this, m, project)
+    });
 
     methods => allMethods;
 
