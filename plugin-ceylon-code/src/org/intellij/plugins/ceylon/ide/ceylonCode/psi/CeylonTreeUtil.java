@@ -50,7 +50,7 @@ public class CeylonTreeUtil {
                 }
                 if (candidateCeylonNode == ceylonNode) {
                     return candidate;
-                } else if (candidateCeylonNode.getClass() == ceylonNode.getClass()
+                } else if (candidateCeylonNode !=null && candidateCeylonNode.getClass() == ceylonNode.getClass()
                         && Objects.equals(candidateCeylonNode.getStartIndex(), ceylonNode.getStartIndex())
                         && Objects.equals(candidateCeylonNode.getEndIndex(), ceylonNode.getEndIndex())) {
                     // TODO if this file has never been opened in the editor, the compilation
