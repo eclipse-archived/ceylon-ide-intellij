@@ -64,11 +64,8 @@ shared class IdeaModule(
         return super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
     }
 
-    shared actual void encloseOnTheFlyTypechecking(void typechecking()) {
-        concurrencyManager.withUpToDateIndexes(() {
-            typechecking();
-        });
-    }
+    encloseOnTheFlyTypechecking(void typechecking())
+            => concurrencyManager.withUpToDateIndexes(typechecking);
 
     shared actual Set<String> listPackages() {
         value name = nameAsString;
