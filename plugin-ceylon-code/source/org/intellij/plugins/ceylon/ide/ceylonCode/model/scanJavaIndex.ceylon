@@ -85,12 +85,16 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
     IdeaModuleManager moduleManager, Module mod, String startingWith, Integer proximity) {
 
     value result = HashMap<JString,DeclarationWithProximity>();
-    value allDependencies = that.transitiveDependencies
-        .narrow<IdeaModule>()
-        .map((dep) => dep.artifact)
-        .coalesced;
+    value allDependencies
+            = that.transitiveDependencies
+            .narrow<IdeaModule>()
+            .map((dep) => dep.artifact)
+            .coalesced;
 
-    value ceylonDependency = if (is IdeaModule lang = that.languageModule) then lang.artifact else null;
+    value ceylonDependency
+            = if (is IdeaModule lang = that.languageModule)
+            then lang.artifact
+            else null;
 
     object processor satisfies Processor<PsiClass> {
         String? findName(PsiClass cls) {
@@ -100,7 +104,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 defaultName.endsWith("_"),
                 classFileDecompilerUtil.isCeylonCompiledFile(cls.containingFile.virtualFile)) {
 
-                return defaultName.spanTo(defaultName.size - 2);
+                return defaultName.removeTerminal("_");
             }
 
             return defaultName;
@@ -112,12 +116,10 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 return null;
             }
             if (exists qName = cls.qualifiedName) {
-                value imported = CeylonIterable(sourceUnit.imports).find(
-                    (imp) => getJavaQualifiedName(imp.declaration) == qName
-                );
-
-                if (exists imported) {
-                    return null;
+                for (imp in sourceUnit.imports) {
+                    if (getJavaQualifiedName(imp.declaration) == qName) {
+                        return null;
+                    }
                 }
             }
             if (modifiers.findAnnotation(ceylonContainerAnnotation) exists
@@ -132,7 +134,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 lightModel = object extends Interface() {
                     variable Interface? lazyRealIntf = langNull;
 
-                    Interface? computeRealIntf() {
+                    function computeRealIntf() {
                         if (is Interface decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
                             return decl;
                         }
@@ -140,9 +142,10 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                         return langNull;
                     }
 
-                    Interface? realIntf => lazyRealIntf else (lazyRealIntf = computeRealIntf());
+                    value realIntf => lazyRealIntf else (lazyRealIntf = computeRealIntf());
 
-                    shared actual JList<TypeParameter> typeParameters => realIntf?.typeParameters else emptyList<TypeParameter>();
+                    shared actual JList<TypeParameter> typeParameters
+                            => realIntf?.typeParameters else emptyList<TypeParameter>();
                     assign typeParameters {}
                     shared actual Type? type => realIntf?.type;
                 };
@@ -151,7 +154,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 lightModel = object extends Function() {
                     variable Function? lazyRealFunction = langNull;
 
-                    Function? computeRealFunction() {
+                    function computeRealFunction() {
                         if (is Function decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
                             return decl;
                         }
@@ -159,7 +162,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                         return langNull;
                     }
 
-                    Function? realFunction => lazyRealFunction else (lazyRealFunction = computeRealFunction());
+                    value realFunction => lazyRealFunction else (lazyRealFunction = computeRealFunction());
 
                     parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
 
@@ -173,14 +176,14 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 lightModel = object extends Value() {
                     variable Value? lazyRealValue = langNull;
 
-                    Value? computeRealValue() {
+                    function computeRealValue() {
                         if (is Value decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
                             return decl;
                         }
                         return langNull;
                     }
 
-                    Value? realValue => lazyRealValue else (lazyRealValue =computeRealValue());
+                    value realValue => lazyRealValue else (lazyRealValue =computeRealValue());
 
                     shared actual Type? type => realValue ?. type;
                     assign type {}
@@ -189,14 +192,16 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 lightModel = object extends TypeAlias() {
                     variable TypeAlias? lazyRealAlias = langNull;
 
-                    TypeAlias? computeRealAlias() {
-                        if (is TypeAlias decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                    function computeRealAlias() {
+                        if (is TypeAlias decl
+                                = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
                             return decl;
                         }
                         return langNull;
                     }
 
-                    TypeAlias? realAlias => lazyRealAlias else (lazyRealAlias = computeRealAlias());
+                    value realAlias
+                            => lazyRealAlias else (lazyRealAlias = computeRealAlias());
 
                     shared actual JList<TypeParameter> typeParameters
                             => realAlias?.typeParameters else emptyList<TypeParameter>();
@@ -206,8 +211,9 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 lightModel = object extends Class() {
                     variable Class? lazyRealClass = langNull;
 
-                    Class? computeRealClass() {
-                        if (exists decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                    function computeRealClass() {
+                        if (exists decl
+                                = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
                             if (is Class decl) {
                                 return decl;
                             } else {
@@ -217,7 +223,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                         return langNull;
                     }
 
-                    Class? realClass => lazyRealClass else (lazyRealClass = computeRealClass());
+                    value realClass => lazyRealClass else (lazyRealClass = computeRealClass());
 
                     parameterLists => realClass?.parameterLists else emptyList<ParameterList>();
 
@@ -250,18 +256,12 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
             if (exists modifiers = cls.modifierList,
                 modifiers.hasExplicitModifier(PsiModifier.public),
                 is PsiClassOwner file = cls.containingFile,
-                exists pkg = moduleManager.modelLoader.findPackage(file.packageName)) {
-
-                value lightModel = findOrCreateDeclaration(cls, modifiers, pkg);
-
-                if (exists lightModel,
-                    exists qname = cls.qualifiedName) {
-
-                    value langPackage = pkg.languagePackage;
-                    value prox = that.getProximity(proximity, langPackage, lightModel.name);
-                    value dwp = DeclarationWithProximity(lightModel of Declaration, prox);
-                    result.put(javaString(qname), dwp);
-                }
+                exists pkg = moduleManager.modelLoader.findPackage(file.packageName),
+                exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
+                exists qname = cls.qualifiedName) {
+                value prox = that.getProximity(proximity, pkg.languagePackage, lightModel.name);
+                value dwp = DeclarationWithProximity(lightModel of Declaration, prox);
+                result.put(javaString(qname), dwp);
             }
             return langTrue;
         }
@@ -270,7 +270,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
         shared actual Boolean contains(VirtualFile file) {
             if (exists jar = JarFileSystem.instance.getVirtualFileForJar(file)) {
                 // skip inner and internal classes
-                if (file.name.contains('$')) {
+                if ('$' in file.name) {
                     return false;
                 }
 
@@ -286,7 +286,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                 }
 
                 // accept dependencies of the current module
-                if (allDependencies.contains(jarFile)) {
+                if (jarFile in allDependencies) {
                     return true;
                 }
 
@@ -296,7 +296,7 @@ HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit so
                     value entryPath = file.path.spanFrom(sep + JarFileSystem.jarSeparator.size);
 
                     if (exists sep2 = entryPath.lastIndexWhere('/'.equals)) {
-                        value pkg = entryPath.spanTo(sep2 - 1).replace("/", ".");
+                        value pkg = entryPath[...sep2-1].replace("/", ".");
                         if (moduleManager.modelLoader.findPackage(pkg) exists) {
                             return true;
                         }
