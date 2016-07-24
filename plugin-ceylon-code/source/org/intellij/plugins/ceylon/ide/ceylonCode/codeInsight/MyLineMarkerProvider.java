@@ -7,7 +7,7 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.psi.PsiElement;
 
-// TODO remove me once this is fixed: https://github.com/ceylon/ceylon-compiler/issues/2424
+// TODO remove me once this is fixed: https://github.com/ceylon/ceylon/issues/2424
 public abstract class MyLineMarkerProvider implements LineMarkerProvider {
 
     @Override
