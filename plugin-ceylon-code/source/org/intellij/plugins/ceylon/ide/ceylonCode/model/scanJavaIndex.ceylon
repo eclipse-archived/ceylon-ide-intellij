@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaString,
-    CeylonIterable
+    javaString
 }
 import ceylon.language {
     langNull=null,
@@ -34,8 +33,24 @@ import com.intellij.psi {
 import com.intellij.util {
     Processor
 }
+import com.redhat.ceylon.ide.common.completion {
+    completionManager {
+        Proposals
+    }
+}
 import com.redhat.ceylon.ide.common.model.asjava {
     getJavaQualifiedName
+}
+import com.redhat.ceylon.model.loader {
+    AbstractModelLoader {
+        ceylonTypeAliasAnnotation,
+        ceylonContainerAnnotation,
+        ceylonIgnoreAnnotation,
+        ceylonMethodAnnotation,
+        ceylonAnnotationInstantiationAnnotation,
+        ceylonObjectAnnotation,
+        ceylonAttributeAnnotation
+    }
 }
 import com.redhat.ceylon.model.typechecker.model {
     TypeParameter,
@@ -63,27 +78,16 @@ import java.util {
     Collections {
         emptyList
     },
-    JList=List,
-    JMap=Map
+    JList=List
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
     classFileDecompilerUtil
 }
-import com.redhat.ceylon.model.loader {
-    AbstractModelLoader {
-        ceylonTypeAliasAnnotation,
-        ceylonContainerAnnotation,
-        ceylonIgnoreAnnotation,
-        ceylonMethodAnnotation,
-        ceylonAnnotationInstantiationAnnotation,
-        ceylonObjectAnnotation,
-        ceylonAttributeAnnotation
-    }
-}
 
-JMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit sourceUnit,
-    IdeaModuleManager moduleManager, Module mod, String startingWith, Integer proximity) {
+Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
+        IdeaModuleManager moduleManager, Module mod,
+        String startingWith, Integer proximity) {
 
     value result = HashMap<JString,DeclarationWithProximity>();
     value allDependencies
