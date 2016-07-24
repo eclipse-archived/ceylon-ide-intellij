@@ -239,7 +239,7 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
                 }
 
                 if (range.endOffset > currentIndex + size) {
-                    String subtext = text.substring(sublength);
+                    String subtext = text[sublength...];
                     merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
                     consumedFromRange += size - sublength;
                     currentRange = null;
@@ -249,11 +249,11 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
                     String subtext;
                     if (consumedFromRange > 0) {
                         Integer toConsume = range.length - consumedFromRange;
-                        subtext = text.substring(0, Math.min(toConsume, size));
+                        subtext = text[0:toConsume];
                         sublength = toConsume;
                     }
                     else {
-                        subtext = text.substring(sublength, sublength + range.length);
+                        subtext = text[sublength:range.length];
                         sublength += range.length;
                     }
                     merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
@@ -266,7 +266,7 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
                     }
                     else {
                         if (sublength < size) {
-                            String rest = text.substring(sublength);
+                            String rest = text[sublength...];
                             merged.add(createFragment(rest, fragment.attributes));
                         }
                         currentRange = null;
