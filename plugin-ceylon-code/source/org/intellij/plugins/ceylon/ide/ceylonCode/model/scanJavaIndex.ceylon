@@ -265,7 +265,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
                 exists qname = cls.qualifiedName) {
                 value prox = that.getProximity(proximity, pkg.languagePackage, lightModel.name);
-                value dwp = DeclarationWithProximity(lightModel of Declaration, prox);
+                value dwp = DeclarationWithProximity(lightModel of Declaration, prox, langTrue);
                 result.put(javaString(qname), dwp);
             }
             return langTrue;

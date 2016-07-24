@@ -62,7 +62,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
     }
     
     shared actual void newInvocationCompletion(CompletionContext ctx, Integer offset,
-        String prefix, String desc, String text, Declaration dec, Reference? pr, Scope scope,
+        String prefix, String desc, String text, Declaration dec, Reference? reference, Scope scope,
         Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation, 
         Boolean inherited, Boolean qualified, Declaration? qualifyingDec) {
         
@@ -73,7 +73,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 desc = desc;
                 text = text;
                 declaration = dec;
-                producedReference = pr;
+                producedReference = reference;
                 scope = scope;
                 includeDefaulted = includeDefaulted;
                 positionalInvocation = positionalInvocation;
