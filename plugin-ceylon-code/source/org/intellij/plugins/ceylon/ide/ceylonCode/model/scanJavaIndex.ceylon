@@ -63,7 +63,8 @@ import java.util {
     Collections {
         emptyList
     },
-    JList=List
+    JList=List,
+    JMap=Map
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
@@ -81,7 +82,7 @@ import com.redhat.ceylon.model.loader {
     }
 }
 
-HashMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit sourceUnit,
+JMap<JString,DeclarationWithProximity> scanJavaIndex(IdeaModule that, Unit sourceUnit,
     IdeaModuleManager moduleManager, Module mod, String startingWith, Integer proximity) {
 
     value result = HashMap<JString,DeclarationWithProximity>();
