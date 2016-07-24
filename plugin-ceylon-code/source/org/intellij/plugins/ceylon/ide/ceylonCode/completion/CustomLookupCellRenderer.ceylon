@@ -56,7 +56,6 @@ import java.awt {
 import java.lang {
     ReflectiveOperationException,
     JString=String,
-    Math,
     Runnable
 }
 
