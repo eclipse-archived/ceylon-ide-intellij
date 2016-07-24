@@ -314,6 +314,6 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
     value before = system.milliseconds;
     AllClassesGetter.processJavaClasses(CamelHumpMatcher(startingWith), mod.project, scope, processor);
-    print("processed Java index in ``system.milliseconds - before``ms => ``result.size()`` results.");
+    print("processed Java index in ``system.milliseconds - before``ms => ``result.size()`` results");
     return result;
 }
