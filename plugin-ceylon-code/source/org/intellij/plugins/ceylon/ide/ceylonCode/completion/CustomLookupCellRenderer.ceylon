@@ -214,63 +214,69 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
         TextRange? nextMatch(), SimpleTextAttributes highlighted) {
 
     value merged = ArrayList<Fragment>();
-    variable TextRange? currentRange = nextMatch();
     variable Integer currentIndex = 0;
-    variable Integer consumedFromRange = 0;
     for (fragment in highlight) {
-        value range = currentRange;
-        if (!exists range) {
+        value initialRange = nextMatch();
+        value text = fragment.text;
+        value size = text.size;
+        if (!exists initialRange) {
             merged.add(fragment);
         }
-        else if (currentIndex + fragment.text.size<range.startOffset) {
+        else if (currentIndex + size < initialRange.startOffset) {
             merged.add(fragment);
         }
         else {
             variable Integer substart = 0;
             variable Integer sublength = 0;
-            variable String subtext;
-            variable Boolean rangeIsApplicable = true;
-            while (rangeIsApplicable) {
-                if (currentIndex<range.startOffset) {
+            variable TextRange? currentRange = initialRange;
+            variable Integer consumedFromRange = 0;
+            while (exists range = currentRange) {
+
+                if (currentIndex < range.startOffset) {
                     sublength = range.startOffset - currentIndex;
-                    subtext = fragment.text.substring(substart, sublength);
+                    String subtext = text.substring(substart, sublength);
                     merged.add(createFragment(subtext, fragment.attributes));
                 }
-                if (range.endOffset>currentIndex +fragment.text.size) {
-                    subtext = fragment.text.substring(sublength);
+
+                if (range.endOffset > currentIndex + size) {
+                    String subtext = text.substring(sublength);
                     merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
-                    consumedFromRange += fragment.text.size - sublength;
-                    rangeIsApplicable = false;
+                    consumedFromRange += size - sublength;
+                    currentRange = null;
                 }
                 else {
-                    if (consumedFromRange>0) {
+
+                    String subtext;
+                    if (consumedFromRange > 0) {
                         Integer toConsume = range.length - consumedFromRange;
-                        subtext = fragment.text.substring(0, Math.min(toConsume, fragment.text.size));
+                        subtext = text.substring(0, Math.min(toConsume, size));
                         sublength = toConsume;
                     }
                     else {
-                        subtext = fragment.text.substring(sublength, sublength + range.length);
+                        subtext = text.substring(sublength, sublength + range.length);
                         sublength += range.length;
                     }
                     merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
-                    currentRange = nextMatch();
+
+                    value nextRange = nextMatch();
                     consumedFromRange = 0;
-                    value bool
-                            = if (exists r = currentRange)
-                            then r.startOffset >= currentIndex + fragment.text.size
-                            else true;
-                    if (bool) {
-                        rangeIsApplicable = false;
-                        if (sublength<fragment.text.size) {
-                            subtext = fragment.text.substring(sublength);
-                            merged.add(createFragment(subtext, fragment.attributes));
-                        }
+                    if (exists nextRange,
+                        nextRange.startOffset < currentIndex + size) {
+                        currentRange = nextRange;
                     }
+                    else {
+                        if (sublength < size) {
+                            String rest = text.substring(sublength);
+                            merged.add(createFragment(rest, fragment.attributes));
+                        }
+                        currentRange = null;
+                    }
+
                 }
                 substart = sublength;
             }
         }
-        currentIndex += fragment.text.size;
+        currentIndex += text.size;
     }
     return merged;
 }
