@@ -58,7 +58,8 @@ shared class IdeaModule(
             return Collections.emptyMap<JString,DeclarationWithProximity>();
         }
 
-        if (exists mod = moduleSourceMapper.ceylonProject?.ideArtifact) {
+        if (startingWith.size>0,
+            exists mod = moduleSourceMapper.ceylonProject?.ideArtifact) {
             return scanJavaIndex(this, unit, moduleManager, mod, startingWith, proximity);
         }
         return super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
