@@ -89,6 +89,9 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
         IdeaModuleManager moduleManager, Module mod,
         String startingWith, Integer proximity) {
 
+    value noTypeParameters = emptyList<TypeParameter>();
+    value noTypes = emptyList<Type>();
+
     value result = HashMap<JString,DeclarationWithProximity>();
     value allDependencies
             = that.transitiveDependencies
@@ -140,7 +143,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     variable Interface? lazyRealIntf = langNull;
 
                     function computeRealIntf() {
-                        if (is Interface decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                        if (is Interface decl
+                                = pkg.getMember(clsName, noTypes, langFalse)) {
                             return decl;
                         }
 
@@ -149,9 +153,14 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     value realIntf => lazyRealIntf else (lazyRealIntf = computeRealIntf());
 
+                    value hasTypeParams = cls.hasTypeParameters();
+
                     shared actual JList<TypeParameter> typeParameters
-                            => realIntf?.typeParameters else emptyList<TypeParameter>();
+                            => if (hasTypeParams)
+                            then (realIntf?.typeParameters else noTypeParameters)
+                            else noTypeParameters;
                     assign typeParameters {}
+
                     shared actual Type? type => realIntf?.type;
                 };
 
@@ -160,7 +169,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     variable Function? lazyRealFunction = langNull;
 
                     function computeRealFunction() {
-                        if (is Function decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                        if (is Function decl
+                                = pkg.getMember(clsName, noTypes, langFalse)) {
                             return decl;
                         }
 
@@ -182,7 +192,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     variable Value? lazyRealValue = langNull;
 
                     function computeRealValue() {
-                        if (is Value decl = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                        if (is Value decl
+                                = pkg.getMember(clsName, noTypes, langFalse)) {
                             return decl;
                         }
                         return langNull;
@@ -199,7 +210,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     function computeRealAlias() {
                         if (is TypeAlias decl
-                                = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                                = pkg.getMember(clsName, noTypes, langFalse)) {
                             return decl;
                         }
                         return langNull;
@@ -208,8 +219,13 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     value realAlias
                             => lazyRealAlias else (lazyRealAlias = computeRealAlias());
 
+                    value hasTypeParams = cls.hasTypeParameters();
+
                     shared actual JList<TypeParameter> typeParameters
-                            => realAlias?.typeParameters else emptyList<TypeParameter>();
+                            => if (hasTypeParams)
+                            then (realAlias?.typeParameters else noTypeParameters)
+                            else noTypeParameters;
+
                     assign typeParameters {}
                 };
             } else {
@@ -218,7 +234,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     function computeRealClass() {
                         if (exists decl
-                                = pkg.getMember(clsName, emptyList<Type>(), langFalse)) {
+                                = pkg.getMember(clsName, noTypes, langFalse)) {
                             if (is Class decl) {
                                 return decl;
                             } else {
@@ -232,8 +248,12 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     parameterLists => realClass?.parameterLists else emptyList<ParameterList>();
 
+                    value hasTypeParams = cls.hasTypeParameters();
+
                     shared actual JList<TypeParameter> typeParameters
-                            => realClass?.typeParameters else emptyList<TypeParameter>();
+                            => if (hasTypeParams)
+                            then (realClass?.typeParameters else noTypeParameters)
+                            else noTypeParameters;
                     assign typeParameters {}
 
                     shared actual Type? type => realClass?.type;
