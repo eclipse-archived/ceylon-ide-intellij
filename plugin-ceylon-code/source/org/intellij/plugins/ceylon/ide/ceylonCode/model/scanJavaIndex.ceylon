@@ -94,10 +94,9 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
     value result = HashMap<JString,DeclarationWithProximity>();
     value allDependencies
-            = that.transitiveDependencies
-            .narrow<IdeaModule>()
-            .map((dep) => dep.artifact)
-            .coalesced;
+            = [ for (m in that.transitiveDependencies)
+                if (is IdeaModule m, exists a = m.artifact)
+                a ];
 
     value ceylonDependency
             = if (is IdeaModule lang = that.languageModule)
@@ -161,7 +160,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             else noTypeParameters;
                     assign typeParameters {}
 
-                    shared actual Type? type => realIntf?.type;
+//                    shared actual Type? type => realIntf?.type;
                 };
 
             } else if (modifiers.findAnnotation(ceylonMethodAnnotation) exists) {
@@ -201,7 +200,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     value realValue => lazyRealValue else (lazyRealValue =computeRealValue());
 
-                    shared actual Type? type => realValue ?. type;
+                    shared actual Type? type => realValue?.type;
                     assign type {}
                 };
             } else if (modifiers.findAnnotation(ceylonTypeAliasAnnotation) exists) {
@@ -256,7 +255,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             else noTypeParameters;
                     assign typeParameters {}
 
-                    shared actual Type? type => realClass?.type;
+//                    shared actual Type? type => realClass?.type;
 
                     abstract = modifiers.hasModifierProperty(PsiModifier.abstract);
                     final = modifiers.hasModifierProperty(PsiModifier.final);
