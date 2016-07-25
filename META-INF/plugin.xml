@@ -231,7 +231,7 @@
                               instance="org.intellij.plugins.ceylon.ide.settings.CompletionConfigurable"/>
             </configurable>
         </applicationConfigurable>
-        <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.settings.CompletionSettings"/>
+        <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.ceylonCode.completion.CompletionSettings"/>
         <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings"/>
         <projectConfigurable instance="org.intellij.plugins.ceylon.ide.settings.CompilerConfigurable" id="preferences.Ceylon.compiler"
                              displayName="Ceylon Compiler" parentId="project.propCompiler"/>

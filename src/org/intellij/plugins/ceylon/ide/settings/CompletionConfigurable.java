@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.settings;
 import com.intellij.openapi.options.BaseConfigurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.redhat.ceylon.ide.common.settings.CompletionOptions;
+import org.intellij.plugins.ceylon.ide.ceylonCode.completion.completionSettings_;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,7 @@ public class CompletionConfigurable extends BaseConfigurable {
         restoreDefaultsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CompletionSettings.getInstance().loadState(new CompletionOptions());
+                completionSettings_.get_().loadState(new CompletionOptions());
                 reset();
             }
         });
@@ -61,7 +62,7 @@ public class CompletionConfigurable extends BaseConfigurable {
 
     @Override
     public void apply() throws ConfigurationException {
-        CompletionOptions options = CompletionSettings.getInstance().getOptions();
+        CompletionOptions options = completionSettings_.get_().getOptions();
 
         options.setInexactMatches(getInexactMatches());
         options.setParameterTypesInCompletion(displayParameterTypes.isSelected());
@@ -90,7 +91,7 @@ public class CompletionConfigurable extends BaseConfigurable {
 
     @Override
     public void reset() {
-        CompletionOptions options = CompletionSettings.getInstance().getOptions();
+        CompletionOptions options = completionSettings_.get_().getOptions();
         displayParameterTypes.setSelected(options.getParameterTypesInCompletion());
 
         switch (options.getInexactMatches()) {
@@ -118,7 +119,7 @@ public class CompletionConfigurable extends BaseConfigurable {
 
     @Override
     public boolean isModified() {
-        CompletionOptions options = CompletionSettings.getInstance().getOptions();
+        CompletionOptions options = completionSettings_.get_().getOptions();
         boolean isModified;
 
         isModified = options.getParameterTypesInCompletion() != displayParameterTypes.isSelected();

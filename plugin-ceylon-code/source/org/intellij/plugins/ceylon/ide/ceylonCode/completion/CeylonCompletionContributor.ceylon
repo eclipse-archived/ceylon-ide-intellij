@@ -19,8 +19,13 @@ shared variable CompletionOptions completionOptions = CompletionOptions();
 shared class CeylonCompletionContributor extends CompletionContributor {
 
     shared new() extends CompletionContributor() {
-        extend(CompletionType.basic, PlatformPatterns.psiElement(),
-            object extends IdeaCompletionProvider() { options => completionOptions; });
+        extend(
+            CompletionType.basic,
+            PlatformPatterns.psiElement(),
+            object extends IdeaCompletionProvider() {
+                options => completionSettings.options;
+            }
+        );
     }
 
     shared actual void beforeCompletion(CompletionInitializationContext context) {
