@@ -64,7 +64,8 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit,
     Package,
     Value,
-    TypeAlias
+    TypeAlias,
+    ModelUtil
 }
 
 import java.io {
@@ -235,7 +236,13 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                         if (exists decl
                                 = pkg.getMember(clsName, noTypes, langFalse)) {
                             if (is Class decl) {
-                                return decl;
+                                if (ModelUtil.isOverloadedVersion(decl),
+                                    is Class abst = decl.extendedType?.declaration) {
+                                    return abst;
+                                }
+                                else {
+                                    return decl;
+                                }
                             } else {
                                 print("Expected member of type Class but was ``className(decl)``");
                             }
@@ -254,6 +261,16 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             then (realClass?.typeParameters else noTypeParameters)
                             else noTypeParameters;
                     assign typeParameters {}
+
+                    abstraction
+                            = !modifiers.findAnnotation(Annotations.ceylon.className) exists
+                            && cls.constructors.size>1;
+
+                    shared actual JList<Declaration>? overloads
+                            => if (abstraction)
+                            then (realClass?.overloads else emptyList<Declaration>())
+                            else langNull;
+                    assign overloads {}
 
 //                    shared actual Type? type => realClass?.type;
 
