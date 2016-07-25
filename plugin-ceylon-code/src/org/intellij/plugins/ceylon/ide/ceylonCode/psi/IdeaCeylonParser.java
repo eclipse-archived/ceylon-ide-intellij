@@ -158,11 +158,12 @@ public class IdeaCeylonParser extends IStubFileElementType {
             for (CommonToken token : originalTokens) {
                 if (token != null) {
                     int lastStopIndex = -1;
+                    boolean lastWasEof = false;
                     if (!lastToken.isNull()) {
                         lastStopIndex = lastToken.get().getStopIndex();
+                        lastWasEof = lastToken.get().getType() == CeylonLexer.EOF;
                     }
-                    if (token.getType() != CeylonLexer.EOF
-                            && lastStopIndex != token.getStartIndex() - 1) {
+                    if (!lastWasEof && lastStopIndex != token.getStartIndex() - 1) {
                         CommonToken badToken = new CommonToken(token.getInputStream(), -2, 0,
                                 lastStopIndex + 1,
                                 token.getStartIndex() - 1);
