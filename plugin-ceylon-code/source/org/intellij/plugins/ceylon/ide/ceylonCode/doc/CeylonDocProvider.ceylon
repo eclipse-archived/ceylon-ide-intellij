@@ -40,9 +40,6 @@ import com.intellij.psi {
 import com.intellij.psi.impl {
     PsiElementBase
 }
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
-}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree,
     UnexpectedError
@@ -64,9 +61,6 @@ import java.lang {
 import java.util {
     Arrays
 }
-import java.util.concurrent {
-    Callable
-}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerProvider
@@ -87,7 +81,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi {
     CeylonLightElement
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    ConcurrencyManagerForJava,
     getCeylonProjects,
     FakeCompletionDeclaration
 }
