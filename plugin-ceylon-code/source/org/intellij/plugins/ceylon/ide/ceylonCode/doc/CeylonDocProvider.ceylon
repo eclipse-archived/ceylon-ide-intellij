@@ -88,7 +88,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     ConcurrencyManagerForJava,
-    getCeylonProjects
+    getCeylonProjects,
+    FakeCompletionDeclaration
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
@@ -167,12 +168,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                 };
             }
             if (is CeylonFile file = element.containingFile,
-                exists phasedUnit =
-                        ConcurrencyManagerForJava.withAlternateResolution(object
-                                satisfies Callable<PhasedUnit> {
-                            shared actual PhasedUnit? call()
-                                    => file.ensureTypechecked();
-                        })) {
+                exists phasedUnit = file.upToDatePhasedUnit) {
                 value params = generator.DocParams(phasedUnit, element.project);
                 if (is CeylonLightElement element) {
                     return generator.getDocumentationText {
@@ -206,8 +202,11 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             then contextElement else null;
 
     shared actual PsiElement? getDocumentationElementForLookupItem(PsiManager psiManager, Object arg, PsiElement element) {
-        if (is Sequence<Anything> arg, is Declaration first = arg.first) {
-            value target = resolveDeclaration(first, element.project);
+        if (is Sequence<Anything> arg,
+            is Declaration first = arg.first,
+            exists decl = if (is FakeCompletionDeclaration first) then first.realDeclaration else first) {
+
+            value target = resolveDeclaration(decl, element.project);
             return if (is DeclarationPsiNameIdOwner target)
                 then target.nameIdentifier
                 else target;

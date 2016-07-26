@@ -86,6 +86,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
     classFileDecompilerUtil
 }
 
+shared interface FakeCompletionDeclaration {
+    shared formal Declaration? realDeclaration;
+}
+
 Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
         IdeaModuleManager moduleManager, Module mod,
         String startingWith, Integer proximity) {
@@ -139,7 +143,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             Declaration lightModel;
 
             if (cls.\iinterface) {
-                lightModel = object extends Interface() {
+                lightModel = object extends Interface() satisfies FakeCompletionDeclaration {
                     variable Interface? lazyRealIntf = langNull;
 
                     function computeRealIntf() {
@@ -152,6 +156,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     }
 
                     value realIntf => lazyRealIntf else (lazyRealIntf = computeRealIntf());
+                    shared actual Declaration? realDeclaration => realIntf;
 
                     value hasTypeParams = cls.hasTypeParameters();
 
@@ -165,7 +170,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 };
 
             } else if (modifiers.findAnnotation(ceylonMethodAnnotation) exists) {
-                lightModel = object extends Function() {
+                lightModel = object extends Function() satisfies FakeCompletionDeclaration {
                     variable Function? lazyRealFunction = langNull;
 
                     function computeRealFunction() {
@@ -178,6 +183,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     }
 
                     value realFunction => lazyRealFunction else (lazyRealFunction = computeRealFunction());
+                    shared actual Declaration? realDeclaration => realFunction;
 
                     parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
 
@@ -188,7 +194,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 };
             } else if (modifiers.findAnnotation(ceylonObjectAnnotation) exists
                         || modifiers.findAnnotation(ceylonAttributeAnnotation) exists) {
-                lightModel = object extends Value() {
+                lightModel = object extends Value() satisfies FakeCompletionDeclaration {
                     variable Value? lazyRealValue = langNull;
 
                     function computeRealValue() {
@@ -200,12 +206,13 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     }
 
                     value realValue => lazyRealValue else (lazyRealValue =computeRealValue());
+                    shared actual Declaration? realDeclaration => realValue;
 
                     shared actual Type? type => realValue?.type;
                     assign type {}
                 };
             } else if (modifiers.findAnnotation(ceylonTypeAliasAnnotation) exists) {
-                lightModel = object extends TypeAlias() {
+                lightModel = object extends TypeAlias() satisfies FakeCompletionDeclaration {
                     variable TypeAlias? lazyRealAlias = langNull;
 
                     function computeRealAlias() {
@@ -218,6 +225,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     value realAlias
                             => lazyRealAlias else (lazyRealAlias = computeRealAlias());
+                    shared actual Declaration? realDeclaration => realAlias;
 
                     value hasTypeParams = cls.hasTypeParameters();
 
@@ -229,7 +237,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     assign typeParameters {}
                 };
             } else {
-                lightModel = object extends Class() {
+                lightModel = object extends Class() satisfies FakeCompletionDeclaration {
                     variable Class? lazyRealClass = langNull;
 
                     function computeRealClass() {
@@ -251,6 +259,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     }
 
                     value realClass => lazyRealClass else (lazyRealClass = computeRealClass());
+                    realDeclaration => realClass;
 
                     parameterLists => realClass?.parameterLists else emptyList<ParameterList>();
 
