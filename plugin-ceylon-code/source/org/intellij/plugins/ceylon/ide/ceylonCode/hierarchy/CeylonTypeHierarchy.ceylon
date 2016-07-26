@@ -71,13 +71,12 @@ class CeylonTypeHierarchyBrowser(Project project, PsiElement element)
         if (is ClassOrInterface dec) {
             if (exists extendedType = dec.extendedType) {
                 value extended = skipConstructor(extendedType.declaration);
-                if (exists psiElement = resolveDeclaration(extended, project)) {
-                    if (exists parentDescriptor = build(skipConstructorElement(psiElement), extended)) {
-                        value nodeDescriptor
-                                = CeylonHierarchyNodeDescriptor(element, dec, parentDescriptor);
-                        parentDescriptor.children = createJavaObjectArray { nodeDescriptor };
-                        return nodeDescriptor;
-                    }
+                if (exists psiElement = resolveDeclaration(extended, project),
+                    exists parentDescriptor = build(skipConstructorElement(psiElement), extended)) {
+                    value nodeDescriptor
+                            = CeylonHierarchyNodeDescriptor(element, dec, parentDescriptor);
+                    parentDescriptor.children = createJavaObjectArray { nodeDescriptor };
+                    return nodeDescriptor;
                 }
             }
             return CeylonHierarchyNodeDescriptor(element, dec);
