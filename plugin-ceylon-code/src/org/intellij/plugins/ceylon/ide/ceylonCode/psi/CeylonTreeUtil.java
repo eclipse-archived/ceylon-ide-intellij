@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
@@ -7,6 +8,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.jetbrains.annotations.Nullable;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -22,6 +24,7 @@ import com.redhat.ceylon.ide.common.model.CeylonUnit;
 import com.redhat.ceylon.model.typechecker.model.Unit;
 
 public class CeylonTreeUtil {
+    private static Logger LOGGER = Logger.getInstance(CeylonTreeUtil.class);
 
     public static CeylonPsi.DeclarationPsi createDeclarationFromText(Project project, String code) {
         PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(CeylonLanguage.INSTANCE, code);
@@ -42,9 +45,13 @@ public class CeylonTreeUtil {
 
         PsiElement candidate = PsiUtilCore.getElementAtOffset(file, ceylonNode.getStartIndex());
 
+        ArrayList<Node> ceylonNodeCandidates = new ArrayList<>();
+        ArrayList<PsiElement> candidates = new ArrayList<>();
         while (!(candidate instanceof PsiFile)) {
+            candidates.add(candidate);
             if (candidate instanceof CeylonCompositeElement) {
                 Node candidateCeylonNode = ((CeylonCompositeElement) candidate).getCeylonNode();
+                ceylonNodeCandidates.add(candidateCeylonNode);
                 if (candidateCeylonNode instanceof Tree.ParameterDeclaration) {
                     candidateCeylonNode = ((Tree.ParameterDeclaration) candidateCeylonNode).getTypedDeclaration();
                 }
@@ -57,12 +64,30 @@ public class CeylonTreeUtil {
                     // unit is not the same as the one that contains ceylonNode, so we can't use ==
                     return candidate;
                 }
+            } else {
+                ceylonNodeCandidates.add(null);
             }
             candidate = candidate.getParent();
         }
 
-        throw new IllegalArgumentException(String.format("No PSI node found for ceylon node of type %s at (%d-%d).%n",
-                ceylonNode.getNodeType(), ceylonNode.getStartIndex(), ceylonNode.getEndIndex()));
+        String message = String.format("No PSI node found for ceylon node of type %s at (%d-%d).%n",
+                ceylonNode.getNodeType(), ceylonNode.getStartIndex(), ceylonNode.getEndIndex());
+        message += "====================================\n";
+        message += "Searched ceylon node:\n" + ceylonNode.getNodeType() + "(" + ceylonNode.getLocation() + ")\n";
+        message += "In the following Psi Nodes:\n" ;
+        for (int i=0; i<candidates.size(); i++) {
+            message += "    " + candidates.get(i) + " -> candidate Ceylon node: " ;
+            Node ceylonNodeCandidate = ceylonNodeCandidates.get(i);
+            if (ceylonNodeCandidate == null) {
+                message += "<null>\n" ;
+            } else {
+                message += ceylonNodeCandidates.get(i).getNodeType() + "(" + ceylonNodeCandidates.get(i).getLocation() + ")\n" ;
+            }
+        }
+        message += "====================================\n";
+        
+        LOGGER.warn(message);
+        return null;
     }
 
     @Nullable
