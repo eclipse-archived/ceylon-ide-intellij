@@ -158,7 +158,9 @@ shared class CeylonImplementationsSearch()
                         if (is CeylonFile declaringFile) {
                             declaringFile.ensureTypechecked();
                         }
-                        consumer(findPsiElement(dnode, declaringFile));
+                        if (exists psiElement = findPsiElement(dnode, declaringFile)) {
+                            consumer(psiElement);
+                        }
                     }
                 }
                 ApplicationManager.application.runReadAction(run);

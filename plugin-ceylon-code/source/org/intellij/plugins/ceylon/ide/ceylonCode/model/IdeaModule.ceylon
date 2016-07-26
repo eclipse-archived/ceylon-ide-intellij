@@ -42,6 +42,11 @@ import java.util {
     JMap=Map,
     Collections
 }
+import com.intellij.openapi.application {
+    ApplicationManager {
+        application
+    }
+}
 
 shared class IdeaModule(
     shared actual IdeaModuleManager moduleManager,
@@ -65,8 +70,17 @@ shared class IdeaModule(
         return super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
     }
 
-    encloseOnTheFlyTypechecking(void typechecking())
-            => concurrencyManager.withUpToDateIndexes(typechecking);
+    shared actual void encloseOnTheFlyTypechecking(void typechecking()) {
+        if (application.readAccessAllowed) {
+            concurrencyManager.withAlternateResolution(() {
+                typechecking();
+            });
+        } else {
+            concurrencyManager.withUpToDateIndexes(() {
+                typechecking();
+            });
+        }
+    }
 
     shared actual Set<String> listPackages() {
         value name = nameAsString;
