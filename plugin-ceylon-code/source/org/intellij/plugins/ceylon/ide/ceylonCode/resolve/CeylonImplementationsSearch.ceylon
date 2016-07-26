@@ -72,8 +72,9 @@ shared class CeylonImplementationsSearch()
 
             if (exists name = nameGetter.qualifiedName,
                 exists psiFile = sourceElement.containingFile,
+                //TODO: this returns null for Java SDK classes!
                 exists project = findProjectForFile(psiFile),
-                exists modules = project.modules,
+//                exists modules = project.modules,
                 exists file = project.projectFileFromNative(psiFile.virtualFile),
                 exists unit = file.unit,
                 is TypeDeclaration|TypedDeclaration decl
