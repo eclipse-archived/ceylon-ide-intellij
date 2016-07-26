@@ -161,7 +161,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             else noTypeParameters;
                     assign typeParameters {}
 
-//                    shared actual Type? type => realIntf?.type;
+                    shared actual Type? type => langNull;
                 };
 
             } else if (modifiers.findAnnotation(ceylonMethodAnnotation) exists) {
@@ -272,7 +272,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             else langNull;
                     assign overloads {}
 
-//                    shared actual Type? type => realClass?.type;
+                    shared actual Type? type => realClass?.type;
 
                     abstract = modifiers.hasModifierProperty(PsiModifier.abstract);
                     final = modifiers.hasModifierProperty(PsiModifier.final);
