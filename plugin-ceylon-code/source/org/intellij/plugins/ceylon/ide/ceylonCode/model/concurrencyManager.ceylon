@@ -182,6 +182,10 @@ shared object concurrencyManager {
             previousStrategy = null;
         }
         try {
+            if (s == NoIndexStrategy.waitForIndexes
+                && application.readAccessAllowed) {
+                throw CannotWaitForIndexesInReadAccessError();
+            }
             noIndexStrategy_.set(s);
             return func();
         } finally {
