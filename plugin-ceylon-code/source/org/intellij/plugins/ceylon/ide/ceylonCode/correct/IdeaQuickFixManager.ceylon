@@ -305,7 +305,9 @@ shared class IdeaQuickFixData(
                     ProgressManager.instance
                             .runProcessWithProgressAsynchronously(
                         project, "Searching...",
-                        JavaRunnable(() => concurrencyManager.needReadAccess(change)),
+                        JavaRunnable(() =>
+                            concurrencyManager.withAlternateResolution(() =>
+                                concurrencyManager.needReadAccess(change))),
                         JavaRunnable(() {
                             resolutions = null;
                             if (candidates.empty) {
