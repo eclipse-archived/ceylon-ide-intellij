@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
+import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,13 @@ public class CeylonTreeUtil {
             return null;
         }
 
+        if (ceylonNode instanceof CustomTree.GuardedVariable) {
+            Node identifier = ((CustomTree.GuardedVariable)ceylonNode).getIdentifier();
+            if (identifier != null) {
+                ceylonNode = identifier;
+            }
+        }
+
         PsiElement candidate = PsiUtilCore.getElementAtOffset(file, ceylonNode.getStartIndex());
 
         ArrayList<Node> ceylonNodeCandidates = new ArrayList<>();
@@ -70,8 +78,9 @@ public class CeylonTreeUtil {
             candidate = candidate.getParent();
         }
 
-        String message = String.format("No PSI node found for ceylon node of type %s at (%d-%d).%n",
-                ceylonNode.getNodeType(), ceylonNode.getStartIndex(), ceylonNode.getEndIndex());
+        String message = String.format("No PSI node found for ceylon node of type %s at (%d-%d) in %s.%n",
+                ceylonNode.getNodeType(), ceylonNode.getStartIndex(), ceylonNode.getEndIndex(),
+                ceylonNode.getUnit() == null ? "<null>" : ceylonNode.getUnit().getFilename());
         message += "====================================\n";
         message += "Searched ceylon node:\n" + ceylonNode.getNodeType() + "(" + ceylonNode.getLocation() + ")\n";
         message += "In the following Psi Nodes:\n" ;
