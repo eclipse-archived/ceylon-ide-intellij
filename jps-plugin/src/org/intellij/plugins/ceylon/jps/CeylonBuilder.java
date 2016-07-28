@@ -283,7 +283,20 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
         // Only the Java backend can do incremental builds
         if (backend == Backend.Java && !fullBuild) {
-            options.setFiles(filesToBuild);
+            List<File> filteredFiles = new ArrayList<>();
+
+            // filesToBuild contains file for every module we're building, we need to filter
+            // files for the current module only.
+            for (File f : filesToBuild) {
+                for (File src : srcPath) {
+                    if (f.toPath().startsWith(src.toPath())) {
+                        filteredFiles.add(f);
+                        break;
+                    }
+                }
+            }
+
+            options.setFiles(filteredFiles);
         } else {
             List<String> moduleNames = new ArrayList<>(expandWildcards(
                     getSourceRoots(chunk),
