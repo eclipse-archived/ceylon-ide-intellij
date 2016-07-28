@@ -139,6 +139,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.settings {
 import java.util.concurrent.atomic {
     AtomicInteger
 }
+import com.intellij.openapi.util {
+    Ref
+}
 
 final class ChangesInProject of noChange | changesThatAlwaysRequireModelUpdate {
     shared new noChange {}
@@ -160,6 +163,7 @@ shared class CeylonModelManager(model)
     
     shared IdeaCeylonProjects model;
     shared Integer delayBeforeUpdatingAfterChange => ceylonSettings.autoUpdateInterval;
+    shared Integer modelUpdateTimeoutMinutes => ceylonSettings.modelUpdateTimeoutMinutes;
     variable value automaticModelUpdateEnabled_ = true;
     variable value ideaProjectReady = false;
     variable Boolean cancelledBecauseOfSyntaxErrors = false;
@@ -341,6 +345,7 @@ shared class CeylonModelManager(model)
                     
                     DumbService.getInstance(model.ideaProject).waitForSmartMode();
                     value bakgroundBuildLatch = CountDownLatch(1);
+                    value buildProgressIndicator = Ref<ProgressIndicator>();
                     application.invokeAndWait(JavaRunnable {
                         run() => progressManager.run(object extends Backgroundable(
                             model.ideaProject,
@@ -349,6 +354,7 @@ shared class CeylonModelManager(model)
                             PerformInBackgroundOption.alwaysBackground) {
                             
                             shared actual void run(ProgressIndicator progressIndicator) {
+                                buildProgressIndicator.set(progressIndicator);
                                 value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
                                 value ticks = model.ceylonProjectNumber * 1000;
                                 try (progress = monitor.Progress(ticks, "Updating Ceylon model")) {
@@ -381,8 +387,13 @@ shared class CeylonModelManager(model)
                             onCancel() => bakgroundBuildLatch.countDown();
                         });
                     }, ModalityState.any());
-                    if (! bakgroundBuildLatch.await(5, TimeUnit.minutes)) {
+                    if (! bakgroundBuildLatch.await(modelUpdateTimeoutMinutes, TimeUnit.minutes)) {
                         automaticModelUpdateEnabled_ = false;
+                        try {
+                            buildProgressIndicator.get()?.cancel();
+                        } catch(Exception e) {
+                            platformUtils.log(Status._WARNING, "Error when trying to cancel a timed-out model update", e);
+                        }
                         Notification(
                             "Ceylon Model Update",
                             "Ceylon model update stalled",

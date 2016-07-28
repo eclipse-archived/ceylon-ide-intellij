@@ -17,10 +17,12 @@ public class EditorConfigurable extends BaseConfigurable {
     private JPanel myPanel;
     private JLabel completionLink;
     private JFormattedTextField modelUpdateDelay;
+    private JFormattedTextField modelUpdateTimeoutMinutes;
 
     public EditorConfigurable() {
         setupLinks();
         UIUtil.configureNumericFormattedTextField(modelUpdateDelay);
+        UIUtil.configureNumericFormattedTextField(modelUpdateTimeoutMinutes);
     }
 
     @Nls
@@ -45,18 +47,24 @@ public class EditorConfigurable extends BaseConfigurable {
     public void apply() throws ConfigurationException {
         ceylonSettings_.get_()
                 .setAutoUpdateInterval(Integer.valueOf(modelUpdateDelay.getText()) * 1000);
+        ceylonSettings_.get_()
+                .setModelUpdateTimeoutMinutes(Integer.valueOf(modelUpdateTimeoutMinutes.getText()));
     }
 
     @Override
     public void reset() {
         modelUpdateDelay.setText(String.valueOf(
                 ceylonSettings_.get_().getAutoUpdateInterval() / 1000));
+        modelUpdateTimeoutMinutes.setText(String.valueOf(
+                ceylonSettings_.get_().getModelUpdateTimeoutMinutes()));
     }
 
     @Override
     public boolean isModified() {
         return ceylonSettings_.get_()
-                .getAutoUpdateInterval() != Integer.valueOf(modelUpdateDelay.getText()) * 1000;
+                .getAutoUpdateInterval() != Integer.valueOf(modelUpdateDelay.getText()) * 1000 ||
+        ceylonSettings_.get_()
+                .getModelUpdateTimeoutMinutes() != Integer.valueOf(modelUpdateTimeoutMinutes.getText());
     }
 
     @Override
