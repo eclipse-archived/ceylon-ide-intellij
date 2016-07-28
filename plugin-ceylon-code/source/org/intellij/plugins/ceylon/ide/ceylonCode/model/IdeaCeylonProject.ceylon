@@ -32,7 +32,8 @@ import com.intellij.openapi.project {
 import com.intellij.openapi.roots {
     ModuleRootManager,
     OrderRootType,
-    LibraryOrderEntry
+    LibraryOrderEntry,
+    DependencyScope
 }
 import com.intellij.openapi.ui {
     Messages
@@ -344,8 +345,11 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             }
 
-            if (!exists entry = mrm.findLibraryOrderEntry(lib)) {
-                mrm.addLibraryEntry(lib);
+            if (exists entry = mrm.findLibraryOrderEntry(lib)) {
+                entry.scope = DependencyScope.provided;
+            } else {
+                value newEntry = mrm.addLibraryEntry(lib);
+                newEntry.scope = DependencyScope.provided;
             }
 
             provider.commit();
