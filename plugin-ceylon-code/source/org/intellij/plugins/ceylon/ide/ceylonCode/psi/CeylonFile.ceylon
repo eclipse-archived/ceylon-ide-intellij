@@ -95,33 +95,33 @@ shared class CeylonFile(FileViewProvider viewProvider)
         return compilationUnitPsi.ceylonNode;
     }
 
-    VirtualFile realVirtualFile() {
-        return originalFile.virtualFile;
-    }
+    VirtualFile? realVirtualFile() => originalFile.virtualFile;
 
-    shared CeylonLocalAnalyzer? localAnalyzer {
-        value localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>());
-        return localAnalyzerManager.get(realVirtualFile());
-    }
+    shared CeylonLocalAnalyzer? localAnalyzer => 
+        let(localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>()),
+            vf = realVirtualFile())
+        if (exists vf) 
+        then localAnalyzerManager.get(vf) 
+        else null;
 
     shared ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit() {
         value mod = ApplicationManager.application.runReadAction(
             object satisfies Computable<Module> {
-                compute() => ModuleUtil.findModuleForPsiElement(outer);
+                compute() => ModuleUtil.findModuleForPsiElement(outer) else null;
             }
         );
 
         value ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>());
         if (exists ceylonProject = ceylonProjects.getProject(mod),
-            exists ceylonVirtualFile = ceylonProject.projectFileFromNative(realVirtualFile())) {
-
+            exists vf = realVirtualFile(),
+            exists ceylonVirtualFile = ceylonProject.projectFileFromNative(vf)) {
             return ceylonProject.getParsedUnit(ceylonVirtualFile);
         }
         return null;
     }
 
     ExternalPhasedUnit? retrieveExternalPhasedUnit() {
-        if (exists externalPuRef = realVirtualFile().getUserData(uneditedExternalPhasedUnit),
+        if (exists externalPuRef = realVirtualFile()?.getUserData(uneditedExternalPhasedUnit),
             exists externalPu = externalPuRef.get()) {
 
             return externalPu;
@@ -221,7 +221,6 @@ shared class CeylonFile(FileViewProvider viewProvider)
     }
 
     shared PhasedUnit? forceReparse() {
-        putUserData(IdeaCeylonParser.forcedCuKey, null);
         onContentReload();
 
         suppressWarnings("unusedDeclaration")
