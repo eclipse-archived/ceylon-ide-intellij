@@ -25,7 +25,7 @@ public class CeylonClassImpl extends StubBasedPsiElementBase<ClassStub> implemen
         super(node);
         specClassDecl =
                 (Tree.ClassOrInterface)
-                    node.getUserData(IdeaCeylonParser.CEYLON_NODE_KEY);
+                    node.getUserData(org.intellij.plugins.ceylon.ide.ceylonCode.psi.parserConstants_.get_().get_CEYLON_NODE_KEY());
     }
 
     public CeylonClassImpl(ClassStub stub, IStubElementType nodeType) {
