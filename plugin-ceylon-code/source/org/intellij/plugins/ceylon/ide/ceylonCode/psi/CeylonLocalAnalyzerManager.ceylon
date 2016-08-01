@@ -181,7 +181,8 @@ shared class CeylonLocalAnalyzerManager(model)
         value virtualFile = virtualFileEvent.file;
         if (exists analyzer = editedFilesAnalyzers[virtualFile],
             isInSourceArchive(virtualFile)) {
-            editedFilesAnalyzersMap.put(virtualFile, newCeylonLocalAnalyzer(virtualFile));
+            virtualFile.putUserData(uneditedExternalPhasedUnit, null);
+            editedFilesAnalyzersMap.put(virtualFile, newCeylonLocalAnalyzer(virtualFile))?.dispose();
         }
     }
 
