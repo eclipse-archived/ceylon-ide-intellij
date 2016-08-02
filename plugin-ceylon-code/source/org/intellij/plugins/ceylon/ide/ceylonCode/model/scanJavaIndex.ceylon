@@ -88,6 +88,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
 
 shared interface FakeCompletionDeclaration {
     shared formal Declaration? realDeclaration;
+    shared formal PsiClass psiClass;
 }
 
 Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
@@ -167,6 +168,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     assign typeParameters {}
 
                     shared actual Type? type => langNull;
+
+                    psiClass => cls;
                 };
 
             } else if (modifiers.findAnnotation(ceylonMethodAnnotation) exists) {
@@ -191,6 +194,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     assign type {}
 
                     annotation = modifiers.findAnnotation(ceylonAnnotationInstantiationAnnotation) exists;
+
+                    psiClass => cls;
                 };
             } else if (modifiers.findAnnotation(ceylonObjectAnnotation) exists
                         || modifiers.findAnnotation(ceylonAttributeAnnotation) exists) {
@@ -210,6 +215,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     shared actual Type? type => realValue?.type;
                     assign type {}
+
+                    psiClass => cls;
                 };
             } else if (modifiers.findAnnotation(ceylonTypeAliasAnnotation) exists) {
                 lightModel = object extends TypeAlias() satisfies FakeCompletionDeclaration {
@@ -235,6 +242,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             else noTypeParameters;
 
                     assign typeParameters {}
+
+                    psiClass => cls;
                 };
             } else {
                 lightModel = object extends Class() satisfies FakeCompletionDeclaration {
@@ -286,6 +295,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     abstract = modifiers.hasModifierProperty(PsiModifier.abstract);
                     final = modifiers.hasModifierProperty(PsiModifier.final);
                     annotation = modifiers.findAnnotation(Annotations.annotationType.className) exists;
+
+                    psiClass => cls;
                 };
             }
 

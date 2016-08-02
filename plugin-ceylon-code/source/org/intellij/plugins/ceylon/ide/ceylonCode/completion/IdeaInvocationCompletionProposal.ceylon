@@ -35,7 +35,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text,
-        Declaration declaration, Reference? producedReference, Scope scope,
+        Declaration declaration, Reference()? producedReference, Scope scope,
         Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
         Boolean inherited, Boolean qualified, Declaration? qualifyingValue,
         IdeaCompletionContext ctx)

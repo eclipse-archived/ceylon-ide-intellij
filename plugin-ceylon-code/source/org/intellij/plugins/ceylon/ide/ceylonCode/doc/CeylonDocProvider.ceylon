@@ -179,7 +179,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                 }
             }
             else {
-                logger.warn("No phased unit for file " + element.containingFile.virtualFile.path);
+                logger.warn("No phased unit for file " + originalElement.containingFile.virtualFile.path);
             }
         }
         catch (AssertionError|Exception e) {
