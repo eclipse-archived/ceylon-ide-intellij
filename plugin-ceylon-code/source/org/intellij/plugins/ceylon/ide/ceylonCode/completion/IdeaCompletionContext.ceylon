@@ -37,17 +37,22 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import com.redhat.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
+import com.intellij.codeInsight.completion {
+    CompletionResultSet
+}
 
-shared class IdeaCompletionContext(file, localAnalysisResult, editor, options) satisfies CompletionContext {
+shared class IdeaCompletionContext(file, localAnalysisResult, editor, options, result)
+        satisfies CompletionContext {
 
     shared CeylonFile file;
     shared Editor editor;
     LocalAnalysisResult localAnalysisResult;
+    CompletionResultSet result;
 
     shared actual CompletionOptions options;
 
     shared actual IdeaDocument commonDocument = IdeaDocument(editor.document);
-    shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder();
+    shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder(result);
     shared actual BaseCeylonProject? ceylonProject => localAnalysisResult.ceylonProject;
 
     parsedRootNode => localAnalysisResult.parsedRootNode;
@@ -73,12 +78,18 @@ shared class IdeaCompletionContext(file, localAnalysisResult, editor, options) s
     
 }
 
-shared class IdeaProposalsHolder() satisfies ProposalsHolder {
+shared class IdeaProposalsHolder(CompletionResultSet? result = null) satisfies ProposalsHolder {
     value _proposals = ArrayList<LookupElement>();
     
     shared List<LookupElement> proposals => _proposals;
 
-    shared void add(LookupElement element) => _proposals.add(element);
+    shared void add(LookupElement element) {
+        if (exists result) {
+            result.addElement(element);
+        } else {
+            _proposals.add(element);
+        }
+    }
 
     size => _proposals.size;
     

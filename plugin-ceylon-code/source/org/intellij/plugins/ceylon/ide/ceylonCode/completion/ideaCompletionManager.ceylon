@@ -157,6 +157,7 @@ shared abstract class IdeaCompletionProvider()
                 localAnalysisResult = analysisResult;
                 editor = parameters.editor;
                 options = options;
+                result = result;
             };
             value doc = parameters.editor.document;
             completionManager.getContentProposals {
@@ -171,10 +172,6 @@ shared abstract class IdeaCompletionProvider()
             };
 
             installCustomLookupCellRenderer(project);
-
-            for (completion in params.proposals.proposals) {
-                result.addElement(completion);
-            }
 
             if (!isSecondLevel) {
                 result.addLookupAdvertisement("Call again to toggle second-level completions");
