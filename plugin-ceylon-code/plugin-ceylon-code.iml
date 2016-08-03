@@ -22,32 +22,32 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ceylon-ide-common" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.language/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.interop.java/1.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.collection/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.formatter/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.typechecker/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.antlr.runtime/3.4" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.antlr.stringtemplate/3.2.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.antlr.antlr/2.7.7" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.module-resolver/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.langtools.classfile/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.model/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.common/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.cli/1.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.file/1.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.formatter/1.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.interop.java/1.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.language/1.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.github.rjeschke.txtmark/0.13" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.annotations/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.asm/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.extensions/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.idea/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.openapi/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.util/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.cli/1.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.common/1.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.compiler.java/1.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.compiler.js/1.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.jgrapht.core/0.9.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.langtools.classfile/1.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.model/1.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.module-resolver/1.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.typechecker/1.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: net.lingala.zip4j/1.3.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.openapi/current" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.annotations/current" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.extensions/current" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.util/current" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.idea/current" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.asm/current" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.jetbrains.plugins.gradle/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.antlr.antlr/2.7.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.antlr.runtime/3.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.antlr.stringtemplate/3.2.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.intellij.groovy/current" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.github.rjeschke.txtmark/0.13" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.jetbrains.plugins.gradle/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.jgrapht.core/0.9.1" level="project" />
   </component>
 </module>
