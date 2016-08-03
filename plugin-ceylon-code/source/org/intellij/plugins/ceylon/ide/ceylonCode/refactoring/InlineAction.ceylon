@@ -65,6 +65,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonCompositeElement
 }
+import com.intellij.codeInsight.hint {
+    HintManager
+}
 
 shared class InlineAction() extends InlineActionHandler() {
 
@@ -102,6 +105,11 @@ shared class InlineAction() extends InlineActionHandler() {
                     value dialog = InlineDialog(proj, element, refactoring);
                     
                     if (dialog.showAndGet()) {
+                        if (is String availability = refactoring.checkAvailability()) {
+                            HintManager.instance.showErrorHint(editor, availability);
+                            return;
+                        }
+
                         value change = IdeaCompositeChange();
                         refactoring.build(change);
                         
