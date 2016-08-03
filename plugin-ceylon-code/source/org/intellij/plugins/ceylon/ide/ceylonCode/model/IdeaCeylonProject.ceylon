@@ -1,3 +1,6 @@
+import ceylon.collection {
+    ArrayList
+}
 import ceylon.interop.java {
     javaClass,
     JavaRunnable,
@@ -107,6 +110,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     IdeaVirtualFolder
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    ideaPlatformUtils
+}
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
@@ -116,6 +122,18 @@ shared class IdeaCeylonProject(ideArtifact, model)
         shared Key<Package> packageModel = Key<Package>("CeylonPlugin.nativeFolder_packageModel");
         shared Key<IdeaVirtualFolder> root = Key<IdeaVirtualFolder>("CeylonPlugin.nativeFolder_root");
         shared Key<Boolean> rootIsSource = Key<Boolean>("CeylonPlugin.nativeFolder_rootIsSource");
+    }
+
+    shared variable Boolean validatingDependencies = false;
+    shared ArrayList<ArtifactResult> dependenciesToAdd = ArrayList<ArtifactResult>();
+
+    shared void addDependencyToClasspath(ArtifactResult dependency) {
+        if (validatingDependencies) {
+            dependenciesToAdd.add(dependency);
+        } else {
+            ideaPlatformUtils.log(Status._ERROR,
+                "addDependencyToClasspath should only be called when validating dependencies");
+        }
     }
 
     object addModuleArchiveHook
@@ -131,32 +149,39 @@ shared class IdeaCeylonProject(ideArtifact, model)
         }
 
         shared actual void beforeClasspathResolution(CeylonProjectBuildAlias build, CeylonProjectBuildAlias.State state) {
-            Thread.currentThread().contextClassLoader = javaClass<IdeaCeylonProject>().classLoader;
-            if (! languageModuleAdded) {
-                if (exists languageModuleArtifact = findLanguageCar()) {
-                    value runnable = JavaRunnable(() {
-                        try {
-                            addLibrary(languageModuleArtifact, true);
-                        } catch (IOException e) {
-                            platformUtils.log(Status._ERROR,
-                                "Can't add ceylon language to classpath", e);
-                        }
-                    });
-                    application.invokeAndWait(runnable, ModalityState.any());
-
-                    dumbService(model.ideaProject).waitForSmartMode();
-                    languageModuleAdded = true;
-                } else {
-                    platformUtils.log(Status._ERROR, "Could not locate ceylon.language.car");
-                }
-            }
         }
 
         shared actual void repositoryManagerReset(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject) {
             languageModuleAdded = false;
         }
-    }
 
+        shared actual void beforeDependencyTreeValidation(CeylonProjectAlias ceylonProject) {
+            validatingDependencies = true;
+            dependenciesToAdd.clear();
+
+            if (exists languageModuleArtifact = findLanguageCar()) {
+                dependenciesToAdd.add(languageModuleArtifact);
+            } else {
+                platformUtils.log(Status._ERROR, "Could not locate ceylon.language.car");
+            }
+        }
+
+        shared actual void afterDependencyTreeValidation(CeylonProjectAlias ceylonProject) {
+            Thread.currentThread().contextClassLoader = javaClass<IdeaCeylonProject>().classLoader;
+
+            value runnable = JavaRunnable(() {
+                try {
+                    addLibraries(dependenciesToAdd, true);
+                } catch (IOException e) {
+                    platformUtils.log(Status._ERROR, "Can't add required artifacts to classpath", e);
+                }
+            });
+            application.invokeAndWait(runnable, ModalityState.any());
+
+            dumbService(model.ideaProject).waitForSmartMode();
+            validatingDependencies = false;
+        }
+    }
 
     shared actual Module ideArtifact;
     shared actual IdeaCeylonProjects model;
@@ -299,8 +324,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
                     return IdeaModuleSourceMapper(context, moduleManager);
                 }
             };
-    
-    shared void addLibrary(ArtifactResult artifact, Boolean clear = false) {
+
+    shared void addLibraries(List<ArtifactResult> libraries, Boolean clear = false) {
         value lock = application.acquireWriteActionLock(javaClass<IdeaCeylonProject>());
         value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
         value mrm = provider.getModifiableRootModel(ideArtifact);
@@ -316,40 +341,41 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             }
 
-            value libraryName = "Ceylon: " + artifact.name() + "/" + artifact.version();
-            value lib = provider.getLibraryByName(libraryName)
+            for (artifact in libraries.sort((x, y) => x.name().compare(y.name()))) {
+                value libraryName = "Ceylon: " + artifact.name() + "/" + artifact.version();
+                value lib = provider.getLibraryByName(libraryName)
                 else provider.createLibrary(libraryName);
-            value libModel = provider.getModifiableLibraryModel(lib);
+                value libModel = provider.getModifiableLibraryModel(lib);
 
-            void updateUrl(OrderRootType type, VirtualFile file) {
-                if (!javaString(file.string) in libModel.getUrls(type).iterable) {
-                    libModel.addRoot(file, type);
+                void updateUrl(OrderRootType type, VirtualFile file) {
+                    if (!javaString(file.string) in libModel.getUrls(type).iterable) {
+                        libModel.addRoot(file, type);
+                    }
                 }
-            }
 
+                value carFile = VirtualFileManager.instance
+                    .refreshAndFindFileByUrl(JarFileSystem.protocolPrefix + artifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
 
-            value carFile = VirtualFileManager.instance
-                .refreshAndFindFileByUrl(JarFileSystem.protocolPrefix + artifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
-
-            if (exists carFile) {
-                updateUrl(OrderRootType.classes, carFile);
-            }
-
-            value sourceContext = ArtifactContext(null, artifact.name(), artifact.version(), ArtifactContext.src);
-            if (exists sourceArtifact = repositoryManager.getArtifactResult(sourceContext)) {
-                value srcFile = VirtualFileManager.instance
-                    .findFileByUrl(JarFileSystem.protocolPrefix + sourceArtifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
-                
-                if (exists srcFile) {
-                    updateUrl(OrderRootType.sources, srcFile);
+                if (exists carFile) {
+                    updateUrl(OrderRootType.classes, carFile);
                 }
-            }
 
-            if (exists entry = mrm.findLibraryOrderEntry(lib)) {
-                entry.scope = DependencyScope.provided;
-            } else {
-                value newEntry = mrm.addLibraryEntry(lib);
-                newEntry.scope = DependencyScope.provided;
+                value sourceContext = ArtifactContext(null, artifact.name(), artifact.version(), ArtifactContext.src);
+                if (exists sourceArtifact = repositoryManager.getArtifactResult(sourceContext)) {
+                    value srcFile = VirtualFileManager.instance
+                        .findFileByUrl(JarFileSystem.protocolPrefix + sourceArtifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
+
+                    if (exists srcFile) {
+                        updateUrl(OrderRootType.sources, srcFile);
+                    }
+                }
+
+                if (exists entry = mrm.findLibraryOrderEntry(lib)) {
+                    entry.scope = DependencyScope.provided;
+                } else {
+                    value newEntry = mrm.addLibraryEntry(lib);
+                    newEntry.scope = DependencyScope.provided;
+                }
             }
 
             provider.commit();

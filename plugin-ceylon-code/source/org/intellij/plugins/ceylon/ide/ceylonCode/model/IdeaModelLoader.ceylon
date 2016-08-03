@@ -20,7 +20,9 @@ import com.intellij.openapi.util {
     Ref
 }
 import com.intellij.openapi.vfs {
-    VirtualFile
+    VirtualFile,
+    JarFileSystem,
+    VirtualFileManager
 }
 import com.intellij.psi {
     JavaPsiFacade {
@@ -28,6 +30,9 @@ import com.intellij.psi {
     },
     PsiClass,
     PsiNamedElement
+}
+import com.intellij.psi.impl.compiled {
+    ClsFileImpl
 }
 import com.intellij.psi.search {
     GlobalSearchScope
@@ -38,6 +43,9 @@ import com.intellij.util.indexing {
 import com.redhat.ceylon.ide.common.model {
     IdeModelLoader,
     BaseIdeModule
+}
+import com.redhat.ceylon.ide.common.platform {
+    Status
 }
 import com.redhat.ceylon.model.cmr {
     ArtifactResult
@@ -51,11 +59,14 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
-    Runnable,
     ThreadLocal
 }
 import java.util.concurrent {
     Callable
+}
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    ideaPlatformUtils
 }
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
@@ -104,14 +115,9 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     shared actual void addModuleToClasspathInternal(ArtifactResult? artifact) {
         if (exists artifact,
             is IdeaCeylonProject project = ideaModuleManager.ceylonProject) {
-            
-            // TODO everytime we add a jar, it's indexed, which is slowing down
-            // the process
-            application.invokeAndWait(object satisfies Runnable {
-                shared actual void run() {
-                    project.addLibrary(artifact);
-                }
-            }, ModalityState.any());
+
+            print("Add module ``artifact.name()``");
+            project.addDependencyToClasspath(artifact);
         }
     }
     
@@ -166,9 +172,15 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     }
     
     shared actual ClassMirror? buildClassMirrorInternal(String name) {
-        assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
-        
+        assert(is IdeaCeylonProject ceylonProject = ideaModuleManager.ceylonProject);
+
+        if (ceylonProject.validatingDependencies) {
+            return findModuleDescriptorInArtifacts(ceylonProject, name);
+        }
+
+        value project = ceylonProject.ideArtifact.project;
         updateIndexIfnecessary();
+
         return concurrencyManager.needIndexes(project, () => concurrencyManager.needReadAccess(() {
             if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) { 
                 value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
@@ -181,7 +193,39 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             return null;
         }));
     }
-    
+
+    "Reads a module descriptor from bytecode instead of adding its containing artifact to
+     the classpath and wait for IntelliJ to finish indexing it."
+    ClassMirror? findModuleDescriptorInArtifacts(IdeaCeylonProject project, String name) {
+        if (name.endsWith(".$module_") || name.endsWith(".module_")) {
+            value entryPath = JarFileSystem.jarSeparator + name.replace(".", "/") + ".class";
+
+            for (dep in project.dependenciesToAdd) {
+                value path = JarFileSystem.protocolPrefix + dep.artifact().absolutePath + entryPath;
+
+                if (exists file = VirtualFileManager.instance.refreshAndFindFileByUrl(path)) {
+                    return buildClassMirrorFromBytecode(file);
+                }
+            }
+        } else {
+            ideaPlatformUtils.log(Status._WARNING,
+                "Unexpected class name '``name``' while trying to read module descriptor from bytecode");
+        }
+
+        return null;
+    }
+
+    ClassMirror? buildClassMirrorFromBytecode(VirtualFile file) {
+
+        if (exists stub = ClsFileImpl.buildFileStub(file, file.contentsToByteArray()),
+            stub.classes.size > 0) {
+
+            return PSIClass(stub.classes.get(0));
+        }
+
+        return null;
+    }
+
     shared actual String typeName(PsiClass type)
             => (type of PsiNamedElement).name else "<unknown>";
 
