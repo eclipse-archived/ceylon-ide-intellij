@@ -105,9 +105,9 @@ shared class CeylonFile(FileViewProvider viewProvider)
         else null;
 
     shared ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit() {
-        value mod = ApplicationManager.application.runReadAction(
+        Module? mod = ApplicationManager.application.runReadAction(
             object satisfies Computable<Module> {
-                compute() => ModuleUtil.findModuleForPsiElement(outer) else null;
+                compute() => ModuleUtil.findModuleForPsiElement(outer);
             }
         );
 
