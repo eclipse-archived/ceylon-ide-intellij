@@ -24,5 +24,6 @@ shared object parserConstants {
         CeylonTypes.naturalLiteral, CeylonTypes.functionLiteral, CeylonTypes.stringLiteral);
 
     shared Key<Node> _CEYLON_NODE_KEY = Key<Node>("CEYLON-SPEC_NODE");
+    shared Key<Anything()> _POST_PARSE_ACTION = Key<Anything()>("POST-PARSE-ACTION");
 }
 

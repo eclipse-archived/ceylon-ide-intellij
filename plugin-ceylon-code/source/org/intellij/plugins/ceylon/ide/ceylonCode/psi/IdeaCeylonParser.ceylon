@@ -76,7 +76,6 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
             value translator = CompilationUnitTranslator(file, verbose);
             value parseResult = sourceCodeParser.parseSourceCode(StringReader(file.text));
 
-            ASTNode root;
             if (isCommitted, exists virtualFile) {
                 if (isInSourceArchive(virtualFile)) {
                     if (isCommitted,
@@ -85,45 +84,60 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
                         value puTokens = externalPu.tokens;
                         value localTokens = parseResult.tokens;
                         if (structurallyDifferent(puTokens, localTokens)) {
-                            ideaCeylonParserLogger.warn(() => "Tokens of the phasedUnit are not the same as the parsed tokens", 20);
-                            root = translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
+                            ideaCeylonParserLogger.warn(() => "Tokens of the externalPhasedUnit are not the same as the parsed tokens for file `` file.originalFile.name ``(``file.originalFile.hash``)", 20);
+                            ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
+                            return translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
                         } else {
-                            root = translator.translateToAstNode(externalPu.compilationUnit, externalPu.tokens);
+                            ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(externalPu.compilationUnit (`` externalPu.compilationUnit.hash ``), externalPu.tokens (`` externalPu.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
+                            ASTNode root = translator.translateToAstNode(externalPu.compilationUnit, externalPu.tokens);
                             if (exists localAnalyzer) {
                                 assert(exists lastCommittedDocument);
-                                localAnalyzer.translatedExternalSource(lastCommittedDocument, externalPu);
+                                root.putUserData(parserConstants._POST_PARSE_ACTION, void () {
+                                    localAnalyzer.translatedExternalSource(lastCommittedDocument, externalPu);
+                                });
                             }
+                            return root;
                         }
                     } else {
-                        root = translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
+                        ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
+                        return translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
                     }
-                    return root;
                 } else {
                     if (! localAnalyzer exists) {
                         if (isCommitted, exists projectPhasedUnit = file.retrieveProjectPhasedUnit()) {
                             value puTokens = projectPhasedUnit.tokens;
                             value localTokens = parseResult.tokens;
                             if (structurallyDifferent(puTokens, localTokens)) {
-                                ideaCeylonParserLogger.warn(() => "Tokens of the phasedUnit are not the same as the parsed tokens", 20);
+                                ideaCeylonParserLogger.warn(() => "Tokens of the projectphasedUnit are not the same as the parsed tokens for file `` file.originalFile.name ``(``file.originalFile.hash``)", 20);
+                                ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
                                 return translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
                             } else {
+                                ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(projectPhasedUnit.compilationUnit (`` projectPhasedUnit.compilationUnit.hash ``), projectPhasedUnit.tokens (`` projectPhasedUnit.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
                                 return translator.translateToAstNode(projectPhasedUnit.compilationUnit, projectPhasedUnit.tokens);
                             }
                         } else {
+                            ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
                             return translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
                         }
                     }
                 }
             }
 
-            root = translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
-            if (exists localAnalyzer,
-                ! CompletionInitializationContext.dummyIdentifierTrimmed in file.text) {
-                assert(exists lastCommittedDocument);
-                localAnalyzer.parsedProjectSource(
-                    lastCommittedDocument,
-                    parseResult.compilationUnit,
-                    parseResult.tokens);
+            ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
+            ASTNode root = translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
+            if (exists localAnalyzer) {
+                if (! CompletionInitializationContext.dummyIdentifierTrimmed in file.text) {
+                    assert(exists lastCommittedDocument);
+                    root.putUserData(parserConstants._POST_PARSE_ACTION, void () {
+                        localAnalyzer.parsedProjectSource(
+                            lastCommittedDocument,
+                            parseResult.compilationUnit,
+                            parseResult.tokens);
+                    });
+
+                } else {
+                    ideaCeylonParserLogger.debug(() => "Local analyzer not notified of parsing for file `` file.originalFile.name ``(``file.originalFile.hash``) because the text contains '`` CompletionInitializationContext.dummyIdentifierTrimmed ``'");
+                }
             }
 
             return root;

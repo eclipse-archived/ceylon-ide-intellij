@@ -7,7 +7,8 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.psi {
-    FileViewProvider
+    FileViewProvider,
+    PsiElement
 }
 import com.intellij.psi.tree {
     TokenSet
@@ -25,7 +26,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsiFactory,
     CeylonTypes,
     TokenTypes,
-    IdeaCeylonParser
+    IdeaCeylonParser,
+    CeylonPsi,
+    parserConstants
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     SpecifierStatementPsiIdOwner
@@ -54,10 +57,19 @@ shared class CeylonParserDefinition() satisfies ParserDefinition {
                 TokenTypes.stringEnd.tokenType,
                 TokenTypes.charLiteral.tokenType);
 
-    createElement(ASTNode node)
-            => if (node.elementType == CeylonTypes.specifierStatement)
-            then SpecifierStatementPsiIdOwner(node)
-            else CeylonPsiFactory.createElement(node);
+    shared actual PsiElement createElement(ASTNode node) {
+        if (node.elementType == CeylonTypes.specifierStatement) {
+            return SpecifierStatementPsiIdOwner(node);
+        } else {
+            value elem = CeylonPsiFactory.createElement(node);
+            if (is CeylonPsi.CompilationUnitPsi elem,
+                exists postParseAction = node.getUserData(parserConstants._POST_PARSE_ACTION)) {
+                postParseAction();
+                node.putUserData(parserConstants._POST_PARSE_ACTION, null);
+            }
+            return elem;
+        }
+    }
 
     createFile(FileViewProvider viewProvider)
             => CeylonFile(viewProvider);
