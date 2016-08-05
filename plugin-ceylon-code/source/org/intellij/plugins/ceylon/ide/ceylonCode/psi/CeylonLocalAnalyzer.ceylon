@@ -144,10 +144,13 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
 
     value logger => ceylonLocalAnalyzerLogger;
     
+    function makeTaskId(Anything() typecheckingTask)
+            => "[`` LogUtils.retrieveHash(typecheckingTask) ``(`` virtualFile.name ``)]";
+
     void submitLocalTypechecking(
         void typecheckingTask(), 
         Integer delay = delayToStartLocalAnalysisAfterParsing) {
-        value taskId => "[`` LogUtils.retrieveHash(typecheckingTask) ``(`` virtualFile.name ``)]";
+        value taskId => makeTaskId(typecheckingTask);
         
         if (disposed) {
             logger.debug(()=>"ERROR : Submitted local tyechecking task `` taskId `` while the CeylonLocalAnalyzer is already disposed.
@@ -244,7 +247,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
 
     function prepareLocalAnalysisResult(Document document, Tree.CompilationUnit parsedRootNode, List<CommonToken> tokens) {
-        logger.debug(()=>"Enter prepareLocalAnalysisResult(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``");
+        logger.trace(()=>"Enter prepareLocalAnalysisResult(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``");
         resultLock.lock();
         try {
             MutableLocalAnalysisResult result;
@@ -264,16 +267,16 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
     
     shared void parsedProjectSource(Document document, Tree.CompilationUnit parsedRootNode, List<CommonToken> tokens) {
-        logger.debug(()=>"Enter parsedProjectSource(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``", 20);
+        logger.trace(()=>"Enter parsedProjectSource(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``", 20);
         value result = prepareLocalAnalysisResult(document, parsedRootNode, tokens);
         submitLocalTypechecking(void () {
-            typecheckSourceFile(document, parsedRootNode, tokens, result, 0, restarterCancellable);
+            typecheckSourceFile(result, 0, restarterCancellable);
         });
-        logger.debug(()=>"Exit parsedProjectSource(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``");
+        logger.trace(()=>"Exit parsedProjectSource(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``");
     }
 
     shared void scheduleExternalSourcePreparation(CeylonLocalAnalyzerManager manager) {
-        logger.debug(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
+        logger.trace(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
             ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
                 assert (is PsiDocumentManagerBase psiDocumentManager = PsiDocumentManager.getInstance(ideaProject));
                 value phasedUnit = getCeylonProjects(ideaProject)?.findExternalPhasedUnit(virtualFile);
@@ -284,15 +287,21 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                     logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
                 }
             }));
-        logger.debug(()=>"Exit prepareExternalSource() for file ``virtualFile.name``");
+        logger.trace(()=>"Exit prepareExternalSource() for file ``virtualFile.name``");
     }
     
     shared void translatedExternalSource(Document document, ExternalPhasedUnit phasedUnit) {
-        logger.debug(()=>"Enter translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``", 20);
-        value result = prepareLocalAnalysisResult(document, phasedUnit.compilationUnit, phasedUnit.tokens);
-        result.finishedTypechecking(phasedUnit, phasedUnit.typeChecker);
+        logger.trace(()=>"Enter translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``", 20);
+        resultLock.lock();
+        MutableLocalAnalysisResult result;
+        try {
+            result = prepareLocalAnalysisResult(document, phasedUnit.compilationUnit, phasedUnit.tokens);
+            result.finishedTypechecking(phasedUnit, phasedUnit.typeChecker);
+        } finally {
+            resultLock.unlock();
+        }
         submitLocalTypechecking(void () {
-            completeExternalPhasedUnitTypechecking(phasedUnit, result, restarterCancellable);
+            completeExternalPhasedUnitTypechecking(result, restarterCancellable);
         });
         externalPhasedUnitToTranslate = null;
         logger.debug(()=>"Exit translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``");
@@ -313,11 +322,8 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
     
     shared void scheduleForcedTypechecking(Integer delay = 0, Integer waitForModelInSeconds = 0) {
-        logger.debug(()=>"Enter scheduleForcedTypechecking(``0``, ``waitForModelInSeconds``) for file ``virtualFile.name``", 20);
+        logger.trace(()=>"Enter scheduleForcedTypechecking(``0``, ``waitForModelInSeconds``) for file ``virtualFile.name``", 20);
         void typecheckingTask() {
-            Document document;
-            Tree.CompilationUnit parsedRootNode;
-            List<CommonToken> commonTokens;
             MutableLocalAnalysisResult currentResult;
             
             resultLock.lock();
@@ -329,19 +335,15 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                 
                 currentResult = theResult;
                 
-                document = currentResult.document;
-                parsedRootNode = currentResult.parsedRootNode;
-                commonTokens = currentResult.tokens;
-
-                removePreviousTypecheckingErrors(parsedRootNode);
+                removePreviousTypecheckingErrors(currentResult.parsedRootNode);
             } finally {
                 resultLock.unlock();
             }
             
-            typecheckSourceFile(document, parsedRootNode, commonTokens, currentResult, waitForModelInSeconds, restarterCancellable);
+            typecheckSourceFile(currentResult, waitForModelInSeconds, restarterCancellable);
         }
         submitLocalTypechecking(typecheckingTask, delay);
-        logger.debug(()=>"Exit scheduleForcedTypechecking(``0``, ``waitForModelInSeconds``) for file ``virtualFile.name``", 20);
+        logger.trace(()=>"Exit scheduleForcedTypechecking(``0``, ``waitForModelInSeconds``) for file ``virtualFile.name``", 20);
     }
 
     shared LocalAnalysisResult? forceTypechecking(Cancellable? cancellable, Integer waitForModelInSeconds) =>
@@ -377,9 +379,6 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
             }
             logger.debug(()=>"Finished waiting for the Alarm to be empty for file `` virtualFile.name `` : `` system.milliseconds - startWait `` ms");
             
-            Document document;
-            Tree.CompilationUnit parsedRootNode;
-            List<CommonToken> commonTokens;
             MutableLocalAnalysisResult currentResult;
                         
             resultLock.lock();
@@ -393,39 +392,49 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                 
                 if (!force && currentResult.typecheckedRootNode exists) {
                     logger.debug(()=>"The file `` virtualFile.name `` is already up-to-date so don't run the synchronous local typechecking");
-                    return currentResult;
+                    return currentResult.immutable;
                 }
                 
-                document = currentResult.document;
-                parsedRootNode = currentResult.parsedRootNode;
-                commonTokens = currentResult.tokens;
                 if (force) {
-                    removePreviousTypecheckingErrors(parsedRootNode);
+                    removePreviousTypecheckingErrors(currentResult.parsedRootNode);
                 }
             } finally {
                 resultLock.unlock();
             }
-            typecheckSourceFile(document, parsedRootNode, commonTokens, currentResult, waitForModelInSeconds, cancellable);
+            typecheckSourceFile(currentResult, waitForModelInSeconds, cancellable);
             return currentResult.immutable;
         } finally {
             backgroundAnalysisDisabled = false;
             if (exists toSubmitAgain = 
                             taskSubmittedWhileBackgroundTypecheckingWasDisabled) {
                 taskSubmittedWhileBackgroundTypecheckingWasDisabled = null;
-                logger.debug(()=>"Submitting again the typechecking task [``toSubmitAgain``] that was cancelled to let synchronous typechecking run for file ``virtualFile.name``");
+                logger.debug(()=>"Submitting again the typechecking task [``makeTaskId(toSubmitAgain)``] that was cancelled to let synchronous typechecking run for file ``virtualFile.name``");
                 submitLocalTypechecking(toSubmitAgain);            
             }
             logger.debug(()=>"Exit runTypechecking(``cancellable else "<null>"``, ``waitForModelInSeconds``, ``force``) for file ``virtualFile.name``");
         }
     }
 
-    void typecheckSourceFile(Document document, Tree.CompilationUnit parsedRootNode, List<CommonToken> tokens, MutableLocalAnalysisResult result, Integer waitForModelInSeconds, Cancellable? cancellable) {
+    void typecheckSourceFile(MutableLocalAnalysisResult result, Integer waitForModelInSeconds, Cancellable? cancellable) {
         assert (exists modelManager = getModelManager(model.ideaProject));
         try {
             modelManager.pauseAutomaticModelUpdate();
             checkCancelled(cancellable);
             if (exists ceylonProject) {
                 ceylonProject.withSourceModel(true, () {
+                    Document document;
+                    Tree.CompilationUnit parsedRootNode;
+                    List<CommonToken> tokens;
+
+                    resultLock.lock();
+                    try {
+                        document = result.document;
+                        parsedRootNode = result.parsedRootNode;
+                        tokens = result.tokens;
+                    } finally {
+                        resultLock.unlock();
+                    }
+
                     TypeChecker typechecker;
                     FileVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> fileVirtualFileToTypecheck;
                     FolderVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile> srcDir;
@@ -462,7 +471,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                         
                         value existingPackage = sourceFileVirtualFile.ceylonPackage;
                         if (! exists existingPackage) {
-                            platformUtils.log(Status._ERROR, "The `ceylonPackage` is null for FileVirtualFile: `` sourceFileVirtualFile `` during local typechecking");
+                            ceylonLocalAnalyzerLogger.error(() => "The `ceylonPackage` is null for FileVirtualFile: `` sourceFileVirtualFile `` during local typechecking");
                             throw platformUtils.newOperationCanceledException();
                         }
                         pkg = existingPackage;
@@ -575,7 +584,8 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         });
     }
 
-    void completeExternalPhasedUnitTypechecking(ExternalPhasedUnit phasedUnit, MutableLocalAnalysisResult result, Cancellable cancellable) {
+    void completeExternalPhasedUnitTypechecking(MutableLocalAnalysisResult result, Cancellable cancellable) {
+        assert(is ExternalPhasedUnit phasedUnit = result.lastPhasedUnit);
         concurrencyManager.withUpToDateIndexes(() {
             phasedUnit.analyseTypes(cancelDidYouMeanSearch);
             phasedUnit.analyseUsage();
@@ -583,19 +593,24 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         if (exists typechecker = phasedUnit.typeChecker) {
             result.finishedTypechecking(phasedUnit, typechecker);
         } else {
-            platformUtils.log(Status._DEBUG, "the `typechecker` of the ExternalPhasedUnit `` phasedUnit `` is null");
+            ceylonLocalAnalyzerLogger.debug(()=> "the `typechecker` of the ExternalPhasedUnit `` phasedUnit `` is null");
         }
     }
     
     shared LocalAnalysisResult? result => result_;
     
     shared void initialize(CeylonLocalAnalyzerManager manager) {
-        if (isInSourceArchive(virtualFile)) {
-            scheduleExternalSourcePreparation(manager);
-        } else {
-            ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
-                manager.scheduleReparse(virtualFile);
-            }));
+        ceylonLocalAnalyzerLogger.trace(()=> "Enter initialize(`` manager ``)", 10);
+        try {
+            if (isInSourceArchive(virtualFile)) {
+                scheduleExternalSourcePreparation(manager);
+            } else {
+                ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
+                    manager.scheduleReparse(virtualFile);
+                }));
+            }
+        } finally {
+            ceylonLocalAnalyzerLogger.trace(()=> "Exit initialize(`` manager ``)", 10);
         }
     }
 }
