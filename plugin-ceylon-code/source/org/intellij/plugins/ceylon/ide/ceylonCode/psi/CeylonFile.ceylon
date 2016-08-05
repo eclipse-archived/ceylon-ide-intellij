@@ -79,6 +79,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import com.intellij.psi.text {
     BlockSupport
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    CeylonLogger
+}
+
+CeylonLogger<CeylonFile> ceylonFileLogger = CeylonLogger<CeylonFile>();
 
 shared class CeylonFile(FileViewProvider viewProvider)
         extends PsiFileBase(viewProvider, CeylonLanguage.instance) satisfies PsiClassOwner {
@@ -158,9 +163,14 @@ shared class CeylonFile(FileViewProvider viewProvider)
             if (result.parsedRootNode === attachedCompilationUnit) {
                 return result;
             } else {
-                platformUtils.log(Status._WARNING, "LocalAnalysisResult.parsedRootNode !== ceylonFile.compilationUnit ");
+                ceylonFileLogger.warn(() =>
+                "LocalAnalysisResult.parsedRootNode (``
+                result.parsedRootNode.hash ``) !== ceylonFile.compilationUnit (``
+                attachedCompilationUnit.hash `` - `` attachedCompilationUnit.nodeType `` - `` attachedCompilationUnit.location ``) for file `` originalFile.name ``(``originalFile.hash``)");
+                return null;
             }
         }
+
         IdePhasedUnit? phasedUnit = if (!isInSourceArchive(realVirtualFile()))
             then retrieveProjectPhasedUnit()
             else retrieveExternalPhasedUnit();
@@ -193,7 +203,11 @@ shared class CeylonFile(FileViewProvider viewProvider)
                     }
                 };
             } else {
-                platformUtils.log(Status._WARNING, "ProjectPhasedUnit.compilationUnit !== ceylonFile.compilationUnit ");
+                ceylonFileLogger.warn(() =>
+                "ProjectPhasedUnit.compilationUnit (``
+                phasedUnit.compilationUnit.hash ``) !== ceylonFile.compilationUnit (``
+                attachedCompilationUnit.hash `` - `` attachedCompilationUnit.nodeType `` - `` attachedCompilationUnit.location ``) for file `` originalFile.name ``(``originalFile.hash``)");
+                return null;
             }
         }
         platformUtils.log(Status._DEBUG, "localAnalysisResult requested, but was null");

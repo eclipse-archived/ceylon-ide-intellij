@@ -176,7 +176,9 @@ shared object concurrencyManager {
     Return withIndexStrategy<Return>(NoIndexStrategy s, Return() func) {
         NoIndexStrategy? previousStrategy;
         if (exists currentStrategy = noIndexStrategy_.get()) {
-            logger.debug(()=>"The current strategy (``currentStrategy``) when indexes are unavailable should overriden by a new one (``s``) with care", 10);
+            if (currentStrategy != s && s != NoIndexStrategy.ousideDumbMode) {
+                logger.info(()=>"The current strategy (``currentStrategy``) when indexes are unavailable should overriden by a new one (``s``) with care", 10);
+            }
             previousStrategy = currentStrategy;
         } else {
             previousStrategy = null;

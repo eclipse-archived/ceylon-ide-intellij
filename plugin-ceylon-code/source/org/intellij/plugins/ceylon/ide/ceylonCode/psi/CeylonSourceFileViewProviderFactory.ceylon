@@ -43,16 +43,16 @@ shared class CeylonSourceFileViewProviderFactory()
         }
         
         if (isInSourceArchive(virtualFile)) {
-            ceylonSourceFileViewProviderFactoryLogger.debug(() => "Creating a CeylonSourceFileViewProvider for the virtual file: `` virtualFile ``", 15);            
+            ceylonSourceFileViewProviderFactoryLogger.trace(() => "Creating a CeylonSourceFileViewProvider for the virtual file: `` virtualFile ``");
             return CeylonSourceFileViewProvider(psiManager, virtualFile, eventSystemEnabled);
         }
         
         if (virtualFile is LightVirtualFile) {
-            ceylonSourceFileViewProviderFactoryLogger.debug(() => "Don't create a CeylonSourceFileViewProvider for the light virtual file: `` virtualFile ``", 15);            
+            ceylonSourceFileViewProviderFactoryLogger.trace(() => "Don't create a CeylonSourceFileViewProvider for the light virtual file: `` virtualFile ``");
             return SingleRootFileViewProvider(psiManager, virtualFile, eventSystemEnabled);
         }
         
-        ceylonSourceFileViewProviderFactoryLogger.debug(() => "Creating a CeylonSourceFileViewProvider for the virtual file: `` virtualFile ``", 15);            
+        ceylonSourceFileViewProviderFactoryLogger.trace(() => "Creating a CeylonSourceFileViewProvider for the virtual file: `` virtualFile ``");
         return CeylonSourceFileViewProvider(psiManager, virtualFile, eventSystemEnabled);
     }
 }

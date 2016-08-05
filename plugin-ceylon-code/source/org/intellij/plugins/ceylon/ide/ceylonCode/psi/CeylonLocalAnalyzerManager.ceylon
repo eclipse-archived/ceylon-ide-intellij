@@ -187,6 +187,7 @@ shared class CeylonLocalAnalyzerManager(model)
     }
 
     shared actual void modelPhasedUnitsTypechecked({ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile>*} typecheckedUnits) {
+        logger.trace(()=>"Enter modelPhasedUnitsTypechecked(``typecheckedUnits``)", 10);
         value ceylonEditedFiles = concurrencyManager.needReadAccess(() =>
             fileEditorManagerInstance(model.ideaProject)
                 .openFiles.array.coalesced).sequence();
@@ -203,6 +204,7 @@ shared class CeylonLocalAnalyzerManager(model)
                 scheduleReparse(virtualFile);
             }
         }
+        logger.trace(()=>"Exit modelPhasedUnitsTypechecked(``typecheckedUnits``)");
     }
     
     shared actual void ceylonModelParsed(CeylonProject<Module, VirtualFile, VirtualFile, VirtualFile> project) {
@@ -217,15 +219,18 @@ shared class CeylonLocalAnalyzerManager(model)
     }
 
     shared actual void externalPhasedUnitsTypechecked({ExternalPhasedUnit*} typecheckedUnits, Boolean fullyTypechecked) {
+        logger.trace(()=>"Enter externalPhasedUnitsTypechecked(``typecheckedUnits``, ``fullyTypechecked``)", 10);
         for (unit in typecheckedUnits) {
             if (exists virtualFile = CeylonTreeUtil.getDeclaringFile(unit.unit, model.ideaProject)?.virtualFile) {
                 virtualFile.putUserData(uneditedExternalPhasedUnit, WeakReference<ExternalPhasedUnit>(unit));
                 scheduleReparse(virtualFile);
             }
         }
+        logger.trace(()=>"Exit externalPhasedUnitsTypechecked(``typecheckedUnits``, ``fullyTypechecked``)");
     }
 
     shared void scheduleReparse(VirtualFile virtualFile) {
+        logger.trace(()=>"Enter scheduleReparse(``virtualFile``)", 10);
         ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() {
             if (is SingleRootFileViewProvider fileViewProvider =
                 application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
@@ -255,6 +260,7 @@ shared class CeylonLocalAnalyzerManager(model)
                 }));
             }
         }));
+        logger.trace(()=>"Exit scheduleReparse(``virtualFile``)");
     }
 
     selectionChanged(FileEditorManagerEvent fileEditorManagerEvent) => noop();
