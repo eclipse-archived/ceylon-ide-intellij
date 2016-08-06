@@ -22,8 +22,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
 shared class CeylonRefactoringListener() satisfies RefactoringElementListenerProvider {
 
     shared actual RefactoringElementListener? getListener(PsiElement element) {
-        value file = element.containingFile;
-        if (is DeclarationPsiNameIdOwner element) {
+        if (exists file = element.containingFile,
+            is DeclarationPsiNameIdOwner element) {
             return object satisfies RefactoringElementListener {
                 shared actual void elementMoved(PsiElement newElement) {}
                 shared actual void elementRenamed(PsiElement newElement) {
