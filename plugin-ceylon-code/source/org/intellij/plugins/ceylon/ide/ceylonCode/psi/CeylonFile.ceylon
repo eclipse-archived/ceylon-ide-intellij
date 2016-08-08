@@ -203,8 +203,11 @@ shared class CeylonFile(FileViewProvider viewProvider)
                     }
                 };
             } else {
-                ceylonFileLogger.warn(() =>
-                "ProjectPhasedUnit.compilationUnit (``
+                ceylonFileLogger.warn(() => "``
+                if(phasedUnit is ExternalPhasedUnit)
+                then "ExternalPhasedUnit"
+                else "ProjectPhasedUnit"
+                ``.compilationUnit (``
                 phasedUnit.compilationUnit.hash ``) !== ceylonFile.compilationUnit (``
                 attachedCompilationUnit.hash `` - `` attachedCompilationUnit.nodeType `` - `` attachedCompilationUnit.location ``) for file `` originalFile.name ``(``originalFile.hash``)");
                 return null;
