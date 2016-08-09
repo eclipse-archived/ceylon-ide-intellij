@@ -29,7 +29,9 @@ import com.intellij.psi {
         javaPsiFacade=getInstance
     },
     PsiClass,
-    PsiNamedElement
+    PsiNamedElement,
+    PsiManager,
+    PsiJavaFile
 }
 import com.intellij.psi.impl.compiled {
     ClsFileImpl
@@ -67,6 +69,9 @@ import java.util.concurrent {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     ideaPlatformUtils
+}
+import com.intellij.psi.impl.java.stubs.impl {
+    PsiJavaFileStubImpl
 }
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
@@ -217,10 +222,14 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
 
     ClassMirror? buildClassMirrorFromBytecode(VirtualFile file) {
 
-        if (exists stub = ClsFileImpl.buildFileStub(file, file.contentsToByteArray()),
-            stub.classes.size > 0) {
+        if (is PsiJavaFileStubImpl stub = ClsFileImpl.buildFileStub(file, file.contentsToByteArray()),
+            stub.classes.size > 0,
+            exists ideaProject = ideaModuleManager.ceylonProject?.ideArtifact?.project,
+            is PsiJavaFile psiFile = PsiManager.getInstance(ideaProject).findFile(file)) {
 
-            return PSIClass(stub.classes.get(0));
+            stub.psi = psiFile;
+            value internalPsiClass = stub.classes.get(0);
+            return PSIClass(internalPsiClass);
         }
 
         return null;

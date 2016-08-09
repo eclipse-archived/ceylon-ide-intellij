@@ -18,11 +18,12 @@ class PSIPackage(PsiClass psi)
     shared actual String qualifiedName { 
         if (!name exists) {
             name = concurrencyManager.needReadAccess(() {
-                if (is PsiJavaFile f = psi.containingFile) {
+                value f = psi.containingFile else null;
+                if (is PsiJavaFile f) {
                     return f.packageName;
                 }
                 platformUtils.log(Status._WARNING, 
-                    "No qualified name for file ``className(psi.containingFile)``");
+                    "No qualified name for file ``f else "<null>"``");
                 return "";
             });
         }
