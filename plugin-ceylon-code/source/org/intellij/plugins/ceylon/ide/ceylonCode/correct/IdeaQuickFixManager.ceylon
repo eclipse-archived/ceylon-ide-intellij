@@ -108,7 +108,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     textAttributes
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    concurrencyManager
+    concurrencyManager,
+    getModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -177,16 +178,23 @@ class CustomIntention(Integer position, String desc,
     familyName => "Ceylon Intentions";
 
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile) {
-        if (is IdeaTextChange change) {
-            change.applyOnProject(project);
-        } else if (is Anything() change) {
-            change();
+        assert (exists modelManager = getModelManager(project));
+        try {
+            modelManager.pauseAutomaticModelUpdate();
+
+            if (is IdeaTextChange change) {
+                change.applyOnProject(project);
+            } else if (is Anything() change) {
+                change();
+            }
+            if (exists selection) {
+                editor.selectionModel.setSelection(selection.startOffset, selection.endOffset);
+                editor.caretModel.moveToOffset(selection.endOffset);
+            }
+            callback(project, editor, psiFile);
+        } finally {
+            modelManager.resumeAutomaticModelUpdate(0);
         }
-        if (exists selection) {
-            editor.selectionModel.setSelection(selection.startOffset, selection.endOffset);
-            editor.caretModel.moveToOffset(selection.endOffset);
-        }
-        callback(project, editor, psiFile);
     }
     
     shared actual Boolean isAvailable(Project project, Editor? editor, PsiFile? psiFile) {
@@ -215,11 +223,13 @@ shared class IdeaQuickFixData(
     shared actual Tree.CompilationUnit rootNode,
     shared actual PhasedUnit phasedUnit,
     shared actual Node node,
-    shared Mod project,
+    shared Mod ideaModule,
     shared Annotation? annotation,
     shared actual BaseCeylonProject ceylonProject,
     shared variable Editor? editor = null
 ) satisfies QuickFixData {
+
+    assert (exists modelManager = getModelManager(ideaModule.project));
 
     useLazyFixes => true;
     errorCode => message.code;
@@ -258,18 +268,24 @@ shared class IdeaQuickFixData(
                 };
             annotation.registerFix(intention);
         } else {
-            switch (change)
-            case (null) {
-                return;
-            } case (is PlatformTextChange) {
-                change.apply();
-            } else {
-                change();
-            }
+            try {
+                modelManager.pauseAutomaticModelUpdate();
 
-            if (exists selection, exists e = editor) {
-                e.selectionModel.setSelection(selection.startOffset, selection.endOffset);
-                e.caretModel.moveToOffset(selection.endOffset);
+                switch (change)
+                case (null) {
+                    return;
+                } case (is PlatformTextChange) {
+                    change.apply();
+                } else {
+                    change();
+                }
+
+                if (exists selection, exists e = editor) {
+                    e.selectionModel.setSelection(selection.startOffset, selection.endOffset);
+                    e.caretModel.moveToOffset(selection.endOffset);
+                }
+            } finally {
+                modelManager.resumeAutomaticModelUpdate(0);
             }
         }
     }
@@ -319,25 +335,32 @@ shared class IdeaQuickFixData(
                                 assert (exists resolution = candidates[0]);
                                 value change = resolution.change;
                                 value p = project;
-                                object extends WriteCommandAction<Nothing>(p, file) {
-                                    shared actual void run(Result<Nothing> result) {
-                                        if (is PlatformTextChange change) {
-                                            assert (is IdeaTextChange change);
-                                            change.applyOnProject(project);
-                                        } else {
-                                            change();
+
+                                try {
+                                    modelManager.pauseAutomaticModelUpdate();
+
+                                    object extends WriteCommandAction<Nothing>(p, file) {
+                                        shared actual void run(Result<Nothing> result) {
+                                            if (is PlatformTextChange change) {
+                                                assert (is IdeaTextChange change);
+                                                change.applyOnProject(project);
+                                            } else {
+                                                change();
+                                            }
+                                            if (exists qualifier = resolution.qualifier) {
+                                                value text = highlighter.highlightQuotedMessage {
+                                                    description = "Automatically resolved '``resolution.description``' ('``qualifier``')";
+                                                    project = project;
+                                                    qualifiedNameIsPath = true;
+                                                };
+                                                //TODO: the icon?
+                                                HintManager.instance.showInformationHint(editor, JBLabel(text));
+                                            }
                                         }
-                                        if (exists qualifier = resolution.qualifier) {
-                                            value text = highlighter.highlightQuotedMessage {
-                                                description = "Automatically resolved '``resolution.description``' ('``qualifier``')";
-                                                project = project;
-                                                qualifiedNameIsPath = true;
-                                            };
-                                            //TODO: the icon?
-                                            HintManager.instance.showInformationHint(editor, JBLabel(text));
-                                        }
-                                    }
-                                }.execute();
+                                    }.execute();
+                                } finally {
+                                    modelManager.resumeAutomaticModelUpdate(0);
+                                }
                             }
                             else {
                                 showPopup {
@@ -458,12 +481,19 @@ shared void showPopup(Editor editor, List<Resolution> candidates, String title, 
             if (exists candidate = candidates[list.selectedIndex]) {
                 object extends WriteCommandAction<Nothing>(editor.project) {
                     shared actual void run(Result<Nothing> result) {
-                        switch (change = candidate.change)
-                        case (is PlatformTextChange) {
-                            change.apply();
-                        }
-                        else {
-                            change();
+                        assert (exists modelManager = getModelManager(project));
+                        try {
+                            modelManager.pauseAutomaticModelUpdate();
+
+                            switch (change = candidate.change)
+                            case (is PlatformTextChange) {
+                                change.apply();
+                            }
+                            else {
+                                change();
+                            }
+                        } finally {
+                            modelManager.resumeAutomaticModelUpdate(0);
                         }
                     }
                 }.execute();

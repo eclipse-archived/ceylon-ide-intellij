@@ -153,7 +153,7 @@ shared class CeylonTypeCheckerAnnotator()
                 rootNode = pu.compilationUnit;
                 phasedUnit = pu;
                 node = node;
-                project = mod;
+                ideaModule = mod;
                 annotation = annotation;
                 ceylonProject = project;
             };

@@ -98,7 +98,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             }
 
         } finally {
-            modelManager.resumeAutomaticModelUpdate();
+            modelManager.resumeAutomaticModelUpdate(0);
         }
     }
 

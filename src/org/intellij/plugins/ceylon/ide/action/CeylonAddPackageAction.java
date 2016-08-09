@@ -11,6 +11,7 @@ import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.CeylonModelManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.Nullable;
@@ -28,36 +29,49 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
                                final VirtualFile srcRoot, final String eventPackage,
                                final PsiDirectory eventPsiDir) {
 
-        final String packageName = Messages.showInputDialog(
-                e.getProject(),
-                message("ceylon.package.wizard.message"),
-                message("ceylon.package.wizard.title"),
-                null,
-                eventPackage,
-                new AddPackageInputValidator(),
-                TextRange.from(eventPackage.length(), 0)
-        );
+        boolean madeTheChange = false;
+        CeylonModelManager modelManager = project.getModel().getIdeaProject().getComponent(CeylonModelManager.class);
+        try {
+            modelManager.pauseAutomaticModelUpdate();
 
-        if (packageName != null) {
-            ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                @Override
-                public void run() {
-                    PsiDirectory srcRootDirectory = PsiManager.getInstance(e.getProject())
-                            .findDirectory(srcRoot);
-                    PsiDirectory subdirectory = createSubdirectories(packageName, srcRootDirectory, ".");
+            final String packageName = Messages.showInputDialog(
+                    e.getProject(),
+                    message("ceylon.package.wizard.message"),
+                    message("ceylon.package.wizard.title"),
+                    null,
+                    eventPackage,
+                    new AddPackageInputValidator(),
+                    TextRange.from(eventPackage.length(), 0)
+            );
 
-                    if (subdirectory != null) {
-                        PsiElement pack = ceylonFileFactory.createPackageDescriptor(subdirectory, packageName, true);
+            if (packageName != null) {
+                madeTheChange = true;
+                ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        PsiDirectory srcRootDirectory = PsiManager.getInstance(e.getProject())
+                                .findDirectory(srcRoot);
+                        PsiDirectory subdirectory = createSubdirectories(packageName, srcRootDirectory, ".");
 
-                        if (pack instanceof Navigatable) {
-                            ((Navigatable) pack).navigate(true);
+                        if (subdirectory != null) {
+                            PsiElement pack = ceylonFileFactory.createPackageDescriptor(subdirectory, packageName, true);
+
+                            if (pack instanceof Navigatable) {
+                                ((Navigatable) pack).navigate(true);
+                            }
+                        } else {
+                            Logger.getInstance(CeylonAddModuleAction.class)
+                                    .error("Can't create package descriptor: subdirectory is null.");
                         }
-                    } else {
-                        Logger.getInstance(CeylonAddModuleAction.class)
-                                .error("Can't create package descriptor: subdirectory is null.");
                     }
-                }
-            });
+                });
+            }
+        } finally {
+            if (madeTheChange) {
+                modelManager.resumeAutomaticModelUpdate(0);
+            } else {
+                modelManager.resumeAutomaticModelUpdate();
+            }
         }
     }
 

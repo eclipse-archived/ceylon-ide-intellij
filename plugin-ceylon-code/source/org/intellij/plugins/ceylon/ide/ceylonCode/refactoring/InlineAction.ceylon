@@ -123,7 +123,7 @@ shared class InlineAction() extends InlineActionHandler() {
             }
 
         } finally {
-            modelManager.resumeAutomaticModelUpdate();
+            modelManager.resumeAutomaticModelUpdate(0);
         }
     }
 

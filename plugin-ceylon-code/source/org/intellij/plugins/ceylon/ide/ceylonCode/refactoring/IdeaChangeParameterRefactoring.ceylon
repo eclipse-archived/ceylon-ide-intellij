@@ -164,7 +164,7 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
             }
 
         } finally {
-            modelManager.resumeAutomaticModelUpdate();
+            modelManager.resumeAutomaticModelUpdate(0);
         }
     }
 

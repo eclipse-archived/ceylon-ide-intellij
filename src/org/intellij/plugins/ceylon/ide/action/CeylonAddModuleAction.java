@@ -12,6 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.redhat.ceylon.common.Backend;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.CeylonModelManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.intellij.plugins.ceylon.ide.wizard.CreateCeylonModuleWizard;
@@ -27,66 +28,81 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                                final VirtualFile srcRoot, final String eventPackage,
                                final PsiDirectory srcRootDir) {
 
+        CeylonModelManager modelManager = project.getModel().getIdeaProject().getComponent(CeylonModelManager.class);
+
         final CreateCeylonModuleWizard wizard = new CreateCeylonModuleWizard(e.getProject(), project);
 
-        wizard.show();
+        boolean madeTheChange = true;
+        try {
+            modelManager.pauseAutomaticModelUpdate();
+            wizard.show();
 
-        if (wizard.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-            final String moduleName = wizard.getModuleName();
-            boolean hasSuffix = wizard.getCompilationUnitName().endsWith(".ceylon");
-            final String unitFileName = hasSuffix
-                    ? wizard.getCompilationUnitName()
-                    : wizard.getCompilationUnitName() + ".ceylon";
-            final String unitName = hasSuffix
-                    ? wizard.getCompilationUnitName().substring(0, ".ceylon".length())
-                    : wizard.getCompilationUnitName();
+            if (wizard.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                final String moduleName = wizard.getModuleName();
+                boolean hasSuffix = wizard.getCompilationUnitName().endsWith(".ceylon");
+                final String unitFileName = hasSuffix
+                        ? wizard.getCompilationUnitName()
+                        : wizard.getCompilationUnitName() + ".ceylon";
+                final String unitName = hasSuffix
+                        ? wizard.getCompilationUnitName().substring(0, ".ceylon".length())
+                        : wizard.getCompilationUnitName();
 
-            ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                @Override
-                public void run() {
-                    PsiDirectory subdirectory = findOrCreateModuleDirectory();
+                ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        PsiDirectory subdirectory = findOrCreateModuleDirectory();
 
-                    try {
-                        Backend backend;
-                        if (project == null) {
-                            backend = null;
-                        } else if (project.getCompileToJs() && !project.getCompileToJava()) {
-                            backend = Backend.JavaScript;
-                        } else if (!project.getCompileToJs() && project.getCompileToJava()) {
-                            backend = Backend.Java;
-                        } else {
-                            backend = null;
-                        }
-                        ceylonFileFactory.createModuleDescriptor(
-                                subdirectory, moduleName, wizard.getModuleVersion(),
-                                backend
-                        );
-
-                        ceylonFileFactory.createPackageDescriptor(subdirectory,
-                                moduleName);
-
-                        if (StringUtil.isNotEmpty(unitName)) {
-                            PsiElement run = ceylonFileFactory.createRun(subdirectory, moduleName,
-                                    unitFileName, unitName);
-
-                            if (run instanceof PsiFile) {
-                                ((PsiFile) run).navigate(true);
+                        try {
+                            Backend backend;
+                            if (project == null) {
+                                backend = null;
+                            } else if (project.getCompileToJs() && !project.getCompileToJava()) {
+                                backend = Backend.JavaScript;
+                            } else if (!project.getCompileToJs() && project.getCompileToJava()) {
+                                backend = Backend.Java;
+                            } else {
+                                backend = null;
                             }
-                        }
-                    } catch (Exception e1) {
-                        Logger.getInstance(CeylonAddModuleAction.class)
-                                .error("Can't create file from template", e1);
-                    }
-                }
+                            ceylonFileFactory.createModuleDescriptor(
+                                    subdirectory, moduleName, wizard.getModuleVersion(),
+                                    backend
+                            );
 
-                @NotNull
-                private PsiDirectory findOrCreateModuleDirectory() {
-                    VirtualFile targetDir = srcRoot.findChild(moduleName.replace('.', '/'));
-                    return targetDir != null
-                            ? PsiManager.getInstance(e.getProject()).findDirectory(targetDir)
-                            : DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
-                }
-            });
+                            ceylonFileFactory.createPackageDescriptor(subdirectory,
+                                    moduleName);
+
+                            if (StringUtil.isNotEmpty(unitName)) {
+                                PsiElement run = ceylonFileFactory.createRun(subdirectory, moduleName,
+                                        unitFileName, unitName);
+
+                                if (run instanceof PsiFile) {
+                                    ((PsiFile) run).navigate(true);
+                                }
+                            }
+                        } catch (Exception e1) {
+                            Logger.getInstance(CeylonAddModuleAction.class)
+                                    .error("Can't create file from template", e1);
+                        }
+                    }
+
+                    @NotNull
+                    private PsiDirectory findOrCreateModuleDirectory() {
+                        VirtualFile targetDir = srcRoot.findChild(moduleName.replace('.', '/'));
+                        return targetDir != null
+                                ? PsiManager.getInstance(e.getProject()).findDirectory(targetDir)
+                                : DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
+                    }
+                });
+                madeTheChange = true;
+            } else {
+                madeTheChange = false;
+            }
+        } finally {
+            if (madeTheChange) {
+                modelManager.resumeAutomaticModelUpdate(0);
+            } else {
+                modelManager.resumeAutomaticModelUpdate();
+            }
         }
     }
 

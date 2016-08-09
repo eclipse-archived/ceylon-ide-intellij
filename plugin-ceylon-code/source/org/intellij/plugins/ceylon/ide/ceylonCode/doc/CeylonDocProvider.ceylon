@@ -235,7 +235,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                             rootNode = cu;
                             phasedUnit = pu;
                             node = node;
-                            project = mod;
+                            ideaModule = mod;
                             annotation = null;
                             ceylonProject = ceylonProj;
                         };
