@@ -101,10 +101,6 @@ import com.redhat.ceylon.ide.common.model {
     ModelListenerAdapter,
     deltaBuilderFactory
 }
-import com.redhat.ceylon.ide.common.platform {
-    platformUtils,
-    Status
-}
 
 import java.lang {
     Runnable,
@@ -142,11 +138,16 @@ import java.util.concurrent.atomic {
 import com.intellij.openapi.util {
     Ref
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    CeylonLogger
+}
 
 final class ChangesInProject of noChange | changesThatAlwaysRequireModelUpdate {
     shared new noChange {}
     shared new changesThatAlwaysRequireModelUpdate {}
 }
+
+CeylonLogger<CeylonModelManager> ceylonModelManagerLogger = CeylonLogger<CeylonModelManager>();
 
 shared class CeylonModelManager(model) 
         satisfies ProjectComponent
@@ -159,8 +160,9 @@ shared class CeylonModelManager(model)
         & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
 
     value pauseRequests = AtomicInteger();
+    variable Integer? lastRequestedDelay = null;
     pauseRequests.set(0);
-    
+
     shared IdeaCeylonProjects model;
     shared Integer delayBeforeUpdatingAfterChange => ceylonSettings.autoUpdateInterval;
     shared Integer modelUpdateTimeoutMinutes => ceylonSettings.modelUpdateTimeoutMinutes;
@@ -173,14 +175,16 @@ shared class CeylonModelManager(model)
     value accumulatedChanges = LinkedBlockingQueue<NativeResourceChange>();
     variable Future<out Anything>? submitChangesFuture = null;
 
+    value logger => ceylonModelManagerLogger;
+
     shared void pauseAutomaticModelUpdate() {
         pauseRequests.incrementAndGet();
     }
 
-    shared void resumeAutomaticModelUpdate() {
+    shared void resumeAutomaticModelUpdate(Integer delay = delayBeforeUpdatingAfterChange) {
         if (pauseRequests.decrementAndGet() == 0) {
-            if (cancelledBecauseOfAPause) {
-                scheduleModelUpdate();
+            if (cancelledBecauseOfAPause || delay == 0) {
+                scheduleModelUpdate(delay, true);
             }
         }
     }
@@ -199,7 +203,7 @@ shared class CeylonModelManager(model)
             accumulatedChanges.drainTo(changeSet);
             try {
                 if (! changeSet.empty) {
-                    platformUtils.log(Status._DEBUG, "Submitting ``changeSet.size()`` changes to the model");
+                    logger.debug(() => "Submitting ``changeSet.size()`` changes to the model");
                     model.fileTreeChanged(CeylonIterable(changeSet));
                     scheduleModelUpdate();
                 }
@@ -211,7 +215,7 @@ shared class CeylonModelManager(model)
                     e = Exception(null, t);
                 }
                 if (! e is ProcessCanceledException) {
-                    platformUtils.log(Status._WARNING, "An exception as thrown during the change submission task", e);
+                    logger.warnThrowable(e, () => "An exception as thrown during the change submission task");
                 }
                 accumulatedChanges.addAll(changeSet);
                 Thread.sleep(1000);
@@ -244,10 +248,14 @@ shared class CeylonModelManager(model)
     }
     
     componentName => "CeylonModelManager";
-    
+
+    function delayToUse(Integer requestedDelay) => min({requestedDelay, if (exists theLastDelay = lastRequestedDelay) theLastDelay});
+
     shared void scheduleModelUpdate(Integer delay = delayBeforeUpdatingAfterChange, Boolean force = false) {
         if (ideaProjectReady && 
             ((automaticModelUpdateEnabled_) || force)) {
+            value plannedDelay = delayToUse(delay);
+            lastRequestedDelay = plannedDelay;
             buildTriggeringAlarm.cancelAllRequests();
             buildTriggeringAlarm.addRequest(JavaRunnable {
                 void run() {
@@ -255,8 +263,18 @@ shared class CeylonModelManager(model)
                     cancelledBecauseOfAPause = false;
                     buildTriggeringAlarm.cancelAllRequests();
                     
+                    void resetLastRequestedDelay() {
+                        if (exists theLastDelay = lastRequestedDelay,
+                            plannedDelay == theLastDelay) {
+                            lastRequestedDelay = null;
+                        }
+                    }
+                    
                     if (! model.ceylonProjects.any((ceylonProject)
                         => ceylonProject.build.somethingToDo)) {
+                        if (!force) {
+                            resetLastRequestedDelay();                            
+                        }
                         return;
                     }
 
@@ -337,12 +355,14 @@ shared class CeylonModelManager(model)
                                 }
                                 if (shouldCancel) {
                                     cancelledBecauseOfSyntaxErrors = true;
+                                    resetLastRequestedDelay();
                                     return;
                                 }
                             }
                         }
                     }
                     
+                    resetLastRequestedDelay();                            
                     DumbService.getInstance(model.ideaProject).waitForSmartMode();
                     value bakgroundBuildLatch = CountDownLatch(1);
                     value buildProgressIndicator = Ref<ProgressIndicator>();
@@ -354,6 +374,7 @@ shared class CeylonModelManager(model)
                             PerformInBackgroundOption.alwaysBackground) {
                             
                             shared actual void run(ProgressIndicator progressIndicator) {
+                                
                                 buildProgressIndicator.set(progressIndicator);
                                 value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
                                 value ticks = model.ceylonProjectNumber * 1000;
@@ -392,7 +413,7 @@ shared class CeylonModelManager(model)
                         try {
                             buildProgressIndicator.get()?.cancel();
                         } catch(Exception e) {
-                            platformUtils.log(Status._WARNING, "Error when trying to cancel a timed-out model update", e);
+                            logger.warnThrowable(e, () => "Error when trying to cancel a timed-out model update");
                         }
                         Notification(
                             "Ceylon Model Update",
@@ -402,7 +423,7 @@ shared class CeylonModelManager(model)
                             warning).notify(model.ideaProject);
                     }
                 }
-            }, delay);
+            }, plannedDelay);
         }
     }
     
