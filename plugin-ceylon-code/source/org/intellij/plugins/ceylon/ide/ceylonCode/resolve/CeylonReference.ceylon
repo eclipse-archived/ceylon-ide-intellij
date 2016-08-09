@@ -32,15 +32,11 @@ import com.redhat.ceylon.model.typechecker.model {
     ...
 }
 
-import java.util.concurrent {
-    Callable
-}
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    ConcurrencyManagerForJava
+    concurrencyManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
@@ -115,13 +111,21 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         assert (is CeylonFile ceylonFile = myElement.containingFile);
 
         if (exists rootNode = ceylonFile.localAnalysisResult?.typecheckedRootNode) {
-            object callable satisfies Callable<Node> {
-                call() => IdeaNavigation(project).getTarget(rootNode, node, backend);
-            }
-            if (exists target = ConcurrencyManagerForJava.withAlternateResolution(callable),
+            function searchForTarget(Tree.CompilationUnit cu, Node searchedNode) =>
+                IdeaNavigation(project).getTarget(cu, searchedNode, backend);
+
+            if (exists target = concurrencyManager.withAlternateResolution(() => searchForTarget(rootNode, node)),
                 exists unit = target.unit,
                 exists file = getVirtualFile(unit)) {
                 value psiFile = PsiManager.getInstance(project).findFile(file);
+                if (is CeylonFile psiFile,
+                    exists localAnalyzisResult = psiFile.localAnalyzer?.result,
+                    exists targetModel = nodes.getReferencedModel(nodes.getIdentifyingNode(target) else target)) {
+                    if (exists targetInEditor = concurrencyManager.withAlternateResolution(()
+                        => nodes.getReferencedNode(targetModel, localAnalyzisResult.parsedRootNode))) {
+                        return CeylonTreeUtil.findPsiElement(targetInEditor, psiFile);
+                    }
+                }
                 return CeylonTreeUtil.findPsiElement(target, psiFile);
             }
         }
