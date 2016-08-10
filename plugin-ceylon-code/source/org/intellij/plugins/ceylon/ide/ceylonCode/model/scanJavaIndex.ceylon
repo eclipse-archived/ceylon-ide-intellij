@@ -157,7 +157,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     }
 
                     value realIntf => lazyRealIntf else (lazyRealIntf = computeRealIntf());
-                    shared actual Declaration? realDeclaration => realIntf;
+                    realDeclaration => realIntf;
 
                     value hasTypeParams = cls.hasTypeParameters();
 
@@ -167,9 +167,11 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             else noTypeParameters;
                     assign typeParameters {}
 
-                    shared actual Type? type => langNull;
+                    type => langNull;
 
                     psiClass => cls;
+
+                    members => realIntf?.members;
                 };
 
             } else if (modifiers.findAnnotation(ceylonMethodAnnotation) exists) {
@@ -186,7 +188,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     }
 
                     value realFunction => lazyRealFunction else (lazyRealFunction = computeRealFunction());
-                    shared actual Declaration? realDeclaration => realFunction;
+                    realDeclaration => realFunction;
 
                     parameterLists => realFunction?.parameterLists else emptyList<ParameterList>();
 
@@ -211,7 +213,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     }
 
                     value realValue => lazyRealValue else (lazyRealValue =computeRealValue());
-                    shared actual Declaration? realDeclaration => realValue;
+                    realDeclaration => realValue;
 
                     shared actual Type? type => realValue?.type;
                     assign type {}
@@ -290,13 +292,15 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             else langNull;
                     assign overloads {}
 
-                    shared actual Type? type => realClass?.type;
+                    type => realClass?.type;
 
                     abstract = modifiers.hasModifierProperty(PsiModifier.abstract);
                     final = modifiers.hasModifierProperty(PsiModifier.final);
                     annotation = modifiers.findAnnotation(Annotations.annotationType.className) exists;
 
                     psiClass => cls;
+
+                    members => realClass?.members;
                 };
             }
 
