@@ -65,7 +65,12 @@ shared class IdeaModule(
 
         if (startingWith.size>0,
             exists mod = moduleSourceMapper.ceylonProject?.ideArtifact) {
-            return scanJavaIndex(this, unit, moduleManager, mod, startingWith, proximity);
+            value proposals = scanJavaIndex(this, unit, moduleManager, mod, startingWith, proximity);
+
+            // The empty prefix will only add proposals for the current module + language
+            proposals.putAll(super.getAvailableDeclarations(unit, "", proximity, canceller));
+
+            return proposals;
         }
         return super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
     }
