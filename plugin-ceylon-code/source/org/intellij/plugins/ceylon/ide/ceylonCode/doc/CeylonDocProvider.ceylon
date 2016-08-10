@@ -195,7 +195,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             then contextElement else null;
 
     shared actual PsiElement? getDocumentationElementForLookupItem(PsiManager psiManager, Object arg, PsiElement element) {
-        if (is Sequence<Anything> arg,
+        if (is [Anything+] arg,
             is Declaration first = arg.first,
             exists decl = if (is FakeCompletionDeclaration first) then first.realDeclaration else first) {
 
