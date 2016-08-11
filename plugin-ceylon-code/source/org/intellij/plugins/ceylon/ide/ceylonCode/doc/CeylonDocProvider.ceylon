@@ -140,6 +140,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
         }
         return null;
     }
+
     shared actual String? generateDoc(PsiElement element, PsiElement originalElement) {
         try {
             value typeChecker
