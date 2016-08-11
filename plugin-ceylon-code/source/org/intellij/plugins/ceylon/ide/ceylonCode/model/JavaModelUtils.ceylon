@@ -30,6 +30,9 @@ import com.redhat.ceylon.model.typechecker.model {
 import java.lang {
     Class
 }
+import com.redhat.ceylon.model.cmr {
+    JDKUtils
+}
 
 Class<IdeaCeylonProjects> ceylonProjectsClass = javaClass<IdeaCeylonProjects>();
 
@@ -43,16 +46,24 @@ shared CeylonModelManager? getModelManager(Project project)
 
 shared IdeaCeylonProject? getCeylonProject(PsiFile psiFile) {
     if (exists projects = getCeylonProjects(psiFile.project),
-        exists file = psiFile.virtualFile,
-        exists mod = ModuleUtilCore.findModuleForFile(file, psiFile.project),
-        is IdeaCeylonProject project = projects.getProject(mod)) {
-        return project;
+        exists file = psiFile.virtualFile) {
+
+        if (exists mod = ModuleUtilCore.findModuleForFile(file, psiFile.project),
+            is IdeaCeylonProject project = projects.getProject(mod)) {
+            return project;
+        } else if (is PsiJavaFile psiFile,
+            JDKUtils.isJDKAnyPackage(concurrencyManager.needReadAccess(() => psiFile.packageName)),
+            exists mod = ModuleUtilCore.findModuleForPsiElement(psiFile),
+            is IdeaCeylonProject project = projects.getProject(mod)) {
+
+            return project;
+        }
     }
     return null;
 }
 
 shared Package? packageFromJavaPsiFile(PsiJavaFile psiFile) {
-    String packageName = psiFile.packageName;
+    String packageName = concurrencyManager.needReadAccess(() => psiFile.packageName);
     if (exists modelLoader = getCeylonProject(psiFile)?.modelLoader) {
         return modelLoader.findPackage(JVMModuleUtil.quoteJavaKeywords(packageName)) else null;
     }

@@ -42,7 +42,10 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    findProjectForFile
+    findProjectForFile,
+    declarationFromPsiElement,
+    getCeylonProject,
+    concurrencyManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTreeUtil {
@@ -64,34 +67,18 @@ shared class CeylonImplementationsSearch()
 
     void findImplementors(PsiElement sourceElement, void consumer(PsiElement element)) {
         if (is PsiClass sourceElement) {
-            object nameGetter satisfies Runnable {
-                shared variable String? qualifiedName = null;
-                run() => qualifiedName = sourceElement.qualifiedName;
-            }
-            ApplicationManager.application.runReadAction(nameGetter);
-
-            if (exists name = nameGetter.qualifiedName,
+            if (exists name = concurrencyManager.needReadAccess(() => sourceElement.qualifiedName),
                 exists psiFile = sourceElement.containingFile,
-                //TODO: this returns null for Java SDK classes!
-                exists project = findProjectForFile(psiFile),
-//                exists modules = project.modules,
-                exists file = project.projectFileFromNative(psiFile.virtualFile),
-                exists unit = file.unit,
-                is TypeDeclaration|TypedDeclaration decl
-                        = CeylonIterable(unit.declarations)
-                            .find((d) => d.name exists
-                                      //TODO is this correct:
-                                      && d.qualifiedNameString.replaceLast("::", ".") == name)) {
+                is TypeDeclaration|TypedDeclaration decl = declarationFromPsiElement(sourceElement),
+                exists pus = getCeylonProject(psiFile)?.typechecker?.phasedUnits) {
 
-                if (exists pus = project.typechecker?.phasedUnits) {
-                    scanPhasedUnits {
-                        pus = CeylonIterable(pus.phasedUnits);
-                        decl = decl;
-                        node = null;
-                        sourceElement = sourceElement;
-                        consumer = consumer;
-                    };
-                }
+                scanPhasedUnits {
+                    pus = CeylonIterable(pus.phasedUnits);
+                    decl = decl;
+                    node = null;
+                    sourceElement = sourceElement;
+                    consumer = consumer;
+                };
             }
         }
         else if (is CeylonPsi.DeclarationPsi sourceElement,
