@@ -24,7 +24,8 @@ import com.intellij.openapi.editor {
     Editor
 }
 import com.intellij.openapi.\imodule {
-    ModuleUtilCore
+    ModuleUtilCore,
+    ModuleManager
 }
 import com.intellij.openapi.util {
     Key
@@ -35,7 +36,8 @@ import com.intellij.pom {
 import com.intellij.psi {
     PsiElement,
     PsiFile,
-    PsiManager
+    PsiManager,
+    PsiClass
 }
 import com.intellij.psi.impl {
     PsiElementBase
@@ -46,6 +48,9 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.correct {
     specifyTypeQuickFix
+}
+import com.redhat.ceylon.ide.common.model {
+    CeylonUnit
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -82,7 +87,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     getCeylonProjects,
-    FakeCompletionDeclaration
+    FakeCompletionDeclaration,
+    declarationFromPsiElement
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
@@ -125,23 +131,35 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
         }
     }
 
-    function moduleForFile(CeylonFile file)
+    function moduleForFile(PsiFile file)
             => ModuleUtilCore.findModuleForFile(file.virtualFile, file.project);
 
-    function typeCheckerForElement(PsiElement element) {
-        if (is CeylonFile file = element.containingFile ) {
-            if (exists typechecker = file.typechecker) {
-                return typechecker;
+    function typeCheckerForElement(PsiElement? element) {
+        if (exists element) {
+            if (exists file = element.containingFile) {
+                if (is CeylonFile file,
+                    exists typechecker = file.typechecker) {
+                    return typechecker;
+                }
+                if (exists mod = moduleForFile(file)) {
+                    value provider = mod.getComponent(javaClass<ITypeCheckerProvider>());
+                    return provider.typeChecker;
+                }
             }
-            if (exists mod = moduleForFile(file)) {
-                value provider = mod.getComponent(javaClass<ITypeCheckerProvider>());
-                return provider.typeChecker;
+            if (exists ceylonProjects = getCeylonProjects(element.project)) {
+                for (mod in ModuleManager.getInstance(element.project).modules) {
+                    if (exists ceylonProject = ceylonProjects.getProject(mod),
+                        exists modules = ceylonProject.modules,
+                        exists typechecker = ceylonProject.typechecker) {
+                        return typechecker;
+                    }
+                }
             }
         }
         return null;
     }
 
-    shared actual String? generateDoc(PsiElement element, PsiElement originalElement) {
+    shared actual String? generateDoc(PsiElement element, PsiElement? originalElement) {
         try {
             value typeChecker
                     = typeCheckerForElement(element)
@@ -179,8 +197,21 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     };
                 }
             }
+            else if (is PsiClass element,
+                exists declaration = declarationFromPsiElement(element),
+                is CeylonUnit unit = declaration.unit,
+                exists phasedUnit = unit.phasedUnit) {
+
+                return generator.getDocumentation {
+                    rootNode = phasedUnit.compilationUnit;
+                    offset = element.textRange.startOffset;
+                    cmp = generator.DocParams(phasedUnit, element.project);
+                };
+            }
             else {
-                logger.warn("No phased unit for file " + originalElement.containingFile.virtualFile.path);
+                if (exists file = originalElement?.containingFile) {
+                    logger.warn("No phased unit for file " + file.virtualFile.path);
+                }
             }
         }
         catch (AssertionError|Exception e) {

@@ -106,6 +106,7 @@
         <lang.fileViewProviderFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonSourceFileViewProviderFactory"/>
     
         <ApplicationLoadListener implementation="org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin"/>
+        <lang.documentationProvider language="JAVA" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.doc.CeylonDocProvider" order="first"/>
         <lang.documentationProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.doc.CeylonDocProvider"/>
 
         <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileTypeFactory"/>
