@@ -28,7 +28,8 @@ import com.intellij.psi {
     PsiModifier,
     PsiNamedElement,
     PsiClass,
-    PsiModifierList
+    PsiModifierList,
+    PsiType
 }
 import com.intellij.util {
     Processor
@@ -198,6 +199,14 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     annotation = modifiers.findAnnotation(ceylonAnnotationInstantiationAnnotation) exists;
 
                     psiClass => cls;
+
+                    shared actual Boolean declaredVoid
+                            => if (exists method = cls.findMethodsByName(clsName, langFalse)[0],
+                                   exists type = method.returnType)
+                            then type == PsiType.\ivoid
+                            else langFalse;
+                    assign declaredVoid {}
+
                 };
             } else if (modifiers.findAnnotation(ceylonObjectAnnotation) exists
                         || modifiers.findAnnotation(ceylonAttributeAnnotation) exists) {
