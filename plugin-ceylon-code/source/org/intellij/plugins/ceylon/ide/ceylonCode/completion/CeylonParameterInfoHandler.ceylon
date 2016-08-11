@@ -2,7 +2,8 @@ import ceylon.interop.java {
     createJavaObjectArray,
     javaClass,
     javaString,
-    CeylonIterable
+    CeylonIterable,
+    CeylonList
 }
 
 import com.intellij.codeInsight.lookup {
@@ -134,11 +135,11 @@ shared class CeylonParameterInfoHandler()
 
                 if (exists arg) {
                     value index
-                            = CeylonIterable(model.parameterList.parameters).indexed
-                                .find((idx -> param) => param.name == arg.identifier.text);
+                            = CeylonList(model.parameterList.parameters)
+                                .firstIndexWhere((param) => param.name == arg.identifier.text);
 
                     if (exists index) {
-                        context.setCurrentParameter(index.key);
+                        context.setCurrentParameter(index);
                     }
                 }
             }
@@ -160,7 +161,7 @@ shared class CeylonParameterInfoHandler()
     }
 
     shared actual void updateUI(Functional fun, ParameterInfoUIContext context) {
-        value noparams = "<no parameters>";
+        value noparams = "no parameters";
         variable String params = noparams;
         StringBuilder builder = StringBuilder();
         variable Integer highlightOffsetStart = - 1;
@@ -190,13 +191,20 @@ shared class CeylonParameterInfoHandler()
         if (is ParameterInfoUIContextEx context) {
             context.setEscapeFunction(object satisfies IJFunction<JString, JString> {
                 fun(JString string)
-                        => string.string == convertToHTML(noparams) then string
-                        else javaString(highlighter.highlight(string.string, context.parameterOwner.project));
+                        => let (unescaped = convertFromHTML(string.string)) //undo the escaping that ParameterInfoUIContext does by default
+                        if (unescaped == noparams) then string //don't highlight 'no parameters' text
+                        else javaString(highlighter.highlight(unescaped, context.parameterOwner.project));
             });
         }
         context.setupUIComponentPresentation(params, highlightOffsetStart, highlightOffsetEnd,
             false, false, false, context.defaultParameterColor);
     }
+
+    String convertFromHTML(String content)
+            => content.replace("&amp;", "&")
+            .replace("&quot;", "\"")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">");
 
     String getParameterLabel(Parameter param, Unit unit) {
         value builder = StringBuilder()
