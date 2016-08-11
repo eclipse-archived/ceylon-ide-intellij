@@ -119,14 +119,19 @@ shared class CeylonGotoClassContributor() extends CeylonGotoContributor() {
 
 shared class CeylonGotoSymbolContributor() extends CeylonGotoContributor() {
 
+    function isPresentable(Declaration declaration)
+            => if (exists name = declaration.name)
+            then !declaration.anonymous
+            else false;
+
     shared actual void scanModules(TypeChecker typechecker, Set<Module> modules,
             Boolean includeNonProjectItems, Boolean(Declaration) consumer) {
         //pick up stuff from edited source files
         for (pu in typechecker.phasedUnits.phasedUnits) {
             for (declaration in pu.declarations) {
                 if (!declaration.unit is AnyJavaUnit,
-                    isPresentable(declaration),
-                        !consumer(declaration)) {
+                    isPresentable(declaration)
+                    && !consumer(declaration)) {
                     return;
                 }
             }
@@ -139,8 +144,8 @@ shared class CeylonGotoSymbolContributor() extends CeylonGotoContributor() {
                 for (pu in mod.phasedUnits) {
                     for (declaration in pu.declarations) {
                         if (!declaration.unit is AnyJavaUnit,
-                            isPresentable(declaration),
-                                !consumer(declaration)) {
+                            isPresentable(declaration)
+                            && !consumer(declaration)) {
                             return;
                         }
                     }
@@ -148,11 +153,6 @@ shared class CeylonGotoSymbolContributor() extends CeylonGotoContributor() {
             }
         }
     }
-
-    Boolean isPresentable(Declaration d)
-            => if (exists name = d.name)
-            then !d.anonymous
-            else false;
 
 }
 
@@ -193,8 +193,7 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
     shared actual String? getQualifiedName(NavigationItem item) {
         //was getting NPEs here when using expression form
         if (is DeclarationNavigationItem item) {
-            value declaration = item.declaration;
-            return declaration.qualifiedNameString;
+            return item.declaration.qualifiedNameString;
         }
         else {
             return null;
@@ -206,21 +205,23 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
     shared formal void scanModules(TypeChecker typechecker, Set<Module> modules,
         Boolean includeNonProjectItems, Boolean(Declaration) consumer);
 
-    void processDeclarations(Project project, Boolean includeNonProjectItems, Boolean(Declaration) consumer) {
-        concurrencyManager.withAlternateResolution(() {
-            if (exists ceylonProjects = getCeylonProjects(project)) {
-                for (mod in ModuleManager.getInstance(project).modules) {
-                    if (exists ceylonProject = ceylonProjects.getProject(mod),
-                        exists modules = ceylonProject.modules,
-                        exists typechecker = ceylonProject.typechecker) {
+    void processDeclarations(Project project, Boolean includeNonProjectItems, Boolean(Declaration) consumer)
+            => concurrencyManager.withAlternateResolution(() {
+                if (exists ceylonProjects = getCeylonProjects(project)) {
+                    for (mod in ModuleManager.getInstance(project).modules) {
+                        if (exists ceylonProject = ceylonProjects.getProject(mod),
+                            exists modules = ceylonProject.modules,
+                            exists typechecker = ceylonProject.typechecker) {
 
-                        scanModules(typechecker,
-                            modules.typecheckerModules.listOfModules,
-                            includeNonProjectItems, consumer);
+                            scanModules {
+                                typechecker = typechecker;
+                                modules = modules.typecheckerModules.listOfModules;
+                                includeNonProjectItems = includeNonProjectItems;
+                                consumer = consumer;
+                            };
+                        }
                     }
                 }
-            }
-        });
-    }
+            });
 
 }

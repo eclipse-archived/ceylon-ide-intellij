@@ -61,10 +61,11 @@ shared Package? packageFromJavaPsiFile(PsiJavaFile psiFile) {
 
 shared Declaration? declarationFromPsiElement(PsiClass|PsiMethod psiElement) {
     if (is PsiJavaFile psiFile = psiElement.containingFile,
-        exists pkg = packageFromJavaPsiFile(psiFile)) {
-        if (exists modelLoader = getCeylonProject(psiFile)?.modelLoader) {
-            return modelLoader.convertToDeclaration(pkg.\imodule, "``pkg.nameAsString ``.``getCeylonSimpleName(psiElement)  else ""``", DeclarationType.type);
-        }
+        exists pkg = packageFromJavaPsiFile(psiFile),
+        exists modelLoader = getCeylonProject(psiFile)?.modelLoader) {
+        return modelLoader.convertToDeclaration(pkg.\imodule,
+            "``pkg.nameAsString ``.``getCeylonSimpleName(psiElement) else ""``",
+            DeclarationType.type);
     }
         
     return null;
