@@ -37,7 +37,8 @@ import com.intellij.psi {
     PsiElement,
     PsiFile,
     PsiManager,
-    PsiClass
+    PsiClass,
+    PsiMethod
 }
 import com.intellij.psi.impl {
     PsiElementBase
@@ -48,9 +49,6 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.ide.common.correct {
     specifyTypeQuickFix
-}
-import com.redhat.ceylon.ide.common.model {
-    CeylonUnit
 }
 import com.redhat.ceylon.ide.common.util {
     nodes
@@ -197,15 +195,17 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     };
                 }
             }
-            else if (is PsiClass element,
-                exists declaration = declarationFromPsiElement(element),
-                is CeylonUnit unit = declaration.unit,
-                exists phasedUnit = unit.phasedUnit) {
+            else if (is CeylonFile file = originalElement?.containingFile,
+                exists phasedUnit = file.upToDatePhasedUnit,
+                is PsiClass|PsiMethod element,
+                exists declaration = declarationFromPsiElement(element)) {
 
-                return generator.getDocumentation {
-                    rootNode = phasedUnit.compilationUnit;
-                    offset = element.textRange.startOffset;
+                return generator.getDeclarationDoc {
+                    model = declaration;
+                    node = null;
+                    unit = declaration.unit;
                     cmp = generator.DocParams(phasedUnit, element.project);
+                    pr = null;
                 };
             }
             else {
