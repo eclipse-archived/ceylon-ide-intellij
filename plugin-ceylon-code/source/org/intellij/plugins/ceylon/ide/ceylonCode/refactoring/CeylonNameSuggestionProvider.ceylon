@@ -33,14 +33,23 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
 
+    value noStrings = ObjectArray<JString>(0);
+
     shared actual SuggestedNameInfo? getSuggestedNames(PsiElement element, PsiElement nameSuggestionContext, Set<JString> result) {
-        if (element.language.isKindOf(ceylonLanguage),
-            is CeylonFile file = element.containingFile,
-            is CeylonPsi.DeclarationPsi element) {
-            nodes.renameProposals(element.ceylonNode, file.compilationUnit).map(javaString).each(result.add);
-            return object extends SuggestedNameInfo(result.toArray(ObjectArray<JString>(0))) {};
+        if (element.language.isKindOf(ceylonLanguage)) {
+            nodes.renameProposals {
+                node = if (is CeylonPsi.DeclarationPsi element)
+                    then element.ceylonNode else null;
+                rootNode = if (is CeylonFile file = element.containingFile)
+                    then file.compilationUnit else null;
+            }
+            .map(javaString)
+            .each(result.add);
+            return object extends SuggestedNameInfo(result.toArray(noStrings)) {};
         }
-        return null;
+        else {
+            return null;
+        }
     }
 
 }
