@@ -92,23 +92,11 @@ class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
                     void addName(Parameter param)
                             => nodes.addNameProposals(result, false, param.name);
 
-                    Boolean isReference(Tree.Expression? ex, Tree.BaseMemberExpression bme) {
-                        if (exists term = ex?.term) {
-                            switch (term)
-                            case (is Tree.InvocationExpression) {
-                                return term.primary == bme;
-                            }
-                            case (is Tree.BaseMemberExpression) {
-                                return term == bme;
-                            }
-                            else {
-                                return false;
-                            }
-                        }
-                        else {
-                            return false;
-                        }
-                    }
+                    function isReference(Tree.Expression? ex, Tree.BaseMemberExpression bme)
+                            => switch (term = ex?.term)
+                            case (is Tree.InvocationExpression) term.primary == bme
+                            case (is Tree.BaseMemberExpression) term == bme
+                            else false;
 
                     shared actual void visit(Tree.BaseMemberExpression that) {
                         if (that.declaration?.equals(dec) else false,
