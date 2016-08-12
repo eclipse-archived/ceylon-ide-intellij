@@ -92,24 +92,42 @@ class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
                     void addName(Parameter param)
                             => nodes.addNameProposals(result, false, param.name);
 
+                    Boolean isReference(Tree.Expression? ex, Tree.BaseMemberExpression bme) {
+                        if (exists term = ex?.term) {
+                            switch (term)
+                            case (is Tree.InvocationExpression) {
+                                return term.primary == bme;
+                            }
+                            case (is Tree.BaseMemberExpression) {
+                                return term == bme;
+                            }
+                            else {
+                                return false;
+                            }
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+
                     shared actual void visit(Tree.BaseMemberExpression that) {
                         if (that.declaration?.equals(dec) else false,
                             exists arg = currentArg) {
                             switch (arg)
                             case (is Tree.ListedArgument) {
-                                if (arg.expression?.term?.equals(that) else false,
+                                if (isReference(arg.expression, that),
                                     exists param = arg.parameter) {
                                     addName(param);
                                 }
                             }
                             case (is Tree.SpreadArgument) {
-                                if (arg.expression?.term?.equals(that) else false,
+                                if (isReference(arg.expression, that),
                                     exists param = arg.parameter) {
                                     addName(param);
                                 }
                             }
                             case (is Tree.SpecifiedArgument) {
-                                if (arg.specifierExpression?.expression?.term?.equals(that) else false,
+                                if (isReference(arg.specifierExpression?.expression, that),
                                     exists param = arg.parameter) {
                                     addName(param);
                                 }
