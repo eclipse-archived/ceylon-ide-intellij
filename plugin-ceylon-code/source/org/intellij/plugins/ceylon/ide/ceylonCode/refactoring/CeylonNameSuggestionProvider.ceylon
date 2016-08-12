@@ -11,14 +11,20 @@ import com.intellij.psi.codeStyle {
 import com.intellij.refactoring.rename {
     NameSuggestionProvider
 }
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Visitor,
+    Tree
+}
 import com.redhat.ceylon.ide.common.util {
     nodes
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Parameter
 }
 
 import java.lang {
     JString=String,
-    ObjectArray,
-    Thread
+    ObjectArray
 }
 import java.util {
     Set
@@ -49,6 +55,71 @@ class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
             }
             .map(javaString)
             .each(result.add);
+
+            //This code runs with the after-refactoring AST,
+            //so ceylon-ide-common doesn't know how to suggest
+            //a name for an argument. This crap implementation
+            //attempts to reproduce what nodes.addArgumentNameProposals()
+            //already does better!
+            //TODO: reproduce the special handling for sequenced args!
+            if (is CeylonFile file = element.containingFile,
+                is CeylonPsi.TypedDeclarationPsi element,
+                exists dec = element.ceylonNode?.declarationModel) {
+
+                object extends Visitor() {
+                    variable Tree.ListedArgument|Tree.SpreadArgument|Tree.SpecifiedArgument?
+                    currentArg = null;
+
+                    shared actual void visit(Tree.ListedArgument that) {
+                        value oca = currentArg;
+                        currentArg = that;
+                        super.visit(that);
+                        currentArg = oca;
+                    }
+                    shared actual void visit(Tree.SpreadArgument that) {
+                        value oca = currentArg;
+                        currentArg = that;
+                        super.visit(that);
+                        currentArg = oca;
+                    }
+                    shared actual void visit(Tree.SpecifiedArgument that) {
+                        value oca = currentArg;
+                        currentArg = that;
+                        super.visit(that);
+                        currentArg = oca;
+                    }
+
+                    void addName(Parameter param)
+                            => nodes.addNameProposals(result, false, param.name);
+
+                    shared actual void visit(Tree.BaseMemberExpression that) {
+                        if (that.declaration?.equals(dec) else false,
+                            exists arg = currentArg) {
+                            switch (arg)
+                            case (is Tree.ListedArgument) {
+                                if (arg.expression?.term?.equals(that) else false,
+                                    exists param = arg.parameter) {
+                                    addName(param);
+                                }
+                            }
+                            case (is Tree.SpreadArgument) {
+                                if (arg.expression?.term?.equals(that) else false,
+                                    exists param = arg.parameter) {
+                                    addName(param);
+                                }
+                            }
+                            case (is Tree.SpecifiedArgument) {
+                                if (arg.specifierExpression?.expression?.term?.equals(that) else false,
+                                    exists param = arg.parameter) {
+                                    addName(param);
+                                }
+                            }
+                        }
+                    }
+
+                }.visit(file.compilationUnit);
+            }
+
             return object extends SuggestedNameInfo(result.toArray(noStrings)) {};
         }
         else {
