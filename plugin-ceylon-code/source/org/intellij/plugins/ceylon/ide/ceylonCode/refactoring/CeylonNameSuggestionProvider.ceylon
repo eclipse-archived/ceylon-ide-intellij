@@ -17,7 +17,8 @@ import com.redhat.ceylon.ide.common.util {
 
 import java.lang {
     JString=String,
-    ObjectArray
+    ObjectArray,
+    Thread
 }
 import java.util {
     Set
@@ -36,6 +37,7 @@ class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
     value noStrings = ObjectArray<JString>(0);
 
     shared actual SuggestedNameInfo? getSuggestedNames(PsiElement element, PsiElement nameSuggestionContext, Set<JString> result) {
+        Thread.sleep(300); //TODO: this is awful, how can we fix it?
         if (element.language.isKindOf(ceylonLanguage)) {
             nodes.renameProposals {
                 node = if (is CeylonPsi.DeclarationPsi element)
