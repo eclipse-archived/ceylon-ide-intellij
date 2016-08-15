@@ -30,9 +30,6 @@ import com.intellij.util {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.ide.common.doc {
-    convertToHTML
-}
 import com.redhat.ceylon.model.typechecker.model {
     Functional,
     Unit,
