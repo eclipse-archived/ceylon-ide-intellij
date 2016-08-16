@@ -37,7 +37,8 @@ import com.redhat.ceylon.model.cmr {
 import com.redhat.ceylon.model.typechecker.model {
     DeclarationWithProximity,
     Cancellable,
-    Unit
+    Unit,
+    CeylonModule=Module
 }
 
 import java.io {
@@ -85,7 +86,7 @@ shared class IdeaModule(
     void addJavaArrays(JMap<JString,DeclarationWithProximity> proposals, Unit unit,
         String startingWith, Integer proximity) {
 
-        if (transitiveDependencies.any((mod) => mod.nameAsString == "java.base")) {
+        if ("java.base" in transitiveDependencies.map(CeylonModule.nameAsString)) {
             value arrays = [
                 "ObjectArray" -> Unit.javaObjectArrayDeclaration,
                 "BooleanArray" -> Unit.javaBooleanArrayDeclaration,
