@@ -8,6 +8,11 @@ import ceylon.language {
     langFalse=false
 }
 
+import com.intellij.openapi.application {
+    ApplicationManager {
+        application
+    }
+}
 import com.intellij.openapi.\imodule {
     Module
 }
@@ -42,11 +47,6 @@ import java.util {
     JMap=Map,
     Collections
 }
-import com.intellij.openapi.application {
-    ApplicationManager {
-        application
-    }
-}
 
 shared class IdeaModule(
     shared actual IdeaModuleManager moduleManager,
@@ -67,8 +67,7 @@ shared class IdeaModule(
             exists mod = moduleSourceMapper.ceylonProject?.ideArtifact) {
             value proposals = scanJavaIndex(this, unit, moduleManager, mod, startingWith, proximity);
 
-            // The empty prefix will only add proposals for the current module + language
-            proposals.putAll(super.getAvailableDeclarations(unit, "", proximity, canceller));
+            proposals.putAll(super.getAvailableDeclarationsInCurrentModule(unit, startingWith, proximity, canceller));
 
             return proposals;
         }
