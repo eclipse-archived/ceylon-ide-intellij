@@ -333,9 +333,10 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 exists pkg = moduleManager.modelLoader.findPackage(file.packageName),
                 exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
                 exists qname = cls.qualifiedName) {
-                value prox = that.getProximity(proximity, pkg.languagePackage, lightModel.name);
-                value dwp = DeclarationWithProximity(lightModel of Declaration, prox, langTrue);
-                result.put(javaString(qname), dwp);
+                result.put(javaString(qname),
+                    DeclarationWithProximity(lightModel,
+                        that.getProximity(proximity, pkg.languagePackage, lightModel.name),
+                        langTrue));
             }
             return langTrue;
         }
