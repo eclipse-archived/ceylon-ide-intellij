@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    createJavaObjectArray,
     javaClass,
     javaString,
     CeylonIterable,
@@ -43,7 +42,8 @@ import com.redhat.ceylon.model.typechecker.util {
 }
 
 import java.lang {
-    JString=String
+    JString=String,
+    ObjectArray
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
@@ -64,6 +64,9 @@ shared class CeylonParameterInfoHandler()
     
     value printer = TypePrinter(true, true, false, true, false);
 
+    value argumentListClass = javaClass<CeylonPsi.ArgumentListPsi>();
+    value invocationExpressionClass = javaClass<CeylonPsi.InvocationExpressionPsi>();
+
     couldShowInLookup() => true;
     
     shared actual ArgumentListPsi? findElementForParameterInfo(CreateParameterInfoContext context) {
@@ -73,8 +76,8 @@ shared class CeylonParameterInfoHandler()
                     = PsiUtilCore.getElementAtOffset(context.file,
                         context.editor.caretModel.offset);
 
-            if (exists args = getParentOfType(elementAtOffset, javaClass<CeylonPsi.ArgumentListPsi>()),
-                exists invocation = getParentOfType(args, javaClass<CeylonPsi.InvocationExpressionPsi>()),
+            if (exists args = getParentOfType(elementAtOffset, argumentListClass),
+                exists invocation = getParentOfType(args, invocationExpressionClass),
                 exists node = invocation.ceylonNode,
                 exists argList
                         = node.positionalArgumentList
@@ -82,7 +85,7 @@ shared class CeylonParameterInfoHandler()
                 is Tree.MemberOrTypeExpression mot = node.primary,
                 is Functional declaration = mot.declaration) {
                 
-                context.itemsToShow = createJavaObjectArray { declaration };
+                context.itemsToShow = ObjectArray<Object>(1, declaration);
 
                 return args;
             }
@@ -97,10 +100,10 @@ shared class CeylonParameterInfoHandler()
     }
     
     getParametersForDocumentation(Functional? p, ParameterInfoContext? context)
-            => createJavaObjectArray(empty);
+            => ObjectArray<Object>(0);
     
     getParametersForLookup(LookupElement? item, ParameterInfoContext? context)
-            => createJavaObjectArray(empty);
+            => ObjectArray<Object>(0);
     
     parameterCloseChars => ParameterInfoUtils.defaultParameterCloseChars;
     
@@ -204,9 +207,18 @@ shared class CeylonParameterInfoHandler()
             .replace("&gt;", ">");
 
     String getParameterLabel(Parameter param, Unit unit) {
-        value builder = StringBuilder()
-            .append(printer.print(param.type, unit))
-            .append(" ").append(param.name);
+        value builder = StringBuilder();
+        if (param.sequenced) {
+            value type = unit.getSequentialElementType(param.type);
+            builder.append(printer.print(type, unit)).append("*");
+        }
+        else {
+            builder.append(printer.print(param.type, unit));
+        }
+        builder.append(" ").append(param.name);
+        if (param.defaulted) {
+            builder.append(" = ...");
+        }
         
         if (is Function model = param.model) {
             builder.append("(");
