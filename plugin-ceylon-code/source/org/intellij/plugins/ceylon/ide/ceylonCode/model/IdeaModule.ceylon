@@ -3,6 +3,9 @@ import ceylon.collection {
     MutableSet,
     MutableList
 }
+import ceylon.interop.java {
+    javaString
+}
 import ceylon.language {
     langNull=null,
     langFalse=false
@@ -47,6 +50,9 @@ import java.util {
     JMap=Map,
     Collections
 }
+import com.intellij.codeInsight.completion.impl {
+    CamelHumpMatcher
+}
 
 shared class IdeaModule(
     shared actual IdeaModuleManager moduleManager,
@@ -69,9 +75,40 @@ shared class IdeaModule(
 
             proposals.putAll(super.getAvailableDeclarationsInCurrentModule(unit, startingWith, proximity, canceller));
 
+            addJavaArrays(proposals, unit, startingWith, proximity);
+
             return proposals;
         }
         return super.getAvailableDeclarations(unit, startingWith, proximity, canceller);
+    }
+
+    void addJavaArrays(JMap<JString,DeclarationWithProximity> proposals, Unit unit,
+        String startingWith, Integer proximity) {
+
+        if (transitiveDependencies.any((mod) => mod.nameAsString == "java.base")) {
+            value arrays = [
+                "ObjectArray" -> Unit.javaObjectArrayDeclaration,
+                "BooleanArray" -> Unit.javaBooleanArrayDeclaration,
+                "ByteArray" -> Unit.javaByteArrayDeclaration,
+                "ShortArray" -> Unit.javaShortArrayDeclaration,
+                "IntArray" -> Unit.javaIntArrayDeclaration,
+                "LongArray" -> Unit.javaLongArrayDeclaration,
+                "FloatArray" -> Unit.javaFloatArrayDeclaration,
+                "DoubleArray" -> Unit.javaDoubleArrayDeclaration,
+                "CharArray" -> Unit.javaCharArrayDeclaration
+            ];
+
+            value matcher = CamelHumpMatcher(startingWith);
+
+            for (name -> getter in arrays) {
+                if (matcher.isStartMatch(name)) {
+                    proposals.put(
+                        javaString("java.lang." + name),
+                        DeclarationWithProximity(getter(unit), proximity)
+                    );
+                }
+            }
+        }
     }
 
     shared actual void encloseOnTheFlyTypechecking(void typechecking()) {
