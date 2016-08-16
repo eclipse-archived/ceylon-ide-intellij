@@ -204,8 +204,10 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     psiClass => cls;
 
                     shared actual Boolean declaredVoid
-                            => if (exists method = cls.findMethodsByName(clsName, langFalse)[0],
-                                   exists type = method.returnType)
+                            => let (methods = cls.findMethodsByName(clsName, langFalse))
+                            if (methods.size>0, //workaround for compiler bug #6421
+                                exists method = methods[0],
+                                exists type = method.returnType)
                             then type == PsiType.\ivoid
                             else langFalse;
                     assign declaredVoid {}
@@ -372,7 +374,6 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 value sep = file.path.indexOf(JarFileSystem.jarSeparator);
                 if (sep>0) {
                     value entryPath = file.path.spanFrom(sep + JarFileSystem.jarSeparator.size);
-
                     if (exists sep2 = entryPath.lastIndexWhere('/'.equals)) {
                         value pkg = entryPath[...sep2-1].replace("/", ".");
                         if (moduleManager.modelLoader.findPackage(pkg) exists) {
