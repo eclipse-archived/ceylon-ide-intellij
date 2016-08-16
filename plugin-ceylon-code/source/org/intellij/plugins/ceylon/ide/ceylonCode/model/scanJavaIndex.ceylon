@@ -66,7 +66,10 @@ import com.redhat.ceylon.model.typechecker.model {
     Package,
     Value,
     TypeAlias,
-    ModelUtil
+    ModelUtil,
+    Module_=Module {
+        getUnimportedProximity
+    }
 }
 
 import java.io {
@@ -335,7 +338,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 exists qname = cls.qualifiedName) {
                 result.put(javaString(qname),
                     DeclarationWithProximity(lightModel,
-                        that.getProximity(proximity, pkg.languagePackage, lightModel.name),
+                        getUnimportedProximity(proximity, pkg.languagePackage, lightModel.name),
                         langTrue));
             }
             return langTrue;
