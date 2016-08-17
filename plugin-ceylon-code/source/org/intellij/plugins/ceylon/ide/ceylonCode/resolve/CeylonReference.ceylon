@@ -171,7 +171,7 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
             if (is CeylonPsi.AttributeSetterDefinitionPsi resolved) {
                 setter = resolved.ceylonNode?.declarationModel;
             } else if (is CeylonPsi.IdentifierPsi myElement,
-                    is Setter scope = myElement.ceylonNode.scope) {
+                    is Setter scope = myElement.ceylonNode?.scope) {
                 setter = scope;
             }
             else {
