@@ -72,8 +72,8 @@ shared object highlighter {
 
     "Highlights a message that contains code snippets in single quotes, and add colored
      fragments to the given [[data]]."
-    shared void highlightPresentationData(PresentationData data, String description, Project project,
-        Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
+    shared void highlightPresentationData(PresentationData data, String description,
+        Project project, Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
 
         iterateTokens(description, eliminateQuotes, (token, highlight) {
             switch(highlight)
@@ -93,8 +93,8 @@ shared object highlighter {
 
     "Highlights a message that contains code snippets in single quotes, and add colored
      fragments to the given [[appearance]]."
-    shared void highlightCompositeAppearance(CompositeAppearance appearance, String description, Project project,
-            Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
+    shared void highlightCompositeAppearance(CompositeAppearance appearance, String description,
+            Project project, Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
 
         value data = appearance.ending;
         iterateTokens(description, eliminateQuotes, (token, highlight) {
@@ -168,10 +168,9 @@ shared object highlighter {
     void highlightInternal(String rawText, Project project, Boolean qualifiedNameIsPath,
         Anything(String, TextAttributes) consume) {
 
-        value highlighter = HighlighterFactory.createHighlighter(
-            project,
-            FileTypeManager.instance.getFileTypeByFileName("coin.ceylon")
-        );
+        value highlighter
+                = HighlighterFactory.createHighlighter(project,
+                    FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
         highlighter.setText(javaString(rawText));
 
         value iterator = highlighter.createIterator(0);
