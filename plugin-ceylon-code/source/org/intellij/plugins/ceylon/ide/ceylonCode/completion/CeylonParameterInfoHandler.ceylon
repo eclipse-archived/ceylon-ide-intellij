@@ -2,7 +2,8 @@ import ceylon.interop.java {
     javaClass,
     javaString,
     CeylonIterable,
-    CeylonList
+    CeylonList,
+    javaObjectArray
 }
 
 import com.intellij.codeInsight.lookup {
@@ -65,7 +66,7 @@ shared class CeylonParameterInfoHandler()
     value invocationExpressionClass = javaClass<CeylonPsi.InvocationExpressionPsi>();
 
     couldShowInLookup() => true;
-    
+
     shared actual CeylonPsi.ArgumentListPsi? findElementForParameterInfo(CreateParameterInfoContext context) {
         if (is CeylonFile file = context.file) {
 
@@ -81,8 +82,29 @@ shared class CeylonParameterInfoHandler()
                         else node.namedArgumentList,
                 is Tree.MemberOrTypeExpression mot = node.primary,
                 is Functional declaration = mot.declaration) {
-                
-                context.itemsToShow = ObjectArray<Object>(1, declaration);
+
+                Array<Object?> overloads;
+                if (ModelUtil.isAbstraction(declaration)) {
+                    overloads = Array<Object?> { for (dec in declaration.overloads) dec };
+                }
+                else if (ModelUtil.isOverloadedVersion(declaration)) {
+                    value abstraction
+                            = declaration.scope.getDirectMember(declaration.name, null, false);
+                    overloads = Array<Object?> { for (dec in abstraction.overloads) dec };
+                }
+                else {
+                    overloads = Array<Object?> { declaration };
+                }
+
+                function weight(Anything x)
+                        => if (is Functional x)
+                        then (x==declaration
+                                then -1
+                                else x.firstParameterList?.parameters?.size() else 0)
+                        else 100;
+
+                overloads.sortInPlace(byIncreasing(weight));
+                context.itemsToShow = javaObjectArray(overloads);
 
                 return args;
             }
@@ -152,26 +174,17 @@ shared class CeylonParameterInfoHandler()
               || seq.startIndex.intValue()-1 <= offset <= seq.stopIndex.intValue()+1
             else false;
 
-    function byParameters(Declaration x, Declaration y)
-            => if (is Functional x, is Functional y)
-            then (x.firstParameterList?.parameters?.size() else 0)
-             <=> (y.firstParameterList?.parameters?.size() else 0)
-            else equal;
-
-    function sortedOverloads(Declaration abstraction)
-            => CeylonList(abstraction.overloads)
-                .sort(byParameters);
-
     shared actual void updateUI(Functional&Declaration fun, ParameterInfoUIContext context) {
         value noparams = "'no parameters'";
 
         value unit = fun.unit;
-        StringBuilder builder = StringBuilder();
+        value builder = StringBuilder();
 
         variable Integer highlightOffsetStart = -1;
         variable Integer highlightOffsetEnd = -1;
         variable Integer i = 0;
-        if (exists parameters = fun.firstParameterList?.parameters) {
+        if (!ModelUtil.isAbstraction(fun),
+            exists parameters = fun.firstParameterList?.parameters) {
             if (parameters.empty) {
                 builder.append(noparams);
             }
@@ -189,53 +202,6 @@ shared class CeylonParameterInfoHandler()
             }
         }
 
-        if (ModelUtil.isAbstraction(fun)) {
-            for (dec in sortedOverloads(fun)) {
-                if (is Functional dec,
-                    exists parameters = dec.firstParameterList?.parameters) {
-
-                    if (!builder.empty) {
-                        builder.appendCharacter('\n');
-                    }
-
-                    if (parameters.empty) {
-                        builder.append(noparams);
-                    }
-                    else {
-                        for (param in parameters) {
-                            value paramLabel = getParameterLabel(param, unit);
-                            builder.append(paramLabel).append(", ");
-                        }
-                        builder.deleteTerminal(2);
-                    }
-                }
-            }
-        }
-
-        if (ModelUtil.isOverloadedVersion(fun),
-            exists abstraction = fun.scope.getDirectMember(fun.name, null, false)) {
-            for (dec in sortedOverloads(abstraction)) {
-                if (is Functional dec, dec!=fun,
-                    exists parameters = dec.firstParameterList?.parameters) {
-
-                    if (!builder.empty) {
-                        builder.appendCharacter('\n');
-                    }
-
-                    if (parameters.empty) {
-                        builder.append(noparams);
-                    }
-                    else {
-                        for (param in parameters) {
-                            value paramLabel = getParameterLabel(param, unit);
-                            builder.append(paramLabel).append(", ");
-                        }
-                        builder.deleteTerminal(2);
-                    }
-                }
-            }
-        }
-
         if (is ParameterInfoUIContextEx context) {
             context.setEscapeFunction(object satisfies IJFunction<JString, JString> {
                 fun(JString string)
@@ -243,14 +209,13 @@ shared class CeylonParameterInfoHandler()
                             rawText = convertFromHTML(string.string).replace(noparams, "$$");
                             project = context.parameterOwner.project;
                         }
-                        .replace("$$", "<i>no parameters</i>")
-                        .replace("\n", "<br/>"));
+                        .replace("$$", "<i>no parameters</i>"));
             });
         }
 
         context.setupUIComponentPresentation(builder.string,
             highlightOffsetStart, highlightOffsetEnd,
-            false, false, false,
+            !context.uiComponentEnabled, fun.deprecated, false,
             context.defaultParameterColor);
     }
 
