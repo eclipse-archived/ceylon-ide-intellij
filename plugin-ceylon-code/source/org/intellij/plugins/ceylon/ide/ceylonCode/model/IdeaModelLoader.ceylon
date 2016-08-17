@@ -121,7 +121,6 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         if (exists artifact,
             is IdeaCeylonProject project = ideaModuleManager.ceylonProject) {
 
-            print("Add module ``artifact.name()``");
             project.addDependencyToClasspath(artifact);
         }
     }
