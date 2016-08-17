@@ -73,7 +73,7 @@ shared class CeylonTypeDeclarationProvider() satisfies TypeDeclarationProvider {
             addDeclarations(type, list);
         }
         else if (is CeylonPsi.ConstructorPsi psiElement,
-            exists dec = psiElement?.ceylonNode?.constructor) {
+            exists dec = psiElement.ceylonNode?.constructor) {
             if (exists type = dec.extendedType) {
                 list.add(type.declaration);
             }
