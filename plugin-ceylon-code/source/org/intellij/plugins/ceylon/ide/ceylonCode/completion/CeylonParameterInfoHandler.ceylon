@@ -35,7 +35,8 @@ import com.redhat.ceylon.model.typechecker.model {
     Parameter,
     Function,
     Declaration,
-    NamedArgumentList
+    NamedArgumentList,
+    ModelUtil
 }
 import com.redhat.ceylon.model.typechecker.util {
     TypePrinter
@@ -56,7 +57,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class CeylonParameterInfoHandler()
-        satisfies ParameterInfoHandler<CeylonPsi.ArgumentListPsi, Functional> {
+        satisfies ParameterInfoHandler<CeylonPsi.ArgumentListPsi, Functional&Declaration> {
     
     value printer = TypePrinter(true, true, false, true, false);
 
@@ -94,7 +95,7 @@ shared class CeylonParameterInfoHandler()
             => getParentOfType(PsiUtilCore.getElementAtOffset(context.file, context.offset),
                     argumentListClass);
     
-    getParametersForDocumentation(Functional? p, ParameterInfoContext? context)
+    getParametersForDocumentation(Functional&Declaration? fun, ParameterInfoContext? context)
             => ObjectArray<Object>(0);
     
     getParametersForLookup(LookupElement? item, ParameterInfoContext? context)
@@ -151,52 +152,111 @@ shared class CeylonParameterInfoHandler()
               || seq.startIndex.intValue()-1 <= offset <= seq.stopIndex.intValue()+1
             else false;
 
-    shared actual void updateUI(Functional fun, ParameterInfoUIContext context) {
-        value noparams = "no parameters";
-        variable String params = noparams;
+    function byParameters(Declaration x, Declaration y)
+            => if (is Functional x, is Functional y)
+            then (x.firstParameterList?.parameters?.size() else 0)
+             <=> (y.firstParameterList?.parameters?.size() else 0)
+            else equal;
+
+    function sortedOverloads(Declaration abstraction)
+            => CeylonList(abstraction.overloads)
+                .sort(byParameters);
+
+    shared actual void updateUI(Functional&Declaration fun, ParameterInfoUIContext context) {
+        value noparams = "'no parameters'";
+
+        value unit = fun.unit;
         StringBuilder builder = StringBuilder();
-        variable Integer highlightOffsetStart = - 1;
-        variable Integer highlightOffsetEnd = - 1;
+
+        variable Integer highlightOffsetStart = -1;
+        variable Integer highlightOffsetEnd = -1;
         variable Integer i = 0;
-        
-        if (is Declaration fun,
-            exists parameters = fun.firstParameterList?.parameters,
-            parameters.size()>0) {
-
-            value unit = fun.unit;
-            for (param in parameters) {
-                value paramLabel
-                        = getParameterLabel(param, unit);
-//                            .replace("->", "→");
-
-                if (i == context.currentParameterIndex) {
-                    highlightOffsetStart = builder.size;
-                    highlightOffsetEnd = builder.size + paramLabel.size;
-                }
-                builder.append(paramLabel).append(", ");
-                i++;
+        if (exists parameters = fun.firstParameterList?.parameters) {
+            if (parameters.empty) {
+                builder.append(noparams);
             }
-            builder.deleteTerminal(2);
-            params = builder.string;
+            else {
+                for (param in parameters) {
+                    value paramLabel = getParameterLabel(param, unit);
+                    if (i == context.currentParameterIndex) {
+                        highlightOffsetStart = builder.size;
+                        highlightOffsetEnd = builder.size + paramLabel.size;
+                    }
+                    builder.append(paramLabel).append(", ");
+                    i ++;
+                }
+                builder.deleteTerminal(2);
+            }
+        }
+
+        if (ModelUtil.isAbstraction(fun)) {
+            for (dec in sortedOverloads(fun)) {
+                if (is Functional dec,
+                    exists parameters = dec.firstParameterList?.parameters) {
+
+                    if (!builder.empty) {
+                        builder.appendCharacter('\n');
+                    }
+
+                    if (parameters.empty) {
+                        builder.append(noparams);
+                    }
+                    else {
+                        for (param in parameters) {
+                            value paramLabel = getParameterLabel(param, unit);
+                            builder.append(paramLabel).append(", ");
+                        }
+                        builder.deleteTerminal(2);
+                    }
+                }
+            }
+        }
+
+        if (ModelUtil.isOverloadedVersion(fun),
+            exists abstraction = fun.scope.getDirectMember(fun.name, null, false)) {
+            for (dec in sortedOverloads(abstraction)) {
+                if (is Functional dec, dec!=fun,
+                    exists parameters = dec.firstParameterList?.parameters) {
+
+                    if (!builder.empty) {
+                        builder.appendCharacter('\n');
+                    }
+
+                    if (parameters.empty) {
+                        builder.append(noparams);
+                    }
+                    else {
+                        for (param in parameters) {
+                            value paramLabel = getParameterLabel(param, unit);
+                            builder.append(paramLabel).append(", ");
+                        }
+                        builder.deleteTerminal(2);
+                    }
+                }
+            }
         }
 
         if (is ParameterInfoUIContextEx context) {
             context.setEscapeFunction(object satisfies IJFunction<JString, JString> {
                 fun(JString string)
-                        => let (unescaped = convertFromHTML(string.string)) //undo the escaping that ParameterInfoUIContext does by default
-                        if (unescaped == noparams) then string //don't highlight 'no parameters' text
-                        else javaString(highlighter.highlight(unescaped, context.parameterOwner.project));
+                        => javaString(highlighter.highlight {
+                            rawText = convertFromHTML(string.string).replace(noparams, "$$");
+                            project = context.parameterOwner.project;
+                        }
+                        .replace("$$", "<i>no parameters</i>")
+                        .replace("\n", "<br/>"));
             });
         }
 
-        context.setupUIComponentPresentation(params,
+        context.setupUIComponentPresentation(builder.string,
             highlightOffsetStart, highlightOffsetEnd,
             false, false, false,
             context.defaultParameterColor);
     }
 
     String convertFromHTML(String content)
-            => content.replace("&amp;", "&")
+            => content.replace("&#10;", "\n")
+            .replace("&amp;", "&")
             .replace("&quot;", "\"")
             .replace("&lt;", "<")
             .replace("&gt;", ">");
@@ -211,10 +271,7 @@ shared class CeylonParameterInfoHandler()
             builder.append(printer.print(param.type, unit));
         }
         builder.append(" ").append(param.name);
-        if (param.defaulted) {
-            builder.append(" = ...");
-        }
-        
+
         if (is Function model = param.model) {
             builder.append("(");
             for (parameter in model.firstParameterList.parameters) {
@@ -224,6 +281,11 @@ shared class CeylonParameterInfoHandler()
             builder.deleteTerminal(2);
             builder.append(")");
         }
+
+        if (param.defaulted) {
+            builder.append(" = ...");
+        }
+
         return builder.string;
     }
 }
