@@ -105,65 +105,64 @@ shared class PSIType(psi,
     
     primitive => psi is PsiPrimitiveType;
     
-    PsiClass? findClass(String name) {
-        assert (is PsiClassReferenceType psi);
-        value scope = psi.resolveScope;
-        
-        return concurrencyManager.needReadAccess(() =>
-            javaFacade(psi.reference.project).findClass(name, scope)
-        );
-    }
-    
     String computedQualifiedName {
         value canonicalText = PsiNameHelper.getQualifiedClassName(psi.canonicalText, false);
 
         if (is PsiClassReferenceType psi) {
-            if (exists cls = findClass(canonicalText)) {
-                assert(exists qName = cls.qualifiedName);
-                return qName; 
-            }
-            
-            value parts = canonicalText.split('.'.equals);
+            value resolveScope = psi.resolveScope;
             value facade = javaFacade(psi.reference.project);
-            value clsName = concurrencyManager.needReadAccess(() {
-                variable value pkg = facade.findPackage("");
-                value sb = StringBuilder();
-                variable value lookingForPkg = true;
+
+            if (exists cls = concurrencyManager.needReadAccess(() =>
+                    facade.findClass(canonicalText, resolveScope))) {
+                assert(exists qName = cls.qualifiedName);
+                return qName;
+            }
+
+            if ('.' in canonicalText) {
+                value parts = canonicalText.split('.'.equals).sequence();
+                assert(nonempty reversedParts = parts.reversed);
                 
-                for (part in parts) {
-                    if (lookingForPkg,
-                        exists _pkg = pkg,
-                        exists subPkg = _pkg.subPackages.array.coalesced.find(
-                        (el) => (el.name else "") == part)) {
-                        pkg = subPkg;
+                PsiClass? searchForClass(String potentialClass, [String*] potentialPackageParts) {
+                    String prefixedPotentialClass = StringBuilder().appendCharacter('$').append(potentialClass).string;
+                    value pkg = facade.findPackage(".".join(potentialPackageParts.reversed)) else null;
+                    if (exists pkg) {
+                        if (exists found = pkg.findClassByShortName(potentialClass, resolveScope).array.first) {
+                            return found;
+                        }
+                        if (exists found = pkg.findClassByShortName(prefixedPotentialClass, resolveScope).array.first) {
+                            return found;
+                        }
                     } else {
-                        lookingForPkg = false;
-                        sb.append(part).append(".");
+                        if (nonempty potentialPackageParts) {
+                            if (potentialClass == "impl") {
+                                if (exists found = searchForClass(potentialPackageParts.first + "$impl", potentialPackageParts.rest)) {
+                                    return found;
+                                }
+                            }
+                            if (exists parentClass = searchForClass(potentialPackageParts.first, potentialPackageParts.rest)) {
+                                if (exists found = parentClass.findInnerClassByName(potentialClass, false)) {
+                                    return found;
+                                }
+                                if (exists found = parentClass.findInnerClassByName(prefixedPotentialClass, false)) {
+                                    return found;
+                                }
+                            }
+                        }
+                        
                     }
+                    return null;
                 }
                 
-                if (sb.endsWith(".")) {
-                    sb.deleteTerminal(1);
+                if (exists clsName = concurrencyManager.needReadAccess(() {
+                    if (exists foundClass = searchForClass(reversedParts.first, reversedParts.rest),
+                        exists qualifiedName = foundClass.qualifiedName) {
+                        return qualifiedName;
+                    }
+                    
+                    return null;
+                })) {
+                    return clsName;
                 }
-                if (exists _pkg = pkg,
-                    exists cls = _pkg.findClassByShortName(sb.string, psi.resolveScope).array.first) {
-                    return cls.qualifiedName;
-                }
-                // TODO not cool, we got an incorrect qualified name
-                if (exists _pkg = pkg,
-                    ".impl" in sb.string,
-                    exists cls = _pkg.findClassByShortName(sb.string.replace(".impl", "$impl"), psi.resolveScope).array.first) {
-                    return cls.qualifiedName;
-                }
-                if (exists _pkg = pkg,
-                    exists cls = _pkg.findClassByShortName(sb.string.replaceLast(".", "$"), psi.resolveScope).array.first) {
-                    return cls.qualifiedName;
-                }
-                return null;
-            });
-            
-            if (exists clsName) {
-                return clsName;
             }
         }
         
