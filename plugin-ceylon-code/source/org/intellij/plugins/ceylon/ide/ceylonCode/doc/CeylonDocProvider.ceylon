@@ -17,9 +17,6 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.command {
     WriteCommandAction
 }
-import com.intellij.openapi.diagnostic {
-    Logger
-}
 import com.intellij.openapi.editor {
     Editor
 }
@@ -103,8 +100,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 
 shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
-    value logger = Logger.getInstance(javaClass<CeylonDocProvider>());
-
     value typesToIgnore = Arrays.asList(
         CeylonTokens.ws,
         CeylonTokens.lineComment,
@@ -163,7 +158,6 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     = typeCheckerForElement(element)
                     else typeCheckerForElement(originalElement);
             if (!exists typeChecker) {
-                logger.warn("No type checker for file " + element.containingFile.virtualFile.path);
                 return null;
             }
 
@@ -207,11 +201,6 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     cmp = generator.DocParams(phasedUnit, element.project);
                     pr = null;
                 };
-            }
-            else {
-                if (exists file = originalElement?.containingFile) {
-                    logger.warn("No phased unit for file " + file.virtualFile.path);
-                }
             }
         }
         catch (AssertionError|Exception e) {
