@@ -19,7 +19,9 @@ import com.intellij.lang.parameterInfo {
     ParameterInfoUIContextEx
 }
 import com.intellij.psi.util {
-    PsiUtilCore,
+    PsiUtilCore {
+        getElementAtOffset
+    },
     PsiTreeUtil {
         getParentOfType
     }
@@ -65,57 +67,55 @@ shared class CeylonParameterInfoHandler()
     value argumentListClass = javaClass<CeylonPsi.ArgumentListPsi>();
     value invocationExpressionClass = javaClass<CeylonPsi.InvocationExpressionPsi>();
 
+    function findArgumentList(ParameterInfoContext context)
+            => getParentOfType(getElementAtOffset(context.file, context.offset), argumentListClass);
+
     couldShowInLookup() => true;
 
-    shared actual CeylonPsi.ArgumentListPsi? findElementForParameterInfo(CreateParameterInfoContext context) {
-        if (is CeylonFile file = context.file) {
+    function overloadedVersions(Declaration&Functional declaration) {
+        if (ModelUtil.isAbstraction(declaration)) {
+            return Array<Object?> { for (dec in declaration.overloads) dec };
+        }
+        else if (ModelUtil.isOverloadedVersion(declaration)) {
+            value abstraction
+                    = declaration.scope.getDirectMember(declaration.name, null, false);
+            return Array<Object?> { for (dec in abstraction.overloads) dec };
+        }
+        else {
+            return Array<Object?> { declaration };
+        }
+    }
 
-            value elementAtOffset
-                    = PsiUtilCore.getElementAtOffset(context.file,
-                        context.editor.caretModel.offset);
+    shared actual CeylonPsi.ArgumentListPsi?
+    findElementForParameterInfo(CreateParameterInfoContext context) {
+        if (is CeylonFile file = context.file,
+            exists args = findArgumentList(context),
+            exists invocation = getParentOfType(args, invocationExpressionClass),
+            exists node = invocation.ceylonNode,
+            exists argList
+                    = node.positionalArgumentList
+                    else node.namedArgumentList,
+            is Tree.MemberOrTypeExpression mot = node.primary,
+            is Functional declaration = mot.declaration) {
 
-            if (exists args = getParentOfType(elementAtOffset, argumentListClass),
-                exists invocation = getParentOfType(args, invocationExpressionClass),
-                exists node = invocation.ceylonNode,
-                exists argList
-                        = node.positionalArgumentList
-                        else node.namedArgumentList,
-                is Tree.MemberOrTypeExpression mot = node.primary,
-                is Functional declaration = mot.declaration) {
+            value overloads = overloadedVersions(declaration);
 
-                Array<Object?> overloads;
-                if (ModelUtil.isAbstraction(declaration)) {
-                    overloads = Array<Object?> { for (dec in declaration.overloads) dec };
-                }
-                else if (ModelUtil.isOverloadedVersion(declaration)) {
-                    value abstraction
-                            = declaration.scope.getDirectMember(declaration.name, null, false);
-                    overloads = Array<Object?> { for (dec in abstraction.overloads) dec };
-                }
-                else {
-                    overloads = Array<Object?> { declaration };
-                }
+            function weight(Anything x)
+                    => if (is Functional x, exists pl = x.firstParameterList)
+                    then (x==declaration then -1 else pl.parameters.size())
+                    else 0;
 
-                function weight(Anything x)
-                        => if (is Functional x)
-                        then (x==declaration
-                                then -1
-                                else x.firstParameterList?.parameters?.size() else 0)
-                        else 100;
+            overloads.sortInPlace(byIncreasing(weight));
+            context.itemsToShow = javaObjectArray(overloads);
 
-                overloads.sortInPlace(byIncreasing(weight));
-                context.itemsToShow = javaObjectArray(overloads);
-
-                return args;
-            }
+            return args;
         }
         
         return null;
     }
     
     findElementForUpdatingParameterInfo(UpdateParameterInfoContext context)
-            => getParentOfType(PsiUtilCore.getElementAtOffset(context.file, context.offset),
-                    argumentListClass);
+            => findArgumentList(context);
     
     getParametersForDocumentation(Functional&Declaration? fun, ParameterInfoContext? context)
             => ObjectArray<Object>(0);
@@ -125,8 +125,7 @@ shared class CeylonParameterInfoHandler()
     
     parameterCloseChars => ParameterInfoUtils.defaultParameterCloseChars;
     
-    showParameterInfo(CeylonPsi.ArgumentListPsi pal,
-        CreateParameterInfoContext context)
+    showParameterInfo(CeylonPsi.ArgumentListPsi pal, CreateParameterInfoContext context)
             => context.showHint(pal, pal.textRange.startOffset, this);
     
     tracksParameterIndex() => true;
@@ -134,12 +133,12 @@ shared class CeylonParameterInfoHandler()
     shared actual void updateParameterInfo(CeylonPsi.ArgumentListPsi al,
         UpdateParameterInfoContext context) {
 
-        value offset = context.editor.caretModel.offset;
+        value offset = context.offset;
 
         if (is CeylonPsi.PositionalArgumentListPsi al) {
             value index
-                    = ParameterInfoUtils.getCurrentParameterIndex(al.node, offset,
-                        TokenTypes.comma.tokenType);
+                    = ParameterInfoUtils.getCurrentParameterIndex(al.node,
+                        offset, TokenTypes.comma.tokenType);
             context.setCurrentParameter(index);
         }
         else if (is CeylonPsi.NamedArgumentListPsi al,
@@ -148,16 +147,15 @@ shared class CeylonParameterInfoHandler()
 
             if (inSequencedArgs(al, model, offset)) {
                 context.setCurrentParameter(model.parameterList.parameters.size()-1);
-            } else {
+            }
+            else {
                 value arg
                         = CeylonIterable(node.namedArguments)
                             .find((a) => a.startIndex.intValue()-1 <= offset <= a.endIndex.intValue()+1);
-
                 if (exists arg) {
                     value index
                             = CeylonList(model.parameterList.parameters)
                                 .firstIndexWhere((param) => param.name == arg.identifier.text);
-
                     if (exists index) {
                         context.setCurrentParameter(index);
                     }
