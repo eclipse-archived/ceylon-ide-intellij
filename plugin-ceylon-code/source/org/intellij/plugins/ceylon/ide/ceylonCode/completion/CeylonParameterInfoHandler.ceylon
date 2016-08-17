@@ -52,15 +52,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     TokenTypes,
-    CeylonPsi {
-        ArgumentListPsi,
-        PositionalArgumentListPsi,
-        NamedArgumentListPsi
-    }
+    CeylonPsi
 }
 
 shared class CeylonParameterInfoHandler()
-        satisfies ParameterInfoHandler<ArgumentListPsi, Functional> {
+        satisfies ParameterInfoHandler<CeylonPsi.ArgumentListPsi, Functional> {
     
     value printer = TypePrinter(true, true, false, true, false);
 
@@ -69,7 +65,7 @@ shared class CeylonParameterInfoHandler()
 
     couldShowInLookup() => true;
     
-    shared actual ArgumentListPsi? findElementForParameterInfo(CreateParameterInfoContext context) {
+    shared actual CeylonPsi.ArgumentListPsi? findElementForParameterInfo(CreateParameterInfoContext context) {
         if (is CeylonFile file = context.file) {
 
             value elementAtOffset
@@ -94,10 +90,9 @@ shared class CeylonParameterInfoHandler()
         return null;
     }
     
-    shared actual ArgumentListPsi? findElementForUpdatingParameterInfo(UpdateParameterInfoContext context) {
-        value elementAtOffset = PsiUtilCore.getElementAtOffset(context.file, context.offset);
-        return getParentOfType(elementAtOffset, javaClass<ArgumentListPsi>());
-    }
+    findElementForUpdatingParameterInfo(UpdateParameterInfoContext context)
+            => getParentOfType(PsiUtilCore.getElementAtOffset(context.file, context.offset),
+                    argumentListClass);
     
     getParametersForDocumentation(Functional? p, ParameterInfoContext? context)
             => ObjectArray<Object>(0);
@@ -107,30 +102,32 @@ shared class CeylonParameterInfoHandler()
     
     parameterCloseChars => ParameterInfoUtils.defaultParameterCloseChars;
     
-    showParameterInfo(ArgumentListPsi pal,
+    showParameterInfo(CeylonPsi.ArgumentListPsi pal,
         CreateParameterInfoContext context)
             => context.showHint(pal, pal.textRange.startOffset, this);
     
     tracksParameterIndex() => true;
     
-    shared actual void updateParameterInfo(ArgumentListPsi al,
+    shared actual void updateParameterInfo(CeylonPsi.ArgumentListPsi al,
         UpdateParameterInfoContext context) {
 
         value offset = context.editor.caretModel.offset;
 
-        if (is PositionalArgumentListPsi al) {
+        if (is CeylonPsi.PositionalArgumentListPsi al) {
             value index
                     = ParameterInfoUtils.getCurrentParameterIndex(al.node, offset,
                         TokenTypes.comma.tokenType);
             context.setCurrentParameter(index);
-        } else if (is NamedArgumentListPsi al,
-            exists model = al.ceylonNode?.namedArgumentList) {
+        }
+        else if (is CeylonPsi.NamedArgumentListPsi al,
+            exists node = al.ceylonNode,
+            exists model = node.namedArgumentList) {
 
             if (inSequencedArgs(al, model, offset)) {
                 context.setCurrentParameter(model.parameterList.parameters.size()-1);
             } else {
                 value arg
-                        = CeylonIterable(al.ceylonNode.namedArguments)
+                        = CeylonIterable(node.namedArguments)
                             .find((a) => a.startIndex.intValue()-1 <= offset <= a.endIndex.intValue()+1);
 
                 if (exists arg) {
@@ -146,19 +143,13 @@ shared class CeylonParameterInfoHandler()
         }
     }
 
-    Boolean inSequencedArgs(NamedArgumentListPsi nal, NamedArgumentList model, Integer offset) {
-
-        if (exists seq = nal.ceylonNode.sequencedArgument) {
-            if (nal.ceylonNode.namedArguments.empty) {
-                return true;
-            }
-            if (seq.startIndex.intValue() - 1 <= offset <= seq.stopIndex.intValue() + 1) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    Boolean inSequencedArgs(CeylonPsi.NamedArgumentListPsi nal,
+                NamedArgumentList model, Integer offset)
+            => if (exists node = nal.ceylonNode,
+                   exists seq = node.sequencedArgument)
+            then node.namedArguments.empty
+              || seq.startIndex.intValue()-1 <= offset <= seq.stopIndex.intValue()+1
+            else false;
 
     shared actual void updateUI(Functional fun, ParameterInfoUIContext context) {
         value noparams = "no parameters";
