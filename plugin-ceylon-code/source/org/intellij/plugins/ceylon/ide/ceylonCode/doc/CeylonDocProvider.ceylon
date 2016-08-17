@@ -125,7 +125,9 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
     }
 
     function moduleForFile(PsiFile file)
-            => ModuleUtilCore.findModuleForFile(file.virtualFile, file.project);
+            => if (exists virtualFile = file.virtualFile)
+            then ModuleUtilCore.findModuleForFile(virtualFile, file.project)
+            else null;
 
     function typeCheckerForElement(PsiElement? element) {
         if (exists element) {
