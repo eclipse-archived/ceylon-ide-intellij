@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    javaString
+}
+
 import com.intellij.codeInsight.completion {
     InsertHandler,
     InsertionContext
@@ -65,9 +69,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
-}
-import ceylon.interop.java {
-    javaString
 }
 
 shared object ideaCompletionServices satisfies CompletionServices {
@@ -201,15 +202,14 @@ shared object ideaCompletionServices satisfies CompletionServices {
     shared actual void newModuleDescriptorProposal(CompletionContext ctx, Integer offset,
             String prefix, String desc, String text,
             Integer selectionStart, Integer selectionLength) {
-        
-        value selection = TextRange.from(selectionStart, selectionLength); 
+
         if (is IdeaCompletionContext ctx) {
             ctx.proposals.add(newLookup {
                 desc = desc;
                 text = text;
                 icon = icons.moduleDescriptors;
                 handler = null;
-                selection = selection;
+                selection = TextRange.from(selectionStart, selectionLength);
             });
         }
     }
@@ -325,7 +325,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         if (is FakeCompletionDeclaration dec,
             !classFileDecompilerUtil.isCeylonCompiledFile(dec.psiClass.containingFile.virtualFile)) {
 
-            assert(is IdeaCompletionContext ctx);
+            assert (is IdeaCompletionContext ctx);
 
             function toCeylonType(PsiType javaType) {
                 if (javaType in [PsiPrimitiveType.long, PsiPrimitiveType.int, PsiPrimitiveType.short]) {
