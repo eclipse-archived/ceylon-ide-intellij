@@ -95,6 +95,13 @@ shared interface FakeCompletionDeclaration {
     shared formal PsiClass psiClass;
 }
 
+String[] ignoredTypes = [
+    "java.lang.Object",
+    "java.lang.Exception",
+    "java.lang.Throwable",
+    "java.lang.annotation.Annotation"
+];
+
 Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
         IdeaModuleManager moduleManager, Module mod,
         String startingWith, Integer proximity) {
@@ -127,6 +134,9 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             return defaultName;
         }
 
+        function ignored(PsiClass cls)
+                => (cls.qualifiedName else "") in ignoredTypes;
+
         function findOrCreateDeclaration(PsiClass cls, PsiModifierList modifiers, Package pkg) {
 
             if (!pkg.shared) {
@@ -145,6 +155,13 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             }
 
             value clsName = findName(cls);
+            if (!exists clsName) {
+                return null;
+            }
+            if (ignored(cls)) {
+                return null;
+            }
+
             Declaration lightModel;
 
             if (cls.\iinterface) {
