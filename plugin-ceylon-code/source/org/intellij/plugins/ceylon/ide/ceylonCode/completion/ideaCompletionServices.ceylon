@@ -113,7 +113,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         Reference? pr, String desc, String text, CompletionContext ctx,
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType) {
         
-        assert(exists pr);
+        assert (exists pr);
         if (is IdeaCompletionContext ctx) {
             ctx.proposals.add(IdeaRefinementCompletionProposal {
                 offset = offset;
@@ -278,11 +278,14 @@ shared object ideaCompletionServices satisfies CompletionServices {
             String description, DefaultRegion region, String text) {
         
         if (is IdeaProposalsHolder proposals) {
-            value myIcon = switch(icon)
-            case (is Icons) null
-            else icons.forDeclaration(icon);
-            
-            proposals.add(newLookup(description, text, myIcon));
+            proposals.add(newLookup {
+                desc = description;
+                text = text;
+                icon
+                    = if (is Declaration icon)
+                    then icons.forDeclaration(icon)
+                    else null;
+            });
         }
     }
     
@@ -291,29 +294,26 @@ shared object ideaCompletionServices satisfies CompletionServices {
             TextChange? additionalChange, DefaultRegion? selection) {
         
         if (is IdeaCompletionContext ctx) {
-            value myIcon = switch(icon)
-            case (is Icons) null
-            else icons.forDeclaration(icon);
-            
-            value myRange
-                    = if (exists selection)
-                    then TextRange.from(selection.start, selection.length)
-                    else null;
-            
-            value myHandler = if (is IdeaTextChange additionalChange)
-            then object satisfies InsertHandler<LookupElement> {
-                handleInsert(InsertionContext context, LookupElement? element)
-                        => additionalChange.apply();
-            }
-            else null;
-            
+
             ctx.proposals.add(newLookup {
                 desc = description;
                 text = text;
-                icon = myIcon;
-                selection = myRange;
-                handler = myHandler;
                 obj = description;
+                selection
+                    = if (exists selection)
+                    then TextRange.from(selection.start, selection.length)
+                    else null;
+                handler
+                    = if (is IdeaTextChange additionalChange)
+                    then object satisfies InsertHandler<LookupElement> {
+                        handleInsert(InsertionContext context, LookupElement? element)
+                                => additionalChange.apply();
+                    }
+                    else null;
+                icon
+                    = if (is Declaration icon)
+                    then icons.forDeclaration(icon)
+                    else null;
             });
         }
     }
@@ -344,15 +344,16 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 }
 
                 // arrays -> ObjectArray
-                variable value withoutArrays = MyString(javaType.presentableText)
-                    .replaceAll("\\bboolean\\[\\]", "BooleanArray")
-                    .replaceAll("\\bchar\\[\\]", "CharArray")
-                    .replaceAll("\\blong\\[\\]", "LongArray")
-                    .replaceAll("\\bint\\[\\]", "IntArray")
-                    .replaceAll("\\bshort\\[\\]", "ShortArray")
-                    .replaceAll("\\bbyte\\[\\]", "ByteArray")
-                    .replaceAll("\\bdouble\\[\\]", "DoubleArray")
-                    .replaceAll("\\bfloat\\[\\]", "FloatArray");
+                variable value withoutArrays
+                        = MyString(javaType.presentableText)
+                        .replaceAll("\\bboolean\\[\\]", "BooleanArray")
+                        .replaceAll("\\bchar\\[\\]", "CharArray")
+                        .replaceAll("\\blong\\[\\]", "LongArray")
+                        .replaceAll("\\bint\\[\\]", "IntArray")
+                        .replaceAll("\\bshort\\[\\]", "ShortArray")
+                        .replaceAll("\\bbyte\\[\\]", "ByteArray")
+                        .replaceAll("\\bdouble\\[\\]", "DoubleArray")
+                        .replaceAll("\\bfloat\\[\\]", "FloatArray");
 
                 variable Integer i = 0;
                 while (withoutArrays.string.contains("[]") && i < 20) {
@@ -365,12 +366,13 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 }
 
                 // primitive types -> Ceylon types
-                value withoutPrimitives = MyString(withoutArrays.string)
-                    .replaceAll("\\bboolean\\b", "Boolean")
-                    .replaceAll("\\bchar\\b", "Character")
-                    .replaceAll("\\b(long|int|short)\\b", "Integer")
-                    .replaceAll("\\bbyte\\b", "Byte")
-                    .replaceAll("\\b(double|float)\\b", "Float");
+                value withoutPrimitives
+                        = MyString(withoutArrays.string)
+                        .replaceAll("\\bboolean\\b", "Boolean")
+                        .replaceAll("\\bchar\\b", "Character")
+                        .replaceAll("\\b(long|int|short)\\b", "Integer")
+                        .replaceAll("\\bbyte\\b", "Byte")
+                        .replaceAll("\\b(double|float)\\b", "Float");
 
                 return withoutPrimitives.string
                     .replace("? extends ", "out ")
