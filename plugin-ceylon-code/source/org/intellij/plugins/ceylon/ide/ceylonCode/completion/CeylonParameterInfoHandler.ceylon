@@ -166,8 +166,8 @@ shared class CeylonParameterInfoHandler()
             value unit = fun.unit;
             for (param in parameters) {
                 value paramLabel
-                        = getParameterLabel(param, unit)
-                            .replace("->", "→");
+                        = getParameterLabel(param, unit);
+//                            .replace("->", "→");
 
                 if (i == context.currentParameterIndex) {
                     highlightOffsetStart = builder.size;
@@ -179,6 +179,7 @@ shared class CeylonParameterInfoHandler()
             builder.deleteTerminal(2);
             params = builder.string;
         }
+
         if (is ParameterInfoUIContextEx context) {
             context.setEscapeFunction(object satisfies IJFunction<JString, JString> {
                 fun(JString string)
@@ -187,8 +188,11 @@ shared class CeylonParameterInfoHandler()
                         else javaString(highlighter.highlight(unescaped, context.parameterOwner.project));
             });
         }
-        context.setupUIComponentPresentation(params, highlightOffsetStart, highlightOffsetEnd,
-            false, false, false, context.defaultParameterColor);
+
+        context.setupUIComponentPresentation(params,
+            highlightOffsetStart, highlightOffsetEnd,
+            false, false, false,
+            context.defaultParameterColor);
     }
 
     String convertFromHTML(String content)
