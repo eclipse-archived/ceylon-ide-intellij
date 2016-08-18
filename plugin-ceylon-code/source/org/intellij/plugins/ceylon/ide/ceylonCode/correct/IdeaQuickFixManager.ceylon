@@ -418,11 +418,11 @@ shared class IdeaQuickFixData(
         registerFix { 
             desc = description;
             change = null;
-            callback = (p, e, f) {
+            void callback(Project p, Editor e, PsiFile f) {
                 if (is CeylonFile f) {
-                    AssignToLocalElement(this, p, e, f).perform();
+                    AssignToLocalElement(this, e, f).perform();
                 }
-            };
+            }
         };
     }
     
