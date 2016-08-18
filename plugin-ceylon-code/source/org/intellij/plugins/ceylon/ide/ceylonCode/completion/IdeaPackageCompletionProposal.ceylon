@@ -39,18 +39,23 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
 
     shared actual variable Boolean toggleOverwrite = false;
     
-    shared LookupElement lookupElement => newLookup(description, text, icons.packageArchives,
-        object satisfies InsertHandler<LookupElement> {
-            shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
-                // Undo IntelliJ's completion
-                value platformDoc = ctx.commonDocument;
-                replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
-                
-                applyInternal(platformDoc);
-                adjustSelection(ctx);
-            }
-        }
-    );
+    shared LookupElement lookupElement
+            => newLookup {
+                description = description;
+                text = text;
+                icon = icons.packageArchives;
+                object handler satisfies InsertHandler<LookupElement> {
+                    shared actual void handleInsert(InsertionContext? insertionContext,
+                            LookupElement? t) {
+                        // Undo IntelliJ's completion
+                        value platformDoc = ctx.commonDocument;
+                        replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
+
+                        applyInternal(platformDoc);
+                        adjustSelection(ctx);
+                    }
+                }
+            };
     
     shared actual void newPackageMemberCompletionProposal(ProposalsHolder proposals,
             Declaration d, DefaultRegion selection, LinkedMode lm) {
@@ -67,20 +72,24 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => newLookup(description, text, icons.moduleArchives,
-        object satisfies InsertHandler<LookupElement> {
-            shared actual void handleInsert(InsertionContext ctx, LookupElement? t) {
-                // TODO
-                //ideaModuleImportUtils.addModuleImport(ModuleUtil.findModuleForPsiElement(ctx.file),
-                //    data.lastPhasedUnit.\ipackage.\imodule,
-                //    version.\imodule,
-                //    version.version);
-                value selection = getSelectionInternal(completionCtx.commonDocument);
-                ctx.editor.selectionModel.setSelection(selection.start, selection.end);
-                ctx.editor.caretModel.moveToOffset(selection.end); 
-            }
-        }
-    );
+    shared LookupElement lookupElement
+            => newLookup {
+                description = description;
+                text = text;
+                icon = icons.moduleArchives;
+                object handler satisfies InsertHandler<LookupElement> {
+                    shared actual void handleInsert(InsertionContext ctx, LookupElement? t) {
+                        // TODO
+                        //ideaModuleImportUtils.addModuleImport(ModuleUtil.findModuleForPsiElement(ctx.file),
+                        //    data.lastPhasedUnit.\ipackage.\imodule,
+                        //    version.\imodule,
+                        //    version.version);
+                        value selection = getSelectionInternal(completionCtx.commonDocument);
+                        ctx.editor.selectionModel.setSelection(selection.start, selection.end);
+                        ctx.editor.caretModel.moveToOffset(selection.end);
+                    }
+                }
+            };
     
     toggleOverwrite => false;
 }

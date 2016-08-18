@@ -32,39 +32,44 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaModuleCompletionProposal(Integer offset, String prefix,
         Integer len, String versioned, ModuleSearchResult.ModuleDetails mod,
-        Boolean withBody, ModuleVersionDetails version, 
-        String name, Node node, IdeaCompletionContext ctx) 
+        Boolean withBody, ModuleVersionDetails version,
+        String name, Node node, IdeaCompletionContext ctx)
         extends ModuleProposal
         (offset, prefix, len, versioned, mod, withBody, version, name, node, ctx)
         satisfies IdeaCompletionProposal {
-   
-    shared LookupElement lookupElement => newLookup(versioned, versioned.spanFrom(len),
-       icons.moduleArchives, object satisfies InsertHandler<LookupElement> {
-           shared actual void handleInsert(InsertionContext insertionContext,
-               LookupElement? element) {
-               
-               // Undo IntelliJ's completion
-               value platformDoc = ctx.commonDocument;
-               replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
-               
-               applyInternal(platformDoc);
-           }
-        }
-    );
-    
+
+    shared LookupElement lookupElement
+            => newLookup {
+                description = versioned;
+                text = versioned.spanFrom(len);
+                icon = icons.moduleArchives;
+                object handler satisfies InsertHandler<LookupElement> {
+                   shared actual void handleInsert(InsertionContext insertionContext,
+                       LookupElement? element) {
+
+                       // Undo IntelliJ's completion
+                       value platformDoc = ctx.commonDocument;
+                       replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
+
+                       applyInternal(platformDoc);
+                   }
+                }
+            };
+
     shared actual void newModuleProposal(ProposalsHolder proposals,
             ModuleVersionDetails details, DefaultRegion selection, LinkedMode linkedMode) {
         if (is IdeaProposalsHolder proposals) {
             // TODO icon
+            value version = details.version;
             proposals.add(newLookup {
-                desc = details.version;
-                text = details.version;
+                description = version;
+                text = version;
                 icon = null;
                 handler = null;
                 selection = TextRange.from(selection.start, selection.length);
             });
         }
     }
-    
+
     toggleOverwrite => false;
 }

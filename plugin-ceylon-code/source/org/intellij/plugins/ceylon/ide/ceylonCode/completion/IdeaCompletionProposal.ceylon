@@ -46,35 +46,13 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
     completionMode => "insert";
 }
 
-LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
+LookupElementBuilder newLookup(String description, String text, Icon? icon = null,
     InsertHandler<LookupElement>? handler = null, TextRange? selection = null,
-    Object? obj = null, Boolean deprecated = false) {
-    
-    Integer? cutOffset;
-    
-    Integer? parenOffset = desc.firstOccurrence('(');
-    
-    if (exists typeOffset = desc.firstOccurrence('<')) {
-        if (exists parenOffset, parenOffset < typeOffset) {
-            cutOffset = parenOffset;
-        } else {
-            cutOffset = typeOffset;
-        }
-    } else if (exists parenOffset) {
-        cutOffset = parenOffset;
-    } else {
-        cutOffset = null;
-    }
+    Boolean deprecated = false) {
 
-    value newText = if (exists cutOffset) then text.spanTo(cutOffset-1) else text;
-
-    object newHandler satisfies InsertHandler<LookupElement>{
+    object newHandler satisfies InsertHandler<LookupElement> {
         shared actual void handleInsert(InsertionContext insertionContext, LookupElement? t) {
-            if (exists cutOffset) {
-                insertionContext.document.replaceString(insertionContext.tailOffset,
-                    insertionContext.tailOffset, javaString(text.spanFrom(cutOffset)));
-            }
-            
+
             if (exists handler) {
                 handler.handleInsert(insertionContext, t);
             }
@@ -87,8 +65,8 @@ LookupElementBuilder newLookup(String desc, String text, Icon? icon = null,
         }
     }
     
-    return LookupElementBuilder.create(obj else text, newText)
-            .withPresentableText(desc)
+    return LookupElementBuilder.create(text, text)
+            .withPresentableText(description)
             .withIcon(icon)
             .withStrikeoutness(deprecated)
             .withInsertHandler(newHandler);

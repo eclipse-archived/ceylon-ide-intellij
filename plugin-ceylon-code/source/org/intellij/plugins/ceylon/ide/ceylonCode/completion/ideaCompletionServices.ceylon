@@ -78,7 +78,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         
         if (is IdeaCompletionContext ctx) {
             ctx.proposals.add(newLookup {
-                desc = prefix + desc;
+                description = prefix + desc;
                 text = prefix + text;
                 icon = icons.correction;
             });
@@ -135,7 +135,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
             String prefix, String desc, String text) {
         if (is IdeaCompletionContext ctx) {
             ctx.proposals.add(newLookup {
-                desc = desc;
+                description = desc;
                 text = text;
                 icon = icons.packageDescriptors;
             });
@@ -205,10 +205,9 @@ shared object ideaCompletionServices satisfies CompletionServices {
 
         if (is IdeaCompletionContext ctx) {
             ctx.proposals.add(newLookup {
-                desc = desc;
+                description = desc;
                 text = text;
                 icon = icons.moduleDescriptors;
-                handler = null;
                 selection = TextRange.from(selectionStart, selectionLength);
             });
         }
@@ -219,7 +218,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         
         if (is IdeaCompletionContext ctx) {
             ctx.proposals.add(newLookup {
-                desc = versioned;
+                description = versioned;
                 text = versioned.spanFrom(len);
                 icon = icons.moduleArchives;
             });
@@ -279,7 +278,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         
         if (is IdeaProposalsHolder proposals) {
             proposals.add(newLookup {
-                desc = description;
+                description = description;
                 text = text;
                 icon
                     = if (is Declaration icon)
@@ -296,9 +295,8 @@ shared object ideaCompletionServices satisfies CompletionServices {
         if (is IdeaCompletionContext ctx) {
 
             ctx.proposals.add(newLookup {
-                desc = description;
+                description = description;
                 text = text;
-                obj = description;
                 selection
                     = if (exists selection)
                     then TextRange.from(selection.start, selection.length)

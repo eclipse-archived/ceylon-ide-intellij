@@ -1,13 +1,9 @@
-import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
-}
 import com.intellij.codeInsight.lookup {
     LookupElement,
     LookupElementBuilder
 }
-import com.intellij.psi {
-    PsiDocumentManager
+import com.intellij.openapi.util {
+    TextRange
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Node
@@ -30,27 +26,38 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
         (offset, prefix, desc, text, node, declaration, ctx)
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => newLookup(desc, text, icons.correction,
-        object satisfies InsertHandler<LookupElement> {
-            shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
-                // Undo IntelliJ's completion
-                value platformDoc = ctx.commonDocument;
-                if (exists node) {
-                    value start = offset;
-                    value nodeText = platformDoc.getText(node.startIndex.intValue(), node.distance.intValue());
-                    value len = text.size - (prefix.size - nodeText.size) + 1; 
+    shared LookupElement lookupElement
+            => newLookup {
+                description = desc;
+                text = text;
+                icon = icons.correction;
+                selection = TextRange.from(start+text.size-1, 0);
+                /*object handler satisfies InsertHandler<LookupElement> {
+                    shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
+                        // Undo IntelliJ's completion
+                        value doc = ctx.commonDocument;
+                        if (exists node) {
+                            value nodeText = doc.getText {
+                                offset = node.startIndex.intValue();
+                                length = node.distance.intValue();
+                            };
 
-                    replaceInDoc(platformDoc, start, len, "");
-                    assert (exists project = ctx.editor.project);
-                    PsiDocumentManager.getInstance(project)
-                        .commitDocument(platformDoc.nativeDocument);
-                }
-                
-                applyInternal(platformDoc);
-                adjustSelection(ctx);
-            }
-        }
-    , null, [declaration, text]);
+                            replaceInDoc {
+                                doc = doc;
+                                start = offset;
+                                length = text.size - (prefix.size - nodeText.size) + 1;
+                                newText = "";
+                            };
+                            assert (exists project = ctx.editor.project);
+                            PsiDocumentManager.getInstance(project)
+                                .commitDocument(doc.nativeDocument);
+                        }
+
+                        applyInternal(doc);
+                        adjustSelection(ctx);
+                    }
+                }*/
+            };
         
     
     shared actual void newNameCompletion(ProposalsHolder proposals, String? name) {

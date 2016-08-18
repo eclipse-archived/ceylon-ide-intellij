@@ -44,7 +44,8 @@ class IdeaFunctionCompletionProposal
                 replaceInDoc(platformDoc, startOfTextToErase, lengthBeforeCaret, "");
 
                 assert (exists project = ctx.editor.project);
-                PsiDocumentManager.getInstance(project).commitDocument(platformDoc.nativeDocument);
+                PsiDocumentManager.getInstance(project)
+                    .commitDocument(platformDoc.nativeDocument);
 
                 value change = createChange(platformDoc);
 
