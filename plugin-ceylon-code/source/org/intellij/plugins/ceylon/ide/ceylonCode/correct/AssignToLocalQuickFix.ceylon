@@ -13,9 +13,6 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Editor
 }
-import com.intellij.openapi.project {
-    Project
-}
 import com.redhat.ceylon.ide.common.completion {
     ProposalsHolder
 }

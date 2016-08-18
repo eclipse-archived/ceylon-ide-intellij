@@ -3,15 +3,13 @@ import com.intellij.codeInsight.completion {
     InsertHandler
 }
 import com.intellij.codeInsight.lookup {
-    LookupElement,
-    LookupElementBuilder
+    LookupElement
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Node
 }
 import com.redhat.ceylon.ide.common.completion {
-    ControlStructureProposal,
-    ProposalsHolder
+    ControlStructureProposal
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration
