@@ -51,7 +51,6 @@ import com.redhat.ceylon.ide.common.util {
     nodes
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration,
     Referenceable
 }
 
@@ -218,9 +217,8 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             then contextElement else null;
 
     shared actual PsiElement? getDocumentationElementForLookupItem(PsiManager psiManager, Object arg, PsiElement element) {
-        if (is [Anything+] arg,
-            is Declaration first = arg.first,
-            exists decl = if (is FakeCompletionDeclaration first) then first.realDeclaration else first) {
+        if (is Referenceable arg,
+            exists decl = if (is FakeCompletionDeclaration arg) then arg.realDeclaration else arg) {
 
             value target = resolveDeclaration(decl, element.project);
             return if (is DeclarationPsiNameIdOwner target)

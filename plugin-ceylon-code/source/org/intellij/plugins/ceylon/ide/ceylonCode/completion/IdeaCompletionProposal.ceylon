@@ -19,6 +19,9 @@ import com.redhat.ceylon.ide.common.completion {
 import com.redhat.ceylon.ide.common.platform {
     CommonDocument
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Referenceable
+}
 
 import javax.swing {
     Icon
@@ -26,9 +29,6 @@ import javax.swing {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Declaration
 }
 
 
@@ -50,7 +50,7 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
 
 LookupElementBuilder newLookup(String description, String text, Icon? icon = null,
     InsertHandler<LookupElement>? handler = null, TextRange? selection = null,
-    Boolean deprecated = false, Declaration? declaration = null) {
+    Boolean deprecated = false, Referenceable? declaration = null) {
 
     object newHandler satisfies InsertHandler<LookupElement> {
         shared actual void handleInsert(InsertionContext insertionContext,
@@ -70,7 +70,7 @@ LookupElementBuilder newLookup(String description, String text, Icon? icon = nul
         }
     }
     
-    return LookupElementBuilder.create([declaration,text], text)
+    return LookupElementBuilder.create(declaration else text, text)
             .withPresentableText(description)
             .withIcon(icon)
             .withStrikeoutness(deprecated)
