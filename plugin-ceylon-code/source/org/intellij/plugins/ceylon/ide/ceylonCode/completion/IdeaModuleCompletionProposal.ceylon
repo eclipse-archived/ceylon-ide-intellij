@@ -46,12 +46,16 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
                 object handler satisfies InsertHandler<LookupElement> {
                    shared actual void handleInsert(InsertionContext insertionContext,
                        LookupElement? element) {
-
                        // Undo IntelliJ's completion
-                       value platformDoc = ctx.commonDocument;
-                       replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
+                       value doc = ctx.commonDocument;
+                       replaceInDoc {
+                           doc = doc;
+                           start = offset;
+                           length = text.size - prefix.size;
+                           newText = "";
+                       };
 
-                       applyInternal(platformDoc);
+                       applyInternal(doc);
                    }
                 }
             };
@@ -65,7 +69,6 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
                 description = version;
                 text = version;
                 icon = null;
-                handler = null;
                 selection = TextRange.from(selection.start, selection.length);
             });
         }

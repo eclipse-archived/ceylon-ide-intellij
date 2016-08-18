@@ -48,10 +48,16 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
                     shared actual void handleInsert(InsertionContext? insertionContext,
                             LookupElement? t) {
                         // Undo IntelliJ's completion
-                        value platformDoc = ctx.commonDocument;
-                        replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
+                        value doc = ctx.commonDocument;
 
-                        applyInternal(platformDoc);
+                        replaceInDoc {
+                            doc = doc;
+                            start = offset;
+                            length = text.size - prefix.size;
+                            newText = "";
+                        };
+
+                        applyInternal(doc);
                         adjustSelection(ctx);
                     }
                 }

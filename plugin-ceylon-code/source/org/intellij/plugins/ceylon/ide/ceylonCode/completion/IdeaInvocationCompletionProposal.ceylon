@@ -82,21 +82,20 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 object handler satisfies InsertHandler<LookupElement> {
                     shared actual void handleInsert(InsertionContext context, LookupElement? t) {
                         // Undo IntelliJ's completion
-                        value platformDoc = ctx.commonDocument;
+                        value doc = ctx.commonDocument;
                         value len = context.getOffset(selectionEndOffset) - offset;
-                        replaceInDoc(platformDoc, offset, len, "");
+                        replaceInDoc(doc, offset, len, "");
 
-                        assert (exists project = ctx.editor.project);
-                        PsiDocumentManager.getInstance(project).commitDocument(platformDoc.nativeDocument);
+                        assert (exists proj = ctx.editor.project);
+                        PsiDocumentManager.getInstance(proj).commitDocument(doc.nativeDocument);
 
-                        value change = createChange(platformDoc);
-
-                        object extends WriteCommandAction<Nothing>(ctx.editor.project, ctx.file) {
+                        value change = createChange(doc);
+                        object extends WriteCommandAction<Nothing>(proj, ctx.file) {
                             run(Result<Nothing> result) => change.apply();
                         }.execute();
 
                         adjustSelection(ctx);
-                        activeLinkedMode(platformDoc, ctx);
+                        activeLinkedMode(doc, ctx);
                     }
                 }
             }

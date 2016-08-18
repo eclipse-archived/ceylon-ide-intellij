@@ -1,9 +1,10 @@
+import com.intellij.codeInsight.completion {
+    InsertionContext,
+    InsertHandler
+}
 import com.intellij.codeInsight.lookup {
     LookupElement,
     LookupElementBuilder
-}
-import com.intellij.openapi.util {
-    TextRange
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Node
@@ -32,42 +33,23 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
                 text = text;
                 icon = icons.correction;
                 declaration = declaration;
-                selection
-                        = if (exists brace = text.firstOccurrence('{'))
-                        then TextRange.from(start+brace+1, 0) else null;
-                /*object handler satisfies InsertHandler<LookupElement> {
+                object handler satisfies InsertHandler<LookupElement> {
                     shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                         // Undo IntelliJ's completion
                         value doc = ctx.commonDocument;
-                        if (exists node) {
-                            value nodeText = doc.getText {
-                                offset = node.startIndex.intValue();
-                                length = node.distance.intValue();
-                            };
 
-                            replaceInDoc {
-                                doc = doc;
-                                start = offset;
-                                length = text.size - (prefix.size - nodeText.size) + 1;
-                                newText = "";
-                            };
-                            assert (exists project = ctx.editor.project);
-                            PsiDocumentManager.getInstance(project)
-                                .commitDocument(doc.nativeDocument);
-                        }
+                        replaceInDoc {
+                            doc = doc;
+                            start = offset;
+                            length = text.size - prefix.size;
+                            newText = "";
+                        };
 
                         applyInternal(doc);
                         adjustSelection(ctx);
                     }
-                }*/
+                }
             };
-        
-    
-    shared actual void newNameCompletion(ProposalsHolder proposals, String? name) {
-        if (is IdeaProposalsHolder proposals, exists name) {
-            proposals.add(LookupElementBuilder.create(name));
-        }
-    }
-    
+
     toggleOverwrite => false;
 }

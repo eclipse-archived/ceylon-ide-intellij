@@ -48,12 +48,12 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
                         value platformDoc = ctx.commonDocument;
                         replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
 
-                        assert (exists project = ctx.editor.project);
-                        PsiDocumentManager.getInstance(project).commitDocument(platformDoc.nativeDocument);
+                        assert (exists proj = ctx.editor.project);
+                        PsiDocumentManager.getInstance(proj).commitDocument(platformDoc.nativeDocument);
 
                         value change = createChange(platformDoc);
 
-                        object extends WriteCommandAction<Nothing>(ctx.editor.project, ctx.file) {
+                        object extends WriteCommandAction<Nothing>(proj, ctx.file) {
                             run(Result<Nothing> result) => change.apply();
                         }.execute();
 
