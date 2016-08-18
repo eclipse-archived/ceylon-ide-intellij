@@ -8,9 +8,6 @@ import com.intellij.extapi.psi {
 import com.intellij.openapi.application {
     ApplicationManager
 }
-import com.intellij.openapi.fileTypes {
-    FileType
-}
 import com.intellij.openapi.\imodule {
     Module,
     ModuleUtil
@@ -43,9 +40,6 @@ import com.redhat.ceylon.compiler.typechecker.context {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.ide.common.model {
-    BaseCeylonProject
-}
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
@@ -63,9 +57,6 @@ import com.redhat.ceylon.model.typechecker.model {
 import java.lang {
     ObjectArray,
     JBoolean=Boolean
-}
-import java.util {
-    ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
@@ -85,27 +76,31 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 CeylonLogger<CeylonFile> ceylonFileLogger = CeylonLogger<CeylonFile>();
 
 shared class CeylonFile(FileViewProvider viewProvider)
-        extends PsiFileBase(viewProvider, CeylonLanguage.instance) satisfies PsiClassOwner {
+        extends PsiFileBase(viewProvider, CeylonLanguage.instance)
+        satisfies PsiClassOwner {
+
+    value declarationClass = javaClass<CeylonPsi.DeclarationPsi>();
+    value compilationUnitClass = javaClass<CeylonPsi.CompilationUnitPsi>();
+    value localAnalyzerManagerClass = javaClass<CeylonLocalAnalyzerManager>();
+    value ideaCeylonProjectsClass = javaClass<IdeaCeylonProjects>();
+    value noPsiClasses = ObjectArray<PsiClass>(0);
 
     putUserData(BlockSupport.treeDepthLimitExceeded, JBoolean.true);
 
     value compilationUnitPsi {
-        value psi = PsiTreeUtil.findChildOfType(this, javaClass<CeylonPsi.CompilationUnitPsi>());
-        assert(exists psi);
+        assert (exists psi = PsiTreeUtil.findChildOfType(this, compilationUnitClass));
         return psi;
     }
 
-    shared Tree.CompilationUnit compilationUnit {
-        return compilationUnitPsi.ceylonNode;
-    }
+    shared Tree.CompilationUnit compilationUnit => compilationUnitPsi.ceylonNode;
 
     VirtualFile? realVirtualFile() => originalFile.virtualFile;
 
-    shared CeylonLocalAnalyzer? localAnalyzer => 
-        let (localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>()))
-        if (exists vf = realVirtualFile())
-        then localAnalyzerManager[vf]
-        else null;
+    shared CeylonLocalAnalyzer? localAnalyzer
+            => let (localAnalyzerManager = project.getComponent(localAnalyzerManagerClass))
+            if (exists vf = realVirtualFile())
+            then localAnalyzerManager[vf]
+            else null;
 
     shared ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit() {
         Module? mod = ApplicationManager.application.runReadAction(
@@ -114,7 +109,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
             }
         );
 
-        value ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>());
+        value ceylonProjects = project.getComponent(ideaCeylonProjectsClass);
         if (exists ceylonProject = ceylonProjects.getProject(mod),
             exists vf = realVirtualFile(),
             exists ceylonVirtualFile = ceylonProject.projectFileFromNative(vf)) {
@@ -133,7 +128,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
 
     shared TypeChecker? typechecker {
         if (isInSourceArchive(realVirtualFile())) {
-            value ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>());
+            value ceylonProjects = project.getComponent(ideaCeylonProjectsClass);
             if (exists mod = ceylonProjects.findModuleForExternalPhasedUnit(realVirtualFile()),
                 exists ceylonProject = mod.ceylonProject) {
 
@@ -148,18 +143,19 @@ shared class CeylonFile(FileViewProvider viewProvider)
     }
 
     shared LocalAnalysisResult? localAnalysisResult {
-        value attachedCompilationUnit = ApplicationManager.application.runReadAction(
-            object satisfies Computable<Tree.CompilationUnit> {
-                compute() => outer.compilationUnit;
-            }
-        );
+        value attachedCompilationUnit
+                = ApplicationManager.application.runReadAction(
+                    object satisfies Computable<Tree.CompilationUnit> {
+                        compute() => outer.compilationUnit;
+                    });
 
-        if (exists la = localAnalyzer,
-            exists result = la.result) {
+        if (exists localAnalyzer = this.localAnalyzer,
+            exists result = localAnalyzer.result) {
 
             if (result.parsedRootNode === attachedCompilationUnit) {
                 return result;
-            } else {
+            }
+            else {
                 ceylonFileLogger.warn(() =>
                 "LocalAnalysisResult.parsedRootNode (``
                 result.parsedRootNode.hash ``) !== ceylonFile.compilationUnit (``
@@ -185,20 +181,17 @@ shared class CeylonFile(FileViewProvider viewProvider)
                     lastCompilationUnit => attachedCompilationUnit;
 
                     shared actual IdeaDocument commonDocument {
-                        assert(exists document = viewProvider.document);
+                        assert (exists document = viewProvider.document);
                         return IdeaDocument(document);
                     }
 
-                    shared actual BaseCeylonProject? ceylonProject {
-                        if (is AnyProjectPhasedUnit phasedUnit) {
-                            return phasedUnit.ceylonProject;
-                        } else if (is ExternalPhasedUnit phasedUnit) {
-                            return phasedUnit.moduleSourceMapper?.ceylonProject;
-                        }
-                        return null;
-                    }
+                    ceylonProject
+                            => if (is AnyProjectPhasedUnit phasedUnit)
+                            then phasedUnit.ceylonProject
+                            else phasedUnit.moduleSourceMapper?.ceylonProject;
                 };
-            } else {
+            }
+            else {
                 ceylonFileLogger.warn(() => "``
                 if(phasedUnit is ExternalPhasedUnit)
                 then "ExternalPhasedUnit"
@@ -213,9 +206,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
         return null;
     }
 
-    shared actual FileType fileType {
-        return CeylonFileType.instance;
-    }
+    fileType => CeylonFileType.instance;
 
     shared PhasedUnit? upToDatePhasedUnit {
         if (exists lar = localAnalysisResult,
@@ -243,17 +234,20 @@ shared class CeylonFile(FileViewProvider viewProvider)
     }
 
     shared actual ObjectArray<PsiClass> classes {
-        value classes = ArrayList<PsiClass>();
-        if (exists decls = getChildrenOfType(compilationUnitPsi, javaClass<CeylonPsi.DeclarationPsi>())) {
-            for (CeylonPsi.DeclarationPsi decl in decls) {
-                classes.add(NavigationPsiClass(decl));
+        if (exists decls = getChildrenOfType(compilationUnitPsi, declarationClass)) {
+            value classes = ObjectArray<PsiClass>(decls.size);
+            variable value i = 0;
+            for (decl in decls) {
+                classes.set(i++, NavigationPsiClass(decl));
             }
+            return classes;
         }
-        return classes.toArray(ObjectArray<PsiClass>(classes.size()));
+        else {
+            return noPsiClasses;
+        }
     }
 
     shared actual String packageName => "";
+    assign packageName {}
 
-    assign packageName {
-    }
 }
