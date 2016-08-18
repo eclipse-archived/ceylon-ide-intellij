@@ -33,9 +33,7 @@ import com.intellij.pom {
 import com.intellij.psi {
     PsiElement,
     PsiFile,
-    PsiManager,
-    PsiClass,
-    PsiMethod
+    PsiManager
 }
 import com.intellij.psi.impl {
     PsiElementBase
@@ -51,15 +49,11 @@ import com.redhat.ceylon.ide.common.util {
     nodes
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration,
     Referenceable
 }
 
 import java.lang {
     CharArray
-}
-import java.util {
-    Arrays
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
@@ -82,14 +76,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     getCeylonProjects,
-    FakeCompletionDeclaration,
-    declarationFromPsiElement
+    FakeCompletionDeclaration
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
     CeylonFile,
     CeylonTokens,
-    descriptions
+    descriptions,
+    CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     DeclarationPsiNameIdOwner
@@ -100,7 +94,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 
 shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
-    value typesToIgnore = Arrays.asList(
+    value typesToIgnore = [
         CeylonTokens.ws,
         CeylonTokens.lineComment,
         CeylonTokens.comma,
@@ -110,7 +104,8 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
         CeylonTokens.lbracket,
         CeylonTokens.rbracket,
         CeylonTokens.lparen,
-        CeylonTokens.rparen);
+        CeylonTokens.rparen
+    ];
 
     shared actual String? getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
         if (is CeylonCompositeElement element,
@@ -154,6 +149,13 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
         return null;
     }
 
+    function phasedUnit(PsiElement element)
+            => if (is CeylonFile file = element.containingFile)
+            then (file.upToDatePhasedUnit
+                else file.retrieveProjectPhasedUnit()
+                else file.retrieveExternalPhasedUnit())
+            else null;
+
     shared actual String? generateDoc(PsiElement element, PsiElement? originalElement) {
         try {
             value typeChecker
@@ -162,25 +164,18 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             if (!exists typeChecker) {
                 return null;
             }
-
             value generator = IdeaDocGenerator(typeChecker);
-            if (is DummyPsiElement element) {
-                assert (exists pu = element.containingFile.localAnalysisResult?.lastPhasedUnit);
-                return generator.getDocumentationText {
-                    model = element.referenceable;
-                    node = null;
-                    rootNode = element.containingFile.compilationUnit;
-                    cmp = generator.DocParams(pu, element.project);
-                };
-            }
-            if (is CeylonFile file = element.containingFile,
-                exists phasedUnit = file.upToDatePhasedUnit) {
+
+            //usual case
+            if (exists phasedUnit = phasedUnit(element)) {
                 value params = generator.DocParams(phasedUnit, element.project);
-                if (is CeylonLightElement element) {
+                if (is CeylonLightElement|DummyPsiElement element) {
                     return generator.getDocumentationText {
-                        model = element.declaration;
-                        node = null;
                         rootNode = phasedUnit.compilationUnit;
+                        model = switch (element)
+                                case (is CeylonLightElement) element.declaration
+                                case (is DummyPsiElement) element.referenceable;
+                        node = null;
                         cmp = params;
                     };
                 } else {
@@ -191,23 +186,23 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     };
                 }
             }
-            else if (is CeylonFile file = originalElement?.containingFile,
-                exists phasedUnit = file.upToDatePhasedUnit,
-                is PsiClass|PsiMethod element,
-                exists declaration = declarationFromPsiElement(element)) {
 
-                return generator.getDeclarationDoc {
-                    model = declaration;
-                    node = null;
-                    unit = declaration.unit;
+            //special case for Navigate > Class
+            if (is CeylonPsi.DeclarationPsi navigationElement = element.navigationElement,
+                exists node = navigationElement.ceylonNode,
+                exists phasedUnit = phasedUnit(navigationElement)) {
+
+                return generator.getDocumentationText {
+                    rootNode = phasedUnit.compilationUnit;
+                    model = node.declarationModel;
+                    node = node;
                     cmp = generator.DocParams(phasedUnit, element.project);
-                    pr = null;
                 };
             }
+
         }
         catch (AssertionError|Exception e) {
             e.printStackTrace();
-            throw e;
         }
 
         return null;
@@ -218,9 +213,8 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             then contextElement else null;
 
     shared actual PsiElement? getDocumentationElementForLookupItem(PsiManager psiManager, Object arg, PsiElement element) {
-        if (is [Anything+] arg,
-            is Declaration first = arg.first,
-            exists decl = if (is FakeCompletionDeclaration first) then first.realDeclaration else first) {
+        if (is Referenceable arg,
+            exists decl = if (is FakeCompletionDeclaration arg) then arg.realDeclaration else arg) {
 
             value target = resolveDeclaration(decl, element.project);
             return if (is DeclarationPsiNameIdOwner target)
@@ -286,7 +280,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
 }
 
-class DummyPsiElement(referenceable, containingFile)
+final class DummyPsiElement(referenceable, containingFile)
         extends PsiElementBase() {
 
     shared Referenceable referenceable;

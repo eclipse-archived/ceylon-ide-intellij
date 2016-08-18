@@ -52,10 +52,10 @@ shared class AssignToLocalIntention() extends AbstractIntention() {
     familyName => "Assign to local";
 }
 
-class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFile f)
+class AssignToLocalElement(IdeaQuickFixData data, Editor editor, CeylonFile file)
         satisfies AssignToLocalProposal {
     
-    shared actual variable Integer currentOffset = e.caretModel.offset;
+    shared actual variable Integer currentOffset = editor.caretModel.offset;
     
     shared actual variable Integer exitPos = 0;
     
@@ -69,20 +69,22 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
         if (exists change = performInitialChange(data, currentOffset)) {
             change.apply();
         }
-        assert(is IdeaDocument doc = data.document);
-        value lm = IdeaLinkedMode(doc);
-        assert(exists phasedUnit = f.localAnalysisResult?.lastPhasedUnit);
-        addLinkedPositions(lm, phasedUnit.unit);
+
+        assert (is IdeaDocument doc = data.document,
+                exists phasedUnit = file.localAnalysisResult?.lastPhasedUnit);
+
+        value linkedMode = IdeaLinkedMode(doc);
+        addLinkedPositions(linkedMode, phasedUnit.unit);
         // TODO can't we do that in ide-common?
-        lm.install(this, 0, 0);
+        linkedMode.install(this, 0, 0);
     }
     
     shared actual void toProposals(<String|Type>[] types, ProposalsHolder proposals, 
         Integer offset, Unit unit) {
         
-        assert(is IdeaProposalsHolder proposals);
+        assert (is IdeaProposalsHolder proposals);
         
-        types.each((type) {
+        for (type in types) {
             if (is String type) {
                 proposals.add(LookupElementBuilder.create(type).withIcon(icons.correction));
             } else {
@@ -103,16 +105,16 @@ class AssignToLocalElement(IdeaQuickFixData data, Project p, Editor e, CeylonFil
                     });
                 proposals.add(prop);
             }
-        });
+        }
     }
 
     shared actual void toNameProposals(String[] names, ProposalsHolder proposals, 
         Integer offset, Unit unit, Integer seq) {
 
-        assert(is IdeaProposalsHolder proposals);
+        assert (is IdeaProposalsHolder proposals);
         
-        names.each(
-            (n) => proposals.add(LookupElementBuilder.create(n).withIcon(icons.local))
-        );
+        for (name in names) {
+            proposals.add(LookupElementBuilder.create(name).withIcon(icons.local));
+        }
     }
 }

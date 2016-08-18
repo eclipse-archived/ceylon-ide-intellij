@@ -26,6 +26,9 @@ import com.intellij.psi {
     PsiClassOwner,
     PsiClass
 }
+import com.intellij.psi.text {
+    BlockSupport
+}
 import com.intellij.psi.util {
     PsiTreeUtil {
         getChildrenOfType
@@ -50,7 +53,6 @@ import com.redhat.ceylon.ide.common.platform {
 import com.redhat.ceylon.ide.common.typechecker {
     ExternalPhasedUnit,
     LocalAnalysisResult,
-    IdePhasedUnit,
     AnyProjectPhasedUnit,
     ProjectPhasedUnit
 }
@@ -76,9 +78,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
 }
-import com.intellij.psi.text {
-    BlockSupport
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger
 }
@@ -103,10 +102,9 @@ shared class CeylonFile(FileViewProvider viewProvider)
     VirtualFile? realVirtualFile() => originalFile.virtualFile;
 
     shared CeylonLocalAnalyzer? localAnalyzer => 
-        let(localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>()),
-            vf = realVirtualFile())
-        if (exists vf) 
-        then localAnalyzerManager.get(vf) 
+        let (localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>()))
+        if (exists vf = realVirtualFile())
+        then localAnalyzerManager[vf]
         else null;
 
     shared ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit() {
@@ -125,11 +123,10 @@ shared class CeylonFile(FileViewProvider viewProvider)
         return null;
     }
 
-    ExternalPhasedUnit? retrieveExternalPhasedUnit() {
-        if (exists externalPuRef = realVirtualFile()?.getUserData(uneditedExternalPhasedUnit),
-            exists externalPu = externalPuRef.get()) {
-
-            return externalPu;
+    shared ExternalPhasedUnit? retrieveExternalPhasedUnit() {
+        if (exists vf = realVirtualFile(),
+            exists externalPuRef = vf.getUserData(uneditedExternalPhasedUnit)) {
+            return externalPuRef.get();
         }
         return null;
     }
@@ -171,11 +168,10 @@ shared class CeylonFile(FileViewProvider viewProvider)
             }
         }
 
-        IdePhasedUnit? phasedUnit = if (!isInSourceArchive(realVirtualFile()))
-            then retrieveProjectPhasedUnit()
-            else retrieveExternalPhasedUnit();
-
-        if (exists phasedUnit,
+        if (exists phasedUnit
+                = if (!isInSourceArchive(realVirtualFile()))
+                then retrieveProjectPhasedUnit()
+                else retrieveExternalPhasedUnit(),
             phasedUnit.refinementValidated) {
 
             if (phasedUnit.compilationUnit === attachedCompilationUnit) {

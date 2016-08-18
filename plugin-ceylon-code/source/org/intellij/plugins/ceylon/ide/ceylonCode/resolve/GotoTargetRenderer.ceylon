@@ -33,7 +33,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 shared class GotoTargetRenderer()
         extends PsiElementListCellRenderer<PsiElement>()
         satisfies GotoTargetRendererProvider {
-    
+
+    value declarationClass = javaClass<CeylonPsi.DeclarationPsi>();
+
     getRenderer(PsiElement psiElement, GotoTargetHandler.GotoData gotoData)
             => this;
 
@@ -45,9 +47,7 @@ shared class GotoTargetRenderer()
             exists loc = p.locationString) {
             return loc;
         }
-        else if (exists parent
-                    = PsiTreeUtil.getParentOfType(element,
-                        javaClass<CeylonPsi.DeclarationPsi>())) {
+        else if (exists parent = PsiTreeUtil.getParentOfType(element, declarationClass)) {
             return getContainerText(parent, string);
         }
         else {
@@ -61,9 +61,7 @@ shared class GotoTargetRenderer()
             exists text = p.presentableText) {
             return text;
         }
-        else if (exists parent
-                    = PsiTreeUtil.getParentOfType(element,
-                        javaClass<CeylonPsi.DeclarationPsi>())) {
+        else if (exists parent = PsiTreeUtil.getParentOfType(element, declarationClass)) {
             return getElementText(parent);
         }
         else {

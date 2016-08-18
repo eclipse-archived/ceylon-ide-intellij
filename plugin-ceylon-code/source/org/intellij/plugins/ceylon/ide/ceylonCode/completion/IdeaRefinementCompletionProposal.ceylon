@@ -35,31 +35,34 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         (offset, prefix, pr, desc, text, ctx, dec, scope, fullType, explicitReturnType) 
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement => newLookup {
-        desc = desc;
-        text = text;
-        icon = dec.formal then icons.refinement else icons.extendedType;
-        deprecated = dec.deprecated;
-        object handler satisfies InsertHandler<LookupElement> {
-            shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
-                // Undo IntelliJ's completion
-                value platformDoc = ctx.commonDocument;
-                replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
+    shared LookupElement lookupElement {
+        return newLookup {
+                description = desc;
+                text = text;
+                icon = dec.formal then icons.refinement else icons.extendedType;
+                deprecated = dec.deprecated;
+                declaration = dec;
+                object handler satisfies InsertHandler<LookupElement> {
+                    shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
+                        // Undo IntelliJ's completion
+                        value platformDoc = ctx.commonDocument;
+                        replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
 
-                assert (exists project = ctx.editor.project);
-                PsiDocumentManager.getInstance(project).commitDocument(platformDoc.nativeDocument);
+                        assert (exists proj = ctx.editor.project);
+                        PsiDocumentManager.getInstance(proj).commitDocument(platformDoc.nativeDocument);
 
-                value change = createChange(platformDoc);
+                        value change = createChange(platformDoc);
 
-                object extends WriteCommandAction<Nothing>(ctx.editor.project, ctx.file) {
-                    run(Result<Nothing> result) => change.apply();
-                }.execute();
+                        object extends WriteCommandAction<Nothing>(proj, ctx.file) {
+                            run(Result<Nothing> result) => change.apply();
+                        }.execute();
 
-                adjustSelection(ctx);
-                enterLinkedMode(platformDoc);
-            }
-        }
-    };
+                        adjustSelection(ctx);
+                        enterLinkedMode(platformDoc);
+                    }
+                }
+            };
+    }
     
     shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
         Declaration dec, Integer loc) {
@@ -68,7 +71,11 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         value desc = getNestedCompletionText(true, unit, dec);
         
         if (is IdeaProposalsHolder proposals) {
-            proposals.add(newLookup(desc, name, icons.forDeclaration(dec)));
+            proposals.add(newLookup {
+                description = desc;
+                text = name;
+                icon = icons.forDeclaration(dec);
+            });
         }
     }
     
@@ -76,7 +83,11 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         String val, Integer loc) {
 
         if (is IdeaProposalsHolder proposals) {
-            proposals.add(newLookup(val, val, icons.correction));
+            proposals.add(newLookup {
+                description = val;
+                text = val;
+                icon = icons.correction;
+            });
         }
     }
     
