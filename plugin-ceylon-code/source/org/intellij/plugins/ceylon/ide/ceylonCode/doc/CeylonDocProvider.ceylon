@@ -57,9 +57,6 @@ import com.redhat.ceylon.model.typechecker.model {
 import java.lang {
     CharArray
 }
-import java.util {
-    Arrays
-}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerProvider
@@ -99,7 +96,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 
 shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
-    value typesToIgnore = Arrays.asList(
+    value typesToIgnore = [
         CeylonTokens.ws,
         CeylonTokens.lineComment,
         CeylonTokens.comma,
@@ -109,7 +106,8 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
         CeylonTokens.lbracket,
         CeylonTokens.rbracket,
         CeylonTokens.lparen,
-        CeylonTokens.rparen);
+        CeylonTokens.rparen
+    ];
 
     shared actual String? getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
         if (is CeylonCompositeElement element,
