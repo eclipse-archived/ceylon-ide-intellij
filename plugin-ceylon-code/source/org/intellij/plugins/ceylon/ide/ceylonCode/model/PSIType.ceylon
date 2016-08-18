@@ -34,6 +34,57 @@ import java.util {
     Map,
     Arrays
 }
+import com.intellij.psi.search {
+    GlobalSearchScope
+}
+
+shared PsiClass? searchForClass(String potentialClass, [String*] potentialPackageParts, JavaPsiFacade facade, GlobalSearchScope resolveScope) {
+    String prefixedPotentialClass = StringBuilder().appendCharacter('$').append(potentialClass).string;
+    value pkg = facade.findPackage(".".join(potentialPackageParts.reversed)) else null;
+    if (exists pkg) {
+        if (exists found = pkg.findClassByShortName(potentialClass, resolveScope).array.first) {
+            return found;
+        }
+        if (exists found = pkg.findClassByShortName(prefixedPotentialClass, resolveScope).array.first) {
+            return found;
+        }
+    } else {
+        if (nonempty potentialPackageParts) {
+            if (exists first = potentialClass.first) {
+                if (first == 'i' && potentialClass == "impl" ||
+                first == 'a' && (potentialClass == "annotation$" || potentialClass == "annotations$")) {
+                    if (exists found = searchForClass {
+                        potentialClass = StringBuilder()
+                            .append(potentialPackageParts.first)
+                            .appendCharacter('$')
+                            .append(potentialClass).string;
+                        potentialPackageParts = potentialPackageParts.rest;
+                        facade = facade;
+                        resolveScope = resolveScope;
+                    }) {
+                        return found;
+                    }
+                }
+            }
+            if (exists parentClass = searchForClass {
+                potentialClass = potentialPackageParts.first;
+                potentialPackageParts = potentialPackageParts.rest;
+                facade = facade;
+                resolveScope = resolveScope;
+            }) {
+                if (exists found = parentClass.findInnerClassByName(potentialClass, false)) {
+                    return found;
+                }
+                if (exists found = parentClass.findInnerClassByName(prefixedPotentialClass, false)) {
+                    return found;
+                }
+            }
+        }
+
+    }
+    return null;
+}
+
 
 shared class PSIType(psi,
     originatingTypes = IdentityHashMap<PsiType,PSIType?>(),
@@ -104,7 +155,7 @@ shared class PSIType(psi,
             else null;
     
     primitive => psi is PsiPrimitiveType;
-    
+
     String computedQualifiedName {
         value canonicalText = PsiNameHelper.getQualifiedClassName(psi.canonicalText, false);
 
@@ -121,51 +172,25 @@ shared class PSIType(psi,
             if ('.' in canonicalText) {
                 value parts = canonicalText.split('.'.equals).sequence();
                 assert(nonempty reversedParts = parts.reversed);
-                
-                PsiClass? searchForClass(String potentialClass, [String*] potentialPackageParts) {
-                    String prefixedPotentialClass = StringBuilder().appendCharacter('$').append(potentialClass).string;
-                    value pkg = facade.findPackage(".".join(potentialPackageParts.reversed)) else null;
-                    if (exists pkg) {
-                        if (exists found = pkg.findClassByShortName(potentialClass, resolveScope).array.first) {
-                            return found;
-                        }
-                        if (exists found = pkg.findClassByShortName(prefixedPotentialClass, resolveScope).array.first) {
-                            return found;
-                        }
-                    } else {
-                        if (nonempty potentialPackageParts) {
-                            if (potentialClass == "impl") {
-                                if (exists found = searchForClass(potentialPackageParts.first + "$impl", potentialPackageParts.rest)) {
-                                    return found;
-                                }
-                            }
-                            if (exists parentClass = searchForClass(potentialPackageParts.first, potentialPackageParts.rest)) {
-                                if (exists found = parentClass.findInnerClassByName(potentialClass, false)) {
-                                    return found;
-                                }
-                                if (exists found = parentClass.findInnerClassByName(prefixedPotentialClass, false)) {
-                                    return found;
-                                }
-                            }
-                        }
-                        
-                    }
-                    return null;
-                }
-                
+
+
                 if (exists clsName = concurrencyManager.needReadAccess(() {
-                    if (exists foundClass = searchForClass(reversedParts.first, reversedParts.rest),
-                        exists qualifiedName = foundClass.qualifiedName) {
+                    if (exists foundClass = searchForClass {
+                            potentialClass = reversedParts.first;
+                            potentialPackageParts = reversedParts.rest;
+                            facade = facade;
+                            resolveScope = resolveScope;
+                        }, exists qualifiedName = foundClass.qualifiedName) {
                         return qualifiedName;
                     }
-                    
+
                     return null;
                 })) {
                     return clsName;
                 }
             }
         }
-        
+
         return canonicalText;
     }
 
