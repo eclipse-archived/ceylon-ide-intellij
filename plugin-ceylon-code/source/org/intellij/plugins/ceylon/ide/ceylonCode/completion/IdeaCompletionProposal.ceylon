@@ -51,16 +51,19 @@ LookupElementBuilder newLookup(String description, String text, Icon? icon = nul
     Boolean deprecated = false) {
 
     object newHandler satisfies InsertHandler<LookupElement> {
-        shared actual void handleInsert(InsertionContext insertionContext, LookupElement? t) {
+        shared actual void handleInsert(InsertionContext insertionContext,
+                LookupElement? lookupElement) {
 
             if (exists handler) {
-                handler.handleInsert(insertionContext, t);
+                handler.handleInsert(insertionContext, lookupElement);
             }
             
             if (exists selection) {
-                insertionContext.editor.selectionModel.setSelection(
-                    selection.startOffset, selection.endOffset);
-                insertionContext.editor.caretModel.moveToOffset(selection.endOffset);
+                value editor = insertionContext.editor;
+                editor.selectionModel
+                    .setSelection(selection.startOffset, selection.endOffset);
+                editor.caretModel
+                    .moveToOffset(selection.endOffset);
             }
         }
     }
