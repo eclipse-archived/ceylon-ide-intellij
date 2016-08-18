@@ -41,6 +41,7 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
                 text = text;
                 icon = dec.formal then icons.refinement else icons.extendedType;
                 deprecated = dec.deprecated;
+                declaration = dec;
                 object handler satisfies InsertHandler<LookupElement> {
                     shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
                         // Undo IntelliJ's completion

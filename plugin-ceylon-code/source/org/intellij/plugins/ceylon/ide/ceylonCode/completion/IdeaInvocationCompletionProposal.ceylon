@@ -78,6 +78,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 text = text;
                 icon = icons.forDeclaration(declaration);
                 deprecated = declaration.deprecated;
+                declaration = declaration;
                 object handler satisfies InsertHandler<LookupElement> {
                     shared actual void handleInsert(InsertionContext context, LookupElement? t) {
                         // Undo IntelliJ's completion

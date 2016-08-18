@@ -31,6 +31,7 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
                 description = desc;
                 text = text;
                 icon = icons.correction;
+                declaration = declaration;
                 selection
                         = if (exists brace = text.firstOccurrence('{'))
                         then TextRange.from(start+brace+1, 0) else null;

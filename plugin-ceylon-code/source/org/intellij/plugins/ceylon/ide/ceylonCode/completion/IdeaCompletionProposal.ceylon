@@ -27,7 +27,9 @@ import javax.swing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
 }
-
+import com.redhat.ceylon.model.typechecker.model {
+    Declaration
+}
 
 
 shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
@@ -48,7 +50,7 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
 
 LookupElementBuilder newLookup(String description, String text, Icon? icon = null,
     InsertHandler<LookupElement>? handler = null, TextRange? selection = null,
-    Boolean deprecated = false) {
+    Boolean deprecated = false, Declaration? declaration = null) {
 
     object newHandler satisfies InsertHandler<LookupElement> {
         shared actual void handleInsert(InsertionContext insertionContext,
@@ -68,7 +70,7 @@ LookupElementBuilder newLookup(String description, String text, Icon? icon = nul
         }
     }
     
-    return LookupElementBuilder.create(text, text)
+    return LookupElementBuilder.create([declaration,text], text)
             .withPresentableText(description)
             .withIcon(icon)
             .withStrikeoutness(deprecated)
