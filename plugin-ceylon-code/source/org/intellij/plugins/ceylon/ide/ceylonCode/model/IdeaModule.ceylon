@@ -72,7 +72,15 @@ shared class IdeaModule(
 
         if (startingWith.size>0,
             exists mod = moduleSourceMapper.ceylonProject?.ideArtifact) {
-            value proposals = scanJavaIndex(this, unit, moduleManager, mod, startingWith, proximity);
+
+            value proposals = scanJavaIndex {
+                that = this;
+                sourceUnit = unit;
+                moduleManager = moduleManager;
+                mod = mod;
+                startingWith = startingWith;
+                proximity = proximity;
+            };
 
             proposals.putAll(super.getAvailableDeclarationsInCurrentModule(unit, startingWith, proximity, canceller));
 
