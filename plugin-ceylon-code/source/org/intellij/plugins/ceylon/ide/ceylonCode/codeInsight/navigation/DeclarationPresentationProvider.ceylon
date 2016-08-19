@@ -1,6 +1,9 @@
 import com.intellij.navigation {
     ItemPresentationProvider,
-    ItemPresentation
+    ColoredItemPresentation
+}
+import com.intellij.openapi.editor.colors {
+    CodeInsightColors
 }
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
@@ -29,9 +32,13 @@ shared class DeclarationPresentationProvider()
             else locationAsString(dec.container);
 
     getPresentation(DeclarationNavigationItem item)
-            => object satisfies ItemPresentation {
+            => object satisfies ColoredItemPresentation {
         getIcon(Boolean unused) => icons.forDeclaration(item.declaration);
         locationString => nestedLocation(item.declaration);
         presentableText => nestedName(item.declaration);
+        textAttributesKey
+                => item.declaration.deprecated
+                then CodeInsightColors.deprecatedAttributes
+                else null;
     };
 }

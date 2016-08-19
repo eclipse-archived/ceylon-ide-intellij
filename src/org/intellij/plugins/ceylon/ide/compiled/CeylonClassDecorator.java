@@ -5,8 +5,11 @@ import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.ProjectViewNodeDecorator;
 import com.intellij.ide.projectView.impl.nodes.ClassTreeNode;
 import com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode;
+import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.packageDependencies.ui.PackageDependenciesNode;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.compiled.ClsClassImpl;
@@ -42,6 +45,10 @@ public class CeylonClassDecorator
                 String presentableText = getPresentableText(clsClass);
                 if (presentableText != null) {
                     data.setPresentableText(presentableText);
+                }
+
+                if (psiClass.isDeprecated()) {
+                    data.setAttributesKey(CodeInsightColors.DEPRECATED_ATTRIBUTES);
                 }
 
                 Icon icon = icons_.get_().forClass(clsClass);
@@ -107,7 +114,13 @@ public class CeylonClassDecorator
         if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())) {
             final String presentableText = getPresentableText(item);
             if (presentableText != null) {
-                return new ItemPresentation() {
+                return new ColoredItemPresentation() {
+                    @Nullable
+                    @Override
+                    public TextAttributesKey getTextAttributesKey() {
+                        return item.isDeprecated() ? CodeInsightColors.DEPRECATED_ATTRIBUTES : null;
+                    }
+
                     @Nullable
                     @Override
                     public String getPresentableText() {

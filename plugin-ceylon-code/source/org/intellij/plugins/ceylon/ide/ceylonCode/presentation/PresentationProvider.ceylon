@@ -1,6 +1,11 @@
 import com.intellij.navigation {
     ItemPresentation,
-    ItemPresentationProvider
+    ItemPresentationProvider,
+    ColoredItemPresentation
+}
+import com.intellij.openapi.editor.colors {
+    CodeInsightColors,
+    TextAttributesKey
 }
 import com.intellij.psi {
     PsiElement
@@ -27,7 +32,7 @@ shared class ClassPresentationProvider()
         satisfies ItemPresentationProvider<CeylonClass> {
 
     shared actual ItemPresentation getPresentation(CeylonClass item)
-            => object satisfies ItemPresentation {
+            => object satisfies ColoredItemPresentation {
 
                 shared actual String? presentableText {
                     if (exists model = item.ceylonNode?.declarationModel) {
@@ -70,6 +75,12 @@ shared class ClassPresentationProvider()
                         => if (exists node = item.ceylonNode)
                         then icons.forDeclaration(node)
                         else null;
+
+                textAttributesKey
+                        => if (exists model = item.ceylonNode?.declarationModel, model.deprecated)
+                        then CodeInsightColors.deprecatedAttributes
+                        else null;
+
             };
 }
 
@@ -77,7 +88,7 @@ shared class DeclarationPresentationProvider()
         satisfies ItemPresentationProvider<DeclarationPsiNameIdOwner> {
 
     shared actual ItemPresentation getPresentation(DeclarationPsiNameIdOwner item)
-            => object satisfies ItemPresentation {
+            => object satisfies ColoredItemPresentation {
 
                 shared actual String? presentableText {
                     if (exists model = item.ceylonNode?.declarationModel) {
@@ -124,6 +135,11 @@ shared class DeclarationPresentationProvider()
                 getIcon(Boolean unused)
                         => if (exists node = item.ceylonNode)
                         then icons.forDeclaration(node)
+                        else null;
+
+                textAttributesKey
+                        => if (exists model = item.ceylonNode?.declarationModel, model.deprecated)
+                        then CodeInsightColors.deprecatedAttributes
                         else null;
             };
 }
