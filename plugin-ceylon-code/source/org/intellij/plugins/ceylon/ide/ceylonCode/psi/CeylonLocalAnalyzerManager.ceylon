@@ -238,12 +238,15 @@ shared class CeylonLocalAnalyzerManager(model)
                 
                 application.invokator.invokeLater(JavaRunnable(() {
                     application.runWriteAction(JavaRunnable(() {
-                        value psiDocMgr = psiDocumentManager(model.ideaProject);
-                        if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
-                            psiDocMgr.isUncommited(cachedDocument)) {
-                            psiDocMgr.commitDocument(cachedDocument);
+                        value ideaProject = model.ideaProject;
+                        if (!ideaProject.isDisposed()) {
+                            value psiDocMgr = psiDocumentManager(ideaProject);
+                            if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
+                                psiDocMgr.isUncommited(cachedDocument)) {
+                                psiDocMgr.commitDocument(cachedDocument);
+                            }
+                            fileViewProvider.onContentReload();
                         }
-                        fileViewProvider.onContentReload();
                     }));
                 }), 
                 ModalityState.any())
