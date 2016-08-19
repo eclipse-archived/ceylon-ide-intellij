@@ -1,6 +1,7 @@
 import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
+    CompletionInitializationContext {
+        selectionEndOffset=\iSELECTION_END_OFFSET
+    }
 }
 import com.intellij.codeInsight.lookup {
     LookupElement
@@ -36,44 +37,48 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         satisfies IdeaCompletionProposal {
 
     shared LookupElement lookupElement {
-        return newLookup {
-                description = desc;
-                text = text;
-                icon = dec.formal then icons.refinement else icons.extendedType;
-                deprecated = dec.deprecated;
-                declaration = dec;
-                object handler satisfies InsertHandler<LookupElement> {
-                    shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
-                        // Undo IntelliJ's completion
-                        value platformDoc = ctx.commonDocument;
-                        replaceInDoc(platformDoc, offset, text.size - prefix.size, "");
+        return newDeclarationLookup {
+            description = desc;
+            text = text;
+            declaration = dec;
+            icon = dec.formal then icons.refinement else icons.extendedType;
+        }
+        .withInsertHandler(
+            //use a new class here since LookupElement's equals() method depends on it
+            object extends CompletionHandler((context) {
+            // Undo IntelliJ's completion
+            value doc = ctx.commonDocument;
 
-                        assert (exists proj = ctx.editor.project);
-                        PsiDocumentManager.getInstance(proj).commitDocument(platformDoc.nativeDocument);
-
-                        value change = createChange(platformDoc);
-
-                        object extends WriteCommandAction<Nothing>(proj, ctx.file) {
-                            run(Result<Nothing> result) => change.apply();
-                        }.execute();
-
-                        adjustSelection(ctx);
-                        enterLinkedMode(platformDoc);
-                    }
-                }
+            replaceInDoc {
+                doc = doc;
+                start = offset;
+                length = context.getOffset(selectionEndOffset) - offset;
+                newText = "";
             };
+
+            assert (exists proj = ctx.editor.project);
+            PsiDocumentManager.getInstance(proj)
+                .commitDocument(doc.nativeDocument);
+
+            value change = createChange(doc);
+
+            object extends WriteCommandAction<Nothing>(proj, ctx.file) {
+                run(Result<Nothing> result) => change.apply();
+            }.execute();
+
+            adjustSelection(ctx);
+            enterLinkedMode(doc);
+        }){});
     }
     
     shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
         Declaration dec, Integer loc) {
         value unit = ctx.lastCompilationUnit.unit;
-        value name = getNestedCompletionText(false, unit, dec);
-        value desc = getNestedCompletionText(true, unit, dec);
         
         if (is IdeaProposalsHolder proposals) {
             proposals.add(newLookup {
-                description = desc;
-                text = name;
+                description = getNestedCompletionText(true, unit, dec);
+                text = getNestedCompletionText(false, unit, dec);
                 icon = icons.forDeclaration(dec);
             });
         }

@@ -2,12 +2,7 @@ import ceylon.collection {
     HashSet
 }
 
-import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
-}
 import com.intellij.codeInsight.lookup {
-    LookupElement,
     LookupElementBuilder
 }
 import com.intellij.openapi.editor {
@@ -28,7 +23,8 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaProposalsHolder
+    IdeaProposalsHolder,
+    CompletionHandler
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaTextChange,
@@ -87,19 +83,17 @@ class AssignToLocalElement(IdeaQuickFixData data, Editor editor, CeylonFile file
             } else {
                 value prop = LookupElementBuilder.create(type.asString(unit))
                     .withIcon(icons.forDeclaration(type.declaration))
-                    .withInsertHandler(object satisfies InsertHandler<LookupElement> {
-                        shared actual void handleInsert(InsertionContext ctx, LookupElement el) {
-                            // TODO abstract that
-                            value imports = HashSet<Declaration>();
-                            importProposals.importType(imports, type, data.rootNode);
-                            if (!imports.empty) {
-                                value change = IdeaTextChange(data.document);
-                                change.initMultiEdit();
-                                importProposals.applyImports(change, imports, data.rootNode, data.document);
-                                change.apply();
-                            }
+                    .withInsertHandler(CompletionHandler((context) {
+                        // TODO abstract that
+                        value imports = HashSet<Declaration>();
+                        importProposals.importType(imports, type, data.rootNode);
+                        if (!imports.empty) {
+                            value change = IdeaTextChange(data.document);
+                            change.initMultiEdit();
+                            importProposals.applyImports(change, imports, data.rootNode, data.document);
+                            change.apply();
                         }
-                    });
+                    }));
                 proposals.add(prop);
             }
         }

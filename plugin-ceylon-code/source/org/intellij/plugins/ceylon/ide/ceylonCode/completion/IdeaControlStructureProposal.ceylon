@@ -1,7 +1,3 @@
-import com.intellij.codeInsight.completion {
-    InsertionContext,
-    InsertHandler
-}
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
@@ -30,24 +26,12 @@ class IdeaControlStructureProposal(Integer offset, String prefix, String desc,
                 description = desc;
                 text = text;
                 icon = icons.correction;
-                declaration = declaration;
-                object handler satisfies InsertHandler<LookupElement> {
-                    shared actual void handleInsert(InsertionContext? insertionContext, LookupElement? t) {
-                        // Undo IntelliJ's completion
-                        value doc = ctx.commonDocument;
-
-                        replaceInDoc {
-                            doc = doc;
-                            start = offset;
-                            length = text.size - prefix.size;
-                            newText = "";
-                        };
-
-                        applyInternal(doc);
-                        adjustSelection(ctx);
-                    }
+            }
+            .withInsertHandler(CompletionHandler((context) {
+                if (exists brace = text.firstOccurrence('{')) {
+                    setSelection(ctx, offset + brace + 1 - prefix.size);
                 }
-            };
+            }));
 
     toggleOverwrite => false;
 }

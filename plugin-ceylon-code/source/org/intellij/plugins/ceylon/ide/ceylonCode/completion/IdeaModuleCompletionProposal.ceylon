@@ -1,12 +1,5 @@
-import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
-}
 import com.intellij.codeInsight.lookup {
     LookupElement
-}
-import com.intellij.openapi.util {
-    TextRange
 }
 import com.redhat.ceylon.cmr.api {
     ModuleVersionDetails,
@@ -38,27 +31,26 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         (offset, prefix, len, versioned, mod, withBody, version, name, node, ctx)
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement
-            => newLookup {
-                description = versioned;
-                text = versioned.spanFrom(len);
-                icon = icons.moduleArchives;
-                object handler satisfies InsertHandler<LookupElement> {
-                   shared actual void handleInsert(InsertionContext insertionContext,
-                       LookupElement? element) {
-                       // Undo IntelliJ's completion
-                       value doc = ctx.commonDocument;
-                       replaceInDoc {
-                           doc = doc;
-                           start = offset;
-                           length = text.size - prefix.size;
-                           newText = "";
-                       };
+    shared LookupElement lookupElement {
+        return newLookup {
+            description = versioned;
+            text = versioned.spanFrom(len);
+            icon = icons.moduleArchives;
+        }
+        .withInsertHandler(CompletionHandler((context) {
+           // Undo IntelliJ's completion
+           value doc = ctx.commonDocument;
 
-                       applyInternal(doc);
-                   }
-                }
-            };
+           replaceInDoc {
+               doc = doc;
+               start = offset;
+               length = text.size - prefix.size;
+               newText = "";
+           };
+
+           applyInternal(doc);
+        }));
+    }
 
     shared actual void newModuleProposal(ProposalsHolder proposals,
             ModuleVersionDetails details, DefaultRegion selection, LinkedMode linkedMode) {
@@ -69,8 +61,9 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
                 description = version;
                 text = version;
                 icon = null;
-                selection = TextRange.from(selection.start, selection.length);
-            });
+            }
+            .withInsertHandler(CompletionHandler((context)
+                    => setSelection(ctx, selection.start, selection.end))));
         }
     }
 

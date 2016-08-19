@@ -1,8 +1,6 @@
 import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext,
     CompletionInitializationContext {
-        selectionEndOffset=SELECTION_END_OFFSET
+        selectionEndOffset=\iSELECTION_END_OFFSET
     }
 }
 import com.intellij.codeInsight.lookup {
@@ -73,34 +71,40 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     }
 
     shared LookupElement lookupElement {
-        return newLookup {
-                description = desc;
-                text = text;
-                icon = icons.forDeclaration(declaration);
-                deprecated = declaration.deprecated;
-                declaration = declaration;
-                object handler satisfies InsertHandler<LookupElement> {
-                    shared actual void handleInsert(InsertionContext context, LookupElement? t) {
-                        // Undo IntelliJ's completion
-                        value doc = ctx.commonDocument;
-                        value len = context.getOffset(selectionEndOffset) - offset;
-                        replaceInDoc(doc, offset, len, "");
+        return newDeclarationLookup {
+            description = desc;
+            text = text;
+            declaration = declaration;
+            icon = icons.forDeclaration(declaration);
+        }
+        .withInsertHandler(
+            //use a new class here since LookupElement's equals() method depends on it
+            object extends CompletionHandler((context) {
+            // Undo IntelliJ's completion
+            value doc = ctx.commonDocument;
 
-                        assert (exists proj = ctx.editor.project);
-                        PsiDocumentManager.getInstance(proj).commitDocument(doc.nativeDocument);
+            replaceInDoc {
+                doc = doc;
+                start = offset;
+                length = context.getOffset(selectionEndOffset) - offset;
+                newText = "";
+            };
 
-                        value change = createChange(doc);
-                        object extends WriteCommandAction<Nothing>(proj, ctx.file) {
-                            run(Result<Nothing> result) => change.apply();
-                        }.execute();
+            assert (exists proj = ctx.editor.project);
+            PsiDocumentManager.getInstance(proj)
+                .commitDocument(doc.nativeDocument);
 
-                        adjustSelection(ctx);
-                        activeLinkedMode(doc, ctx);
-                    }
-                }
-            }
-            .withTailText(greyText, true)
-            .withTypeText(returnType);
+            value change = createChange(doc);
+
+            object extends WriteCommandAction<Nothing>(proj, ctx.file) {
+                run(Result<Nothing> result) => change.apply();
+            }.execute();
+
+            adjustSelection(ctx);
+            activeLinkedMode(doc, ctx);
+        }){})
+        .withTailText(greyText, true)
+        .withTypeText(returnType);
     }
     
     shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
@@ -108,12 +112,10 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         
         if (is IdeaProposalsHolder proposals) {
             value unit = ctx.lastCompilationUnit.unit;
-            value desc = getNestedCompletionText(op, unit, dec, qualifier, basic, true);
-            value text = getNestedCompletionText(op, unit, dec, qualifier, basic, false);
             
             proposals.add(newLookup {
-                description = desc;
-                text = text;
+                description = getNestedCompletionText(op, unit, dec, qualifier, basic, true);
+                text = getNestedCompletionText(op, unit, dec, qualifier, basic, false);
                 icon = icons.forDeclaration(dec);
             });
         }

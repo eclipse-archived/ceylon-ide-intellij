@@ -3,15 +3,12 @@ import ceylon.interop.java {
 }
 
 import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
+    InsertionContext,
+    InsertHandler
 }
 import com.intellij.codeInsight.lookup {
     LookupElementBuilder,
     LookupElement
-}
-import com.intellij.openapi.util {
-    TextRange
 }
 import com.redhat.ceylon.ide.common.completion {
     CommonCompletionProposal
@@ -20,7 +17,8 @@ import com.redhat.ceylon.ide.common.platform {
     CommonDocument
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Referenceable
+    Referenceable,
+    Declaration
 }
 
 import javax.swing {
@@ -41,39 +39,41 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
     
     shared void adjustSelection(IdeaCompletionContext data) {
         value selection = getSelectionInternal(data.commonDocument);
-        data.editor.selectionModel.setSelection(selection.start, selection.end);
-        data.editor.caretModel.moveToOffset(selection.end);
+        setSelection(data, selection.start, selection.end);
     }
     
     completionMode => "insert";
 }
 
-LookupElementBuilder newLookup(String description, String text, Icon? icon = null,
-    InsertHandler<LookupElement>? handler = null, TextRange? selection = null,
-    Boolean deprecated = false, Referenceable? declaration = null) {
-
-    object newHandler satisfies InsertHandler<LookupElement> {
-        shared actual void handleInsert(InsertionContext insertionContext,
-                LookupElement? lookupElement) {
-
-            if (exists handler) {
-                handler.handleInsert(insertionContext, lookupElement);
-            }
-            
-            if (exists selection) {
-                value editor = insertionContext.editor;
-                editor.selectionModel
-                    .setSelection(selection.startOffset, selection.endOffset);
-                editor.caretModel
-                    .moveToOffset(selection.endOffset);
-            }
-        }
-    }
-    
-    return LookupElementBuilder.create(declaration else text, text)
+LookupElementBuilder newLookup(String description, String text, Icon? icon = null)
+        => LookupElementBuilder.create(text, text)
             .withPresentableText(description)
-            .withIcon(icon)
-            .withStrikeoutness(deprecated)
-            .withInsertHandler(newHandler);
-    
+            .withIcon(icon);
+
+LookupElementBuilder newDeclarationLookup(String description, String text,
+        Referenceable declaration, Icon? icon = null) {
+
+    value strikeout
+            = if (is Declaration declaration)
+            then declaration.deprecated
+            else false;
+
+    return LookupElementBuilder.create(declaration, declaration.nameAsString)
+        .withPresentableText(description)
+        .withIcon(icon)
+        .withStrikeoutness(strikeout);
+
+}
+
+void setSelection(IdeaCompletionContext data, Integer start, Integer end = start) {
+    value editor = data.editor;
+    editor.selectionModel.setSelection(start, end);
+    editor.caretModel.moveToOffset(end);
+
+}
+
+shared class CompletionHandler(void handle(InsertionContext context))
+        satisfies InsertHandler<LookupElement> {
+    handleInsert(InsertionContext insertionContext, LookupElement? t)
+            => handle(insertionContext);
 }

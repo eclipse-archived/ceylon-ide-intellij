@@ -1,7 +1,3 @@
-import com.intellij.codeInsight.completion {
-    InsertionContext,
-    InsertHandler
-}
 import com.intellij.codeInsight.lookup {
     LookupElement,
     LookupElementBuilder
@@ -39,29 +35,27 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
 
     shared actual variable Boolean toggleOverwrite = false;
     
-    shared LookupElement lookupElement
-            => newLookup {
-                description = description;
-                text = text;
-                icon = icons.packageArchives;
-                object handler satisfies InsertHandler<LookupElement> {
-                    shared actual void handleInsert(InsertionContext? insertionContext,
-                            LookupElement? t) {
-                        // Undo IntelliJ's completion
-                        value doc = ctx.commonDocument;
+    shared LookupElement lookupElement {
+        return newLookup {
+            description = description;
+            text = text;
+            icon = icons.packageArchives;
+        }
+        .withInsertHandler(CompletionHandler((context) {
+            // Undo IntelliJ's completion
+            value doc = ctx.commonDocument;
 
-                        replaceInDoc {
-                            doc = doc;
-                            start = offset;
-                            length = text.size - prefix.size;
-                            newText = "";
-                        };
-
-                        applyInternal(doc);
-                        adjustSelection(ctx);
-                    }
-                }
+            replaceInDoc {
+                doc = doc;
+                start = offset;
+                length = text.size - prefix.size;
+                newText = "";
             };
+
+            applyInternal(doc);
+            adjustSelection(ctx);
+        }));
+    }
     
     shared actual void newPackageMemberCompletionProposal(ProposalsHolder proposals,
             Declaration d, DefaultRegion selection, LinkedMode lm) {
@@ -78,24 +72,23 @@ class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String mem
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement
-            => newLookup {
-                description = description;
-                text = text;
-                icon = icons.moduleArchives;
-                object handler satisfies InsertHandler<LookupElement> {
-                    shared actual void handleInsert(InsertionContext ctx, LookupElement? t) {
-                        // TODO
-                        //ideaModuleImportUtils.addModuleImport(ModuleUtil.findModuleForPsiElement(ctx.file),
-                        //    data.lastPhasedUnit.\ipackage.\imodule,
-                        //    version.\imodule,
-                        //    version.version);
-                        value selection = getSelectionInternal(completionCtx.commonDocument);
-                        ctx.editor.selectionModel.setSelection(selection.start, selection.end);
-                        ctx.editor.caretModel.moveToOffset(selection.end);
-                    }
-                }
-            };
+    shared LookupElement lookupElement {
+        return newLookup {
+            description = description;
+            text = text;
+            icon = icons.moduleArchives;
+        }
+        .withInsertHandler(CompletionHandler((context) {
+            // TODO
+            //ideaModuleImportUtils.addModuleImport(ModuleUtil.findModuleForPsiElement(ctx.file),
+            //    data.lastPhasedUnit.\ipackage.\imodule,
+            //    version.\imodule,
+            //    version.version);
+            value selection = getSelectionInternal(completionCtx.commonDocument);
+            context.editor.selectionModel.setSelection(selection.start, selection.end);
+            context.editor.caretModel.moveToOffset(selection.end);
+        }));
+    }
     
     toggleOverwrite => false;
 }

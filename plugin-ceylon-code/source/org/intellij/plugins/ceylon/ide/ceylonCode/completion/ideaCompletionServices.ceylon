@@ -2,16 +2,6 @@ import ceylon.interop.java {
     javaString
 }
 
-import com.intellij.codeInsight.completion {
-    InsertHandler,
-    InsertionContext
-}
-import com.intellij.codeInsight.lookup {
-    LookupElement
-}
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.intellij.pom {
     PomNamedTarget
 }
@@ -208,8 +198,9 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 description = desc;
                 text = text;
                 icon = icons.moduleDescriptors;
-                selection = TextRange.from(selectionStart, selectionLength);
-            });
+            }.
+            withInsertHandler(CompletionHandler((context)
+                    => setSelection(ctx, selectionStart, selectionStart+selectionLength))));
         }
     }
     
@@ -263,11 +254,14 @@ shared object ideaCompletionServices satisfies CompletionServices {
     shared actual void newTypeProposal(ProposalsHolder ctx, Integer offset, Type? type,
             String text, String desc, Tree.CompilationUnit rootNode) {
         if (is IdeaProposalsHolder ctx) {
-            value icon
+            ctx.add(newLookup {
+                description = desc;
+                text = text;
+                icon
                     = if (exists type)
                     then icons.forDeclaration(type.declaration)
                     else null;
-            ctx.add(newLookup(desc, text).withIcon(icon));
+            });
         }
     }
     
@@ -293,26 +287,22 @@ shared object ideaCompletionServices satisfies CompletionServices {
             TextChange? additionalChange, DefaultRegion? selection) {
         
         if (is IdeaCompletionContext ctx) {
-
             ctx.proposals.add(newLookup {
                 description = description;
                 text = text;
-                selection
-                    = if (exists selection)
-                    then TextRange.from(selection.start, selection.length)
-                    else null;
-                handler
-                    = if (is IdeaTextChange additionalChange)
-                    then object satisfies InsertHandler<LookupElement> {
-                        handleInsert(InsertionContext context, LookupElement? element)
-                                => additionalChange.apply();
-                    }
-                    else null;
                 icon
                     = if (is Declaration icon)
                     then icons.forDeclaration(icon)
                     else null;
-            });
+            }
+            .withInsertHandler(CompletionHandler((context) {
+                if (is IdeaTextChange additionalChange) {
+                    additionalChange.apply();
+                }
+                if (exists selection) {
+                    setSelection(ctx, selection.start, selection.end);
+                }
+            })));
         }
     }
 
