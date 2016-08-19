@@ -118,7 +118,23 @@ public class CeylonClassDecorator
                     @Nullable
                     @Override
                     public TextAttributesKey getTextAttributesKey() {
-                        return item.isDeprecated() ? CodeInsightColors.DEPRECATED_ATTRIBUTES : null;
+                        if (item.isDeprecated()) {
+                            return CodeInsightColors.DEPRECATED_ATTRIBUTES;
+                        }
+                        String name = item.getName();
+                        if (name.endsWith("_")) { //TODO: better to check for the Ceylon annotations?
+                            for (PsiMethod method : item.findMethodsByName(name.substring(0, name.length()-1), false)) {
+                                if (method.isDeprecated()) {
+                                    return CodeInsightColors.DEPRECATED_ATTRIBUTES;
+                                }
+                            }
+                            for (PsiMethod method : item.findMethodsByName("get_", false)) {
+                                if (method.isDeprecated()) {
+                                    return CodeInsightColors.DEPRECATED_ATTRIBUTES;
+                                }
+                            }
+                        }
+                        return null;
                     }
 
                     @Nullable
