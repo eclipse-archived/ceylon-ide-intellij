@@ -190,6 +190,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     type => langNull;
 
+                    deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
+
                     psiClass => cls;
 
                     members => realIntf?.members;
@@ -216,18 +218,18 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     shared actual Type? type => realFunction?.type;
                     assign type {}
 
+                    value methods = cls.findMethodsByName(clsName, langFalse);
+                    value member
+                            = if (methods.size>0, //workaround for compiler bug #6421
+                                  exists method = methods[0])
+                            then method
+                            else null;
+
                     annotation = modifiers.findAnnotation(ceylonAnnotationInstantiationAnnotation) exists;
+                    deprecated = member?.modifierList?.findAnnotation(Annotations.deprecated.className) exists;
+                    declaredVoid = if (exists type = member?.returnType) then type==PsiType.\ivoid else langFalse;
 
                     psiClass => cls;
-
-                    shared actual Boolean declaredVoid
-                            => let (methods = cls.findMethodsByName(clsName, langFalse))
-                            if (methods.size>0, //workaround for compiler bug #6421
-                                exists method = methods[0],
-                                exists type = method.returnType)
-                            then type == PsiType.\ivoid
-                            else langFalse;
-                    assign declaredVoid {}
 
                 };
             } else if (modifiers.findAnnotation(ceylonObjectAnnotation) exists
@@ -243,11 +245,20 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                         return langNull;
                     }
 
-                    value realValue => lazyRealValue else (lazyRealValue =computeRealValue());
+                    value realValue => lazyRealValue else (lazyRealValue = computeRealValue());
                     realDeclaration => realValue;
 
                     shared actual Type? type => realValue?.type;
                     assign type {}
+
+                    value methods = cls.findMethodsByName("get_", langFalse);
+                    value member
+                            = if (methods.size>0, //workaround for compiler bug #6421
+                                  exists method = methods[0])
+                            then method
+                            else null;
+
+                    deprecated = member?.modifierList?.findAnnotation(Annotations.deprecated.className) exists;
 
                     psiClass => cls;
                 };
@@ -273,8 +284,9 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             => if (hasTypeParams)
                             then (realAlias?.typeParameters else noTypeParameters)
                             else noTypeParameters;
-
                     assign typeParameters {}
+
+                    deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
 
                     psiClass => cls;
                 };
@@ -328,16 +340,17 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     abstract = modifiers.hasModifierProperty(PsiModifier.abstract);
                     final = modifiers.hasModifierProperty(PsiModifier.final);
                     annotation = modifiers.findAnnotation(Annotations.annotationType.className) exists;
+                    deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
 
                     psiClass => cls;
 
                     members => realClass?.members;
+
                 };
             }
 
             lightModel.name = clsName;
             lightModel.container = pkg;
-            lightModel.deprecated = modifiers.findAnnotation(Annotations.deprecated.className) exists;
 
             value unit = Unit();
             unit.\ipackage = pkg;
