@@ -31,26 +31,25 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         (offset, prefix, len, versioned, mod, withBody, version, name, node, ctx)
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement {
-        return newLookup {
-            description = versioned;
-            text = versioned.spanFrom(len);
-            icon = icons.moduleArchives;
-        }
-        .withInsertHandler(CompletionHandler((context) {
-           // Undo IntelliJ's completion
-           value doc = ctx.commonDocument;
+    shared LookupElement lookupElement
+            => newLookup {
+                description = versioned;
+                text = versioned.spanFrom(len);
+                icon = icons.moduleArchives;
+            }
+            .withInsertHandler(CompletionHandler((context) {
+               // Undo IntelliJ's completion
+               value doc = ctx.commonDocument;
 
-           replaceInDoc {
-               doc = doc;
-               start = offset;
-               length = text.size - prefix.size;
-               newText = "";
-           };
+               replaceInDoc {
+                   doc = doc;
+                   start = offset;
+                   length = text.size - prefix.size;
+                   newText = "";
+               };
 
-           applyInternal(doc);
-        }));
-    }
+               applyInternal(doc);
+            }));
 
     shared actual void newModuleProposal(ProposalsHolder proposals,
             ModuleVersionDetails details, DefaultRegion selection, LinkedMode linkedMode) {

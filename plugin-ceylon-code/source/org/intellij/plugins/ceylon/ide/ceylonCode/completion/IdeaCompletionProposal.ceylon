@@ -58,7 +58,10 @@ LookupElementBuilder newDeclarationLookup(String description, String text,
             then declaration.deprecated
             else false;
 
-    return LookupElementBuilder.create(declaration, aliasedName else declaration.nameAsString)
+    value lookupString
+            = aliasedName else declaration.nameAsString;
+
+    return LookupElementBuilder.create(declaration, lookupString)
         .withPresentableText(description)
         .withIcon(icon)
         .withStrikeoutness(strikeout);
