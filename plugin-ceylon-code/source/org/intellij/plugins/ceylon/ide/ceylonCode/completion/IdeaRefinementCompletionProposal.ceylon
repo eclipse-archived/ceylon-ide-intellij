@@ -36,40 +36,39 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
         (offset, prefix, pr, desc, text, ctx, dec, scope, fullType, explicitReturnType) 
         satisfies IdeaCompletionProposal {
 
-    shared LookupElement lookupElement {
-        return newDeclarationLookup {
-            description = desc;
-            text = text;
-            declaration = dec;
-            icon = dec.formal then icons.refinement else icons.extendedType;
-        }
-        .withInsertHandler(
-            //use a new class here since LookupElement's equals() method depends on it
-            object extends CompletionHandler((context) {
-            // Undo IntelliJ's completion
-            value doc = ctx.commonDocument;
+    shared LookupElement lookupElement
+            => newDeclarationLookup {
+                description = desc;
+                text = text;
+                declaration = dec;
+                icon = dec.formal then icons.refinement else icons.extendedType;
+            }
+            .withInsertHandler(
+                //use a new class here since LookupElement's equals() method depends on it
+                object extends CompletionHandler((context) {
+                // Undo IntelliJ's completion
+                value doc = ctx.commonDocument;
 
-            replaceInDoc {
-                doc = doc;
-                start = offset;
-                length = context.getOffset(selectionEndOffset) - offset;
-                newText = "";
-            };
+                replaceInDoc {
+                    doc = doc;
+                    start = offset;
+                    length = context.getOffset(selectionEndOffset) - offset;
+                    newText = "";
+                };
 
-            assert (exists proj = ctx.editor.project);
-            PsiDocumentManager.getInstance(proj)
-                .commitDocument(doc.nativeDocument);
+                assert (exists proj = ctx.editor.project);
+                PsiDocumentManager.getInstance(proj)
+                    .commitDocument(doc.nativeDocument);
 
-            value change = createChange(doc);
+                value change = createChange(doc);
 
-            object extends WriteCommandAction<Nothing>(proj, ctx.file) {
-                run(Result<Nothing> result) => change.apply();
-            }.execute();
+                object extends WriteCommandAction<Nothing>(proj, ctx.file) {
+                    run(Result<Nothing> result) => change.apply();
+                }.execute();
 
-            adjustSelection(ctx);
-            enterLinkedMode(doc);
-        }){});
-    }
+                adjustSelection(ctx);
+                enterLinkedMode(doc);
+            }){});
     
     shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
         Declaration dec, Integer loc) {

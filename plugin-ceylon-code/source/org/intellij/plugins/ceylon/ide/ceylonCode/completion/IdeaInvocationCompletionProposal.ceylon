@@ -70,42 +70,49 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         }
     }
 
-    shared LookupElement lookupElement {
-        return newDeclarationLookup {
-            description = desc;
-            text = text;
-            declaration = declaration;
-            icon = icons.forDeclaration(declaration);
-        }
-        .withInsertHandler(
-            //use a new class here since LookupElement's equals() method depends on it
-            object extends CompletionHandler((context) {
-            // Undo IntelliJ's completion
-            value doc = ctx.commonDocument;
+    shared LookupElement lookupElement
+            => newDeclarationLookup {
+                description = desc;
+                text = text;
+                declaration = declaration;
+                icon = icons.forDeclaration(declaration);
+                value aliasedName {
+                    for (name in declaration.aliases) {
+                        if (desc.startsWith(name.string)) {
+                            return name.string;
+                        }
+                    }
+                    return null;
+                }
+            }
+            .withInsertHandler(
+                //use a new class here since LookupElement's equals() method depends on it
+                object extends CompletionHandler((context) {
+                // Undo IntelliJ's completion
+                value doc = ctx.commonDocument;
 
-            replaceInDoc {
-                doc = doc;
-                start = offset;
-                length = context.getOffset(selectionEndOffset) - offset;
-                newText = "";
-            };
+                replaceInDoc {
+                    doc = doc;
+                    start = offset;
+                    length = context.getOffset(selectionEndOffset) - offset;
+                    newText = "";
+                };
 
-            assert (exists proj = ctx.editor.project);
-            PsiDocumentManager.getInstance(proj)
-                .commitDocument(doc.nativeDocument);
+                assert (exists proj = ctx.editor.project);
+                PsiDocumentManager.getInstance(proj)
+                    .commitDocument(doc.nativeDocument);
 
-            value change = createChange(doc);
+                value change = createChange(doc);
 
-            object extends WriteCommandAction<Nothing>(proj, ctx.file) {
-                run(Result<Nothing> result) => change.apply();
-            }.execute();
+                object extends WriteCommandAction<Nothing>(proj, ctx.file) {
+                    run(Result<Nothing> result) => change.apply();
+                }.execute();
 
-            adjustSelection(ctx);
-            activeLinkedMode(doc, ctx);
-        }){})
-        .withTailText(greyText, true)
-        .withTypeText(returnType);
-    }
+                adjustSelection(ctx);
+                activeLinkedMode(doc, ctx);
+            }){})
+            .withTailText(greyText, true)
+            .withTypeText(returnType);
     
     shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
         Declaration dec, Declaration? qualifier, Integer loc, Integer index, Boolean basic, String op) {

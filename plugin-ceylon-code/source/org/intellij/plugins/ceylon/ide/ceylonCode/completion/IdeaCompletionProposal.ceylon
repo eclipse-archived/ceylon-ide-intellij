@@ -51,14 +51,14 @@ LookupElementBuilder newLookup(String description, String text, Icon? icon = nul
             .withIcon(icon);
 
 LookupElementBuilder newDeclarationLookup(String description, String text,
-        Referenceable declaration, Icon? icon = null) {
+        Referenceable declaration, Icon? icon = null, String? aliasedName = null) {
 
     value strikeout
             = if (is Declaration declaration)
             then declaration.deprecated
             else false;
 
-    return LookupElementBuilder.create(declaration, declaration.nameAsString)
+    return LookupElementBuilder.create(declaration, aliasedName else declaration.nameAsString)
         .withPresentableText(description)
         .withIcon(icon)
         .withStrikeoutness(strikeout);
