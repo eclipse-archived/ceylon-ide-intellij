@@ -5,252 +5,176 @@ import com.intellij.lang.Language;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.light.LightParameter;
+import com.intellij.psi.impl.light.LightParameterListBuilder;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.MethodSignature;
+import com.intellij.psi.util.MethodSignatureBackedByPsiMethod;
+import com.intellij.psi.util.MethodSignatureBase;
 import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
+import com.redhat.ceylon.model.typechecker.model.Type;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Only used to navigate from a decompiled class to a Ceylon source file.
- * From the decompiled file, we'll open the source file, then try to locate a PsiClass with
- * the same name as the .class file.
+ * Wraps a Function in a PsiMethod. This is used to navigate from compiled classes to the
+ * corresponding Ceylon code, for example in Go To Implementations or Navigate > Symbol.
  */
-public class NavigationPsiClass implements PsiSyntheticClass {
+class NavigationPsiMethod implements PsiMethod {
 
-    public final CeylonPsi.DeclarationPsi decl;
+    private CeylonPsi.AnyMethodPsi func;
 
-    private List<PsiMethod> methods;
+    NavigationPsiMethod(CeylonPsi.AnyMethodPsi func) {
+        this.func = func;
+    }
 
-    private List<PsiMethod> wrapMethods() {
-        if (methods == null) {
-            methods = new ArrayList<>();
+    @Nullable
+    @Override
+    public PsiType getReturnType() {
+        return null;
+    }
 
-            CeylonPsi.ClassBodyPsi body = PsiTreeUtil.findChildOfType(decl, CeylonPsi.ClassBodyPsi.class);
+    @Nullable
+    @Override
+    public PsiTypeElement getReturnTypeElement() {
+        return null;
+    }
 
-            if (body != null) {
-                for (PsiElement child : body.getChildren()) {
-                    if (child instanceof CeylonPsi.AnyMethodPsi) {
-                        methods.add(new NavigationPsiMethod((CeylonPsi.AnyMethodPsi) child));
+    @NotNull
+    @Override
+    public PsiParameterList getParameterList() {
+        LightParameterListBuilder builder =
+                new LightParameterListBuilder(func.getManager(), CeylonLanguage.INSTANCE);
+
+        Tree.AnyMethod tree = func.getCeylonNode();
+        Tree.ParameterList parameterList = tree.getParameterLists().get(0);
+
+        ((CeylonFile) func.getContainingFile()).ensureTypechecked();
+
+        for (Tree.Parameter param : parameterList.getParameters()) {
+            if (param instanceof Tree.ParameterDeclaration) {
+                Tree.TypedDeclaration typedDeclaration = ((Tree.ParameterDeclaration) param).getTypedDeclaration();
+                Type typeModel = typedDeclaration.getType().getTypeModel();
+                GlobalSearchScope scope = GlobalSearchScope.allScope(func.getProject());
+
+                LightParameter lightParam = new LightParameter(
+                        typedDeclaration.getIdentifier().getText(),
+                        mapType(typeModel, scope),
+                        func,
+                        CeylonLanguage.INSTANCE
+                );
+                builder.addParameter(lightParam);
+            }
+        }
+        return builder;
+    }
+
+    // Same as ceylonToJavaMapper.mapType() but for PsiTypes
+    private PsiType mapType(Type type, GlobalSearchScope scope) {
+        if (type.isUnion()) {
+            List<Type> types = type.getCaseTypes();
+            boolean hasNullType = false;
+
+            for (Type t : types) {
+                if (t.isNull()) {
+                    hasNullType = true;
+                    break;
+                }
+            }
+
+            if (hasNullType && type.getCaseTypes().size() == 2) {
+                // Return the non-null type
+                Type nonNullType = null;
+
+                for (Type t : types) {
+                    if (!t.isNull()) {
+                        nonNullType = t;
                     }
                 }
+                return mapType(nonNullType, scope);
+            } else {
+                return PsiType.getJavaLangObject(func.getManager(), scope);
             }
         }
 
-        return methods;
+        if (type.isInteger()) {
+            return PsiType.INT;
+        } else if (type.isFloat()) {
+            return PsiType.DOUBLE;
+        } else if (type.isBoolean()) {
+            return PsiType.BOOLEAN;
+        } else if (type.isCharacter()) {
+            return PsiType.CHAR;
+        } else if (type.isByte()) {
+            return PsiType.BYTE;
+        } else if (type.isString()) {
+            return PsiType.getJavaLangString(func.getManager(), scope);
+        }
+
+        String name = type.getDeclaration().getQualifiedNameString().replace("::", ".");
+        return PsiType.getTypeByName(name, func.getProject(), scope);
     }
 
-    NavigationPsiClass(CeylonPsi.DeclarationPsi decl) {
-        this.decl = decl;
+    @NotNull
+    @Override
+    public PsiReferenceList getThrowsList() {
+        return null;
     }
 
     @Nullable
     @Override
-    public String getQualifiedName() {
+    public PsiCodeBlock getBody() {
         return null;
     }
 
     @Override
-    public boolean isInterface() {
+    public boolean isConstructor() {
         return false;
     }
 
     @Override
-    public boolean isAnnotationType() {
+    public boolean isVarArgs() {
         return false;
     }
 
-    @Override
-    public boolean isEnum() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public PsiReferenceList getExtendsList() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public PsiReferenceList getImplementsList() {
-        return null;
-    }
-
     @NotNull
     @Override
-    public PsiClassType[] getExtendsListTypes() {
-        return new PsiClassType[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiClassType[] getImplementsListTypes() {
-        return new PsiClassType[0];
-    }
-
-    @Nullable
-    @Override
-    public PsiClass getSuperClass() {
-        return null;
-    }
-
-    @Override
-    public PsiClass[] getInterfaces() {
-        return new PsiClass[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiClass[] getSupers() {
-        return new PsiClass[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiClassType[] getSuperTypes() {
-        return new PsiClassType[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiField[] getFields() {
-        return new PsiField[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiMethod[] getMethods() {
-        return new PsiMethod[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiMethod[] getConstructors() {
-        return new PsiMethod[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiClass[] getInnerClasses() {
-        if (decl instanceof CeylonPsi.ClassOrInterfacePsi) {
-            CeylonPsi.BodyPsi body = PsiTreeUtil.findChildOfType(decl, CeylonPsi.BodyPsi.class);
-            if (body != null) {
-                Collection<CeylonPsi.ClassOrInterfacePsi> children =
-                        PsiTreeUtil.findChildrenOfType(body, CeylonPsi.ClassOrInterfacePsi.class);
-
-                List<PsiClass> inners = new ArrayList<>(children.size());
-
-                for (CeylonPsi.ClassOrInterfacePsi child : children) {
-                    inners.add(new NavigationPsiClass(child));
-                }
-
-                return inners.toArray(new PsiClass[children.size()]);
-            }
-        }
-        return PsiClass.EMPTY_ARRAY;
-    }
-
-    @NotNull
-    @Override
-    public PsiClassInitializer[] getInitializers() {
-        return new PsiClassInitializer[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiField[] getAllFields() {
-        return new PsiField[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiMethod[] getAllMethods() {
-        return new PsiMethod[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiClass[] getAllInnerClasses() {
-        return new PsiClass[0];
-    }
-
-    @Nullable
-    @Override
-    public PsiField findFieldByName(@NonNls String name, boolean checkBases) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public PsiMethod findMethodBySignature(PsiMethod patternMethod, boolean checkBases) {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public PsiMethod[] findMethodsBySignature(PsiMethod patternMethod, boolean checkBases) {
-        return new PsiMethod[0];
-    }
-
-    @NotNull
-    @Override
-    public PsiMethod[] findMethodsByName(@NonNls String name, boolean checkBases) {
-        List<PsiMethod> allMethods = wrapMethods();
-        List<PsiMethod> matching = new ArrayList<>();
-
-        for (PsiMethod method : allMethods) {
-            if (method.getName().equals(name)) {
-                matching.add(method);
-            }
+    public MethodSignature getSignature(@NotNull PsiSubstitutor substitutor) {
+        PsiParameter[] params = getParameterList().getParameters();
+        PsiType[] types = new PsiType[params.length];
+        int i = 0;
+        for (PsiParameter param : params) {
+            types[i++] = param.getType();
         }
 
-        return matching.toArray(new PsiMethod[matching.size()]);
-    }
+        return new MethodSignatureBase(substitutor, types, PsiTypeParameter.EMPTY_ARRAY) {
+            @NotNull
+            @Override
+            public String getName() {
+                return func.getName();
+            }
 
-    @NotNull
-    @Override
-    public List<Pair<PsiMethod, PsiSubstitutor>> findMethodsAndTheirSubstitutorsByName(@NonNls String name, boolean checkBases) {
-        return Collections.emptyList();
-    }
+            @Override
+            public boolean isRaw() {
+                return false;
+            }
 
-    @NotNull
-    @Override
-    public List<Pair<PsiMethod, PsiSubstitutor>> getAllMethodsAndTheirSubstitutors() {
-        return Collections.emptyList();
-    }
-
-    @Nullable
-    @Override
-    public PsiClass findInnerClassByName(@NonNls String name, boolean checkBases) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public PsiElement getLBrace() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public PsiElement getRBrace() {
-        return null;
+            @Override
+            public boolean isConstructor() {
+                return false;
+            }
+        };
     }
 
     @Nullable
@@ -259,53 +183,73 @@ public class NavigationPsiClass implements PsiSyntheticClass {
         return null;
     }
 
+    @NotNull
     @Override
-    public PsiElement getScope() {
+    public PsiMethod[] findSuperMethods() {
+        return new PsiMethod[0];
+    }
+
+    @NotNull
+    @Override
+    public PsiMethod[] findSuperMethods(boolean checkAccess) {
+        return new PsiMethod[0];
+    }
+
+    @NotNull
+    @Override
+    public PsiMethod[] findSuperMethods(PsiClass parentClass) {
+        return new PsiMethod[0];
+    }
+
+    @NotNull
+    @Override
+    public List<MethodSignatureBackedByPsiMethod> findSuperMethodSignaturesIncludingStatic(boolean checkAccess) {
         return null;
-    }
-
-    @Override
-    public boolean isInheritor(@NotNull PsiClass baseClass, boolean checkDeep) {
-        return false;
-    }
-
-    @Override
-    public boolean isInheritorDeep(PsiClass baseClass, @Nullable PsiClass classToByPass) {
-        return false;
     }
 
     @Nullable
     @Override
-    public PsiClass getContainingClass() {
+    public PsiMethod findDeepestSuperMethod() {
         return null;
     }
 
     @NotNull
     @Override
-    public Collection<HierarchicalMethodSignature> getVisibleSignatures() {
-        return Collections.emptyList();
+    public PsiMethod[] findDeepestSuperMethods() {
+        return new PsiMethod[0];
+    }
+
+    @NotNull
+    @Override
+    public PsiModifierList getModifierList() {
+        return null;
+    }
+
+    @Override
+    public boolean hasModifierProperty(@PsiModifier.ModifierConstant @NonNls @NotNull String name) {
+        return false;
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+        return func.getName();
     }
 
     @Nullable
     @Override
-    public String getName() {
-        Tree.Identifier identifier
-                = decl.getCeylonNode().getIdentifier();
-        if (identifier==null) {
-            return null;
-        }
-
-        String suffix
-                = decl instanceof CeylonPsi.ObjectDefinitionPsi
-               || decl instanceof CeylonPsi.AnyMethodPsi
-               || decl instanceof CeylonPsi.AnyAttributePsi
-                ? "_"
-                : "";
-        return identifier.getText() + suffix;
+    public ItemPresentation getPresentation() {
+        return null;
     }
 
     @Override
     public PsiElement setName(@NonNls @NotNull String name) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public HierarchicalMethodSignature getHierarchicalMethodSignature() {
         return null;
     }
 
@@ -339,40 +283,29 @@ public class NavigationPsiClass implements PsiSyntheticClass {
 
     @Nullable
     @Override
-    public ItemPresentation getPresentation() {
+    public PsiClass getContainingClass() {
         return null;
     }
 
     @Override
     public void navigate(boolean requestFocus) {
-        decl.navigate(requestFocus);
+
     }
 
     @Override
     public boolean canNavigate() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean canNavigateToSource() {
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public PsiModifierList getModifierList() {
-        return null;
-    }
-
-    @Override
-    public boolean hasModifierProperty(@PsiModifier.ModifierConstant @NonNls @NotNull String name) {
         return false;
     }
 
     @NotNull
     @Override
     public Project getProject() throws PsiInvalidElementAccessException {
-        return decl.getProject();
+        return func.getProject();
     }
 
     @NotNull
@@ -419,7 +352,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
 
     @Override
     public PsiFile getContainingFile() throws PsiInvalidElementAccessException {
-        return decl.getContainingFile();
+        return null;
     }
 
     @Override
@@ -468,7 +401,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
     @NotNull
     @Override
     public PsiElement getNavigationElement() {
-        return decl;
+        return func;
     }
 
     @Override
@@ -563,7 +496,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
 
     @Override
     public boolean isValid() {
-        return true;
+        return false;
     }
 
     @Override
@@ -613,13 +546,13 @@ public class NavigationPsiClass implements PsiSyntheticClass {
     @NotNull
     @Override
     public GlobalSearchScope getResolveScope() {
-        return decl.getResolveScope();
+        return func.getResolveScope();
     }
 
     @NotNull
     @Override
     public SearchScope getUseScope() {
-        return decl.getUseScope();
+        return func.getUseScope();
     }
 
     @Override
