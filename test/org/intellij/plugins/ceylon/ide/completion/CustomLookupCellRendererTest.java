@@ -1,3 +1,4 @@
+/*
 package org.intellij.plugins.ceylon.ide.completion;
 
 import ceylon.interop.java.CeylonList;
@@ -199,3 +200,4 @@ public class CustomLookupCellRendererTest {
         }
     }
 }
+*/

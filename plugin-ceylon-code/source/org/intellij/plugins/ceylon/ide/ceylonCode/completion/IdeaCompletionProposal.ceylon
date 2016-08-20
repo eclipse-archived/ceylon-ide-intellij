@@ -10,6 +10,9 @@ import com.intellij.codeInsight.lookup {
     LookupElementBuilder,
     LookupElement
 }
+import com.redhat.ceylon.cmr.api {
+    ModuleVersionDetails
+}
 import com.redhat.ceylon.ide.common.completion {
     CommonCompletionProposal
 }
@@ -27,6 +30,9 @@ import javax.swing {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    icons
 }
 
 
@@ -50,9 +56,15 @@ LookupElementBuilder newLookup(String description, String text, Icon? icon = nul
             .withPresentableText(description)
             .withIcon(icon);
 
+LookupElementBuilder newModuleLookup(String description, String text,
+        ModuleVersionDetails version, Icon? icon = null)
+        => LookupElementBuilder.create(version, text)
+            .withPresentableText(description)
+            .withIcon(icon);
+
 LookupElementBuilder newDeclarationLookup(String description, String text,
-        Referenceable declaration, Icon? icon = null, String? aliasedName = null,
-        Declaration? qualifyingDeclaration = null) {
+        Referenceable declaration, Icon? icon = icons.forDeclaration(declaration),
+        String? aliasedName = null, Declaration? qualifyingDeclaration = null) {
 
     value strikeout
             = if (is Declaration declaration)
@@ -73,9 +85,9 @@ LookupElementBuilder newDeclarationLookup(String description, String text,
             else qualifier + lookupString;
 
     return LookupElementBuilder.create(declaration, fullLookupString)
-        .withPresentableText(description)
-        .withIcon(icon)
-        .withStrikeoutness(strikeout);
+            .withPresentableText(description)
+            .withIcon(icon)
+            .withStrikeoutness(strikeout);
 
 }
 

@@ -42,7 +42,9 @@ import com.redhat.ceylon.model.typechecker.model {
     TypeAlias,
     NothingType,
     Setter,
-    Constructor
+    Constructor,
+    Referenceable,
+    Package
 }
 
 import javax.swing {
@@ -110,7 +112,7 @@ shared object icons {
              | Tree.SpecifierStatement
              | Tree.ObjectExpression;
 
-    shared Icon? getBaseIcon(DeclarationNode|Declaration obj) {
+    shared Icon? getBaseIcon(DeclarationNode|Referenceable obj) {
         if (is Tree.SpecifierStatement obj, !obj.refinement) {
             return null;
         }
@@ -174,42 +176,56 @@ shared object icons {
                 null;
     }
     
-    shared Icon? forDeclaration(DeclarationNode|Declaration obj) {
+    shared Icon? forDeclaration(DeclarationNode|Referenceable obj) {
         value baseIcon = getBaseIcon(obj);
         if (!exists baseIcon) {
             print("Missing icon for ``obj``");
             return null;
         }
 
-        Declaration? model = 
+        Referenceable? model =
             switch (obj) 
             case (is Tree.Declaration) obj.declarationModel
             case (is Tree.TypedArgument) obj.declarationModel
             case (is Tree.SpecifierStatement) obj.declaration
             case (is Tree.ObjectExpression) obj.anonymousClass
             else obj;
-        
+
         if (exists model) {
-            value decorations = ArrayList<Icon>();
-            value layer 
-                = if (model.shared) 
-                then PlatformIcons.publicIcon
-                else PlatformIcons.privateIcon;
-            value final 
-                = switch (model)
-                case (is Class) model.final
-//                case (is FunctionOrValue) model.classOrInterfaceMember && !model.actual
-                else false;
-            if (final) {
-                decorations.add(AllIcons.Nodes.finalMark);
+            if (is Declaration model) {
+                value decorations = ArrayList<Icon>();
+                value layer
+                        = if (model.shared)
+                        then PlatformIcons.publicIcon
+                        else PlatformIcons.privateIcon;
+                value final
+                        = switch (model)
+                        case (is Class) model.final
+                        //case (is FunctionOrValue) model.classOrInterfaceMember && !model.actual
+                        else false;
+                if (final) {
+                    decorations.add(AllIcons.Nodes.finalMark);
+                }
+                value readonly
+                        = model.toplevel
+                        && !model.unit is AnyModifiableSourceFile;
+                if (readonly) {
+                    decorations.add(PlatformIcons.lockedIcon);
+                }
+                return createIcon(decorations, baseIcon, layer);
             }
-            value readonly
-                = model.toplevel 
-                && !model.unit is AnyModifiableSourceFile;
-            if (readonly) {
-                decorations.add(PlatformIcons.lockedIcon);
+            else if (is Package model) {
+                value layer
+                        = if (model.shared)
+                        then PlatformIcons.publicIcon
+                        else PlatformIcons.privateIcon;
+                //TODO: PlatformIcons.lockedIcon
+                return createIcon([], baseIcon, layer);
             }
-            return createIcon(decorations, baseIcon, layer);
+            else {
+                //TODO: PlatformIcons.lockedIcon
+                return baseIcon;
+            }
         }
         else if (is Tree.Declaration obj) {
             for (a in obj.annotationList.annotations) {

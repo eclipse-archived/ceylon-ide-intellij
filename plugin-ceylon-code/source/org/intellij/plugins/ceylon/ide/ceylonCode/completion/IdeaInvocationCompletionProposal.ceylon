@@ -76,7 +76,6 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 text = text;
                 declaration = declaration;
                 qualifyingDeclaration = qualifyingDeclaration;
-                icon = icons.forDeclaration(declaration);
                 value aliasedName {
                     for (name in declaration.aliases) {
                         if (desc.startsWith(name.string)) {

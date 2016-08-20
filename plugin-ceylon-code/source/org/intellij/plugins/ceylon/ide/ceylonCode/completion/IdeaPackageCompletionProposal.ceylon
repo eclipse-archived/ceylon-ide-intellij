@@ -1,10 +1,8 @@
 import com.intellij.codeInsight.lookup {
-    LookupElement,
-    LookupElementBuilder
+    LookupElement
 }
 import com.redhat.ceylon.cmr.api {
-    ModuleVersionDetails,
-    ModuleSearchResult
+    ModuleVersionDetails
 }
 import com.redhat.ceylon.ide.common.completion {
     ImportedModulePackageProposal,
@@ -36,10 +34,11 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
     shared actual variable Boolean toggleOverwrite = false;
     
     shared LookupElement lookupElement
-            => newLookup {
+            => newDeclarationLookup {
                 description = description;
                 text = text;
                 icon = icons.packageArchives;
+                declaration = candidate;
             }
             .withInsertHandler(CompletionHandler((context) {
                 // Undo IntelliJ's completion
@@ -59,23 +58,29 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
     shared actual void newPackageMemberCompletionProposal(ProposalsHolder proposals,
             Declaration d, DefaultRegion selection, LinkedMode lm) {
         if (is IdeaProposalsHolder proposals) {
-             proposals.add(LookupElementBuilder.create(d.name).withIcon(icons.forDeclaration(d)));
+             proposals.add(newDeclarationLookup {
+                 description = d.name;
+                 text = d.name;
+                 declaration = d;
+                 icon = icons.forDeclaration(d);
+             });
         }
     }
 }
 
 class IdeaQueriedModulePackageProposal(Integer offset, String prefix, String memberPackageSubname,
         Boolean withBody, String fullPackageName, IdeaCompletionContext completionCtx,
-        ModuleVersionDetails version, Unit unit, ModuleSearchResult.ModuleDetails md)
+        ModuleVersionDetails version, Unit unit)
         extends PackageCompletionProposal
         (offset, prefix, memberPackageSubname, withBody, fullPackageName)
         satisfies IdeaCompletionProposal {
 
     shared LookupElement lookupElement
-            => newLookup {
+            => newModuleLookup {
                 description = description;
                 text = text;
                 icon = icons.moduleArchives;
+                version = version;
             }
             .withInsertHandler(CompletionHandler((context) {
                 // TODO

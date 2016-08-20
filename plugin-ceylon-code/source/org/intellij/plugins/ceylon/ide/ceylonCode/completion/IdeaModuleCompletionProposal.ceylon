@@ -32,10 +32,11 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
         satisfies IdeaCompletionProposal {
 
     shared LookupElement lookupElement
-            => newLookup {
+            => newModuleLookup {
                 description = versioned;
                 text = versioned.spanFrom(len);
                 icon = icons.moduleArchives;
+                version = version;
             }
             .withInsertHandler(CompletionHandler((context) {
                // Undo IntelliJ's completion

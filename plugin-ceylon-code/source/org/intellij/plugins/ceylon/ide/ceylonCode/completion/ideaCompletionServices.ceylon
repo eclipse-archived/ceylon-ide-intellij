@@ -164,7 +164,6 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 completionCtx = ctx;
                 version = version;
                 unit = unit;
-                md = md;
             }.lookupElement);
         }
     }       

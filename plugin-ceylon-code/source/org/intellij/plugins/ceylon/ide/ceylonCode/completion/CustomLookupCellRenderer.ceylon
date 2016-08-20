@@ -71,6 +71,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonFileType
 }
+import com.redhat.ceylon.cmr.api {
+    ModuleVersionDetails
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Package,
+    Module
+}
 
 shared void installCustomLookupCellRenderer(Project project) {
     if (is CompletionProgressIndicator currentCompletion
@@ -90,8 +97,12 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         extends LookupCellRenderer(lookup) {
 
     function brighter(SimpleTextAttributes textAttributes)
-            => SimpleTextAttributes(textAttributes.bgColor,
-                    textAttributes.fgColor.brighter().brighter(),
+            => let (fg = textAttributes.fgColor)
+                SimpleTextAttributes(
+                    textAttributes.bgColor,
+                    fg.red+fg.green+fg.blue>=384
+                        then fg.darker().darker()
+                        else fg.brighter().brighter(),
                     textAttributes.waveColor,
                     textAttributes.style);
 
@@ -165,9 +176,14 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 then SimpleTextAttributes.styleStrikeout
                 else SimpleTextAttributes.stylePlain;
         value colors
-                = selected
+                = if (selected)
                 then Singleton(createFragment(name,
                         SimpleTextAttributes(style, JBColor.white)))
+                else if (item.\iobject is ModuleVersionDetails|Package|Module)
+                then Singleton(createFragment(name,
+                        SimpleTextAttributes(style,
+                            textAttributes(ceylonHighlightingColors.packages)
+                                .foregroundColor)))
                 else highlight(name, project, strikeout);
 
         String prefix
@@ -300,4 +316,3 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
     }
 
 }
-
