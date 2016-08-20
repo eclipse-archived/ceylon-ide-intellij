@@ -61,7 +61,12 @@ LookupElementBuilder newDeclarationLookup(String description, String text,
     value lookupString
             = aliasedName else declaration.nameAsString;
 
-    return LookupElementBuilder.create(declaration, lookupString)
+    value fullLookupString
+            = if (exists ch = description.find("(<{".contains))
+            then lookupString + ch.string
+            else lookupString;
+
+    return LookupElementBuilder.create(declaration, fullLookupString)
         .withPresentableText(description)
         .withIcon(icon)
         .withStrikeoutness(strikeout);
