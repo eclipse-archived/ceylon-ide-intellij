@@ -31,9 +31,6 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.editor.markup {
     EffectType
 }
-import com.intellij.openapi.fileTypes {
-    FileTypeManager
-}
 import com.intellij.openapi.project {
     Project
 }
@@ -71,6 +68,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     textAttributes,
     ceylonHighlightingColors
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    CeylonFileType
+}
 
 shared void installCustomLookupCellRenderer(Project project) {
     if (is CompletionProgressIndicator currentCompletion
@@ -100,6 +100,8 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
     function highlighted(Fragment fragment, Boolean selected)
             => selected then searchMatch else brighter(fragment.attributes);
+
+    value highlighter = HighlighterFactory.createHighlighter(project, CeylonFileType.instance);
 
     shared void install()
             => ApplicationManager.application
@@ -200,9 +202,6 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
     List<Fragment> highlight(String text, Project project, Boolean strikeout) {
         value refinement = text.startsWith("shared actual ");
-        value highlighter
-                = HighlighterFactory.createHighlighter(project,
-                    FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
         highlighter.setText(JString(text));
         value iterator = highlighter.createIterator(0);
         value fragments = ArrayList<Fragment>();
