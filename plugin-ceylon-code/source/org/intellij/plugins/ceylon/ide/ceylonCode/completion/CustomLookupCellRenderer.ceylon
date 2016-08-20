@@ -47,6 +47,9 @@ import com.intellij.ui {
         merge
     }
 }
+import com.redhat.ceylon.ide.common.util {
+    escaping
+}
 
 import java.awt {
     Color,
@@ -65,9 +68,7 @@ import javax.swing {
     JList,
     ListCellRenderer
 }
-import com.redhat.ceylon.ide.common.util {
-    escaping
-}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     textAttributes,
     ceylonHighlightingColors
@@ -187,25 +188,30 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
     }
 
     List<Fragment> highlight(String text, Project project, Boolean strikeout) {
+        value refinement = text.startsWith("shared actual ");
         value highlighter
                 = HighlighterFactory.createHighlighter(project,
                     FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
         highlighter.setText(JString(text));
         value iterator = highlighter.createIterator(0);
         value fragments = ArrayList<Fragment>();
+        variable value i = 0;
         while (!iterator.atEnd()) {
-            String subtext = text.substring(iterator.start, iterator.end);
+            String token = text.substring(iterator.start, iterator.end);
             value attr
-                    = subtext in escaping.keywords
+                    = if (token in escaping.keywords)
                     then textAttributes(ceylonHighlightingColors.keyword) //correctly highlight keywords!
+                    else if (refinement && (i==0 || i==2))
+                    then textAttributes(ceylonHighlightingColors.annotation) //correctly highlight refinement proposals!
                     else iterator.textAttributes;
             if (strikeout) {
                 attr.effectType = EffectType.strikeout;
                 attr.effectColor = Color.black;
             }
             value attributes = SimpleTextAttributes.fromTextAttributes(attr);
-            fragments.add(createFragment(subtext, attributes));
+            fragments.add(createFragment(token, attributes));
             iterator.advance();
+            i++;
         }
         return fragments;
     }
