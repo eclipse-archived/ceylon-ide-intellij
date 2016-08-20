@@ -1,3 +1,8 @@
+import com.intellij.codeInsight.completion {
+    CompletionInitializationContext {
+        selectionEndOffset=\iSELECTION_END_OFFSET
+    }
+}
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
@@ -47,7 +52,7 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
                 replaceInDoc {
                     doc = doc;
                     start = offset;
-                    length = text.size - prefix.size;
+                    length = context.getOffset(selectionEndOffset) - offset;
                     newText = "";
                 };
 

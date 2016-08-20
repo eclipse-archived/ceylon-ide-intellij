@@ -72,7 +72,8 @@ LookupElementBuilder newDeclarationLookup(String description, String text,
             else false;
 
     value lookupString
-            = aliasedName else declaration.nameAsString;
+            = aliasedName
+            else declaration.nameAsString;
 
     value qualifier
             = if (exists qualifyingDeclaration)

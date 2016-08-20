@@ -168,6 +168,33 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         }
     }
 
+    function colorizeTokens(Boolean selected, String text, Integer style, Object item, Boolean strikeout) {
+        if (selected) {
+            return Singleton(createFragment(text,
+                        SimpleTextAttributes(style, JBColor.white)));
+        }
+        else if (item is ModuleVersionDetails|Package|Module) {
+            if (exists space = text.firstOccurrence(' ')) {
+                return [
+                    createFragment(text[0:space],
+                        SimpleTextAttributes(style,
+                            textAttributes(ceylonHighlightingColors.packages)
+                                .foregroundColor)),
+                    * highlight(text[space...], project, strikeout)
+                ];
+            }
+            else {
+                return Singleton(createFragment(text,
+                    SimpleTextAttributes(style,
+                        textAttributes(ceylonHighlightingColors.packages)
+                            .foregroundColor)));
+            }
+        }
+        else {
+            return highlight(text, project, strikeout);
+        }
+    }
+
     void renderItemName(LookupElement item, Boolean selected, String name,
             SimpleColoredComponent nameComponent, Boolean strikeout) {
 
@@ -175,16 +202,9 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 = strikeout
                 then SimpleTextAttributes.styleStrikeout
                 else SimpleTextAttributes.stylePlain;
+
         value colors
-                = if (selected)
-                then Singleton(createFragment(name,
-                        SimpleTextAttributes(style, JBColor.white)))
-                else if (item.\iobject is ModuleVersionDetails|Package|Module)
-                then Singleton(createFragment(name,
-                        SimpleTextAttributes(style,
-                            textAttributes(ceylonHighlightingColors.packages)
-                                .foregroundColor)))
-                else highlight(name, project, strikeout);
+                = colorizeTokens(selected, name, style, item.\iobject, strikeout);
 
         String prefix
                 = item is EmptyLookupItem
