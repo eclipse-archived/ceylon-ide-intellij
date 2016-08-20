@@ -164,10 +164,11 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                         else prefixForegroundColor);
         value colorsWithPrefix
                 = if (prefix.size>0,
-                      exists ranges = getMatchingFragments(prefix, name))
+                      exists ranges = getMatchingFragments(prefix, item.lookupString))
                 then let (it = ranges.iterator())
                 mergeHighlightAndMatches {
                     highlight = colors;
+                    from = name.firstInclusion(item.lookupString) else 0;
                     nextMatch() => it.hasNext() then it.next();
                     highlighted = highlightedPrefixColor;
                 }
@@ -210,7 +211,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 }
 
 shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
-        TextRange? nextMatch(), SimpleTextAttributes highlighted) {
+        Integer from, TextRange? nextMatch(), SimpleTextAttributes highlighted) {
 
     value merged = ArrayList<Fragment>();
     variable value currentRange = nextMatch();
@@ -222,7 +223,7 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
         if (!exists initialRange) {
             merged.add(fragment);
         }
-        else if (currentIndex + size <= initialRange.startOffset) {
+        else if (currentIndex + size <= initialRange.startOffset + from) {
             merged.add(fragment);
         }
         else {
@@ -231,13 +232,13 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
             variable Integer consumedFromRange = 0;
             while (exists range = currentRange) {
 
-                if (currentIndex < range.startOffset) {
-                    sublength = range.startOffset - currentIndex;
+                if (currentIndex < range.startOffset + from) {
+                    sublength = range.startOffset + from - currentIndex;
                     String subtext = text.substring(substart, sublength);
                     merged.add(createFragment(subtext, fragment.attributes));
                 }
 
-                if (range.endOffset > currentIndex + size) {
+                if (range.endOffset + from > currentIndex + size) {
                     String subtext = text[sublength...];
                     merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
                     consumedFromRange += size - sublength;
@@ -260,7 +261,7 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
                     value nextRange = nextMatch();
                     consumedFromRange = 0;
                     if (exists nextRange,
-                        nextRange.startOffset < currentIndex + size) {
+                        nextRange.startOffset + from < currentIndex + size) {
                         currentRange = nextRange;
                     }
                     else {
