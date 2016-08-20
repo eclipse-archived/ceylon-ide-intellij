@@ -43,9 +43,7 @@ import com.intellij.openapi.util {
 import com.intellij.ui {
     JBColor,
     SimpleColoredComponent,
-    SimpleTextAttributes {
-        merge
-    }
+    SimpleTextAttributes
 }
 import com.redhat.ceylon.ide.common.util {
     escaping
@@ -90,6 +88,18 @@ Fragment createFragment(String text, SimpleTextAttributes atts)
 
 shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         extends LookupCellRenderer(lookup) {
+
+    function brighter(SimpleTextAttributes textAttributes)
+            => SimpleTextAttributes(textAttributes.bgColor,
+                    textAttributes.fgColor.brighter().brighter(),
+                    textAttributes.waveColor,
+                    textAttributes.style);
+
+    value searchMatch
+            = SimpleTextAttributes(SimpleTextAttributes.styleSearchMatch, Color.black);
+
+    function highlighted(Fragment fragment, Boolean selected)
+            => selected then searchMatch else brighter(fragment.attributes);
 
     shared void install()
             => ApplicationManager.application
@@ -164,11 +174,12 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 else lookup.itemPattern(item);
 
         value colorsWithPrefix
-                = if (prefix.size>0,
+                = if (/*selected &&*/ prefix.size>0,
                       exists ranges = getMatchingFragments(prefix, item.lookupString))
                 then let (it = ranges.iterator())
                 mergeHighlightAndMatches {
                     highlight = colors;
+                    selected = selected;
                     from = name.firstInclusion(item.lookupString) else 0;
                     nextMatch() => it.hasNext() then it.next();
                 }
@@ -216,82 +227,78 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         return fragments;
     }
 
-}
+    shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
+            Integer from, TextRange? nextMatch(), Boolean selected) {
 
-SimpleTextAttributes highlighted(Fragment fragment)
-        => merge(fragment.attributes,
-            SimpleTextAttributes(SimpleTextAttributes.styleSearchMatch,
-                                fragment.attributes.fgColor.brighter()));
+        value merged = ArrayList<Fragment>();
+        variable value currentRange = nextMatch();
+        variable Integer currentIndex = 0;
+        for (fragment in highlight) {
+            value text = fragment.text;
+            value size = text.size;
+            value initialRange = currentRange;
+            if (!exists initialRange) {
+                merged.add(fragment);
+            }
+            else if (currentIndex + size <= initialRange.startOffset + from) {
+                merged.add(fragment);
+            }
+            else {
+                variable Integer substart = 0;
+                variable Integer sublength = 0;
+                variable Integer consumedFromRange = 0;
+                while (exists range = currentRange) {
 
-shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
-        Integer from, TextRange? nextMatch()) {
-
-    value merged = ArrayList<Fragment>();
-    variable value currentRange = nextMatch();
-    variable Integer currentIndex = 0;
-    for (fragment in highlight) {
-        value text = fragment.text;
-        value size = text.size;
-        value initialRange = currentRange;
-        if (!exists initialRange) {
-            merged.add(fragment);
-        }
-        else if (currentIndex + size <= initialRange.startOffset + from) {
-            merged.add(fragment);
-        }
-        else {
-            variable Integer substart = 0;
-            variable Integer sublength = 0;
-            variable Integer consumedFromRange = 0;
-            while (exists range = currentRange) {
-
-                if (currentIndex < range.startOffset + from) {
-                    sublength = range.startOffset + from - currentIndex;
-                    String subtext = text.substring(substart, sublength);
-                    merged.add(createFragment(subtext, fragment.attributes));
-                }
-
-                if (range.endOffset + from > currentIndex + size) {
-                    String subtext = text[sublength...];
-                    merged.add(createFragment(subtext, highlighted(fragment)));
-                    consumedFromRange += size - sublength;
-                    currentRange = null;
-                }
-                else {
-
-                    String subtext;
-                    if (consumedFromRange > 0) {
-                        Integer toConsume = range.length - consumedFromRange;
-                        subtext = text[0:toConsume];
-                        sublength = toConsume;
+                    if (currentIndex < range.startOffset + from) {
+                        sublength = range.startOffset + from - currentIndex;
+                        String subtext = text.substring(substart, sublength);
+                        merged.add(createFragment(subtext, fragment.attributes));
                     }
-                    else {
-                        subtext = text[sublength:range.length];
-                        sublength += range.length;
-                    }
-                    merged.add(createFragment(subtext, highlighted(fragment)));
 
-                    value nextRange = nextMatch();
-                    consumedFromRange = 0;
-                    if (exists nextRange,
-                        nextRange.startOffset + from < currentIndex + size) {
-                        currentRange = nextRange;
-                    }
-                    else {
-                        if (sublength < size) {
-                            String rest = text[sublength...];
-                            merged.add(createFragment(rest, fragment.attributes));
-                        }
+                    if (range.endOffset + from > currentIndex + size) {
+                        String subtext = text[sublength...];
+                        merged.add(createFragment(subtext, highlighted(fragment, selected)));
+                        consumedFromRange += size - sublength;
                         currentRange = null;
                     }
+                    else {
+
+                        String subtext;
+                        if (consumedFromRange > 0) {
+                            Integer toConsume = range.length - consumedFromRange;
+                            subtext = text[0:toConsume];
+                            sublength = toConsume;
+                        }
+                        else {
+                            subtext = text[sublength:range.length];
+                            sublength += range.length;
+                        }
+                        merged.add(createFragment(subtext, highlighted(fragment, selected)));
+
+                        value nextRange = nextMatch();
+                        consumedFromRange = 0;
+                        if (exists nextRange,
+                            nextRange.startOffset + from < currentIndex + size) {
+                            currentRange = nextRange;
+                        }
+                        else {
+                            if (sublength < size) {
+                                String rest = text[sublength...];
+                                merged.add(createFragment(rest, fragment.attributes));
+                            }
+                            currentRange = null;
+                        }
+
+                    }
+                    substart = sublength;
 
                 }
-                substart = sublength;
-
             }
-        }
-        currentIndex += size;
+            currentIndex += size;
 
+        }
+        return merged;
     }
-    return merged;
+
 }
+
