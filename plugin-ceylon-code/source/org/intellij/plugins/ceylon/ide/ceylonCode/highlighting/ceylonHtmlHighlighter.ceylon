@@ -134,13 +134,13 @@ shared object highlighter {
         value stringAttrs = textAttributes(ceylonHighlightingColors.strings);
 
         while (tokens.hasMoreTokens()) {
-            variable String tok = tokens.nextToken();
+            String tok = tokens.nextToken();
             if (tok=="'") {
                 if (!eliminateQuotes) {
                     consume(tok, null);
                 }
                 while (tokens.hasMoreTokens()) {
-                    variable String token = tokens.nextToken();
+                    String token = tokens.nextToken();
                     if (token=="'") {
                         if (!eliminateQuotes) {
                             consume(token, null);
