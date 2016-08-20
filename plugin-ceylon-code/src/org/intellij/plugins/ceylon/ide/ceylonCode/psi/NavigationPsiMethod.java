@@ -81,7 +81,11 @@ class NavigationPsiMethod implements PsiMethod {
     }
 
     // Same as ceylonToJavaMapper.mapType() but for PsiTypes
-    private PsiType mapType(Type type, GlobalSearchScope scope) {
+    private PsiType mapType(@Nullable Type type, GlobalSearchScope scope) {
+        if (type==null) {
+            return PsiType.getJavaLangObject(func.getManager(), scope);
+        }
+
         if (type.isUnion()) {
             List<Type> types = type.getCaseTypes();
             boolean hasNullType = false;
