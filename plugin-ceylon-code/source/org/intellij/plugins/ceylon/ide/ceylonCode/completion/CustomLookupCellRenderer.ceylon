@@ -65,6 +65,13 @@ import javax.swing {
     JList,
     ListCellRenderer
 }
+import com.redhat.ceylon.ide.common.util {
+    escaping
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
+    textAttributes,
+    ceylonHighlightingColors
+}
 
 shared void installCustomLookupCellRenderer(Project project) {
     if (is CompletionProgressIndicator currentCompletion
@@ -188,7 +195,10 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         value fragments = ArrayList<Fragment>();
         while (!iterator.atEnd()) {
             String subtext = text.substring(iterator.start, iterator.end);
-            value attr = iterator.textAttributes;
+            value attr
+                    = subtext in escaping.keywords
+                    then textAttributes(ceylonHighlightingColors.keyword) //correctly highlight keywords!
+                    else iterator.textAttributes;
             if (strikeout) {
                 attr.effectType = EffectType.strikeout;
                 attr.effectColor = Color.black;
