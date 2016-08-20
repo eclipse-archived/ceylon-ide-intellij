@@ -35,11 +35,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 class IdeaInvocationCompletionProposal(Integer offset, String prefix, String desc, String text,
         Declaration declaration, Reference()? producedReference, Scope scope,
         Boolean includeDefaulted, Boolean positionalInvocation, Boolean namedInvocation,
-        Boolean inherited, Boolean qualified, Declaration? qualifyingValue,
+        Boolean inherited, Boolean qualified, Declaration? qualifyingDeclaration,
         IdeaCompletionContext ctx)
         extends InvocationCompletionProposal(offset, prefix, desc, text, declaration,
             producedReference, scope, ctx.lastCompilationUnit, includeDefaulted,
-            positionalInvocation, namedInvocation, inherited, qualified, qualifyingValue)
+            positionalInvocation, namedInvocation, inherited, qualified, qualifyingDeclaration)
         satisfies IdeaCompletionProposal {
     
     shared actual variable Boolean toggleOverwrite = false;
@@ -75,6 +75,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 description = desc;
                 text = text;
                 declaration = declaration;
+                qualifyingDeclaration = qualifyingDeclaration;
                 icon = icons.forDeclaration(declaration);
                 value aliasedName {
                     for (name in declaration.aliases) {

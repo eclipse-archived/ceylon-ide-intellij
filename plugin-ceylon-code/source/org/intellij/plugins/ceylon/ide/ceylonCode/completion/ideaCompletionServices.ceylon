@@ -94,7 +94,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 namedInvocation = namedInvocation;
                 inherited = inherited;
                 qualified = qualified;
-                qualifyingValue = qualifyingDec;
+                qualifyingDeclaration = qualifyingDec;
                 ctx = ctx;
             }.lookupElement);
         }
@@ -411,7 +411,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
                     namedInvocation = false;
                     inherited = false;
                     qualified = false;
-                    qualifyingValue = null;
+                    qualifyingDeclaration = null;
                     ctx = ctx;
                 }.lookupElement);
             }
@@ -447,7 +447,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
                     namedInvocation = false;
                     inherited = false;
                     qualified = false;
-                    qualifyingValue = null;
+                    qualifyingDeclaration = null;
                     ctx = ctx;
                 }.lookupElement);
             }

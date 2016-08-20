@@ -51,7 +51,8 @@ LookupElementBuilder newLookup(String description, String text, Icon? icon = nul
             .withIcon(icon);
 
 LookupElementBuilder newDeclarationLookup(String description, String text,
-        Referenceable declaration, Icon? icon = null, String? aliasedName = null) {
+        Referenceable declaration, Icon? icon = null, String? aliasedName = null,
+        Declaration? qualifyingDeclaration = null) {
 
     value strikeout
             = if (is Declaration declaration)
@@ -61,10 +62,15 @@ LookupElementBuilder newDeclarationLookup(String description, String text,
     value lookupString
             = aliasedName else declaration.nameAsString;
 
+    value qualifier
+            = if (exists qualifyingDeclaration)
+            then qualifyingDeclaration.name + "."
+            else "";
+
     value fullLookupString
             = if (exists ch = description.find("(<{".contains))
-            then lookupString + ch.string
-            else lookupString;
+            then qualifier + lookupString + ch.string
+            else qualifier + lookupString;
 
     return LookupElementBuilder.create(declaration, fullLookupString)
         .withPresentableText(description)
