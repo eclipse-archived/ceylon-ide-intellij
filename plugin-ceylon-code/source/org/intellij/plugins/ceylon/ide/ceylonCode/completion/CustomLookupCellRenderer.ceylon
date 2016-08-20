@@ -83,9 +83,6 @@ Fragment createFragment(String text, SimpleTextAttributes atts)
 shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         extends LookupCellRenderer(lookup) {
 
-    value prefixForegroundColor = JBColor(Color(176, 0, 176), Color(209, 122, 214));
-    value selectedPrefixForegroundColor = JBColor(Color(249, 209, 211), Color(209, 122, 214));
-
     shared void install()
             => ApplicationManager.application
                 .invokeLater(object satisfies Runnable {
@@ -157,11 +154,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 = item is EmptyLookupItem
                 then ""
                 else lookup.itemPattern(item);
-        value highlightedPrefixColor
-                = SimpleTextAttributes(style,
-                    selected
-                        then selectedPrefixForegroundColor
-                        else prefixForegroundColor);
+
         value colorsWithPrefix
                 = if (prefix.size>0,
                       exists ranges = getMatchingFragments(prefix, item.lookupString))
@@ -170,7 +163,6 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                     highlight = colors;
                     from = name.firstInclusion(item.lookupString) else 0;
                     nextMatch() => it.hasNext() then it.next();
-                    highlighted = highlightedPrefixColor;
                 }
                 else colors;
 
@@ -210,8 +202,13 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
 }
 
+SimpleTextAttributes highlighted(Fragment fragment)
+        => merge(fragment.attributes,
+            SimpleTextAttributes(SimpleTextAttributes.styleSearchMatch,
+                                fragment.attributes.fgColor.brighter()));
+
 shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
-        Integer from, TextRange? nextMatch(), SimpleTextAttributes highlighted) {
+        Integer from, TextRange? nextMatch()) {
 
     value merged = ArrayList<Fragment>();
     variable value currentRange = nextMatch();
@@ -240,7 +237,7 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
 
                 if (range.endOffset + from > currentIndex + size) {
                     String subtext = text[sublength...];
-                    merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
+                    merged.add(createFragment(subtext, highlighted(fragment)));
                     consumedFromRange += size - sublength;
                     currentRange = null;
                 }
@@ -256,7 +253,7 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
                         subtext = text[sublength:range.length];
                         sublength += range.length;
                     }
-                    merged.add(createFragment(subtext, merge(fragment.attributes, highlighted)));
+                    merged.add(createFragment(subtext, highlighted(fragment)));
 
                     value nextRange = nextMatch();
                     consumedFromRange = 0;
