@@ -213,21 +213,21 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
         TextRange? nextMatch(), SimpleTextAttributes highlighted) {
 
     value merged = ArrayList<Fragment>();
+    variable value currentRange = nextMatch();
     variable Integer currentIndex = 0;
     for (fragment in highlight) {
-        value initialRange = nextMatch();
         value text = fragment.text;
         value size = text.size;
+        value initialRange = currentRange;
         if (!exists initialRange) {
             merged.add(fragment);
         }
-        else if (currentIndex + size < initialRange.startOffset) {
+        else if (currentIndex + size <= initialRange.startOffset) {
             merged.add(fragment);
         }
         else {
             variable Integer substart = 0;
             variable Integer sublength = 0;
-            variable TextRange? currentRange = initialRange;
             variable Integer consumedFromRange = 0;
             while (exists range = currentRange) {
 
@@ -273,9 +273,11 @@ shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
 
                 }
                 substart = sublength;
+
             }
         }
-        currentIndex += text.size;
+        currentIndex += size;
+
     }
     return merged;
 }
