@@ -179,11 +179,11 @@ shared object highlighter {
             value end = iterator.end;
             value token = rawText[start..end-1];
             value attrs =
-            if (qualifiedNameIsPath
-                //&& token.every((ch)=>ch.letter) //TODO: this is wrong!!
-                && (rawText[start-1:1]=="." || rawText[end:1]=="."))
-            then textAttributes(ceylonHighlightingColors.packages)
-            else iterator.textAttributes;
+                if (qualifiedNameIsPath
+                    //&& token.every((ch)=>ch.letter) //TODO: this is wrong!!
+                    && (rawText[start-1:1]=="." || rawText[end:1]==".") || token==".")
+                then textAttributes(ceylonHighlightingColors.packages)
+                else iterator.textAttributes;
 
             consume(token, attrs);
             iterator.advance();
