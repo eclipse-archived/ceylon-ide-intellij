@@ -169,6 +169,10 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
     }
 
     function colorizeTokens(Boolean selected, String text, Integer style, Object item, Boolean strikeout) {
+        //TODO: This is all pretty much a mess.
+        //      Replace it with a handwritten
+        //      function for tokenizing and
+        //      colorizing the text.
         if (selected) {
             return Singleton(createFragment(text,
                         SimpleTextAttributes(style, JBColor.white)));
