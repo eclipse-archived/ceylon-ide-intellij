@@ -183,8 +183,9 @@ shared class CeylonModelManager(model)
 
     shared void resumeAutomaticModelUpdate(Integer delay = delayBeforeUpdatingAfterChange) {
         if (pauseRequests.decrementAndGet() == 0) {
-            if (cancelledBecauseOfAPause || delay == 0) {
-                scheduleModelUpdate(delay, true);
+            value force = delay == 0;
+            if (cancelledBecauseOfAPause || force) {
+                scheduleModelUpdate(delay, force);
             }
         }
     }
@@ -194,8 +195,8 @@ shared class CeylonModelManager(model)
             variable NativeResourceChange? firstChange = null;
             try {
                 firstChange = accumulatedChanges.take();
-            } catch(InterruptedException ie) {
-            }
+            } catch(InterruptedException ie) {}
+
             value changeSet = JHashSet<NativeResourceChange>();
             if (exists first=firstChange) {
                 changeSet.add(first);
@@ -253,7 +254,7 @@ shared class CeylonModelManager(model)
 
     shared void scheduleModelUpdate(Integer delay = delayBeforeUpdatingAfterChange, Boolean force = false) {
         if (ideaProjectReady && 
-            ((automaticModelUpdateEnabled_) || force)) {
+            (automaticModelUpdateEnabled_ || force)) {
             value plannedDelay = delayToUse(delay);
             lastRequestedDelay = plannedDelay;
             buildTriggeringAlarm.cancelAllRequests();
