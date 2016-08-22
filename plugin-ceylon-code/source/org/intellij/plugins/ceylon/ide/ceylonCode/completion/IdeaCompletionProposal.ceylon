@@ -80,10 +80,12 @@ LookupElementBuilder newDeclarationLookup(String description, String text,
             then qualifyingDeclaration.name + "."
             else "";
 
+    value paren
+            = description.find("(<{".contains)?.string
+            else "";
+
     value fullLookupString
-            = if (exists ch = description.find("(<{".contains))
-            then qualifier + lookupString + ch.string
-            else qualifier + lookupString;
+            = qualifier + lookupString + paren + text.size.string;
 
     return LookupElementBuilder.create(declaration, fullLookupString)
             .withPresentableText(description)
