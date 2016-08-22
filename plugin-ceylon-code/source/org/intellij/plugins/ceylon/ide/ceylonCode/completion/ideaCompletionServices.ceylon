@@ -430,7 +430,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
             !classFileDecompilerUtil.isCeylonCompiledFile(dec.psiClass.containingFile.virtualFile)) {
 
             value psiClass = dec.psiClass;
-            assert(is IdeaCompletionContext ctx);
+            assert (is IdeaCompletionContext ctx);
 
             void addLookupElement(String text) {
                 ctx.proposals.add(IdeaInvocationCompletionProposal {
