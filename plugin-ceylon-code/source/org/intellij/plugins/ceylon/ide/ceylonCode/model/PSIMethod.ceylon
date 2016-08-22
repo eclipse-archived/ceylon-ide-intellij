@@ -50,7 +50,7 @@ shared class PSIMethod(shared PsiMethod psi)
                            !m.modifierList.hasModifierProperty("static")
                         && !m.modifierList.hasModifierProperty("private")
                         && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
-                        && !MethodSignatureUtil.areOverrideEquivalent(psi, m)
+                        && !MethodSignatureUtil.isSuperMethod(m, psi)
                      } > 1,
                 false);
     
