@@ -19,17 +19,11 @@ import com.intellij.codeInsight.lookup.impl {
     LookupImpl,
     LookupCellRenderer
 }
-import com.intellij.ide.highlighter {
-    HighlighterFactory
-}
 import com.intellij.ide.util.treeView {
     PresentableNodeDescriptor
 }
 import com.intellij.openapi.application {
     ApplicationManager
-}
-import com.intellij.openapi.editor.markup {
-    EffectType
 }
 import com.intellij.openapi.project {
     Project
@@ -42,8 +36,15 @@ import com.intellij.ui {
     SimpleColoredComponent,
     SimpleTextAttributes
 }
+import com.redhat.ceylon.cmr.api {
+    ModuleVersionDetails
+}
 import com.redhat.ceylon.ide.common.util {
     escaping
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Package,
+    Module
 }
 
 import java.awt {
@@ -53,7 +54,6 @@ import java.awt {
 }
 import java.lang {
     ReflectiveOperationException,
-    JString=String,
     Runnable
 }
 
@@ -68,22 +68,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     textAttributes,
     ceylonHighlightingColors
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    CeylonFileType
-}
-import com.redhat.ceylon.cmr.api {
-    ModuleVersionDetails
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Package,
-    Module
-}
 
 shared void installCustomLookupCellRenderer(Project project) {
     if (is CompletionProgressIndicator currentCompletion
             = CompletionService.completionService.currentCompletion) {
         CustomLookupCellRenderer(currentCompletion.lookup, project).install();
-    } else if (is LookupImpl activeLookup
+    }
+    else if (is LookupImpl activeLookup
             = LookupManager.getInstance(project).activeLookup) {
         CustomLookupCellRenderer(activeLookup, project).install();
     }
@@ -111,8 +102,6 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
     function highlighted(Fragment fragment, Boolean selected)
             => selected then searchMatch else brighter(fragment.attributes);
-
-    value highlighter = HighlighterFactory.createHighlighter(project, CeylonFileType.instance);
 
     shared void install()
             => ApplicationManager.application
@@ -168,47 +157,58 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         }
     }
 
-    function colorizeTokens(Boolean selected, String text, Integer style, Object item, Boolean strikeout) {
-        //TODO: This is all pretty much a mess.
-        //      Replace it with a handwritten
-        //      function for tokenizing and
-        //      colorizing the text.
-        if (selected) {
-            return Singleton(createFragment(text,
-                        SimpleTextAttributes(style, JBColor.white)));
+    Color color(String token, Boolean qualifiedNameIsPath) {
+        if (token in escaping.keywords) {
+            return textAttributes(ceylonHighlightingColors.keyword).foregroundColor;
         }
-        else if (item is ModuleVersionDetails|Package|Module) {
-            if (exists space = text.firstOccurrence(' ')) {
-                return [
-                    createFragment(text[0:space],
-                        SimpleTextAttributes(style,
-                            textAttributes(ceylonHighlightingColors.packages)
-                                .foregroundColor)),
-                    * highlight(text[space...], project, strikeout)
-                ];
-            }
-            else {
-                return Singleton(createFragment(text,
-                    SimpleTextAttributes(style,
-                        textAttributes(ceylonHighlightingColors.packages)
-                            .foregroundColor)));
-            }
+        else if (token.size==1 && token in "()[]<>,.+*&|?;= ") {
+            return JBColor.foreground();
         }
         else {
-            return highlight(text, project, strikeout);
+            assert (exists first = token[0]);
+            value key
+                = if (qualifiedNameIsPath) then ceylonHighlightingColors.packages
+                else if (first.uppercase) then ceylonHighlightingColors.type
+                else ceylonHighlightingColors.identifier;
+            return textAttributes(key).foregroundColor;
+        }
+    }
+
+    Fragment[] colorizeTokens(Boolean selected, String text, Integer style, Boolean qualifiedNameIsPath) {
+        if (selected) {
+            return Singleton(createFragment(text, SimpleTextAttributes(style, JBColor.white)));
+        }
+        else if (text.startsWith("shared actual ")) {
+            value color = textAttributes(ceylonHighlightingColors.annotation).foregroundColor;
+            return [
+                createFragment("shared actual ", SimpleTextAttributes(style, color)),
+                *colorizeTokens(selected, text[14...], style, qualifiedNameIsPath)
+            ];
+        }
+        else {
+            value pattern = qualifiedNameIsPath then "()[]<>,+*&|?;= " else "()[]<>,.+*&|?;= ";
+            return [
+                for (token in text.split(pattern.contains, false)) if (!token.empty)
+                createFragment(token, SimpleTextAttributes(style, color(token, qualifiedNameIsPath)))
+            ];
+
         }
     }
 
     void renderItemName(LookupElement item, Boolean selected, String name,
             SimpleColoredComponent nameComponent, Boolean strikeout) {
 
-        value style
-                = strikeout
-                then SimpleTextAttributes.styleStrikeout
-                else SimpleTextAttributes.stylePlain;
-
         value colors
-                = colorizeTokens(selected, name, style, item.\iobject, strikeout);
+                = colorizeTokens {
+                    text = name;
+                    selected = selected;
+                    style = strikeout
+                        then SimpleTextAttributes.styleStrikeout
+                        else SimpleTextAttributes.stylePlain;
+                    qualifiedNameIsPath
+                        = item.\iobject
+                        is ModuleVersionDetails|Package|Module;
+                };
 
         String prefix
                 = item is EmptyLookupItem
@@ -238,32 +238,6 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         coloredComponent.clear();
         coloredComponent.setIcon(icon);
         coloredComponent.ipad = ipad;
-    }
-
-    List<Fragment> highlight(String text, Project project, Boolean strikeout) {
-        value refinement = text.startsWith("shared actual ");
-        highlighter.setText(JString(text));
-        value iterator = highlighter.createIterator(0);
-        value fragments = ArrayList<Fragment>();
-        variable value i = 0;
-        while (!iterator.atEnd()) {
-            String token = text.substring(iterator.start, iterator.end);
-            value attr
-                    = if (token in escaping.keywords)
-                    then textAttributes(ceylonHighlightingColors.keyword) //correctly highlight keywords!
-                    else if (refinement && (i==0 || i==2))
-                    then textAttributes(ceylonHighlightingColors.annotation) //correctly highlight refinement proposals!
-                    else iterator.textAttributes;
-            if (strikeout) {
-                attr.effectType = EffectType.strikeout;
-                attr.effectColor = Color.black;
-            }
-            value attributes = SimpleTextAttributes.fromTextAttributes(attr);
-            fragments.add(createFragment(token, attributes));
-            iterator.advance();
-            i++;
-        }
-        return fragments;
     }
 
     shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
