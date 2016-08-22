@@ -12,6 +12,7 @@ import com.intellij.psi.PsiFile;
 import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
@@ -34,10 +35,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static com.intellij.psi.util.PsiTreeUtil.getParentOfType;
 import static com.redhat.ceylon.ide.common.debug.getFirstValidLocation_.getFirstValidLocation;
 import static com.redhat.ceylon.ide.common.util.toJavaIterable_.toJavaIterable;
+import static org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava.needReadAccess;
 import static org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil.getDeclaringFile;
 
 class CeylonPositionManager implements PositionManager {
@@ -138,8 +141,14 @@ class CeylonPositionManager implements PositionManager {
     public ClassPrepareRequest createPrepareRequest(@NotNull ClassPrepareRequestor requestor, @NotNull SourcePosition position) throws NoDataException {
         checkCeylonFile(position);
 
-        CeylonFile file = (CeylonFile) position.getFile();
-        Entry<? extends Integer, ? extends Node> location = getFirstValidLocation(file.getCompilationUnit(),
+        final CeylonFile file = (CeylonFile) position.getFile();
+        Tree.CompilationUnit cu = needReadAccess(new Callable<Tree.CompilationUnit>() {
+            @Override
+            public Tree.CompilationUnit call() throws Exception {
+                return file.getCompilationUnit();
+            }
+        });
+        Entry<? extends Integer, ? extends Node> location = getFirstValidLocation(cu,
                 new IdeaDocument(file.getViewProvider().getDocument()), position.getLine() + 1);
 
         if (location != null) {
