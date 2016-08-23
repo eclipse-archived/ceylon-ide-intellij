@@ -33,9 +33,9 @@ import java.util.List;
  */
 class NavigationPsiMethod implements PsiMethod {
 
-    private CeylonPsi.AnyMethodPsi func;
+    private CeylonCompositeElement func;
 
-    NavigationPsiMethod(CeylonPsi.AnyMethodPsi func) {
+    NavigationPsiMethod(CeylonCompositeElement func) {
         this.func = func;
     }
 
@@ -57,27 +57,45 @@ class NavigationPsiMethod implements PsiMethod {
         LightParameterListBuilder builder =
                 new LightParameterListBuilder(func.getManager(), CeylonLanguage.INSTANCE);
 
-        Tree.AnyMethod tree = func.getCeylonNode();
-        Tree.ParameterList parameterList = tree.getParameterLists().get(0);
+        Tree.ParameterList parameterList = findParameterList();
 
-        ((CeylonFile) func.getContainingFile()).ensureTypechecked();
+        if (parameterList != null) {
+            ((CeylonFile) func.getContainingFile()).ensureTypechecked();
 
-        for (Tree.Parameter param : parameterList.getParameters()) {
-            if (param instanceof Tree.ParameterDeclaration) {
-                Tree.TypedDeclaration typedDeclaration = ((Tree.ParameterDeclaration) param).getTypedDeclaration();
-                Type typeModel = typedDeclaration.getType().getTypeModel();
-                GlobalSearchScope scope = GlobalSearchScope.allScope(func.getProject());
+            for (Tree.Parameter param : parameterList.getParameters()) {
+                if (param instanceof Tree.ParameterDeclaration) {
+                    Tree.TypedDeclaration typedDeclaration = ((Tree.ParameterDeclaration) param).getTypedDeclaration();
+                    Type typeModel = typedDeclaration.getType().getTypeModel();
+                    GlobalSearchScope scope = GlobalSearchScope.allScope(func.getProject());
 
-                LightParameter lightParam = new LightParameter(
-                        typedDeclaration.getIdentifier().getText(),
-                        mapType(typeModel, scope),
-                        func,
-                        CeylonLanguage.INSTANCE
-                );
-                builder.addParameter(lightParam);
+                    LightParameter lightParam = new LightParameter(
+                            typedDeclaration.getIdentifier().getText(),
+                            mapType(typeModel, scope),
+                            func,
+                            CeylonLanguage.INSTANCE
+                    );
+                    builder.addParameter(lightParam);
+                }
             }
         }
+
         return builder;
+    }
+
+    @Nullable
+    private Tree.ParameterList findParameterList() {
+        if (func instanceof CeylonPsi.AnyMethodPsi) {
+            return ((CeylonPsi.AnyMethodPsi) func).getCeylonNode().getParameterLists().get(0);
+        } else if (func instanceof CeylonPsi.SpecifierStatementPsi) {
+            CeylonPsi.SpecifierStatementPsi ss = (CeylonPsi.SpecifierStatementPsi) func;
+            Tree.Term bme = ss.getCeylonNode().getBaseMemberExpression();
+
+            if (bme instanceof Tree.ParameterizedExpression) {
+                return ((Tree.ParameterizedExpression) bme).getParameterLists().get(0);
+            }
+        }
+
+        return null;
     }
 
     // Same as ceylonToJavaMapper.mapType() but for PsiTypes
@@ -166,7 +184,7 @@ class NavigationPsiMethod implements PsiMethod {
             @NotNull
             @Override
             public String getName() {
-                return func.getName();
+                return NavigationPsiMethod.this.getName();
             }
 
             @Override
