@@ -17,6 +17,7 @@ import com.intellij.psi.util.MethodSignature;
 import com.intellij.psi.util.MethodSignatureBackedByPsiMethod;
 import com.intellij.psi.util.MethodSignatureBase;
 import com.intellij.util.IncorrectOperationException;
+import com.redhat.ceylon.compiler.java.util.Util;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Type;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonLanguage;
@@ -33,10 +34,29 @@ import java.util.List;
  */
 class NavigationPsiMethod implements PsiMethod {
 
+    private boolean isGetter;
+    private boolean isSetter;
     private CeylonCompositeElement func;
 
     NavigationPsiMethod(CeylonCompositeElement func) {
         this.func = func;
+        this.isGetter = false;
+        this.isSetter = false;
+
+        if (func instanceof CeylonPsi.SpecifierStatementPsi) {
+            CeylonPsi.SpecifierStatementPsi ss = (CeylonPsi.SpecifierStatementPsi) func;
+            Tree.Term bme = ss.getCeylonNode().getBaseMemberExpression();
+
+            if (!(bme instanceof Tree.ParameterizedExpression)) {
+                isGetter = true;
+            }
+        }
+    }
+
+    NavigationPsiMethod(CeylonCompositeElement func, boolean isGetter) {
+        this.func = func;
+        this.isGetter = isGetter;
+        this.isSetter = !isGetter;
     }
 
     @Nullable
@@ -255,6 +275,12 @@ class NavigationPsiMethod implements PsiMethod {
     @NotNull
     @Override
     public String getName() {
+        if (isSetter) {
+            return "set" + Util.capitalize(func.getName());
+        } else if (isGetter) {
+            return "get" + Util.capitalize(func.getName());
+        }
+
         return func.getName();
     }
 

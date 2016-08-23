@@ -41,7 +41,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
         if (methods == null) {
             methods = new ArrayList<>();
 
-            CeylonPsi.ClassBodyPsi body = PsiTreeUtil.findChildOfType(decl, CeylonPsi.ClassBodyPsi.class);
+            CeylonPsi.BodyPsi body = PsiTreeUtil.findChildOfType(decl, CeylonPsi.BodyPsi.class);
 
             if (body != null) {
                 for (PsiElement child : body.getChildren()) {
@@ -50,6 +50,10 @@ public class NavigationPsiClass implements PsiSyntheticClass {
                     }
                     if (child instanceof CeylonPsi.SpecifierStatementPsi) {
                         methods.add(new NavigationPsiMethod((CeylonPsi.SpecifierStatementPsi) child));
+                    }
+                    if (child instanceof CeylonPsi.AnyAttributePsi) {
+                        methods.add(new NavigationPsiMethod((CeylonPsi.AnyAttributePsi) child, true));
+                        methods.add(new NavigationPsiMethod((CeylonPsi.AnyAttributePsi) child, false));
                     }
                 }
             }
