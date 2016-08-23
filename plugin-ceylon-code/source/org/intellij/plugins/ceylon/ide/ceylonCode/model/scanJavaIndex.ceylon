@@ -218,12 +218,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     shared actual Type? type => realFunction?.type;
                     assign type {}
 
-                    value methods = cls.findMethodsByName(clsName, langFalse);
-                    value member
-                            = if (methods.size>0, //workaround for compiler bug #6421
-                                  exists method = methods[0])
-                            then method
-                            else null;
+                    value member = cls.findMethodsByName(clsName, langFalse)[0];
 
                     annotation = modifiers.findAnnotation(ceylonAnnotationInstantiationAnnotation) exists;
                     deprecated = member?.modifierList?.findAnnotation(Annotations.deprecated.className) exists;
@@ -251,12 +246,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     shared actual Type? type => realValue?.type;
                     assign type {}
 
-                    value methods = cls.findMethodsByName("get_", langFalse);
-                    value member
-                            = if (methods.size>0, //workaround for compiler bug #6421
-                                  exists method = methods[0])
-                            then method
-                            else null;
+                    value member = cls.findMethodsByName("get_", langFalse)[0];
 
                     deprecated = member?.modifierList?.findAnnotation(Annotations.deprecated.className) exists;
 
