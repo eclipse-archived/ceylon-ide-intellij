@@ -51,6 +51,10 @@ public class NavigationPsiClass implements PsiSyntheticClass {
                     if (child instanceof CeylonPsi.SpecifierStatementPsi) {
                         methods.add(new NavigationPsiMethod((CeylonPsi.SpecifierStatementPsi) child));
                     }
+                    if (child instanceof CeylonPsi.AnyAttributePsi) {
+                        methods.add(new NavigationPsiMethod((CeylonPsi.AnyAttributePsi) child, true));
+                        methods.add(new NavigationPsiMethod((CeylonPsi.AnyAttributePsi) child, false));
+                    }
                 }
             }
         }
