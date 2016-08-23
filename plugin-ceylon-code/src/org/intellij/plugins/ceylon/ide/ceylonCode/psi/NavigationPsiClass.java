@@ -41,7 +41,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
         if (methods == null) {
             methods = new ArrayList<>();
 
-            CeylonPsi.ClassBodyPsi body = PsiTreeUtil.findChildOfType(decl, CeylonPsi.ClassBodyPsi.class);
+            CeylonPsi.BodyPsi body = PsiTreeUtil.findChildOfType(decl, CeylonPsi.BodyPsi.class);
 
             if (body != null) {
                 for (PsiElement child : body.getChildren()) {
