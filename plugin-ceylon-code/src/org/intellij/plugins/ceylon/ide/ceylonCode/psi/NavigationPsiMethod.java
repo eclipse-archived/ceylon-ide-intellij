@@ -9,6 +9,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.light.LightParameter;
 import com.intellij.psi.impl.light.LightParameterListBuilder;
+import com.intellij.psi.impl.light.LightTypeParameterBuilder;
+import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -17,6 +19,7 @@ import com.intellij.psi.util.MethodSignature;
 import com.intellij.psi.util.MethodSignatureBackedByPsiMethod;
 import com.intellij.psi.util.MethodSignatureBase;
 import com.intellij.util.IncorrectOperationException;
+import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import com.redhat.ceylon.compiler.java.util.Util;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.model.typechecker.model.Type;
@@ -77,6 +80,25 @@ class NavigationPsiMethod implements PsiMethod {
         LightParameterListBuilder builder =
                 new LightParameterListBuilder(func.getManager(), CeylonLanguage.INSTANCE);
 
+        GlobalSearchScope scope = GlobalSearchScope.allScope(func.getProject());
+
+        if (func instanceof CeylonPsi.AnyMethodPsi) {
+            CeylonPsi.AnyMethodPsi method = (CeylonPsi.AnyMethodPsi) func;
+            Tree.TypeParameterList tpList = method.getCeylonNode().getTypeParameterList();
+            if (tpList != null) {
+                for (int i = 0; i < tpList.getTypeParameterDeclarations().size(); i++) {
+                    LightParameter lightParam = new LightParameter(
+                            "td" + i,
+                            PsiType.getTypeByName(TypeDescriptor.class.getCanonicalName(), func.getProject(), scope),
+                            func,
+                            CeylonLanguage.INSTANCE
+                    );
+                    builder.addParameter(lightParam);
+                }
+            }
+
+        }
+
         Tree.ParameterList parameterList = findParameterList();
 
         if (parameterList != null) {
@@ -86,11 +108,18 @@ class NavigationPsiMethod implements PsiMethod {
                 if (param instanceof Tree.ParameterDeclaration) {
                     Tree.TypedDeclaration typedDeclaration = ((Tree.ParameterDeclaration) param).getTypedDeclaration();
                     Type typeModel = typedDeclaration.getType().getTypeModel();
-                    GlobalSearchScope scope = GlobalSearchScope.allScope(func.getProject());
+                    PsiType psiType;
+
+                    if (typeModel != null && typeModel.isTypeParameter()) {
+                        LightTypeParameterBuilder tp = new LightTypeParameterBuilder(typedDeclaration.getType().getText(), this, 0);
+                        psiType = new PsiImmediateClassType(tp, PsiSubstitutor.EMPTY);
+                    } else {
+                        psiType = mapType(typeModel, scope);
+                    }
 
                     LightParameter lightParam = new LightParameter(
                             typedDeclaration.getIdentifier().getText(),
-                            mapType(typeModel, scope),
+                            psiType,
                             func,
                             CeylonLanguage.INSTANCE
                     );
@@ -364,7 +393,7 @@ class NavigationPsiMethod implements PsiMethod {
 
     @Override
     public PsiManager getManager() {
-        return null;
+        return func.getManager();
     }
 
     @NotNull
