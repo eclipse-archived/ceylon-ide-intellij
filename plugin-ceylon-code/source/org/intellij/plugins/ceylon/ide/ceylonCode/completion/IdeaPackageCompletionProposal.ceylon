@@ -63,10 +63,9 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
     shared actual void newPackageMemberCompletionProposal(ProposalsHolder proposals,
             Declaration d, DefaultRegion selection, LinkedMode lm) {
         if (is IdeaProposalsHolder proposals) {
-             proposals.add(newDeclarationLookup {
+             proposals.add(newLookup {
                  description = d.name;
                  text = d.name;
-                 declaration = d;
                  icon = icons.forDeclaration(d);
              });
         }
