@@ -8,18 +8,23 @@ import com.intellij.psi {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi {
-        AttributeDeclarationPsi,
-        SpecifierStatementPsi,
-        VariablePsi
+        ...
     }
 }
 
 shared class CeylonReadWriteAccessDetector() extends ReadWriteAccessDetector() {
 
     getExpressionAccess(PsiElement psiElement)
-            => (psiElement.parent is AttributeDeclarationPsi|VariablePsi
-             || psiElement.parent.parent is CeylonPsi.SpecifierStatementPsi)
-            then Access.write else Access.read;
+            => (psiElement.parent
+                    is AttributeDeclarationPsi
+                     | VariablePsi
+             || psiElement.parent.parent
+                    is SpecifierStatementPsi
+                     | AssignmentOpPsi
+                     | PostfixOperatorExpressionPsi
+                     | PrefixOperatorExpressionPsi)
+            then Access.write
+            else Access.read;
     
     getReferenceAccess(PsiElement psiElement, PsiReference psiReference)
             => getExpressionAccess(psiReference.element);
@@ -32,6 +37,7 @@ shared class CeylonReadWriteAccessDetector() extends ReadWriteAccessDetector() {
             else false;
     
     isReadWriteAccessible(PsiElement psiElement)
-            => psiElement is AttributeDeclarationPsi|VariablePsi;
+            => psiElement is AttributeDeclarationPsi
+                           | VariablePsi;
 
 }

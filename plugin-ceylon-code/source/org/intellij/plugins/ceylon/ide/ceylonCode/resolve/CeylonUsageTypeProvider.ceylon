@@ -1,12 +1,5 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.psi {
     PsiElement
-}
-import com.intellij.psi.util {
-    PsiTreeUtil
 }
 import com.intellij.usages.impl.rules {
     UsageTypeProvider,
@@ -21,35 +14,55 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class CeylonUsageTypeProvider() satisfies UsageTypeProvider {
 
+    value functionInvocation = UsageType("Function invocation");
+    value evaluationOrFunctionReference = UsageType("Evaluation or function reference");
+    value valueOrFunctionTypeDeclaration = UsageType("Value or function declaration");
+    value aliasedType = UsageType("Aliased type");
+
     shared actual UsageType? getUsageType(PsiElement el) {
-        if (exists invocation = PsiTreeUtil.getParentOfType(el, javaClass<InvocationExpressionPsi>()),
-            invocation.ceylonNode.primary.endIndex.intValue() >= el.textRange.endOffset,
-            PsiTreeUtil.getParentOfType(el, javaClass<BaseTypeExpressionPsi>()) exists
-         || PsiTreeUtil.getParentOfType(el, javaClass<QualifiedTypeExpressionPsi>()) exists,
-            !PsiTreeUtil.getParentOfType(el, javaClass<QualifiedMemberExpressionPsi>()) exists
-         /*&& !PsiTreeUtil.getParentOfType(el, javaClass<BaseMemberExpressionPsi>()) exists*/) {
-            return UsageType.classNewOperator;
-        }
-        
-        if (el.parent is ImportMemberPsi) {
+        if (el.parent is ImportMemberOrTypePsi) {
             return UsageType.classImport;
         }
-        
-        if (PsiTreeUtil.getParentOfType(el, javaClass<TypeArgumentListPsi>()) exists) {
-            return UsageType.typeParameter;
-        }
-        
-        if (PsiTreeUtil.getParentOfType(el, javaClass<ValueParameterDeclarationPsi>()) exists) {
-            return UsageType.classMethodParameterDeclaration;
-        }
-        
-        if (PsiTreeUtil.getParentOfType(el, javaClass<ExtendedTypePsi>()) exists
-         || PsiTreeUtil.getParentOfType(el, javaClass<SatisfiedTypesPsi>()) exists) {
-            return UsageType.classExtendsImplementsList;
+
+        if (el.parent is SimpleTypePsi) {
+            variable PsiElement type = el.parent;
+            while (is TypePsi parent = type.parent) {
+                type = parent;
+            }
+            if (type.parent.parent is ParameterDeclarationPsi) {
+                return UsageType.classMethodParameterDeclaration;
+            }
+            else if (type.parent is TypedDeclarationPsi) {
+                return valueOrFunctionTypeDeclaration;
+            }
+            else if (type.parent is ExtendedTypePsi|SatisfiedTypesPsi) {
+                return UsageType.classExtendsImplementsList;
+            }
+            else if (type.parent is TypeArgumentListPsi) {
+                return UsageType.typeParameter;
+            }
+            else if (type.parent is TypeSpecifierPsi|ClassSpecifierPsi) {
+                return aliasedType;
+            }
+            else if (type.parent is IsConditionPsi|IsCasePsi|IsOpPsi) {
+                return UsageType.classInstanceOf;
+            }
         }
 
-        if (PsiTreeUtil.getParentOfType(el, javaClass<AnnotationPsi>()) exists) {
-            return UsageType.annotation;
+        if (el.parent is StaticMemberOrTypeExpressionPsi) {
+            value ref = el.parent;
+            if (ref.parent is AnnotationPsi) {
+                return UsageType.annotation;
+            }
+            else if (ref.parent is InvocationExpressionPsi) {
+                return ref is BaseTypeExpressionPsi
+                            | QualifiedTypeExpressionPsi
+                    then UsageType.classNewOperator
+                    else functionInvocation;
+            }
+            else {
+                return evaluationOrFunctionReference;
+            }
         }
 
         return null;
