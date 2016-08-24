@@ -304,7 +304,11 @@ class NavigationPsiMethod implements PsiMethod {
     @NotNull
     @Override
     public String getName() {
-        if (isSetter) {
+        if (func.getName().equals("string")) {
+            return "toString";
+        } else if (func.getName().equals("hash")) {
+            return "hashCode";
+        } else if (isSetter) {
             return "set" + Util.capitalize(func.getName());
         } else if (isGetter) {
             return "get" + Util.capitalize(func.getName());
