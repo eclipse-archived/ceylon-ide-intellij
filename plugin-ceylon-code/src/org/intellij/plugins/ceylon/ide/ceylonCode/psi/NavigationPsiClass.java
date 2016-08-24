@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 public class NavigationPsiClass implements PsiSyntheticClass {
 
-    public final CeylonPsi.DeclarationPsi decl;
+    public final CeylonPsi.StatementOrArgumentPsi decl;
 
     private List<PsiMethod> methods;
 
@@ -62,7 +63,7 @@ public class NavigationPsiClass implements PsiSyntheticClass {
         return methods;
     }
 
-    NavigationPsiClass(CeylonPsi.DeclarationPsi decl) {
+    NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) {
         this.decl = decl;
     }
 
@@ -296,19 +297,30 @@ public class NavigationPsiClass implements PsiSyntheticClass {
     @Nullable
     @Override
     public String getName() {
-        Tree.Identifier identifier
-                = decl.getCeylonNode().getIdentifier();
-        if (identifier==null) {
-            return null;
+        if (decl instanceof CeylonPsi.DeclarationPsi) {
+            Tree.Identifier identifier
+                    = ((CeylonPsi.DeclarationPsi) decl).getCeylonNode().getIdentifier();
+            if (identifier == null) {
+                return null;
+            }
+
+            String suffix
+                    = decl instanceof CeylonPsi.ObjectDefinitionPsi
+                    || decl instanceof CeylonPsi.AnyMethodPsi
+                    || decl instanceof CeylonPsi.AnyAttributePsi
+                    ? "_"
+                    : "";
+            return identifier.getText() + suffix;
+        } else if (decl instanceof CeylonPsi.PackageDescriptorPsi) {
+            return "$package_";
+        } else if (decl instanceof CeylonPsi.ModuleDescriptorPsi) {
+            return "$module_";
         }
 
-        String suffix
-                = decl instanceof CeylonPsi.ObjectDefinitionPsi
-               || decl instanceof CeylonPsi.AnyMethodPsi
-               || decl instanceof CeylonPsi.AnyAttributePsi
-                ? "_"
-                : "";
-        return identifier.getText() + suffix;
+        Logger.getInstance(NavigationPsiClass.class)
+                .error("Unhandled class of type " + decl.getClass().getName());
+
+        return "<unknown>";
     }
 
     @Override

@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    createJavaObjectArray
 }
 
 import com.intellij.extapi.psi {
@@ -241,8 +242,11 @@ shared class CeylonFile(FileViewProvider viewProvider)
                 classes.set(i++, NavigationPsiClass(decl));
             }
             return classes;
-        }
-        else {
+        } else if (is CeylonPsi.ModuleDescriptorPsi mod = compilationUnitPsi.firstChild) {
+            return createJavaObjectArray({NavigationPsiClass(mod)});
+        } else if (is CeylonPsi.PackageDescriptorPsi pkg = compilationUnitPsi.firstChild) {
+            return createJavaObjectArray({NavigationPsiClass(pkg)});
+        } else {
             return noPsiClasses;
         }
     }
