@@ -5,6 +5,11 @@ import ceylon.interop.java {
 import com.intellij.codeInsight.daemon {
     DaemonCodeAnalyzer
 }
+import com.intellij.concurrency {
+    AsyncFuture,
+    AsyncFutureFactory,
+    AsyncFutureResult
+}
 import com.intellij.openapi {
     Disposable
 }
@@ -33,9 +38,6 @@ import com.intellij.openapi.vfs {
 import com.intellij.psi {
     PsiManager,
     PsiDocumentManager
-}
-import com.intellij.psi.impl {
-    PsiDocumentManagerBase
 }
 import com.intellij.util {
     Alarm
@@ -111,8 +113,9 @@ shared variable Integer delayToStartLocalAnalysisAfterParsing = 200;
 
 CeylonLogger<CeylonLocalAnalyzer> ceylonLocalAnalyzerLogger = CeylonLogger<CeylonLocalAnalyzer>();
 
-shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject) 
+shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     satisfies Disposable {
+    variable AsyncFutureResult<LocalAnalysisResult>? resultFuture_ = null;
     variable MutableLocalAnalysisResult? result_= null;
     value resultLock = ReentrantLock(true);
     variable value backgroundAnalysisDisabled = false;
@@ -127,8 +130,6 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     assert (exists model = getCeylonProjects(ideaProject));
     assert (is IdeaCeylonProject? ceylonProject
             = model.getProject(ModuleUtilCore.findModuleForFile(virtualFile, ideaProject)));
-    
-    variable ExternalPhasedUnit? externalPhasedUnitToTranslate = null;
     
     shared actual void dispose() {
         disposed = true;
@@ -258,6 +259,9 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
             else {
                 result = MutableLocalAnalysisResult(document, tokens, parsedRootNode, ceylonProject);
                 result_ = result;
+                if (exists rf = resultFuture_) {
+                    rf.set(result);
+                }
             }
             return result;
         } finally {
@@ -275,21 +279,6 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         logger.trace(()=>"Exit parsedProjectSource(``document.hash``, ``parsedRootNode.hash``, ``tokens.hash``) for file ``virtualFile.name``");
     }
 
-    shared void scheduleExternalSourcePreparation(CeylonLocalAnalyzerManager manager) {
-        logger.trace(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
-            ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
-                assert (is PsiDocumentManagerBase psiDocumentManager = PsiDocumentManager.getInstance(ideaProject));
-                value phasedUnit = getCeylonProjects(ideaProject)?.findExternalPhasedUnit(virtualFile);
-                if (exists phasedUnit) {
-                    externalPhasedUnitToTranslate = phasedUnit;
-                    manager.scheduleReparse(virtualFile);
-                } else {
-                    logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
-                }
-            }));
-        logger.trace(()=>"Exit prepareExternalSource() for file ``virtualFile.name``");
-    }
-    
     shared void translatedExternalSource(Document document, ExternalPhasedUnit phasedUnit) {
         logger.trace(()=>"Enter translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``", 20);
         resultLock.lock();
@@ -303,7 +292,6 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         submitLocalTypechecking(void () {
             completeExternalPhasedUnitTypechecking(result, restarterCancellable);
         });
-        externalPhasedUnitToTranslate = null;
         logger.debug(()=>"Exit translatedExternalSource(``document.hash``, ``phasedUnit.hash``) for file ``virtualFile.name``");
     }
 
@@ -349,7 +337,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     shared LocalAnalysisResult? forceTypechecking(Cancellable? cancellable, Integer waitForModelInSeconds) =>
             runTypechecking(cancellable, waitForModelInSeconds, true);
 
-    shared LocalAnalysisResult? ensureTypechecked(Cancellable? cancellable, Integer waitForModelInSeconds) =>
+    shared LocalAnalysisResult? ensureTypechecked(Cancellable? cancellable = null, Integer waitForModelInSeconds = 5) =>
             runTypechecking(cancellable, waitForModelInSeconds, false);
     
     "Synchronously perform the typechecking (if necessary)"
@@ -598,12 +586,33 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     }
     
     shared LocalAnalysisResult? result => result_;
-    
+
+    shared AsyncFuture<LocalAnalysisResult> waitForResult() {
+        resultLock.lock();
+        try {
+            AsyncFutureResult<LocalAnalysisResult> resultFuture;
+            if (exists existingResultFuture = resultFuture_) {
+                resultFuture = existingResultFuture;
+            }
+            else {
+                if (exists existingResult = result_) {
+                    return AsyncFutureFactory.instance.wrap(existingResult of LocalAnalysisResult);
+                } else {
+                    resultFuture = AsyncFutureFactory.instance.createAsyncFutureResult<LocalAnalysisResult>();
+                    resultFuture_ = resultFuture;
+                }
+            }
+            return resultFuture;
+        } finally {
+            resultLock.unlock();
+        }
+    }
+
     shared void initialize(CeylonLocalAnalyzerManager manager) {
         ceylonLocalAnalyzerLogger.trace(()=> "Enter initialize(`` manager ``)", 10);
         try {
             if (isInSourceArchive(virtualFile)) {
-                scheduleExternalSourcePreparation(manager);
+                manager.scheduleExternalSourcePreparation(virtualFile);
             } else {
                 ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
                     manager.scheduleReparse(virtualFile);

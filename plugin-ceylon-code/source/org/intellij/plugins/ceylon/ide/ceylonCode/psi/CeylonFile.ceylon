@@ -3,6 +3,12 @@ import ceylon.interop.java {
     createJavaObjectArray
 }
 
+import com.intellij.concurrency {
+    AsyncFutureFactory,
+    AsyncFuture,
+    SameThreadExecutor,
+    ResultConsumer
+}
 import com.intellij.extapi.psi {
     PsiFileBase
 }
@@ -14,7 +20,8 @@ import com.intellij.openapi.\imodule {
     ModuleUtil
 }
 import com.intellij.openapi.util {
-    Computable
+    Computable,
+    Ref
 }
 import com.intellij.openapi.vfs {
     VirtualFile
@@ -49,15 +56,21 @@ import com.redhat.ceylon.ide.common.typechecker {
     ExternalPhasedUnit,
     LocalAnalysisResult,
     AnyProjectPhasedUnit,
-    ProjectPhasedUnit
+    ProjectPhasedUnit,
+    AnalysisResult
 }
-import com.redhat.ceylon.model.typechecker.model {
-    Cancellable
+import com.redhat.ceylon.ide.common.util {
+    unsafeCast
 }
 
 import java.lang {
     ObjectArray,
-    JBoolean=Boolean
+    JBoolean=Boolean,
+    JClass=Class
+}
+import java.util.concurrent {
+    ExecutionException,
+    TimeUnit
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
@@ -66,7 +79,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
-    getModelManager
+    getModelManager,
+    concurrencyManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
@@ -74,18 +88,69 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger
 }
+import org.jetbrains.ide {
+    PooledThreadExecutor
+}
+import com.intellij.openapi.progress {
+    ProcessCanceledException
+}
+import com.intellij.openapi.diagnostic {
+    ControlFlowException
+}
 
 CeylonLogger<CeylonFile> ceylonFileLogger = CeylonLogger<CeylonFile>();
+
+JClass<CeylonPsi.DeclarationPsi> declarationClass = javaClass<CeylonPsi.DeclarationPsi>();
+JClass<CeylonPsi.CompilationUnitPsi> compilationUnitClass = javaClass<CeylonPsi.CompilationUnitPsi>();
+JClass<CeylonLocalAnalyzerManager> localAnalyzerManagerClass = javaClass<CeylonLocalAnalyzerManager>();
+JClass<IdeaCeylonProjects> ideaCeylonProjectsClass = javaClass<IdeaCeylonProjects>();
+ObjectArray<PsiClass> noPsiClasses = ObjectArray<PsiClass>(0);
+
+ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit(CeylonFile file) {
+    Module? mod = ApplicationManager.application.runReadAction(
+        object satisfies Computable<Module> {
+            compute() => ModuleUtil.findModuleForPsiElement(file);
+        }
+    );
+
+    value ceylonProjects = file.project.getComponent(ideaCeylonProjectsClass);
+    if (exists ceylonProject = ceylonProjects.getProject(mod),
+        exists vf = file.realVirtualFile(),
+        exists ceylonVirtualFile = ceylonProject.projectFileFromNative(vf)) {
+        return ceylonProject.getParsedUnit(ceylonVirtualFile);
+    }
+    return null;
+}
+
+ExternalPhasedUnit? retrieveAvailableExternalPhasedUnit(CeylonFile file) {
+    if (exists vf = file.realVirtualFile(),
+        exists externalPuRef = vf.getUserData(uneditedExternalPhasedUnitRef)) {
+        return externalPuRef.get();
+    }
+    return null;
+}
+
+
+AnalysisResult? returnIt(AnalysisResult? result)
+        => result;
+
+AsyncFuture<AnalysisResult> wrapItInFuture(AnalysisResult? result)
+        => AsyncFutureFactory.instance.wrap(result);
+
+Null giveUp(AsyncFuture<AnalysisResult>() futureBuilder)
+        => null;
+
+AsyncFuture<AnalysisResult> returnTheFuture(AsyncFuture<AnalysisResult>() futureBuilder)
+        => futureBuilder();
+
+shared class CannotWaitForAnalysisResultInLockedSection() extends Exception(
+                "Waiting for an analysis result on a Ceylon File in a
+                 locked section (read or write) is dead-lock-prone.\n
+                 Cancelling the wait.") {}
 
 shared class CeylonFile(FileViewProvider viewProvider)
         extends PsiFileBase(viewProvider, CeylonLanguage.instance)
         satisfies PsiClassOwner {
-
-    value declarationClass = javaClass<CeylonPsi.DeclarationPsi>();
-    value compilationUnitClass = javaClass<CeylonPsi.CompilationUnitPsi>();
-    value localAnalyzerManagerClass = javaClass<CeylonLocalAnalyzerManager>();
-    value ideaCeylonProjectsClass = javaClass<IdeaCeylonProjects>();
-    value noPsiClasses = ObjectArray<PsiClass>(0);
 
     putUserData(BlockSupport.treeDepthLimitExceeded, JBoolean.true);
 
@@ -94,39 +159,16 @@ shared class CeylonFile(FileViewProvider viewProvider)
         return psi;
     }
 
+    "Be careful: this might be a Ceylon compiation that is not fully typechecked"
     shared Tree.CompilationUnit compilationUnit => compilationUnitPsi.ceylonNode;
 
-    VirtualFile? realVirtualFile() => originalFile.virtualFile;
+    shared VirtualFile? realVirtualFile() => originalFile.virtualFile;
 
     shared CeylonLocalAnalyzer? localAnalyzer
             => let (localAnalyzerManager = project.getComponent(localAnalyzerManagerClass))
             if (exists vf = realVirtualFile())
             then localAnalyzerManager[vf]
             else null;
-
-    shared ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit() {
-        Module? mod = ApplicationManager.application.runReadAction(
-            object satisfies Computable<Module> {
-                compute() => ModuleUtil.findModuleForPsiElement(outer);
-            }
-        );
-
-        value ceylonProjects = project.getComponent(ideaCeylonProjectsClass);
-        if (exists ceylonProject = ceylonProjects.getProject(mod),
-            exists vf = realVirtualFile(),
-            exists ceylonVirtualFile = ceylonProject.projectFileFromNative(vf)) {
-            return ceylonProject.getParsedUnit(ceylonVirtualFile);
-        }
-        return null;
-    }
-
-    shared ExternalPhasedUnit? retrieveExternalPhasedUnit() {
-        if (exists vf = realVirtualFile(),
-            exists externalPuRef = vf.getUserData(uneditedExternalPhasedUnit)) {
-            return externalPuRef.get();
-        }
-        return null;
-    }
 
     shared TypeChecker? typechecker {
         if (isInSourceArchive(realVirtualFile())) {
@@ -137,94 +179,247 @@ shared class CeylonFile(FileViewProvider viewProvider)
                 return ceylonProject.typechecker;
             }
             return null;
-        } else if (exists projectPhasedUnit = retrieveProjectPhasedUnit()) {
+        } else if (exists projectPhasedUnit = retrieveProjectPhasedUnit(this)) {
             return projectPhasedUnit.typeChecker;
         }
 
-        return localAnalysisResult?.typeChecker;
+        return availableAnalysisResult?.typeChecker;
     }
 
-    shared LocalAnalysisResult? localAnalysisResult {
+    shared AnalysisResult? availableAnalysisResult {
+        value result = requestAnalysisResult {
+            onExistingResult = returnIt;
+            onNonExistingResult = giveUp;
+        };
+        return result;
+    }
+
+    shared AnalysisResult? waitForAnalysis(Integer timeout, TimeUnit unit) {
+        value resultFuture = requestAnalysisResult {
+            onExistingResult = wrapItInFuture;
+            onNonExistingResult = returnTheFuture;
+        };
+        try {
+            if (!resultFuture.done) {
+                value application = ApplicationManager.application;
+                if (application.readAccessAllowed
+                    || application.writeAccessAllowed ) {
+                    throw ProcessCanceledException(CannotWaitForAnalysisResultInLockedSection());
+                }
+            }
+            return resultFuture.get(timeout, unit);
+        } catch (Exception e) {
+            if (is ControlFlowException realException = e) {
+                throw realException;
+            }
+            if (is ControlFlowException realException = e.cause) {
+                throw realException;
+            }
+            platformUtils.log(Status._WARNING,
+                "Analysis result retrieval triggered the following exception for file ``
+                realVirtualFile() else "<unknown>" ``", e);
+            return null;
+        }
+    }
+
+    shared void doWhenAnalyzed(void action(AnalysisResult analysisResult)) {
+        void doWithFuture<V>(AsyncFuture<V> future, void action(V? v)) {
+            Ref<Boolean> consumerStarted = Ref(false);
+            future.addConsumer(SameThreadExecutor.instance, object satisfies ResultConsumer<V> {
+                shared actual void onFailure(Throwable throwable) {
+                    consumerStarted.set(true);
+                    ceylonFileLogger.warnThrowable(throwable);
+                }
+
+                shared actual void onSuccess(V? v) {
+                    consumerStarted.set(true);
+                    if (exists v) {
+                        action(v);
+                    }
+                }
+            });
+            if (future.done && !(consumerStarted.get() else false)) {
+                try {
+                    if(exists v = future.get()) {
+                        action(v);
+                    }
+                } catch(ExecutionException ee) {
+                    ceylonFileLogger.warnThrowable(ee.cause else ee);
+                }
+            }
+        }
+
+        value resultFuture = requestAnalysisResult {
+            onExistingResult = wrapItInFuture;
+            onNonExistingResult = returnTheFuture;
+        };
+        doWithFuture<AnalysisResult>(resultFuture, (AnalysisResult? analysisResult) {
+            if(exists analysisResult) {
+                value phasedUnitFuture = unsafeCast<AsyncFuture<PhasedUnit>>(
+                        analysisResult.phasedUnitWhenTypechecked);
+                doWithFuture(phasedUnitFuture, (Anything phasedUnit) {
+                    if (exists phasedUnit) {
+                        action(analysisResult);
+                    }
+                });
+            }
+        });
+    }
+
+    shared PhasedUnit? availableUpToDatePhasedUnit {
+        return availableAnalysisResult?.typecheckedPhasedUnit;
+    }
+
+    shared PhasedUnit? waitForUpToDatePhasedUnit(Integer timeout, TimeUnit unit) {
+        if (exists analysisResult = waitForAnalysis(timeout, unit)) {
+            value phasedUnitFuture = analysisResult.phasedUnitWhenTypechecked;
+            try {
+                return phasedUnitFuture.get(timeout, unit);
+            } catch (Exception e) {
+                if (is ControlFlowException realException = e) {
+                    throw realException;
+                }
+                if (is ControlFlowException realException = e.cause) {
+                    throw realException;
+                }
+                platformUtils.log(Status._WARNING,
+                    "Analysis result retrieval triggered the following exception for file ``
+                    realVirtualFile() else "<unknown>" ``", e);
+            }
+        }
+
+        return null;
+    }
+
+    Return requestAnalysisResult<Return>(
+            Return onExistingResult(AnalysisResult? result),
+            Return onNonExistingResult(AsyncFuture<AnalysisResult>() futureBuilder)) {
         value attachedCompilationUnit
-                = ApplicationManager.application.runReadAction(
-                    object satisfies Computable<Tree.CompilationUnit> {
-                        compute() => outer.compilationUnit;
-                    });
+                => concurrencyManager.needReadAccess(() => compilationUnit);
 
-        if (exists localAnalyzer = this.localAnalyzer,
-            exists result = localAnalyzer.result) {
-
-            if (result.parsedRootNode === attachedCompilationUnit) {
-                return result;
+        function checkRootNode(Tree.CompilationUnit toCheck, AnalysisResult() produceResult, String checkedAttributeName) {
+            AnalysisResult? resultToReturn;
+            value theAttachedCompilationUnit = attachedCompilationUnit;
+            if (toCheck === theAttachedCompilationUnit) {
+                resultToReturn = produceResult();
             }
             else {
                 ceylonFileLogger.warn(() =>
-                "LocalAnalysisResult.parsedRootNode (``
-                result.parsedRootNode.hash ``) !== ceylonFile.compilationUnit (``
-                attachedCompilationUnit.hash `` - `` attachedCompilationUnit.nodeType `` - `` attachedCompilationUnit.location ``) for file `` originalFile.name ``(``originalFile.hash``)");
-                return null;
+                "`` checkedAttributeName ``(``
+                toCheck.hash ``) !== ceylonFile.compilationUnit (``
+                theAttachedCompilationUnit.hash `` - `` theAttachedCompilationUnit.nodeType `` - `` theAttachedCompilationUnit.location ``) for file `` originalFile.name ``(``originalFile.hash``)");
+                resultToReturn =  null;
+            }
+            return resultToReturn;
+        }
+
+        if (exists localAnalyzer = this.localAnalyzer) {
+            function checkAnalysisResult(AnalysisResult result) => checkRootNode {
+                toCheck = result.parsedRootNode;
+                produceResult() => result;
+                checkedAttributeName = "LocalAnalysisResult.parsedRootNode";
+            };
+
+            if (exists result = localAnalyzer.result) {
+                return onExistingResult(checkAnalysisResult(result));
+            } else {
+                return onNonExistingResult {
+                    function futureBuilder() {
+                        value resultFuture = AsyncFutureFactory.instance.createAsyncFutureResult<AnalysisResult>();
+                        localAnalyzer.waitForResult().addConsumer(
+                            SameThreadExecutor.instance,
+                            object satisfies ResultConsumer<LocalAnalysisResult> {
+                                shared actual void onFailure(Throwable throwable) => resultFuture.setException(throwable);
+                                shared actual void onSuccess(LocalAnalysisResult result) {
+                                    try {
+                                        resultFuture.set(checkAnalysisResult(result));
+                                    } catch(Throwable t) {
+                                        resultFuture.setException(t);
+                                    }
+                                }
+                            });
+                        return resultFuture;
+                    }
+                };
             }
         }
 
-        if (exists phasedUnit
-                = if (!isInSourceArchive(realVirtualFile()))
-                then retrieveProjectPhasedUnit()
-                else retrieveExternalPhasedUnit(),
+        alias ExpectedPhasedUnit => ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>|ExternalPhasedUnit;
+        function analysisResultFromPhasedUnit(ExpectedPhasedUnit phasedUnit) {
+            return object satisfies AnalysisResult {
+                assert (exists document = viewProvider.document);
+
+                commonDocument => IdeaDocument(document);
+                typeChecker => phasedUnit.typeChecker;
+                tokens => phasedUnit.tokens;
+                parsedRootNode => attachedCompilationUnit;
+                typecheckedPhasedUnit => phasedUnit;
+
+                ceylonProject
+                        => if (is AnyProjectPhasedUnit phasedUnit)
+                then phasedUnit.ceylonProject
+                else phasedUnit.moduleSourceMapper?.ceylonProject;
+
+                phasedUnitWhenTypechecked => AsyncFutureFactory.instance.wrap(phasedUnit);
+            };
+        }
+
+        value inSourceArchive = isInSourceArchive(realVirtualFile());
+
+        ExpectedPhasedUnit? phasedUnit = if (inSourceArchive)
+        then retrieveAvailableExternalPhasedUnit(this)
+        else retrieveProjectPhasedUnit(this);
+
+        function checkPhasedUnit(ExpectedPhasedUnit phasedUnit) => checkRootNode {
+            toCheck = phasedUnit.compilationUnit;
+            produceResult() => analysisResultFromPhasedUnit(phasedUnit);
+            checkedAttributeName = "``
+            if(phasedUnit is ExternalPhasedUnit)
+            then "ExternalPhasedUnit"
+            else "ProjectPhasedUnit"
+            ``.compilationUnit";
+        };
+
+        if (exists phasedUnit,
             phasedUnit.refinementValidated) {
+            return onExistingResult(checkPhasedUnit(phasedUnit));
+        } else {
+            if (inSourceArchive) {
+                return onNonExistingResult {
+                    function futureBuilder() {
+                        value newPhasedUnitFuture = AsyncFutureFactory.instance.createAsyncFutureResult<ExternalPhasedUnit>();
+                        assert(exists vf = realVirtualFile());
+                        value phasedUnitFuture = vf.putUserDataIfAbsent(uneditedExternalPhasedUnitFuture, newPhasedUnitFuture);
+                        if (phasedUnitFuture != newPhasedUnitFuture) {
+                            newPhasedUnitFuture.cancel(true);
+                        }
 
-            if (phasedUnit.compilationUnit === attachedCompilationUnit) {
-                return object satisfies LocalAnalysisResult {
+                        value resultFuture = AsyncFutureFactory.instance.createAsyncFutureResult<AnalysisResult>();
+                        phasedUnitFuture.addConsumer(PooledThreadExecutor.instance, object satisfies ResultConsumer<ExternalPhasedUnit> {
+                            shared actual void onFailure(Throwable throwable) => resultFuture.setException(throwable);
 
-                    typecheckedRootNode => attachedCompilationUnit;
-                    typeChecker => phasedUnit.typeChecker;
-                    tokens => phasedUnit.tokens;
-                    parsedRootNode => attachedCompilationUnit;
-                    lastPhasedUnit => phasedUnit;
-                    lastCompilationUnit => attachedCompilationUnit;
+                            shared actual void onSuccess(ExternalPhasedUnit phasedUnit) {
+                                try {
+                                    resultFuture.set(checkPhasedUnit(phasedUnit));
+                                } catch(Throwable t) {
+                                    resultFuture.setException(t);
+                                }
+                            }
+                        });
 
-                    shared actual IdeaDocument commonDocument {
-                        assert (exists document = viewProvider.document);
-                        return IdeaDocument(document);
+                        value localAnalyzerManager = project.getComponent(localAnalyzerManagerClass);
+                        localAnalyzerManager.scheduleExternalSourcePreparation(vf);
+
+                        return resultFuture;
                     }
-
-                    ceylonProject
-                            => if (is AnyProjectPhasedUnit phasedUnit)
-                            then phasedUnit.ceylonProject
-                            else phasedUnit.moduleSourceMapper?.ceylonProject;
                 };
-            }
-            else {
-                ceylonFileLogger.warn(() => "``
-                if(phasedUnit is ExternalPhasedUnit)
-                then "ExternalPhasedUnit"
-                else "ProjectPhasedUnit"
-                ``.compilationUnit (``
-                phasedUnit.compilationUnit.hash ``) !== ceylonFile.compilationUnit (``
-                attachedCompilationUnit.hash `` - `` attachedCompilationUnit.nodeType `` - `` attachedCompilationUnit.location ``) for file `` originalFile.name ``(``originalFile.hash``)");
-                return null;
             }
         }
         platformUtils.log(Status._DEBUG, "localAnalysisResult requested, but was null");
-        return null;
+        return onExistingResult(null);
     }
 
     fileType => CeylonFileType.instance;
-
-    shared PhasedUnit? upToDatePhasedUnit {
-        if (exists lar = localAnalysisResult,
-            lar.typecheckedRootNode exists) {
-
-            return lar.lastPhasedUnit;
-        }
-        return null;
-    }
-
-    shared PhasedUnit? ensureTypechecked(Cancellable? cancellable = null, Integer timeoutSeconds = 5) {
-        if (exists la = localAnalyzer) {
-            return la.ensureTypechecked(cancellable, timeoutSeconds)?.lastPhasedUnit;
-        }
-        return null;
-    }
 
     shared PhasedUnit? forceReparse() {
         onContentReload();
@@ -232,7 +427,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
         suppressWarnings("unusedDeclaration")
         value neededToTriggerTheReparse = node.lastChildNode;
 
-        return ensureTypechecked();
+        return localAnalyzer?.ensureTypechecked()?.lastPhasedUnit;
     }
 
     shared actual ObjectArray<PsiClass> classes {

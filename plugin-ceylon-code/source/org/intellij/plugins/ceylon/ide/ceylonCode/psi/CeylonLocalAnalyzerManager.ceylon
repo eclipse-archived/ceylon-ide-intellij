@@ -2,6 +2,9 @@ import ceylon.interop.java {
     JavaRunnable
 }
 
+import com.intellij.concurrency {
+    AsyncFutureResult
+}
 import com.intellij.openapi {
     Disposable
 }
@@ -23,15 +26,18 @@ import com.intellij.openapi.fileEditor {
     },
     FileEditorManagerEvent,
     FileDocumentManager {
-        fileDocumentManager = instance
+        fileDocumentManager=instance
     }
 }
 import com.intellij.openapi.\imodule {
     Module
 }
+import com.intellij.openapi.progress {
+    ProgressManager
+}
 import com.intellij.openapi.startup {
     StartupManager {
-        startupManager = getInstance
+        startupManager=getInstance
     }
 }
 import com.intellij.openapi.util {
@@ -46,7 +52,7 @@ import com.intellij.openapi.vfs {
     VirtualFilePropertyEvent,
     VirtualFileCopyEvent,
     VirtualFileManager {
-        virtualFileManager = instance
+        virtualFileManager=instance
     }
 }
 import com.intellij.psi {
@@ -56,7 +62,7 @@ import com.intellij.psi {
     FileViewProvider,
     SingleRootFileViewProvider,
     PsiDocumentManager {
-        psiDocumentManager = getInstance
+        psiDocumentManager=getInstance
     }
 }
 import com.intellij.util.messages {
@@ -74,27 +80,28 @@ import com.redhat.ceylon.ide.common.util {
     ImmutableMapWrapper
 }
 
+import java.lang.ref {
+    WeakReference
+}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     ceylonFileType,
     ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
-    concurrencyManager
+    concurrencyManager,
+    getCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger
 }
-import com.intellij.openapi.progress {
-    ProgressManager
-}
-import java.lang.ref {
-    WeakReference
-}
 
 CeylonLogger<CeylonLocalAnalyzerManager> ceylonLocalAnalyzerManagerLogger = CeylonLogger<CeylonLocalAnalyzerManager>();
 
-shared Key<WeakReference<ExternalPhasedUnit>> uneditedExternalPhasedUnit = Key<WeakReference<ExternalPhasedUnit>>("CeylonPlugin.nativeFile_uneditedExternalPhasedUnit");
+shared Key<AsyncFutureResult<ExternalPhasedUnit>> uneditedExternalPhasedUnitFuture = Key<AsyncFutureResult<ExternalPhasedUnit>>("CeylonPlugin.nativeFile_uneditedExternalPhasedUnitFuture");
+shared Key<WeakReference<ExternalPhasedUnit>> uneditedExternalPhasedUnitRef = Key<WeakReference<ExternalPhasedUnit>>("CeylonPlugin.nativeFile_uneditedExternalPhasedUnitRef");
+shared Key<ExternalPhasedUnit> uneditedExternalPhasedUnitToParse = Key<ExternalPhasedUnit>("CeylonPlugin.nativeFile_uneditedExternalPhasedUnitToParse");
 
 shared class CeylonLocalAnalyzerManager(model) 
         satisfies Correspondence<VirtualFile, CeylonLocalAnalyzer>
@@ -181,7 +188,7 @@ shared class CeylonLocalAnalyzerManager(model)
         value virtualFile = virtualFileEvent.file;
         if (exists analyzer = editedFilesAnalyzers[virtualFile],
             isInSourceArchive(virtualFile)) {
-            virtualFile.putUserData(uneditedExternalPhasedUnit, null);
+            virtualFile.putUserData(uneditedExternalPhasedUnitRef, null);
             editedFilesAnalyzersMap.put(virtualFile, newCeylonLocalAnalyzer(virtualFile))?.dispose();
         }
     }
@@ -206,14 +213,14 @@ shared class CeylonLocalAnalyzerManager(model)
         }
         logger.trace(()=>"Exit modelPhasedUnitsTypechecked(``typecheckedUnits``)");
     }
-    
+
     shared actual void ceylonModelParsed(CeylonProject<Module, VirtualFile, VirtualFile, VirtualFile> project) {
         value ceylonEditedFiles = concurrencyManager.needReadAccess(() =>
             fileEditorManagerInstance(model.ideaProject)
                 .openFiles.array.coalesced).sequence();
         for (externalFile in ceylonEditedFiles.filter(isInSourceArchive)) {
             if (exists analyzer = editedFilesAnalyzersMap.get(externalFile)) {
-                analyzer.scheduleExternalSourcePreparation(this);
+                scheduleExternalSourcePreparation(externalFile);
             }
         }
     }
@@ -222,44 +229,85 @@ shared class CeylonLocalAnalyzerManager(model)
         logger.trace(()=>"Enter externalPhasedUnitsTypechecked(``typecheckedUnits``, ``fullyTypechecked``)", 10);
         for (unit in typecheckedUnits) {
             if (exists virtualFile = CeylonTreeUtil.getDeclaringFile(unit.unit, model.ideaProject)?.virtualFile) {
-                virtualFile.putUserData(uneditedExternalPhasedUnit, WeakReference<ExternalPhasedUnit>(unit));
-                scheduleReparse(virtualFile);
+                scheduleReparse(virtualFile, unit);
             }
         }
         logger.trace(()=>"Exit externalPhasedUnitsTypechecked(``typecheckedUnits``, ``fullyTypechecked``)");
     }
 
-    shared void scheduleReparse(VirtualFile virtualFile) {
+    shared void scheduleExternalSourcePreparation(VirtualFile virtualFile) {
+        logger.trace(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
+        ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
+            value phasedUnit = getCeylonProjects(model.ideaProject)?.findExternalPhasedUnit(virtualFile);
+            if (exists phasedUnit) {
+                scheduleReparse(virtualFile, phasedUnit);
+            } else {
+                logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
+            }
+        }));
+        logger.trace(()=>"Exit prepareExternalSource() for file ``virtualFile.name``");
+    }
+
+    shared void scheduleReparse(VirtualFile virtualFile, ExternalPhasedUnit? externalPhasedUnit = null) {
         logger.trace(()=>"Enter scheduleReparse(``virtualFile``)", 10);
         ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() {
             if (is SingleRootFileViewProvider fileViewProvider =
                 application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
                 => psiManager(model.ideaProject).findViewProvider(virtualFile);})) {
-                
+
+                void cleanOnFailure(Throwable? t = null) {
+                    virtualFile.putUserData(uneditedExternalPhasedUnitToParse, null);
+                    if (exists future = virtualFile.getUserData(uneditedExternalPhasedUnitFuture)) {
+                        if (! future.done) {
+                            try {
+                                if (exists t) {
+                                    future.setException(t);
+                                } else {
+                                    future.cancel(true);
+                                }
+                            } catch(Throwable tt) {}
+                        }
+                    }
+                }
+
                 application.invokator.invokeLater(JavaRunnable(() {
                     application.runWriteAction(JavaRunnable(() {
+                        if (exists externalPhasedUnit) {
+                            virtualFile.putUserData(uneditedExternalPhasedUnitToParse, externalPhasedUnit);
+                        }
                         value ideaProject = model.ideaProject;
                         if (!ideaProject.isDisposed()) {
-                            value psiDocMgr = psiDocumentManager(ideaProject);
-                            if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
-                                psiDocMgr.isUncommited(cachedDocument)) {
-                                psiDocMgr.commitDocument(cachedDocument);
+                            try {
+                                value psiDocMgr = psiDocumentManager(ideaProject);
+                                if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
+                                    psiDocMgr.isUncommited(cachedDocument)) {
+                                    psiDocMgr.commitDocument(cachedDocument);
+                                }
+                                fileViewProvider.onContentReload();
+                            } catch(Throwable t) {
+                                cleanOnFailure(t);
+                                throw;
                             }
-                            fileViewProvider.onContentReload();
                         }
                     }));
                 }), 
                 ModalityState.any())
                 .doWhenDone(JavaRunnable(() {
                     application.runReadAction(JavaRunnable(() {
-                        if (exists cachedPsi = fileViewProvider.getCachedPsi(ceylonLanguage)) {
-                            suppressWarnings("unusedDeclaration")
-                            value unused = cachedPsi.node.lastChildNode;
+                        try {
+                            if (exists cachedPsi = fileViewProvider.getCachedPsi(ceylonLanguage)) {
+                                suppressWarnings("unusedDeclaration")
+                                value unused = cachedPsi.node.lastChildNode;
+                            }
+                        } catch(Throwable t) {
+                            cleanOnFailure(t);
+                            throw;
                         }
                     }));
                 }))
                 .doWhenRejected(JavaRunnable(void () {
                     logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
+                    cleanOnFailure();
                 }));
             }
         }));

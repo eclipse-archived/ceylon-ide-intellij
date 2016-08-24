@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    CeylonList
+    CeylonList,
+    synchronize
 }
 
 import com.intellij.codeInsight.completion {
@@ -44,6 +45,16 @@ import org.antlr.runtime {
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger
 }
+import ceylon.language {
+    ceylonTrue = true,
+    ceylonFalse = false
+}
+import com.redhat.ceylon.ide.common.typechecker {
+    ExternalPhasedUnit
+}
+import java.lang.ref {
+    WeakReference
+}
 
 CeylonLogger<IdeaCeylonParser> ideaCeylonParserLogger = CeylonLogger<IdeaCeylonParser>();
 
@@ -78,25 +89,63 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
 
             if (isCommitted, exists virtualFile) {
                 if (isInSourceArchive(virtualFile)) {
-                    if (isCommitted,
-                        exists externalPuRef = virtualFile.getUserData(uneditedExternalPhasedUnit),
-                        exists externalPu = externalPuRef.get()) {
-                        value puTokens = externalPu.tokens;
-                        value localTokens = parseResult.tokens;
-                        if (structurallyDifferent(puTokens, localTokens)) {
-                            ideaCeylonParserLogger.warn(() => "Tokens of the externalPhasedUnit are not the same as the parsed tokens for file `` file.originalFile.name ``(``file.originalFile.hash``)", 20);
-                            ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
-                            return translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
+                    if (isCommitted) {
+                        ExternalPhasedUnit? externalPhasedUnit;
+                        Boolean parseExplicitelyRequested;
+                        if (exists externalPuToParse = virtualFile.getUserData(uneditedExternalPhasedUnitToParse)) {
+                            externalPhasedUnit = externalPuToParse;
+                            parseExplicitelyRequested = ceylonTrue;
+                        } else if(exists externalPuRef = virtualFile.getUserData(uneditedExternalPhasedUnitRef),
+                                  exists externalPuRefGet = externalPuRef.get()) {
+                            externalPhasedUnit = externalPuRefGet;
+                            parseExplicitelyRequested = false;
                         } else {
-                            ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(externalPu.compilationUnit (`` externalPu.compilationUnit.hash ``), externalPu.tokens (`` externalPu.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
-                            ASTNode root = translator.translateToAstNode(externalPu.compilationUnit, externalPu.tokens);
-                            if (exists localAnalyzer) {
-                                assert(exists lastCommittedDocument);
-                                root.putUserData(parserConstants._POST_PARSE_ACTION, void () {
-                                    localAnalyzer.translatedExternalSource(lastCommittedDocument, externalPu);
-                                });
+                            externalPhasedUnit = null;
+                            parseExplicitelyRequested = false;
+                        }
+
+                        if (exists externalPu = externalPhasedUnit) {
+                            value puTokens = externalPu.tokens;
+                            value localTokens = parseResult.tokens;
+                            if (structurallyDifferent(puTokens, localTokens)) {
+                                ideaCeylonParserLogger.warn(() => "Tokens of the externalPhasedUnit are not the same as the parsed tokens for file `` file.originalFile.name ``(``file.originalFile.hash``)", 20);
+                                ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
+                                return translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
+                            } else {
+                                ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(externalPu.compilationUnit (`` externalPu.compilationUnit.hash ``), externalPu.tokens (`` externalPu.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
+                                ASTNode root = translator.translateToAstNode(externalPu.compilationUnit, externalPu.tokens);
+                                void cleanUserDataIfNecessary() {
+                                    if(parseExplicitelyRequested) {
+                                        virtualFile.putUserData(uneditedExternalPhasedUnitToParse, null);
+                                        virtualFile.putUserData(uneditedExternalPhasedUnitRef, WeakReference(externalPhasedUnit));
+                                    }
+                                }
+                                void postParseAction();
+
+                                if (exists localAnalyzer) {
+                                    assert(exists lastCommittedDocument);
+                                    postParseAction = () {
+                                        cleanUserDataIfNecessary();
+                                        localAnalyzer.translatedExternalSource(lastCommittedDocument, externalPu);
+                                    };
+                                } else {
+                                    postParseAction = () {
+                                        cleanUserDataIfNecessary();
+                                        if (exists future = virtualFile.getUserData(uneditedExternalPhasedUnitFuture)) {
+                                            if (! future.done) {
+                                                try {
+                                                    future.set(externalPu);
+                                                } catch(Throwable t) {
+                                                    noop();
+                                                }
+                                            }
+                                            virtualFile.putUserData(uneditedExternalPhasedUnitFuture, null);
+                                        }
+                                    };
+                                }
+                                root.putUserData(parserConstants._POST_PARSE_ACTION, postParseAction);
+                                return root;
                             }
-                            return root;
                         }
                     } else {
                         ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
@@ -104,7 +153,7 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
                     }
                 } else {
                     if (! localAnalyzer exists) {
-                        if (isCommitted, exists projectPhasedUnit = file.retrieveProjectPhasedUnit()) {
+                        if (isCommitted, exists projectPhasedUnit = retrieveProjectPhasedUnit(file)) {
                             value puTokens = projectPhasedUnit.tokens;
                             value localTokens = parseResult.tokens;
                             if (structurallyDifferent(puTokens, localTokens)) {
