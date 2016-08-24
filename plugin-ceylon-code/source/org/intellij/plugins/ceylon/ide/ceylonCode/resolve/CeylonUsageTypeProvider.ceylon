@@ -18,10 +18,16 @@ shared class CeylonUsageTypeProvider() satisfies UsageTypeProvider {
     value evaluationOrFunctionReference = UsageType("Evaluation or function reference");
     value valueOrFunctionTypeDeclaration = UsageType("Value or function declaration");
     value aliasedType = UsageType("Aliased type");
+    value meta = UsageType("Metamodel usage");
 
     shared actual UsageType? getUsageType(PsiElement el) {
         if (el.parent is ImportMemberOrTypePsi) {
             return UsageType.classImport;
+        }
+
+        if (el.parent.parent is TypeLiteralPsi
+          ||el.parent is MemberLiteralPsi) {
+            return meta;
         }
 
         if (el.parent is SimpleTypePsi) {
