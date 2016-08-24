@@ -65,7 +65,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonFileType
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProjects
+    IdeaCeylonProjects,
+    getModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
@@ -235,6 +236,12 @@ shared class CeylonFile(FileViewProvider viewProvider)
     }
 
     shared actual ObjectArray<PsiClass> classes {
+        if (exists mm = getModelManager(project), mm.busy) {
+            // To avoid huge performance hits during full model updates, because `getName()` on
+            // any compiled PSI element will try to get the name from sources
+            return noPsiClasses;
+        }
+
         if (exists decls = getChildrenOfType(compilationUnitPsi, declarationClass)) {
             value classes = ObjectArray<PsiClass>(decls.size);
             variable value i = 0;

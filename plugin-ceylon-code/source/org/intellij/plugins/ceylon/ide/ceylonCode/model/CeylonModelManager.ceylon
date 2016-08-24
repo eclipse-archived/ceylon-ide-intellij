@@ -171,7 +171,10 @@ shared class CeylonModelManager(model)
     variable Boolean cancelledBecauseOfSyntaxErrors = false;
     variable Boolean cancelledBecauseOfAPause = false;
     late variable Alarm buildTriggeringAlarm;
-    
+    variable value busy_ = false;
+
+    shared Boolean busy => busy_;
+
     value accumulatedChanges = LinkedBlockingQueue<NativeResourceChange>();
     variable Future<out Anything>? submitChangesFuture = null;
 
@@ -375,7 +378,7 @@ shared class CeylonModelManager(model)
                             PerformInBackgroundOption.alwaysBackground) {
                             
                             shared actual void run(ProgressIndicator progressIndicator) {
-                                
+                                busy_ = true;
                                 buildProgressIndicator.set(progressIndicator);
                                 value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
                                 value ticks = model.ceylonProjectNumber * 1000;
@@ -387,7 +390,9 @@ shared class CeylonModelManager(model)
                                             ceylonProject.build.performBuild(progress.newChild(1000));
                                         }
                                     });
+                                    busy_ = false;
                                 } catch(Throwable t) {
+                                    busy_ = false;
                                     if (is ProcessCanceledException t) {
                                         throw t;
                                     } else {
