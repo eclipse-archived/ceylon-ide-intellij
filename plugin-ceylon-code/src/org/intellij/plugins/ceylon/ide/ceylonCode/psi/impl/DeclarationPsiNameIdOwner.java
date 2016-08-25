@@ -10,12 +10,12 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
-import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+import com.redhat.ceylon.ide.common.typechecker.AnalysisResult;
 import com.redhat.ceylon.ide.common.util.escaping_;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.FunctionOrValue;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.isInSourceArchive_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil;
@@ -80,17 +80,17 @@ public abstract class DeclarationPsiNameIdOwner
     public SearchScope getUseScope() {
         CeylonFile file = (CeylonFile) getContainingFile();
         ProjectScopeBuilder builder = ProjectScopeBuilder.getInstance(getProject());
-        LocalAnalysisResult localAnalysisResult = file.getLocalAnalysisResult();
-        if (localAnalysisResult != null) {
-            if (localAnalysisResult.getUpToDate()) {
+        AnalysisResult analysisResult = file.getAvailableAnalysisResult();
+        if (analysisResult != null) {
+
+            if (analysisResult.getUpToDate()) {
                 Declaration model = getCeylonNode().getDeclarationModel();
                 if (model!=null && !isAffectingOtherFiles(model)) {
                     return new LocalSearchScope(file);
                 }
             }
 
-            //TODO: is this really the best way to detect a library?
-            if (localAnalysisResult.getLastPhasedUnit() instanceof ExternalPhasedUnit) {
+            if (isInSourceArchive_.isInSourceArchive(file.realVirtualFile())) {
                 return new LocalSearchScope(file)
                         .union(builder.buildProjectScope())
                         .union(builder.buildLibrariesScope());

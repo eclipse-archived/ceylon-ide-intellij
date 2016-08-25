@@ -10,10 +10,10 @@ import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.platform.Status;
 import com.redhat.ceylon.ide.common.platform.platformUtils_;
-import com.redhat.ceylon.ide.common.typechecker.ExternalPhasedUnit;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+import com.redhat.ceylon.ide.common.typechecker.AnalysisResult;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.isInSourceArchive_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiImpl;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.utilJ2C;
@@ -71,7 +71,7 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
     @Override
     public SearchScope getUseScope() {
         CeylonFile ceylonFile = (CeylonFile) getContainingFile();
-        LocalAnalysisResult localAnalysisResult = ceylonFile.getLocalAnalysisResult();
+        AnalysisResult localAnalysisResult = ceylonFile.getAvailableAnalysisResult();
         if (localAnalysisResult != null) {
             if (localAnalysisResult.getUpToDate()) {
                 Declaration model = getCeylonNode().getDeclaration();
@@ -90,7 +90,7 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
                 throw platformUtils_.get_().newOperationCanceledException();
             }
 
-            if (localAnalysisResult.getLastPhasedUnit() instanceof ExternalPhasedUnit) {
+            if (isInSourceArchive_.isInSourceArchive(ceylonFile.realVirtualFile())) {
                 return ProjectScopeBuilder.getInstance(getProject()).buildProjectScope()
                         .union(new LocalSearchScope(getContainingFile()));
             }
