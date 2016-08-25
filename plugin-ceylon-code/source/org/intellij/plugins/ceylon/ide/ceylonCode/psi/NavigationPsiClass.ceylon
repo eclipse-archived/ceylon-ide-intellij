@@ -18,6 +18,9 @@ import com.intellij.psi.scope {
 import com.intellij.psi.util {
     PsiTreeUtil
 }
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
 
 import java.lang {
     ObjectArray,
@@ -78,7 +81,37 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
             if (exists body = PsiTreeUtil.findChildOfType(decl, javaClass<CeylonPsi.BodyPsi>())) {
                 for (PsiElement child in body.children) {
                     if (is CeylonPsi.AnyMethodPsi child) {
+                        value ceylonNode = child.ceylonNode;
+                        value paramList = ceylonNode.parameterLists.get(0);
+
+                        // We need to generate extra PsiMethods for default arguments
+                        variable value idx = 0;
+                        variable value firstDefaultArgPosition = -1;
+
+                        for (p in paramList.parameters) {
+                            if (is Tree.ParameterDeclaration p) {
+                                if (is Tree.AttributeDeclaration attr = p.typedDeclaration,
+                                    attr.specifierOrInitializerExpression exists) {
+
+                                    firstDefaultArgPosition = idx;
+                                    break ;
+                                } else if (is Tree.MethodDeclaration meth = p.typedDeclaration,
+                                    meth.specifierExpression exists) {
+
+                                    firstDefaultArgPosition = idx;
+                                    break ;
+                                }
+                            }
+                            idx++;
+                        }
+
                         meths.add(NavigationPsiMethod(child));
+
+                        if (firstDefaultArgPosition > -1) {
+                            for (i in firstDefaultArgPosition..paramList.parameters.size() - 1) {
+                                meths.add(NavigationPsiMethod.forDefaultArgs(child, i));
+                            }
+                        }
                     }
                     if (is CeylonPsi.SpecifierStatementPsi child) {
                         meths.add(NavigationPsiMethod(child));

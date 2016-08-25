@@ -50,6 +50,9 @@ import javax.swing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonLanguage
 }
+import ceylon.interop.java {
+    CeylonIterable
+}
 
 "Wraps a Function in a PsiMethod. This is used to navigate from compiled classes to the
  corresponding Ceylon code, for example in Go To Implementations or Navigate > Symbol."
@@ -58,6 +61,7 @@ class NavigationPsiMethod satisfies PsiMethod {
     variable Boolean isGetter;
     Boolean isSetter;
     CeylonCompositeElement func;
+    Integer paramsCount;
 
     shared new (CeylonCompositeElement func) {
         this.func = func;
@@ -70,12 +74,21 @@ class NavigationPsiMethod satisfies PsiMethod {
                 isGetter = true;
             }
         }
+        this.paramsCount = -1;
     }
 
     shared new getterOrSetter(CeylonCompositeElement func, Boolean isGetter) {
         this.func = func;
         this.isGetter = isGetter;
         this.isSetter = !isGetter;
+        this.paramsCount = -1;
+    }
+
+    shared new forDefaultArgs(CeylonCompositeElement func, Integer paramsCount) {
+        this.func = func;
+        this.isGetter = false;
+        this.isSetter = false;
+        this.paramsCount = paramsCount;
     }
 
     value typeDescriptorClassName = "com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor";
@@ -107,8 +120,13 @@ class NavigationPsiMethod satisfies PsiMethod {
 
             file.ensureTypechecked();
 
-            for (Tree.Parameter param in parameterList.parameters) {
-                if (is Tree.ParameterDeclaration param) {
+            value maxParams = paramsCount == -1
+                then parameterList.parameters.size()
+                else paramsCount;
+
+            for (idx -> param in CeylonIterable(parameterList.parameters).indexed) {
+                if (idx < maxParams,
+                    is Tree.ParameterDeclaration param) {
                     value typedDeclaration = param.typedDeclaration;
                     Type? typeModel = typedDeclaration.type.typeModel;
 
