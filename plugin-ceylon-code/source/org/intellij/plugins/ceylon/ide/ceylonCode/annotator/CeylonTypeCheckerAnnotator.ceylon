@@ -72,6 +72,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsi
 }
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
 
 shared alias AnyError => AnalysisError|RecognitionError|UnexpectedError;
 
@@ -85,7 +88,7 @@ shared class CeylonTypeCheckerAnnotator()
     ];
 
     Boolean addAnnotation(Message message, TextRange? range,
-            AnnotationHolder annotationHolder, PsiFile file) {
+            AnnotationHolder annotationHolder, PsiFile file, PhasedUnit phasedUnit) {
 
         if (exists range) {
             value project = file.project;
@@ -134,6 +137,7 @@ shared class CeylonTypeCheckerAnnotator()
                     error = message;
                     annotation = annotation;
                     annotationHolder = annotationHolder;
+                    phasedUnit= phasedUnit;
                 };
             }
         }
@@ -141,13 +145,11 @@ shared class CeylonTypeCheckerAnnotator()
     }
 
     void addQuickFixes(TextRange range, Message error, Annotation annotation,
-            AnnotationHolder annotationHolder) {
+            AnnotationHolder annotationHolder, PhasedUnit phasedUnit) {
         assert (is CeylonFile file
                     = annotationHolder.currentAnnotationSession.file,
                 exists mod
-                    = ModuleUtilCore.findModuleForFile(file.virtualFile, file.project),
-                exists phasedUnit
-                    = file.localAnalysisResult?.lastPhasedUnit);
+                    = ModuleUtilCore.findModuleForFile(file.virtualFile, file.project));
         
         if (is IdeaCeylonProjects projects = getCeylonProjects(file.project),
             exists project = projects.getProject(mod),
@@ -182,7 +184,7 @@ shared class CeylonTypeCheckerAnnotator()
     shared actual void annotate(PsiElement psiElement, AnnotationHolder annotationHolder) {
         if (is CeylonPsi.CompilationUnitPsi psiElement,
             is CeylonFile ceylonFile = psiElement.containingFile) {
-            if (exists pu = ceylonFile.upToDatePhasedUnit) {
+            if (exists pu = ceylonFile.availableAnalysisResult?.typecheckedPhasedUnit) {
                 if (exists cu = pu.compilationUnit,
                     !pu is ExternalPhasedUnit) {
                      value ceylonMessages 
@@ -200,6 +202,7 @@ shared class CeylonTypeCheckerAnnotator()
                                  range = range;
                                  annotationHolder = annotationHolder;
                                  file = ceylonFile;
+                                 phasedUnit = pu;
                              };
                              hasErrors ||= result;
                          }
