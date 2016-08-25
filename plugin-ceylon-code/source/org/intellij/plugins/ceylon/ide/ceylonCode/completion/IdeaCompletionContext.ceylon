@@ -57,8 +57,9 @@ shared class IdeaCompletionContext(file, localAnalysisResult, editor, options, r
 
     parsedRootNode => localAnalysisResult.parsedRootNode;
     tokens => localAnalysisResult.tokens;
-    typecheckedRootNode => localAnalysisResult.typecheckedRootNode;
-    
+    phasedUnitWhenTypechecked => localAnalysisResult.phasedUnitWhenTypechecked;
+    typecheckedPhasedUnit => localAnalysisResult.typecheckedPhasedUnit;
+
     shared actual TypeChecker typeChecker {
         assert (exists existingTypeChecker = localAnalysisResult.typeChecker);
         return existingTypeChecker;
@@ -75,7 +76,6 @@ shared class IdeaCompletionContext(file, localAnalysisResult, editor, options, r
     }
 
     proposalFilters => empty;
-    
 }
 
 shared class IdeaProposalsHolder(CompletionResultSet? result = null) satisfies ProposalsHolder {

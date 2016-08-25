@@ -18,6 +18,9 @@ import com.intellij.psi.impl.compiled {
 import com.intellij.psi.javadoc {
     PsiDocComment
 }
+import com.intellij.util.concurrency {
+    FixedFuture
+}
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
 }
@@ -91,11 +94,15 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
                 => lastPhasedUnit.compilationUnit;
 
         parsedRootNode => lastCompilationUnit;
-        typecheckedRootNode => lastCompilationUnit;
         tokens => lastPhasedUnit.tokens;
         typeChecker => outer.typechecker;
         ceylonProject => lastPhasedUnit.moduleSourceMapper?.ceylonProject;
         commonDocument => nothing;
+
+        phasedUnitWhenTypechecked => FixedFuture(lastPhasedUnit);
+
+        typecheckedPhasedUnit => lastPhasedUnit;
+
     }
 
     String hexColor(Integer red, Integer green, Integer blue) 
