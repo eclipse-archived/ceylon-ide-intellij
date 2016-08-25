@@ -78,10 +78,6 @@ class NavigationPsiMethod satisfies PsiMethod {
         this.isSetter = !isGetter;
     }
 
-    returnType => null;
-
-    returnTypeElement => null;
-
     value typeDescriptorClassName = "com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor";
 
     shared actual PsiParameterList parameterList {
@@ -118,7 +114,7 @@ class NavigationPsiMethod satisfies PsiMethod {
 
                     PsiType psiType;
                     if (exists typeModel, typeModel.typeParameter) {
-                        LightTypeParameterBuilder tp = LightTypeParameterBuilder(typedDeclaration.type.text, this, 0);
+                        value tp = LightTypeParameterBuilder(typedDeclaration.type.text, this, 0);
                         psiType = PsiImmediateClassType(tp, PsiSubstitutor.empty);
                     } else {
                         psiType = mapType(typeModel, scope);
@@ -192,16 +188,6 @@ class NavigationPsiMethod satisfies PsiMethod {
         return PsiType.getTypeByName(name, func.project, scope);
     }
 
-    throwsList => nothing;
-
-    body => null;
-
-    constructor => false;
-
-    shared actual Boolean varArgs {
-        return false;
-    }
-
     shared actual MethodSignature getSignature(PsiSubstitutor substitutor_) {
         value params = parameterList.parameters;
         value types = ObjectArray<PsiType>(params.size);
@@ -218,29 +204,6 @@ class NavigationPsiMethod satisfies PsiMethod {
         };
     }
 
-    nameIdentifier => null;
-
-    shared actual ObjectArray<PsiMethod> findSuperMethods()
-            => PsiMethod.emptyArray;
-
-    shared actual ObjectArray<PsiMethod> findSuperMethods(Boolean checkAccess)
-            => PsiMethod.emptyArray;
-
-    shared actual ObjectArray<PsiMethod> findSuperMethods(PsiClass parentClass)
-            => PsiMethod.emptyArray;
-
-    shared actual List<MethodSignatureBackedByPsiMethod> findSuperMethodSignaturesIncludingStatic(Boolean checkAccess) {
-        return Collections.emptyList<MethodSignatureBackedByPsiMethod>();
-    }
-
-    findDeepestSuperMethod() => null;
-
-    findDeepestSuperMethods() => PsiMethod.emptyArray;
-
-    modifierList => nothing;
-
-    hasModifierProperty(String name) => false;
-
     shared actual String name {
         value _name = func.name else "<unknown>";
 
@@ -255,6 +218,40 @@ class NavigationPsiMethod satisfies PsiMethod {
         }
         return _name;
     }
+
+    returnType => null;
+
+    returnTypeElement => null;
+
+    throwsList => nothing;
+
+    body => null;
+
+    constructor => false;
+
+    varArgs => false;
+
+    nameIdentifier => null;
+
+    shared actual ObjectArray<PsiMethod> findSuperMethods()
+            => PsiMethod.emptyArray;
+
+    shared actual ObjectArray<PsiMethod> findSuperMethods(Boolean checkAccess)
+            => PsiMethod.emptyArray;
+
+    shared actual ObjectArray<PsiMethod> findSuperMethods(PsiClass parentClass)
+            => PsiMethod.emptyArray;
+
+    findSuperMethodSignaturesIncludingStatic(Boolean checkAccess)
+            => Collections.emptyList<MethodSignatureBackedByPsiMethod>();
+
+    findDeepestSuperMethod() => null;
+
+    findDeepestSuperMethods() => PsiMethod.emptyArray;
+
+    modifierList => nothing;
+
+    hasModifierProperty(String name) => false;
 
     presentation => null;
 
@@ -370,7 +367,8 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     shared actual void putCopyableUserData<T>(Key<T> key, T \ivalue) given T satisfies Object {}
 
-    processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) => false;
+    processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent,
+        PsiElement place) => false;
 
     context => null;
 

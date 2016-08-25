@@ -43,7 +43,32 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
  the same name as the .class file."
 shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies PsiSyntheticClass {
 
+    shared actual ObjectArray<PsiClass> innerClasses {
+        if (is CeylonPsi.ClassOrInterfacePsi decl) {
+            if (exists body = PsiTreeUtil.findChildOfType(decl, javaClass<CeylonPsi.BodyPsi>())) {
+                value children = PsiTreeUtil.findChildrenOfType(body, javaClass<CeylonPsi.ClassOrInterfacePsi>());
+                value inners = ArrayList<PsiClass>(children.size());
+                for (child in children) {
+                    inners.add(NavigationPsiClass(child));
+                }
+                return inners.toArray(ObjectArray<PsiClass>(children.size()));
+            }
+        }
+        return PsiClass.emptyArray;
+    }
+
     variable List<PsiMethod>? _methods = null;
+
+    shared actual ObjectArray<PsiMethod> findMethodsByName(String name, Boolean checkBases) {
+        List<PsiMethod> allMethods = wrapMethods();
+        List<PsiMethod> matching = ArrayList<PsiMethod>();
+        for (PsiMethod method in allMethods) {
+            if (method.name.equals(name)) {
+                matching.add(method);
+            }
+        }
+        return matching.toArray(ObjectArray<PsiMethod>(matching.size()));
+    }
 
     List<PsiMethod> wrapMethods() {
         if (!exists m = _methods) {
@@ -68,6 +93,28 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
         assert(exists m = _methods);
         return m;
+    }
+
+    shared actual String name {
+        if (is CeylonPsi.DeclarationPsi decl) {
+            if (exists identifier = decl.ceylonNode.identifier) {
+                value suffix = if (decl is CeylonPsi.ObjectDefinitionPsi|CeylonPsi.AnyMethodPsi|CeylonPsi.AnyAttributePsi)
+                then "_"
+                else "";
+
+                return identifier.text + suffix;
+            }
+            return "<unknown>";
+        } else if (is CeylonPsi.PackageDescriptorPsi decl) {
+            return "$package_";
+        } else if (is CeylonPsi.ModuleDescriptorPsi decl) {
+            return "$module_";
+        }
+
+        Logger.getInstance(javaClass<NavigationPsiClass>())
+            .error("Unhandled class of type " + className(decl));
+
+        return "<unknown>";
     }
 
     qualifiedName => null;
@@ -100,20 +147,6 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
     constructors => PsiMethod.emptyArray;
 
-    shared actual ObjectArray<PsiClass> innerClasses {
-        if (is CeylonPsi.ClassOrInterfacePsi decl) {
-            if (exists body = PsiTreeUtil.findChildOfType(decl, javaClass<CeylonPsi.BodyPsi>())) {
-                value children = PsiTreeUtil.findChildrenOfType(body, javaClass<CeylonPsi.ClassOrInterfacePsi>());
-                value inners = ArrayList<PsiClass>(children.size());
-                for (child in children) {
-                    inners.add(NavigationPsiClass(child));
-                }
-                return inners.toArray(ObjectArray<PsiClass>(children.size()));
-            }
-        }
-        return PsiClass.emptyArray;
-    }
-
     initializers => PsiClassInitializer.emptyArray;
 
     allFields => PsiField.emptyArray;
@@ -127,17 +160,6 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
     findMethodBySignature(PsiMethod patternMethod, Boolean checkBases) => null;
 
     findMethodsBySignature(PsiMethod patternMethod, Boolean checkBases) => PsiMethod.emptyArray;
-
-    shared actual ObjectArray<PsiMethod> findMethodsByName(String name, Boolean checkBases) {
-        List<PsiMethod> allMethods = wrapMethods();
-        List<PsiMethod> matching = ArrayList<PsiMethod>();
-        for (PsiMethod method in allMethods) {
-            if (method.name.equals(name)) {
-                matching.add(method);
-            }
-        }
-        return matching.toArray(ObjectArray<PsiMethod>(matching.size()));
-    }
 
     findMethodsAndTheirSubstitutorsByName(String name, Boolean checkBases)
             => Collections.emptyList<Pair<PsiMethod,PsiSubstitutor>>();
@@ -161,28 +183,6 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
     containingClass => null;
 
     visibleSignatures => Collections.emptyList<HierarchicalMethodSignature>();
-
-    shared actual String name {
-        if (is CeylonPsi.DeclarationPsi decl) {
-            if (exists identifier = decl.ceylonNode.identifier) {
-                value suffix = if (decl is CeylonPsi.ObjectDefinitionPsi|CeylonPsi.AnyMethodPsi|CeylonPsi.AnyAttributePsi)
-                then "_"
-                else "";
-
-                return identifier.text + suffix;
-            }
-            return "<unknown>";
-        } else if (is CeylonPsi.PackageDescriptorPsi decl) {
-            return "$package_";
-        } else if (is CeylonPsi.ModuleDescriptorPsi decl) {
-            return "$module_";
-        }
-
-        Logger.getInstance(javaClass<NavigationPsiClass>())
-            .error("Unhandled class of type " + className(decl));
-
-        return "<unknown>";
-    }
 
     setName(String name) => null;
 
