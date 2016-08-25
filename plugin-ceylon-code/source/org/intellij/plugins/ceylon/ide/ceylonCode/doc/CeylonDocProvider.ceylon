@@ -91,6 +91,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     resolveDeclaration
 }
+import java.util.concurrent {
+    TimeUnit
+}
+import com.intellij.openapi.diagnostic {
+    ControlFlowException
+}
 
 shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
@@ -125,7 +131,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             else null;
 
     function typeCheckerForElement(PsiElement? element) {
-        if (exists element) {
+        if (exists element, element.valid) {
             if (exists file = element.containingFile) {
                 if (is CeylonFile file,
                     exists typechecker = file.typechecker) {
@@ -149,12 +155,12 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
         return null;
     }
 
-    function phasedUnit(PsiElement element)
-            => if (is CeylonFile file = element.containingFile)
-            then (file.upToDatePhasedUnit
-                else file.retrieveProjectPhasedUnit()
-                else file.retrieveExternalPhasedUnit())
-            else null;
+    function phasedUnit(PsiElement element) {
+        if (is CeylonFile file = element.containingFile) {
+            return file.waitForUpToDatePhasedUnit(3, TimeUnit.seconds);
+        }
+        return null;
+    }
 
     shared actual String? generateDoc(PsiElement element, PsiElement? originalElement) {
         try {
@@ -202,6 +208,9 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
         }
         catch (AssertionError|Exception e) {
+            if (is ControlFlowException e) {
+                throw e;
+            }
             e.printStackTrace();
         }
 
@@ -229,13 +238,15 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
     shared actual PsiElement? getDocumentationElementForLink(PsiManager psiManager, String link, PsiElement context) {
         if (exists tc = typeCheckerForElement(context),
             is CeylonFile file = context.containingFile,
-            exists localAnalysisResult = file.localAnalysisResult,
-            exists cu = localAnalysisResult.typecheckedRootNode,
-            exists pu = localAnalysisResult.lastPhasedUnit) {
+            exists analysisResult = file.availableAnalysisResult,
+            exists pu = analysisResult.typecheckedPhasedUnit) {
+
+            value cu = pu.compilationUnit;
 
             if (link.startsWith("stp:"),
                 exists offset = parseInteger(link.substring(4)),
                 is Tree.Type node = nodes.findNode(cu, null, offset, offset+1)) {
+
                 if (exists hint
                         = DocumentationManager.getInstance(context.project).docInfoHint) {
                     hint.cancel();
@@ -265,16 +276,16 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             value gen = IdeaDocGenerator(tc);
             if (exists target
                     = gen.getLinkedModel(link, gen.DocParams(pu, context.project))) {
+
                 if (link.startsWith("doc:")) {
                     return DummyPsiElement(target, file);
                 } else if (link.startsWith("dec:"),
-                    is Navigatable psiDecl
-                            = resolveDeclaration(target, context.project)) {
+                            is Navigatable psiDecl
+                                = resolveDeclaration(target, context.project)) {
                     psiDecl.navigate(true);
                 }
             }
         }
-
         return null;
     }
 
