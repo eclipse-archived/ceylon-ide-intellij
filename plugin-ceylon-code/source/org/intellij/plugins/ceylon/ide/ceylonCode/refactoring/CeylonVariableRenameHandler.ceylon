@@ -58,7 +58,7 @@ shared class CeylonVariableRenameHandler()
         }
 
         if (is CeylonFile file,
-            exists localAnalysisResult = file.localAnalysisResult,
+            exists localAnalysisResult = file.localAnalyzer?.result,
             ! localAnalysisResult.upToDate) {
 
             platformUtils.log(Status._DEBUG, "CeylonVariableRenameHandler unavailable because the file `` file `` is not typechecked and up-to-date");

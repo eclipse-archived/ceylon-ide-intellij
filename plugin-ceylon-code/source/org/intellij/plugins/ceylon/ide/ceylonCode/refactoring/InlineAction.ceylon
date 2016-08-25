@@ -89,11 +89,10 @@ shared class InlineAction() extends InlineActionHandler() {
             modelManager.pauseAutomaticModelUpdate();
 
             if (is CeylonFile file = element.containingFile,
-                exists localAnalysisResult = file.localAnalysisResult,
-                exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode, 
-                exists phasedUnit = localAnalysisResult.lastPhasedUnit) {
+                exists localAnalysisResult = file.localAnalyzer?.result,
+                exists phasedUnit = localAnalysisResult.typecheckedPhasedUnit) {
                 value node = nodes.findNode(
-                    typecheckedRootNode, localAnalysisResult.tokens,
+                    phasedUnit.compilationUnit, localAnalysisResult.tokens,
                     editor.selectionModel.selectionStart,
                     editor.selectionModel.selectionEnd
                 );

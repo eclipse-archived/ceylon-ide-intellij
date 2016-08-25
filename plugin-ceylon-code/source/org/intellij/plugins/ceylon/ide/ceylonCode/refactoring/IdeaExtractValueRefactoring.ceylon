@@ -63,11 +63,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
 shared class ExtractValueHandler() extends AbstractExtractHandler() {
 
     shared actual [TextRange+]? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
-        if (exists localAnalysisResult = file.localAnalysisResult,
-            exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode,
-            exists phasedUnit = localAnalysisResult.lastPhasedUnit) {
+        if (exists localAnalysisResult = file.localAnalyzer?.result,
+            exists phasedUnit = localAnalysisResult.typecheckedPhasedUnit) {
             assert(exists node = nodes.findNode {
-                node = typecheckedRootNode;
+                node = phasedUnit.compilationUnit;
                 tokens = localAnalysisResult.tokens;
                 startOffset = range.startOffset;
                 endOffset = range.endOffset;

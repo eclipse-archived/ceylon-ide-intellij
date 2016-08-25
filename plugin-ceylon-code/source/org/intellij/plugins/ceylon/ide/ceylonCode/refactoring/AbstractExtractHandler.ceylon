@@ -93,7 +93,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         try {
             modelManager.pauseAutomaticModelUpdate();
             
-            if (is CeylonFile psiFile, psiFile.ensureTypechecked() exists) {
+            if (is CeylonFile psiFile, psiFile.localAnalyzer?.ensureTypechecked() exists) {
                 extractSelectedExpression(project, editor, psiFile);
             }
 

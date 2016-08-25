@@ -44,7 +44,7 @@ class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
 
     shared actual SuggestedNameInfo? getSuggestedNames(PsiElement element, PsiElement nameSuggestionContext, Set<JString> result) {
         if (is CeylonFile file = element.containingFile) {
-            file.ensureTypechecked();
+            file.localAnalyzer?.ensureTypechecked();
         }
         if (element.language.isKindOf(ceylonLanguage)) {
             nodes.renameProposals {

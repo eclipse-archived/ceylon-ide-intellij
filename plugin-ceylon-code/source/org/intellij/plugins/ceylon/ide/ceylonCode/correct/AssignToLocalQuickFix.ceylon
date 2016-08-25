@@ -64,7 +64,7 @@ class AssignToLocalElement(IdeaQuickFixData data, Editor editor, CeylonFile file
         }
 
         assert (is IdeaDocument doc = data.document,
-                exists phasedUnit = file.localAnalysisResult?.lastPhasedUnit);
+                exists phasedUnit = file.localAnalyzer?.result?.lastPhasedUnit);
 
         value linkedMode = IdeaLinkedMode(doc);
         addLinkedPositions(linkedMode, phasedUnit.unit);

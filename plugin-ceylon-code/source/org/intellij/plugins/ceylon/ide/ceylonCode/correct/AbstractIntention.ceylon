@@ -105,17 +105,17 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
         callback = noop;
 
         if (is CeylonFile psiFile,
-            exists localAnalysisResult = psiFile.localAnalysisResult,
+            exists localAnalysisResult = psiFile.localAnalyzer?.result,
             is ModifiablePhasedUnit<out Anything,out Anything,out Anything,out Anything>
-                analyzedPhasedUnit = localAnalysisResult.lastPhasedUnit) {
+                lastAnalyzedPhasedUnit = localAnalysisResult.lastPhasedUnit) {
             
-            value typecheckedCompilationUnit = localAnalysisResult.typecheckedRootNode;
-            if (! exists typecheckedCompilationUnit) {
+            value typecheckedPhasedUnit = localAnalysisResult.typecheckedPhasedUnit;
+            if (! exists typecheckedPhasedUnit) {
                 platformUtils.log(Status._DEBUG, "AbstractIntention '`` this.text ``' is not available because the file `` psiFile `` is not typechecked and up-to-date");
                 return false;
             }
             value offset = _editor.caretModel.offset;
-            value _node = nodes.findNode(typecheckedCompilationUnit,
+            value _node = nodes.findNode(typecheckedPhasedUnit.compilationUnit,
                 localAnalysisResult.tokens, offset);
             
             if (exists mod = ModuleUtilCore.findModuleForFile(psiFile.virtualFile, project),
@@ -127,8 +127,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                 value data = object extends IdeaQuickFixData(
                     dummyMsg, 
                     doc,
-                    typecheckedCompilationUnit,
-                    analyzedPhasedUnit,
+                    typecheckedPhasedUnit.compilationUnit,
+                    typecheckedPhasedUnit,
                     _node,
                     mod,
                     null,
