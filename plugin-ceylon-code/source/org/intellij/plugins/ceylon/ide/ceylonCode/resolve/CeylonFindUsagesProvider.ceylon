@@ -42,6 +42,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     DeclarationPsiNameIdOwner
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    AnalysisResult
+}
+import java.util.concurrent {
+    TimeUnit
+}
 
 shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
 
@@ -66,13 +72,21 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
     shared actual String getDescriptiveName(PsiElement element) {
         if (is CeylonCompositeElement element) {
             assert (is CeylonFile file = element.containingFile);
-            if (exists localAnalysisResult
-                    = file.localAnalysisResult,
-                exists lastCompilationUnit
-                    = localAnalysisResult.lastCompilationUnit) {
+            Tree.CompilationUnit? typecheckedCompilationUnit;
+            AnalysisResult? analysisResult;
+            if (exists localAnalysisResult = file.localAnalyzer?.result) {
+                analysisResult = localAnalysisResult;
+                typecheckedCompilationUnit = localAnalysisResult.lastCompilationUnit;
+            } else {
+                analysisResult = file.waitForAnalysis(5, TimeUnit.seconds);
+                typecheckedCompilationUnit = analysisResult?.typecheckedRootNode;
+            }
+
+            if (exists analysisResult,
+                exists typecheckedCompilationUnit) {
                 value node = nodes.findNode {
-                    node = lastCompilationUnit;
-                    tokens = localAnalysisResult.tokens;
+                    node = typecheckedCompilationUnit;
+                    tokens = analysisResult.tokens;
                     startOffset = element.textRange.startOffset;
                     endOffset = element.textRange.endOffset;
                 };
@@ -81,7 +95,7 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
                 case (is Tree.InitializerParameter) {
                     return node.identifier.text;
                 }
-                else if (exists id = nodes.findDeclaration(lastCompilationUnit, node)?.identifier) {
+                else if (exists id = nodes.findDeclaration(typecheckedCompilationUnit, node)?.identifier) {
                     return id.text;
                 }
             }
