@@ -25,9 +25,6 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node,
     Tree
 }
-import com.redhat.ceylon.ide.common.typechecker {
-    ExternalPhasedUnit
-}
 import com.redhat.ceylon.ide.common.util {
     FindSubtypesVisitor,
     FindRefinementsVisitor
@@ -53,7 +50,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
         getDeclaringFile
     },
     CeylonFile,
-    CeylonPsi
+    CeylonPsi,
+    isInSourceArchive
 }
 
 shared class CeylonImplementationsSearch()
@@ -98,7 +96,7 @@ shared class CeylonImplementationsSearch()
                 };
             }
 
-            if (is ExternalPhasedUnit pu = ceylonFile.localAnalysisResult?.lastPhasedUnit) {
+            if (isInSourceArchive(ceylonFile.realVirtualFile())) {
                 for (mod in modules) {
                     scanPhasedUnits {
                         pus = mod.phasedUnits;
@@ -139,18 +137,19 @@ shared class CeylonImplementationsSearch()
                         continue;
                     }
                 }
-                object run satisfies Runnable {
-                    shared actual void run() {
-                        value declaringFile = getDeclaringFile(dnode.unit, sourceElement.project);
-                        if (is CeylonFile declaringFile) {
-                            declaringFile.ensureTypechecked();
-                        }
-                        if (exists psiElement = findPsiElement(dnode, declaringFile)) {
-                            consumer(psiElement);
-                        }
+                
+                value declaringFile = getDeclaringFile(dnode.unit, sourceElement.project);
+                void action() {
+                    if (exists psiElement = findPsiElement(dnode, declaringFile)) {
+                        consumer(psiElement);
                     }
                 }
-                ApplicationManager.application.runReadAction(run);
+
+                if (is CeylonFile declaringFile) {
+                    declaringFile.doWhenAnalyzed((analysisResult) => action());
+                } else {
+                    action();
+                }
             }
         }
     }
