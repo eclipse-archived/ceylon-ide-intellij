@@ -220,17 +220,14 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     nameIdentifier => null;
 
-    shared actual ObjectArray<PsiMethod> findSuperMethods() {
-        return ObjectArray<PsiMethod>(0);
-    }
+    shared actual ObjectArray<PsiMethod> findSuperMethods()
+            => PsiMethod.emptyArray;
 
-    shared actual ObjectArray<PsiMethod> findSuperMethods(Boolean checkAccess) {
-        return ObjectArray<PsiMethod>(0);
-    }
+    shared actual ObjectArray<PsiMethod> findSuperMethods(Boolean checkAccess)
+            => PsiMethod.emptyArray;
 
-    shared actual ObjectArray<PsiMethod> findSuperMethods(PsiClass parentClass) {
-        return ObjectArray<PsiMethod>(0);
-    }
+    shared actual ObjectArray<PsiMethod> findSuperMethods(PsiClass parentClass)
+            => PsiMethod.emptyArray;
 
     shared actual List<MethodSignatureBackedByPsiMethod> findSuperMethodSignaturesIncludingStatic(Boolean checkAccess) {
         return Collections.emptyList<MethodSignatureBackedByPsiMethod>();
@@ -238,7 +235,7 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     findDeepestSuperMethod() => null;
 
-    findDeepestSuperMethods() => ObjectArray<PsiMethod>(0);
+    findDeepestSuperMethods() => PsiMethod.emptyArray;
 
     modifierList => nothing;
 
@@ -273,7 +270,7 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     typeParameterList => null;
 
-    typeParameters => ObjectArray<PsiTypeParameter>(0);
+    typeParameters => PsiTypeParameter.emptyArray;
 
     containingClass => null;
 
@@ -289,7 +286,7 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     manager => func.manager;
 
-    children => ObjectArray<PsiElement>(0);
+    children => PsiElement.emptyArray;
 
     parent => null;
 
@@ -367,7 +364,7 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     reference => null;
 
-    references => ObjectArray<PsiReference>(0);
+    references => PsiReference.emptyArray;
 
     shared actual T? getCopyableUserData<T>(Key<T> key) given T satisfies Object => null;
 

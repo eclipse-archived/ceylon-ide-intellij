@@ -81,24 +81,24 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
     extendsList => null;
 
     implementsList => null;
+    
+    extendsListTypes => PsiClassType.emptyArray;
 
-    extendsListTypes => ObjectArray<PsiClassType>(0);
-
-    implementsListTypes => ObjectArray<PsiClassType>(0);
+    implementsListTypes => PsiClassType.emptyArray;
 
     superClass => null;
 
-    interfaces => ObjectArray<PsiClass>(0);
+    interfaces => PsiClass.emptyArray;
 
-    supers => ObjectArray<PsiClass>(0);
+    supers => PsiClass.emptyArray;
 
-    superTypes => ObjectArray<PsiClassType>(0);
+    superTypes => PsiClassType.emptyArray;
 
-    fields => ObjectArray<PsiField>(0);
+    fields => PsiField.emptyArray;
 
-    methods => ObjectArray<PsiMethod>(0);
+    methods => PsiMethod.emptyArray;
 
-    constructors => ObjectArray<PsiMethod>(0);
+    constructors => PsiMethod.emptyArray;
 
     shared actual ObjectArray<PsiClass> innerClasses {
         if (is CeylonPsi.ClassOrInterfacePsi decl) {
@@ -114,19 +114,19 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
         return PsiClass.emptyArray;
     }
 
-    initializers => ObjectArray<PsiClassInitializer>(0);
+    initializers => PsiClassInitializer.emptyArray;
 
-    allFields => ObjectArray<PsiField>(0);
+    allFields => PsiField.emptyArray;
 
-    allMethods => ObjectArray<PsiMethod>(0);
+    allMethods => PsiMethod.emptyArray;
 
-    allInnerClasses => ObjectArray<PsiClass>(0);
+    allInnerClasses => PsiClass.emptyArray;
 
     findFieldByName(String name, Boolean checkBases) => null;
 
     findMethodBySignature(PsiMethod patternMethod, Boolean checkBases) => null;
 
-    findMethodsBySignature(PsiMethod patternMethod, Boolean checkBases) => ObjectArray<PsiMethod>(0);
+    findMethodsBySignature(PsiMethod patternMethod, Boolean checkBases) => PsiMethod.emptyArray;
 
     shared actual ObjectArray<PsiMethod> findMethodsByName(String name, Boolean checkBases) {
         List<PsiMethod> allMethods = wrapMethods();
@@ -194,7 +194,7 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
     typeParameterList => null;
 
-    typeParameters => ObjectArray<PsiTypeParameter>(0);
+    typeParameters => PsiTypeParameter.emptyArray;
 
     presentation => null;
 
@@ -216,7 +216,7 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
     manager => null;
 
-    children => ObjectArray<PsiElement>(0);
+    children => PsiElement.emptyArray;
 
     parent => null;
 
@@ -300,7 +300,7 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
     reference => null;
 
-    references => ObjectArray<PsiReference>(0);
+    references => PsiReference.emptyArray;
 
     shared actual T? getCopyableUserData<T>(Key<T> key) given T satisfies Object {
         return null;
