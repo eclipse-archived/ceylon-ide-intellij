@@ -110,7 +110,7 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         value project = myElement.project;
         assert (is CeylonFile ceylonFile = myElement.containingFile);
 
-        if (exists rootNode = ceylonFile.localAnalysisResult?.typecheckedRootNode) {
+        if (exists rootNode = ceylonFile.availableAnalysisResult?.typecheckedRootNode) {
             function searchForTarget(Tree.CompilationUnit cu, Node searchedNode) =>
                 IdeaNavigation(project).getTarget(cu, searchedNode, backend);
 
@@ -119,10 +119,10 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
                 exists file = getVirtualFile(unit)) {
                 value psiFile = PsiManager.getInstance(project).findFile(file);
                 if (is CeylonFile psiFile,
-                    exists localAnalyzisResult = psiFile.localAnalyzer?.result,
+                    exists localAnalysisResult = psiFile.localAnalyzer?.result,
                     exists targetModel = nodes.getReferencedModel(nodes.getIdentifyingNode(target) else target)) {
                     if (exists targetInEditor = concurrencyManager.withAlternateResolution(()
-                        => nodes.getReferencedNode(targetModel, localAnalyzisResult.parsedRootNode))) {
+                        => nodes.getReferencedNode(targetModel, localAnalysisResult.parsedRootNode))) {
                         return CeylonTreeUtil.findPsiElement(targetInEditor, psiFile);
                     }
                 }

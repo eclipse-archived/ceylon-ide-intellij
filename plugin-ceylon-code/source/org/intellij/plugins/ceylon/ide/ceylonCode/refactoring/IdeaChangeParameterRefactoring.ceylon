@@ -146,10 +146,10 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
     shared actual PsiElement? findTargetMember(PsiElement? element) {
         if (exists element,
             is CeylonFile file = element.containingFile,
-            exists localAnalysisResult = file.localAnalysisResult,
+            exists analysisResult = file.availableAnalysisResult,
             exists node = nodes.findNode {
-                node = localAnalysisResult.parsedRootNode;
-                tokens = localAnalysisResult.tokens;
+                node = analysisResult.parsedRootNode;
+                tokens = analysisResult.tokens;
                 startOffset = element.textOffset;
             }) {
 
@@ -178,9 +178,8 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
 
     shared actual void invoke(Project p, Editor editor, PsiFile file, DataContext? dataContext) {
         if (is CeylonFile file,
-            exists localAnalysisResult = file.localAnalysisResult,
-            exists typecheckedRootNode = localAnalysisResult.typecheckedRootNode,
-            exists phasedUnit = localAnalysisResult.lastPhasedUnit,
+            exists localAnalysisResult = file.localAnalyzer?.result,
+            exists phasedUnit = localAnalysisResult.typecheckedPhasedUnit,
             exists ceylonProject = getCeylonProject(file)) {
 
             value refacto = IdeaChangeParameterRefactoring(phasedUnit, localAnalysisResult.tokens, editor, ceylonProject);
