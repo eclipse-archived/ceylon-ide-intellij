@@ -11,7 +11,9 @@ import com.intellij.psi {
 import com.intellij.psi.impl.light {
     LightParameter,
     LightParameterListBuilder,
-    LightTypeParameterBuilder
+    LightTypeParameterBuilder,
+    LightEmptyImplementsList,
+    LightModifierList
 }
 import com.intellij.psi.impl.source {
     PsiImmediateClassType
@@ -244,7 +246,7 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     returnTypeElement => null;
 
-    throwsList => nothing;
+    throwsList => LightEmptyImplementsList(func.manager);
 
     body => null;
 
@@ -270,7 +272,7 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     findDeepestSuperMethods() => PsiMethod.emptyArray;
 
-    modifierList => nothing;
+    modifierList => LightModifierList(func.manager);
 
     hasModifierProperty(String name) => false;
 
