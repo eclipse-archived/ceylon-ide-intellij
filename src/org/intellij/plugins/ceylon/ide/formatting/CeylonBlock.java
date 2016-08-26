@@ -11,7 +11,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlighter
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.stub.CeylonStubTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +45,7 @@ class CeylonBlock implements Block {
             CeylonTypes.CONDITION_LIST
     );
     private static final List<IElementType> INDENT_CHILDREN_NONE = Arrays.asList(
-            CeylonStubTypes.CEYLON_FILE, CeylonTypes.COMPILATION_UNIT,
+            CeylonTypes.COMPILATION_UNIT,
             CeylonTypes.SWITCH_STATEMENT, CeylonTypes.SWITCH_CASE_LIST, CeylonTypes.SWITCH_CLAUSE, CeylonTypes.CASE_CLAUSE,
             CeylonTypes.SEQUENCE_ENUMERATION, CeylonTypes.ANNOTATION_LIST, CeylonTypes.TYPE_CONSTRAINT_LIST,
             CeylonTypes.IF_STATEMENT, CeylonTypes.ELSE_CLAUSE

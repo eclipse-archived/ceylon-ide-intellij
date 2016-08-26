@@ -6,17 +6,11 @@ import com.intellij.navigation {
 import com.intellij.openapi.editor.colors {
     CodeInsightColors
 }
-import com.intellij.psi {
-    PsiElement
-}
 import com.redhat.ceylon.model.typechecker.model {
-    ClassOrInterface,
-    Scope,
-    TypeDeclaration
+    ClassOrInterface
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonClass,
     CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
@@ -25,62 +19,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
-}
-
-shared class ClassPresentationProvider() 
-        satisfies ItemPresentationProvider<CeylonClass> {
-
-    shared actual ItemPresentation getPresentation(CeylonClass item)
-            => object satisfies ColoredItemPresentation {
-
-                shared actual String? presentableText {
-                    if (exists model = item.ceylonNode?.declarationModel) {
-                        value text = StringBuilder().append(model.name);
-                        variable Scope container = model.container;
-                        while (is TypeDeclaration type = container) {
-                            text.append(" in ").append(type.name);
-                            container = container.container;
-                        }
-                        return text.string;
-                    } else {
-                        if (exists id = item.ceylonNode?.identifier?.text) {
-                            value text = StringBuilder().append(id);
-                            variable PsiElement container = item.parent;
-                            while (is CeylonPsi.ClassOrInterfacePsi classOrInterface = item.parent) {
-                                if (exists typeName = classOrInterface.ceylonNode?.identifier?.text) {
-                                    text.append(" in ").append(typeName);
-                                }
-                                container = container.parent;
-                            }
-                            return text.string;
-                        }
-                        return null;
-                    }
-                }
-
-                shared actual String? locationString {
-                    if (exists node = item.ceylonNode) {
-                        value nameAsString = node.unit.\ipackage.nameAsString;
-                        return nameAsString.empty
-                            then "(default package)"
-                            else "(``nameAsString``)";
-                    }
-                    else {
-                        return null;
-                    }
-                }
-
-                getIcon(Boolean unused)
-                        => if (exists node = item.ceylonNode)
-                        then icons.forDeclaration(node)
-                        else null;
-
-                textAttributesKey
-                        => if (exists model = item.ceylonNode?.declarationModel, model.deprecated)
-                        then CodeInsightColors.deprecatedAttributes
-                        else null;
-
-            };
 }
 
 shared class DeclarationPresentationProvider() 
