@@ -1,10 +1,15 @@
 import ceylon.interop.java {
     javaClass
 }
+
+import com.intellij.openapi.application {
+    ApplicationInfo
+}
 import com.intellij.openapi.diagnostic {
     Logger
 }
-import java.lang { 
+
+import java.lang {
     Thread {
         currentThread
     }
@@ -61,8 +66,12 @@ shared class CeylonLogger<Type>()
     }
     
     shared void trace(String message(), Integer stackTraceDepth = 0) {
-        if (internalLogger.traceEnabled) {
+        if (ApplicationInfo.instance.build.baselineVersion >= 145,
+            internalLogger.traceEnabled) {
+
             internalLogger.trace(prepareMessage(stackTraceDepth, message));
+        } else if (internalLogger.debugEnabled) {
+            internalLogger.debug(prepareMessage(stackTraceDepth, message));
         }
     }
 }
