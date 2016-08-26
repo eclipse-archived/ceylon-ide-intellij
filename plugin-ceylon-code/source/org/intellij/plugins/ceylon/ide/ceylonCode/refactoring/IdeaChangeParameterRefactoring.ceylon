@@ -1,6 +1,5 @@
 import ceylon.interop.java {
     createJavaObjectArray,
-    createJavaStringArray,
     javaString,
     CeylonIterable
 }
@@ -18,9 +17,16 @@ import com.intellij.openapi.command {
 import com.intellij.openapi.editor {
     Editor
 }
+import com.intellij.openapi.editor.colors {
+    EditorColorsManager,
+    EditorFontType
+}
 import com.intellij.openapi.editor.event {
     DocumentListener,
     DocumentEvent
+}
+import com.intellij.openapi.fileTypes {
+    FileType
 }
 import com.intellij.openapi.project {
     Project
@@ -32,7 +38,6 @@ import com.intellij.openapi.ui {
 import com.intellij.psi {
     PsiElement,
     PsiFile,
-    PsiCodeFragment,
     PsiDocumentManager
 }
 import com.intellij.psi.impl.source {
@@ -44,7 +49,6 @@ import com.intellij.refactoring {
 import com.intellij.refactoring.changeSignature {
     ChangeSignatureHandler,
     ChangeSignatureDialogBase,
-    CallerChooserBase,
     MethodDescriptor,
     ParameterInfo,
     ParameterTableModelBase,
@@ -54,7 +58,9 @@ import com.intellij.refactoring.ui {
     ComboBoxVisibilityPanel
 }
 import com.intellij.ui {
-    EditorTextField
+    EditorTextField,
+    EditorSettingsProvider,
+    DottedBorder
 }
 import com.intellij.ui.treeStructure {
     IJTree=Tree
@@ -63,10 +69,10 @@ import com.intellij.util {
     Consumer
 }
 import com.intellij.util.ui {
-    ColumnInfo
+    ColumnInfo,
+    UIUtil
 }
 import com.intellij.util.ui.table {
-    JBListTable,
     JBTableRowEditor,
     JBTableRow
 }
@@ -88,7 +94,8 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.awt {
-    GridLayout
+    GridLayout,
+    BorderLayout
 }
 import java.awt.event {
     ActionListener,
@@ -108,7 +115,8 @@ import java.util {
 import javax.swing {
     JComponent,
     JTable,
-    JCheckBox
+    JCheckBox,
+    JPanel
 }
 
 import org.antlr.runtime {
@@ -351,18 +359,18 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
 
     calculateSignature() => myMethod.params.previewSignature();
 
-    shared actual CallerChooserBase<PsiElement>? createCallerChooser(String? title,
-        IJTree? treeToReuse, Consumer<Set<PsiElement>>? callback) => null;
+    createCallerChooser(String? title, IJTree? treeToReuse, Consumer<Set<PsiElement>>? callback)
+            => null;
 
     createParametersInfoModel(MyMethodDescriptor method)
             => MyParameterTableModel(method.params, method.project).init();
 
-    shared actual BaseRefactoringProcessor? createRefactoringProcessor() => null;
+    createRefactoringProcessor() => null;
 
-    shared actual PsiCodeFragment? createReturnTypeCodeFragment() => null;
+    createReturnTypeCodeFragment() => null;
 
     createVisibilityControl()
-        => ComboBoxVisibilityPanel("", createJavaObjectArray<Object>({}), createJavaStringArray({}));
+            => ComboBoxVisibilityPanel("", ObjectArray<Object>(0), ObjectArray<JString>(0));
 
     fileType => ceylonFileType;
 
@@ -380,18 +388,46 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
 
     postponeValidation() => false;
 
-    shared actual String? validateAndCommitData() => null;
+    validateAndCommitData() => null;
 
     listTableViewSupported => true;
 
-    shared actual JComponent getRowPresentation(ParameterTableModelItemBase<MyParameterInfo> item, Boolean selected, Boolean focused) {
-        value param = item.parameter.param;
-        value text = param.model.type.asString() + " " + param.name
-            + (if (exists a = param.defaultArgs) then " = " + a else "");
-
-        return JBListTable.createEditorTextFieldPresentation(project, ceylonFileType,
-            text, selected, focused);
+    JComponent createEditorTextFieldPresentation(
+            Project proj, FileType type, String txt,
+            Boolean selected, Boolean focused) {
+        value panel = JPanel(BorderLayout());
+        object field extends EditorTextField(txt, proj, type) {
+            shouldHaveBorder() => false;
+        }
+        value font = EditorColorsManager.instance.globalScheme.getFont(EditorFontType.plain);
+//        font = Font(font.fontName, font.style, 12);
+        field.setFont(font);
+        field.addSettingsProvider(EditorSettingsProvider.noWhitespace);
+        if (selected, focused) {
+            panel.setBackground(UIUtil.tableSelectionBackground);
+            field.setAsRendererWithSelection(UIUtil.tableSelectionBackground,
+                                             UIUtil.tableSelectionForeground);
+        } else {
+            panel.setBackground(UIUtil.tableBackground);
+            if (selected) {
+                panel.border = DottedBorder(UIUtil.tableForeground);
+            }
+        }
+        panel.add(field, javaString("West"));
+        return panel;
     }
+
+    getRowPresentation(ParameterTableModelItemBase<MyParameterInfo> item,
+                Boolean selected, Boolean focused)
+            => createEditorTextFieldPresentation {
+                proj = project;
+                type = ceylonFileType;
+                txt = let (value param = item.parameter.param)
+                        param.model.type.asString() + " " + param.name
+                        + (if (exists arg = param.defaultArgs) then " = " + arg else "");
+                selected = selected;
+                focused = focused;
+            };
 
     getTableEditor(JTable table, ParameterTableModelItemBase<MyParameterInfo> item)
         => object extends JBTableRowEditor() {
@@ -400,7 +436,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
             late variable JCheckBox myDefaultedCb;
             late variable EditorTextField myDefaultArgEditor;
 
-            shared actual ObjectArray<JComponent> focusableComponents
+            focusableComponents
                     => createJavaObjectArray<JComponent>({
                         myTypeEditor.focusTarget,
                         myNameEditor.focusTarget,
@@ -408,9 +444,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
                         myDefaultArgEditor.focusTarget
                     });
 
-            shared actual JComponent preferredFocusedComponent {
-                return myTypeEditor.focusTarget;
-            }
+            preferredFocusedComponent => myTypeEditor.focusTarget;
 
             shared actual void prepareEditor(JTable tbl, Integer row) {
                 this.layout = GridLayout(2, 2);
@@ -453,15 +487,13 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
                 add(createLabeledPanel("Default arg:", myDefaultArgEditor));
             }
 
-            shared actual JBTableRow \ivalue {
-                return object satisfies JBTableRow {
-                    shared actual Object? getValueAt(Integer column) {
-                        return switch (column)
-                        case (0) item.typeCodeFragment
-                        case (1) javaString(myNameEditor.text.trimmed)
-                        else null;
-                    }
-                };
-            }
+            \ivalue => object satisfies JBTableRow {
+                shared actual Object? getValueAt(Integer column) {
+                    return switch (column)
+                    case (0) item.typeCodeFragment
+                    case (1) javaString(myNameEditor.text.trimmed)
+                    else null;
+                }
+            };
         };
 }
