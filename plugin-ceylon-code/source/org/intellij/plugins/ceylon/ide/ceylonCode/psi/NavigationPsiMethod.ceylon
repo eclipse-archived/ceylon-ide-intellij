@@ -280,7 +280,8 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     setName(String name) => null;
 
-    hierarchicalMethodSignature => nothing;
+    suppressWarnings("expressionTypeNothing")
+    shared actual Nothing hierarchicalMethodSignature => nothing;
 
     docComment => null;
 
