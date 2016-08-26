@@ -142,6 +142,9 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             if (!pkg.shared) {
                 return null;
             }
+            if (cls.containingClass exists) {
+                return null;
+            }
             if (exists qName = cls.qualifiedName) {
                 for (imp in sourceUnit.imports) {
                     if (getJavaQualifiedName(imp.declaration) == qName) {
