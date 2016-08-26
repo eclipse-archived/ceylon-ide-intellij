@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    CeylonIterable
+}
+
 import com.intellij.openapi.util {
     Key
 }
@@ -49,9 +53,6 @@ import javax.swing {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonLanguage
-}
-import ceylon.interop.java {
-    CeylonIterable
 }
 
 "Wraps a Function in a PsiMethod. This is used to navigate from compiled classes to the
@@ -120,12 +121,12 @@ class NavigationPsiMethod satisfies PsiMethod {
 
             file.ensureTypechecked();
 
-            value maxParams = paramsCount == -1
+            value signatureLength = paramsCount == -1
                 then parameterList.parameters.size()
                 else paramsCount;
 
             for (idx -> param in CeylonIterable(parameterList.parameters).indexed) {
-                if (idx < maxParams,
+                if (idx < signatureLength,
                     is Tree.ParameterDeclaration param) {
                     value typedDeclaration = param.typedDeclaration;
                     Type? typeModel = typedDeclaration.type.typeModel;
@@ -134,6 +135,8 @@ class NavigationPsiMethod satisfies PsiMethod {
                     if (exists typeModel, typeModel.typeParameter) {
                         value tp = LightTypeParameterBuilder(typedDeclaration.type.text, this, 0);
                         psiType = PsiImmediateClassType(tp, PsiSubstitutor.empty);
+                    } else if (exists typeModel, typeModel.functional) {
+                        psiType = PsiType.getTypeByName("ceylon.language.Callable", func.project, scope);
                     } else {
                         psiType = mapType(typeModel, scope);
                     }
