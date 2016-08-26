@@ -16,18 +16,41 @@ import com.intellij.psi.tree {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
-    TokenTypes
+    TokenTypes,
+    CeylonTokens
 }
 
 shared class CeylonBraceMatcher() satisfies PairedBraceMatcher {
 
-    pairs = createJavaObjectArray<BracePair> {
+    pairs = createJavaObjectArray {
         BracePair(TokenTypes.lparen.tokenType, TokenTypes.rparen.tokenType, false),
         BracePair(TokenTypes.lbrace.tokenType, TokenTypes.rbrace.tokenType, true),
         BracePair(TokenTypes.lbracket.tokenType, TokenTypes.rbracket.tokenType, false)
     };
 
-    isPairedBracesAllowedBeforeType(IElementType lbraceType, IElementType contextType) => true;
+    isPairedBracesAllowedBeforeType(IElementType lbraceType, IElementType contextType)
+            => contextType != CeylonTokens.lidentifier
+            && contextType != CeylonTokens.uidentifier
+            && contextType != CeylonTokens.stringLiteral
+            && contextType != CeylonTokens.astringLiteral
+            && contextType != CeylonTokens.verbatimString
+            && contextType != CeylonTokens.averbatimString
+            && contextType != CeylonTokens.stringStart
+            && contextType != CeylonTokens.charLiteral
+            && contextType != CeylonTokens.floatLiteral
+            && contextType != CeylonTokens.naturalLiteral
+            && contextType != CeylonTokens.\isuper
+            && contextType != CeylonTokens.\ithis
+            && contextType != CeylonTokens.\iouter
+            && contextType != CeylonTokens.ifClause
+            && contextType != CeylonTokens.switchClause
+            && contextType != CeylonTokens.\ilet
+            && contextType != CeylonTokens.objectDefinition
+            && contextType != CeylonTokens.\inonempty
+            && contextType != CeylonTokens.isOp
+            && contextType != CeylonTokens.\iexists
+            && contextType != CeylonTokens.decrementOp
+            && contextType != CeylonTokens.incrementOp;
 
     shared actual Integer getCodeConstructStart(PsiFile file, Integer openingBraceOffset) {
         if (exists element = file.findElementAt(openingBraceOffset),
