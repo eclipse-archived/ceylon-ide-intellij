@@ -93,7 +93,8 @@ shared class CeylonTypeCheckerAnnotator()
                 = highlighter.highlightQuotedMessage {
                     description = message.message;
                     project = project;
-                };
+                }
+                .replaceFirst(": ", "<br/>");
 
             Annotation annotation;
             Boolean isError;
