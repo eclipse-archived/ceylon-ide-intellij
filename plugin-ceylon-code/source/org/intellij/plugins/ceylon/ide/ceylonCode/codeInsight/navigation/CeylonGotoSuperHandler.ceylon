@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.codeInsight.generation.actions {
     PresentableCodeInsightActionHandler
 }
@@ -27,9 +23,6 @@ import com.intellij.psi {
     PsiElement,
     PsiFile
 }
-import com.intellij.psi.util {
-    PsiTreeUtil
-}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
@@ -53,7 +46,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     ceylonFileType
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonPsi
+    CeylonPsi {
+        ...
+    }
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     resolveDeclaration
@@ -67,18 +62,18 @@ shared class CeylonGotoSuperHandler()
     value noAdditionalActions = Collections.emptyList<AdditionalAction>();
 
     alias SourceTypes
-        => CeylonPsi.AnyClassPsi
-         | CeylonPsi.AnyInterfacePsi
-         | CeylonPsi.ObjectDefinitionPsi
-         | CeylonPsi.ObjectExpressionPsi
-         | CeylonPsi.ObjectArgumentPsi;
+        => AnyClassPsi
+         | AnyInterfacePsi
+         | ObjectDefinitionPsi
+         | ObjectExpressionPsi
+         | ObjectArgumentPsi;
     alias SourceMembers
-        => CeylonPsi.AnyAttributePsi
-         | CeylonPsi.AnyMethodPsi
-         | CeylonPsi.SpecifierStatementPsi;
+        => AnyAttributePsi
+         | AnyMethodPsi
+         | SpecifierStatementPsi;
     alias SourceConstructors
-        => CeylonPsi.ConstructorPsi
-         | CeylonPsi.EnumeratedPsi;
+        => ConstructorPsi
+         | EnumeratedPsi;
 
     alias Source
         => SourceTypes | SourceMembers | SourceConstructors;
@@ -108,29 +103,25 @@ shared class CeylonGotoSuperHandler()
 
     Source? findSource(Editor editor, PsiFile file) {
         if (exists element = file.findElementAt(editor.caretModel.offset)) {
-            if (exists psi
-                = PsiTreeUtil.getParentOfType(element,
-                    javaClass<CeylonPsi.SpecifierStatementPsi>()),
-                psi.ceylonNode.refinement) {
-                return psi;
+            variable value current = element;
+            while (!current is CompilationUnitPsi) {
+                if (is SpecifierStatementPsi psi = current) {
+                    if (psi.ceylonNode.refinement) {
+                        return psi;
+                    }
+                }
+                else if (is Source psi = current) {
+                    return psi;
+                }
+                current = current.parent;
             }
-            return PsiTreeUtil.getParentOfType(element,
-                //TODO: this is awful, do something different
-                javaClass<CeylonPsi.AnyClassPsi>(),
-                javaClass<CeylonPsi.AnyInterfacePsi>(),
-                javaClass<CeylonPsi.AnyAttributePsi>(),
-                javaClass<CeylonPsi.AnyMethodPsi>(),
-                javaClass<CeylonPsi.ConstructorPsi>(),
-                javaClass<CeylonPsi.ObjectDefinitionPsi>(),
-                javaClass<CeylonPsi.ObjectExpressionPsi>(),
-                javaClass<CeylonPsi.ObjectArgumentPsi>());
         }
         return null;
     }
 
     ObjectArray<PsiElement> findTargets(Source e) {
         value list = ArrayList<Declaration>();
-        if (is CeylonPsi.AnyMethodPsi e) {
+        if (is AnyMethodPsi e) {
             if (exists fun = e.ceylonNode.declarationModel,
                 fun.actual,
                 is ClassOrInterface bottom = fun.container) {
@@ -145,7 +136,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is CeylonPsi.AnyAttributePsi e) {
+        else if (is AnyAttributePsi e) {
             if (exists val = e.ceylonNode.declarationModel,
                 val.actual,
                 is ClassOrInterface bottom = val.container) {
@@ -159,7 +150,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is CeylonPsi.AnyClassPsi e) {
+        else if (is AnyClassPsi e) {
             if (exists cla = e.ceylonNode.declarationModel) {
                 if (exists target = cla.extendedType ?. declaration) {
                     list.add(target);
@@ -169,7 +160,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is CeylonPsi.AnyInterfacePsi e) {
+        else if (is AnyInterfacePsi e) {
             if (exists int = e.ceylonNode.declarationModel) {
                 if (exists target = int.extendedType ?. declaration) {
                     list.add(target);
@@ -179,7 +170,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is CeylonPsi.ObjectDefinitionPsi e) {
+        else if (is ObjectDefinitionPsi e) {
             if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType ?. declaration) {
                     list.add(target);
@@ -189,7 +180,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is CeylonPsi.ObjectExpressionPsi e) {
+        else if (is ObjectExpressionPsi e) {
             if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType ?. declaration) {
                     list.add(target);
@@ -199,7 +190,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is CeylonPsi.ObjectArgumentPsi e) {
+        else if (is ObjectArgumentPsi e) {
             if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType ?. declaration) {
                     list.add(target);
@@ -209,7 +200,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is CeylonPsi.ConstructorPsi e) {
+        else if (is ConstructorPsi e) {
             Tree.DelegatedConstructor? delegatedConstructor
                     = e.ceylonNode.delegatedConstructor;
             if (exists target
@@ -217,7 +208,7 @@ shared class CeylonGotoSuperHandler()
                 list.add(target);
             }
         }
-        else if (is CeylonPsi.EnumeratedPsi e) {
+        else if (is EnumeratedPsi e) {
             Tree.DelegatedConstructor? delegatedConstructor
                 = e.ceylonNode.delegatedConstructor;
             if (exists target
