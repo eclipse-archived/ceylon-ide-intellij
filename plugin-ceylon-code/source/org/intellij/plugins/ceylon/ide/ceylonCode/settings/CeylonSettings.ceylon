@@ -30,7 +30,7 @@ shared class CeylonOptions() {
 
 state {
     name = "CeylonSettings";
-    storages = { storage("$APP_CONFIG$/ceylon.xml") };
+    storages = { storage {file = "$APP_CONFIG$/ceylon.xml";} };
 }
 shared class CeylonSettings
         satisfies PersistentStateComponent<CeylonOptions> {
