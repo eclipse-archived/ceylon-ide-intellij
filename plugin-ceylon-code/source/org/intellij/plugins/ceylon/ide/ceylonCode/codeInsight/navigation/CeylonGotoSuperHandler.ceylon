@@ -152,7 +152,7 @@ shared class CeylonGotoSuperHandler()
         }
         else if (is AnyClassPsi e) {
             if (exists cla = e.ceylonNode.declarationModel) {
-                if (exists target = cla.extendedType ?. declaration) {
+                if (exists target = cla.extendedType?.declaration) {
                     list.add(target);
                 }
                 for (type in cla.satisfiedTypes) {
@@ -162,7 +162,7 @@ shared class CeylonGotoSuperHandler()
         }
         else if (is AnyInterfacePsi e) {
             if (exists int = e.ceylonNode.declarationModel) {
-                if (exists target = int.extendedType ?. declaration) {
+                if (exists target = int.extendedType?.declaration) {
                     list.add(target);
                 }
                 for (type in int.satisfiedTypes) {
@@ -172,7 +172,7 @@ shared class CeylonGotoSuperHandler()
         }
         else if (is ObjectDefinitionPsi e) {
             if (exists cla = e.ceylonNode.anonymousClass) {
-                if (exists target = cla.extendedType ?. declaration) {
+                if (exists target = cla.extendedType?.declaration) {
                     list.add(target);
                 }
                 for (type in cla.satisfiedTypes) {
@@ -182,7 +182,7 @@ shared class CeylonGotoSuperHandler()
         }
         else if (is ObjectExpressionPsi e) {
             if (exists cla = e.ceylonNode.anonymousClass) {
-                if (exists target = cla.extendedType ?. declaration) {
+                if (exists target = cla.extendedType?.declaration) {
                     list.add(target);
                 }
                 for (type in cla.satisfiedTypes) {
@@ -192,7 +192,7 @@ shared class CeylonGotoSuperHandler()
         }
         else if (is ObjectArgumentPsi e) {
             if (exists cla = e.ceylonNode.anonymousClass) {
-                if (exists target = cla.extendedType ?. declaration) {
+                if (exists target = cla.extendedType?.declaration) {
                     list.add(target);
                 }
                 for (type in cla.satisfiedTypes) {
