@@ -158,16 +158,16 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
     }
 
     Color color(String token, Boolean qualifiedNameIsPath) {
-        if (token in escaping.keywords) {
-            return textAttributes(ceylonHighlightingColors.keyword).foregroundColor;
-        }
-        else if (token.every(Character.whitespace)
-              || token.size==1 && token in "()[]{}<>,.+*&|?;= "
+        if (token.whitespace
+              || token.size==1 && token in "()[]{}<>,.+*&|?;="
               || token == "...") {
             return JBColor.foreground();
         }
         else if (token.startsWith("\"") && token.endsWith("\"")) {
             return textAttributes(ceylonHighlightingColors.strings).foregroundColor;
+        }
+        else if (token in escaping.keywords) {
+            return textAttributes(ceylonHighlightingColors.keyword).foregroundColor;
         }
         else {
             assert (exists first = token[0]);
