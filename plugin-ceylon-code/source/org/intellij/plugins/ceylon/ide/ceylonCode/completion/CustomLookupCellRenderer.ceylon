@@ -161,8 +161,13 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         if (token in escaping.keywords) {
             return textAttributes(ceylonHighlightingColors.keyword).foregroundColor;
         }
-        else if (token.size==1 && token in "()[]<>,.+*&|?;= ") {
+        else if (token.every(Character.whitespace)
+              || token.size==1 && token in "()[]{}<>,.+*&|?;= "
+              || token == "...") {
             return JBColor.foreground();
+        }
+        else if (token.startsWith("\"") && token.endsWith("\"")) {
+            return textAttributes(ceylonHighlightingColors.strings).foregroundColor;
         }
         else {
             assert (exists first = token[0]);
@@ -186,9 +191,9 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
             ];
         }
         else {
-            value pattern = qualifiedNameIsPath then "()[]<>,+*&|?;= " else "()[]<>,.+*&|?;= ";
+            value pattern = qualifiedNameIsPath then "()[]{}<>,+*&|?;= " else "()[]{}<>,.+*&|?;= ";
             return [
-                for (token in text.split(pattern.contains, false)) if (!token.empty)
+                for (token in text.split(pattern.contains, false, false)) if (!token.empty)
                 createFragment(token, SimpleTextAttributes(style, color(token, qualifiedNameIsPath)))
             ];
 
