@@ -56,6 +56,13 @@ import javax.swing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonLanguage
 }
+import java.util.concurrent {
+    TimeUnit
+}
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
+}
 
 "Wraps a Function in a PsiMethod. This is used to navigate from compiled classes to the
  corresponding Ceylon code, for example in Go To Implementations or Navigate > Symbol."
@@ -63,11 +70,11 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     variable Boolean isGetter;
     Boolean isSetter;
-    CeylonCompositeElement func;
+    SmartPsiElementPointer<CeylonCompositeElement> funcPointer;
     Integer paramsCount;
 
     shared new (CeylonCompositeElement func) {
-        this.func = func;
+        this.funcPointer = SmartPointerManager.getInstance(func.project).createSmartPsiElementPointer(func);
         this.isGetter = false;
         this.isSetter = false;
         if (is CeylonPsi.SpecifierStatementPsi func) {
@@ -81,14 +88,14 @@ class NavigationPsiMethod satisfies PsiMethod {
     }
 
     shared new getterOrSetter(CeylonCompositeElement func, Boolean isGetter) {
-        this.func = func;
+        this.funcPointer = SmartPointerManager.getInstance(func.project).createSmartPsiElementPointer(func);
         this.isGetter = isGetter;
         this.isSetter = !isGetter;
         this.paramsCount = -1;
     }
 
     shared new forDefaultArgs(CeylonCompositeElement func, Integer paramsCount) {
-        this.func = func;
+        this.funcPointer = SmartPointerManager.getInstance(func.project).createSmartPsiElementPointer(func);
         this.isGetter = false;
         this.isSetter = false;
         this.paramsCount = paramsCount;
@@ -96,12 +103,25 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     value typeDescriptorClassName = "com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor";
 
+    CeylonCompositeElement func {
+        assert (exists theFunc = funcPointer.element);
+        return theFunc;
+    }
+    
     shared actual PsiParameterList parameterList {
+        assert(is CeylonFile ceylonFile = funcPointer.containingFile);
+        try {
+            ceylonFile.waitForUpToDatePhasedUnit(4, TimeUnit.seconds);
+        } catch(CannotWaitForAnalysisResultInLockedSection e) {
+            platformUtils.log(Status._DEBUG, e.message, e);
+        }
+        
+        
         value builder = LightParameterListBuilder(func.manager, CeylonLanguage.instance);
         value scope = GlobalSearchScope.allScope(func.project);
 
-        if (is CeylonPsi.AnyMethodPsi func,
-            exists tpList = func.ceylonNode.typeParameterList) {
+        if (is CeylonPsi.AnyMethodPsi theFunc = func,
+            exists tpList = theFunc.ceylonNode.typeParameterList) {
 
             variable Integer i = 0;
 
@@ -119,9 +139,6 @@ class NavigationPsiMethod satisfies PsiMethod {
         }
 
         if (exists parameterList = findParameterList()) {
-            assert (is CeylonFile file = func.containingFile);
-
-            file.ensureTypechecked();
 
             value signatureLength = paramsCount == -1
                 then parameterList.parameters.size()
@@ -157,10 +174,10 @@ class NavigationPsiMethod satisfies PsiMethod {
     }
 
     Tree.ParameterList? findParameterList() {
-        if (is CeylonPsi.AnyMethodPsi func) {
-            return func.ceylonNode.parameterLists.get(0);
-        } else if (is CeylonPsi.SpecifierStatementPsi func) {
-            value bme = func.ceylonNode.baseMemberExpression;
+        if (is CeylonPsi.AnyMethodPsi theFunc = func) {
+            return theFunc.ceylonNode.parameterLists.get(0);
+        } else if (is CeylonPsi.SpecifierStatementPsi theFunc = func) {
+            value bme = theFunc.ceylonNode.baseMemberExpression;
             if (is Tree.ParameterizedExpression bme) {
                 return bme.parameterLists.get(0);
             }
@@ -206,7 +223,10 @@ class NavigationPsiMethod satisfies PsiMethod {
             return PsiType.byte;
         } else if (type.isString()) {
             return PsiType.getJavaLangString(func.manager, scope);
+        } else if (type.\iobject) {
+            return PsiType.getJavaLangObject(func.manager, scope);
         }
+        
         String name = type.declaration.qualifiedNameString.replace("::", ".");
         return PsiType.getTypeByName(name, func.project, scope);
     }
