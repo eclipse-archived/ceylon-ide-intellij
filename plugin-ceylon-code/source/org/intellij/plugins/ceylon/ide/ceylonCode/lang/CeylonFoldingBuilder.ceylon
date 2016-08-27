@@ -62,11 +62,18 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
         return createJavaObjectArray(descriptors);
     }
 
-    void foldElement(PsiElement element, void add(FoldingDescriptor d))
-            => add(FoldingDescriptor(element.node, element.textRange));
+    void foldElement(PsiElement element, void add(FoldingDescriptor d)) {
+        if (element.textLength>0) {
+            add(FoldingDescriptor(element.node, element.textRange));
+        }
+    }
 
-    void foldRange(Integer[2] range, PsiElement element, void add(FoldingDescriptor d))
-            => add(FoldingDescriptor(element.node, TextRange(*range)));
+    void foldRange(Integer[2] range, PsiElement element, void add(FoldingDescriptor d)) {
+        value [start, end] = range;
+        if (end > start) {
+            add(FoldingDescriptor(element.node, TextRange(start, end)));
+        }
+    }
 
     void foldAfterFirstLine(PsiElement element, void add(FoldingDescriptor d)) {
         if (exists newLine = element.text.firstOccurrence('\n')) {
