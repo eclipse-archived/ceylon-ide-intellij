@@ -28,13 +28,14 @@ shared class CeylonImportOptimizer()
 //    variable Project? project = null;
 
     shared actual Runnable processFile(PsiFile psiFile) {
-        assert (exists doc = psiFile.viewProvider.document);
+        assert (exists doc = psiFile.viewProvider.document,
+                is CeylonFile psiFile);
 //        project = psiFile.project; //YUCK!!!
-        assert (is CeylonFile psiFile);
-        value cu = psiFile.compilationUnit;
+        value rootNode = psiFile.compilationUnit;
         return object satisfies CollectingInfoRunnable {
             variable value workDone = false;
-            run() => workDone = cleanImports(cu, IdeaDocument(doc));
+            //TODO: if the tree isn't typechecked, show an error!
+            run() => workDone = cleanImports(rootNode, IdeaDocument(doc));
             userNotificationInfo => workDone
                     then "Imports optimized"
                     else "Nothing to optimize";
