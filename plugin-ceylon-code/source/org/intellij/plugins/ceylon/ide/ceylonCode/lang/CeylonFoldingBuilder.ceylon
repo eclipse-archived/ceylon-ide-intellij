@@ -44,6 +44,7 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
         CeylonTypes.block,
         CeylonTypes.classBody,
         CeylonTypes.interfaceBody
+//        CeylonTypes.importMemberOrTypeList
     ];
 
     shared actual String getPlaceholderText(ASTNode node) {
@@ -87,9 +88,12 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
         if (element is CeylonPsi.BodyPsi) {
             foldElement(element, add);
         }
-        else if (element is CeylonPsi.ImportModuleListPsi ) {
+        else if (element is CeylonPsi.ImportModuleListPsi) {
             foldElement(element, add);
         }
+        /*else if (element is CeylonPsi.ImportMemberOrTypeListPsi) {
+            foldElement(element, add);
+        }*/
         else if (element.node.elementType == CeylonTokens.multiComment) {
             foldAfterFirstLine(element, add);
         }
