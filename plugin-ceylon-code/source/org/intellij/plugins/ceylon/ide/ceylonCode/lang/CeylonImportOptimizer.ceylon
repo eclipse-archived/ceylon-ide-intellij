@@ -31,14 +31,21 @@ shared class CeylonImportOptimizer()
         assert (exists doc = psiFile.viewProvider.document,
                 is CeylonFile psiFile);
 //        project = psiFile.project; //YUCK!!!
-        value rootNode = psiFile.compilationUnit;
         return object satisfies CollectingInfoRunnable {
-            variable value workDone = false;
-            //TODO: if the tree isn't typechecked, show an error!
-            run() => workDone = cleanImports(rootNode, IdeaDocument(doc));
-            userNotificationInfo => workDone
-                    then "Imports optimized"
-                    else "Nothing to optimize";
+            shared actual variable String? userNotificationInfo = null;
+            shared actual void run() {
+                if (exists rootNode
+                        = psiFile.localAnalysisResult?.typecheckedRootNode) {
+                    userNotificationInfo
+                            = cleanImports(rootNode, IdeaDocument(doc))
+                            then "Imports optimized"
+                            else "Nothing to optimize";
+                }
+                else {
+                    userNotificationInfo
+                            = "Optimize imports not available";
+                }
+            }
         };
     }
     
