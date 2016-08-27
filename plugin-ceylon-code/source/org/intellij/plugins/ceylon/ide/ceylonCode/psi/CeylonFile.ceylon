@@ -143,10 +143,11 @@ Null giveUp(AsyncFuture<AnalysisResult>() futureBuilder)
 AsyncFuture<AnalysisResult> returnTheFuture(AsyncFuture<AnalysisResult>() futureBuilder)
         => futureBuilder();
 
-shared class CannotWaitForAnalysisResultInLockedSection() extends Exception(
-                "Waiting for an analysis result on a Ceylon File in a
-                 locked section (read or write) is dead-lock-prone.\n
-                 Cancelling the wait.") {}
+shared class CannotWaitForAnalysisResultInLockedSection() extends ProcessCanceledException() {
+    message => "Waiting for an analysis result on a Ceylon File in a
+                locked section (read or write) is dead-lock-prone.\n
+                Cancelling the wait.";
+}
 
 shared class CeylonFile(FileViewProvider viewProvider)
         extends PsiFileBase(viewProvider, CeylonLanguage.instance)
@@ -202,9 +203,9 @@ shared class CeylonFile(FileViewProvider viewProvider)
         try {
             if (!resultFuture.done) {
                 value application = ApplicationManager.application;
-                if (application.readAccessAllowed
+                if ((application.readAccessAllowed && !application.dispatchThread)
                     || application.writeAccessAllowed ) {
-                    throw ProcessCanceledException(CannotWaitForAnalysisResultInLockedSection());
+                    throw CannotWaitForAnalysisResultInLockedSection();
                 }
             }
             return resultFuture.get(timeout, unit);
@@ -408,7 +409,11 @@ shared class CeylonFile(FileViewProvider viewProvider)
                         });
 
                         value localAnalyzerManager = project.getComponent(localAnalyzerManagerClass);
-                        localAnalyzerManager.scheduleExternalSourcePreparation(vf);
+                        if (ApplicationManager.application.dispatchThread) {
+                            localAnalyzerManager.retrieveTypecheckedAndBridgedExternalSource(vf);
+                        } else {
+                            localAnalyzerManager.scheduleExternalSourcePreparation(vf);
+                        }
 
                         return resultFuture;
                     }

@@ -42,7 +42,9 @@ import com.intellij.openapi.startup {
 }
 import com.intellij.openapi.util {
     Computable,
-    Key
+    Key,
+    Ref,
+    Conditions
 }
 import com.intellij.openapi.vfs {
     VirtualFileListener,
@@ -163,7 +165,7 @@ shared class CeylonLocalAnalyzerManager(model)
             value analyzer = editedFilesAnalyzersMap.remove(virtualFile);
             if (exists analyzer) {
                 analyzer.dispose();
-                scheduleReparse(virtualFile);
+                triggerReparse(virtualFile);
             }
         }
     }
@@ -208,7 +210,7 @@ shared class CeylonLocalAnalyzerManager(model)
                     localAnalyzer.scheduleForcedTypechecking();
                 }
             } else {
-                scheduleReparse(virtualFile);
+                triggerReparse(virtualFile);
             }
         }
         logger.trace(()=>"Exit modelPhasedUnitsTypechecked(``typecheckedUnits``)");
@@ -229,10 +231,21 @@ shared class CeylonLocalAnalyzerManager(model)
         logger.trace(()=>"Enter externalPhasedUnitsTypechecked(``typecheckedUnits``, ``fullyTypechecked``)", 10);
         for (unit in typecheckedUnits) {
             if (exists virtualFile = CeylonTreeUtil.getDeclaringFile(unit.unit, model.ideaProject)?.virtualFile) {
-                scheduleReparse(virtualFile, unit);
+                triggerReparse(virtualFile, unit);
             }
         }
         logger.trace(()=>"Exit externalPhasedUnitsTypechecked(``typecheckedUnits``, ``fullyTypechecked``)");
+    }
+
+    shared class PhasedUnitSynchronizer(VirtualFile virtualFile) {
+        shared void typecheckExternalPhasedUnitIfNecessary(void nextStep(ExternalPhasedUnit pu)) {
+            value phasedUnit = getCeylonProjects(model.ideaProject)?.findExternalPhasedUnit(virtualFile);
+            if (exists phasedUnit) {
+                nextStep(phasedUnit);
+            } else {
+                logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
+            }
+        }
     }
 
     shared void scheduleExternalSourcePreparation(VirtualFile virtualFile) {
@@ -240,7 +253,7 @@ shared class CeylonLocalAnalyzerManager(model)
         ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
             value phasedUnit = getCeylonProjects(model.ideaProject)?.findExternalPhasedUnit(virtualFile);
             if (exists phasedUnit) {
-                scheduleReparse(virtualFile, phasedUnit);
+                triggerReparse(virtualFile, phasedUnit);
             } else {
                 logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
             }
@@ -248,13 +261,35 @@ shared class CeylonLocalAnalyzerManager(model)
         logger.trace(()=>"Exit prepareExternalSource() for file ``virtualFile.name``");
     }
 
-    shared void scheduleReparse(VirtualFile virtualFile, ExternalPhasedUnit? externalPhasedUnit = null) {
-        logger.trace(()=>"Enter scheduleReparse(``virtualFile``)", 10);
-        ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() {
-            if (is SingleRootFileViewProvider fileViewProvider =
-                application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
-                => psiManager(model.ideaProject).findViewProvider(virtualFile);})) {
+    shared void retrieveTypecheckedAndBridgedExternalSource(VirtualFile virtualFile) {
+        logger.trace(()=>"Enter retrieveTypecheckedAndBridgedExternalSource() for file ``virtualFile.name``", 20);
+        "This synchronous method can only becalled from the UI thread.
+         From pooled threads that don't hold the read lock, 
+         call the asynchronous `scheduleExternalSourcePreparation` method."
+        assert(application.dispatchThread);
+        value phasedUnit = getCeylonProjects(model.ideaProject)?.findExternalPhasedUnit(virtualFile);
+        if (exists phasedUnit) {
+            triggerReparse(virtualFile, phasedUnit);
+        } else {
+            logger.debug(()=>"External phased unit not found in retrieveTypecheckedAndBridgedExternalSource() for file ``virtualFile.name``");
+        }
+        logger.trace(()=>"Exit retrieveTypecheckedAndBridgedExternalSource() for file ``virtualFile.name``");
+    }
 
+    shared void triggerReparse(VirtualFile virtualFile, ExternalPhasedUnit? externalPhasedUnit = null) {
+        logger.trace(()=>"Enter scheduleReparse(``virtualFile``)", 10);
+            Ref<FileViewProvider> providerRef = Ref<FileViewProvider>();
+            ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() {
+                providerRef.set(
+                    application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
+                    => psiManager(model.ideaProject).findViewProvider(virtualFile);}));
+            }));
+
+            if (is SingleRootFileViewProvider fileViewProvider = providerRef.get()) {
+                if (exists externalPhasedUnit) {
+                    virtualFile.putUserData(uneditedExternalPhasedUnitToParse, externalPhasedUnit);
+                }
+                
                 void cleanOnFailure(Throwable? t = null) {
                     virtualFile.putUserData(uneditedExternalPhasedUnitToParse, null);
                     if (exists future = virtualFile.getUserData(uneditedExternalPhasedUnitFuture)) {
@@ -270,29 +305,23 @@ shared class CeylonLocalAnalyzerManager(model)
                     }
                 }
 
-                application.invokator.invokeLater(JavaRunnable(() {
+                void commitAndReloadContent() {
                     application.runWriteAction(JavaRunnable(() {
-                        if (exists externalPhasedUnit) {
-                            virtualFile.putUserData(uneditedExternalPhasedUnitToParse, externalPhasedUnit);
-                        }
-                        value ideaProject = model.ideaProject;
-                        if (!ideaProject.isDisposed()) {
-                            try {
-                                value psiDocMgr = psiDocumentManager(ideaProject);
-                                if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
-                                    psiDocMgr.isUncommited(cachedDocument)) {
-                                    psiDocMgr.commitDocument(cachedDocument);
-                                }
-                                fileViewProvider.onContentReload();
-                            } catch(Throwable t) {
-                                cleanOnFailure(t);
-                                throw;
+                        try {
+                            value psiDocMgr = psiDocumentManager(model.ideaProject);
+                            if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
+                                psiDocMgr.isUncommited(cachedDocument)) {
+                                psiDocMgr.commitDocument(cachedDocument);
                             }
+                            fileViewProvider.onContentReload();
+                        } catch(Throwable t) {
+                            cleanOnFailure(t);
+                            throw;
                         }
                     }));
-                }), 
-                ModalityState.any())
-                .doWhenDone(JavaRunnable(() {
+                }
+
+                void triggerReparse() {
                     application.runReadAction(JavaRunnable(() {
                         try {
                             if (exists cachedPsi = fileViewProvider.getCachedPsi(ceylonLanguage)) {
@@ -304,13 +333,22 @@ shared class CeylonLocalAnalyzerManager(model)
                             throw;
                         }
                     }));
-                }))
-                .doWhenRejected(JavaRunnable(void () {
-                    logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
-                    cleanOnFailure();
-                }));
+                }
+                
+                if (application.dispatchThread) {
+                    commitAndReloadContent();
+                    triggerReparse();
+                } else {
+                    application.invokator.invokeLater(
+                        JavaRunnable(commitAndReloadContent), ModalityState.any(), 
+                        model.ideaProject.disposed)
+                            .doWhenDone(JavaRunnable(triggerReparse))
+                            .doWhenRejected(JavaRunnable(void () {
+                            logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
+                            cleanOnFailure();
+                        }));
+                }
             }
-        }));
         logger.trace(()=>"Exit scheduleReparse(``virtualFile``)");
     }
 

@@ -615,7 +615,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                 manager.scheduleExternalSourcePreparation(virtualFile);
             } else {
                 ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
-                    manager.scheduleReparse(virtualFile);
+                    manager.triggerReparse(virtualFile);
                 }));
             }
         } finally {
