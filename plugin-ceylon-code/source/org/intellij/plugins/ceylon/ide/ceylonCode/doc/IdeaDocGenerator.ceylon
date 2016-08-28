@@ -116,11 +116,15 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
 
     shared actual String color(Object? what, Colors how) {
         value attributes = textAttributes(getAttributes(how));
-        value color = "color:``hexColor(attributes.foregroundColor.red, attributes.foregroundColor.green, attributes.foregroundColor.blue)``";
-        value fontBold = if (attributes.fontType.and(bold) != 0) then "font-weight: bold" else "";
-        value fontItalic = if (attributes.fontType.and(italic) != 0) then "font-size: italic" else "";
+        value color = hexColor {
+            red = attributes.foregroundColor.red;
+            green = attributes.foregroundColor.green;
+            blue = attributes.foregroundColor.blue;
+        };
+        value fontBold = if (attributes.fontType.and(bold) != 0) then "font-weight:bold;" else "";
+        value fontItalic = if (attributes.fontType.and(italic) != 0) then "font-style:italic;" else "";
 
-        return "<code style='``color``; ``fontBold``; ``fontItalic``'>``what else "<error>"``</code>";
+        return "<code style='color:``color``;``fontBold````fontItalic``'>``what else "<error>"``</code>";
     }
 
     Icon? getIconUrl(Icons|Referenceable thing) 
@@ -168,9 +172,10 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
     }
 
     shared actual void appendJavadoc(Declaration model, StringBuilder buffer) {
-        value declaration = if (is Function model, model.annotation)
-                            then model.typeDeclaration
-                            else model;
+        value declaration
+                = if (is Function model, model.annotation)
+                then model.typeDeclaration
+                else model;
 
         if (is IdeaJavaModelAware unit = declaration.unit,
             exists javaEl = unit.toJavaElement(declaration)) {
