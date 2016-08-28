@@ -22,10 +22,10 @@ import com.redhat.ceylon.model.loader.model {
 shared interface IdeaJavaModelAware
     satisfies IJavaModelAware<Module, PsiClass, PsiClass|PsiMethod> {
 
-        shared actual Module javaClassRootToNativeProject(PsiClass javaClassRoot)
+        javaClassRootToNativeProject(PsiClass javaClassRoot)
             => nothing; // TODO : this has to be implemented
 
-        shared actual PsiClass|PsiMethod? toJavaElement(Declaration ceylonDeclaration, BaseProgressMonitor? monitor)
+        toJavaElement(Declaration ceylonDeclaration, BaseProgressMonitor? monitor)
             => if (is LazyClass cls = ceylonDeclaration,
                    is PSIClass mirror = cls.classMirror)
                then mirror.psi
