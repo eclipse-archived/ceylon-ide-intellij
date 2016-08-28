@@ -933,6 +933,10 @@ public class CeylonPsi {
         @Override Tree.Expression getCeylonNode();
     }
 
+    public static interface ParExpressionPsi extends ExpressionPsi {
+        @Override Tree.ParExpression getCeylonNode();
+    }
+
     public static interface PrimaryPsi extends TermPsi {
         @Override Tree.Primary getCeylonNode();
     }

@@ -483,6 +483,8 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
             visitExpressionListPsi((ExpressionListPsi) element);
         } else if (element instanceof ExpressionPsi) {
             visitExpressionPsi((ExpressionPsi) element);
+        } else if (element instanceof ParExpressionPsi) {
+            visitParExpressionPsi((ParExpressionPsi) element);
         } else if (element instanceof PrimaryPsi) {
             visitPrimaryPsi((PrimaryPsi) element);
         } else if (element instanceof PostfixExpressionPsi) {
@@ -696,6 +698,7 @@ public class CeylonPsiVisitor extends PsiElementVisitor {
     public void visitInvocationExpressionPsi(@NotNull InvocationExpressionPsi element) { visitPostfixExpressionPsi(element); }
     public void visitPostfixExpressionPsi(@NotNull PostfixExpressionPsi element) { visitPrimaryPsi(element); }
     public void visitPrimaryPsi(@NotNull PrimaryPsi element) { visitTermPsi(element); }
+    public void visitParExpressionPsi(@NotNull ParExpressionPsi element) { visitExpressionPsi(element); }
     public void visitExpressionPsi(@NotNull ExpressionPsi element) { visitAtomPsi(element); }
     public void visitExpressionListPsi(@NotNull ExpressionListPsi element) {}
     public void visitPostfixDecrementOpPsi(@NotNull PostfixDecrementOpPsi element) { visitPostfixOperatorExpressionPsi(element); }

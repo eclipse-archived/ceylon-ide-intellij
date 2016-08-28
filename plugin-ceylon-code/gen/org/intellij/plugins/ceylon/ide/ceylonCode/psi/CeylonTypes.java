@@ -236,6 +236,7 @@ public interface CeylonTypes {
     IElementType POSTFIX_DECREMENT_OP = new CeylonElementType("POSTFIX_DECREMENT_OP");
     IElementType EXPRESSION_LIST = new CeylonElementType("EXPRESSION_LIST");
     IElementType EXPRESSION = new CeylonElementType("EXPRESSION");
+    IElementType PAR_EXPRESSION = new CeylonElementType("PAR_EXPRESSION");
     IElementType PRIMARY = new CeylonElementType("PRIMARY");
     IElementType POSTFIX_EXPRESSION = new CeylonElementType("POSTFIX_EXPRESSION");
     IElementType INVOCATION_EXPRESSION = new CeylonElementType("INVOCATION_EXPRESSION");

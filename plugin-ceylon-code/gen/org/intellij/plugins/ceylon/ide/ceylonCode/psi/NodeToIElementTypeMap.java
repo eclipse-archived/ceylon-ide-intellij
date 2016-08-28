@@ -247,6 +247,7 @@ public class NodeToIElementTypeMap {
         map.put(CustomTree.PostfixDecrementOp.class, CeylonTypes.POSTFIX_DECREMENT_OP);
         map.put(CustomTree.ExpressionList.class, CeylonTypes.EXPRESSION_LIST);
         map.put(CustomTree.Expression.class, CeylonTypes.EXPRESSION);
+        map.put(CustomTree.ParExpression.class, CeylonTypes.PAR_EXPRESSION);
         map.put(CustomTree.Primary.class, CeylonTypes.PRIMARY);
         map.put(CustomTree.PostfixExpression.class, CeylonTypes.POSTFIX_EXPRESSION);
         map.put(CustomTree.InvocationExpression.class, CeylonTypes.INVOCATION_EXPRESSION);

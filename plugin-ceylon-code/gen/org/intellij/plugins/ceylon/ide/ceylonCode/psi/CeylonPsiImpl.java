@@ -1401,6 +1401,12 @@ public class CeylonPsiImpl {
         @Override public Tree.Expression getCeylonNode() { return (Tree.Expression) super.getCeylonNode(); }
     }
 
+    public static class ParExpressionPsiImpl extends ExpressionPsiImpl
+            implements CeylonPsi.ParExpressionPsi {
+        public ParExpressionPsiImpl(ASTNode astNode) { super(astNode); }
+        @Override public Tree.ParExpression getCeylonNode() { return (Tree.ParExpression) super.getCeylonNode(); }
+    }
+
     public static abstract class PrimaryPsiImpl extends TermPsiImpl
             implements CeylonPsi.PrimaryPsi {
         public PrimaryPsiImpl(ASTNode astNode) { super(astNode); }

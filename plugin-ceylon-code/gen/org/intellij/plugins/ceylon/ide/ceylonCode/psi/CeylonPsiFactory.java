@@ -403,6 +403,8 @@ public class CeylonPsiFactory {
             return new ExpressionListPsiImpl(node);
         } else if (type == EXPRESSION) {
             return new ExpressionPsiImpl(node);
+        } else if (type == PAR_EXPRESSION) {
+            return new ParExpressionPsiImpl(node);
         } else if (type == INVOCATION_EXPRESSION) {
             return new InvocationExpressionPsiImpl(node);
         } else if (type == PARAMETERIZED_EXPRESSION) {
