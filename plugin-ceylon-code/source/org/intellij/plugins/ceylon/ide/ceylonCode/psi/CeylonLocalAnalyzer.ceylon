@@ -382,7 +382,6 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                     logger.debug(()=>"The file `` virtualFile.name `` is already up-to-date so don't run the synchronous local typechecking");
                     return currentResult.immutable;
                 }
-                
                 if (force) {
                     removePreviousTypecheckingErrors(currentResult.parsedRootNode);
                 }

@@ -80,6 +80,8 @@ shared class MutableLocalAnalysisResult(
     shared void finishedTypechecking(
         PhasedUnit phasedUnit, 
         TypeChecker? typechecker) {
+        lastPhasedUnit_ = phasedUnit;
+        typechecker_ = typechecker;
         if (phasedUnit.compilationUnit === parsedRootNode) {
             synchronize(futureMutex, () {
                 if (!phasedUnitWhenTypechecked_.done) {
@@ -102,8 +104,6 @@ shared class MutableLocalAnalysisResult(
             });
             platformUtils.log(Status._WARNING, "The typechecked phased unit reported by `MutableLocalAnalysisResult.finishTypechecking()` doesn't match the pending root node !");
         }
-        lastPhasedUnit_ = phasedUnit;
-        typechecker_ = typechecker;
     }
     
     shared Document document => document_;
@@ -128,13 +128,30 @@ shared class MutableLocalAnalysisResult(
 
     shared LocalAnalysisResult immutable => object
             satisfies LocalAnalysisResult {
+        value initialLastPhasedUnit = outer.lastPhasedUnit;
+
         ceylonProject = outer.ceylonProject;
         commonDocument = outer.commonDocument;
-        lastPhasedUnit = outer.lastPhasedUnit;
         parsedRootNode = outer.parsedRootNode;
         tokens = outer.tokens;
         typeChecker = outer.typeChecker;
-        typecheckedPhasedUnit = outer.typecheckedPhasedUnit;
         phasedUnitWhenTypechecked = outer.phasedUnitWhenTypechecked;
+
+        shared actual PhasedUnit? lastPhasedUnit {
+            if (phasedUnitWhenTypechecked.done) {
+                try {
+                    return phasedUnitWhenTypechecked.get();
+                } catch(Exception e) {
+                }
+            }
+            return initialLastPhasedUnit;
+        }
+
+        typecheckedPhasedUnit =>
+            if (exists aTypecheckedPhasedUnit = lastPhasedUnit,
+                exists lastTypecheckedRootNode = aTypecheckedPhasedUnit.compilationUnit,
+                lastTypecheckedRootNode === parsedRootNode)
+            then aTypecheckedPhasedUnit
+            else null;
     };
 }
