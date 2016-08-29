@@ -3,7 +3,9 @@ import ceylon.interop.java {
 }
 
 import com.intellij.ide.util.treeView {
-    NodeRenderer
+    NodeRenderer,
+    AbstractTreeBuilder,
+    AbstractTreeStructureBase
 }
 import com.intellij.openapi.actionSystem {
     CommonDataKeys
@@ -46,10 +48,33 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import java.lang {
     Runnable
 }
+import com.intellij.ide.projectView {
+    TreeStructureProvider
+}
+import java.util {
+    Collections
+}
 
 shared alias BuildMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.BuildMessage;
 shared alias SourceMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.SourceFileMessage;
 shared alias ProjectMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.ProjectMessage;
+
+class ProblemsTreeBuilder(JTree tree, DefaultTreeModel model, Project project)
+        extends AbstractTreeBuilder(tree, model, null, null, false) {}
+
+class ProblemsTreeStructure(Project project, ProblemsModel model)
+        extends AbstractTreeStructureBase(project) {
+
+    value rootNode = ProblemsRootNode(project, model);
+
+    commit() => noop();
+
+    hasSomethingToCommit() => false;
+
+    providers => Collections.emptyList<TreeStructureProvider>();
+
+    rootElement => rootNode;
+}
 
 class CeylonProblemsList(Project project)
         extends SimpleToolWindowPanel(false, true) {
