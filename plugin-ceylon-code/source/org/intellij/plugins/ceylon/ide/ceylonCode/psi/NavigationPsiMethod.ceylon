@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    CeylonIterable
-}
-
 import com.intellij.openapi.util {
     Key
 }
@@ -35,6 +31,10 @@ import com.redhat.ceylon.compiler.java.util {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
+import com.redhat.ceylon.ide.common.platform {
+    platformUtils,
+    Status
+}
 import com.redhat.ceylon.model.typechecker.model {
     Type
 }
@@ -48,6 +48,9 @@ import java.util {
     List,
     Collections
 }
+import java.util.concurrent {
+    TimeUnit
+}
 
 import javax.swing {
     ...
@@ -55,13 +58,6 @@ import javax.swing {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonLanguage
-}
-import java.util.concurrent {
-    TimeUnit
-}
-import com.redhat.ceylon.ide.common.platform {
-    platformUtils,
-    Status
 }
 
 "Wraps a Function in a PsiMethod. This is used to navigate from compiled classes to the
@@ -74,7 +70,9 @@ class NavigationPsiMethod satisfies PsiMethod {
     Integer paramsCount;
 
     shared new (CeylonCompositeElement func) {
-        this.funcPointer = SmartPointerManager.getInstance(func.project).createSmartPsiElementPointer(func);
+        this.funcPointer
+                = SmartPointerManager.getInstance(func.project)
+                    .createSmartPsiElementPointer(func);
         this.isGetter = false;
         this.isSetter = false;
         if (is CeylonPsi.SpecifierStatementPsi func) {
@@ -88,14 +86,18 @@ class NavigationPsiMethod satisfies PsiMethod {
     }
 
     shared new getterOrSetter(CeylonCompositeElement func, Boolean isGetter) {
-        this.funcPointer = SmartPointerManager.getInstance(func.project).createSmartPsiElementPointer(func);
+        this.funcPointer
+                = SmartPointerManager.getInstance(func.project)
+                    .createSmartPsiElementPointer(func);
         this.isGetter = isGetter;
         this.isSetter = !isGetter;
         this.paramsCount = -1;
     }
 
     shared new forDefaultArgs(CeylonCompositeElement func, Integer paramsCount) {
-        this.funcPointer = SmartPointerManager.getInstance(func.project).createSmartPsiElementPointer(func);
+        this.funcPointer
+                = SmartPointerManager.getInstance(func.project)
+                    .createSmartPsiElementPointer(func);
         this.isGetter = false;
         this.isSetter = false;
         this.paramsCount = paramsCount;
@@ -108,8 +110,19 @@ class NavigationPsiMethod satisfies PsiMethod {
         return theFunc;
     }
     
+    function getPsiType(Type? typeModel, Tree.TypedDeclaration typedDeclaration, GlobalSearchScope scope) {
+        if (exists typeModel, typeModel.typeParameter) {
+            value tp = LightTypeParameterBuilder(typedDeclaration.type.text, this, 0);
+            return PsiImmediateClassType(tp, PsiSubstitutor.empty);
+        } else if (exists typeModel, typeModel.functional) {
+            return PsiType.getTypeByName("ceylon.language.Callable", func.project, scope);
+        } else {
+            return mapType(typeModel, scope);
+        }
+    }
+
     shared actual PsiParameterList parameterList {
-        assert(is CeylonFile ceylonFile = funcPointer.containingFile);
+        assert (is CeylonFile ceylonFile = funcPointer.containingFile);
         try {
             ceylonFile.waitForUpToDatePhasedUnit(4, TimeUnit.seconds);
         } catch(CannotWaitForAnalysisResultInLockedSection e) {
@@ -123,18 +136,13 @@ class NavigationPsiMethod satisfies PsiMethod {
         if (is CeylonPsi.AnyMethodPsi theFunc = func,
             exists tpList = theFunc.ceylonNode.typeParameterList) {
 
-            variable Integer i = 0;
-
-            while (i<tpList.typeParameterDeclarations.size()) {
-                LightParameter lightParam = LightParameter(
+            for (i in 0:tpList.typeParameterDeclarations.size()) {
+                builder.addParameter(LightParameter(
                     "td" + i.string,
                     PsiType.getTypeByName(typeDescriptorClassName, func.project, scope),
                     func,
                     CeylonLanguage.instance
-                );
-
-                builder.addParameter(lightParam);
-                i ++;
+                ));
             }
         }
 
@@ -144,25 +152,16 @@ class NavigationPsiMethod satisfies PsiMethod {
                 then parameterList.parameters.size()
                 else paramsCount;
 
-            for (idx -> param in CeylonIterable(parameterList.parameters).indexed) {
+            for (idx in 0:parameterList.parameters.size()) {
+                value param = parameterList.parameters.get(idx);
                 if (idx < signatureLength,
                     is Tree.ParameterDeclaration param) {
                     value typedDeclaration = param.typedDeclaration;
                     Type? typeModel = typedDeclaration.type.typeModel;
 
-                    PsiType psiType;
-                    if (exists typeModel, typeModel.typeParameter) {
-                        value tp = LightTypeParameterBuilder(typedDeclaration.type.text, this, 0);
-                        psiType = PsiImmediateClassType(tp, PsiSubstitutor.empty);
-                    } else if (exists typeModel, typeModel.functional) {
-                        psiType = PsiType.getTypeByName("ceylon.language.Callable", func.project, scope);
-                    } else {
-                        psiType = mapType(typeModel, scope);
-                    }
-
                     value lightParam = LightParameter(
                         typedDeclaration.identifier.text,
-                        psiType,
+                        getPsiType(typeModel, typedDeclaration, scope),
                         func,
                         CeylonLanguage.instance
                     );
@@ -175,11 +174,11 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     Tree.ParameterList? findParameterList() {
         if (is CeylonPsi.AnyMethodPsi theFunc = func) {
-            return theFunc.ceylonNode.parameterLists.get(0);
+            return theFunc.ceylonNode.parameterLists[0];
         } else if (is CeylonPsi.SpecifierStatementPsi theFunc = func) {
             value bme = theFunc.ceylonNode.baseMemberExpression;
             if (is Tree.ParameterizedExpression bme) {
-                return bme.parameterLists.get(0);
+                return bme.parameterLists[0];
             }
         }
         return null;
@@ -235,7 +234,6 @@ class NavigationPsiMethod satisfies PsiMethod {
         value params = parameterList.parameters;
         value types = ObjectArray<PsiType>(params.size);
         variable Integer i = 0;
-
         for (param in params) {
             types.set(i++, param.type);
         }
@@ -249,7 +247,6 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     shared actual String name {
         value _name = func.name else "<unknown>";
-
         if (_name == "string") {
             return "toString";
         } else if (_name == "hash") {
@@ -361,13 +358,9 @@ class NavigationPsiMethod satisfies PsiMethod {
 
     originalElement => null;
 
-    shared actual Boolean textMatches(CharSequence text) {
-        return false;
-    }
+    shared actual Boolean textMatches(CharSequence text) => false;
 
-    shared actual Boolean textMatches(PsiElement element) {
-        return false;
-    }
+    shared actual Boolean textMatches(PsiElement element) => false;
 
     textContains(Character c) => false;
 
