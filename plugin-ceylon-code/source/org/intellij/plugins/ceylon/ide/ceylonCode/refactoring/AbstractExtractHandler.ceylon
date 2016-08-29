@@ -1,6 +1,5 @@
 import ceylon.interop.java {
     javaClass,
-    createJavaObjectArray,
     JavaCollection
 }
 
