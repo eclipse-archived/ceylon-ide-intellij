@@ -7,6 +7,7 @@ import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonLocalAnalyzer;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 
 import java.util.concurrent.TimeoutException;
@@ -39,7 +40,10 @@ public abstract class CeylonCodeInsightTestSupport extends LightCodeInsightFixtu
         myFixture.configureByFiles(PATH + filename);
         final CeylonFile ceylonFile = (CeylonFile) myFixture.getFile();
 
-        ceylonFile.ensureTypechecked();
+        CeylonLocalAnalyzer localAnalyzer = ceylonFile.getLocalAnalyzer();
+        if (localAnalyzer != null) {
+            localAnalyzer.ensureTypechecked();
+        }
         return ceylonFile;
     }
 

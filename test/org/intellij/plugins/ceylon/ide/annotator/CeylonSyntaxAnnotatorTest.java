@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.annotator;
 import com.intellij.psi.PsiFile;
 import org.intellij.plugins.ceylon.ide.CeylonCodeInsightTestSupport;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonLocalAnalyzer;
 
 public class CeylonSyntaxAnnotatorTest extends CeylonCodeInsightTestSupport {
 
@@ -18,8 +19,10 @@ public class CeylonSyntaxAnnotatorTest extends CeylonCodeInsightTestSupport {
     private void testSyntax(String cuName, boolean checkWarnings, boolean checkInfos, boolean checkWeakWarnings) {
 
         PsiFile[] files = myFixture.configureByFiles("org/intellij/plugins/ceylon/annotator/" + cuName + ".ceylon");
-        ((CeylonFile) files[0]).ensureTypechecked();
-
+        CeylonLocalAnalyzer localAnalyzer = ((CeylonFile) files[0]).getLocalAnalyzer();
+        if (localAnalyzer != null) {
+            localAnalyzer.ensureTypechecked();
+        }
         myFixture.checkHighlighting(checkWarnings, checkInfos, checkWeakWarnings);
     }
 }
