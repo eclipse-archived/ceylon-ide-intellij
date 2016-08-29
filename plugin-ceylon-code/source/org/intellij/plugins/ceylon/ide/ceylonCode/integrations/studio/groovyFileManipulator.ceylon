@@ -129,6 +129,25 @@ object groovyFileManipulator {
         return null;
     }
 
+    shared String? findAppCompatVersion(GroovyFile file) {
+        if (exists blck = getBlockByName(file, "dependencies"),
+            exists allExpressions = PsiTreeUtil.getChildrenOfType(blck, javaClass<GrMethodCall>())) {
+
+            value lookupString = "'com.android.support:appcompat-v7:";
+
+            for (expr in allExpressions) {
+                if (expr.invokedExpression.text == "compile",
+                    exists arg = expr.argumentList.allArguments.get(0),
+                    arg.text.startsWith(lookupString)) {
+
+                    return arg.text.spanFrom(lookupString.size).trimTrailing('\''.equals);
+                }
+            }
+        }
+
+        return null;
+    }
+
     shared [String,String]? findModuleName(GroovyFile file) {
         if (exists blck = getBlockByName(file, "android"),
             exists blck2 = getBlockByName(blck, "defaultConfig")) {
