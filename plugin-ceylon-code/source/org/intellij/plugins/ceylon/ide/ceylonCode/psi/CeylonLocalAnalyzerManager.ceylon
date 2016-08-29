@@ -269,14 +269,14 @@ shared class CeylonLocalAnalyzerManager(model)
         assert(application.dispatchThread);
         value phasedUnit = getCeylonProjects(model.ideaProject)?.findExternalPhasedUnit(virtualFile);
         if (exists phasedUnit) {
-            triggerReparse(virtualFile, phasedUnit);
+            triggerReparse(virtualFile, phasedUnit, true);
         } else {
             logger.debug(()=>"External phased unit not found in retrieveTypecheckedAndBridgedExternalSource() for file ``virtualFile.name``");
         }
         logger.trace(()=>"Exit retrieveTypecheckedAndBridgedExternalSource() for file ``virtualFile.name``");
     }
 
-    shared void triggerReparse(VirtualFile virtualFile, ExternalPhasedUnit? externalPhasedUnit = null) {
+    shared void triggerReparse(VirtualFile virtualFile, ExternalPhasedUnit? externalPhasedUnit = null, Boolean synchronously = false) {
         logger.trace(()=>"Enter scheduleReparse(``virtualFile``)", 10);
             Ref<FileViewProvider> providerRef = Ref<FileViewProvider>();
             ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() {
@@ -335,7 +335,8 @@ shared class CeylonLocalAnalyzerManager(model)
                     }));
                 }
                 
-                if (application.dispatchThread) {
+                if (synchronously) {
+                    assert(application.dispatchThread);
                     commitAndReloadContent();
                     triggerReparse();
                 } else {
