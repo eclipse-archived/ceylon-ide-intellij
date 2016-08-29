@@ -5,7 +5,7 @@ import android.support.v7.app {
     AppCompatActivity
 }
 
-shared class MainActivity() extends AppCompatActivity() {
+shared class CeylonMainActivity() extends AppCompatActivity() {
 
     shared actual void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
