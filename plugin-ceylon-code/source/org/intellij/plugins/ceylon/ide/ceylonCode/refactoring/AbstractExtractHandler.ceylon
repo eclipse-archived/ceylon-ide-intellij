@@ -173,9 +173,10 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             }
             editor.caretModel.moveToOffset(identifier.textOffset);
             value myDataContext = HashMap<JString,Object>();
-            myDataContext.put(JString(CommonDataKeys.editor.name), editor);
-            myDataContext.put(JString(CommonDataKeys.psiFile.name), file);
-            myDataContext.put(JString(LangDataKeys.psiElementArray.name), createJavaObjectArray<PsiElement>({ inserted }));
+            myDataContext[JString(CommonDataKeys.editor.name)] = editor;
+            myDataContext[JString(CommonDataKeys.psiFile.name)] = file;
+            myDataContext[JString(LangDataKeys.psiElementArray.name)]
+                    = ObjectArray<PsiElement>(0, inserted);
             value context = SimpleDataContext.getSimpleContext(myDataContext, null);
             ExtractedVariableRenameHandler(usages).invoke(proj, editor, file, context);
         }

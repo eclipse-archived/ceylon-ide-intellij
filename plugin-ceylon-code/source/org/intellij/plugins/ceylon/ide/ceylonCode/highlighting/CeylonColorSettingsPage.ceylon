@@ -60,11 +60,11 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
     ];
 
     JMap<JString,TextAttributesKey> ourTags = HashMap<JString,TextAttributesKey>();
-    ourTags.put(javaString("anno"), ceylonHighlightingColors.annotation);
-    ourTags.put(javaString("interp"), ceylonHighlightingColors.interp);
-    ourTags.put(javaString("stringInAnno"), ceylonHighlightingColors.annotationString);
-    ourTags.put(javaString("member"), ceylonHighlightingColors.member);
-    ourTags.put(javaString("pkg"), ceylonHighlightingColors.packages);
+    ourTags[javaString("anno")] = ceylonHighlightingColors.annotation;
+    ourTags[javaString("interp")] = ceylonHighlightingColors.interp;
+    ourTags[javaString("stringInAnno")] = ceylonHighlightingColors.annotationString;
+    ourTags[javaString("member")] = ceylonHighlightingColors.member;
+    ourTags[javaString("pkg")] = ceylonHighlightingColors.packages;
     
     additionalHighlightingTagToDescriptorMap => ourTags;
     

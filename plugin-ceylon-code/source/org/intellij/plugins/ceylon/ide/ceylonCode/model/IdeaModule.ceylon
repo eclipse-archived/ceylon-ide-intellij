@@ -111,10 +111,8 @@ shared class IdeaModule(
 
             for (name -> getter in arrays) {
                 if (matcher.isStartMatch(name)) {
-                    proposals.put(
-                        javaString("java.lang." + name),
-                        DeclarationWithProximity(getter(unit), proximity+4)
-                    );
+                    proposals[javaString("java.lang." + name)]
+                        = DeclarationWithProximity(getter(unit), proximity+4);
                 }
             }
         }

@@ -37,12 +37,13 @@ class ProblemsModel() {
     shared void updateProblems(IdeaCeylonProject project, {SourceMsg*}? frontendMessages,
         {SourceMsg*}? backendMessages, {ProjectMsg*}? projectMessages) {
 
-        problemsByProject.put(project, Problems {
-            project = project;
-            frontendMessages = frontendMessages;
-            backendMessages = backendMessages;
-            projectMessages = projectMessages;
-        });
+        problemsByProject[project]
+            = Problems {
+                project = project;
+                frontendMessages = frontendMessages;
+                backendMessages = backendMessages;
+                projectMessages = projectMessages;
+            };
     }
 
     shared Integer count(Severity s)

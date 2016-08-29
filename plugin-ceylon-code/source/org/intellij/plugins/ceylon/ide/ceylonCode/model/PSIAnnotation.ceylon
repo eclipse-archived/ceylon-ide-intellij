@@ -85,7 +85,7 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
         for (attr in psi.parameterList.attributes) {
             value name = attr.name else "value";
             value val = convert(attr, name);
-            values.put(name, val);
+            values[name] = val;
         }
     });
     

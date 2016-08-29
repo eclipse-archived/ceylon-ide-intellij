@@ -98,7 +98,7 @@ shared class PSIType(psi,
 
     variable String? cachedQualifiedName = null;
     
-    originatingTypes.put(psi, null);
+    originatingTypes[psi] = null;
    
     componentType
             => if (is PsiArrayType psi)

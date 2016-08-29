@@ -361,10 +361,10 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 exists pkg = moduleManager.modelLoader.findPackage(file.packageName),
                 exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
                 exists qname = cls.qualifiedName) {
-                result.put(javaString(qname),
-                    DeclarationWithProximity(lightModel,
+                result[javaString(qname)]
+                    = DeclarationWithProximity(lightModel,
                         getUnimportedProximity(proximity, pkg.languagePackage, lightModel.name),
-                        langTrue));
+                        langTrue);
             }
             return langTrue;
         }

@@ -37,13 +37,13 @@ shared object ceylonFileFactory {
         value props = HashMap<JString,Object>();
 
         if (exists backend) {
-            props.put(javaString("NATIVE"), javaString("native(\"" + backend.nativeAnnotation + "\")"));
+            props[javaString("NATIVE")] = javaString("native(\"" + backend.nativeAnnotation + "\")");
         }
-        props.put(javaString("MODULE_NAME"), javaString(name));
-        props.put(javaString("MODULE_VERSION"), javaString(version));
+        props[javaString("MODULE_NAME")] = javaString(name);
+        props[javaString("MODULE_VERSION")] = javaString(version);
 
         if (! imports.empty) {
-            props.put(javaString("IMPORTS"), toJavaStringList(imports));
+            props[javaString("IMPORTS")] = toJavaStringList(imports);
         }
 
         return createFromTemplate(
@@ -56,8 +56,8 @@ shared object ceylonFileFactory {
         value tplManager = fileTemplateManager(dir.project);
         value props = HashMap<JString,Object>();
 
-        props.put(javaString("MODULE_NAME"), javaString(name));
-        props.put(javaString("IS_SHARED"), javaString(shared.string));
+        props[javaString("MODULE_NAME")] = javaString(name);
+        props[javaString("IS_SHARED")] = javaString(shared.string);
 
         return createFromTemplate(
             tplManager.getInternalTemplate("package.ceylon"),
@@ -69,8 +69,8 @@ shared object ceylonFileFactory {
         value tplManager = fileTemplateManager(dir.project);
         value props = HashMap<JString,Object>();
 
-        props.put(javaString("MODULE_NAME"), javaString(moduleName));
-        props.put(javaString("FUN_NAME"), javaString(unitName));
+        props[javaString("MODULE_NAME")] = javaString(moduleName);
+        props[javaString("FUN_NAME")] = javaString(unitName);
 
         return createFromTemplate(
             tplManager.getInternalTemplate("run.ceylon"),
@@ -88,7 +88,7 @@ shared object ceylonFileFactory {
             case ("class"|"interface")
             escaping.escapeInitialUppercase(unitName)
             else unitName;
-        props.put(javaString("UNIT_NAME"), javaString(escaped));
+        props[javaString("UNIT_NAME")] = javaString(escaped);
 
         return createFromTemplate(
             tplManager.getInternalTemplate(templateName + ".ceylon"),
