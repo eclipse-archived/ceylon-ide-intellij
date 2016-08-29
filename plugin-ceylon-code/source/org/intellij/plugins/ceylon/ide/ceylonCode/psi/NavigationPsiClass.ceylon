@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    createJavaObjectArray
 }
 
 import com.intellij.openapi.diagnostic {
@@ -47,39 +48,33 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
 shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies PsiSyntheticClass {
 
     shared actual ObjectArray<PsiClass> innerClasses {
-        if (is CeylonPsi.ClassOrInterfacePsi decl) {
-            if (exists body = PsiTreeUtil.findChildOfType(decl, javaClass<CeylonPsi.BodyPsi>())) {
-                value children = PsiTreeUtil.findChildrenOfType(body, javaClass<CeylonPsi.ClassOrInterfacePsi>());
-                value inners = ArrayList<PsiClass>(children.size());
-                for (child in children) {
-                    inners.add(NavigationPsiClass(child));
-                }
-                return inners.toArray(ObjectArray<PsiClass>(children.size()));
+        if (is CeylonPsi.ClassOrInterfacePsi decl,
+            exists body = PsiTreeUtil.findChildOfType(decl, javaClass<CeylonPsi.BodyPsi>())) {
+            value children = PsiTreeUtil.findChildrenOfType(body, javaClass<CeylonPsi.ClassOrInterfacePsi>());
+            value inners = ObjectArray<PsiClass>(children.size());
+            variable value i = 0;
+            for (child in children) {
+                inners.set(i++, NavigationPsiClass(child));
             }
+            return inners;
         }
-        return PsiClass.emptyArray;
+        else {
+            return PsiClass.emptyArray;
+        }
     }
 
     variable List<PsiMethod>? _methods = null;
 
-    shared actual ObjectArray<PsiMethod> findMethodsByName(String name, Boolean checkBases) {
-        List<PsiMethod> allMethods = wrapMethods();
-        List<PsiMethod> matching = ArrayList<PsiMethod>();
-        for (PsiMethod method in allMethods) {
-            if (method.name.equals(name)) {
-                matching.add(method);
-            }
-        }
-        return matching.toArray(ObjectArray<PsiMethod>(matching.size()));
-    }
-
     List<PsiMethod> wrapMethods() {
-        if (!exists m = _methods) {
+        if (exists meths = _methods) {
+            return meths;
+        }
+        else {
             value meths = ArrayList<PsiMethod>();
             _methods = meths;
 
             if (exists body = PsiTreeUtil.findChildOfType(decl, javaClass<CeylonPsi.BodyPsi>())) {
-                for (PsiElement child in body.children) {
+                for (child in body.children) {
                     if (is CeylonPsi.AnyMethodPsi child) {
                         value ceylonNode = child.ceylonNode;
                         value paramList = ceylonNode.parameterLists.get(0);
@@ -90,17 +85,20 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
                         for (p in paramList.parameters) {
                             if (is Tree.ParameterDeclaration p) {
-                                if (is Tree.AttributeDeclaration attr = p.typedDeclaration,
-                                    attr.specifierOrInitializerExpression exists) {
-
-                                    firstDefaultArgPosition = idx;
-                                    break ;
-                                } else if (is Tree.MethodDeclaration meth = p.typedDeclaration,
-                                    meth.specifierExpression exists) {
-
-                                    firstDefaultArgPosition = idx;
-                                    break ;
+                                switch (dec = p.typedDeclaration)
+                                case (is Tree.AttributeDeclaration) {
+                                    if (dec.specifierOrInitializerExpression exists) {
+                                        firstDefaultArgPosition = idx;
+                                        break ;
+                                    }
                                 }
+                                case (is Tree.MethodDeclaration) {
+                                    if (dec.specifierExpression exists) {
+                                        firstDefaultArgPosition = idx;
+                                        break ;
+                                    }
+                                }
+                                else {}
                             }
                             idx++;
                         }
@@ -108,7 +106,7 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
                         meths.add(NavigationPsiMethod(child));
 
                         if (firstDefaultArgPosition > -1) {
-                            for (i in firstDefaultArgPosition..paramList.parameters.size() - 1) {
+                            for (i in firstDefaultArgPosition:paramList.parameters.size()) {
                                 meths.add(NavigationPsiMethod.forDefaultArgs(child, i));
                             }
                         }
@@ -122,18 +120,19 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
                     }
                 }
             }
+            return meths;
         }
-
-        assert(exists m = _methods);
-        return m;
     }
 
     shared actual String name {
         if (is CeylonPsi.DeclarationPsi decl) {
             if (exists identifier = decl.ceylonNode.identifier) {
-                value suffix = if (decl is CeylonPsi.ObjectDefinitionPsi|CeylonPsi.AnyMethodPsi|CeylonPsi.AnyAttributePsi)
-                then "_"
-                else "";
+                value suffix
+                        = decl is CeylonPsi.ObjectDefinitionPsi
+                                | CeylonPsi.AnyMethodPsi
+                                | CeylonPsi.AnyAttributePsi
+                        then "_"
+                        else "";
 
                 return identifier.text + suffix;
             }
@@ -149,6 +148,13 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
         return "<unknown>";
     }
+
+    findMethodsByName(String name, Boolean checkBases)
+            => createJavaObjectArray {
+            for (method in wrapMethods())
+            if (method.name == name)
+            method
+    };
 
     qualifiedName => null;
 
@@ -279,19 +285,13 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
     textToCharArray() => CharArray(0);
 
-    shared actual PsiElement navigationElement {
-        return decl;
-    }
+    shared actual PsiElement navigationElement => decl;
 
     originalElement => null;
 
-    shared actual Boolean textMatches(CharSequence text) {
-        return false;
-    }
+    shared actual Boolean textMatches(CharSequence text) => false;
 
-    shared actual Boolean textMatches(PsiElement element) {
-        return false;
-    }
+    shared actual Boolean textMatches(PsiElement element) => false;
 
     textContains(Character c) => false;
 
@@ -323,21 +323,15 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
     replace(PsiElement newElement) => null;
 
-    shared actual Boolean valid {
-        return true;
-    }
+    shared actual Boolean valid => true;
 
-    shared actual Boolean writable {
-        return false;
-    }
+    shared actual Boolean writable => false;
 
     reference => null;
 
     references => PsiReference.emptyArray;
 
-    shared actual T? getCopyableUserData<T>(Key<T> key) given T satisfies Object {
-        return null;
-    }
+    shared actual T? getCopyableUserData<T>(Key<T> key) given T satisfies Object => null;
 
     shared actual void putCopyableUserData<T>(Key<T> key, T \ivalue) given T satisfies Object {}
 
@@ -357,9 +351,7 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
 
     getIcon(Integer flags) => null;
 
-    shared actual T? getUserData<T>(Key<T> key) given T satisfies Object {
-        return null;
-    }
+    shared actual T? getUserData<T>(Key<T> key) given T satisfies Object => null;
 
     shared actual void putUserData<T>(Key<T> key, T \ivalue) given T satisfies Object {}
 
