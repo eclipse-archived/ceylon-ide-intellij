@@ -131,9 +131,15 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         }
 
         return if (exists declaration = nodes.getReferencedModel(node),
-                   exists location = resolveDeclaration(declaration, project))
+                   exists location = resolveDeclaration(original(declaration), project))
             then location else null; //myElement.containingFile;
     }
+
+    Referenceable original(Referenceable dec)
+            => if (is TypedDeclaration dec,
+                   exists od = dec.originalDeclaration)
+            then original(od)
+            else dec;
 
     variants => PsiElement.emptyArray;
 
