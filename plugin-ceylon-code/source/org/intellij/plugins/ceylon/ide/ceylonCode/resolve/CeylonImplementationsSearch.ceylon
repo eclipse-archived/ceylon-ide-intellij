@@ -2,9 +2,6 @@ import ceylon.interop.java {
     CeylonIterable
 }
 
-import com.intellij.openapi.application {
-    ApplicationManager
-}
 import com.intellij.psi {
     PsiElement,
     PsiClass
@@ -32,10 +29,6 @@ import com.redhat.ceylon.ide.common.util {
 import com.redhat.ceylon.model.typechecker.model {
     TypeDeclaration,
     TypedDeclaration
-}
-
-import java.lang {
-    Runnable
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {

@@ -43,8 +43,7 @@ import com.intellij.openapi.startup {
 import com.intellij.openapi.util {
     Computable,
     Key,
-    Ref,
-    Conditions
+    Ref
 }
 import com.intellij.openapi.vfs {
     VirtualFileListener,
