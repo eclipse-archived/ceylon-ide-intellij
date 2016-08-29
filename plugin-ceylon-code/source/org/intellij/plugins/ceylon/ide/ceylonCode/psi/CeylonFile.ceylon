@@ -498,7 +498,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
             value classes = ObjectArray<PsiClass>(decls.size);
             variable value i = 0;
             for (decl in decls) {
-                classes.set(i++, NavigationPsiClass(decl));
+                classes[i++] = NavigationPsiClass(decl);
             }
             return classes;
         } else if (is CeylonPsi.ModuleDescriptorPsi mod = compilationUnitPsi.firstChild) {

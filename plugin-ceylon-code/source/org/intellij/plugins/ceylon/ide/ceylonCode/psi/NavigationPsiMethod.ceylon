@@ -234,7 +234,7 @@ class NavigationPsiMethod satisfies PsiMethod {
         value types = ObjectArray<PsiType>(params.size);
         variable Integer i = 0;
         for (param in params) {
-            types.set(i++, param.type);
+            types[i++] = param.type;
         }
 
         return object extends MethodSignatureBase(substitutor_, types, PsiTypeParameter.emptyArray) {

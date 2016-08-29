@@ -143,7 +143,7 @@ shared class CeyLightClass extends LightElement
         value params = ObjectArray<PsiTypeParameter>(list.size());
         variable Integer i = 0;
         for (mirror in list) {
-            params.set(i++, CeyLightTypeParameter(mirror, manager));
+            params[i++] = CeyLightTypeParameter(mirror, manager);
         }
         return params;
     }

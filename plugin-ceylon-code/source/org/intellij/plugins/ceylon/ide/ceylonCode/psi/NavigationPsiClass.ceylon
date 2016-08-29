@@ -54,7 +54,7 @@ shared class NavigationPsiClass(CeylonPsi.StatementOrArgumentPsi decl) satisfies
             value inners = ObjectArray<PsiClass>(children.size());
             variable value i = 0;
             for (child in children) {
-                inners.set(i++, NavigationPsiClass(child));
+                inners[i++] = NavigationPsiClass(child);
             }
             return inners;
         }
