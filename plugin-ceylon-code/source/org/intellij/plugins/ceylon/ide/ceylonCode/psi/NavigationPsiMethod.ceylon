@@ -148,14 +148,13 @@ class NavigationPsiMethod satisfies PsiMethod {
 
         if (exists parameterList = findParameterList()) {
 
-            value signatureLength = paramsCount == -1
-                then parameterList.parameters.size()
-                else paramsCount;
+            value signatureLength
+                    = paramsCount == -1
+                    then parameterList.parameters.size()
+                    else paramsCount;
 
-            for (idx in 0:parameterList.parameters.size()) {
-                value param = parameterList.parameters.get(idx);
-                if (idx < signatureLength,
-                    is Tree.ParameterDeclaration param) {
+            for (idx in 0:signatureLength) {
+                if (is Tree.ParameterDeclaration param = parameterList.parameters[idx]) {
                     value typedDeclaration = param.typedDeclaration;
                     Type? typeModel = typedDeclaration.type.typeModel;
 
