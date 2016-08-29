@@ -83,7 +83,8 @@ shared class CeylonImplementationsSearch()
             exists node = sourceElement.ceylonNode,
             is TypeDeclaration|TypedDeclaration decl = node.declarationModel,
             is CeylonFile ceylonFile = sourceElement.containingFile,
-            exists project = findProjectForFile(ceylonFile),
+            exists project = concurrencyManager.needReadAccess(()
+                => findProjectForFile(ceylonFile)),
             exists modules = project.modules) {
 
             if (exists pus = project.typechecker?.phasedUnits) {
