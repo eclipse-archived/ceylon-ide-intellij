@@ -37,7 +37,9 @@ shared class PSIMethod(shared PsiMethod psi)
     Boolean computedIsOverriding
             =>  (classIs("ceylon.language.Identifiable") && psi.name in ["equals", "hashCode"])
             || !(classIs("ceylon.language.Object") && psi.name in ["equals", "hashCode", "toString"])
-                && concurrencyManager.needIndexes(psi.project, ()=>SuperMethodsSearch.search(psi, null, true, false).findFirst()) exists;
+                && concurrencyManager.needIndexes(psi.project,
+                    ()=> concurrencyManager.needReadAccess(
+                        () => SuperMethodsSearch.search(psi, null, true, false).findFirst())) exists;
 
     variable Boolean? lazyIsOverriding = null;
     shared Boolean isOverriding => lazyIsOverriding else (lazyIsOverriding = computedIsOverriding);
