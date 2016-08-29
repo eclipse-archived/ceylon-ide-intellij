@@ -35,7 +35,7 @@ shared class CeylonImportOptimizer()
             shared actual variable String? userNotificationInfo = null;
             shared actual void run() {
                 if (exists rootNode
-                        = psiFile.localAnalysisResult?.typecheckedRootNode) {
+                        = psiFile.localAnalyzer?.result?.typecheckedRootNode) {
                     userNotificationInfo
                             = cleanImports(rootNode, IdeaDocument(doc))
                             then "Imports optimized"
