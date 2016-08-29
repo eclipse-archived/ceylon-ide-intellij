@@ -114,7 +114,7 @@ class NavigationPsiMethod satisfies PsiMethod {
         if (exists typeModel, typeModel.typeParameter) {
             value tp = LightTypeParameterBuilder(typedDeclaration.type.text, this, 0);
             return PsiImmediateClassType(tp, PsiSubstitutor.empty);
-        } else if (exists typeModel, typeModel.functional) {
+        } else if (is Tree.MethodDeclaration typedDeclaration) {
             return PsiType.getTypeByName("ceylon.language.Callable", func.project, scope);
         } else {
             return mapType(typeModel, scope);
