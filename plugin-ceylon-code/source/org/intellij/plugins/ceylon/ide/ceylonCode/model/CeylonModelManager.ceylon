@@ -390,9 +390,7 @@ shared class CeylonModelManager(model)
                                             ceylonProject.build.performBuild(progress.newChild(1000));
                                         }
                                     });
-                                    busy_ = false;
                                 } catch(Throwable t) {
-                                    busy_ = false;
                                     if (is ProcessCanceledException t) {
                                         throw t;
                                     } else {
@@ -408,6 +406,8 @@ shared class CeylonModelManager(model)
                                         ).notify(model.ideaProject);
                                         throw t;
                                     }
+                                } finally {
+                                    busy_ = false;
                                 }
                             }
                             onSuccess() => bakgroundBuildLatch.countDown();
