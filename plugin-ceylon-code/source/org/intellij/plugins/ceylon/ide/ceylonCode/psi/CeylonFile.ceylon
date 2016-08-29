@@ -94,9 +94,6 @@ import org.jetbrains.ide {
 import com.intellij.openapi.progress {
     ProcessCanceledException
 }
-import com.intellij.openapi.diagnostic {
-    ControlFlowException
-}
 
 CeylonLogger<CeylonFile> ceylonFileLogger = CeylonLogger<CeylonFile>();
 
@@ -241,10 +238,11 @@ shared class CeylonFile(FileViewProvider viewProvider)
                 phasedUnitFuture.get(timeout, unit);
                 return analysisResult;
             } catch (Exception e) {
-                if (is ControlFlowException realException = e) {
+                // We could check for ControlFlowExceptions if we didn't have to support Android Studio 2.1
+                if (is ProcessCanceledException realException = e) {
                     throw realException;
                 }
-                if (is ControlFlowException realException = e.cause) {
+                if (is ProcessCanceledException realException = e.cause) {
                     throw realException;
                 }
                 platformUtils.log(Status._WARNING,
@@ -463,10 +461,11 @@ shared class CeylonFile(FileViewProvider viewProvider)
             }
             return resultFuture.get(timeout, unit);
         } catch (Exception e) {
-            if (is ControlFlowException realException = e) {
+            // We could check for ControlFlowExceptions if we didn't have to support Android Studio 2.1
+            if (is ProcessCanceledException realException = e) {
                 throw realException;
             }
-            if (is ControlFlowException realException = e.cause) {
+            if (is ProcessCanceledException realException = e.cause) {
                 throw realException;
             }
             platformUtils.log(Status._WARNING,

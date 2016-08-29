@@ -94,8 +94,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 import java.util.concurrent {
     TimeUnit
 }
-import com.intellij.openapi.diagnostic {
-    ControlFlowException
+import com.intellij.openapi.progress {
+    ProcessCanceledException
 }
 
 shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
@@ -208,7 +208,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
         }
         catch (AssertionError|Exception e) {
-            if (is ControlFlowException e) {
+            if (is ProcessCanceledException e) {
                 throw e;
             }
             e.printStackTrace();
