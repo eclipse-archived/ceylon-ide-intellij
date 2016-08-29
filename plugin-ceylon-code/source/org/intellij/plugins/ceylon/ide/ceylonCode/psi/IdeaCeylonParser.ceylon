@@ -1,6 +1,9 @@
 import ceylon.interop.java {
-    CeylonList,
-    synchronize
+    CeylonList
+}
+import ceylon.language {
+    ceylonTrue=true,
+    ceylonFalse=false
 }
 
 import com.intellij.codeInsight.completion {
@@ -27,12 +30,18 @@ import com.intellij.psi.tree {
 import com.redhat.ceylon.ide.common.model.parsing {
     sourceCodeParser
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    ExternalPhasedUnit
+}
 
 import java.io {
     StringReader
 }
 import java.lang {
     RuntimeException
+}
+import java.lang.ref {
+    WeakReference
 }
 import java.util {
     JList=List
@@ -44,16 +53,6 @@ import org.antlr.runtime {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger
-}
-import ceylon.language {
-    ceylonTrue = true,
-    ceylonFalse = false
-}
-import com.redhat.ceylon.ide.common.typechecker {
-    ExternalPhasedUnit
-}
-import java.lang.ref {
-    WeakReference
 }
 
 CeylonLogger<IdeaCeylonParser> ideaCeylonParserLogger = CeylonLogger<IdeaCeylonParser>();
