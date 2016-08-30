@@ -22,11 +22,15 @@ import com.intellij.psi.impl.compiled {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
+import com.redhat.ceylon.ide.common.model {
+    CeylonUnit
+}
 import com.redhat.ceylon.ide.common.util {
     FindDeclarationNodeVisitor
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    TypeDeclaration
 }
 
 import java.util {
@@ -49,13 +53,28 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
 
     isGeneratedSource(VirtualFile file, Project project) => false;
 
-    function modeltoPsi(Declaration member, Tree.CompilationUnit cu, CeylonFile file) {
-        value vis = FindDeclarationNodeVisitor(member);
-        vis.visit(cu);
-        if (exists result = vis.declarationNode,
-            exists psi = CeylonTreeUtil.findPsiElement(result, file)) {
+    function modelToPsi(Declaration member, Tree.CompilationUnit cu, CeylonFile file) {
+        Tree.CompilationUnit? actualCu;
+        CeylonFile actualFile;
 
-            return Collections.singletonList(psi);
+        if (member.unit != cu.unit,
+            is CeylonUnit unit = member.unit,
+            is CeylonFile f = CeylonTreeUtil.getDeclaringFile(unit, file.project)) {
+            actualCu = unit.compilationUnit;
+            actualFile = f;
+        } else {
+            actualCu = cu;
+            actualFile = file;
+        }
+
+        if (exists actualCu) {
+            value vis = FindDeclarationNodeVisitor(member);
+            vis.visit(actualCu);
+            if (exists result = vis.declarationNode,
+                exists psi = CeylonTreeUtil.findPsiElement(result, actualFile)) {
+
+                return Collections.singletonList(psi);
+            }
         }
 
         return null;
@@ -65,7 +84,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         if (is ClsClassImpl element,
             is CeylonFile file = element.containingFile.navigationElement,
             exists [decl, cu] = findClassModel(element, file),
-            exists psi = modeltoPsi(decl, cu, file)) {
+            exists psi = modelToPsi(decl, cu, file)) {
 
             return psi;
         }
@@ -76,24 +95,33 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             exists [decl, cu] = findClassModel(parent, file)) {
 
             value matchingName = ArrayList<Declaration>();
+            value ceylonName = getCeylonSimpleName(element);
 
             for (member in decl.members) {
                 if (exists memberName = member.name,
-                    exists clsName = getCeylonSimpleName(element),
+                    exists clsName = ceylonName,
                     memberName == clsName) {
 
                     matchingName.add(member);
                 }
             }
 
+            if (matchingName.empty, is TypeDeclaration decl) {
+                for (inherited in decl.getInheritedMembers(ceylonName)) {
+                    if (inherited.default) {
+                        matchingName.add(inherited);
+                    }
+                }
+            }
+
             if (matchingName.size == 1,
                 exists first = matchingName.first,
-                exists psi = modeltoPsi(first, cu, file)) {
+                exists psi = modelToPsi(first, cu, file)) {
 
                 return psi;
             }
 
-            if (exists psi = modeltoPsi(decl, cu, file)) {
+            if (exists psi = modelToPsi(decl, cu, file)) {
                 return psi;
             }
         }
