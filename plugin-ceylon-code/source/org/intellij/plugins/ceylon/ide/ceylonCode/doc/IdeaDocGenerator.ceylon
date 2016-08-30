@@ -97,7 +97,8 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
         tokens => lastPhasedUnit.tokens;
         typeChecker => outer.typechecker;
         ceylonProject => lastPhasedUnit.moduleSourceMapper?.ceylonProject;
-        commonDocument => nothing;
+        suppressWarnings("expressionTypeNothing")
+        shared actual Nothing commonDocument => nothing; // never used to generate the doc
 
         phasedUnitWhenTypechecked => FixedFuture(lastPhasedUnit);
 
