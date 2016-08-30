@@ -204,6 +204,7 @@
         <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.GotoTargetRenderer"/>
         <referencesSearch implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.ImportAliasReferencesSearch"/>
+        <generatedSourcesFilter implementation="org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonSourceNavigator"/>
         <!--<java.elementFinder implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonElementFinder"/>-->
         <!--<java.shortNamesCache implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi.CeylonShortNamesCache"/>-->
 

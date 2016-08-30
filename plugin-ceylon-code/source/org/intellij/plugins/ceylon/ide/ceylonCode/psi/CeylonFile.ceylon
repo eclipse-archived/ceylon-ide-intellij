@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaClass,
-    createJavaObjectArray
+    javaClass
 }
 
 import com.intellij.concurrency {
@@ -19,6 +18,9 @@ import com.intellij.openapi.\imodule {
     Module,
     ModuleUtil
 }
+import com.intellij.openapi.progress {
+    ProcessCanceledException
+}
 import com.intellij.openapi.util {
     Computable,
     Ref
@@ -35,9 +37,7 @@ import com.intellij.psi.text {
     BlockSupport
 }
 import com.intellij.psi.util {
-    PsiTreeUtil {
-        getChildrenOfType
-    }
+    PsiTreeUtil
 }
 import com.redhat.ceylon.compiler.typechecker {
     TypeChecker
@@ -79,7 +79,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProjects,
-    getModelManager,
     concurrencyManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
@@ -90,9 +89,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 }
 import org.jetbrains.ide {
     PooledThreadExecutor
-}
-import com.intellij.openapi.progress {
-    ProcessCanceledException
 }
 
 CeylonLogger<CeylonFile> ceylonFileLogger = CeylonLogger<CeylonFile>();
@@ -148,6 +144,7 @@ shared class CannotWaitForAnalysisResultInLockedSection() extends ProcessCancele
 
 shared class CeylonFile(FileViewProvider viewProvider)
         extends PsiFileBase(viewProvider, CeylonLanguage.instance)
+        // needed to associate a ClsClassImpl with its CeylonFile source mirror
         satisfies PsiClassOwner {
 
     putUserData(BlockSupport.treeDepthLimitExceeded, JBoolean.true);
@@ -486,28 +483,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
         return localAnalyzer?.ensureTypechecked()?.lastPhasedUnit;
     }
 
-    shared actual ObjectArray<PsiClass> classes {
-        if (exists mm = getModelManager(project), mm.busy) {
-            // To avoid huge performance hits during full model updates, because `getName()` on
-            // any compiled PSI element will try to get the name from sources
-            return noPsiClasses;
-        }
-
-        if (exists decls = getChildrenOfType(compilationUnitPsi, declarationClass)) {
-            value classes = ObjectArray<PsiClass>(decls.size);
-            variable value i = 0;
-            for (decl in decls) {
-                classes[i++] = NavigationPsiClass(decl);
-            }
-            return classes;
-        } else if (is CeylonPsi.ModuleDescriptorPsi mod = compilationUnitPsi.firstChild) {
-            return createJavaObjectArray({NavigationPsiClass(mod)});
-        } else if (is CeylonPsi.PackageDescriptorPsi pkg = compilationUnitPsi.firstChild) {
-            return createJavaObjectArray({NavigationPsiClass(pkg)});
-        } else {
-            return noPsiClasses;
-        }
-    }
+     classes => noPsiClasses;
 
     shared actual String packageName => "";
     assign packageName {}
