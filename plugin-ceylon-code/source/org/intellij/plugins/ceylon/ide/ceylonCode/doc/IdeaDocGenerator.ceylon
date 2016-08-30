@@ -98,7 +98,7 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
         typeChecker => outer.typechecker;
         ceylonProject => lastPhasedUnit.moduleSourceMapper?.ceylonProject;
         shared actual Nothing commonDocument {
-            "should never used to generate the doc"
+            "should never be used to generate the doc"
             assert(false);
         }
 
