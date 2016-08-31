@@ -43,7 +43,8 @@ shared CeylonModelManager? getModelManager(Project project)
 
 shared IdeaCeylonProject? getCeylonProject(PsiFile psiFile) {
     if (exists projects = getCeylonProjects(psiFile.project),
-        exists mod = ModuleUtilCore.findModuleForPsiElement(psiFile),
+        exists mod = concurrencyManager.needReadAccess(
+            ()=> ModuleUtilCore.findModuleForPsiElement(psiFile)),
         is IdeaCeylonProject project = projects.getProject(mod)) {
 
         return project;
