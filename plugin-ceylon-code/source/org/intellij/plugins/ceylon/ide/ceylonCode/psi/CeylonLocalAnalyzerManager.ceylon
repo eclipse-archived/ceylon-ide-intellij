@@ -315,7 +315,7 @@ shared class CeylonLocalAnalyzerManager(model)
                             fileViewProvider.onContentReload();
                         } catch(Throwable t) {
                             cleanOnFailure(t);
-                            throw;
+                            throw t;
                         }
                     }));
                 }
@@ -329,7 +329,7 @@ shared class CeylonLocalAnalyzerManager(model)
                             }
                         } catch(Throwable t) {
                             cleanOnFailure(t);
-                            throw;
+                            throw t;
                         }
                     }));
                 }
