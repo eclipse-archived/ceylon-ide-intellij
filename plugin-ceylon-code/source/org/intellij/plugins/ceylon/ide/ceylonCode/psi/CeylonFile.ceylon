@@ -70,7 +70,8 @@ import java.lang {
 }
 import java.util.concurrent {
     ExecutionException,
-    TimeUnit
+    TimeUnit,
+    CancellationException
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
@@ -465,9 +466,20 @@ shared class CeylonFile(FileViewProvider viewProvider)
             if (is ProcessCanceledException realException = e.cause) {
                 throw realException;
             }
-            platformUtils.log(Status._WARNING,
-                "Analysis result retrieval triggered the following exception for file ``
-                realVirtualFile() else "<unknown>" ``", e);
+            
+            variable value canceled = false;
+            // We could check for ControlFlowExceptions if we didn't have to support Android Studio 2.1
+            if (is CancellationException realException = e) {
+                canceled = true;
+            }
+            if (is CancellationException realException = e.cause) {
+                canceled = true;
+            }
+            if (! canceled) {
+                platformUtils.log(Status._WARNING,
+                    "Analysis result retrieval triggered the following exception for file ``
+                    realVirtualFile() else "<unknown>" ``", e);
+            }
             return null;
         }
     }

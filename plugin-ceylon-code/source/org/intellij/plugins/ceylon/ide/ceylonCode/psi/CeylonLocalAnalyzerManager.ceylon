@@ -270,10 +270,27 @@ shared class CeylonLocalAnalyzerManager(model)
         if (exists phasedUnit) {
             triggerReparse(virtualFile, phasedUnit, true);
         } else {
+            cleanOnFailure(virtualFile);
             logger.debug(()=>"External phased unit not found in retrieveTypecheckedAndBridgedExternalSource() for file ``virtualFile.name``");
         }
         logger.trace(()=>"Exit retrieveTypecheckedAndBridgedExternalSource() for file ``virtualFile.name``");
     }
+
+    void cleanOnFailure(VirtualFile virtualFile, Throwable? t = null) {
+        virtualFile.putUserData(uneditedExternalPhasedUnitToParse, null);
+        if (exists future = virtualFile.getUserData(uneditedExternalPhasedUnitFuture)) {
+            if (! future.done) {
+                try {
+                    if (exists t) {
+                        future.setException(t);
+                    } else {
+                        future.cancel(true);
+                    }
+                } catch(Throwable tt) {}
+            }
+        }
+    }
+    
 
     shared void triggerReparse(VirtualFile virtualFile, ExternalPhasedUnit? externalPhasedUnit = null, Boolean synchronously = false) {
         logger.trace(()=>"Enter scheduleReparse(``virtualFile``)", 10);
@@ -289,21 +306,6 @@ shared class CeylonLocalAnalyzerManager(model)
                     virtualFile.putUserData(uneditedExternalPhasedUnitToParse, externalPhasedUnit);
                 }
                 
-                void cleanOnFailure(Throwable? t = null) {
-                    virtualFile.putUserData(uneditedExternalPhasedUnitToParse, null);
-                    if (exists future = virtualFile.getUserData(uneditedExternalPhasedUnitFuture)) {
-                        if (! future.done) {
-                            try {
-                                if (exists t) {
-                                    future.setException(t);
-                                } else {
-                                    future.cancel(true);
-                                }
-                            } catch(Throwable tt) {}
-                        }
-                    }
-                }
-
                 void commitAndReloadContent() {
                     application.runWriteAction(JavaRunnable(() {
                         try {
@@ -314,7 +316,7 @@ shared class CeylonLocalAnalyzerManager(model)
                             }
                             fileViewProvider.onContentReload();
                         } catch(Throwable t) {
-                            cleanOnFailure(t);
+                            cleanOnFailure(virtualFile, t);
                             throw t;
                         }
                     }));
@@ -328,7 +330,7 @@ shared class CeylonLocalAnalyzerManager(model)
                                 value unused = cachedPsi.node.lastChildNode;
                             }
                         } catch(Throwable t) {
-                            cleanOnFailure(t);
+                            cleanOnFailure(virtualFile, t);
                             throw t;
                         }
                     }));
@@ -345,7 +347,7 @@ shared class CeylonLocalAnalyzerManager(model)
                             .doWhenDone(JavaRunnable(triggerReparse))
                             .doWhenRejected(JavaRunnable(void () {
                             logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
-                            cleanOnFailure();
+                            cleanOnFailure(virtualFile);
                         }));
                 }
             }
