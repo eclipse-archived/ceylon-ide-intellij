@@ -36,13 +36,15 @@ import com.intellij.openapi.roots {
     ModuleRootManager,
     OrderRootType,
     LibraryOrderEntry,
-    DependencyScope
+    DependencyScope,
+    ModifiableRootModel
 }
 import com.intellij.openapi.ui {
     Messages
 }
 import com.intellij.openapi.util {
-    Key
+    Key,
+    Ref
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
@@ -80,7 +82,8 @@ import com.redhat.ceylon.ide.common.typechecker {
     IdePhasedUnit
 }
 import com.redhat.ceylon.ide.common.util {
-    BaseProgressMonitorChild
+    BaseProgressMonitorChild,
+    BaseProgressMonitor
 }
 import com.redhat.ceylon.model.cmr {
     ArtifactResult
@@ -104,14 +107,14 @@ import java.lang {
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerInvoker
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
+    ideaPlatformUtils
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     IdeaVirtualFolder
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
-    ideaPlatformUtils
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -155,7 +158,9 @@ shared class IdeaCeylonProject(ideArtifact, model)
             languageModuleAdded = false;
         }
 
-        shared actual void beforeDependencyTreeValidation(CeylonProjectAlias ceylonProject) {
+        shared actual void beforeDependencyTreeValidation(CeylonProjectAlias ceylonProject,
+            BaseProgressMonitor.Progress progress) {
+
             validatingDependencies = true;
             dependenciesToAdd.clear();
 
@@ -166,12 +171,16 @@ shared class IdeaCeylonProject(ideArtifact, model)
             }
         }
 
-        shared actual void afterDependencyTreeValidation(CeylonProjectAlias ceylonProject) {
+        shared actual void afterDependencyTreeValidation(CeylonProjectAlias ceylonProject,
+            BaseProgressMonitor.Progress progress) {
             Thread.currentThread().contextClassLoader = javaClass<IdeaCeylonProject>().classLoader;
+
+            value sourcesToAttach = Ref<{ArtifactContext*}>();
 
             value runnable = JavaRunnable(() {
                 try {
-                    addLibraries(dependenciesToAdd, true);
+                    sourcesToAttach.set(addLibraries(dependenciesToAdd, true));
+                    validatingDependencies = false;
                 } catch (IOException e) {
                     platformUtils.log(Status._ERROR, "Can't add required artifacts to classpath", e);
                 }
@@ -179,7 +188,16 @@ shared class IdeaCeylonProject(ideArtifact, model)
             application.invokeAndWait(runnable, ModalityState.any());
 
             dumbService(model.ideaProject).waitForSmartMode();
-            validatingDependencies = false;
+
+            if (exists sources = sourcesToAttach.get()) {
+                progress.changeTaskName("Attaching sources to dependencies");
+                value artifacts = sources.collect(
+                    (ctx) => ctx -> (repositoryManager.getArtifactResult(ctx) else null)
+                );
+
+                value sourcesRunnable = JavaRunnable(() => attachSources(artifacts));
+                application.invokeAndWait(sourcesRunnable, ModalityState.any());
+            }
         }
     }
 
@@ -325,12 +343,25 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             };
 
-    shared void addLibraries(List<ArtifactResult> libraries, Boolean clear = false) {
+    void doWithLibraryModel(void func(IdeModifiableModelsProviderImpl provider, ModifiableRootModel mrm)) {
         value lock = application.acquireWriteActionLock(javaClass<IdeaCeylonProject>());
         value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
         value mrm = provider.getModifiableRootModel(ideArtifact);
 
         try {
+            func(provider, mrm);
+
+            provider.commit();
+        } catch (e) {
+            platformUtils.log(Status._ERROR, "Couldn't modify library", e);
+            provider.dispose();
+        } finally {
+            lock.finish();
+        }
+    }
+
+    {ArtifactContext*} addLibraries(List<ArtifactResult> libraries, Boolean clear = false) {
+        doWithLibraryModel((provider, mrm) {
             if (clear) {
                 for (e in mrm.orderEntries) {
                     if (is LibraryOrderEntry e,
@@ -360,16 +391,6 @@ shared class IdeaCeylonProject(ideArtifact, model)
                     updateUrl(OrderRootType.classes, carFile);
                 }
 
-                value sourceContext = ArtifactContext(null, artifact.name(), artifact.version(), ArtifactContext.src);
-                if (exists sourceArtifact = repositoryManager.getArtifactResult(sourceContext)) {
-                    value srcFile = VirtualFileManager.instance
-                        .findFileByUrl(JarFileSystem.protocolPrefix + sourceArtifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
-
-                    if (exists srcFile) {
-                        updateUrl(OrderRootType.sources, srcFile);
-                    }
-                }
-
                 if (exists entry = mrm.findLibraryOrderEntry(lib)) {
                     entry.scope = DependencyScope.provided;
                 } else {
@@ -378,14 +399,33 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             }
 
-            provider.commit();
-        } catch (e) {
-            platformUtils.log(Status._ERROR, "Couldn't add library", e);
-            provider.dispose();
-        } finally {
-            lock.finish();
-        }
+        });
+
+        return {
+            for (artifact in libraries.sort((x, y) => x.name().compare(y.name())))
+                ArtifactContext(null, artifact.name(), artifact.version(), ArtifactContext.src)
+        };
+
     }
+
+    void attachSources(<ArtifactContext->ArtifactResult?>[] artifacts) =>
+            doWithLibraryModel((provider, mrm) {
+                for (sourceContext -> sourceArtifact in artifacts) {
+                    if (exists sourceArtifact) {
+                        value libraryName = "Ceylon: " + sourceContext.name + "/" + sourceContext.version;
+                        value lib = provider.getLibraryByName(libraryName) else provider.createLibrary(libraryName);
+                        value libModel = provider.getModifiableLibraryModel(lib);
+                        value srcFile = VirtualFileManager.instance
+                            .findFileByUrl(JarFileSystem.protocolPrefix + sourceArtifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
+
+                        if (exists srcFile) {
+                            if (!javaString(srcFile.string) in libModel.getUrls(OrderRootType.sources).iterable) {
+                                libModel.addRoot(srcFile, OrderRootType.sources);
+                            }
+                        }
+                    }
+                }
+            });
 
     shared Boolean isAndroid {
         for (f in FacetManager.getInstance(ideaModule).allFacets) {
