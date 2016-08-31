@@ -12,12 +12,16 @@ import com.intellij.openapi.vfs {
     VirtualFile
 }
 import com.intellij.psi {
-    PsiElement
+    PsiElement,
+    PsiElementVisitor
 }
 import com.intellij.psi.impl.compiled {
     ClsClassImpl,
     ClsMethodImpl,
     ClsMemberImpl
+}
+import com.intellij.psi.impl.light {
+    LightElement
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
@@ -41,6 +45,9 @@ import java.util.concurrent {
     TimeUnit
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    CeylonLanguage
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     Annotations
 }
@@ -82,13 +89,49 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         return null;
     }
 
+
+    class DelegatingClass(ClsClassImpl binaryClass, CeylonFile file) extends LightElement(binaryClass.manager, CeylonLanguage.instance) {
+        value sourcePsi {
+            if (exists [decl, cu] = findClassModel(binaryClass, file),
+                exists psiCollection = modelToPsi(decl, cu, file),
+                exists psi = psiCollection[0]) {
+                return psi;
+            }
+            return null;
+        }
+
+        parent => binaryClass.parent;
+
+        containingFile => file;
+
+        shared actual void accept(PsiElementVisitor visitor) {
+            if (exists theSourcePsi = sourcePsi) {
+                theSourcePsi.accept(visitor);
+            } else {
+                super.accept(visitor);
+            }
+        }
+
+        findElementAt(Integer offset) =>
+                sourcePsi?.findElementAt(offset) else super.findElementAt(offset);
+
+        children => sourcePsi?.children else super.children;
+        node => sourcePsi?.node else super.node;
+        nextSibling => sourcePsi?.nextSibling else super.nextSibling;
+        prevSibling => sourcePsi?.prevSibling else super.prevSibling;
+        startOffsetInParent => sourcePsi?.startOffsetInParent else super.startOffsetInParent;
+        string => sourcePsi?.string else binaryClass.string;
+        text => sourcePsi?.string else "";
+        textOffset => sourcePsi?.textOffset else super.textOffset;
+        textRange => sourcePsi?.textRange else super.textRange;
+        name => getCeylonSimpleName(binaryClass) else binaryClass.name;
+    }
+
     shared actual List<out PsiElement> getOriginalElements(PsiElement element) {
         if (is ClsClassImpl element,
-            is CeylonFile file = element.containingFile.navigationElement,
-            exists [decl, cu] = findClassModel(element, file),
-            exists psi = modelToPsi(decl, cu, file)) {
+            is CeylonFile file = element.containingFile.navigationElement) {
 
-            return psi;
+            return Collections.singletonList(DelegatingClass(element, file));
         }
 
         if (is ClsMethodImpl element,
