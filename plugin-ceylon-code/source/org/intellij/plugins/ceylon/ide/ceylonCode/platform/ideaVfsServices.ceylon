@@ -13,7 +13,9 @@ import com.redhat.ceylon.ide.common.model {
     CeylonProject
 }
 import com.redhat.ceylon.ide.common.platform {
-    VfsServices
+    VfsServices,
+    platformUtils,
+    Status
 }
 import com.redhat.ceylon.ide.common.util {
     Path
@@ -34,14 +36,25 @@ import java.lang.ref {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
-    IdeaCeylonProjects
+    IdeaCeylonProjects,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     IdeaVirtualFolder,
     VirtualFileVirtualFile
 }
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    JavaRunnable
+}
+import com.intellij.openapi.fileEditor {
+    FileDocumentManager
+}
+import com.intellij.openapi.application {
+    ApplicationManager
+}
+import com.intellij.openapi.project {
+    ProjectManager
 }
 
 object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,VirtualFile> {
@@ -106,6 +119,38 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
             else parent.moduleFile?.parent?.findFileByRelativePath(path.string);
 
     fromJavaFile(File javaFile, Module project) => VfsUtil.findFileByIoFile(javaFile, true);
+
+    shared actual Boolean flushIfNecessary(VirtualFile resource) {
+        value fileDocumentManager = FileDocumentManager.instance;
+        if (fileDocumentManager.isFileModified(resource)) {
+            if (exists document = fileDocumentManager.getCachedDocument(resource)){
+                value application = ApplicationManager.application;
+                if (application.dispatchThread) {
+                    fileDocumentManager.saveDocument(document);
+                    return true;
+                } else {
+                    // The file could not be flushed to disk synchronously, since we're not
+                    // on the UI thread.
+                    // So do it asynchronously, and further notify the change to the
+                    // model manager in case that should trigger a model update.
+                    application.invokeLater(JavaRunnable(() {
+                        fileDocumentManager.saveDocument(document);
+                        for (project in ProjectManager.instance.openProjects) {
+                            if (exists modelManager = project.getComponent(javaClass<CeylonModelManager>())) {
+                                modelManager.notifyFileContenChange(resource);
+                            }
+                        }
+                    }));
+                    return false;
+                }
+            } else {
+                platformUtils.log(Status._WARNING, "Modified file `` resource.path `` was not saved.");
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     // TODO check if it's prefixed with a protocol
     getJavaFile(VirtualFile resource) => File(resource.canonicalPath);
