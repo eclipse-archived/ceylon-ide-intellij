@@ -205,6 +205,7 @@ shared class CeylonModelManager(model)
                 changeSet.add(first);
             }
             accumulatedChanges.drainTo(changeSet);
+
             try {
                 if (! changeSet.empty) {
                     logger.debug(() => "Submitting ``changeSet.size()`` changes to the model");
@@ -501,7 +502,7 @@ shared class CeylonModelManager(model)
         }
     }
     
-    void notifyFileContenChange(VirtualFile file) {
+    shared void notifyFileContenChange(VirtualFile file) {
         if (! isProjectOrWorkspaceFile(file)) {
             notifyChanges { NativeFileContentChange(file) };
         }
