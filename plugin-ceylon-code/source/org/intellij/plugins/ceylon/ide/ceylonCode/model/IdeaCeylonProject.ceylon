@@ -273,8 +273,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
     shared actual Boolean hasConfigFile
             => findModuleFile(ceylonConfigFileProjectRelativePath) exists;
 
-    shared actual void refreshConfigFile() {
-        value configFile = findModuleFile(ceylonConfigFileProjectRelativePath);
+    shared actual void refreshConfigFile(String projectRelativePath) {
+        value configFile = findModuleFile(projectRelativePath);
         if (exists configFile) {
             // TODO check if this is OK to do a synchronous refresh
             configFile.refresh(false, false);
