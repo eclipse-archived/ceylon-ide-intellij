@@ -99,6 +99,8 @@ public class CeylonFacetConfiguration implements FacetConfiguration {
         @Override
         public void apply() throws ConfigurationException {
             form.apply(ceylonProject);
+            ceylonProject.getConfiguration().save();
+            ceylonProject.getIdeConfiguration().save();
         }
 
         @Override
