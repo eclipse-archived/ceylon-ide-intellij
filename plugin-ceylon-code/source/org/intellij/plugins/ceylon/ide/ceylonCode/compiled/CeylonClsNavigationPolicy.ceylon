@@ -7,12 +7,21 @@ import com.intellij.psi {
 }
 import com.intellij.psi.impl.compiled {
     ClsCustomNavigationPolicyEx,
-    ClsClassImpl
+    ClsClassImpl,
+    ClsMethodImpl
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
+    ceylonSourceNavigator
 }
 
 shared class CeylonClsNavigationPolicy() extends ClsCustomNavigationPolicyEx() {
 
     shared actual PsiElement? getNavigationElement(ClsClassImpl clsClass) {
+        value sources = ceylonSourceNavigator.getOriginalElements(clsClass);
+        if (!sources.empty) {
+            return sources.get(0);
+        }
+
         if (is ClsClassImpl parent = clsClass.parent,
             parent.name.endsWith("$impl")) {
 
@@ -31,6 +40,14 @@ shared class CeylonClsNavigationPolicy() extends ClsCustomNavigationPolicyEx() {
             }
         }
 
+        return null;
+    }
+
+    shared actual PsiElement? getNavigationElement(ClsMethodImpl clsMethod) {
+        value sources = ceylonSourceNavigator.getOriginalElements(clsMethod);
+        if (!sources.empty) {
+            return sources.get(0);
+        }
         return null;
     }
 }

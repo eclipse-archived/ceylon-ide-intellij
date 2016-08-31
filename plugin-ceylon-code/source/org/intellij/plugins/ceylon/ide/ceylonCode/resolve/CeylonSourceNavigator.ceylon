@@ -49,6 +49,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
+shared CeylonSourceNavigator ceylonSourceNavigator = CeylonSourceNavigator();
+
 shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
 
     isGeneratedSource(VirtualFile file, Project project) => false;
