@@ -89,7 +89,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     DeclarationPsiNameIdOwner
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
-    resolveDeclaration
+    resolveDeclaration,
+    CeylonSourceNavigator
 }
 import java.util.concurrent {
     TimeUnit
@@ -193,17 +194,23 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                 }
             }
 
+            PsiElement? sourcePsiElement = let (navigationElement = element.navigationElement)
+            if (is CeylonSourceNavigator.DelegatingClass navigationElement) 
+            then navigationElement.delegate 
+            else navigationElement;
+            
             //special case for Navigate > Class
-            if (is CeylonPsi.DeclarationPsi navigationElement = element.navigationElement,
-                exists node = navigationElement.ceylonNode,
-                exists phasedUnit = phasedUnit(navigationElement)) {
-
-                return generator.getDocumentationText {
-                    rootNode = phasedUnit.compilationUnit;
-                    model = node.declarationModel;
-                    node = node;
-                    cmp = generator.DocParams(phasedUnit, element.project);
-                };
+            if (is CeylonPsi.DeclarationPsi sourcePsiElement) {
+                if (exists phasedUnit = phasedUnit(sourcePsiElement),
+                    exists node = sourcePsiElement.ceylonNode) {
+    
+                    return generator.getDocumentationText {
+                        rootNode = phasedUnit.compilationUnit;
+                        model = node.declarationModel;
+                        node = node;
+                        cmp = generator.DocParams(phasedUnit, element.project);
+                    };
+                }
             }
 
         }

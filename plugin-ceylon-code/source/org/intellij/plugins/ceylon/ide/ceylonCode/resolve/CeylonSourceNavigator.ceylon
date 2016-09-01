@@ -93,12 +93,14 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         return null;
     }
 
-    class DelegatingClass(ClsMemberImpl<out Anything> binaryClass, CeylonFile file, PsiElement? sourcePsi())
+    shared class DelegatingClass(ClsMemberImpl<out Anything> binaryClass, CeylonFile file, PsiElement? sourcePsi())
             extends LightElement(binaryClass.manager, CeylonLanguage.instance) {
 
         parent => binaryClass.parent;
 
         containingFile => file;
+
+        shared PsiElement? delegate => sourcePsi();
 
         shared actual void accept(PsiElementVisitor visitor) {
             if (exists theSourcePsi = sourcePsi()) {
