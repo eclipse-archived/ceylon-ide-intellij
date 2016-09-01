@@ -41,7 +41,9 @@ import com.redhat.ceylon.model.typechecker.model {
 
 import java.util {
     List,
-    Collections
+    Collections {
+        singletonList
+    }
 }
 import java.util.concurrent {
     TimeUnit
@@ -84,7 +86,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             if (exists result = vis.declarationNode,
                 exists psi = CeylonTreeUtil.findPsiElement(result, actualFile)) {
 
-                return Collections.singletonList(psi);
+                return singletonList(psi);
             }
         }
 
@@ -92,7 +94,8 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
     }
 
 
-    class DelegatingClass(ClsClassImpl binaryClass, CeylonFile file) extends LightElement(binaryClass.manager, CeylonLanguage.instance) {
+    class DelegatingClass(ClsClassImpl binaryClass, CeylonFile file)
+            extends LightElement(binaryClass.manager, CeylonLanguage.instance) {
         value sourcePsi {
             if (exists [decl, cu] = findClassModel(binaryClass, file),
                 exists psiCollection = modelToPsi(decl, cu, file),
@@ -115,7 +118,8 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         }
 
         findElementAt(Integer offset) =>
-                sourcePsi?.findElementAt(offset) else super.findElementAt(offset);
+                sourcePsi?.findElementAt(offset)
+                else super.findElementAt(offset);
 
         children => sourcePsi?.children else super.children;
         node => sourcePsi?.node else super.node;
@@ -132,17 +136,21 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
 
     function isGetter(ClsMethodImpl member)
             => let (name = member.name)
-                name.startsWith("get") && name.size > 3 && member.parameterList.parametersCount == 0;
+                   name.startsWith("get")
+                && name.size > 3
+                && member.parameterList.parametersCount == 0;
 
     function isSetter(ClsMethodImpl member)
             => let (name = member.name)
-                name.startsWith("set") && name.size > 3 && member.parameterList.parametersCount == 1;
+                   name.startsWith("set")
+                && name.size > 3
+                && member.parameterList.parametersCount == 1;
 
     shared actual List<out PsiElement> getOriginalElements(PsiElement element) {
         if (is ClsClassImpl element,
             is CeylonFile file = element.containingFile.navigationElement) {
 
-            return Collections.singletonList(DelegatingClass(element, file));
+            return singletonList(DelegatingClass(element, file));
         }
 
         if (is ClsMethodImpl element,
@@ -222,9 +230,8 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             if (name.endsWith("$priv$")) {
                 name = name.substring(0, name.size - "$priv$".size);
             }
-        } else if (is ClsClassImpl member,
-            name.endsWith("_"),
-            member.modifierList.findAnnotation(Annotations.\iobject.className) exists
+        } else if (is ClsClassImpl member, name.endsWith("_"),
+               member.modifierList.findAnnotation(Annotations.\iobject.className) exists
             || member.modifierList.findAnnotation(Annotations.attribute.className) exists
             || member.modifierList.findAnnotation(Annotations.method.className) exists) {
 
