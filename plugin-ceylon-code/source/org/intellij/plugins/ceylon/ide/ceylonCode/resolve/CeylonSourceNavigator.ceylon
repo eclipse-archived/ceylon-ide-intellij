@@ -34,7 +34,9 @@ import com.redhat.ceylon.ide.common.util {
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
-    TypeDeclaration
+    TypeDeclaration,
+    Value,
+    TypedDeclaration
 }
 
 import java.util {
@@ -127,6 +129,15 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         name => getCeylonSimpleName(binaryClass) else binaryClass.name;
     }
 
+
+    function isGetter(ClsMethodImpl member)
+            => let (name = member.name)
+                name.startsWith("get") && name.size > 3 && member.parameterList.parametersCount == 0;
+
+    function isSetter(ClsMethodImpl member)
+            => let (name = member.name)
+                name.startsWith("set") && name.size > 3 && member.parameterList.parametersCount == 1;
+
     shared actual List<out PsiElement> getOriginalElements(PsiElement element) {
         if (is ClsClassImpl element,
             is CeylonFile file = element.containingFile.navigationElement) {
@@ -147,7 +158,17 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
                     exists clsName = ceylonName,
                     memberName == clsName) {
 
-                    matchingName.add(member);
+                    if (isGetter(element)) {
+                        if (is Value member) {
+                            matchingName.add(member);
+                        }
+                    } else if (isSetter(element)) {
+                        if (is TypedDeclaration member, member.variable) {
+                            matchingName.add(member);
+                        }
+                    } else {
+                        matchingName.add(member);
+                    }
                 }
             }
 
@@ -159,8 +180,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
                 }
             }
 
-            if (matchingName.size == 1,
-                exists first = matchingName.first,
+            if (exists first = matchingName.first,
                 exists psi = modelToPsi(first, cu, file)) {
 
                 return psi;
@@ -187,9 +207,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
                 }
             } else if (name.startsWith("$")) {
                 name = name.substring(1);
-            } else if (name.startsWith("get"), name.size > 3, member.parameterList.parametersCount == 0) {
-                name = (name[3]?.lowercased else ' ').string + name.spanFrom(4);
-            } else if (name.startsWith("set"), name.size > 3, member.parameterList.parametersCount == 1) {
+            } else if (isGetter(member) || isSetter(member)) {
                 name = (name[3]?.lowercased else ' ').string + name.spanFrom(4);
             } else if (name == "toString") {
                 name = "string";
@@ -207,6 +225,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         } else if (is ClsClassImpl member,
             name.endsWith("_"),
             member.modifierList.findAnnotation(Annotations.\iobject.className) exists
+            || member.modifierList.findAnnotation(Annotations.attribute.className) exists
             || member.modifierList.findAnnotation(Annotations.method.className) exists) {
 
             name = name.trimTrailing('_'.equals);
@@ -221,7 +240,8 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
 
             for (decl in pu.declarations) {
                 if (exists ceylonName = getCeylonSimpleName(cls),
-                    decl.name == ceylonName) {
+                    exists declName = decl.name,
+                    declName == ceylonName) {
 
                     return [decl, cu];
                 }
