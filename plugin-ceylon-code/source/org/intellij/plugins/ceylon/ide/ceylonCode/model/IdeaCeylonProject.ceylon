@@ -202,8 +202,13 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 ProgressManager.instance.runProcessWithProgressAsynchronously(
                     object extends Task.Backgroundable(ceylonProject.ideArtifact.project, "Attaching sources to dependencies") {
                         shared actual void run(ProgressIndicator progressIndicator) {
+                            variable value counter = 0;
                             value artifacts = sources.collect(
-                                (ctx) => ctx -> (repositoryManager.getArtifactResult(ctx) else null)
+                                (ctx) {
+                                    progressIndicator.fraction = counter.float / sources.size;
+                                    progressIndicator.text2 = "Attaching " + ctx.string;
+                                    return ctx -> (repositoryManager.getArtifactResult(ctx) else null);
+                                }
                             );
 
                             value sourcesRunnable = JavaRunnable(() => attachSources(artifacts));
