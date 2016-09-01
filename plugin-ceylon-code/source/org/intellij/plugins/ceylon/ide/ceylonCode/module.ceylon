@@ -3,7 +3,7 @@
 native("jvm")
 module org.intellij.plugins.ceylon.ide.ceylonCode "current" {
     shared import java.base "7";
-    shared import com.redhat.ceylon.ide.common "1.2.3";
+    shared import com.redhat.ceylon.ide.common "1.3.0";
     shared import com.intellij.openapi "current";
     shared import com.intellij.idea "current";
     shared import org.jetbrains.plugins.gradle "current";
