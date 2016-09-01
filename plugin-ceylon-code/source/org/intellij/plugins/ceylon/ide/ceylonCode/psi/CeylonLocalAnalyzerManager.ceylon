@@ -332,8 +332,7 @@ shared class CeylonLocalAnalyzerManager(model)
                                 logger.debug(() => "no cached PSI file on which we could call `cachedPsi.node.lastChildNode` to trigger a reparse of file `` virtualFile.path ``");
                             }
                             if (exists ceylonFile = fileViewProvider.getPsi(ceylonLanguage)) {
-                                value cu = ceylonFile.firstChild;
-                                if (!exists cu) {
+                                if (!ceylonFile.firstChild exists) {
                                     logger.warn(() => "`ceylonFile.firstChild` is `null` in the `CeylonFile` of a triggered reparse of file `` virtualFile.path ``");
                                 }
                             } else {
