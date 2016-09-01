@@ -86,31 +86,22 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             if (exists result = vis.declarationNode,
                 exists psi = CeylonTreeUtil.findPsiElement(result, actualFile)) {
 
-                return singletonList(psi);
+                return psi;
             }
         }
 
         return null;
     }
 
-
-    class DelegatingClass(ClsClassImpl binaryClass, CeylonFile file)
+    class DelegatingClass(ClsMemberImpl<out Anything> binaryClass, CeylonFile file, PsiElement? sourcePsi())
             extends LightElement(binaryClass.manager, CeylonLanguage.instance) {
-        value sourcePsi {
-            if (exists [decl, cu] = findClassModel(binaryClass, file),
-                exists psiCollection = modelToPsi(decl, cu, file),
-                exists psi = psiCollection[0]) {
-                return psi;
-            }
-            return null;
-        }
 
         parent => binaryClass.parent;
 
         containingFile => file;
 
         shared actual void accept(PsiElementVisitor visitor) {
-            if (exists theSourcePsi = sourcePsi) {
+            if (exists theSourcePsi = sourcePsi()) {
                 theSourcePsi.accept(visitor);
             } else {
                 super.accept(visitor);
@@ -118,18 +109,18 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         }
 
         findElementAt(Integer offset)
-                => sourcePsi?.findElementAt(offset)
+                => sourcePsi()?.findElementAt(offset)
                 else super.findElementAt(offset);
 
-        children => sourcePsi?.children else super.children;
-        node => sourcePsi?.node else super.node;
-        nextSibling => sourcePsi?.nextSibling else super.nextSibling;
-        prevSibling => sourcePsi?.prevSibling else super.prevSibling;
-        startOffsetInParent => sourcePsi?.startOffsetInParent else super.startOffsetInParent;
-        string => sourcePsi?.string else binaryClass.string;
-        text => sourcePsi?.string else "";
-        textOffset => sourcePsi?.textOffset else super.textOffset;
-        textRange => sourcePsi?.textRange else super.textRange;
+        children => sourcePsi()?.children else super.children;
+        node => sourcePsi()?.node else super.node;
+        nextSibling => sourcePsi()?.nextSibling else super.nextSibling;
+        prevSibling => sourcePsi()?.prevSibling else super.prevSibling;
+        startOffsetInParent => sourcePsi()?.startOffsetInParent else super.startOffsetInParent;
+        string => sourcePsi()?.string else binaryClass.string;
+        text => sourcePsi()?.string else "";
+        textOffset => sourcePsi()?.textOffset else super.textOffset;
+        textRange => sourcePsi()?.textRange else super.textRange;
         name => getCeylonSimpleName(binaryClass) else binaryClass.name;
     }
 
@@ -150,53 +141,66 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         if (is ClsClassImpl element,
             is CeylonFile file = element.containingFile.navigationElement) {
 
-            return singletonList(DelegatingClass(element, file));
+            function sourcePsi() {
+                if (exists [decl, cu] = findClassModel(element, file),
+                    exists psi = modelToPsi(decl, cu, file)) {
+                    return psi;
+                }
+                return null;
+            }
+            return singletonList(DelegatingClass(element, file, sourcePsi));
         }
 
         if (is ClsMethodImpl element,
             is ClsClassImpl parent = element.parent,
-            is CeylonFile file = element.containingFile.navigationElement,
-            exists [decl, cu] = findClassModel(parent, file)) {
+            is CeylonFile file = element.containingFile.navigationElement) {
 
-            value matchingName = ArrayList<Declaration>();
-            value ceylonName = getCeylonSimpleName(element);
+            function sourcePsi() {
+                if (exists [decl, cu] = findClassModel(parent, file)) {
+                    value matchingName = ArrayList<Declaration>();
+                    value ceylonName = getCeylonSimpleName(element);
 
-            for (member in decl.members) {
-                if (exists memberName = member.name,
-                    exists clsName = ceylonName,
-                    memberName == clsName) {
+                    for (member in decl.members) {
+                        if (exists memberName = member.name,
+                            exists clsName = ceylonName,
+                            memberName == clsName) {
 
-                    if (isGetter(element)) {
-                        if (is Value member) {
-                            matchingName.add(member);
+                            if (isGetter(element)) {
+                                if (is Value member) {
+                                    matchingName.add(member);
+                                }
+                            } else if (isSetter(element)) {
+                                if (is TypedDeclaration member, member.variable) {
+                                    matchingName.add(member);
+                                }
+                            } else {
+                                matchingName.add(member);
+                            }
                         }
-                    } else if (isSetter(element)) {
-                        if (is TypedDeclaration member, member.variable) {
-                            matchingName.add(member);
+                    }
+
+                    if (matchingName.empty, is TypeDeclaration decl) {
+                        for (inherited in decl.getInheritedMembers(ceylonName)) {
+                            if (inherited.default) {
+                                matchingName.add(inherited);
+                            }
                         }
-                    } else {
-                        matchingName.add(member);
+                    }
+
+                    if (exists first = matchingName.first,
+                        exists psi = modelToPsi(first, cu, file)) {
+
+                        return psi;
+                    }
+
+                    if (exists psi = modelToPsi(decl, cu, file)) {
+                        return psi;
                     }
                 }
+                return null;
             }
 
-            if (matchingName.empty, is TypeDeclaration decl) {
-                for (inherited in decl.getInheritedMembers(ceylonName)) {
-                    if (inherited.default) {
-                        matchingName.add(inherited);
-                    }
-                }
-            }
-
-            if (exists first = matchingName.first,
-                exists psi = modelToPsi(first, cu, file)) {
-
-                return psi;
-            }
-
-            if (exists psi = modelToPsi(decl, cu, file)) {
-                return psi;
-            }
+            return singletonList(DelegatingClass(element, file, sourcePsi));
         }
 
         return super.getOriginalElements(element);
