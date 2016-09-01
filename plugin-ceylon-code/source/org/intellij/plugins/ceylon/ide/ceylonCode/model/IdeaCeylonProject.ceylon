@@ -27,6 +27,14 @@ import com.intellij.openapi.externalSystem.service.project {
 import com.intellij.openapi.\imodule {
     Module
 }
+import com.intellij.openapi.progress {
+    ProgressManager,
+    Task,
+    ProgressIndicator
+}
+import com.intellij.openapi.progress.util {
+    ProgressIndicatorBase
+}
 import com.intellij.openapi.project {
     DumbService {
         dumbService=getInstance
@@ -190,13 +198,17 @@ shared class IdeaCeylonProject(ideArtifact, model)
             dumbService(model.ideaProject).waitForSmartMode();
 
             if (exists sources = sourcesToAttach.get()) {
-                progress.changeTaskName("Attaching sources to dependencies");
-                value artifacts = sources.collect(
-                    (ctx) => ctx -> (repositoryManager.getArtifactResult(ctx) else null)
-                );
+                ProgressManager.instance.runProcessWithProgressAsynchronously(
+                    object extends Task.Backgroundable(ceylonProject.ideArtifact.project, "Attaching sources to dependencies") {
+                        shared actual void run(ProgressIndicator progressIndicator) {
+                            value artifacts = sources.collect(
+                                (ctx) => ctx -> (repositoryManager.getArtifactResult(ctx) else null)
+                            );
 
-                value sourcesRunnable = JavaRunnable(() => attachSources(artifacts));
-                application.invokeAndWait(sourcesRunnable, ModalityState.any());
+                            value sourcesRunnable = JavaRunnable(() => attachSources(artifacts));
+                            application.invokeAndWait(sourcesRunnable, ModalityState.any());
+                        }
+                } , ProgressIndicatorBase());
             }
         }
     }
