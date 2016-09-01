@@ -328,6 +328,16 @@ shared class CeylonLocalAnalyzerManager(model)
                             if (exists cachedPsi = fileViewProvider.getCachedPsi(ceylonLanguage)) {
                                 suppressWarnings("unusedDeclaration")
                                 value unused = cachedPsi.node.lastChildNode;
+                            } else {
+                                logger.debug(() => "no cached PSI file on which we could call `cachedPsi.node.lastChildNode` to trigger a reparse of file `` virtualFile.path ``");
+                            }
+                            if (exists ceylonFile = fileViewProvider.getPsi(ceylonLanguage)) {
+                                value cu = ceylonFile.firstChild;
+                                if (!exists cu) {
+                                    logger.warn(() => "`ceylonFile.firstChild` is `null` in the `CeylonFile` of a triggered reparse of file `` virtualFile.path ``");
+                                }
+                            } else {
+                                logger.warn(() => "ceylonFile is `null` at the end of a triggered reparse of file `` virtualFile.path ``");
                             }
                         } catch(Throwable t) {
                             cleanOnFailure(virtualFile, t);
