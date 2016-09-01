@@ -17,11 +17,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
 
 shared class CeylonClsNavigationPolicy() extends ClsCustomNavigationPolicyEx() {
 
-    function getSource(PsiElement clsClass)
+    function getElement(PsiElement clsClass)
             => ceylonSourceNavigator.getOriginalElements(clsClass)[0];
 
+    shared actual PsiElement? getNavigationElement(ClsMethodImpl clsMethod)
+            => getElement(clsMethod);
+
     shared actual PsiElement? getNavigationElement(ClsClassImpl clsClass) {
-        if (exists source = getSource(clsClass)) {
+        if (exists source = getElement(clsClass)) {
             return source;
         }
 
@@ -47,10 +50,4 @@ shared class CeylonClsNavigationPolicy() extends ClsCustomNavigationPolicyEx() {
         return null;
     }
 
-    shared actual PsiElement? getNavigationElement(ClsMethodImpl clsMethod) {
-        if (exists source = getSource(clsMethod)) {
-            return source;
-        }
-        return null;
-    }
 }
