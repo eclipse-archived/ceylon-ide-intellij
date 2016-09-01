@@ -94,7 +94,8 @@ import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitor
 }
 import com.redhat.ceylon.model.cmr {
-    ArtifactResult
+    ArtifactResult,
+    ArtifactResultType
 }
 import com.redhat.ceylon.model.typechecker.model {
     Package
@@ -415,7 +416,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
         return {
             for (artifact in libraries.sort((x, y) => x.name().compare(y.name())))
-                ArtifactContext(null, artifact.name(), artifact.version(), ArtifactContext.src)
+                let(type = artifact.type() == ArtifactResultType.maven then ArtifactContext.legacySrc else ArtifactContext.src)
+                ArtifactContext(artifact.namespace(), artifact.name(), artifact.version(), type)
         };
 
     }
