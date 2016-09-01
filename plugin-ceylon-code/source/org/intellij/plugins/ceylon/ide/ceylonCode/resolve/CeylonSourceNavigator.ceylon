@@ -117,8 +117,8 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             }
         }
 
-        findElementAt(Integer offset) =>
-                sourcePsi?.findElementAt(offset)
+        findElementAt(Integer offset)
+                => sourcePsi?.findElementAt(offset)
                 else super.findElementAt(offset);
 
         children => sourcePsi?.children else super.children;
