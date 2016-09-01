@@ -1,9 +1,5 @@
 import com.intellij.psi {
-    PsiElement,
-    PsiNamedElement,
-    JavaPsiFacade {
-        javaFacade=getInstance
-    }
+    PsiElement
 }
 import com.intellij.psi.impl.compiled {
     ClsCustomNavigationPolicyEx,
@@ -26,25 +22,6 @@ shared class CeylonClsNavigationPolicy() extends ClsCustomNavigationPolicyEx() {
     shared actual PsiElement? getNavigationElement(ClsClassImpl clsClass) {
         if (exists source = getElement(clsClass)) {
             return source;
-        }
-
-        if (is ClsClassImpl parent = clsClass.parent,
-            parent.name.endsWith("$impl")) {
-
-            value parentNoImpl = parent.qualifiedName[0:parent.qualifiedName.size-5];
-            value child = javaFacade(clsClass.project)
-                .findClass(parentNoImpl, clsClass.resolveScope);
-
-            if (is ClsClassImpl child,
-                exists source = child.sourceMirrorClass) {
-
-                for (cl in source.innerClasses) {
-                    if (exists name = (cl of PsiNamedElement).name,
-                        name == clsClass.name) {
-                        return cl;
-                    }
-                }
-            }
         }
 
         return null;

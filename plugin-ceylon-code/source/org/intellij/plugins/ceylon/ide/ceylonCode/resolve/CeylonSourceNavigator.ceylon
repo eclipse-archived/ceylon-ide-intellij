@@ -234,12 +234,18 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             if (name.endsWith("$priv$")) {
                 name = name.substring(0, name.size - "$priv$".size);
             }
-        } else if (is ClsClassImpl member, name.endsWith("_"),
-               member.modifierList.findAnnotation(Annotations.\iobject.className) exists
-            || member.modifierList.findAnnotation(Annotations.attribute.className) exists
-            || member.modifierList.findAnnotation(Annotations.method.className) exists) {
+        } else if (is ClsClassImpl member) {
+            if (name.endsWith("_"),
+                member.modifierList.findAnnotation(Annotations.\iobject.className) exists
+                || member.modifierList.findAnnotation(Annotations.attribute.className) exists
+                || member.modifierList.findAnnotation(Annotations.method.className) exists) {
 
-            name = name.trimTrailing('_'.equals);
+                name = name.trimTrailing('_'.equals);
+            } else if (name.endsWith("$impl"),
+                member.modifierList.findAnnotation(Annotations.ignore.className) exists) {
+
+                name = name.removeTerminal("$impl");
+            }
         }
 
         return name;
