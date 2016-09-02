@@ -1,16 +1,9 @@
-import ceylon.collection {
-    ArrayList
-}
-import ceylon.interop.java {
-    createJavaObjectArray
-}
-
 import com.intellij.lang {
     ASTNode
 }
 import com.intellij.lang.folding {
-    FoldingBuilderEx,
-    FoldingDescriptor
+    FoldingDescriptor,
+    CustomFoldingBuilder
 }
 import com.intellij.openapi.editor {
     Document
@@ -25,8 +18,8 @@ import com.intellij.psi.util {
     PsiTreeUtil
 }
 
-import java.lang {
-    ObjectArray
+import java.util {
+    List
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
@@ -35,9 +28,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTypes
 }
 
-shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
+shared class CeylonFoldingBuilder() extends CustomFoldingBuilder() {
 
-    isCollapsedByDefault(ASTNode node) => node.elementType == CeylonTypes.importList;
+    isRegionCollapsedByDefault(ASTNode node)
+            => node.elementType == CeylonTypes.importList;
 
     value blockElementTypes = [
         CeylonTypes.importModuleList,
@@ -47,7 +41,7 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
 //        CeylonTypes.importMemberOrTypeList
     ];
 
-    shared actual String getPlaceholderText(ASTNode node) {
+    shared actual String getLanguagePlaceholderText(ASTNode node, TextRange textRange) {
         if (node.elementType in blockElementTypes) {
             value text = node.text.normalized.trimmed;
             return text.size<40 then text else "{...}";
@@ -56,11 +50,14 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
         }
     }
 
-    shared actual ObjectArray<FoldingDescriptor> buildFoldRegions(PsiElement root,
-            Document document, Boolean quick) {
-        value descriptors = ArrayList<FoldingDescriptor>();
-        appendDescriptors(root, descriptors.add);
-        return createJavaObjectArray(descriptors);
+    shared actual void buildLanguageFoldRegions(List<FoldingDescriptor> list,
+            PsiElement element, Document document, Boolean quick) {
+        variable PsiElement? current = element.firstChild;
+        while (exists child = current) {
+            appendDescriptors(child, (d) => list.add(d));
+            buildLanguageFoldRegions(list, child, document, quick);
+            current = child.nextSibling;
+        }
     }
 
     void foldElement(PsiElement element, void add(FoldingDescriptor d)) {
@@ -85,6 +82,7 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
     }
 
     void appendDescriptors(PsiElement element, void add(FoldingDescriptor d)) {
+
         if (element is CeylonPsi.BodyPsi) {
             foldElement(element, add);
         }
@@ -98,12 +96,11 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
             foldAfterFirstLine(element, add);
         }
         else if (element.node.elementType == CeylonTokens.lineComment) {
-            value prev = PsiTreeUtil.prevVisibleLeaf(element);
-            value prevIsComment
-                    = if (exists prev)
+            value prevlineComment
+                    = if (exists prev = PsiTreeUtil.prevVisibleLeaf(element))
                     then prev.node.elementType == CeylonTokens.lineComment
                     else false;
-            if (!prevIsComment) {
+            if (!prevlineComment) {
                 variable PsiElement lastComment = element;
                 while (exists next = PsiTreeUtil.nextVisibleLeaf(lastComment),
                        next.node.elementType == CeylonTokens.lineComment) {
@@ -128,11 +125,6 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
             foldRange([start, end], element, add);
         }
 
-        variable PsiElement? child = element.firstChild;
-        while (exists c = child) {
-            appendDescriptors(c, add);
-            child = c.nextSibling;
-        }
     }
 
 }
