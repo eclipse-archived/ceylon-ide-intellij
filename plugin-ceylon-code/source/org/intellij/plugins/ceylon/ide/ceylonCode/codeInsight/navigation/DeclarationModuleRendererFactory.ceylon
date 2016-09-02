@@ -85,16 +85,17 @@ shared object declarationListCellRenderer extends DefaultListCellRenderer() {
 
             return superComponent();
         } else if (is ClsClassImpl val,
-            classFileDecompilerUtil.hasValidCeylonBinaryData(val.containingFile.virtualFile)) {
+            exists vfile = val.containingFile?.virtualFile,
+            classFileDecompilerUtil.hasValidCeylonBinaryData(vfile)) {
 
-            if (exists jar = jarFs.getVirtualFileForJar(val.containingFile.virtualFile)) {
+            if (exists jar = jarFs.getVirtualFileForJar(vfile)) {
                 if (exists pos = jar.nameWithoutExtension.firstOccurrence('-')) {
                     text = jar.nameWithoutExtension.replaceFirst("-", "/");
                 } else {
                     text = jar.name;
                 }
             } else {
-                text = val.containingFile.virtualFile.name;
+                text = vfile.name;
             }
 
             icon = icons.moduleArchives;
