@@ -134,7 +134,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                 "\"com.android.support.appcompat-v7\" \"``groovyFileManipulator.findAppCompatVersion(buildFile) else "23.1.1"``\""
             });
 
-            ceylonFileFactory.createFileFromTemplate(psiDir, "MainActivity.ceylon");
+            ceylonFileFactory.createFileFromTemplate(psiDir, "CeylonMainActivity.ceylon");
 
             return true;
         }
