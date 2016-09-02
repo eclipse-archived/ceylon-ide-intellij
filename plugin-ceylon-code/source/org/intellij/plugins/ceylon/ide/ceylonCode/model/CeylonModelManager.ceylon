@@ -8,6 +8,11 @@ import ceylon.interop.java {
     javaClassFromInstance
 }
 
+import com.intellij.compiler.server {
+    BuildManagerListener {
+        buildManagerTopic=topic
+    }
+}
 import com.intellij.notification {
     Notification,
     NotificationType {
@@ -57,7 +62,8 @@ import com.intellij.openapi.project {
     ProjectCoreUtil {
         isProjectOrWorkspaceFile
     },
-    DumbService
+    DumbService,
+    Project
 }
 import com.intellij.openapi.roots {
     ProjectRootManager {
@@ -68,6 +74,9 @@ import com.intellij.openapi.startup {
     StartupManager {
         startupManager=getInstance
     }
+}
+import com.intellij.openapi.util {
+    Ref
 }
 import com.intellij.openapi.vfs {
     VirtualFileListener,
@@ -109,13 +118,17 @@ import java.lang {
     Thread
 }
 import java.util {
-    JHashSet=HashSet
+    JHashSet=HashSet,
+    UUID
 }
 import java.util.concurrent {
     TimeUnit,
     CountDownLatch,
     LinkedBlockingQueue,
     Future
+}
+import java.util.concurrent.atomic {
+    AtomicInteger
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
@@ -131,12 +144,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings {
     ceylonSettings
-}
-import java.util.concurrent.atomic {
-    AtomicInteger
-}
-import com.intellij.openapi.util {
-    Ref
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger
@@ -155,6 +162,7 @@ shared class CeylonModelManager(model)
         & VirtualFileListener
         & FileEditorManagerListener
         & PsiDocumentTransactionListener
+        & BuildManagerListener
         & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile>
         & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
         & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
@@ -469,6 +477,7 @@ shared class CeylonModelManager(model)
         busConnection = model.ideaProject.messageBus.connect();
         busConnection.subscribe(fileEditorManagerTopic, this);
         busConnection.subscribe(psiDocumentTransactionTopic, this);
+        busConnection.subscribe(buildManagerTopic, this);
         VirtualFileManager.instance.addVirtualFileListener(this);
         model.addModelListener(this);
     }
@@ -579,7 +588,26 @@ shared class CeylonModelManager(model)
     fileOpened(FileEditorManager manager, VirtualFile file) => noop();
     
     selectionChanged(FileEditorManagerEvent evt) => scheduleModelUpdate(0);
-    
+
+    /***************************************************************************
+      BuildManagerListener implementation that checks if the IDE is currently
+      compiling something.
+    ***************************************************************************/
+
+    shared actual void beforeBuildProcessStarted(Project? project, UUID? sessionId) {}
+
+    shared actual void buildStarted(Project? project, UUID? sessionId, Boolean isAutomake) {
+        if (exists project, project == model.ideaProject) {
+            pauseAutomaticModelUpdate();
+        }
+    }
+
+    shared actual void buildFinished(Project? project, UUID? sessionId, Boolean isAutomake) {
+        if (exists project, project == model.ideaProject) {
+            resumeAutomaticModelUpdate();
+        }
+    }
+
     /***************************************************************************
       Utility functions
      ***************************************************************************/
