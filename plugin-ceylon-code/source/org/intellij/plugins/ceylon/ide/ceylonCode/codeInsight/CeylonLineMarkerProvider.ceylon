@@ -206,7 +206,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                 result.add(MarkerInfo {
                     alignment = GutterIconRenderer.Alignment.right;
                     tooltip = "Refinements of ``model.name``";
-                    updatePass = Pass.updateOverridenMarkers;
+                    updatePass = Pass.lineMarkers;
                     icon = model.formal
                         then AllIcons.Gutter.implementedMethod
                         else AllIcons.Gutter.overridenMethod;
