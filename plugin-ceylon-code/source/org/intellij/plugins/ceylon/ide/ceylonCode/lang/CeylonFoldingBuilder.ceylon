@@ -42,10 +42,15 @@ shared class CeylonFoldingBuilder() extends CustomFoldingBuilder() {
     ];
 
     shared actual String getLanguagePlaceholderText(ASTNode node, TextRange textRange) {
-        if (node.elementType in blockElementTypes) {
+        value elementType = node.elementType;
+        if (elementType in blockElementTypes) {
             value text = node.text.normalized.trimmed;
-            return text.size<40 then text else "{...}";
-        } else {
+            return text.shorterThan(40) then text else "{...}";
+        }
+        else if (elementType == CeylonTokens.multiComment) {
+            return "...*/";
+        }
+        else {
             return "...";
         }
     }
@@ -75,9 +80,12 @@ shared class CeylonFoldingBuilder() extends CustomFoldingBuilder() {
 
     void foldAfterFirstLine(PsiElement element, void add(FoldingDescriptor d)) {
         if (exists newLine = element.text.firstOccurrence('\n')) {
-            value start = element.textRange.startOffset + newLine;
-            value end = element.textRange.endOffset;
-            foldRange([start, end], element, add);
+            foldRange {
+                range = [ element.textRange.startOffset + newLine,
+                          element.textRange.endOffset ];
+                element = element;
+                add = add;
+            };
         }
     }
 
@@ -107,9 +115,12 @@ shared class CeylonFoldingBuilder() extends CustomFoldingBuilder() {
                     lastComment = next;
                 }
                 if (lastComment != element) {
-                    value start = element.textRange.endOffset-1;
-                    value end = lastComment.textRange.endOffset-1;
-                    foldRange([start, end], element, add);
+                    foldRange {
+                        range = [ element.textRange.endOffset,
+                                  lastComment.textRange.endOffset ];
+                        element = element;
+                        add = add;
+                    };
                 }
             }
         }
@@ -118,11 +129,12 @@ shared class CeylonFoldingBuilder() extends CustomFoldingBuilder() {
         }
         else if (element is CeylonPsi.ImportListPsi,
                  element.textLength>0) {
-            value start
-                    = element.textRange.startOffset
-                    + (element.text.startsWith("import ") then 7 else 0);
-            value end = element.textRange.endOffset;
-            foldRange([start, end], element, add);
+            foldRange {
+                range = [ element.textRange.startOffset
+                          + (element.text.startsWith("import ") then 7 else 0),
+                          element.textRange.endOffset ];
+                element = element;
+                add = add; };
         }
 
     }
