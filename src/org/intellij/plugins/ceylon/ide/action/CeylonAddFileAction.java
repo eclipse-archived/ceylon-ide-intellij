@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import com.redhat.ceylon.ide.common.util.escaping_;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.ceylonFileFactory_;
