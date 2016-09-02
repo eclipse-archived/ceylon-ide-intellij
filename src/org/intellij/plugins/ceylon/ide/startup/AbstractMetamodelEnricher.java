@@ -29,7 +29,8 @@ import java.util.regex.Pattern;
 abstract class AbstractMetamodelEnricher implements ApplicationComponent {
 
     private static Map<String, String> registeredModules = new HashMap<>();
-    private static final Pattern moduleArchivePattern = Pattern.compile("(.+)-([^\\-]+)\\.(j|J|c|C)ar");
+    private static final Pattern moduleArchivePatternCar = Pattern.compile("([^\\-]+)-(.+)\\.(c|C)ar");
+    private static final Pattern moduleArchivePatternJar = Pattern.compile("(.+)-([^\\-]+)\\.(j|J)ar");
 
     @Override
     public void initComponent() {
@@ -106,7 +107,10 @@ abstract class AbstractMetamodelEnricher implements ApplicationComponent {
         File[] modulesArchives = getArchives(pluginDescriptor, new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                Matcher matcher = moduleArchivePattern.matcher(name);
+                Matcher matcher = moduleArchivePatternCar.matcher(name);
+                if (!matcher.matches()) {
+                    matcher = moduleArchivePatternJar.matcher(name);
+                }
                 if (!"ceylon-bootstrap.jar".equals(name)
                         && !name.equals(pluginDescriptor.getPath().getName() + ".jar")
                         && matcher.matches()) {
