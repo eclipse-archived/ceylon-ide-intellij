@@ -93,15 +93,10 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             then decl.ceylonNode?.declarationModel
             else decl.ceylonNode?.declaration;
 
-    function findParentDeclaration(PsiElement el) {
-        if (is CeylonPsi.DeclarationPsi decl = el.parent) {
-            return decl;
-        } else if (is CeylonPsi.SpecifierStatementPsi el) {
-            return el;
-        } else {
-            return null;
-        }
-    }
+    function findParentDeclaration(PsiElement el)
+            => if (is CeylonPsi.DeclarationPsi decl = el.parent) then decl
+            else if (is CeylonPsi.SpecifierStatementPsi el) then el
+            else null;
 
     function findDeclaration(PsiElement element) {
         /*if (is CeylonFile file = element.containingFile) {
@@ -127,9 +122,8 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
         value file = element.containingFile;
         if (exists virtualFile = file.virtualFile) {
             value fileEditor
-                    = FileEditorManager
-                .getInstance(file.project)
-                .getSelectedEditor(virtualFile);
+                    = FileEditorManager.getInstance(file.project)
+                        .getSelectedEditor(virtualFile);
             if (is TextEditor fileEditor) {
                 return fileEditor.editor;
             }
@@ -206,15 +200,15 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                 exists offset = findParentDeclaration(element)?.textOffset,
                 model.formal || model.default) {
 
-                value ourUpdatePass => ApplicationInfo.instance.build.baselineVersion >= 163
-                    then Pass.lineMarkers
-                    else 6; // Pass.UPDATE_OVERRIDEN_MARKERS was renamed, then deprecated in platform 163.x
-
                 result.add(MarkerInfo {
                     alignment = GutterIconRenderer.Alignment.right;
                     tooltip = "Refinements of ``model.name``";
-                    updatePass = ourUpdatePass;
-                    icon = model.formal
+                    updatePass
+                        = ApplicationInfo.instance.build.baselineVersion >= 163
+                        then Pass.lineMarkers
+                        else 6; //Pass.UPDATE_OVERRIDEN_MARKERS was renamed, then deprecated in platform 163.x
+                    icon
+                        = model.formal
                         then AllIcons.Gutter.implementedMethod
                         else AllIcons.Gutter.overridenMethod;
                     range = element.textRange;
