@@ -16,6 +16,9 @@ import com.intellij.codeInsight.navigation {
 import com.intellij.icons {
     AllIcons
 }
+import com.intellij.openapi.application {
+    ApplicationInfo
+}
 import com.intellij.openapi.editor {
     Editor
 }
@@ -203,10 +206,14 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
                 exists offset = findParentDeclaration(element)?.textOffset,
                 model.formal || model.default) {
 
+                value ourUpdatePass => ApplicationInfo.instance.build.baselineVersion >= 163
+                    then Pass.lineMarkers
+                    else 6; // Pass.UPDATE_OVERRIDEN_MARKERS was renamed, then deprecated in platform 163.x
+
                 result.add(MarkerInfo {
                     alignment = GutterIconRenderer.Alignment.right;
                     tooltip = "Refinements of ``model.name``";
-                    updatePass = Pass.lineMarkers;
+                    updatePass = ourUpdatePass;
                     icon = model.formal
                         then AllIcons.Gutter.implementedMethod
                         else AllIcons.Gutter.overridenMethod;
