@@ -99,11 +99,11 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
         }
         else if (element.node.elementType == CeylonTokens.lineComment) {
             value prev = PsiTreeUtil.prevVisibleLeaf(element);
-            value lineComment
+            value prevIsComment
                     = if (exists prev)
                     then prev.node.elementType == CeylonTokens.lineComment
                     else false;
-            if (lineComment) {
+            if (!prevIsComment) {
                 variable PsiElement lastComment = element;
                 while (exists next = PsiTreeUtil.nextVisibleLeaf(lastComment),
                        next.node.elementType == CeylonTokens.lineComment) {
@@ -128,8 +128,10 @@ shared class CeylonFoldingBuilder() extends FoldingBuilderEx() {
             foldRange([start, end], element, add);
         }
 
-        for (child in element.children) {
-            appendDescriptors(child, add);
+        variable PsiElement? child = element.firstChild;
+        while (exists c = child) {
+            appendDescriptors(c, add);
+            child = c.nextSibling;
         }
     }
 
