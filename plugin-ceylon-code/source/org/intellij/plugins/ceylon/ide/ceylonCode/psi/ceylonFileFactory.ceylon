@@ -26,7 +26,8 @@ import java.lang {
     JString=String
 }
 import java.util {
-    HashMap
+    HashMap,
+    Properties
 }
 
 shared object ceylonFileFactory {
@@ -96,12 +97,13 @@ shared object ceylonFileFactory {
         );
     }
 
-    shared PsiElement createFileFromTemplate(PsiDirectory dir, String templateName, String fileName = templateName) {
+    shared PsiElement createFileFromTemplate(PsiDirectory dir, String templateName,
+        String fileName = templateName, Properties? properties = null) {
         value tplManager = fileTemplateManager(dir.project);
 
         return createFromTemplate(
             tplManager.getInternalTemplate(templateName),
-            fileName, null, dir
+            fileName, properties, dir
         );
     }
 }

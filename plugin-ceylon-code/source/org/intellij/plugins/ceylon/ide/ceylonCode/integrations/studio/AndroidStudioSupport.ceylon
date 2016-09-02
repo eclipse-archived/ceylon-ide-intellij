@@ -69,6 +69,9 @@ import org.jetbrains.plugins.gradle.util {
 import org.jetbrains.plugins.groovy.lang.psi {
     GroovyFile
 }
+import java.util {
+    Properties
+}
 
 shared interface AndroidStudioSupport {
     shared formal void setupModule(Module mod);
@@ -135,6 +138,16 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             });
 
             ceylonFileFactory.createFileFromTemplate(psiDir, "CeylonMainActivity.ceylon");
+
+            assert (exists layout = VfsUtil.findRelativeFile(mod.moduleFile?.parent, "src", "main", "res", "layout"));
+            assert (exists layoutPsi = PsiManager.getInstance(mod.project).findDirectory(layout));
+            value props = Properties();
+            props.setProperty("ACTIVITY_NAME", modName[0] + ".CeylonMainActivity");
+            ceylonFileFactory.createFileFromTemplate {
+                dir = layoutPsi;
+                templateName = "activity_main_ceylon.xml";
+                properties = props;
+            };
 
             return true;
         }
