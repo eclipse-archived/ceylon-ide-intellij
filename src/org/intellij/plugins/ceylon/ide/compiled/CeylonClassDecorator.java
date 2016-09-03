@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.lang.Class;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Decorates results in Navigate > Class for compiled Ceylon classes.
@@ -72,7 +74,19 @@ public class CeylonClassDecorator
                 return "package.ceylon";
             } else if (is(clsClass, Method.class)) {
                 String text = clsClass.getName();
-                return text.substring(0, text.length() - 1);
+                String name = text.substring(0, text.length() - 1);
+                PsiMethod[] methods = clsClass.findMethodsByName(name, false);
+                Arrays.sort(methods,
+                        new Comparator<PsiMethod>() {
+                            @Override
+                            public int compare(PsiMethod x, PsiMethod y) {
+                                return Integer.compare(
+                                        y.getParameterList().getParametersCount(),
+                                        x.getParameterList().getParametersCount());
+                            }
+                        });
+                PsiMethod clsMethod = methods[0];
+                return name + '(' + CeylonMethodDecorator.parameters(clsMethod) + ')';
             } else if (is(clsClass, Object.class)) {
                 return getName(clsClass);
             } else if (is(clsClass, Attribute.class)) {
@@ -89,26 +103,33 @@ public class CeylonClassDecorator
     }
 
     static String getName(PsiClass clsClass) {
-        PsiAnnotation ann
-                = clsClass.getModifierList()
-                    .findAnnotation(Name.class.getName());
+
+        PsiAnnotation ann = nameAnnotation(clsClass);
+
+        String name = clsClass.getName();
 
         if (ann != null) {
-            PsiNameValuePair[] attributes
-                    = ann.getParameterList().getAttributes();
-            if (attributes.length == 1) {
-                PsiAnnotationMemberValue value = attributes[0].getValue();
-                if (value instanceof PsiLiteralExpression) {
-                    return ((PsiLiteralExpression) value).getValue().toString();
-                }
-            }
-        } else if (clsClass.getName().endsWith("_")) {
-            return clsClass.getName().substring(0, clsClass.getName().length() - 1);
-        } else if (clsClass.getName().endsWith("$impl")) {
-            return clsClass.getName().substring(0, clsClass.getName().length() - 5);
+            name = nameValue(ann);
+        } else if (name.endsWith("_")) {
+            name = name.substring(0, name.length() - 1);
+        } else if (name.endsWith("$impl")) {
+            name = name.substring(0, name.length() - 5);
         }
 
-        return clsClass.getName();
+        PsiClass outer = clsClass.getContainingClass();
+        return outer != null ? getName(outer) + '.' + name : name;
+    }
+
+    static PsiAnnotation nameAnnotation(PsiModifierListOwner owner) {
+        return owner.getModifierList().findAnnotation(Name.class.getName());
+    }
+
+    static String nameValue(PsiAnnotation nameAnnotation) {
+        PsiLiteralExpression value =
+                (PsiLiteralExpression)
+                        nameAnnotation.findAttributeValue(
+                                PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME);
+        return value.getValue().toString();
     }
 
     @Override
@@ -116,7 +137,9 @@ public class CeylonClassDecorator
 
     @Override
     public ItemPresentation getPresentation(@NotNull final ClsClassImpl item) {
-        if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())) {
+        if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())
+                || item.getContainingClass()!=null
+                && item.getContainingClass().getName().endsWith("$impl")) {
             final String presentableText = getPresentableText(item);
             if (presentableText != null) {
                 return new ColoredItemPresentation() {

@@ -1,32 +1,20 @@
 package org.intellij.plugins.ceylon.ide.compiled;
 
-import com.intellij.ide.projectView.PresentationData;
-import com.intellij.ide.projectView.ProjectViewNode;
-import com.intellij.ide.projectView.ProjectViewNodeDecorator;
-import com.intellij.ide.projectView.impl.nodes.ClassTreeNode;
-import com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.packageDependencies.ui.PackageDependenciesNode;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.compiled.ClsClassImpl;
 import com.intellij.psi.impl.compiled.ClsMethodImpl;
-import com.intellij.psi.presentation.java.ClassPresentationProvider;
 import com.intellij.psi.presentation.java.MethodPresentationProvider;
-import com.intellij.ui.ColoredTreeCellRenderer;
-import com.redhat.ceylon.compiler.java.metadata.*;
-import com.redhat.ceylon.compiler.java.metadata.Object;
-import com.redhat.ceylon.compiler.java.metadata.Package;
+import com.redhat.ceylon.compiler.java.metadata.Ceylon;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.lang.Class;
 
 /**
  * Decorates results in Navigate > Symbol for compiled Ceylon class members.
@@ -48,23 +36,13 @@ public class CeylonMethodDecorator
     }
 
     private String getName(ClsMethodImpl clsMethod) {
-        PsiAnnotation ann
-                = clsMethod.getModifierList()
-                    .findAnnotation(Name.class.getName());
+        PsiAnnotation ann = CeylonClassDecorator.nameAnnotation(clsMethod);
 
         String name = clsMethod.getName();
         if (ann != null) {
-            PsiNameValuePair[] attributes
-                    = ann.getParameterList().getAttributes();
-            if (attributes.length == 1) {
-                PsiAnnotationMemberValue value = attributes[0].getValue();
-                if (value instanceof PsiLiteralExpression) {
-                    return ((PsiLiteralExpression) value).getValue().toString();
-                }
-            }
-            return name;
+            name = CeylonClassDecorator.nameValue(ann);
         } else if (name.endsWith("_")) {
-            return name.substring(0, name.length() - 1);
+            name = name.substring(0, name.length() - 1);
         } else if (name.length()>3
                 && name.startsWith("get")
                 && Character.isUpperCase(name.codePointAt(3))
@@ -72,9 +50,29 @@ public class CeylonMethodDecorator
             char[] chars = Character.toChars(Character.toLowerCase(name.codePointAt(3)));
             return String.valueOf(chars) + name.substring(3 + chars.length);
         }
-        else {
-            return name;
+
+        return name + '(' + parameters(clsMethod) + ')';
+    }
+
+    @NotNull
+    static StringBuilder parameters(PsiMethod clsMethod) {
+        StringBuilder params = new StringBuilder();
+        for (PsiParameter param: clsMethod.getParameterList().getParameters()) {
+            PsiAnnotation pann = CeylonClassDecorator.nameAnnotation(param);
+            if (pann!=null) {
+                if (params.length() > 0) {
+                    params.append(", ");
+                }
+                params.append(CeylonClassDecorator.nameValue(pann));
+            }
+            else if (!param.getName().startsWith("$reified$")) {
+                if (params.length() > 0) {
+                    params.append(", ");
+                }
+                params.append(param.getName());
+            }
         }
+        return params;
     }
 
     @Override
