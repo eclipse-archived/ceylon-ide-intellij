@@ -27,11 +27,15 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class CeylonExpressionTypeProvider()
-        extends ExpressionTypeProvider<CeylonPsi.TermPsi>() {
+        extends ExpressionTypeProvider<CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi>() {
 
-    getInformationHint(CeylonPsi.TermPsi termPsi)
-            => if (exists node = termPsi.ceylonNode,
-                   exists type = node.typeModel)
+    function type(CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi psi)
+            => if (is CeylonPsi.TermPsi psi)
+            then psi.ceylonNode?.typeModel
+            else psi.ceylonNode?.typeModel;
+
+    getInformationHint(CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi psi)
+            => if (exists node = psi.ceylonNode, exists type = type(psi))
             //This highlighting doesn't work :-(
             //"<html>``highlighter.highlight(type.asString(node.unit), termPsi.project)``</html>"
             then StringUtil.escapeXml(type.asString(node.unit))
@@ -40,15 +44,24 @@ shared class CeylonExpressionTypeProvider()
     errorHint => "No expression found";
 
     value termType = javaClass<CeylonPsi.TermPsi>();
+    value modifierType = javaClass<CeylonPsi.LocalModifierPsi>();
 
-    shared actual List<CeylonPsi.TermPsi> getExpressionsAt(PsiElement psiElement) {
-        value list = ArrayList<CeylonPsi.TermPsi>();
-        variable value expression = psiElement;
-        while (exists ex = getParentOfType(expression, termType)) {
-            if (!ex is CeylonPsi.ExpressionPsi, !ex in list) {
-                list.add(ex);
+    shared actual List<CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi>
+    getExpressionsAt(PsiElement psiElement) {
+        value list = ArrayList<CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi>();
+        //TODO: this doesn't work because there are never any
+        //      CeylonPsi.LocalModifierPsi nodes in the tree!
+        if (exists mod = getParentOfType(psiElement, modifierType)) {
+            list.add(mod);
+        }
+        else {
+            variable value expression = psiElement;
+            while (exists ex = getParentOfType(expression, termType)) {
+                if (!ex is CeylonPsi.ExpressionPsi, !ex in list) {
+                    list.add(ex);
+                }
+                expression = ex;
             }
-            expression = ex;
         }
         return list;
     }
