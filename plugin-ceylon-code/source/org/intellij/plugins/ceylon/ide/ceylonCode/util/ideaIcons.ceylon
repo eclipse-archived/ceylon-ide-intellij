@@ -13,7 +13,8 @@ import com.intellij.psi {
     CommonClassNames
 }
 import com.intellij.psi.impl.compiled {
-    ClsClassImpl
+    ClsClassImpl,
+    ClsMethodImpl
 }
 import com.intellij.psi.util {
     InheritanceUtil
@@ -275,6 +276,40 @@ shared object icons {
                     else if (cls.hasModifierProperty(PsiModifier.abstract))
                     then (isException(cls) then abstractExceptions else abstractClasses)
                     else (isException(cls) then exceptions else classes);
+        }
+
+        if (exists baseIcon) {
+            value visibility
+                    = if (cls.hasModifierProperty(PsiModifier.public))
+                    then PlatformIcons.publicIcon
+                    else PlatformIcons.privateIcon;
+
+            value decorations = ArrayList<Icon>();
+            if (cls.hasModifierProperty(PsiModifier.final)) {
+                decorations.add(AllIcons.Nodes.finalMark);
+            }
+            decorations.add(PlatformIcons.lockedIcon);
+            return createIcon(decorations, baseIcon, visibility);
+        }
+
+        return null;
+    }
+
+    function isGetter(ClsMethodImpl cls) {
+        String name = cls.name;
+        return name.longerThan(3) &&
+            name.startsWith("get") &&
+            name[3:1].every(Character.uppercase) &&
+            cls.parameterList.parametersCount==0;
+    }
+
+    shared Icon? forMethod(ClsMethodImpl cls) {
+        Icon? baseIcon;
+
+        if (isGetter(cls)) {
+            baseIcon = attributes;
+        } else {
+            baseIcon = methods;
         }
 
         if (exists baseIcon) {

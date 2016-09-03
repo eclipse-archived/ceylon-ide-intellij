@@ -156,6 +156,8 @@
         <projectViewNodeDecorator implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonClassDecorator"/>
         <itemPresentationProvider forClass="com.intellij.psi.impl.compiled.ClsClassImpl" order="first"
                                   implementationClass="org.intellij.plugins.ceylon.ide.compiled.CeylonClassDecorator"/>
+        <itemPresentationProvider forClass="com.intellij.psi.impl.compiled.ClsMethodImpl" order="first"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.compiled.CeylonMethodDecorator"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonClass"
                                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.presentation.ClassPresentationProvider"/>
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.DeclarationPsiNameIdOwner"

@@ -13,7 +13,9 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.packageDependencies.ui.PackageDependenciesNode;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.compiled.ClsClassImpl;
+import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.presentation.java.ClassPresentationProvider;
+import com.intellij.psi.presentation.java.MethodPresentationProvider;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.redhat.ceylon.compiler.java.metadata.*;
 import com.redhat.ceylon.compiler.java.metadata.Object;
@@ -27,72 +29,30 @@ import javax.swing.*;
 import java.lang.Class;
 
 /**
- * Decorates results in Navigate > Class for compiled Ceylon classes.
- * Decorates nodes in the Project View that represent compiled Ceylon classes.
+ * Decorates results in Navigate > Symbol for compiled Ceylon class members.
  */
-public class CeylonClassDecorator
-        implements ProjectViewNodeDecorator, ItemPresentationProvider<ClsClassImpl> {
+public class CeylonMethodDecorator
+        implements ItemPresentationProvider<ClsMethodImpl> {
 
     private static final classFileDecompilerUtil_ decompilerUtil = classFileDecompilerUtil_.get_();
 
-    @Override
-    public void decorate(ProjectViewNode node, PresentationData data) {
-        if (node instanceof ClassTreeNode) {
-            PsiClass psiClass = ((ClassTreeNode) node).getPsiClass();
-            if (psiClass instanceof ClsClassImpl
-                    && decompilerUtil.hasValidCeylonBinaryData(psiClass.getContainingFile().getVirtualFile())) {
-                ClsClassImpl clsClass = (ClsClassImpl) psiClass;
-
-                String presentableText = getPresentableText(clsClass);
-                if (presentableText != null) {
-                    data.setPresentableText(presentableText);
-                }
-
-                if (psiClass.isDeprecated()) {
-                    data.setAttributesKey(CodeInsightColors.DEPRECATED_ATTRIBUTES);
-                }
-
-                Icon icon = icons_.get_().forClass(clsClass);
-                if (icon != null) {
-                    data.setIcon(icon);
-                }
-            }
-        } else if (node.getParentDescriptor() instanceof NamedLibraryElementNode
-                && ((NamedLibraryElementNode) node.getParentDescriptor()).getName().startsWith("Ceylon: ")) {
-            node.getParentDescriptor().setIcon(icons_.get_().getModuleArchives());
-        }
-    }
-
     @Nullable
-    private String getPresentableText(ClsClassImpl clsClass) {
-        if (is(clsClass, Ceylon.class)) {
-            if (is(clsClass, Module.class)) {
-                return "module.ceylon";
-            } else if (is(clsClass, Package.class)) {
-                return "package.ceylon";
-            } else if (is(clsClass, Method.class)) {
-                String text = clsClass.getName();
-                return text.substring(0, text.length() - 1);
-            } else if (is(clsClass, Object.class)) {
-                return getName(clsClass);
-            } else if (is(clsClass, Attribute.class)) {
-                return getName(clsClass);
-            } else {
-                return getName(clsClass);
-            }
+    private String getPresentableText(ClsMethodImpl clsMethod) {
+        PsiClass clsClass = clsMethod.getContainingClass();
+        if (CeylonClassDecorator.is(clsClass, Ceylon.class)
+                || clsClass.getName().endsWith("$impl")) {
+            return CeylonClassDecorator.getName(clsClass)
+                    + '.' + getName(clsMethod);
         }
         return null;
     }
 
-    static boolean is(PsiClass clsClass, Class<?> ann) {
-        return clsClass.getModifierList().findAnnotation(ann.getName()) != null;
-    }
-
-    static String getName(PsiClass clsClass) {
+    private String getName(ClsMethodImpl clsMethod) {
         PsiAnnotation ann
-                = clsClass.getModifierList()
+                = clsMethod.getModifierList()
                     .findAnnotation(Name.class.getName());
 
+        String name = clsMethod.getName();
         if (ann != null) {
             PsiNameValuePair[] attributes
                     = ann.getParameterList().getAttributes();
@@ -102,21 +62,25 @@ public class CeylonClassDecorator
                     return ((PsiLiteralExpression) value).getValue().toString();
                 }
             }
-        } else if (clsClass.getName().endsWith("_")) {
-            return clsClass.getName().substring(0, clsClass.getName().length() - 1);
-        } else if (clsClass.getName().endsWith("$impl")) {
-            return clsClass.getName().substring(0, clsClass.getName().length() - 5);
+            return name;
+        } else if (name.endsWith("_")) {
+            return name.substring(0, name.length() - 1);
+        } else if (name.length()>3
+                && name.startsWith("get")
+                && Character.isUpperCase(name.codePointAt(3))
+                && clsMethod.getParameterList().getParametersCount()==0) {
+            char[] chars = Character.toChars(Character.toLowerCase(name.codePointAt(3)));
+            return String.valueOf(chars) + name.substring(3 + chars.length);
         }
-
-        return clsClass.getName();
+        else {
+            return name;
+        }
     }
 
     @Override
-    public void decorate(PackageDependenciesNode node, ColoredTreeCellRenderer cellRenderer) {}
-
-    @Override
-    public ItemPresentation getPresentation(@NotNull final ClsClassImpl item) {
-        if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())) {
+    public ItemPresentation getPresentation(@NotNull final ClsMethodImpl item) {
+        if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())
+                || item.getContainingClass().getName().endsWith("$impl")) {
             final String presentableText = getPresentableText(item);
             if (presentableText != null) {
                 return new ColoredItemPresentation() {
@@ -125,19 +89,6 @@ public class CeylonClassDecorator
                     public TextAttributesKey getTextAttributesKey() {
                         if (item.isDeprecated()) {
                             return CodeInsightColors.DEPRECATED_ATTRIBUTES;
-                        }
-                        String name = item.getName();
-                        if (name.endsWith("_")) { //TODO: better to check for the Ceylon annotations?
-                            for (PsiMethod method : item.findMethodsByName(name.substring(0, name.length()-1), false)) {
-                                if (method.isDeprecated()) {
-                                    return CodeInsightColors.DEPRECATED_ATTRIBUTES;
-                                }
-                            }
-                            for (PsiMethod method : item.findMethodsByName("get_", false)) {
-                                if (method.isDeprecated()) {
-                                    return CodeInsightColors.DEPRECATED_ATTRIBUTES;
-                                }
-                            }
                         }
                         return null;
                     }
@@ -178,13 +129,13 @@ public class CeylonClassDecorator
                     @Nullable
                     @Override
                     public Icon getIcon(boolean unused) {
-                        return icons_.get_().forClass(item);
+                        return icons_.get_().forMethod(item);
                     }
                 };
             }
         }
 
         // we can't return null
-        return new ClassPresentationProvider().getPresentation(item);
+        return new MethodPresentationProvider().getPresentation(item);
     }
 }
