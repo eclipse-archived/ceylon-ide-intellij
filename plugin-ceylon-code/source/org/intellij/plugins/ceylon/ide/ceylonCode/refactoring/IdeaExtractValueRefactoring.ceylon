@@ -65,14 +65,21 @@ shared class ExtractValueHandler() extends AbstractExtractHandler() {
     shared actual [TextRange+]? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
         if (exists localAnalysisResult = file.localAnalyzer?.result,
             exists phasedUnit = localAnalysisResult.typecheckedPhasedUnit) {
-            assert(exists node = nodes.findNode {
+            assert (exists node = nodes.findNode {
                 node = phasedUnit.compilationUnit;
                 tokens = localAnalysisResult.tokens;
                 startOffset = range.startOffset;
                 endOffset = range.endOffset;
             });
             
-            value refactoring = IdeaExtractValueRefactoring(file, phasedUnit, localAnalysisResult.tokens, editor, node);
+            value refactoring
+                    = IdeaExtractValueRefactoring {
+                        file = file;
+                        phasedUnit = phasedUnit;
+                        theTokens = localAnalysisResult.tokens;
+                        editor = editor;
+                        node = node;
+                    };
             value name = nodes.nameProposals(if (is Tree.Term node) then node else null).first;
             refactoring.newName = name;
             return refactoring.extractInFile(project, file);
@@ -90,6 +97,7 @@ class IdeaExtractValueRefactoring(CeylonFile file, PhasedUnit phasedUnit, List<C
     searchInFile(PhasedUnit pu) => false;
     searchInEditor() => false;
     rootNode => phasedUnit.compilationUnit;
+
     shared variable actual Boolean canBeInferred = false;
     shared actual variable Type? type = null;
     shared actual variable Boolean getter = false;
@@ -105,7 +113,7 @@ class IdeaExtractValueRefactoring(CeylonFile file, PhasedUnit phasedUnit, List<C
     
     dupeRegions = ArrayList<TextRange>();
 
-    assert(exists mod = ModuleUtilCore.findModuleForFile(file.virtualFile, file.project));
+    assert (exists mod = ModuleUtilCore.findModuleForFile(file.virtualFile, file.project));
 
     editorData => object satisfies EditorData {
         tokens => theTokens;

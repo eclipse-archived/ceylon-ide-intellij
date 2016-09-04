@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    javaString
 }
 
 import com.intellij.openapi.actionSystem {
@@ -107,23 +108,26 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
 
     void extractSelectedExpression(Project project, Editor editor, CeylonFile file) {
 
-        if (editor.selectionModel.selectionStart < editor.selectionModel.selectionEnd) {
+        value selectionModel = editor.selectionModel;
+        if (selectionModel.selectionStart < selectionModel.selectionEnd) {
             extractToScope {
                 project = project;
                 editor = editor;
                 file = file;
-                range = TextRange(editor.selectionModel.selectionStart,
-                                  editor.selectionModel.selectionEnd);
+                range = TextRange(selectionModel.selectionStart,
+                                  selectionModel.selectionEnd);
             };
         }
         else {
             value visitor = FindContainingExpressionsVisitor(editor.caretModel.offset);
-            assert(exists cu = PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()));
+            assert (exists cu = PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()));
             visitor.visitAny(cu.ceylonNode);
 
             value allParentExpressions
-                = psiElements<CeylonPsi.TermPsi> { file = file;
-                    elements = visitor.elements.iterable.coalesced; };
+                = psiElements<CeylonPsi.TermPsi> {
+                    file = file;
+                    elements = visitor.elements.iterable.coalesced;
+                };
             if (!nonempty allParentExpressions) {
                 //noop
             }
@@ -153,6 +157,16 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         }
     }
 
+    function createContext(Editor editor, CeylonFile file, CeylonPsi.DeclarationPsi inserted) {
+        value myDataContext = HashMap<JString,Object>();
+        myDataContext[javaString(CommonDataKeys.editor.name)] = editor;
+        myDataContext[javaString(CommonDataKeys.psiFile.name)] = file;
+        myDataContext[javaString(CommonDataKeys.psiElement.name)] = inserted;
+        myDataContext[javaString(LangDataKeys.psiElementArray.name)]
+                    = ObjectArray<PsiElement>(0, inserted);
+        return SimpleDataContext.getSimpleContext(myDataContext, null);
+    }
+
     shared void createAndIntroduceValue(Project proj, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? ceylonNode) {
 
         if (exists [newIdentifier, *usages] = extract(proj, editor, file, range, ceylonNode)) {
@@ -166,19 +180,13 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             }
 
             assert (is CeylonPsi.DeclarationPsi inserted = identifierElement.parent.parent);
-            PsiElement? identifier = PsiTreeUtil.getChildOfType(inserted, javaClass<CeylonPsi.IdentifierPsi>());
-            if (! exists identifier) {
-                return;
+
+            if (exists identifier = PsiTreeUtil.getChildOfType(inserted, javaClass<CeylonPsi.IdentifierPsi>())) {
+                editor.caretModel.moveToOffset(identifier.textOffset);
+                ExtractedVariableRenameHandler(usages)
+                    .invoke(proj, editor, file,
+                        createContext(editor, file, inserted));
             }
-            editor.caretModel.moveToOffset(identifier.textOffset);
-            value myDataContext = HashMap<JString,Object>();
-            myDataContext[JString(CommonDataKeys.editor.name)] = editor;
-            myDataContext[JString(CommonDataKeys.psiFile.name)] = file;
-            myDataContext[JString(CommonDataKeys.psiElement.name)] = inserted;
-            myDataContext[JString(LangDataKeys.psiElementArray.name)]
-                    = ObjectArray<PsiElement>(0, inserted);
-            value context = SimpleDataContext.getSimpleContext(myDataContext, null);
-            ExtractedVariableRenameHandler(usages).invoke(proj, editor, file, context);
         }
     }
 
