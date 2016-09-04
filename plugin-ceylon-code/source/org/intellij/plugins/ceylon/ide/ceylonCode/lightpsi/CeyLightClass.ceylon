@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    CeylonIterable
-}
-
 import com.intellij.openapi.project {
     Project
 }
@@ -75,15 +71,15 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lightpsi {
     CeyLightMethod,
     CeyLightTypeParameter
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    PSIClass,
+    PSIMethod
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTreeUtil
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     IdeaNavigation
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    PSIClass,
-    PSIMethod
 }
 
 
