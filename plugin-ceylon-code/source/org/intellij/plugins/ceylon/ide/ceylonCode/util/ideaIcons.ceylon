@@ -310,12 +310,21 @@ shared object icons {
             cls.parameterList.parametersCount==1;
 
     shared Icon forMethod(ClsMethodImpl cls)
-            => decorateIcon(cls, isGetter(cls)||isSetter(cls) then attributes else methods);
+            => decorateIcon {
+                cls = cls;
+                baseIcon
+                    = isGetter(cls) || isSetter(cls)
+                    then attributes
+                    else methods;
+            };
 
     shared Icon forField(ClsFieldImpl cls)
             //TODO: this results in the wrong visibility
             //      we should look at the getter for that
-            => decorateIcon(cls, attributes);
+            => decorateIcon {
+                cls = cls;
+                baseIcon = attributes;
+            };
 
     Icon createIcon(List<Icon> decorations, Icon icon, Icon visibility)
             => RowIcon(LayeredIcon(icon, *decorations), visibility);
