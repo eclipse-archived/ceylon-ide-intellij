@@ -257,7 +257,8 @@ shared object icons {
                 else PlatformIcons.privateIcon;
         value decorations = ArrayList<Icon>();
         if (cls.hasModifierProperty(PsiModifier.final)
-                && baseIcon!=interfaces) {
+                && baseIcon!=interfaces
+            || baseIcon==annotationClasses) {
             decorations.add(AllIcons.Nodes.finalMark);
         }
         decorations.add(PlatformIcons.lockedIcon);
@@ -275,7 +276,10 @@ shared object icons {
         } else if (has(Annotations.packageDescriptor)) {
             baseIcon = packageDescriptors;
         } else if (cls.\iinterface || cls.name.endsWith("$impl")) {
-            baseIcon = interfaces;
+            baseIcon
+                    = cls.name.endsWith("$annotation$")
+                    then annotationClasses
+                    else interfaces;
         } else if (has(Annotations.\iobject)) {
             baseIcon = objects;
         } else if (has(Annotations.method)) {
