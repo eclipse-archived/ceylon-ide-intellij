@@ -67,7 +67,8 @@ public class CeylonClassDecorator
 
     @Nullable
     private String getPresentableText(ClsClassImpl clsClass) {
-        if (is(clsClass, Ceylon.class)) {
+        if (is(clsClass, Ceylon.class)
+                || clsClass.getName().endsWith("$impl")) {
             if (is(clsClass, Module.class)) {
                 return "module.ceylon";
             } else if (is(clsClass, Package.class)) {
@@ -138,6 +139,7 @@ public class CeylonClassDecorator
     @Override
     public ItemPresentation getPresentation(@NotNull final ClsClassImpl item) {
         if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())
+                || item.getName().endsWith("$impl")
                 || item.getContainingClass()!=null
                 && item.getContainingClass().getName().endsWith("$impl")) {
             final String presentableText = getPresentableText(item);

@@ -252,11 +252,12 @@ shared object icons {
 
     function decorateIcon(PsiModifierListOwner cls, Icon baseIcon) {
         value visibility
-                = if (cls.hasModifierProperty(PsiModifier.public))
+                = cls.hasModifierProperty(PsiModifier.public)
                 then PlatformIcons.publicIcon
                 else PlatformIcons.privateIcon;
         value decorations = ArrayList<Icon>();
-        if (cls.hasModifierProperty(PsiModifier.final)) {
+        if (cls.hasModifierProperty(PsiModifier.final)
+                && baseIcon!=interfaces) {
             decorations.add(AllIcons.Nodes.finalMark);
         }
         decorations.add(PlatformIcons.lockedIcon);
@@ -273,13 +274,13 @@ shared object icons {
             baseIcon = moduleDescriptors;
         } else if (has(Annotations.packageDescriptor)) {
             baseIcon = packageDescriptors;
-        } else if (cls.\iinterface) {
+        } else if (cls.\iinterface || cls.name.endsWith("$impl")) {
             baseIcon = interfaces;
         } else if (has(Annotations.\iobject)) {
             baseIcon = objects;
         } else if (has(Annotations.method)) {
             baseIcon
-                    = if(has(Annotations.annotationInstantiation))
+                    = if (has(Annotations.annotationInstantiation))
                     then annotations
                     else methods;
         } else if (has(Annotations.attribute)) {
