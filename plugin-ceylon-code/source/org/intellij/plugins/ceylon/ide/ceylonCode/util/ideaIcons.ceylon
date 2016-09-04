@@ -297,19 +297,17 @@ shared object icons {
         return decorateIcon(cls, baseIcon);
     }
 
-    function isGetter(ClsMethodImpl cls) {
-        String name = cls.name;
-        return name.longerThan(3) &&
+    function isGetter(ClsMethodImpl cls)
+            => let (name = cls.name)
+            name.longerThan(3) &&
             name.startsWith("get") &&
             cls.parameterList.parametersCount==0;
-    }
 
-    function isSetter(ClsMethodImpl cls) {
-        String name = cls.name;
-        return name.longerThan(3) &&
-        name.startsWith("set") &&
-        cls.parameterList.parametersCount==1;
-    }
+    function isSetter(ClsMethodImpl cls)
+            => let (name = cls.name)
+            name.longerThan(3) &&
+            name.startsWith("set") &&
+            cls.parameterList.parametersCount==1;
 
     shared Icon forMethod(ClsMethodImpl cls)
             => decorateIcon(cls, isGetter(cls)||isSetter(cls) then attributes else methods);
