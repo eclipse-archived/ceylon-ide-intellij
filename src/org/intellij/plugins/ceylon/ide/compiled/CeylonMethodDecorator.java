@@ -62,6 +62,7 @@ public class CeylonMethodDecorator
     static StringBuilder parameters(PsiMethod clsMethod) {
         StringBuilder params = new StringBuilder();
         for (PsiParameter param: clsMethod.getParameterList().getParameters()) {
+            //TODO: the type of the parameter!!
             PsiAnnotation pann = CeylonClassDecorator.nameAnnotation(param);
             if (pann!=null) {
                 if (params.length() > 0) {
