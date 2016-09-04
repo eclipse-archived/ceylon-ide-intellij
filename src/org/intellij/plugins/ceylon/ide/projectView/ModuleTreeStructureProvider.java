@@ -92,12 +92,12 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider, DumbA
                                                          @NotNull Collection<AbstractTreeNode> children,
                                                          @NotNull VirtualFile sourceRoot) {
         List<AbstractTreeNode> modules = new ArrayList<>();
-        PsiDirectory root = null;
-        if (parent instanceof PsiDirectoryNode) {
-            root = ((PsiDirectoryNode) parent).getValue();
-        }
-        ModuleTreeNode defaultModule = new ModuleTreeNode(parent.getProject(), root, "(default module)");
-        modules.add(defaultModule);
+//        PsiDirectory root = null;
+//        if (parent instanceof PsiDirectoryNode) {
+//            root = ((PsiDirectoryNode) parent).getValue();
+//        }
+//        ModuleTreeNode defaultModule = new ModuleTreeNode(parent.getProject(), root, "(default module)");
+//        modules.add(defaultModule);
 
         Map<String, ModuleTreeNode> modulesByName = new HashMap<>();
 
@@ -110,7 +110,8 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider, DumbA
                 ModuleTreeNode container = getContainingModule(modulesByName, child, sourceRoot);
 
                 if (container == null) {
-                    defaultModule.addChild(child);
+//                    defaultModule.addChild(child);
+                    modules.add(child);
                 } else {
                     container.addChild(child);
                 }
