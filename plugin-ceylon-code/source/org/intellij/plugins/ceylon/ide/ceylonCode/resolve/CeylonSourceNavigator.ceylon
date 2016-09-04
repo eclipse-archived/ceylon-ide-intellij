@@ -18,7 +18,8 @@ import com.intellij.psi {
 import com.intellij.psi.impl.compiled {
     ClsClassImpl,
     ClsMethodImpl,
-    ClsMemberImpl
+    ClsMemberImpl,
+    ClsFieldImpl
 }
 import com.intellij.psi.impl.light {
     LightElement
@@ -130,13 +131,13 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
     function isGetter(ClsMethodImpl member)
             => let (name = member.name)
                    name.startsWith("get")
-                && name.size > 3
+                && name.longerThan(3)
                 && member.parameterList.parametersCount == 0;
 
     function isSetter(ClsMethodImpl member)
             => let (name = member.name)
                    name.startsWith("set")
-                && name.size > 3
+                && name.longerThan(3)
                 && member.parameterList.parametersCount == 1;
 
     shared actual List<out PsiElement> getOriginalElements(PsiElement element) {
@@ -153,7 +154,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             return singletonList(DelegatingClass(element, file, sourcePsi));
         }
 
-        if (is ClsMethodImpl element,
+        if (is ClsMethodImpl|ClsFieldImpl element,
             is ClsClassImpl parent = element.parent,
             is CeylonFile file = element.containingFile.navigationElement) {
 
@@ -167,16 +168,25 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
                             exists clsName = ceylonName,
                             memberName == clsName) {
 
-                            if (isGetter(element)) {
+                            switch (element)
+                            case (is ClsMethodImpl) {
+                                if (isGetter(element)) {
+                                    if (is Value member) {
+                                        matchingName.add(member);
+                                    }
+                                } else if (isSetter(element)) {
+                                    if (is TypedDeclaration member,
+                                        member.variable) {
+                                        matchingName.add(member);
+                                    }
+                                } else {
+                                    matchingName.add(member);
+                                }
+                            }
+                            case (is ClsFieldImpl) {
                                 if (is Value member) {
                                     matchingName.add(member);
                                 }
-                            } else if (isSetter(element)) {
-                                if (is TypedDeclaration member, member.variable) {
-                                    matchingName.add(member);
-                                }
-                            } else {
-                                matchingName.add(member);
                             }
                         }
                     }
@@ -211,18 +221,19 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
     String? getCeylonSimpleName(ClsMemberImpl<out Anything> member) {
         variable value name = member.name;
 
-        if (is ClsMethodImpl member) {
+        switch (member)
+        case (is ClsMethodImpl) {
             if (name.startsWith("$default$")) {
-                name = name.substring("$default$".size);
+                name = name.removeInitial("$default$");
             } else if (name == "get_") {
                 if (member.hasModifierProperty("static"),
                     member.parameterList.parametersCount == 0) {
                     return null;
                 }
             } else if (name.startsWith("$")) {
-                name = name.substring(1);
+                name = name[1...];
             } else if (isGetter(member) || isSetter(member)) {
-                name = (name[3]?.lowercased else ' ').string + name.spanFrom(4);
+                name = name[3:1].lowercased + name[4...];
             } else if (name == "toString") {
                 name = "string";
             } else if (name == "hashCode") {
@@ -231,12 +242,13 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
                 // TODO
             }
             if (name.endsWith("$canonical$")) {
-                name = name.substring(0, name.size - "$canonical$".size);
+                name = name.removeTerminal("$canonical$");
             }
             if (name.endsWith("$priv$")) {
-                name = name.substring(0, name.size - "$priv$".size);
+                name = name.removeTerminal("$priv$");
             }
-        } else if (is ClsClassImpl member) {
+        }
+        case (is ClsClassImpl) {
             if (name.endsWith("_"),
                 member.modifierList.findAnnotation(Annotations.\iobject.className) exists
                 || member.modifierList.findAnnotation(Annotations.attribute.className) exists
@@ -249,6 +261,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
                 name = name.removeTerminal("$impl");
             }
         }
+        else {}
 
         return name;
     }

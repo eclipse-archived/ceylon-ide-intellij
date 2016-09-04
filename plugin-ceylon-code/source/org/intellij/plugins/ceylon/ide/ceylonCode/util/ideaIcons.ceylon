@@ -10,11 +10,13 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiModifier,
-    CommonClassNames
+    CommonClassNames,
+    PsiModifierListOwner
 }
 import com.intellij.psi.impl.compiled {
     ClsClassImpl,
-    ClsMethodImpl
+    ClsMethodImpl,
+    ClsFieldImpl
 }
 import com.intellij.psi.util {
     InheritanceUtil
@@ -248,12 +250,25 @@ shared object icons {
             => InheritanceUtil.isInheritor(cls,
                     CommonClassNames.javaLangThrowable);
 
-    shared Icon? forClass(ClsClassImpl cls) {
-        Icon? baseIcon;
+    function decorateIcon(PsiModifierListOwner cls, Icon baseIcon) {
+        value visibility
+                = if (cls.hasModifierProperty(PsiModifier.public))
+                then PlatformIcons.publicIcon
+                else PlatformIcons.privateIcon;
+        value decorations = ArrayList<Icon>();
+        if (cls.hasModifierProperty(PsiModifier.final)) {
+            decorations.add(AllIcons.Nodes.finalMark);
+        }
+        decorations.add(PlatformIcons.lockedIcon);
+        return createIcon(decorations, baseIcon, visibility);
+    }
+
+    shared Icon forClass(ClsClassImpl cls) {
 
         function has(Annotations ann)
                 => cls.modifierList.findAnnotation(ann.className) exists;
 
+        Icon baseIcon;
         if (has(Annotations.moduleDescriptor)) {
             baseIcon = moduleDescriptors;
         } else if (has(Annotations.packageDescriptor)) {
@@ -278,57 +293,31 @@ shared object icons {
                     else (isException(cls) then exceptions else classes);
         }
 
-        if (exists baseIcon) {
-            value visibility
-                    = if (cls.hasModifierProperty(PsiModifier.public))
-                    then PlatformIcons.publicIcon
-                    else PlatformIcons.privateIcon;
-
-            value decorations = ArrayList<Icon>();
-            if (cls.hasModifierProperty(PsiModifier.final)) {
-                decorations.add(AllIcons.Nodes.finalMark);
-            }
-            decorations.add(PlatformIcons.lockedIcon);
-            return createIcon(decorations, baseIcon, visibility);
-        }
-
-        return null;
+        return decorateIcon(cls, baseIcon);
     }
 
     function isGetter(ClsMethodImpl cls) {
         String name = cls.name;
         return name.longerThan(3) &&
             name.startsWith("get") &&
-            name[3:1].every(Character.uppercase) &&
             cls.parameterList.parametersCount==0;
     }
 
-    shared Icon? forMethod(ClsMethodImpl cls) {
-        Icon? baseIcon;
-
-        if (isGetter(cls)) {
-            baseIcon = attributes;
-        } else {
-            baseIcon = methods;
-        }
-
-        if (exists baseIcon) {
-            value visibility
-                    = if (cls.hasModifierProperty(PsiModifier.public))
-                    then PlatformIcons.publicIcon
-                    else PlatformIcons.privateIcon;
-
-            value decorations = ArrayList<Icon>();
-            if (cls.hasModifierProperty(PsiModifier.final)) {
-                decorations.add(AllIcons.Nodes.finalMark);
-            }
-            decorations.add(PlatformIcons.lockedIcon);
-            return createIcon(decorations, baseIcon, visibility);
-        }
-
-        return null;
+    function isSetter(ClsMethodImpl cls) {
+        String name = cls.name;
+        return name.longerThan(3) &&
+        name.startsWith("set") &&
+        cls.parameterList.parametersCount==1;
     }
 
-    Icon createIcon(List<Icon> decorations, Icon icon, Icon visibility) 
+    shared Icon forMethod(ClsMethodImpl cls)
+            => decorateIcon(cls, isGetter(cls)||isSetter(cls) then attributes else methods);
+
+    shared Icon forField(ClsFieldImpl cls)
+            //TODO: this results in the wrong visibility
+            //      we should look at the getter for that
+            => decorateIcon(cls, attributes);
+
+    Icon createIcon(List<Icon> decorations, Icon icon, Icon visibility)
             => RowIcon(LayeredIcon(icon, *decorations), visibility);
 }

@@ -6,8 +6,8 @@ import com.intellij.navigation.ItemPresentationProvider;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.compiled.ClsMethodImpl;
-import com.intellij.psi.presentation.java.MethodPresentationProvider;
+import com.intellij.psi.impl.compiled.ClsFieldImpl;
+import com.intellij.psi.presentation.java.FieldPresentationProvider;
 import com.redhat.ceylon.compiler.java.metadata.Ceylon;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
@@ -19,13 +19,13 @@ import javax.swing.*;
 /**
  * Decorates results in Navigate > Symbol for compiled Ceylon class members.
  */
-public class CeylonMethodDecorator
-        implements ItemPresentationProvider<ClsMethodImpl> {
+public class CeylonFieldDecorator
+        implements ItemPresentationProvider<ClsFieldImpl> {
 
     private static final classFileDecompilerUtil_ decompilerUtil = classFileDecompilerUtil_.get_();
 
     @Nullable
-    private String getPresentableText(ClsMethodImpl clsMethod) {
+    private String getPresentableText(ClsFieldImpl clsMethod) {
         PsiClass clsClass = clsMethod.getContainingClass();
         if (CeylonClassDecorator.is(clsClass, Ceylon.class)
                 || clsClass.getName().endsWith("$impl")) {
@@ -35,7 +35,7 @@ public class CeylonMethodDecorator
         return null;
     }
 
-    private String getName(ClsMethodImpl clsMethod) {
+    private String getName(ClsFieldImpl clsMethod) {
         PsiAnnotation ann = CeylonClassDecorator.nameAnnotation(clsMethod);
 
         String name = clsMethod.getName();
@@ -43,44 +43,13 @@ public class CeylonMethodDecorator
             name = CeylonClassDecorator.nameValue(ann);
         } else if (name.endsWith("_")) {
             name = name.substring(0, name.length() - 1);
-        } else if (name.length()>3
-                && name.startsWith("get")
-                && clsMethod.getParameterList().getParametersCount()==0) {
-            char[] chars = Character.toChars(Character.toLowerCase(name.codePointAt(3)));
-            return String.valueOf(chars) + name.substring(3 + chars.length);
-        } else if (name.length()>3
-                && name.startsWith("set")
-                && clsMethod.getParameterList().getParametersCount()==1) {
-            char[] chars = Character.toChars(Character.toLowerCase(name.codePointAt(3)));
-            return String.valueOf(chars) + name.substring(3 + chars.length);
         }
 
-        return name + '(' + parameters(clsMethod) + ')';
-    }
-
-    @NotNull
-    static StringBuilder parameters(PsiMethod clsMethod) {
-        StringBuilder params = new StringBuilder();
-        for (PsiParameter param: clsMethod.getParameterList().getParameters()) {
-            PsiAnnotation pann = CeylonClassDecorator.nameAnnotation(param);
-            if (pann!=null) {
-                if (params.length() > 0) {
-                    params.append(", ");
-                }
-                params.append(CeylonClassDecorator.nameValue(pann));
-            }
-            else if (!param.getName().startsWith("$reified$")) {
-                if (params.length() > 0) {
-                    params.append(", ");
-                }
-                params.append(param.getName());
-            }
-        }
-        return params;
+        return name;
     }
 
     @Override
-    public ItemPresentation getPresentation(@NotNull final ClsMethodImpl item) {
+    public ItemPresentation getPresentation(@NotNull final ClsFieldImpl item) {
         if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())
                 || item.getContainingClass().getName().endsWith("$impl")) {
             final String presentableText = getPresentableText(item);
@@ -131,13 +100,13 @@ public class CeylonMethodDecorator
                     @Nullable
                     @Override
                     public Icon getIcon(boolean unused) {
-                        return icons_.get_().forMethod(item);
+                        return icons_.get_().forField(item);
                     }
                 };
             }
         }
 
         // we can't return null
-        return new MethodPresentationProvider().getPresentation(item);
+        return new FieldPresentationProvider().getPresentation(item);
     }
 }

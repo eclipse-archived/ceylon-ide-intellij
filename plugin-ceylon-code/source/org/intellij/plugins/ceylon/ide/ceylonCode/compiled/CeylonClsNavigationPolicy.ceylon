@@ -4,7 +4,8 @@ import com.intellij.psi {
 import com.intellij.psi.impl.compiled {
     ClsCustomNavigationPolicyEx,
     ClsClassImpl,
-    ClsMethodImpl
+    ClsMethodImpl,
+    ClsFieldImpl
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
@@ -19,12 +20,10 @@ shared class CeylonClsNavigationPolicy() extends ClsCustomNavigationPolicyEx() {
     shared actual PsiElement? getNavigationElement(ClsMethodImpl clsMethod)
             => getElement(clsMethod);
 
-    shared actual PsiElement? getNavigationElement(ClsClassImpl clsClass) {
-        if (exists source = getElement(clsClass)) {
-            return source;
-        }
+    shared actual PsiElement? getNavigationElement(ClsFieldImpl clsField)
+            => getElement(clsField);
 
-        return null;
-    }
+    shared actual PsiElement? getNavigationElement(ClsClassImpl clsClass)
+            => getElement(clsClass);
 
 }
