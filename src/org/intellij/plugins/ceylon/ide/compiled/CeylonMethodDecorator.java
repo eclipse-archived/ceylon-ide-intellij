@@ -8,7 +8,9 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.presentation.java.MethodPresentationProvider;
+import com.redhat.ceylon.compiler.java.metadata.Attribute;
 import com.redhat.ceylon.compiler.java.metadata.Ceylon;
+import com.redhat.ceylon.compiler.java.metadata.Method;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +29,10 @@ public class CeylonMethodDecorator
     @Nullable
     private String getPresentableText(ClsMethodImpl clsMethod) {
         PsiClass clsClass = clsMethod.getContainingClass();
+        if (CeylonClassDecorator.is(clsClass, Method.class)
+            || CeylonClassDecorator.is(clsClass, Attribute.class)) {
+            return getName(clsMethod);
+        }
         if (CeylonClassDecorator.is(clsClass, Ceylon.class)
                 || clsClass.getName().endsWith("$impl")) {
             return CeylonClassDecorator.getName(clsClass)

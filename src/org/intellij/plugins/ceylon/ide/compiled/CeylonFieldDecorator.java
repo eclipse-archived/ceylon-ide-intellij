@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.compiled.ClsFieldImpl;
 import com.intellij.psi.presentation.java.FieldPresentationProvider;
+import com.redhat.ceylon.compiler.java.metadata.Attribute;
 import com.redhat.ceylon.compiler.java.metadata.Ceylon;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
@@ -25,20 +26,23 @@ public class CeylonFieldDecorator
     private static final classFileDecompilerUtil_ decompilerUtil = classFileDecompilerUtil_.get_();
 
     @Nullable
-    private String getPresentableText(ClsFieldImpl clsMethod) {
-        PsiClass clsClass = clsMethod.getContainingClass();
+    private String getPresentableText(ClsFieldImpl clsField) {
+        PsiClass clsClass = clsField.getContainingClass();
+        if (CeylonClassDecorator.is(clsClass, Attribute.class)) {
+            return getName(clsField);
+        }
         if (CeylonClassDecorator.is(clsClass, Ceylon.class)
                 || clsClass.getName().endsWith("$impl")) {
             return CeylonClassDecorator.getName(clsClass)
-                    + '.' + getName(clsMethod);
+                    + '.' + getName(clsField);
         }
         return null;
     }
 
-    private String getName(ClsFieldImpl clsMethod) {
-        PsiAnnotation ann = CeylonClassDecorator.nameAnnotation(clsMethod);
+    private String getName(ClsFieldImpl clsField) {
+        PsiAnnotation ann = CeylonClassDecorator.nameAnnotation(clsField);
 
-        String name = clsMethod.getName();
+        String name = clsField.getName();
         if (ann != null) {
             name = CeylonClassDecorator.nameValue(ann);
         } else if (name.endsWith("_")) {
