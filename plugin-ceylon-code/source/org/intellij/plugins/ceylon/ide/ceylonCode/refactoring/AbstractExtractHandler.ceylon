@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaClass,
-    JavaCollection
+    javaClass
 }
 
 import com.intellij.openapi.actionSystem {
@@ -59,7 +58,8 @@ import java.lang {
 }
 import java.util {
     HashMap,
-    JList=List
+    JList=List,
+    Arrays
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
@@ -174,6 +174,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             value myDataContext = HashMap<JString,Object>();
             myDataContext[JString(CommonDataKeys.editor.name)] = editor;
             myDataContext[JString(CommonDataKeys.psiFile.name)] = file;
+            myDataContext[JString(CommonDataKeys.psiElement.name)] = inserted;
             myDataContext[JString(LangDataKeys.psiElementArray.name)]
                     = ObjectArray<PsiElement>(0, inserted);
             value context = SimpleDataContext.getSimpleContext(myDataContext, null);
@@ -221,10 +222,10 @@ class ExtractedVariableRenameHandler(TextRange[] usages = [])
                     => noop();
 
             collectRefs(SearchScope referencesSearchScope)
-                    => JavaCollection(
-                        usages.collect(
-                            (r) => elementToRename.containingFile.findReferenceAt(r.startOffset)
-                        ).coalesced.sequence());
+                    => Arrays.asList(
+                        for (r in usages)
+                        if (exists e = elementToRename.containingFile.findReferenceAt(r.startOffset))
+                        e);
 
             checkLocalScope() => elementToRename.containingFile;
         };
