@@ -21,7 +21,8 @@ shared object parserConstants {
 
     // Leaves which will be wrapped in a CeylonCompositeElement, for example to allow refactoring them
     shared JList<IElementType> _LEAVES_TO_WRAP = Arrays.asList(CeylonTypes.identifier,
-        CeylonTypes.naturalLiteral, CeylonTypes.functionLiteral, CeylonTypes.stringLiteral);
+        CeylonTypes.naturalLiteral, CeylonTypes.functionLiteral, CeylonTypes.stringLiteral,
+        CeylonTypes.valueModifier, CeylonTypes.functionModifier);
 
     shared Key<Node> _CEYLON_NODE_KEY = Key<Node>("CEYLON-SPEC_NODE");
     shared Key<Anything()> _POST_PARSE_ACTION = Key<Anything()>("POST-PARSE-ACTION");
