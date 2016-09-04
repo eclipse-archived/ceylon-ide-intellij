@@ -124,9 +124,9 @@ shared class CeyLightClass extends LightElement
 
     declaration => mirror.decl;
 
-    value modifiers = CeylonIterable(toJavaModifiers(declaration));
+    value modifiers = toJavaModifiers(declaration);
 
-    modifierList => LightModifierList(manager, language, *modifiers);
+    modifierList => LightModifierList(manager, language, for (m in modifiers) m);
 
     hasModifierProperty(String name) => name in modifiers;
 

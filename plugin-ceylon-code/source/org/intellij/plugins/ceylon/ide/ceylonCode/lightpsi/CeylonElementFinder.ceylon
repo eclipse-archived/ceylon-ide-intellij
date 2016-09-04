@@ -1,6 +1,4 @@
 import ceylon.interop.java {
-    javaObjectArray,
-    CeylonIterable,
     createJavaObjectArray
 }
 
@@ -69,7 +67,9 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
     }
     
     findClasses(String fqName, GlobalSearchScope scope)
-            => javaObjectArray(Array<PsiClass?>({findClass(fqName, scope)}.coalesced));
+            => if (exists cl = findClass(fqName, scope))
+            then ObjectArray(1, cl)
+            else PsiClass.emptyArray;
     
     shared actual ObjectArray<PsiClass> getClasses(PsiPackage pkg, GlobalSearchScope scope) {
         value fqName = pkg.qualifiedName;
@@ -85,23 +85,21 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     
                     for (pack in newArrayList(mod.packages)) {
                         if (pack.qualifiedNameString == fqName) {
-                            return createJavaObjectArray<PsiClass>(
-                                CeylonIterable(pack.members)
-                                    .narrow<ClassOrInterface|FunctionOrValue>()
-                                    .filter((element) => element.unit is CeylonUnit)
-                                    .map(
-                                        (dec) => if (is Function dec)
-                                                 then CeyLightToplevelFunction(dec, p)
-                                                 else CeyLightClass(dec, p)
-                                    )
-                            );
+                            return createJavaObjectArray<PsiClass> {
+                                for (dec in pack.members)
+                                if (is ClassOrInterface|FunctionOrValue dec,
+                                    dec.unit is CeylonUnit)
+                                if (is Function dec)
+                                then CeyLightToplevelFunction(dec, p)
+                                else CeyLightClass(dec, p)
+                            };
                         }
                     }
                 }
             }
         }
         
-        return createJavaObjectArray<PsiClass>({});
+        return PsiClass.emptyArray;
     }
     
 }
