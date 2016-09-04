@@ -3,8 +3,8 @@ package org.intellij.plugins.ceylon.ide.compiled;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.presentation.java.MethodPresentationProvider;
@@ -18,13 +18,15 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+import static com.intellij.openapi.editor.colors.CodeInsightColors.DEPRECATED_ATTRIBUTES;
+import static org.intellij.plugins.ceylon.ide.compiled.CeylonClassDecorator.nameAnnotation;
+import static org.intellij.plugins.ceylon.ide.compiled.CeylonClassDecorator.nameValue;
+
 /**
  * Decorates results in Navigate > Symbol for compiled Ceylon class members.
  */
 public class CeylonMethodDecorator
         implements ItemPresentationProvider<ClsMethodImpl> {
-
-    private static final classFileDecompilerUtil_ decompilerUtil = classFileDecompilerUtil_.get_();
 
     @Nullable
     private String getPresentableText(ClsMethodImpl clsMethod) {
@@ -42,26 +44,30 @@ public class CeylonMethodDecorator
     }
 
     private String getName(ClsMethodImpl clsMethod) {
-        PsiAnnotation ann = CeylonClassDecorator.nameAnnotation(clsMethod);
+        String name = CeylonClassDecorator.getName(clsMethod, clsMethod);
+        return isGetter(clsMethod) || isSetter(clsMethod) ?
+                valueName(name) :
+                name + '(' + parameters(clsMethod) + ')';
+    }
 
+    private static boolean isSetter(ClsMethodImpl clsMethod) {
         String name = clsMethod.getName();
-        if (ann != null) {
-            name = CeylonClassDecorator.nameValue(ann);
-        } else if (name.endsWith("_")) {
-            name = name.substring(0, name.length() - 1);
-        } else if (name.length()>3
-                && name.startsWith("get")
-                && clsMethod.getParameterList().getParametersCount()==0) {
-            char[] chars = Character.toChars(Character.toLowerCase(name.codePointAt(3)));
-            return String.valueOf(chars) + name.substring(3 + chars.length);
-        } else if (name.length()>3
+        return name.length() > 3
                 && name.startsWith("set")
-                && clsMethod.getParameterList().getParametersCount()==1) {
-            char[] chars = Character.toChars(Character.toLowerCase(name.codePointAt(3)));
-            return String.valueOf(chars) + name.substring(3 + chars.length);
-        }
+                && clsMethod.getParameterList().getParametersCount() == 1;
+    }
 
-        return name + '(' + parameters(clsMethod) + ')';
+    private static boolean isGetter(ClsMethodImpl clsMethod) {
+        String name = clsMethod.getName();
+        return name.length() > 3
+                && name.startsWith("get")
+                && clsMethod.getParameterList().getParametersCount() == 0;
+    }
+
+    @NotNull
+    private String valueName(String name) {
+        char[] chars = Character.toChars(Character.toLowerCase(name.codePointAt(3)));
+        return String.valueOf(chars) + name.substring(3 + chars.length);
     }
 
     @NotNull
@@ -69,12 +75,12 @@ public class CeylonMethodDecorator
         StringBuilder params = new StringBuilder();
         for (PsiParameter param: clsMethod.getParameterList().getParameters()) {
             //TODO: the type of the parameter!!
-            PsiAnnotation pann = CeylonClassDecorator.nameAnnotation(param);
+            PsiAnnotation pann = nameAnnotation(param);
             if (pann!=null) {
                 if (params.length() > 0) {
                     params.append(", ");
                 }
-                params.append(CeylonClassDecorator.nameValue(pann));
+                params.append(nameValue(pann));
             }
             else if (!param.getName().startsWith("$reified$")) {
                 if (params.length() > 0) {
@@ -88,7 +94,9 @@ public class CeylonMethodDecorator
 
     @Override
     public ItemPresentation getPresentation(@NotNull final ClsMethodImpl item) {
-        if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())
+        VirtualFile virtualFile = item.getContainingFile().getVirtualFile();
+        if (classFileDecompilerUtil_.get_()
+                .hasValidCeylonBinaryData(virtualFile)
                 || item.getContainingClass().getName().endsWith("$impl")) {
             final String presentableText = getPresentableText(item);
             if (presentableText != null) {
@@ -96,10 +104,9 @@ public class CeylonMethodDecorator
                     @Nullable
                     @Override
                     public TextAttributesKey getTextAttributesKey() {
-                        if (item.isDeprecated()) {
-                            return CodeInsightColors.DEPRECATED_ATTRIBUTES;
-                        }
-                        return null;
+                        return item.isDeprecated() ?
+                                DEPRECATED_ATTRIBUTES :
+                                null;
                     }
 
                     @Nullable
@@ -112,10 +119,9 @@ public class CeylonMethodDecorator
                     @Override
                     public String getLocationString() {
                         PsiQualifiedNamedElement container = getContainer();
-                        if (container != null) {
-                            return "(" + container.getQualifiedName() + ")";
-                        }
-                        return null;
+                        return container != null ?
+                                "(" + container.getQualifiedName() + ")" :
+                                null;
                     }
 
                     private PsiQualifiedNamedElement getContainer() {

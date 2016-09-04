@@ -19,6 +19,8 @@ public class CeylonDecompiler extends ClassFileDecompilers.Full {
 
     private CeylonClsStubBuilder stubBuilder = new CeylonClsStubBuilder();
 
+    static String extension = JavaClassFileType.INSTANCE.getDefaultExtension();
+
     @NotNull
     @Override
     public ClsStubBuilder getStubBuilder() {
@@ -28,16 +30,14 @@ public class CeylonDecompiler extends ClassFileDecompilers.Full {
     @NotNull
     @Override
     public FileViewProvider createFileViewProvider(@NotNull VirtualFile file,
-                                                   @NotNull PsiManager manager, boolean physical) {
+                                                   @NotNull PsiManager manager,
+                                                   boolean physical) {
         return new CeylonClassFileFileViewProvider(manager, file, physical);
     }
 
     @Override
     public boolean accepts(@NotNull VirtualFile file) {
-        if (!Objects.equals(file.getExtension(), JavaClassFileType.INSTANCE.getDefaultExtension())) {
-            return false;
-        }
-
-        return classFileDecompilerUtil_.get_().isCeylonCompiledFile(file);
+        return Objects.equals(file.getExtension(), extension)
+                && classFileDecompilerUtil_.get_().isCeylonCompiledFile(file);
     }
 }

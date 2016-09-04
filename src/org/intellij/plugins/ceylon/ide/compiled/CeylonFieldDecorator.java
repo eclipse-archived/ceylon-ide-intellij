@@ -3,8 +3,8 @@ package org.intellij.plugins.ceylon.ide.compiled;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.compiled.ClsFieldImpl;
 import com.intellij.psi.presentation.java.FieldPresentationProvider;
@@ -17,13 +17,13 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+import static com.intellij.openapi.editor.colors.CodeInsightColors.DEPRECATED_ATTRIBUTES;
+
 /**
  * Decorates results in Navigate > Symbol for compiled Ceylon class members.
  */
 public class CeylonFieldDecorator
         implements ItemPresentationProvider<ClsFieldImpl> {
-
-    private static final classFileDecompilerUtil_ decompilerUtil = classFileDecompilerUtil_.get_();
 
     @Nullable
     private String getPresentableText(ClsFieldImpl clsField) {
@@ -40,21 +40,14 @@ public class CeylonFieldDecorator
     }
 
     private String getName(ClsFieldImpl clsField) {
-        PsiAnnotation ann = CeylonClassDecorator.nameAnnotation(clsField);
-
-        String name = clsField.getName();
-        if (ann != null) {
-            name = CeylonClassDecorator.nameValue(ann);
-        } else if (name.endsWith("_")) {
-            name = name.substring(0, name.length() - 1);
-        }
-
-        return name;
+        return CeylonClassDecorator.getName(clsField, clsField);
     }
 
     @Override
     public ItemPresentation getPresentation(@NotNull final ClsFieldImpl item) {
-        if (decompilerUtil.hasValidCeylonBinaryData(item.getContainingFile().getVirtualFile())
+        VirtualFile virtualFile = item.getContainingFile().getVirtualFile();
+        if (classFileDecompilerUtil_.get_()
+                .hasValidCeylonBinaryData(virtualFile)
                 || item.getContainingClass().getName().endsWith("$impl")) {
             final String presentableText = getPresentableText(item);
             if (presentableText != null) {
@@ -62,10 +55,9 @@ public class CeylonFieldDecorator
                     @Nullable
                     @Override
                     public TextAttributesKey getTextAttributesKey() {
-                        if (item.isDeprecated()) {
-                            return CodeInsightColors.DEPRECATED_ATTRIBUTES;
-                        }
-                        return null;
+                        return item.isDeprecated() ?
+                                DEPRECATED_ATTRIBUTES :
+                                null;
                     }
 
                     @Nullable
@@ -78,10 +70,9 @@ public class CeylonFieldDecorator
                     @Override
                     public String getLocationString() {
                         PsiQualifiedNamedElement container = getContainer();
-                        if (container != null) {
-                            return "(" + container.getQualifiedName() + ")";
-                        }
-                        return null;
+                        return container != null ?
+                                "(" + container.getQualifiedName() + ")" :
+                                null;
                     }
 
                     private PsiQualifiedNamedElement getContainer() {
