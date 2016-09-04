@@ -77,6 +77,9 @@ public class CeylonClassDecorator
                 String text = clsClass.getName();
                 String name = text.substring(0, text.length() - 1);
                 PsiMethod[] methods = clsClass.findMethodsByName(name, false);
+                if (methods.length==0) {
+                    methods = clsClass.findMethodsByName('$' + name, false);
+                }
                 Arrays.sort(methods,
                         new Comparator<PsiMethod>() {
                             @Override
@@ -115,6 +118,8 @@ public class CeylonClassDecorator
             name = name.substring(0, name.length() - 1);
         } else if (name.endsWith("$impl")) {
             name = name.substring(0, name.length() - 5);
+        } else if (name.endsWith("$annotation$")) {
+            name = name.substring(0, name.length() - 12);
         }
 
         PsiClass outer = clsClass.getContainingClass();
