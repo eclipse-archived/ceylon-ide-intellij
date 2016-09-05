@@ -16,6 +16,9 @@ import com.intellij.lang.parameterInfo {
     ParameterInfoUtils,
     ParameterInfoUIContextEx
 }
+import com.intellij.psi {
+    PsiElement
+}
 import com.intellij.psi.util {
     PsiUtilCore {
         getElementAtOffset
@@ -37,7 +40,8 @@ import com.redhat.ceylon.model.typechecker.model {
     Function,
     Declaration,
     NamedArgumentList,
-    ModelUtil
+    ModelUtil,
+    Reference
 }
 import com.redhat.ceylon.model.typechecker.util {
     TypePrinter
@@ -171,8 +175,22 @@ shared class CeylonParameterInfoHandler()
               || seq.startIndex.intValue()-1 <= offset <= seq.stopIndex.intValue()+1
             else false;
 
+    function getReference(PsiElement psi) {
+        if (is CeylonPsi.InvocationExpressionPsi ie
+                = psi.parent,
+            is Tree.MemberOrTypeExpression mte
+                = ie.ceylonNode?.primary) {
+            return mte.target;
+        }
+        else {
+            return null;
+        }
+    }
+
     shared actual void updateUI(Functional&Declaration fun, ParameterInfoUIContext context) {
         value noparams = "'no parameters'";
+
+        value ref = getReference(context.parameterOwner);
 
         value unit = fun.unit;
         value builder = StringBuilder();
@@ -187,7 +205,7 @@ shared class CeylonParameterInfoHandler()
             }
             else {
                 for (param in parameters) {
-                    value paramLabel = getParameterLabel(param, unit);
+                    value paramLabel = getParameterLabel(param, unit, ref);
                     if (i == context.currentParameterIndex) {
                         highlightOffsetStart = builder.size;
                         highlightOffsetEnd = builder.size + paramLabel.size;
@@ -223,21 +241,27 @@ shared class CeylonParameterInfoHandler()
             .replace("&lt;", "<")
             .replace("&gt;", ">");
 
-    String getParameterLabel(Parameter param, Unit unit) {
+    String getParameterLabel(Parameter param, Unit unit, Reference? ref) {
         value builder = StringBuilder();
-        if (param.sequenced) {
-            value type = unit.getSequentialElementType(param.type);
-            builder.append(printer.print(type, unit)).append("*");
+        if (exists type = param.type) {
+            value paramType
+                    = if (exists ref)
+                    then ref.getTypedParameter(param).fullType
+                    else type;
+            if (param.sequenced) {
+                value elementType = unit.getSequentialElementType(paramType);
+                builder.append(printer.print(elementType, unit)).append("*");
+            } else {
+                builder.append(printer.print(paramType, unit));
+            }
+            builder.append(" ");
         }
-        else {
-            builder.append(printer.print(param.type, unit));
-        }
-        builder.append(" ").append(param.name);
+        builder.append(param.name);
 
         if (is Function model = param.model) {
             builder.append("(");
             for (parameter in model.firstParameterList.parameters) {
-                builder.append(getParameterLabel(parameter, unit));
+                builder.append(getParameterLabel(parameter, unit, ref));
                 builder.append(", ");
             }
             builder.deleteTerminal(2);
