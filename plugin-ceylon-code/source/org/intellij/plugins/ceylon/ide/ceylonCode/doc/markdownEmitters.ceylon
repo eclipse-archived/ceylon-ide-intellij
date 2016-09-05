@@ -99,9 +99,8 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
         }
         
         value pkgSeparatorIndex = linkTarget.firstInclusion("::");
-        variable String declName;
-        variable Scope? scope;
-        
+        String declName;
+        Scope? scope;
         if (exists pkgSeparatorIndex) {
             value pkgName = linkTarget[0:pkgSeparatorIndex];
             declName = linkTarget[pkgSeparatorIndex+2...];
@@ -115,10 +114,10 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
             scope = linkScope;
         }
         
-        if (exists s = scope, !declName.empty) {
+        if (exists scope, !declName.empty) {
             value declNames = declName.split('.'.equals);
             variable Declaration? decl
-                    = s.getMemberOrParameter(unit, declNames.first, null, false);
+                    = scope.getMemberOrParameter(unit, declNames.first, null, false);
             
             for (name in declNames.skip(1)) {
                 if (is Scope d = decl) {
