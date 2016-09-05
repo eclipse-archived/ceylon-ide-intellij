@@ -76,11 +76,11 @@ public class CeylonMethodDecorator
     @NotNull
     static StringBuilder parameters(PsiMethod clsMethod) {
         StringBuilder params = new StringBuilder();
-        for (PsiParameter param: clsMethod.getParameterList().getParameters()) {
-            if (!param.getName().startsWith("$reified$")
-                    && !param.getType()
-                    .getCanonicalText()
-                    .equals(TypeDescriptor.class.getCanonicalName())) {
+        for (PsiParameter param :
+                clsMethod.getParameterList()
+                        .getParameters()) {
+            if (!isTypeDescriptor(param)
+                    && !isSelfParameter(clsMethod, param)) {
                 if (params.length() > 0) {
                     params.append(", ");
                 }
@@ -93,23 +93,7 @@ public class CeylonMethodDecorator
                     params.append(type).append(' ');
                 } else {
                     String type;
-                    PsiType pt = param.getType();
-                    if (pt == PsiType.BOOLEAN) {
-                        type = "Boolean";
-                    } else if (pt == PsiType.LONG || pt == PsiType.INT) {
-                        type = "Integer";
-                    } else if (pt == PsiType.INT) {
-                        type = "Character";
-                    } else if (pt == PsiType.DOUBLE || pt == PsiType.FLOAT) {
-                        type = "Float";
-                    } else if (pt.getCanonicalText()
-                            .startsWith(Callable.class.getCanonicalName())) {
-                        type = "Callable"; //no useful type arguments
-                    } else {
-                        type = pt.getPresentableText()
-                                .replace("? extends ", "")
-                                .replace("? super ", "");
-                    }
+                    type = getCeylonType(param);
                     params.append(type).append(' ');
                 }
                 PsiAnnotation pann = nameAnnotation(param);
@@ -121,6 +105,56 @@ public class CeylonMethodDecorator
             }
         }
         return params;
+    }
+
+    private static boolean isSelfParameter(PsiMethod clsMethod, PsiParameter param) {
+        if (clsMethod.getModifierList()
+                .hasExplicitModifier(PsiModifier.STATIC)) {
+            PsiType type = param.getType();
+            switch (clsMethod.getContainingClass().getQualifiedName()) {
+                case "ceylon.language.String":
+                    return java.lang.String.class.getCanonicalName()
+                            .equals(type.getCanonicalText());
+                case "ceylon.language.Integer":
+                    return PsiType.LONG.equals(type);
+                case "ceylon.language.Float":
+                    return PsiType.DOUBLE.equals(type);
+                case "ceylon.language.Byte":
+                    return PsiType.BYTE.equals(type);
+                default:
+                    return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean isTypeDescriptor(PsiParameter param) {
+        return param.getName().startsWith("$reified$") ||
+                param.getType().getCanonicalText()
+                        .equals(TypeDescriptor.class.getCanonicalName());
+    }
+
+    private static String getCeylonType(PsiParameter param) {
+        PsiType pt = param.getType();
+        if (pt == PsiType.BOOLEAN) {
+            return "Boolean";
+        } else if (pt == PsiType.LONG || pt == PsiType.INT) {
+            return "Integer";
+        } else if (pt == PsiType.INT) {
+            return "Character";
+        } else if (pt == PsiType.BYTE) {
+            return "Byte";
+        } else if (pt == PsiType.DOUBLE || pt == PsiType.FLOAT) {
+            return "Float";
+        } else if (pt.getCanonicalText()
+                .startsWith(Callable.class.getCanonicalName())) {
+            return "Callable"; //no useful type arguments
+        } else {
+            return pt.getPresentableText()
+                    .replace("? extends ", "")
+                    .replace("? super ", "");
+        }
     }
 
     static PsiAnnotation typeInfoAnnotation(PsiModifierListOwner owner) {
