@@ -160,14 +160,16 @@ class CeylonBuilder extends ModuleLevelBuilder {
         boolean compileResult = compiler.compile(options, new CompilationListener() {
             @Override
             public void error(File file, long line, long column, String message) {
+                String absolutePath = file == null ? null : file.getAbsolutePath();
                 ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR,
-                        message, file.getAbsolutePath(), -1, -1, -1, line, column));
+                        message, absolutePath, -1, -1, -1, line, column));
             }
 
             @Override
             public void warning(File file, long line, long column, String message) {
+                String absolutePath = file == null ? null : file.getAbsolutePath();
                 ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.WARNING,
-                        message, file.getAbsolutePath(), -1, -1, -1, line, column));
+                        message, absolutePath, -1, -1, -1, line, column));
             }
 
             @Override
