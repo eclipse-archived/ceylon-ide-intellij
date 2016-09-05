@@ -1,18 +1,18 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
-import com.intellij.psi.tree.IElementType;
-import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiVisitor;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
-import org.jetbrains.annotations.NotNull;
-
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.ceylonHighlightingColors_;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsiVisitor;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTokens;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes;
+import org.jetbrains.annotations.NotNull;
 
 public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator {
     private AnnotationHolder annotationHolder;
@@ -51,7 +51,26 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
 
         for (PsiElement child : element.getChildren()) {
             if (child instanceof CeylonPsi.ExpressionPsi) {
-                TextRange range = new TextRange(child.getTextRange().getStartOffset() - 2, child.getTextRange().getEndOffset() + 2);
+                PsiElement prev = child;
+                do {
+                    prev = prev.getPrevSibling();
+                } while (prev.getNode().getElementType() == CeylonTokens.WS);
+                PsiElement next = child;
+                do {
+                    next = next.getNextSibling();
+                } while (next.getNode().getElementType() == CeylonTokens.WS);
+
+                int startOffset
+                        = prev != null
+                        && prev.getText().endsWith("``") ?
+                        prev.getTextRange().getEndOffset() - 2 :
+                        child.getTextRange().getStartOffset();
+                int endOffset
+                        = next != null
+                        && next.getText().startsWith("``") ?
+                        next.getTextRange().getStartOffset() + 2 :
+                        child.getTextRange().getEndOffset();
+                TextRange range = new TextRange(startOffset, endOffset);
                 Annotation anno = annotationHolder.createInfoAnnotation(range, null);
                 anno.setTextAttributes(ceylonHighlightingColors.getInterp());
             }
@@ -67,6 +86,11 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
          || elementType == CeylonTokens.AVERBATIM_STRING) {
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.setTextAttributes(ceylonHighlightingColors.getAnnotationString());
+        }
+
+        //workaround for bug in CeylonPsiVisitor
+        if (element instanceof CeylonPsi.StringTemplatePsi) {
+            visitStringTemplatePsi((CeylonPsi.StringTemplatePsi) element);
         }
     }
 
