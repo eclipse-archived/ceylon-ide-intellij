@@ -24,7 +24,8 @@ import com.redhat.ceylon.model.loader {
 }
 import com.redhat.ceylon.model.typechecker.model {
     Package,
-    Declaration
+    Declaration,
+    Module
 }
 
 import java.lang {
@@ -69,6 +70,17 @@ shared Declaration? declarationFromPsiElement(PsiClass|PsiMethod psiElement) {
             DeclarationType.type);
     }
         
+    return null;
+}
+
+shared Module? findModuleByName(Project project, String moduleName) {
+    if (exists projects = getCeylonProjects(project)) {
+        for (p in projects.ceylonProjects) {
+            if (exists mod = p.modules?.find((m) => m.nameAsString == moduleName)) {
+                return mod;
+            }
+        }
+    }
     return null;
 }
 
