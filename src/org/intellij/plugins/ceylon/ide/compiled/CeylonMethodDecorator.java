@@ -11,6 +11,7 @@ import com.intellij.psi.presentation.java.MethodPresentationProvider;
 import com.redhat.ceylon.compiler.java.metadata.Attribute;
 import com.redhat.ceylon.compiler.java.metadata.Ceylon;
 import com.redhat.ceylon.compiler.java.metadata.Method;
+import com.redhat.ceylon.compiler.java.metadata.TypeInfo;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
@@ -74,22 +75,30 @@ public class CeylonMethodDecorator
     static StringBuilder parameters(PsiMethod clsMethod) {
         StringBuilder params = new StringBuilder();
         for (PsiParameter param: clsMethod.getParameterList().getParameters()) {
-            //TODO: the type of the parameter!!
-            PsiAnnotation pann = nameAnnotation(param);
-            if (pann!=null) {
+            if (!param.getName().startsWith("$reified$")) {
                 if (params.length() > 0) {
                     params.append(", ");
                 }
-                params.append(nameValue(pann));
-            }
-            else if (!param.getName().startsWith("$reified$")) {
-                if (params.length() > 0) {
-                    params.append(", ");
+                PsiAnnotation tann = typeInfoAnnotation(param);
+                if (tann != null) {
+                    String type
+                            = nameValue(tann)
+                            .replaceAll("[a-z]\\w*(\\.[a-z]\\w*)*::", "");
+                    params.append(type).append(' ');
                 }
-                params.append(param.getName());
+                PsiAnnotation pann = nameAnnotation(param);
+                if (pann != null) {
+                    params.append(nameValue(pann));
+                } else {
+                    params.append(param.getName());
+                }
             }
         }
         return params;
+    }
+
+    static PsiAnnotation typeInfoAnnotation(PsiModifierListOwner owner) {
+        return owner.getModifierList().findAnnotation(TypeInfo.class.getName());
     }
 
     @Override
