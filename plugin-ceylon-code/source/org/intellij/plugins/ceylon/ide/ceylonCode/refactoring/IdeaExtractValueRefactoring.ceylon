@@ -59,18 +59,23 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     VirtualFileVirtualFile
 }
+import com.intellij.refactoring.util {
+    CommonRefactoringUtil
+}
 
 shared class ExtractValueHandler() extends AbstractExtractHandler() {
 
-    shared actual [TextRange+]? extract(Project project, Editor editor, CeylonFile file, TextRange range, Tree.Declaration? scope) {
+    shared actual [TextRange+]? extract(Project project, Editor editor, CeylonFile file,
+        TextRange range, Tree.Declaration? scope) {
+
         if (exists localAnalysisResult = file.localAnalyzer?.result,
-            exists phasedUnit = localAnalysisResult.typecheckedPhasedUnit) {
-            assert (exists node = nodes.findNode {
+            exists phasedUnit = localAnalysisResult.typecheckedPhasedUnit,
+            is Tree.Term node = nodes.findNode {
                 node = phasedUnit.compilationUnit;
                 tokens = localAnalysisResult.tokens;
                 startOffset = range.startOffset;
                 endOffset = range.endOffset;
-            });
+            }) {
             
             value refactoring
                     = IdeaExtractValueRefactoring {
@@ -80,10 +85,19 @@ shared class ExtractValueHandler() extends AbstractExtractHandler() {
                         editor = editor;
                         node = node;
                     };
-            value name = nodes.nameProposals(if (is Tree.Term node) then node else null).first;
-            refactoring.newName = name;
+            refactoring.newName = nodes.nameProposals(node).first;
+
             return refactoring.extractInFile(project, file);
         }
+
+        CommonRefactoringUtil.showErrorHint(
+            project,
+            editor,
+            "Nothing to extract at this location",
+            "Extract value",
+            null
+        );
+
         return null;
     }
 }
