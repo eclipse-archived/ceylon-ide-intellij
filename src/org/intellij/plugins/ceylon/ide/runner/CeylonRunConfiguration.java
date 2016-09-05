@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
+import static org.intellij.plugins.ceylon.ide.ceylonCode.model.findModuleByName_.findModuleByName;
+
 /**
  * Run configuration for Ceylon files.
  */
@@ -158,7 +160,23 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
     }
 
     private String getCeylonModuleOrDft() {
-        return isDefaultModule() ? "default" : ceylonModule;
+        String moduleName;
+        if (isDefaultModule()) {
+            moduleName = "default";
+        } else {
+            moduleName = ceylonModule;
+
+            if (!moduleName.contains("/")) {
+                com.redhat.ceylon.model.typechecker.model.Module mod
+                        = findModuleByName(getProject(), ceylonModule);
+
+                if (mod != null) {
+                    moduleName += "/" + mod.getVersion();
+                }
+            }
+        }
+
+        return moduleName;
     }
 
     private boolean isDefaultModule() {
