@@ -1,8 +1,6 @@
 import ceylon.interop.java {
     javaClass,
     javaString,
-    CeylonIterable,
-    CeylonList,
     javaObjectArray
 }
 
@@ -149,15 +147,16 @@ shared class CeylonParameterInfoHandler()
                 context.setCurrentParameter(model.parameterList.parameters.size()-1);
             }
             else {
-                value arg
-                        = CeylonIterable(node.namedArguments)
-                            .find((a) => a.startIndex.intValue()-1 <= offset <= a.endIndex.intValue()+1);
-                if (exists arg) {
-                    value index
-                            = CeylonList(model.parameterList.parameters)
-                                .firstIndexWhere((param) => param.name == arg.identifier.text);
-                    if (exists index) {
-                        context.setCurrentParameter(index);
+                for (arg in node.namedArguments) {
+                    if (arg.startIndex.intValue()-1 <= offset <= arg.endIndex.intValue()+1) {
+                        value params = model.parameterList.parameters;
+                        for (index in 0:params.size()) {
+                            if (exists param = params[index],
+                                param.name == arg.identifier.text) {
+                                context.setCurrentParameter(index);
+                            }
+                        }
+                        break;
                     }
                 }
             }
