@@ -91,10 +91,10 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
     Referenceable? resolveLink(String linkTarget, Scope linkScope, Unit unit) {
         if (linkTarget.startsWith("package ")) {
             value mod = resolveModule(linkScope);
-            return mod?.getPackage(linkTarget.spanFrom(8).trimmed);
+            return mod?.getPackage(linkTarget[8...].trimmed);
         } else if (linkTarget.startsWith("module ")) {
             value mod = resolveModule(linkScope);
-            Package? pack = mod?.getPackage(linkTarget.spanFrom(7).trimmed);
+            Package? pack = mod?.getPackage(linkTarget[7...].trimmed);
             return pack?.\imodule;
         }
         
@@ -103,8 +103,8 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
         variable Scope? scope;
         
         if (exists pkgSeparatorIndex) {
-            value pkgName = linkTarget.spanTo(pkgSeparatorIndex);
-            declName = linkTarget.spanFrom(pkgSeparatorIndex + 2);
+            value pkgName = linkTarget[0:pkgSeparatorIndex];
+            declName = linkTarget[pkgSeparatorIndex+2...];
             if (exists mod = resolveModule(linkScope)) {
                 scope = mod.getPackage(pkgName);
             } else {
