@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.compiled;
 
+import ceylon.language.Callable;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProvider;
@@ -12,6 +13,7 @@ import com.redhat.ceylon.compiler.java.metadata.Attribute;
 import com.redhat.ceylon.compiler.java.metadata.Ceylon;
 import com.redhat.ceylon.compiler.java.metadata.Method;
 import com.redhat.ceylon.compiler.java.metadata.TypeInfo;
+import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.jetbrains.annotations.NotNull;
@@ -75,7 +77,10 @@ public class CeylonMethodDecorator
     static StringBuilder parameters(PsiMethod clsMethod) {
         StringBuilder params = new StringBuilder();
         for (PsiParameter param: clsMethod.getParameterList().getParameters()) {
-            if (!param.getName().startsWith("$reified$")) {
+            if (!param.getName().startsWith("$reified$")
+                    && !param.getType()
+                    .getCanonicalText()
+                    .equals(TypeDescriptor.class.getCanonicalName())) {
                 if (params.length() > 0) {
                     params.append(", ");
                 }
@@ -84,6 +89,27 @@ public class CeylonMethodDecorator
                     String type
                             = nameValue(tann)
                             .replaceAll("[a-z]\\w*(\\.[a-z]\\w*)*::", "");
+                    //TODO: variadic params!!
+                    params.append(type).append(' ');
+                } else {
+                    String type;
+                    PsiType pt = param.getType();
+                    if (pt == PsiType.BOOLEAN) {
+                        type = "Boolean";
+                    } else if (pt == PsiType.LONG || pt == PsiType.INT) {
+                        type = "Integer";
+                    } else if (pt == PsiType.INT) {
+                        type = "Character";
+                    } else if (pt == PsiType.DOUBLE || pt == PsiType.FLOAT) {
+                        type = "Float";
+                    } else if (pt.getCanonicalText()
+                            .startsWith(Callable.class.getCanonicalName())) {
+                        type = "Callable"; //no useful type arguments
+                    } else {
+                        type = pt.getPresentableText()
+                                .replace("? extends ", "")
+                                .replace("? super ", "");
+                    }
                     params.append(type).append(' ');
                 }
                 PsiAnnotation pann = nameAnnotation(param);
