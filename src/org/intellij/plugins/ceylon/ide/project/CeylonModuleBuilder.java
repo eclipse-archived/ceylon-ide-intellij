@@ -75,17 +75,21 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
                 contentEntry.addExcludeFolder(virtualFile);
             }
 
-            CompilerModuleExtension compiler = rootModel.getModuleExtension(CompilerModuleExtension.class);
-            try {
-                compiler.setCompilerOutputPath(outDirectory.getCanonicalPath());
-                compiler.setCompilerOutputPathForTests(outDirectory.getCanonicalPath());
-            } catch (IOException e) {
-                throw new ConfigurationException(e.getMessage());
-            }
-            compiler.inheritCompilerOutputPath(false);
-            compiler.commit();
+            setCompilerOutput(rootModel, outDirectory);
         }
 
+    }
+
+    public static void setCompilerOutput(ModifiableRootModel rootModel, File outDirectory) throws ConfigurationException {
+        CompilerModuleExtension compiler = rootModel.getModuleExtension(CompilerModuleExtension.class);
+        try {
+            compiler.setCompilerOutputPath(outDirectory.getCanonicalPath());
+            compiler.setCompilerOutputPathForTests(outDirectory.getCanonicalPath());
+        } catch (IOException e) {
+            throw new ConfigurationException(e.getMessage());
+        }
+        compiler.inheritCompilerOutputPath(false);
+        compiler.commit();
     }
 
     public void persistConfiguration(Module module) {
