@@ -113,7 +113,8 @@
         <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.parser.CeylonParserDefinition"/>
 
         <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonHighlighterFactory"/>
-        <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonSyntaxAnnotator"/>
+        <annotator language="Ceylon"
+                   implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonSyntaxAnnotator"/>
         <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.annotator.CeylonTypeCheckerAnnotator"/>
         <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonFileHighlightFilter"/>
         <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.CeylonColorSettingsPage"/>
