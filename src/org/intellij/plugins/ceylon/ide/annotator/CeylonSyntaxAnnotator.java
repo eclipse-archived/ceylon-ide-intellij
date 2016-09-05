@@ -54,11 +54,15 @@ public class CeylonSyntaxAnnotator extends CeylonPsiVisitor implements Annotator
                 PsiElement prev = child;
                 do {
                     prev = prev.getPrevSibling();
-                } while (prev.getNode().getElementType() == CeylonTokens.WS);
+                } while (prev != null &&
+                        prev.getNode().getElementType()
+                                == CeylonTokens.WS);
                 PsiElement next = child;
                 do {
                     next = next.getNextSibling();
-                } while (next.getNode().getElementType() == CeylonTokens.WS);
+                } while (next != null &&
+                        next.getNode().getElementType()
+                                == CeylonTokens.WS);
 
                 int startOffset
                         = prev != null
