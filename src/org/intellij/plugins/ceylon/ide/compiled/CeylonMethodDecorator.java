@@ -9,10 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.compiled.ClsMethodImpl;
 import com.intellij.psi.presentation.java.MethodPresentationProvider;
-import com.redhat.ceylon.compiler.java.metadata.Attribute;
-import com.redhat.ceylon.compiler.java.metadata.Ceylon;
-import com.redhat.ceylon.compiler.java.metadata.Method;
-import com.redhat.ceylon.compiler.java.metadata.TypeInfo;
+import com.redhat.ceylon.compiler.java.metadata.*;
 import com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor;
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled.classFileDecompilerUtil_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
@@ -86,16 +83,11 @@ public class CeylonMethodDecorator
                 }
                 PsiAnnotation tann = typeInfoAnnotation(param);
                 if (tann != null) {
-                    String type
-                            = nameValue(tann)
-                            .replaceAll("[a-z]\\w*(\\.[a-z]\\w*)*::", "");
-                    //TODO: variadic params!!
-                    params.append(type).append(' ');
+                    params.append(getAnnotatedType(param, tann));
                 } else {
-                    String type;
-                    type = getCeylonType(param);
-                    params.append(type).append(' ');
+                    params.append(getCeylonType(param));
                 }
+                params.append(' ');
                 PsiAnnotation pann = nameAnnotation(param);
                 if (pann != null) {
                     params.append(nameValue(pann));
@@ -105,6 +97,19 @@ public class CeylonMethodDecorator
             }
         }
         return params;
+    }
+
+    @NotNull
+    private static String getAnnotatedType(PsiParameter param, PsiAnnotation tann) {
+        String type
+                = nameValue(tann)
+                .replaceAll("[a-z]\\w*(\\.[a-z]\\w*)*::", "");
+        if (type.endsWith("[]") &&
+                param.getModifierList()
+                        .findAnnotation(Sequenced.class.getCanonicalName()) != null) {
+            type = type.substring(0, type.length() - 2) + '*';
+        }
+        return type;
     }
 
     private static boolean isSelfParameter(PsiMethod clsMethod, PsiParameter param) {
@@ -135,17 +140,18 @@ public class CeylonMethodDecorator
                         .equals(TypeDescriptor.class.getCanonicalName());
     }
 
+    @NotNull
     private static String getCeylonType(PsiParameter param) {
         PsiType pt = param.getType();
-        if (pt == PsiType.BOOLEAN) {
+        if (PsiType.BOOLEAN.equals(pt)) {
             return "Boolean";
-        } else if (pt == PsiType.LONG || pt == PsiType.INT) {
+        } else if (PsiType.LONG.equals(pt) || PsiType.INT.equals(pt)) {
             return "Integer";
-        } else if (pt == PsiType.INT) {
+        } else if (PsiType.INT.equals(pt)) {
             return "Character";
-        } else if (pt == PsiType.BYTE) {
+        } else if (PsiType.BYTE.equals(pt)) {
             return "Byte";
-        } else if (pt == PsiType.DOUBLE || pt == PsiType.FLOAT) {
+        } else if (PsiType.DOUBLE.equals(pt) || PsiType.FLOAT.equals(pt)) {
             return "Float";
         } else if (pt.getCanonicalText()
                 .startsWith(Callable.class.getCanonicalName())) {
