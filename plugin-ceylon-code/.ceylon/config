@@ -3,6 +3,7 @@ encoding=UTF-8
 overrides=overrides.xml
 flatclasspath=false
 autoexportmavendependencies=false
+offline=false
 
 [repositories]
 lookup=flat:./intellij-repository
