@@ -18,6 +18,7 @@ public class EditorConfigurable extends BaseConfigurable {
     private JLabel completionLink;
     private JFormattedTextField modelUpdateDelay;
     private JFormattedTextField modelUpdateTimeoutMinutes;
+    private JCheckBox decreaseThePriorityOfCheckBox;
 
     public EditorConfigurable() {
         setupLinks();
@@ -49,6 +50,8 @@ public class EditorConfigurable extends BaseConfigurable {
                 .setAutoUpdateInterval(Integer.valueOf(modelUpdateDelay.getText()) * 1000);
         ceylonSettings_.get_()
                 .setModelUpdateTimeoutMinutes(Integer.valueOf(modelUpdateTimeoutMinutes.getText()));
+        ceylonSettings_.get_()
+                .setLowerModelUpdatePriority(decreaseThePriorityOfCheckBox.isSelected());
     }
 
     @Override
@@ -57,6 +60,8 @@ public class EditorConfigurable extends BaseConfigurable {
                 ceylonSettings_.get_().getAutoUpdateInterval() / 1000));
         modelUpdateTimeoutMinutes.setText(String.valueOf(
                 ceylonSettings_.get_().getModelUpdateTimeoutMinutes()));
+        decreaseThePriorityOfCheckBox.setSelected(
+                ceylonSettings_.get_().getLowerModelUpdatePriority());
     }
 
     @Override
@@ -64,7 +69,9 @@ public class EditorConfigurable extends BaseConfigurable {
         return ceylonSettings_.get_()
                 .getAutoUpdateInterval() != Integer.valueOf(modelUpdateDelay.getText()) * 1000 ||
         ceylonSettings_.get_()
-                .getModelUpdateTimeoutMinutes() != Integer.valueOf(modelUpdateTimeoutMinutes.getText());
+                .getModelUpdateTimeoutMinutes() != Integer.valueOf(modelUpdateTimeoutMinutes.getText()) ||
+        ceylonSettings_.get_()
+                .getLowerModelUpdatePriority() != decreaseThePriorityOfCheckBox.isSelected();
     }
 
     @Override
