@@ -9,7 +9,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import ceylon.interop.java {
     javaClass,
-    CeylonIterable
+    CeylonIterable,
+    JavaList,
+    javaString
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings {
     ceylonSettings
@@ -38,7 +40,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
 }
 import com.vasileff.ceylon.dart.compiler {
     compileDart,
-    CompilationStatus
+    CompilationStatus,
+    javaList
 }
 import com.redhat.ceylon.model.typechecker.model {
     ModuleModel = Module
@@ -64,6 +67,9 @@ import com.redhat.ceylon.compiler.typechecker.context {
 import java.lang {
     CharArray,
     JString=String
+}
+import com.siyeh.ig.performance {
+    ArraysAsListWithZeroOrOneArgumentInspection
 }
 
 shared Backend dartBackend = Backend.registerBackend("Dart", "dart");
@@ -141,16 +147,19 @@ shared class CeylonDartBuilder() satisfies CompileTask {
 
         value writer = messageWriter(context);
 
+        value systemRepository = project.systemRepository;
+        // FIXME total hack, and wrong!
+        value supplementalRepo = systemRepository[0:systemRepository.size-17] + "supplementalRepo";
+
         value [_, resultStatus, messages] = compileDart {
             sourceDirectories = sources;
             sourceFiles = files;
             repositoryManager
-                // use the provided typechecker's repository manager, which will
-                // include the embeddedDist repository
-                =   tc?.context?.repositoryManager else
-                    (if (exists systemRepository = project.systemRepository)
-                    then CeylonUtils.repoManager().systemRepo(systemRepository).buildManager()
-                    else null);
+                // TODO add other relevant repos? Dependencies?
+                =   CeylonUtils.repoManager()
+                        .systemRepo(systemRepository)
+                        .userRepos(JavaList([javaString(supplementalRepo)]))
+                        .buildManager();
             outputRepositoryManager
                 =   CeylonUtils.repoManager()
                         .outRepo(context.getModuleOutputDirectory(m)?.canonicalPath)

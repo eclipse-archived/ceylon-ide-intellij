@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin.getEmbeddedCeylonRepository;
+import static org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin.getSupplementalCeylonRepository;
 
 class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
 
@@ -48,6 +49,7 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
         String[] suffixes = {".car", ".jar"};
 
         visitDirectory(getEmbeddedCeylonRepository(), archives, suffixes, fileNameFilter);
+        visitDirectory(getSupplementalCeylonRepository(), archives, suffixes, fileNameFilter);
 
         return archives.toArray(new File[archives.size()]);
     }
@@ -57,6 +59,8 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
         super.configureRepositories(archiveDirectory, builder);
         StructureBuilder structureBuilder = new FileContentStore(getEmbeddedCeylonRepository());
         builder.addRepository(new DefaultRepository(structureBuilder.createRoot()));
+        StructureBuilder structureBuilder2 = new FileContentStore(getSupplementalCeylonRepository());
+        builder.addRepository(new DefaultRepository(structureBuilder2.createRoot()));
     }
 
     private void visitDirectory(File dir, List<File> output, String[] suffixes, FilenameFilter fileNameFilter) {

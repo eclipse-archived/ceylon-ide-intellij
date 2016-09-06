@@ -116,19 +116,20 @@
             <fileset dir="${projects.base.dir}/ceylon/dist/dist" includes="**"/>
         </copy>
 
+        <mkdir dir="${build.dir}/supplementalRepo"/>
         <!-- dart compiler & cli -->
-        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+        <copy todir="${build.dir}/supplementalRepo">
             <fileset dir="${projects.base.dir}/ceylon-dart/ceylon-dart-compiler/build/modules-jvm/main" includes="com/**/*.car*"/>
         </copy>
-        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+        <copy todir="${build.dir}/supplementalRepo">
             <fileset dir="${projects.base.dir}/ceylon-dart/ceylon-dart-cli/build/modules-jvm/main" includes="com/**/*.car*"/>
         </copy>
-        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+        <copy todir="${build.dir}/supplementalRepo">
             <fileset dir="${projects.base.dir}/ceylon-structures/modules" includes="com/**/*.car*"/>
         </copy>
 
         <!-- sdk modules used by dart compiler & cli -->
-        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+        <copy todir="${build.dir}/supplementalRepo">
             <fileset dir="${projects.base.dir}/ceylon-sdk/modules">
                 <include name="ceylon/buffer/**/*.car*"/>
                 <include name="ceylon/collection/**/*.car*"/>
@@ -141,7 +142,7 @@
         </copy>
 
         <!-- ceylon.ast modules used by dart compiler & cli -->
-        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+        <copy todir="${build.dir}/supplementalRepo">
             <fileset dir="${projects.base.dir}/ceylon.ast/modules">
                 <include name="ceylon/ast/core/**/*.car*"/>
                 <include name="ceylon/ast/redhat/**/*.car*"/>
@@ -149,20 +150,20 @@
             </fileset>
         </copy>
 
-        <!-- dart bin scripts -->
-        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/bin">
-            <fileset dir="${projects.base.dir}/ceylon-dart/ceylon-dart-cli/script/com/vasileff/ceylon/dart/cli" includes="*.plugin"/>
-        </copy>
-
         <!-- dart runtime modules -->
         <unzip src="${projects.base.dir}/ceylon-dart/ceylon-dart-language/build/distributions/ceylon-dart-language-0.0.1.zip"
-               dest="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+               dest="${build.dir}/supplementalRepo">
             <cutdirsmapper dirs="1"/>
         </unzip>
         <unzip src="${projects.base.dir}/ceylon-dart/ceylon-dart-sdk/build/distributions/ceylon-dart-sdk-0.0.1.zip"
-               dest="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+               dest="${build.dir}/supplementalRepo">
             <cutdirsmapper dirs="1"/>
         </unzip>
+
+        <mkdir dir="${build.dir}/CeylonIDEA/classes/supplementalRepo"/>
+        <copy todir="${build.dir}/CeylonIDEA/classes/supplementalRepo">
+            <fileset dir="${build.dir}/supplementalRepo" includes="**"/>
+        </copy>
 
         <copy todir="${build.dir}/CeylonIDEA">
             <fileset dir="${basedir}" includes="META-INF/**"/>

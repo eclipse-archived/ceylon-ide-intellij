@@ -77,12 +77,18 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
 
                 params.setMainClass("com.redhat.ceylon.launcher.Bootstrap");
                 params.getClassPath().add(getBootstrapJarPath());
+                // FIXME "run-dart" is no longer available. Instead, add a toplevel run
+                //       function to ceylon-dart-cli, and call with "run".
                 params.getProgramParametersList().add(
                         backend == Backend.JavaScript ? "run-js" :
                         backend == dartBackend ? "run-dart" :
                         "run");
                 params.getProgramParametersList().add("--run", topLevelNameFull);
                 final Iterable<String> outputPaths = getOutputPaths(CeylonRunConfiguration.this.getProject());
+                if (backend == dartBackend) {
+                    params.getProgramParametersList().add("--rep",
+                            CeylonIdePlugin.getSupplementalCeylonRepository().getAbsolutePath());
+                }
                 for (String outputPath : outputPaths) {
                     params.getProgramParametersList().add("--rep", outputPath);
                 }

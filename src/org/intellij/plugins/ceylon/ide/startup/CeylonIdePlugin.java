@@ -57,7 +57,8 @@ public class CeylonIdePlugin implements ApplicationLoadListener {
     }
 
     /**
-     * @return an array of CAR/JAR files found in `lib` and `classes/embeddedDist/repo`
+     * @return an array of CAR/JAR files found in `lib`, `classes/embeddedDist/repo`,
+     *         and `classes/supplementalRepo`
      */
     private File[] getCeylonArchives() {
         IdeaPluginDescriptor pluginDescriptor = getPluginDescriptor(getClass());
@@ -79,6 +80,8 @@ public class CeylonIdePlugin implements ApplicationLoadListener {
         String[] suffixes = {".car", ".jar"};
         visitDirectory(getEmbeddedCeylonRepository(), archives, suffixes);
 
+        // And archives in classes/supplementalRepo/
+        visitDirectory(getSupplementalCeylonRepository(), archives, suffixes);
         return archives.toArray(new File[archives.size()]);
     }
 
@@ -119,6 +122,16 @@ public class CeylonIdePlugin implements ApplicationLoadListener {
         }
 
         throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
+    }
+
+    @NotNull
+    public static File getSupplementalCeylonRepository() {
+        File ceylonRepoDir = new File(getClassesDir(), "supplementalRepo");
+        if (ceylonRepoDir.exists()) {
+            return ceylonRepoDir;
+        }
+
+        throw new PluginException("Supplemental Ceylon repo not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
     }
 
     @NotNull
