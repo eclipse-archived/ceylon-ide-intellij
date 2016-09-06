@@ -38,7 +38,7 @@ shared class PSIMethod(shared PsiMethod psi)
             =>  (classIs("ceylon.language.Identifiable") && psi.name in ["equals", "hashCode"])
             || !(classIs("ceylon.language.Object") && psi.name in ["equals", "hashCode", "toString"])
                 && concurrencyManager.needIndexes(psi.project,
-                    ()=> concurrencyManager.needReadAccess(
+                    ()=> concurrencyManager.dontCancel(
                         () => SuperMethodsSearch.search(psi, null, true, false).findFirst())) exists;
 
     variable Boolean? lazyIsOverriding = null;
@@ -62,8 +62,8 @@ shared class PSIMethod(shared PsiMethod psi)
     abstract =>
         psi.hasModifierProperty(PsiModifier.abstract)
         || doWithContainingClass(PsiClass.\iinterface, false);
-    
-    constructor => psi.constructor;
+
+    constructor => concurrencyManager.dontCancel(() => psi.constructor);
     
     declaredVoid => (psi.returnType else PsiType.null) == PsiType.\ivoid;
     
