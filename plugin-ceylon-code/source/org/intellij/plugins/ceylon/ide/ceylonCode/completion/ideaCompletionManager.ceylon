@@ -57,7 +57,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTokens
 }
 import com.intellij.codeInsight.completion.impl {
-    CompletionServiceImpl
+    CompletionServiceImpl {
+        completionServiceImpl = completionService
+    }
 }
 import com.intellij.openapi.ui {
     MessageType
@@ -68,7 +70,7 @@ shared abstract class IdeaCompletionProvider()
     
     shared formal CompletionOptions options;
     
-    shared actual void addCompletions(CompletionParameters parameters, 
+    shared actual void addCompletions(CompletionParameters parameters,
         ProcessingContext context, variable CompletionResultSet result) {
         assert (exists project = parameters.editor.project,
                 exists modelManager = getModelManager(project));
@@ -137,7 +139,7 @@ shared abstract class IdeaCompletionProvider()
                                     if (exists result = localAnalyzer.result,
                                         exists lastTypecheckedCU = result.lastCompilationUnit) {
                                         analysisResult = result;
-                                        CompletionServiceImpl.completionService.currentCompletion?.addAdvertisement(
+                                        completionServiceImpl.currentCompletion?.addAdvertisement(
                                             "The results might be incomplete during a Ceylon model update",
                                             MessageType.warning.popupBackground);
                                     } else {
