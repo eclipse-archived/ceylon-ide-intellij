@@ -40,10 +40,16 @@
 
     <actions>
         <group text="Ceylon" icon="/icons/ceylon.png" popup="true">
+            <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.UpdateModelAction"
+                    id="Ceylon.UpdateModel" text="Update Ceylon model">
+                <keyboard-shortcut first-keystroke="control alt U" keymap="$default"/>
+            </action>
             <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.ResetModelAction"
                     id="Ceylon.ResetModel" text="Reset Ceylon model"/>
             <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.ToggleModelUpdateAction"
                     id="Ceylon.ToggleAutoUpdate" text="Disable automatic update of model"/>
+            <action class="org.intellij.plugins.ceylon.ide.ceylonCode.action.LowerModelUpdatePriorityAction"
+                    id="Ceylon.LowerModelUpdatePriority" text="Decrease the processing priority of Ceylon model updates"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
         <action id="Ceylon.AddCeylonModule"

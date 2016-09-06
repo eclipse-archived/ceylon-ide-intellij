@@ -26,6 +26,7 @@ shared class CeylonOptions() {
     shared variable String verbosityLevel = "";
     shared variable Integer autoUpdateInterval = 4000;
     shared variable Integer modelUpdateTimeoutMinutes = 7;
+    shared variable Boolean lowerModelUpdatePriority = false;
 }
 
 state {
@@ -59,6 +60,8 @@ shared class CeylonSettings
 
     shared Integer modelUpdateTimeoutMinutes => myOptions.modelUpdateTimeoutMinutes;
 
+    shared Boolean lowerModelUpdatePriority => myOptions.lowerModelUpdatePriority;
+
     assign defaultTargetVm
             => myOptions.defaultTargetVm = defaultTargetVm;
 
@@ -82,4 +85,7 @@ shared class CeylonSettings
 
     assign modelUpdateTimeoutMinutes
             => myOptions.modelUpdateTimeoutMinutes = modelUpdateTimeoutMinutes;
+
+    assign lowerModelUpdatePriority
+            => myOptions.lowerModelUpdatePriority = lowerModelUpdatePriority;
 }

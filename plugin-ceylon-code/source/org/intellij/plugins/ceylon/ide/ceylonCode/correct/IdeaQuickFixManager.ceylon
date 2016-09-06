@@ -20,7 +20,8 @@ import com.intellij.lang.annotation {
     Annotation
 }
 import com.intellij.openapi.application {
-    Result
+    Result,
+    ApplicationManager
 }
 import com.intellij.openapi.command {
     WriteCommandAction
@@ -323,7 +324,7 @@ shared class IdeaQuickFixData(
                         project, "Searching...",
                         JavaRunnable(() =>
                             concurrencyManager.withAlternateResolution(() =>
-                                concurrencyManager.needReadAccess(change))),
+                                ApplicationManager.application.runReadAction(JavaRunnable(change)))),
                         JavaRunnable(() {
                             resolutions = null;
                             if (candidates.empty) {

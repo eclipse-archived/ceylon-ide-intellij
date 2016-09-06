@@ -46,7 +46,8 @@ import java.lang {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     concurrencyManager,
-    getModelManager
+    getModelManager,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
     ProgressIndicatorMonitor
@@ -55,13 +56,21 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonTokens
 }
+import com.intellij.codeInsight.completion.impl {
+    CompletionServiceImpl {
+        completionServiceImpl = completionService
+    }
+}
+import com.intellij.openapi.ui {
+    MessageType
+}
 
 shared abstract class IdeaCompletionProvider()
         extends CompletionProvider<CompletionParameters>()  {
     
     shared formal CompletionOptions options;
     
-    shared actual void addCompletions(CompletionParameters parameters, 
+    shared actual void addCompletions(CompletionParameters parameters,
         ProcessingContext context, variable CompletionResultSet result) {
         assert (exists project = parameters.editor.project,
                 exists modelManager = getModelManager(project));
@@ -80,7 +89,7 @@ shared abstract class IdeaCompletionProvider()
             );
             
             result = result.withRelevanceSorter(sorter);
-    
+
             if (is LeafPsiElement position = parameters.position) {
                 if (position.elementType == CeylonTokens.astringLiteral) {
                     result = result.withPrefixMatcher("");
@@ -115,17 +124,40 @@ shared abstract class IdeaCompletionProvider()
                 try {
                     concurrencyManager.withAlternateResolution(() {
                         if (is CeylonFile ceylonFile = parameters.originalFile,
-                            exists localAnalyzer = ceylonFile.localAnalyzer,
-                            exists analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 5),
-                            analysisResult.upToDate) {
-                            addCompletionsInternal {
-                                parameters = parameters;
-                                context = context;
-                                result = result;
-                                analysisResult = analysisResult;
-                                options = options;
-                                progressMonitor = progressMonitor;
-                            };
+                            exists localAnalyzer = ceylonFile.localAnalyzer) {
+                            LocalAnalysisResult? analysisResult;
+                            if (! modelManager.busy) {
+                                if (parameters.autoPopup) {
+                                    analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 0);
+                                } else {
+                                    analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 4);
+                                }
+                            } else {
+                                if (parameters.autoPopup) {
+                                    analysisResult = null;
+                                } else {
+                                    if (exists result = localAnalyzer.result,
+                                        exists lastTypecheckedCU = result.lastCompilationUnit) {
+                                        analysisResult = result;
+                                        completionServiceImpl.currentCompletion?.addAdvertisement(
+                                            "The results might be incomplete during a Ceylon model update",
+                                            MessageType.warning.popupBackground);
+                                    } else {
+                                        analysisResult = null;
+                                    }
+                                }
+                            }
+                            if (exists analysisResult) {
+                                addCompletionsInternal {
+                                    modelManager = modelManager;
+                                    parameters = parameters;
+                                    context = context;
+                                    result = result;
+                                    analysisResult = analysisResult;
+                                    options = options;
+                                    progressMonitor = progressMonitor;
+                                };
+                            }
                         }
                     });
                 } catch (ProcessCanceledException e) {
@@ -139,7 +171,8 @@ shared abstract class IdeaCompletionProvider()
         }
     }
     
-    void addCompletionsInternal(CompletionParameters parameters, 
+    void addCompletionsInternal(CeylonModelManager modelManager,
+        CompletionParameters parameters,
         ProcessingContext context, CompletionResultSet result,
         LocalAnalysisResult analysisResult, CompletionOptions options,
         ProgressIndicatorMonitor progressMonitor) {
@@ -174,7 +207,9 @@ shared abstract class IdeaCompletionProvider()
             installCustomLookupCellRenderer(project);
 
             if (!isSecondLevel) {
-                result.addLookupAdvertisement("Call again to toggle second-level completions");
+                if (!modelManager.busy) {
+                    result.addLookupAdvertisement("Call again to toggle second-level completions");
+                }
             }
         }
     }

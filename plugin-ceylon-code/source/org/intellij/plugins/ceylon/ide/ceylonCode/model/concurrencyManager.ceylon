@@ -42,11 +42,11 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger
 }
 
-shared class NoIndexStrategy 
-        of useAlternateResolution | 
+shared class NoIndexStrategy
+        of useAlternateResolution |
         waitForIndexes |
         ousideDumbMode {
-    String str; 
+    String str;
     shared new useAlternateResolution {
         str = "useAlternateResolution";
     }
@@ -61,10 +61,10 @@ shared class NoIndexStrategy
 
 shared abstract class ConcurrencyError(String? description=null, Throwable? cause=null) extends Exception(description, cause) {}
 
-shared class CannotWaitForIndexesInReadAccessError() 
+shared class CannotWaitForIndexesInReadAccessError()
         extends ConcurrencyError("Waiting for up-to-date indexes inside a read-allowed section is dead-lock-prone.") {}
 
-shared class DumbModeNotSupported() 
+shared class DumbModeNotSupported()
         extends ConcurrencyError("This code should never be called while Dumb mode is on.") {}
 
 String noIndexStrategyMessage = """Entering in a section that would need indexes, but no strategy has been specified.
@@ -73,18 +73,18 @@ String noIndexStrategyMessage = """Entering in a section that would need indexes
                                      - concurrencyManager.withAlternateResolution()
                                      - concurrencyManager.outsideDumbMode()""";
 
-shared class IndexNeededWithNoIndexStrategy() 
+shared class IndexNeededWithNoIndexStrategy()
         extends ConcurrencyError(noIndexStrategyMessage) {}
 
 shared object concurrencyManager {
     value logger = CeylonLogger<\IconcurrencyManager>();
 
     shared Integer deadLockDetectionTimeout = 30000;
-    
+
     value noIndexStrategy_ = ThreadLocal<NoIndexStrategy?>();
 
     shared NoIndexStrategy? noIndexStrategy => noIndexStrategy_.get();
-    
+
     shared Return|ProcessCanceledException tryReadAccess<Return>(Return() func) {
         try {
             return needReadAccess(func, 0);
@@ -93,13 +93,29 @@ shared object concurrencyManager {
         }
     }
 
+    shared Return dontCancel<Return>(Return() func) {
+        value ref = Ref<Return>();
+        ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() => ref.set(func())));
+        return ref.get();
+    }
+
     shared Return needReadAccess<Return>(Return() func, Integer timeout = deadLockDetectionTimeout) {
+        value ref = Ref<Return>();
+
+        value funcRunnable = JavaRunnable(() {
+            value restoreCurrentPriority = withOriginalModelUpdatePriority();
+            try {
+                return ref.set(func());
+            } finally {
+                restoreCurrentPriority();
+            }
+        });
+
         if (application.readAccessAllowed) {
-            value ref = Ref<Return>();
-            ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() => ref.set(func())));
+            ProgressManager.instance.executeNonCancelableSection(funcRunnable);
             return ref.get();
         } else {
-            "This method is copied on 
+            "This method is copied on
              [[com.intellij.openapi.progress.util::ProgressIndicatorUtils.runInReadActionWithWriteActionPriority]]
              but doesn't fail when a write action is only pending, since this would lead to deadlocks when another read action is
              preventing a pending write action to acquire its lock"
@@ -143,11 +159,10 @@ shared object concurrencyManager {
                 Boolean cancelled = wasCancelled.get();
                 return ! cancelled;
             }
-            
-            value ref = Ref<Return>();
-            
+
             value allowedWaitingTime = System.currentTimeMillis() + timeout;
-            while(!runInReadActionWithWriteActionPriority(JavaRunnable(() => ref.set(func())))) {
+
+            while(!runInReadActionWithWriteActionPriority(funcRunnable)) {
                 try {
                     if (System.currentTimeMillis() > allowedWaitingTime) {
                         if (timeout == deadLockDetectionTimeout) {
@@ -155,7 +170,7 @@ shared object concurrencyManager {
                         }
                         throw ProcessCanceledException();
                     }
-                    Thread.sleep(200);
+                    Thread.sleep(50);
                 } catch(InterruptedException ie) {
                     if (application.disposeInProgress) {
                         throw ProcessCanceledException(ie);
@@ -172,7 +187,7 @@ shared object concurrencyManager {
             return ref.get();
         }
     }
-    
+
     Return withIndexStrategy<Return>(NoIndexStrategy s, Return() func) {
         NoIndexStrategy? previousStrategy;
         if (exists currentStrategy = noIndexStrategy_.get()) {
@@ -185,7 +200,7 @@ shared object concurrencyManager {
         }
         try {
             if (s == NoIndexStrategy.waitForIndexes
-                && application.readAccessAllowed) {
+            && application.readAccessAllowed) {
                 throw CannotWaitForIndexesInReadAccessError();
             }
             noIndexStrategy_.set(s);
@@ -195,13 +210,13 @@ shared object concurrencyManager {
         }
     }
 
-    
+
     "With this strategy applied to [[func()]], all the calls to [[needIndexes()]] 
      (in descendant functions in the same thread), *while Dumb mode is on*,
      will *use the alternate resolution* method."
     see (`function DumbService.withAlternativeResolveEnabled`)
     shared Return withAlternateResolution<Return>(Return func())
-        => withIndexStrategy(NoIndexStrategy.useAlternateResolution, func);
+            => withIndexStrategy(NoIndexStrategy.useAlternateResolution, func);
 
     "With this strategy applied to [[func()]], all the calls to [[needIndexes()]] 
      (in descendant functions in the same thread), *while Dumb mode is on*,
@@ -210,7 +225,7 @@ shared object concurrencyManager {
      in which case a [[CannotWaitForIndexesInReadAccessError]] will be thrown."
     see (`function DumbService.repeatUntilPassesInSmartMode`)
     shared Return withUpToDateIndexes<Return>(Return func())
-        => withIndexStrategy(NoIndexStrategy.waitForIndexes, func);
+            => withIndexStrategy(NoIndexStrategy.waitForIndexes, func);
 
     "With this strategy applied to [[func()]], all the calls to [[needIndexes()]] 
      (in descendant functions in the same thread), are *expected to be called 
@@ -221,13 +236,13 @@ shared object concurrencyManager {
      in which case a [[CannotWaitForIndexesInReadAccessError]] will be thrown."
     shared Return outsideDumbMode<Return>(Return func())
             => withIndexStrategy(NoIndexStrategy.ousideDumbMode, func);
-    
+
     shared Return needIndexes<Return>(Project p, Return func()) {
         value ds = dumbService(p);
-        
+
         value ref = Ref<Return>();
         value runnable = JavaRunnable(() => ref.set(func()));
-        
+
         switch(indexStragey = noIndexStrategy_.get())
         case(NoIndexStrategy.useAlternateResolution) {
             // we are probably in the completion, or navigation, or local typechecking
@@ -268,13 +283,13 @@ shared object concurrencyManager {
 object concurrencyManagerForJava {
     shared Anything needReadAccess(JCallable<Anything> func, Integer timeout)
             => concurrencyManager.needReadAccess(func.call, timeout);
-    
+
     shared Anything withAlternateResolution(JCallable<Anything> func)
             => concurrencyManager.withAlternateResolution(func.call);
-    
+
     shared Anything withUpToDateIndexes(JCallable<Anything> func)
             => concurrencyManager.withUpToDateIndexes(func.call);
-    
+
     shared Anything outsideDumbMode(JCallable<Anything> func)
             => concurrencyManager.outsideDumbMode(func.call);
 }

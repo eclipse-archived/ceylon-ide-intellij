@@ -115,7 +115,8 @@ import java.lang {
     Runnable,
     InterruptedException,
     Error,
-    Thread
+    Thread,
+    ThreadLocal
 }
 import java.util {
     JHashSet=HashSet,
@@ -156,7 +157,27 @@ final class ChangesInProject of noChange | changesThatAlwaysRequireModelUpdate {
 
 CeylonLogger<CeylonModelManager> ceylonModelManagerLogger = CeylonLogger<CeylonModelManager>();
 
-shared class CeylonModelManager(model) 
+variable Boolean cachedLowerModelUpdatePriority = false;
+
+ThreadLocal<Integer> modelUpdateOriginalPriority = ThreadLocal<Integer>();
+Anything() withOriginalModelUpdatePriority() {
+    if (cachedLowerModelUpdatePriority) {
+        if (exists modelUpdatePriority = modelUpdateOriginalPriority.get()) {
+            value currentThread = Thread.currentThread();
+            value currentPriority = currentThread.priority;
+            currentThread.priority = modelUpdatePriority;
+            return () {
+                Thread.currentThread().priority = currentPriority;
+            };
+        } else {
+            return noop;
+        }
+    } else {
+        return noop;
+    }
+}
+
+shared class CeylonModelManager(model)
         satisfies ProjectComponent
         & Disposable
         & VirtualFileListener
@@ -182,6 +203,11 @@ shared class CeylonModelManager(model)
     variable value busy_ = false;
 
     shared Boolean busy => busy_;
+    value lowerPriority {
+        value lowerModelUpdatePriority = ceylonSettings.lowerModelUpdatePriority;
+        cachedLowerModelUpdatePriority = lowerModelUpdatePriority;
+        return lowerModelUpdatePriority;
+    }
 
     value accumulatedChanges = LinkedBlockingQueue<NativeResourceChange>();
     variable Future<out Anything>? submitChangesFuture = null;
@@ -265,7 +291,7 @@ shared class CeylonModelManager(model)
     function delayToUse(Integer requestedDelay) => min({requestedDelay, if (exists theLastDelay = lastRequestedDelay) theLastDelay});
 
     shared void scheduleModelUpdate(Integer delay = delayBeforeUpdatingAfterChange, Boolean force = false) {
-        if (ideaProjectReady && 
+        if (ideaProjectReady &&
             (automaticModelUpdateEnabled_ || force)) {
             value plannedDelay = delayToUse(delay);
             lastRequestedDelay = plannedDelay;
@@ -387,15 +413,23 @@ shared class CeylonModelManager(model)
                             PerformInBackgroundOption.alwaysBackground) {
                             
                             shared actual void run(ProgressIndicator progressIndicator) {
+                                value currentThread = Thread.currentThread();
+                                value currentPriority = currentThread.priority;
+                                modelUpdateOriginalPriority.set(currentPriority);
                                 busy_ = true;
                                 buildProgressIndicator.set(progressIndicator);
                                 value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
                                 value ticks = model.ceylonProjectNumber * 1000;
                                 try (progress = monitor.Progress(ticks, "Updating Ceylon model")) {
+                                    if (lowerPriority) {
+                                        currentThread.priority = currentPriority - (currentPriority  - Thread.minPriority) / 2;
+                                    }
+
                                     concurrencyManager.withUpToDateIndexes(() {
                                         for (ceylonProject in model
                                                 .ceylonProjectsInTopologicalOrder.sequence()
                                                 .reversed) {
+                                            setTitle("Ceylon model update for module `` ceylonProject.name ``");
                                             ceylonProject.build.performBuild(progress.newChild(1000));
                                         }
                                     });
@@ -416,6 +450,8 @@ shared class CeylonModelManager(model)
                                         throw t;
                                     }
                                 } finally {
+                                    currentThread.priority = currentPriority;
+                                    modelUpdateOriginalPriority.set(null);
                                     busy_ = false;
                                 }
                             }
