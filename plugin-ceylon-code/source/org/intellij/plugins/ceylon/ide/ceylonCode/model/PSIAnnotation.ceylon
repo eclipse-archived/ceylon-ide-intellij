@@ -1,6 +1,9 @@
 import ceylon.collection {
     HashMap
 }
+import ceylon.interop.java {
+    javaString
+}
 
 import com.intellij.psi {
     PsiAnnotation,
@@ -17,9 +20,6 @@ import com.intellij.psi {
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
     Status
-}
-import com.redhat.ceylon.ide.common.util {
-    toJavaString
 }
 import com.redhat.ceylon.model.loader.mirror {
     AnnotationMirror
@@ -59,7 +59,11 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
             return toListIfNeeded(PSIAnnotation(v), type);
         }
         else if (is PsiReferenceExpression v) {
-            return toListIfNeeded(toJavaString(v.referenceName), type);
+            value jstring
+                    = if (exists vrn = v.referenceName)
+                    then javaString(vrn)
+                    else null;
+            return toListIfNeeded(jstring, type);
         }
         else if (is PsiClassObjectAccessExpression v) {
             return PSIType(v.operand.type);

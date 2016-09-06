@@ -22,8 +22,6 @@ import javax.swing.*;
 import java.util.Collection;
 import java.util.Collections;
 
-import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
-
 abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPsi>
         extends PsiTreeElementBase<Decl>
         implements ColoredItemPresentation, SortableTreeElement, AccessLevelProvider {
@@ -124,7 +122,10 @@ abstract class CeylonDeclarationTreeElement<Decl extends CeylonPsi.DeclarationPs
         if (!isValid()) {
             return "INVALID";
         }
-        return toJavaString(descriptions_.get_().descriptionForPsi(getElement(), false, false));
+        ceylon.language.String desc
+                = descriptions_.get_()
+                    .descriptionForPsi(getElement(), false, false);
+        return desc==null ? null : desc.toString();
     }
 
     @Override

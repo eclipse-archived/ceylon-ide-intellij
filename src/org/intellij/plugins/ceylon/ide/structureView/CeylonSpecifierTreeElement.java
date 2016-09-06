@@ -5,7 +5,6 @@ import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.ide.structureView.impl.java.AccessLevelProvider;
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.navigation.ColoredItemPresentation;
-import com.intellij.navigation.LocationPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.ui.UIUtil;
@@ -19,8 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
-
-import static com.redhat.ceylon.ide.common.util.toJavaString_.toJavaString;
 
 class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierStatementPsi>
         implements ColoredItemPresentation, SortableTreeElement, AccessLevelProvider {
@@ -84,7 +81,10 @@ class CeylonSpecifierTreeElement extends PsiTreeElementBase<CeylonPsi.SpecifierS
         if (!isValid()) {
             return "INVALID";
         }
-        return toJavaString(descriptions_.get_().descriptionForPsi(getElement(), false, false));
+        ceylon.language.String desc
+                = descriptions_.get_()
+                    .descriptionForPsi(getElement(), false, false);
+        return desc==null ? null : desc.toString();
     }
 
     @NotNull

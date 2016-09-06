@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.debugger;
 
+import ceylon.interop.java.JavaIterable;
 import ceylon.language.Entry;
 import ceylon.language.Integer;
 import com.intellij.debugger.NoDataException;
@@ -39,7 +40,6 @@ import java.util.concurrent.Callable;
 
 import static com.intellij.psi.util.PsiTreeUtil.getParentOfType;
 import static com.redhat.ceylon.ide.common.debug.getFirstValidLocation_.getFirstValidLocation;
-import static com.redhat.ceylon.ide.common.util.toJavaIterable_.toJavaIterable;
 import static org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava.needReadAccess;
 import static org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTreeUtil.getDeclaringFile;
 
@@ -61,8 +61,7 @@ class CeylonPositionManager implements PositionManager {
         IdeaCeylonProjects projects = process.getProject().getComponent(IdeaCeylonProjects.class);
 
         if (projects != null) {
-            TypeDescriptor td = TypeDescriptor.klass(IdeaCeylonProject.class);
-            for (CeylonProject p : toJavaIterable(td, projects.getCeylonProjects())) {
+            for (CeylonProject p : new JavaIterable<CeylonProject>(TypeDescriptor.klass(IdeaCeylonProject.class), projects.getCeylonProjects())) {
                 try {
                     PhasedUnit pu = p.getTypechecker().getPhasedUnitFromRelativePath(location.sourcePath());
                     if (pu != null) {

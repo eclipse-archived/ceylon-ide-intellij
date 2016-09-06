@@ -2,7 +2,6 @@ package org.intellij.plugins.ceylon.ide.structureView;
 
 import static com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor.klass;
 import static com.redhat.ceylon.ide.common.completion.overloads_.overloads;
-import static com.redhat.ceylon.ide.common.util.toJavaIterable_.toJavaIterable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import ceylon.interop.java.JavaIterable;
 import com.redhat.ceylon.model.typechecker.model.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
@@ -81,7 +81,7 @@ class CeylonInheritedMembersNodeProvider extends InheritedMembersNodeProvider
         Map<String, DeclarationWithProximity> decls = type.getMatchingMemberDeclarations(declaration.getUnit(), type, "", 0, null);
 
         for (DeclarationWithProximity dwp : decls.values()) {
-            for (Declaration decl : toJavaIterable(klass(Declaration.class), overloads(dwp.getDeclaration()))) {
+            for (Declaration decl : new JavaIterable<Declaration>(klass(Declaration.class), overloads(dwp.getDeclaration()))) {
                 if (!(decl instanceof TypeParameter)) {
                     Unit unit = decl.getUnit();
                     PsiFile file = unit.equals(declaration.getUnit())
