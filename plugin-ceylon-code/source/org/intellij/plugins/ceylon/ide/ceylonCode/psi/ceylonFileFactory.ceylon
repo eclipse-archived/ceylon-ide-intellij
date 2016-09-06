@@ -18,7 +18,6 @@ import com.redhat.ceylon.common {
     Backend
 }
 import com.redhat.ceylon.ide.common.util {
-    toJavaStringList,
     escaping
 }
 
@@ -27,7 +26,8 @@ import java.lang {
 }
 import java.util {
     HashMap,
-    Properties
+    Properties,
+    Arrays
 }
 
 shared object ceylonFileFactory {
@@ -38,13 +38,13 @@ shared object ceylonFileFactory {
         value props = HashMap<JString,Object>();
 
         if (exists backend) {
-            props[javaString("NATIVE")] = javaString("native(\"" + backend.nativeAnnotation + "\")");
+            props[javaString("NATIVE")] = javaString("native(\"``backend.nativeAnnotation``\")");
         }
         props[javaString("MODULE_NAME")] = javaString(name);
         props[javaString("MODULE_VERSION")] = javaString(version);
 
         if (! imports.empty) {
-            props[javaString("IMPORTS")] = toJavaStringList(imports);
+            props[javaString("IMPORTS")] = Arrays.asList(*imports.map(javaString));
         }
 
         return createFromTemplate(
