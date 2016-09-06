@@ -35,6 +35,8 @@ import static org.intellij.plugins.ceylon.ide.ceylonCode.model.findModuleByName_
  */
 class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule> {
 
+    public static Backend dartBackend = Backend.registerBackend("Dart", "dart");
+
     private String ceylonModule;
 
     /** Full top level name, including the package, including the module */
@@ -75,7 +77,10 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
 
                 params.setMainClass("com.redhat.ceylon.launcher.Bootstrap");
                 params.getClassPath().add(getBootstrapJarPath());
-                params.getProgramParametersList().add(backend == Backend.JavaScript ? "run-js" : "run");
+                params.getProgramParametersList().add(
+                        backend == Backend.JavaScript ? "run-js" :
+                        backend == dartBackend ? "run-dart" :
+                        "run");
                 params.getProgramParametersList().add("--run", topLevelNameFull);
                 final Iterable<String> outputPaths = getOutputPaths(CeylonRunConfiguration.this.getProject());
                 for (String outputPath : outputPaths) {

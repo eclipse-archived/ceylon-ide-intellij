@@ -216,12 +216,15 @@
                 implementation="org.intellij.plugins.ceylon.ide.build.BuildClasspathProvider"/>
         <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonBuilder" execute="BEFORE"/>
         <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonJsBuilder" execute="AFTER"/>
+        <compiler.task implementation="org.intellij.plugins.ceylon.ide.ceylonCode.build.CeylonDartBuilder" execute="AFTER"/>
 
         <!-- Run/Debug -->
         <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationType"/>
         <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonJsRunConfigurationType"/>
+        <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonDartRunConfigurationType"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationProducer"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonJsRunConfigurationProducer"/>
+        <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonDartRunConfigurationProducer"/>
         <!--<runLineMarkerContributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.runner.CeylonRunLineMarkerContributor"/>-->
         <debugger.javaDebugAware implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonDebugAware"/>
         <debugger.positionManagerFactory implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonPositionManagerFactory"/>

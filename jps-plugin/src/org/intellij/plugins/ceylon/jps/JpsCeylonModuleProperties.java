@@ -4,6 +4,7 @@ public class JpsCeylonModuleProperties {
 
     private boolean compileForJvm = true;
     private boolean compileToJs;
+    private boolean compileToDart;
     private String systemRepository;
 
     public boolean isCompileForJvm() {
@@ -20,6 +21,14 @@ public class JpsCeylonModuleProperties {
 
     public void setCompileToJs(boolean compileToJs) {
         this.compileToJs = compileToJs;
+    }
+
+    public boolean isCompileToDart() {
+        return compileToDart;
+    }
+
+    public void setCompileToDart(boolean compileToDart) {
+        this.compileToDart = compileToDart;
     }
 
     public String getSystemRepository() {

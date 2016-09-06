@@ -3,15 +3,15 @@
   <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" manifest="file://$MODULE_DIR$/META-INF/plugin.xml" />
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="true">
     <exclude-output />
+    <content url="file://$CEYLON_DIST$">
+      <sourceFolder url="file://$CEYLON_DIST$" isTestSource="false" packagePrefix="embeddedDist" />
+    </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/testdata" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/ant-build" />
-    </content>
-    <content url="file://$CEYLON_DIST$">
-      <sourceFolder url="file://$CEYLON_DIST$" isTestSource="false" packagePrefix="embeddedDist" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -99,5 +99,86 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="plugin-ceylon-code" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon.ast/modules/ceylon/ast/core/1.3.0/ceylon.ast.core-1.3.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon.ast/modules/ceylon/ast/create/1.3.0/ceylon.ast.create-1.3.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon.ast/modules/ceylon/ast/redhat/1.3.0/ceylon.ast.redhat-1.3.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/whole/1.3.0/ceylon.whole-1.3.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/json/1.3.0/ceylon.json-1.3.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/file/1.3.0/ceylon.file-1.3.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/buffer/1.3.0/ceylon.buffer-1.3.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-structures/modules/com/vasileff/ceylon/structures/1.0.0/com.vasileff.ceylon.structures-1.0.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ceylon-dart/ceylon-dart-compiler/build/modules-jvm/main/com/vasileff/ceylon/dart/compiler/1.3.0-DP3/com.vasileff.ceylon.dart.compiler-1.3.0-DP3.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

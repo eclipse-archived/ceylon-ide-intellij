@@ -36,6 +36,7 @@
         <pathelement path="${build.dir}/runtime"/>
 
         <path refid="dist.classpath"/>
+        <path refid="dist.classpath.nolib"/>
 
 
         <pathelement path="${dist.repo.dir}/org/tautua/markdownpapers/core/1.2.7/org.tautua.markdownpapers.core-1.2.7.jar" />
@@ -63,15 +64,29 @@
     </path>
 
     <path id="dist.classpath">
+        <!-- for plugin -->
         <pathelement path="${basedir}/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/current/org.intellij.plugins.ceylon.ide.ceylonCode-current.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.3.0/com.redhat.ceylon.ide.common-1.3.0.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar" />
-        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/1.3.0/ceylon.collection-1.3.0.car" />
-        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.3.0/ceylon.interop.java-1.3.0.car" />
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.3.0/ceylon.tool.converter.java2ceylon-1.3.0.car" />
         <pathelement path="${projects.base.dir}/ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar" />
-   </path>
+    </path>
+    <path id="dist.classpath.nolib">
+        <!-- for plugin & dart compiler -->
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/1.3.0/ceylon.collection-1.3.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/interop/java/1.3.0/ceylon.interop.java-1.3.0.car" />
+        <!-- for dart compiler -->
+        <pathelement path="${projects.base.dir}/ceylon.ast/modules/ceylon/ast/core/1.3.0/ceylon.ast.core-1.3.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon.ast/modules/ceylon/ast/create/1.3.0/ceylon.ast.create-1.3.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon.ast/modules/ceylon/ast/redhat/1.3.0/ceylon.ast.redhat-1.3.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/whole/1.3.0/ceylon.whole-1.3.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/json/1.3.0/ceylon.json-1.3.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/file/1.3.0/ceylon.file-1.3.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/buffer/1.3.0/ceylon.buffer-1.3.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon-structures/modules/com/vasileff/ceylon/structures/1.0.0/com.vasileff.ceylon.structures-1.0.0.car" />
+        <pathelement path="${projects.base.dir}/ceylon-dart/ceylon-dart-compiler/build/modules-jvm/main/com/vasileff/ceylon/dart/compiler/1.3.0-DP3/com.vasileff.ceylon.dart.compiler-1.3.0-DP3.car" />
+    </path>
 
     <target name="build-ide">
         <taskdef name="javac2" classname="com.intellij.ant.Javac2">
@@ -100,6 +115,54 @@
         <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist">
             <fileset dir="${projects.base.dir}/ceylon/dist/dist" includes="**"/>
         </copy>
+
+        <!-- dart compiler & cli -->
+        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+            <fileset dir="${projects.base.dir}/ceylon-dart/ceylon-dart-compiler/build/modules-jvm/main" includes="com/**/*.car*"/>
+        </copy>
+        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+            <fileset dir="${projects.base.dir}/ceylon-dart/ceylon-dart-cli/build/modules-jvm/main" includes="com/**/*.car*"/>
+        </copy>
+        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+            <fileset dir="${projects.base.dir}/ceylon-structures/modules" includes="com/**/*.car*"/>
+        </copy>
+
+        <!-- sdk modules used by dart compiler & cli -->
+        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+            <fileset dir="${projects.base.dir}/ceylon-sdk/modules">
+                <include name="ceylon/buffer/**/*.car*"/>
+                <include name="ceylon/collection/**/*.car*"/>
+                <include name="ceylon/file/**/*.car*"/>
+                <include name="ceylon/interop/java/**/*.car*"/>
+                <include name="ceylon/json/**/*.car*"/>
+                <include name="ceylon/process/**/*.car*"/>
+                <include name="ceylon/whole/**/*.car*"/>
+            </fileset>
+        </copy>
+
+        <!-- ceylon.ast modules used by dart compiler & cli -->
+        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+            <fileset dir="${projects.base.dir}/ceylon.ast/modules">
+                <include name="ceylon/ast/core/**/*.car*"/>
+                <include name="ceylon/ast/redhat/**/*.car*"/>
+                <include name="ceylon/ast/create/**/*.car*"/>
+            </fileset>
+        </copy>
+
+        <!-- dart bin scripts -->
+        <copy todir="${build.dir}/CeylonIDEA/classes/embeddedDist/bin">
+            <fileset dir="${projects.base.dir}/ceylon-dart/ceylon-dart-cli/script/com/vasileff/ceylon/dart/cli" includes="*.plugin"/>
+        </copy>
+
+        <!-- dart runtime modules -->
+        <unzip src="${projects.base.dir}/ceylon-dart/ceylon-dart-language/build/distributions/ceylon-dart-language-0.0.1.zip"
+               dest="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+            <cutdirsmapper dirs="1"/>
+        </unzip>
+        <unzip src="${projects.base.dir}/ceylon-dart/ceylon-dart-sdk/build/distributions/ceylon-dart-sdk-0.0.1.zip"
+               dest="${build.dir}/CeylonIDEA/classes/embeddedDist/repo">
+            <cutdirsmapper dirs="1"/>
+        </unzip>
 
         <copy todir="${build.dir}/CeylonIDEA">
             <fileset dir="${basedir}" includes="META-INF/**"/>

@@ -40,6 +40,9 @@ import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isForcedRecompilat
 
 class CeylonBuilder extends ModuleLevelBuilder {
 
+    public static com.redhat.ceylon.common.Backend dartBackend =
+            com.redhat.ceylon.common.Backend.registerBackend("Dart", "dart");
+
     private static final String BUILDER_NAME = "ceylon";
     private final Backend backend;
     private static final Logger logger = Logger.getInstance(CeylonBuilder.class);
@@ -51,9 +54,16 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
     @Override
     public List<String> getCompilableFileExtensions() {
-        return backend == Backend.Java
-                ? Arrays.asList("java", "ceylon")
-                : Arrays.asList("js", "ceylon");
+        if (backend == Backend.Java) {
+            return Arrays.asList("java", "ceylon");
+        }
+        else if (backend == Backend.JavaScript) {
+            return Arrays.asList("js", "ceylon");
+        }
+        else if (backend == Backend.Dart) {
+            return Arrays.asList("dart", "ceylon");
+        }
+        throw new RuntimeException("Unsupported backend " + backend.name());
     }
 
     @Override
@@ -75,9 +85,10 @@ class CeylonBuilder extends ModuleLevelBuilder {
             JpsCeylonModuleExtension facet = module.getContainer().getChild(JpsCeylonModuleExtension.KIND);
 
             if (facet != null) {
-                boolean sameBackend = backend == Backend.Java
-                        ? facet.getProperties().isCompileForJvm()
-                        : facet.getProperties().isCompileToJs();
+                boolean sameBackend =
+                        backend == Backend.Java  && facet.getProperties().isCompileForJvm() ||
+                        backend == Backend.JavaScript && facet.getProperties().isCompileToJs() ||
+                        backend == Backend.Dart && facet.getProperties().isCompileToDart();
                 compileForBackend.put(module, sameBackend);
             } else {
                 compileForBackend.put(module, false);
@@ -303,9 +314,9 @@ class CeylonBuilder extends ModuleLevelBuilder {
             List<String> moduleNames = new ArrayList<>(expandWildcards(
                     getSourceRoots(chunk),
                     Collections.singletonList("*"),
-                    (backend == Backend.Java)
-                            ? com.redhat.ceylon.common.Backend.Java
-                            : com.redhat.ceylon.common.Backend.JavaScript
+                    backend == Backend.Java ? com.redhat.ceylon.common.Backend.Java :
+                    backend == Backend.JavaScript ? com.redhat.ceylon.common.Backend.JavaScript :
+                    dartBackend
             ));
             if (defaultModulePresent(chunk)) {
                 moduleNames.add("default");

@@ -53,6 +53,9 @@ public class CeylonFacetConfiguration implements FacetConfiguration {
                 .setAttribute("name", "compileToJs")
                 .setAttribute("value", conf.getCompileToJs() == null ? "false" : conf.getCompileToJs().toString()));
         element.addContent(new Element("option")
+                .setAttribute("name", "compileToDart")
+                .setAttribute("value", conf.getCompileToDart() == null ? "false" : conf.getCompileToDart().toString()));
+        element.addContent(new Element("option")
                 .setAttribute("name", "systemRepository")
                 .setAttribute("value", conf.getSystemRepository() == null ? "" : conf.getSystemRepository().toString()));
 

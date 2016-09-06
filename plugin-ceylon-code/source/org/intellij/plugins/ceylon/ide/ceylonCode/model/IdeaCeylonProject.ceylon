@@ -327,6 +327,9 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared actual Boolean compileToJs
             => ideConfiguration.compileToJs else false;
+    
+    shared actual Boolean compileToDart
+            => ideConfiguration.compileToDart else false;
 
     shared actual void createOverridesProblemMarker(Exception ex, File absoluteFile, Integer overridesLine, Integer overridesColumn) {
         // TODO
