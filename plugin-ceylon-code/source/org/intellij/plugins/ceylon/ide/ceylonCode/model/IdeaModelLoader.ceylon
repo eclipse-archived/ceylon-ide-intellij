@@ -98,10 +98,17 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                         currentStrategy == NoIndexStrategy.waitForIndexes) {
                         updateIndexIfnecessary();
                         assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
-                        dumbService(project).runReadActionInSmartMode(JavaRunnable(()
-                            => concurrencyManager.outsideDumbMode(() {
-                                ref.set(action.call() else null);
-                        })));
+                        dumbService(project).runReadActionInSmartMode(JavaRunnable(() {
+                            value restoreCurrentPriority = withOriginalModelUpdatePriority();
+                            try {
+                                return concurrencyManager.outsideDumbMode(() {
+                                    ref.set(action.call() else null);
+                                });
+                            } finally {
+                                    restoreCurrentPriority();
+
+                            }
+                        }));
                     } else {
                         application.runReadAction(JavaRunnable(() {
                             ref.set(action.call() else null);

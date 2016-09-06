@@ -94,12 +94,22 @@ shared object concurrencyManager {
     }
 
     shared Return needReadAccess<Return>(Return() func, Integer timeout = deadLockDetectionTimeout) {
+        value ref = Ref<Return>();
+
+        value funcRunnable = JavaRunnable(() {
+            value restoreCurrentPriority = withOriginalModelUpdatePriority();
+            try {
+                return ref.set(func());
+            } finally {
+                restoreCurrentPriority();
+            }
+        });
+
         if (application.readAccessAllowed) {
-            value ref = Ref<Return>();
-            ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() => ref.set(func())));
+            ProgressManager.instance.executeNonCancelableSection(funcRunnable);
             return ref.get();
         } else {
-            "This method is copied on 
+            "This method is copied on
              [[com.intellij.openapi.progress.util::ProgressIndicatorUtils.runInReadActionWithWriteActionPriority]]
              but doesn't fail when a write action is only pending, since this would lead to deadlocks when another read action is
              preventing a pending write action to acquire its lock"
@@ -143,11 +153,10 @@ shared object concurrencyManager {
                 Boolean cancelled = wasCancelled.get();
                 return ! cancelled;
             }
-            
-            value ref = Ref<Return>();
-            
+
             value allowedWaitingTime = System.currentTimeMillis() + timeout;
-            while(!runInReadActionWithWriteActionPriority(JavaRunnable(() => ref.set(func())))) {
+
+            while(!runInReadActionWithWriteActionPriority(funcRunnable)) {
                 try {
                     if (System.currentTimeMillis() > allowedWaitingTime) {
                         if (timeout == deadLockDetectionTimeout) {
