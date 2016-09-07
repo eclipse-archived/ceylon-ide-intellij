@@ -27,6 +27,7 @@ shared class CeylonOptions() {
     shared variable Integer autoUpdateInterval = 4000;
     shared variable Integer modelUpdateTimeoutMinutes = 7;
     shared variable Boolean lowerModelUpdatePriority = false;
+    shared variable Boolean highlightedLabels = true;
 }
 
 state {
@@ -62,6 +63,8 @@ shared class CeylonSettings
 
     shared Boolean lowerModelUpdatePriority => myOptions.lowerModelUpdatePriority;
 
+    shared Boolean highlightedLabels => myOptions.highlightedLabels;
+
     assign defaultTargetVm
             => myOptions.defaultTargetVm = defaultTargetVm;
 
@@ -88,4 +91,7 @@ shared class CeylonSettings
 
     assign lowerModelUpdatePriority
             => myOptions.lowerModelUpdatePriority = lowerModelUpdatePriority;
+
+    assign highlightedLabels
+            => myOptions.highlightedLabels = highlightedLabels;
 }

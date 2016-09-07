@@ -68,15 +68,19 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     textAttributes,
     ceylonHighlightingColors
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings {
+    ceylonSettings
+}
 
 shared void installCustomLookupCellRenderer(Project project) {
-    if (is CompletionProgressIndicator currentCompletion
-            = CompletionService.completionService.currentCompletion) {
-        CustomLookupCellRenderer(currentCompletion.lookup, project).install();
-    }
-    else if (is LookupImpl activeLookup
-            = LookupManager.getInstance(project).activeLookup) {
-        CustomLookupCellRenderer(activeLookup, project).install();
+    if (ceylonSettings.highlightedLabels) {
+        if (is CompletionProgressIndicator currentCompletion
+                = CompletionService.completionService.currentCompletion) {
+            CustomLookupCellRenderer(currentCompletion.lookup, project).install();
+        } else if (is LookupImpl activeLookup
+                = LookupManager.getInstance(project).activeLookup) {
+            CustomLookupCellRenderer(activeLookup, project).install();
+        }
     }
 }
 

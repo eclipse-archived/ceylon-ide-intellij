@@ -22,23 +22,14 @@ state__TYPE {
 }
 shared class CompletionSettings() satisfies PersistentStateComponent<CompletionOptions> {
 
-    shared actual CompletionOptions state {
-        return completionOptions;
-    }
+    state => completionOptions;
 
-    shared actual void loadState(CompletionOptions state) {
-        completionOptions = state;
-    }
+    loadState(CompletionOptions state) => completionOptions = state;
 
-    shared CompletionOptions options {
-        return completionOptions;
-    }
+    shared CompletionOptions options => completionOptions;
 }
 
-shared CompletionSettings completionSettings {
-    if (ApplicationManager.application.isDisposed()) {
-        return CompletionSettings();
-    } else {
-        return ServiceManager.getService(javaClass<CompletionSettings>());
-    }
-}
+shared CompletionSettings completionSettings
+        => if (ApplicationManager.application.isDisposed())
+        then CompletionSettings()
+        else ServiceManager.getService(javaClass<CompletionSettings>());
