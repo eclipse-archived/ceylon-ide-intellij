@@ -1,3 +1,5 @@
 void func() {
-    print { val="hello"; };
+    print {
+        val="hello";
+    };
 }
