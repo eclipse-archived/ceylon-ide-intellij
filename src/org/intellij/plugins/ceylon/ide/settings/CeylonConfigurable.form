@@ -104,17 +104,9 @@
               </component>
             </children>
           </grid>
-          <component id="b8906" class="javax.swing.JLabel" binding="editorLink">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="&lt;html&gt;See &lt;a href=&quot;preferences.Ceylon.editor&quot;&gt;Editor&lt;/a&gt; for Ceylon editor preferences.&lt;/html&gt;"/>
-            </properties>
-          </component>
           <component id="aa47e" class="javax.swing.JLabel" binding="completionLink">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="&lt;html&gt;See &lt;a href=&quot;preferences.Ceylon.editor.completion&quot;&gt;Completion&lt;/a&gt; for preferences related to content completion.&lt;/html&gt;"/>
@@ -126,6 +118,14 @@
             </constraints>
             <properties>
               <text value="&lt;html&gt;See &lt;a href=&quot;preferences.Ceylon.compiler&quot;&gt;Compiler&lt;/a&gt; for preferences related to the compiler.&lt;/html&gt;"/>
+            </properties>
+          </component>
+          <component id="b8906" class="javax.swing.JLabel" binding="editorLink">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="&lt;html&gt;See &lt;a href=&quot;preferences.Ceylon.editor&quot;&gt;Model Update&lt;/a&gt; for control over Ceylon model updates.&lt;/html&gt;"/>
             </properties>
           </component>
         </children>

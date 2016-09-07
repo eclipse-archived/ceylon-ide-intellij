@@ -13,15 +13,15 @@ import java.util.List;
 
 import static org.intellij.plugins.ceylon.ide.settings.CeylonConfigurable.selectConfigurable;
 
-public class EditorConfigurable extends BaseConfigurable {
+public class ModelUpdateConfigurable extends BaseConfigurable {
     private JPanel myPanel;
     private JLabel completionLink;
     private JFormattedTextField modelUpdateDelay;
     private JFormattedTextField modelUpdateTimeoutMinutes;
     private JCheckBox decreaseThePriorityOfCheckBox;
 
-    public EditorConfigurable() {
-        setupLinks();
+    public ModelUpdateConfigurable() {
+//        setupLinks();
         UIUtil.configureNumericFormattedTextField(modelUpdateDelay);
         UIUtil.configureNumericFormattedTextField(modelUpdateTimeoutMinutes);
     }
@@ -79,19 +79,19 @@ public class EditorConfigurable extends BaseConfigurable {
 
     }
 
-    private void setupLinks() {
-        JLabelLinkListener listener = new JLabelLinkListener() {
-            @Override
-            public void onLinkClicked(String href) {
-                selectConfigurable(href);
-            }
-        };
-
-        List<JLabel> links = Collections.singletonList(completionLink);
-
-        for (JLabel link : links) {
-            link.addMouseListener(listener);
-            link.addMouseMotionListener(listener);
-        }
-    }
+//    private void setupLinks() {
+//        JLabelLinkListener listener = new JLabelLinkListener() {
+//            @Override
+//            public void onLinkClicked(String href) {
+//                selectConfigurable(href);
+//            }
+//        };
+//
+//        List<JLabel> links = Collections.singletonList(completionLink);
+//
+//        for (JLabel link : links) {
+//            link.addMouseListener(listener);
+//            link.addMouseMotionListener(listener);
+//        }
+//    }
 }

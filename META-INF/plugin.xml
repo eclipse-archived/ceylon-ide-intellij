@@ -236,11 +236,10 @@
         <!-- Settings -->
         <applicationConfigurable groupId="language" displayName="Ceylon" id="preferences.Ceylon"
                                  instance="org.intellij.plugins.ceylon.ide.settings.CeylonConfigurable">
-            <configurable displayName="Editor" id="preferences.Ceylon.editor"
-                          instance="org.intellij.plugins.ceylon.ide.settings.EditorConfigurable">
-                <configurable displayName="Completion" id="preferences.Ceylon.editor.completion"
-                              instance="org.intellij.plugins.ceylon.ide.settings.CompletionConfigurable"/>
-            </configurable>
+            <configurable displayName="Completion" id="preferences.Ceylon.editor.completion"
+                          instance="org.intellij.plugins.ceylon.ide.settings.CompletionConfigurable"/>
+            <configurable displayName="Model Update" id="preferences.Ceylon.editor"
+                          instance="org.intellij.plugins.ceylon.ide.settings.ModelUpdateConfigurable"/>
         </applicationConfigurable>
         <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.ceylonCode.completion.CompletionSettings"/>
         <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings"/>
