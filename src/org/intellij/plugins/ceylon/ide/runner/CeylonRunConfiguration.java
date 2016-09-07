@@ -77,20 +77,35 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
 
                 params.setMainClass("com.redhat.ceylon.launcher.Bootstrap");
                 params.getClassPath().add(getBootstrapJarPath());
-                // FIXME "run-dart" is no longer available. Instead, add a toplevel run
-                //       function to ceylon-dart-cli, and call with "run".
                 params.getProgramParametersList().add(
                         backend == Backend.JavaScript ? "run-js" :
-                        backend == dartBackend ? "run-dart" :
+                        backend == dartBackend ? "run" :
                         "run");
-                params.getProgramParametersList().add("--run", topLevelNameFull);
+
+                // For dart, we can't use run-dart since it won't be available in the
+                // embeddedDist. So, use the "runDart" top-level, which works similarly
+                // to run-dart. For now, there is a limitation requiring '=' be used
+                // for args like --run, --rep, etc.
+                if (backend == dartBackend) {
+                    // It would be *much* better if we could just call runDart() from the
+                    // current process! It's very slow to launch a separate Ceylon/JVM
+                    // process here.
+                    final String supplementalRepo = CeylonIdePlugin.getSupplementalCeylonRepository().getAbsolutePath();
+                    params.getProgramParametersList().add("--rep=" + supplementalRepo); // for ceylon-cli
+                    params.getProgramParametersList().add("--run=com.vasileff.ceylon.dart.cli.runDart"); // ~= run-dart
+                    params.getProgramParametersList().add("com.vasileff.ceylon.dart.cli/1.3.0-DP3");
+                    params.getProgramParametersList().add("--sysrep=" + repoDir); // jvm & js may want this too?
+                    params.getProgramParametersList().add("--rep=" + supplementalRepo); // for ceylon-dart runtime modules
+                }
+
+                params.getProgramParametersList().add("--run=" + topLevelNameFull);
                 final Iterable<String> outputPaths = getOutputPaths(CeylonRunConfiguration.this.getProject());
                 if (backend == dartBackend) {
-                    params.getProgramParametersList().add("--rep",
+                    params.getProgramParametersList().add("--rep=" +
                             CeylonIdePlugin.getSupplementalCeylonRepository().getAbsolutePath());
                 }
                 for (String outputPath : outputPaths) {
-                    params.getProgramParametersList().add("--rep", outputPath);
+                    params.getProgramParametersList().add("--rep=" + outputPath);
                 }
                 params.getProgramParametersList().add(getCeylonModuleOrDft());
 
