@@ -53,6 +53,10 @@ public class CompilerConfigurable implements SearchableConfigurable, Configurabl
                 }
             }
         });
+
+        for (JCheckBox cb : verbosities) {
+            cb.setEnabled(verboseCheckbox.isSelected());
+        }
     }
 
     @NotNull
@@ -89,11 +93,9 @@ public class CompilerConfigurable implements SearchableConfigurable, Configurabl
     public boolean isModified() {
         CeylonSettings settings = ceylonSettings_.get_();
 
-        return (
-                outProcessMode.isSelected() != settings.getUseOutProcessBuild()
-                || verboseCheckbox.isSelected() != settings.getCompilerVerbose()
-                || !Objects.equals(getVerbosityLevel(), settings.getVerbosityLevel())
-        );
+        return outProcessMode.isSelected() != settings.getUseOutProcessBuild()
+            || verboseCheckbox.isSelected() != settings.getCompilerVerbose()
+            || !Objects.equals(getVerbosityLevel(), settings.getVerbosityLevel());
     }
 
     @Override
@@ -114,9 +116,7 @@ public class CompilerConfigurable implements SearchableConfigurable, Configurabl
     }
 
     @Override
-    public void disposeUIResources() {
-
-    }
+    public void disposeUIResources() {}
 
     private String getVerbosityLevel() {
         if (allCheckBox.isSelected()) {
