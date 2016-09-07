@@ -80,7 +80,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-Set<PhasedUnit> collectPhasedUnits(Project project) {
+shared Set<PhasedUnit> collectPhasedUnits(Project project, Boolean sourcesOnly = false) {
     value result = HashSet<PhasedUnit>();
     ProgressManager.instance.runProcessWithProgressSynchronously(object satisfies Runnable {
         shared actual void run() {
@@ -94,11 +94,13 @@ Set<PhasedUnit> collectPhasedUnits(Project project) {
                     if (exists typechecker = ceylonProject.typechecker) {
                         result.addAll(typechecker.phasedUnits.phasedUnits);
                     }
-                    value listOfModules = modules.typecheckerModules.listOfModules;
-                    for (m in listOfModules) {
-                        indicator.text2 = "Indexing module " + m.nameAsString;
-                        assert (is BaseIdeModule m);
-                        m.phasedUnits.each(result.add);
+                    if (!sourcesOnly) {
+                        value listOfModules = modules.typecheckerModules.listOfModules;
+                        for (m in listOfModules) {
+                            indicator.text2 = "Indexing module " + m.nameAsString;
+                            assert (is BaseIdeModule m );
+                            m.phasedUnits.each(result.add);
+                        }
                     }
                 }
             }

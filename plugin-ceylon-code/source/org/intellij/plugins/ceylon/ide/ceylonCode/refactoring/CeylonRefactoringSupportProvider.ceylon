@@ -13,7 +13,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.refactoring {
 
 shared class CeylonRefactoringSupportProvider() extends RefactoringSupportProvider() {
 
-    isInplaceRenameAvailable(PsiElement element, PsiElement context) => false; //TODO: huh?
+    isInplaceRenameAvailable(PsiElement element, PsiElement context)
+            => false; // CeylonVariableRenameHandler handles this
 
     changeSignatureHandler => CeylonChangeSignatureHandler();
 

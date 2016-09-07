@@ -7,14 +7,38 @@ import com.intellij.openapi.project {
 import com.intellij.psi {
     PsiElement
 }
+import com.intellij.psi.search {
+    SearchScope
+}
 import com.intellij.refactoring.rename {
     RenameDialog,
     RenameProcessor,
     RenamePsiElementProcessor
 }
 
+import java.lang {
+    JString=String
+}
+import java.util {
+    Map
+}
+
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile
+    CeylonFile,
+    CeylonPsi
+}
+import com.redhat.ceylon.ide.common.hierarchy {
+    hierarchyManager
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.hierarchy {
+    collectPhasedUnits
+}
+import ceylon.interop.java {
+    CeylonIterable,
+    javaString
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
+    resolveDeclaration
 }
 
 shared class CeylonRenamePsiProcessor() extends RenamePsiElementProcessor() {
@@ -37,5 +61,20 @@ shared class CeylonRenamePsiProcessor() extends RenamePsiElementProcessor() {
                         }
                     };
         };
+    }
+
+    shared actual void prepareRenaming(PsiElement element, String newName,
+        Map<PsiElement,JString> allRenames, SearchScope scope) {
+
+        if (is CeylonPsi.MethodDeclarationPsi element,
+            exists model = element.ceylonNode.declarationModel) {
+
+            value pus = collectPhasedUnits(element.project, true);
+            for (subtype in hierarchyManager.findSubtypes(model, CeylonIterable(pus))) {
+                if (exists psiElement = resolveDeclaration(subtype, element.project)) {
+                    allRenames.put(psiElement, javaString(newName));
+                }
+            }
+        }
     }
 }

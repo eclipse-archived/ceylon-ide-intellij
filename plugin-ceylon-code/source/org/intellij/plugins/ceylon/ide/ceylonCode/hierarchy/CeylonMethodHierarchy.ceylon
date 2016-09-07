@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    createJavaObjectArray
+    createJavaObjectArray,
+    CeylonIterable
 }
 
 import com.intellij.ide.hierarchy {
@@ -17,23 +18,18 @@ import com.intellij.openapi.project {
 import com.intellij.psi {
     PsiElement
 }
+import com.redhat.ceylon.ide.common.hierarchy {
+    hierarchyManager
+}
 import com.redhat.ceylon.ide.common.util {
     types
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration,
-    ClassOrInterface,
-    TypeDeclaration,
-    ModelUtil,
-    Type
+    Declaration
 }
 
 import java.lang {
     ObjectArray
-}
-import java.util {
-    ArrayList,
-    List
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
@@ -65,61 +61,30 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
         return CeylonHierarchyNodeDescriptor(element, model);
     }
 
-    Boolean directlyRefines(Declaration subtype, Declaration supertype) {
-        assert (is TypeDeclaration subtypeScope = subtype.container,
-            is TypeDeclaration supertypeScope = supertype.container);
-        value interveningRefinements
-                = ModelUtil.getInterveningRefinements(subtype.name,
-                    ModelUtil.getSignature(subtype),
-                    supertype.refinedDeclaration,
-                    subtypeScope, supertypeScope);
-        interveningRefinements.remove(supertype);
-        return interveningRefinements.empty;
-    }
-
     shared actual ObjectArray<CeylonHierarchyNodeDescriptor>
     aggregateSubtypes(CeylonHierarchyNodeDescriptor descriptor) {
-        value result = ArrayList<CeylonHierarchyNodeDescriptor>();
-        if (exists model = descriptor.model,
-            model.classOrInterfaceMember,
-            model.formal || model.default) {
-            for (unit in phasedUnits) {
-                for (declaration in unit.declarations) {
-                    if (declaration.classOrInterfaceMember, declaration.actual) {
-                        if (declaration.refines(model),
-                            declaration != model,
-                            directlyRefines(declaration, model)) {
-                            if (exists psiElement = resolveDeclaration(declaration, project)) {
-                                result.add(CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor));
-                            }
-                        }
-                    }
-                }
-            }
+        if (exists model = descriptor.model) {
+            value subtypes = hierarchyManager.findSubtypes(model, CeylonIterable(phasedUnits));
+            return createJavaObjectArray({
+                for (declaration in subtypes)
+                    if (exists psiElement = resolveDeclaration(declaration, project))
+                        CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor)
+            });
         }
-        return result.toArray(noDescriptors);
+        return noDescriptors;
     }
 
     shared actual ObjectArray<CeylonHierarchyNodeDescriptor>
     aggregateSupertypes(CeylonHierarchyNodeDescriptor descriptor) {
-        value result = ArrayList<CeylonHierarchyNodeDescriptor>();
-        if (exists model = descriptor.model,
-            is ClassOrInterface container = model.container,
-            model.actual) {
-            List<Type>? signature = ModelUtil.getSignature(model);
-            for (supertype in container.supertypeDeclarations) {
-                if (exists declaration = supertype.getDirectMember(model.name, signature, false, true),
-                    declaration.default || declaration.formal) {
-                    if (model.refines(declaration),
-                        directlyRefines(model, declaration)) {
-                        if (exists psiElement = resolveDeclaration(declaration, project)) {
-                            result.add(CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor));
-                        }
-                    }
-                }
-            }
+        if (exists model = descriptor.model) {
+            value supertypes = hierarchyManager.findSupertypes(model);
+            return createJavaObjectArray({
+                for (declaration in supertypes)
+                if (exists psiElement = resolveDeclaration(declaration, project))
+                    CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor)
+            });
         }
-        return result.toArray(noDescriptors);
+        return noDescriptors;
     }
 
 }
