@@ -222,15 +222,15 @@ String? location(PsiElement psi) {
 Boolean isSetter(ClsMethodImpl clsMethod) {
     String name = clsMethod.name;
     return name.longerThan(3)
-    && name.startsWith("set")
-    && clsMethod.parameterList.parametersCount == 1;
+        && name.startsWith("set")
+        && clsMethod.parameterList.parametersCount == 1;
 }
 
 Boolean isGetter(ClsMethodImpl clsMethod) {
     String name = clsMethod.name;
     return name.longerThan(3)
-    && name.startsWith("get")
-    && clsMethod.parameterList.parametersCount == 0;
+        && name.startsWith("get")
+        && clsMethod.parameterList.parametersCount == 0;
 }
 
 String valueName(String name) => name[3:1].lowercased + name[4...];
