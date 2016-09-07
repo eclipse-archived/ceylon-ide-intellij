@@ -132,11 +132,27 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
         String val, Integer loc, Integer index) {
         
         if (is IdeaProposalsHolder proposals) {
-            proposals.add(newLookup {
+            value lookup = newLookup {
                 description = val;
                 text = val;
                 icon = icons.correction;
-            });
+            };
+            switch (val)
+            case ("\"\"" | "' '") {
+                proposals.add(lookup.withInsertHandler(
+                    CompletionHandler((context)
+                        => context.editor.caretModel
+                        .moveToOffset(context.tailOffset - 1))));
+            }
+            case ("\"\"\"\"\"\"") {
+                proposals.add(lookup.withInsertHandler(
+                    CompletionHandler((context)
+                        => context.editor.caretModel
+                        .moveToOffset(context.tailOffset - 3))));
+            }
+            else {
+                proposals.add(lookup);
+            }
         }
     }
 }
