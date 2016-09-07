@@ -130,7 +130,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
     
     shared actual void newNestedLiteralCompletionProposal(ProposalsHolder proposals,
         String val, Integer loc, Integer index) {
-        
+
         if (is IdeaProposalsHolder proposals) {
             value lookup = newLookup {
                 description = val;
@@ -138,7 +138,7 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 icon = icons.correction;
             };
             switch (val)
-            case ("\"\"" | "' '") {
+            case ("\"\"" | "''") {
                 proposals.add(lookup.withInsertHandler(
                     CompletionHandler((context)
                         => context.editor.caretModel
