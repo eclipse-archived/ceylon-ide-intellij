@@ -156,7 +156,7 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
                             value puTokens = projectPhasedUnit.tokens;
                             value localTokens = parseResult.tokens;
                             if (structurallyDifferent(puTokens, localTokens)) {
-                                ideaCeylonParserLogger.warn(() => "Tokens of the projectphasedUnit are not the same as the parsed tokens for file `` file.originalFile.name ``(``file.originalFile.hash``)", 20);
+                                ideaCeylonParserLogger.warn(() => "Tokens of the project phasedUnit are not the same as the parsed tokens for file `` file.originalFile.name ``(``file.originalFile.hash``)", 20);
                                 ideaCeylonParserLogger.trace(() => "translator.translateToAstNode(parseResult.compilationUnit (`` parseResult.compilationUnit.hash ``), parseResult.tokens (`` parseResult.tokens.hash ``)) for file `` file.originalFile.name ``(``file.originalFile.hash``)");
                                 return translator.translateToAstNode(parseResult.compilationUnit, parseResult.tokens);
                             } else {
