@@ -36,7 +36,8 @@ import java.io {
     PrintWriter
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode {
-    ITypeCheckerProvider
+    ITypeCheckerProvider,
+    ITypeCheckerInvoker
 }
 import com.vasileff.ceylon.dart.compiler {
     compileDart,
@@ -70,6 +71,9 @@ import java.lang {
 }
 import com.siyeh.ig.performance {
     ArraysAsListWithZeroOrOneArgumentInspection
+}
+import com.intellij.openapi.extensions {
+    Extensions
 }
 
 shared Backend dartBackend = Backend.registerBackend("Dart", "dart");
@@ -148,8 +152,8 @@ shared class CeylonDartBuilder() satisfies CompileTask {
         value writer = messageWriter(context);
 
         value systemRepository = project.systemRepository;
-        // FIXME total hack, and wrong!
-        value supplementalRepo = systemRepository[0:systemRepository.size-17] + "supplementalRepo";
+        value ext = Extensions.getExtensions(ITypeCheckerInvoker.epName).get(0);
+        value supplementalRepo = ext.supplementalCeylonRepository.absolutePath;
 
         value [_, resultStatus, messages] = compileDart {
             sourceDirectories = sources;

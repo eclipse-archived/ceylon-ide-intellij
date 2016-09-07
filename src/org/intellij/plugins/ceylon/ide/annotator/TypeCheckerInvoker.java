@@ -224,6 +224,11 @@ public class TypeCheckerInvoker implements ITypeCheckerInvoker {
     }
 
     @Override
+    public File getSupplementalCeylonRepository() {
+        return CeylonIdePlugin.getSupplementalCeylonRepository();
+    }
+
+    @Override
     public File getEmbeddedCeylonDist() {
         return CeylonIdePlugin.getEmbeddedCeylonDist();
     }

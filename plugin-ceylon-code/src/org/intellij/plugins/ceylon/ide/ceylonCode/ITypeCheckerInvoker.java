@@ -10,4 +10,5 @@ public interface ITypeCheckerInvoker {
 
     File getEmbeddedCeylonRepository();
     File getEmbeddedCeylonDist();
+    File getSupplementalCeylonRepository();
 }
