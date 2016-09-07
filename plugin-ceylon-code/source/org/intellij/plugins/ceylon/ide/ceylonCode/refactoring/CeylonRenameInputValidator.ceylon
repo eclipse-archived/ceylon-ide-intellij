@@ -2,11 +2,13 @@ import ceylon.interop.java {
     javaClass
 }
 
+import com.intellij.lang.refactoring {
+    NamesValidator
+}
 import com.intellij.openapi.project {
     Project
 }
 import com.intellij.patterns {
-    ElementPattern,
     PlatformPatterns
 }
 import com.intellij.psi {
@@ -31,9 +33,6 @@ import java.util.regex {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
-}
-import com.intellij.lang.refactoring {
-    NamesValidator
 }
 
 shared class CeylonRenameTypeInputValidator() satisfies RenameInputValidatorEx {
