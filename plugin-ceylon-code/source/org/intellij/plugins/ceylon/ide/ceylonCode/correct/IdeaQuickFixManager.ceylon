@@ -378,26 +378,28 @@ shared class IdeaQuickFixData(
             };
         } else if (exists candidates = resolutions) {
             candidates.add(Resolution {
-                description =
-                    if (is Referenceable declaration) then declaration.nameAsString
+                description
+                    = if (is Referenceable declaration) then declaration.nameAsString
                     else if (is ModuleVersionDetails declaration) then declaration.\imodule
                     else desc;
-                qualifier =
-                    if (is Declaration declaration) then declaration.unit?.\ipackage?.nameAsString
+                qualifier
+                    = if (is Declaration declaration) then declaration.unit?.\ipackage?.nameAsString
                     else if (is Module declaration) then declaration.version
                     else if (is ModuleVersionDetails declaration) then declaration.version
                     else null;
-                icon =
-                    if (is Declaration declaration,
-                        exists icon = icons.forDeclaration(declaration)) then icon
-                    else icons.moduleArchives;
-                change = change;
                 qualifiedNameIsPath = qualifiedNameIsPath;
-                color = switch (declaration)
-                        case (is TypeDeclaration) textAttributes(ceylonHighlightingColors.type).foregroundColor
-                        case (is TypedDeclaration) textAttributes(ceylonHighlightingColors.identifier).foregroundColor
-                        case (is Module|ModuleVersionDetails) textAttributes(ceylonHighlightingColors.packages).foregroundColor
-                        else SimpleTextAttributes.regularAttributes.fgColor;
+                icon
+                    = if (is Declaration declaration,
+                          exists icon = icons.forDeclaration(declaration))
+                    then icon
+                    else icons.moduleArchives;
+                color
+                    = switch (declaration)
+                    case (is TypeDeclaration) textAttributes(ceylonHighlightingColors.type).foregroundColor
+                    case (is TypedDeclaration) textAttributes(ceylonHighlightingColors.identifier).foregroundColor
+                    case (is Module|ModuleVersionDetails) textAttributes(ceylonHighlightingColors.packages).foregroundColor
+                    else SimpleTextAttributes.regularAttributes.fgColor;
+                change = change;
             });
         } else {
             registerFix {
