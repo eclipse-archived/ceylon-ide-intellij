@@ -22,7 +22,7 @@ public class CompletionConfigurable extends BaseConfigurable {
     private JRadioButton overwritesRadioButton;
     private JCheckBox useLinkedMode;
     private JCheckBox proposeChainCompletions;
-    private JCheckBox enableFiltersInAdditionCheckBox;
+//    private JCheckBox enableFiltersInAdditionCheckBox;
     private JPanel myPanel;
     private JButton restoreDefaultsButton;
     private ButtonGroup trailingIdentifier;
@@ -71,7 +71,7 @@ public class CompletionConfigurable extends BaseConfigurable {
         options.setCompletionMode(getCompletionMode());
         options.setLinkedModeArguments(useLinkedMode.isSelected());
         options.setChainLinkedModeArguments(proposeChainCompletions.isSelected());
-        options.setEnableCompletionFilters(enableFiltersInAdditionCheckBox.isSelected());
+//        options.setEnableCompletionFilters(enableFiltersInAdditionCheckBox.isSelected());
 
         ceylonSettings_.get_()
                 .setHighlightedLabels(useColoredLabelsInCheckBox.isSelected());
@@ -119,7 +119,7 @@ public class CompletionConfigurable extends BaseConfigurable {
 
         useLinkedMode.setSelected(options.getLinkedModeArguments());
         proposeChainCompletions.setSelected(options.getChainLinkedModeArguments());
-        enableFiltersInAdditionCheckBox.setSelected(options.getEnableCompletionFilters());
+//        enableFiltersInAdditionCheckBox.setSelected(options.getEnableCompletionFilters());
 
         useColoredLabelsInCheckBox.setSelected(ceylonSettings_.get_().getHighlightedLabels());
     }
@@ -135,7 +135,7 @@ public class CompletionConfigurable extends BaseConfigurable {
         isModified |= !options.getCompletionMode().equals(getCompletionMode());
         isModified |= options.getLinkedModeArguments() != useLinkedMode.isSelected();
         isModified |= options.getChainLinkedModeArguments() != proposeChainCompletions.isSelected();
-        isModified |= options.getEnableCompletionFilters() != enableFiltersInAdditionCheckBox.isSelected();
+//        isModified |= options.getEnableCompletionFilters() != enableFiltersInAdditionCheckBox.isSelected();
         isModified |= ceylonSettings_.get_().getHighlightedLabels() != useColoredLabelsInCheckBox.isSelected();
 
         return isModified;
