@@ -60,8 +60,7 @@ shared class CeylonRenameTypeInputValidator() satisfies RenameInputValidatorEx {
 
     isInputValid(String newName, PsiElement element, ProcessingContext processingContext) => true;
 
-    shared actual ElementPattern<out PsiElement> pattern
-            => PlatformPatterns.psiElement(javaClass<CeylonPsi.TypeDeclarationPsi>());
+    pattern => PlatformPatterns.psiElement(javaClass<CeylonPsi.TypeDeclarationPsi>());
 
 }
 
@@ -89,8 +88,7 @@ shared class CeylonRenameTypedInputValidator() satisfies RenameInputValidatorEx 
 
     isInputValid(String newName, PsiElement element, ProcessingContext processingContext) => true;
 
-    shared actual ElementPattern<out PsiElement> pattern
-            => PlatformPatterns.psiElement(javaClass<CeylonPsi.TypedDeclarationPsi>());
+    pattern => PlatformPatterns.psiElement(javaClass<CeylonPsi.TypedDeclarationPsi>());
 
 }
 
