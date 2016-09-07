@@ -87,6 +87,7 @@ shared Set<PhasedUnit> collectPhasedUnits(Project project, Boolean sourcesOnly =
             value indicator = ProgressManager.instance.progressIndicator;
             assert (exists ceylonProjects = getCeylonProjects(project));
             for (mod in ModuleManager.getInstance(project).modules) {
+                indicator.checkCanceled();
                 indicator.text = "Indexing project " + mod.name + "...";
                 indicator.indeterminate = true;
                 if (exists ceylonProject = ceylonProjects.getProject(mod),
@@ -97,6 +98,7 @@ shared Set<PhasedUnit> collectPhasedUnits(Project project, Boolean sourcesOnly =
                     if (!sourcesOnly) {
                         value listOfModules = modules.typecheckerModules.listOfModules;
                         for (m in listOfModules) {
+                            indicator.checkCanceled();
                             indicator.text2 = "Indexing module " + m.nameAsString;
                             assert (is BaseIdeModule m );
                             m.phasedUnits.each(result.add);
