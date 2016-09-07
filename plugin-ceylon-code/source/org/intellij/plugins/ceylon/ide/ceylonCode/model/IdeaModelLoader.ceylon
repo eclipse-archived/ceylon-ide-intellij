@@ -31,7 +31,9 @@ import com.intellij.psi {
     PsiClass,
     PsiNamedElement,
     PsiManager,
-    PsiJavaFile
+    PsiJavaFile,
+    SmartPointerManager,
+    PsiElement
 }
 import com.intellij.psi.impl.compiled {
     ClsFileImpl
@@ -181,6 +183,11 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         
         return false;
     }
+
+    function pointer<Psi>(Psi el) given Psi satisfies PsiElement {
+        assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
+        return SmartPointerManager.getInstance(project).createSmartPsiElementPointer(el);
+    }
     
     shared actual ClassMirror? buildClassMirrorInternal(String name) {
         assert(is IdeaCeylonProject ceylonProject = ideaModuleManager.ceylonProject);
@@ -198,7 +205,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                 value facade = javaPsiFacade(m.project);
                 
                 if (exists psi = facade.findClass(name, scope)) {
-                    return PSIClass(psi);
+                    return PSIClass(pointer(psi));
                 }
             }
             return null;
@@ -235,7 +242,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
 
             stub.psi = psiFile;
             value internalPsiClass = stub.classes.get(0);
-            return PSIClass(internalPsiClass);
+            return PSIClass(pointer(internalPsiClass));
         }
 
         return null;

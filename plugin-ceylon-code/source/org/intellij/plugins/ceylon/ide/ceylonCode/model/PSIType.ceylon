@@ -11,7 +11,8 @@ import com.intellij.psi {
     JavaPsiFacade {
         javaFacade=getInstance
     },
-    PsiNameHelper
+    PsiNameHelper,
+    SmartPointerManager
 }
 import com.intellij.psi.impl.source {
     PsiClassReferenceType
@@ -108,7 +109,7 @@ shared class PSIType(psi,
     declaredClass
             => if (is PsiClassType psi,
                    exists cls = concurrencyManager.needReadAccess(() => psi.resolve() else null))
-               then PSIClass(cls)
+               then PSIClass(SmartPointerManager.getInstance(cls.project).createSmartPsiElementPointer(cls))
                else unknownClassMirror;
 
     TypeKind primitiveKind(PsiPrimitiveType psi) {

@@ -12,7 +12,8 @@ import com.intellij.psi {
     PsiMethod,
     PsiTypeParameter,
     PsiManager,
-    PsiNameIdentifierOwner
+    PsiNameIdentifierOwner,
+    SmartPsiElementPointer
 }
 import com.intellij.psi.impl.compiled {
     ClsClassImpl
@@ -55,9 +56,15 @@ import java.util {
 }
 
 // TODO investigate why psi.containingFile is sometimes null
-shared class PSIClass(shared PsiClass psi)
-        extends PSIAnnotatedMirror(psi)
+shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
+        extends PSIAnnotatedMirror(psiPointer)
         satisfies IdeClassMirror {
+
+    shared PsiClass psi {
+        "The PSI element should still exist"
+        assert(exists el = psiPointer.element);
+        return el;
+    }
     
     variable String? cacheKey = null;
     
@@ -98,13 +105,13 @@ shared class PSIClass(shared PsiClass psi)
                 => Arrays.asList<FieldMirror>(
                     for (f in psi.fields)
                     if (!f.hasModifierProperty(PsiModifier.private)) // TODO !f.synthetic?
-                        PSIField(f)));
+                        PSIField(pointer(f))));
     
     directInnerClasses
             => concurrencyManager.needReadAccess(()
                 => Arrays.asList<ClassMirror>(
                     for (ic in psi.innerClasses)
-                        PSIClass(ic)));
+                        PSIClass(pointer(ic))));
     
     directMethods => concurrencyManager.needReadAccess(() {
             value result = ArrayList<MethodMirror>();
@@ -114,17 +121,17 @@ shared class PSIClass(shared PsiClass psi)
                 if (m.constructor) {
                     hasCtor = true;
                 }
-                result.add(PSIMethod(m));
+                result.add(PSIMethod(pointer(m)));
             }
 
             if (psi.enum,
-                is PsiExtensibleClass psi) {
-                value cache = ClassInnerStuffCache(psi);
+                is PsiExtensibleClass ec = psi) {
+                value cache = ClassInnerStuffCache(ec);
                 if (exists valueOfMethod = cache.valueOfMethod) {
-                    result.add(PSIMethod(valueOfMethod));
+                    result.add(PSIMethod(pointer(valueOfMethod)));
                 }
                 if (exists valuesMethod = cache.valuesMethod) {
-                    result.add(PSIMethod(valuesMethod));
+                    result.add(PSIMethod(pointer(valuesMethod)));
                 }
             }
 
@@ -137,19 +144,19 @@ shared class PSIClass(shared PsiClass psi)
                             (psi of PsiNameIdentifierOwner).name)
                         .addModifier("public")
                         .setConstructor(true);
-                result.add(PSIMethod(builder));
+                result.add(PSIMethod(pointer(builder)));
             }
             return result;
         });
     
     enclosingClass
             => if (exists outerClass = getContextOfType(psi, javaClass<PsiClass>()))
-            then PSIClass(outerClass)
+            then PSIClass(pointer(outerClass))
             else null;
     
     enclosingMethod
             => if (exists outerMeth = getContextOfType(psi, javaClass<PsiMethod>()))
-            then PSIMethod(outerMeth)
+            then PSIMethod(pointer(outerMeth))
             else null;
     
     enum => psi.enum;
@@ -179,14 +186,14 @@ shared class PSIClass(shared PsiClass psi)
     
     localClass => PsiUtil.isLocalClass(psi) || hasAnnotation(Annotations.localContainer);
     
-    \ipackage => PSIPackage(psi);
+    \ipackage => PSIPackage(psiPointer);
      
     protected => psi.hasModifierProperty(PsiModifier.protected);
     
     public => psi.hasModifierProperty(PsiModifier.public);
     
     qualifiedName => 
-            if (is PsiTypeParameter psi)
+            if (is PsiTypeParameter tp = psi)
             then \ipackage.qualifiedName + "." + name
             else (concurrencyManager.needReadAccess(() => psi.qualifiedName else ""));
     

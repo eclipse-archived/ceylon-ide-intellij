@@ -9,17 +9,28 @@ import com.intellij.psi {
     PsiAnnotation,
     JavaPsiFacade {
         javaFacade=getInstance
-    }
+    },
+    SmartPsiElementPointer,
+    SmartPointerManager,
+    PsiElement
 }
 import com.redhat.ceylon.model.loader.mirror {
     AnnotatedMirror,
     AnnotationMirror
 }
 
-shared class PSIAnnotatedMirror(psi)
+shared abstract class PSIAnnotatedMirror(psiPointer)
         satisfies AnnotatedMirror {
 
-    PsiModifierListOwner&PsiNamedElement psi;
+    SmartPsiElementPointer<out PsiModifierListOwner&PsiNamedElement> psiPointer;
+    value psi {
+        "The PSI element should still exist"
+        assert(exists el = psiPointer.element);
+        return el;
+    }
+
+    shared SmartPsiElementPointer<Psi> pointer<Psi>(Psi el) given Psi satisfies PsiElement
+            => SmartPointerManager.getInstance(psiPointer.project).createSmartPsiElementPointer(el);
 
     variable Map<String,AnnotationMirror>? annotationMap = null;
 

@@ -14,6 +14,7 @@ import java.util {
     ArrayList
 }
 
+// We don't use `SmartPsiElementPointer`s because `psi` is accessed eagerly
 class PSITypeParameter(PsiTypeParameter|PsiClassReferenceType psi) satisfies TypeParameterMirror {
     
     bounds = ArrayList<TypeMirror>();

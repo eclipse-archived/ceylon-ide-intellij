@@ -1,6 +1,7 @@
 import com.intellij.psi {
     PsiClass,
-    PsiJavaFile
+    PsiJavaFile,
+    SmartPsiElementPointer
 }
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
@@ -10,8 +11,14 @@ import com.redhat.ceylon.model.loader.mirror {
     PackageMirror
 }
 
-class PSIPackage(PsiClass psi) 
+class PSIPackage(SmartPsiElementPointer<PsiClass> psiPointer)
     satisfies PackageMirror {
+
+    PsiClass psi {
+        "The PSI element should still exist"
+        assert(exists el = psiPointer.element);
+        return el;
+    }
     
     variable String? name = null;
     

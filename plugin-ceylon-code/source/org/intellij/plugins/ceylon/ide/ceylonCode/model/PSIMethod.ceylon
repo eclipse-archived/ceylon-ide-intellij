@@ -3,7 +3,8 @@ import com.intellij.psi {
     PsiModifier,
     PsiType,
     PsiAnnotationMethod,
-    PsiClass
+    PsiClass,
+    SmartPsiElementPointer
 }
 import com.intellij.psi.search.searches {
     SuperMethodsSearch
@@ -24,10 +25,16 @@ import java.util {
     Arrays
 }
 
-shared class PSIMethod(shared PsiMethod psi)
-        extends PSIAnnotatedMirror(psi)
+shared class PSIMethod(SmartPsiElementPointer<out PsiMethod> psiPointer)
+        extends PSIAnnotatedMirror(psiPointer)
         satisfies MethodMirror {
-    
+
+    shared PsiMethod psi {
+        "The PSI element should still exist"
+        assert(exists el = psiPointer.element);
+        return el;
+    }
+
     Return doWithContainingClass<Return>(Return(PsiClass) func, Return default)
             => concurrencyManager.needReadAccess(() => if (exists cc = psi.containingClass) then func(cc) else default);
 
@@ -67,13 +74,13 @@ shared class PSIMethod(shared PsiMethod psi)
     
     declaredVoid => (psi.returnType else PsiType.null) == PsiType.\ivoid;
     
-    default => if (is PsiAnnotationMethod psi)
-               then concurrencyManager.needReadAccess(() => psi.defaultValue exists)
+    default => if (is PsiAnnotationMethod meth = psi)
+               then concurrencyManager.needReadAccess(() => meth.defaultValue exists)
                else false;
     
     defaultAccess => !(public || protected || psi.hasModifierProperty(PsiModifier.private));
     
-    enclosingClass => doWithContainingClass(PSIClass, null);
+    enclosingClass => doWithContainingClass((cc) => PSIClass(pointer(cc)), null);
     
     final => psi.hasModifierProperty(PsiModifier.final);
     
@@ -81,7 +88,7 @@ shared class PSIMethod(shared PsiMethod psi)
             => concurrencyManager.needReadAccess(()
                 => Arrays.asList<VariableMirror>(
                     for (p in psi.parameterList.parameters)
-                        PSIVariable(p)));
+                        PSIVariable(pointer(p))));
     
     protected => psi.hasModifierProperty(PsiModifier.protected);
     

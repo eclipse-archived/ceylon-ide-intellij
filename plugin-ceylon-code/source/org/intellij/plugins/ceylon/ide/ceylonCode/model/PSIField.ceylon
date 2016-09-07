@@ -1,14 +1,21 @@
 import com.intellij.psi {
     PsiField,
-    PsiModifier
+    PsiModifier,
+    SmartPsiElementPointer
 }
 import com.redhat.ceylon.model.loader.mirror {
     FieldMirror
 }
 
-class PSIField(PsiField psi)
-        extends PSIAnnotatedMirror(psi)
+class PSIField(SmartPsiElementPointer<PsiField> psiPointer)
+        extends PSIAnnotatedMirror(psiPointer)
         satisfies FieldMirror {
+
+    PsiField psi {
+        "The PSI element should still exist"
+        assert(exists el = psiPointer.element);
+        return el;
+    }
     
     type = PSIType(concurrencyManager.needReadAccess(() => psi.type));
     
