@@ -221,7 +221,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             for (dep in project.dependenciesToAdd) {
                 value path = JarFileSystem.protocolPrefix + dep.artifact().absolutePath + entryPath;
 
-                if (exists file = VirtualFileManager.instance.refreshAndFindFileByUrl(path)) {
+                if (exists file = VirtualFileManager.instance.findFileByUrl(path)) {
                     return buildClassMirrorFromBytecode(file);
                 }
             }
