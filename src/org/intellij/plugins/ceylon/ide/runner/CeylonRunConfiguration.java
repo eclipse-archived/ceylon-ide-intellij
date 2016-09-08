@@ -40,6 +40,8 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
     /** Full top level name, including the package, including the module */
     private String topLevelNameFull;
 
+    private String arguments;
+
     private Backend backend = Backend.Java;
 
     CeylonRunConfiguration(String name, RunConfigurationModule configurationModule, ConfigurationFactory factory) {
@@ -82,6 +84,7 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
                     params.getProgramParametersList().add("--rep", outputPath);
                 }
                 params.getProgramParametersList().add(getCeylonModuleOrDft());
+                params.getProgramParametersList().addParametersString(getArguments());
 
                 params.setWorkingDirectory(getProject().getBasePath()); // todo: make settable
                 return params;
@@ -110,6 +113,7 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         setCeylonModule(element.getAttributeValue("ceylon-module"));
         setTopLevelNameFull(element.getAttributeValue("top-level"));
         setBackend(Backend.fromAnnotation(element.getAttributeValue("backend")));
+        setArguments(element.getAttributeValue("arguments"));
     }
 
     @Override
@@ -119,6 +123,7 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         element.setAttribute("ceylon-module", (String) ObjectUtils.defaultIfNull(getCeylonModule(), ""));
         element.setAttribute("top-level", (String) ObjectUtils.defaultIfNull(getTopLevelNameFull(), ""));
         element.setAttribute("backend", (String) ObjectUtils.defaultIfNull(getBackend().nativeAnnotation, ""));
+        element.setAttribute("arguments", (String) ObjectUtils.defaultIfNull(getArguments(), ""));
     }
 
     private static Iterable<String> getOutputPaths(Project project) {
@@ -145,6 +150,14 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         }
 
         return ProjectRootManager.getInstance(getConfigurationModule().getProject()).getProjectSdk();
+    }
+
+    String getArguments() {
+        return arguments;
+    }
+
+    void setArguments(String arguments) {
+        this.arguments = arguments;
     }
 
     void setTopLevelNameFull(String topLevelNameFull) {
