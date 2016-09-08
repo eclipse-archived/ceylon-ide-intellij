@@ -153,11 +153,11 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
 
 
     // TODO check if it's prefixed with a protocol
-    getJavaFile(VirtualFile resource) => File(resource.canonicalPath);
+    getJavaFile(VirtualFile resource) => File(resource.path);
 
     getVirtualFilePath(VirtualFile resource) => Path(getVirtualFilePathString(resource));
 
-    getVirtualFilePathString(VirtualFile resource) => resource.canonicalPath else "<unknown>";
+    getVirtualFilePathString(VirtualFile resource) => resource.path;
 
     getProjectRelativePath(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>|Module project)
         => if (exists path = getProjectRelativePathString(resource, project))

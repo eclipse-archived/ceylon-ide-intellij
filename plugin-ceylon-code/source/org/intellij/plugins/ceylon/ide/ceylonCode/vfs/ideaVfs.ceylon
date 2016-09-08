@@ -55,7 +55,7 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
         ByteArrayInputStream(javaString(contents).getBytes(file.charset.string)));
     
     name => file.name;
-    path => file.canonicalPath else file.path;
+    path => file.path;
     nativeResource => file;
     charset => file.charset.string;
     
@@ -90,7 +90,7 @@ shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
               then IdeaVirtualFolder(parent, mod)
               else null;
     
-    path => folder.canonicalPath else folder.path;
+    path => folder.path;
         
     hash => folder.hash;
     

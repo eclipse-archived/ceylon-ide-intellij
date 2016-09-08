@@ -211,8 +211,8 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     fileName => psi.containingFile?.name else "<unknown>";
     
     fullPath => if (exists f = psi.containingFile)
-                then let (p = f.virtualFile.canonicalPath)
-                    if (exists p, exists i = p.firstInclusion("!/"))
+                then let (p = f.virtualFile.path)
+                    if (exists i = p.firstInclusion("!/"))
                     then p.spanFrom(i + 2)
                     else "<unknown>"
                 else "<unknown>";
