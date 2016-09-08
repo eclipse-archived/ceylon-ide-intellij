@@ -173,10 +173,14 @@ shared class IdeaCeylonProject(ideArtifact, model)
             validatingDependencies = true;
             dependenciesToAdd.clear();
 
-            if (exists languageModuleArtifact = findLanguageCar()) {
-                dependenciesToAdd.add(languageModuleArtifact);
-            } else {
-                platformUtils.log(Status._ERROR, "Could not locate ceylon.language.car");
+            if (ceylonProject.compileToJava) {
+                // For JS-only modules, the language module is loaded from sources, so we shouldn't add
+                // it to the classpath
+                if (exists languageModuleArtifact = findLanguageCar()) {
+                    dependenciesToAdd.add(languageModuleArtifact);
+                } else {
+                    platformUtils.log(Status._ERROR, "Could not locate ceylon.language.car");
+                }
             }
         }
 
