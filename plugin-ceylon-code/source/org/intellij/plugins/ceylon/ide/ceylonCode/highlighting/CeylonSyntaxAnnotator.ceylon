@@ -54,6 +54,9 @@ shared class CeylonSyntaxAnnotator()
         anno.textAttributes = ceylonHighlightingColors.interp;
     }
 
+    function isWhitespace(PsiElement p)
+            => p.node.elementType == CeylonTokens.ws;
+
     shared actual void visitStringTemplatePsi(CeylonPsi.StringTemplatePsi element) {
         super.visitStringTemplatePsi(element);
         for (PsiElement child in element.children) {
@@ -62,7 +65,7 @@ shared class CeylonSyntaxAnnotator()
                 while (true) {
                     prev = prev?.prevSibling;
                     if (exists p = prev,
-                        p.node.elementType == CeylonTokens.ws) {
+                        isWhitespace(p)) {
                     }
                     else {
                         break;
@@ -72,7 +75,7 @@ shared class CeylonSyntaxAnnotator()
                 while (true) {
                     next = next?.nextSibling;
                     if (exists n = next,
-                        n.node.elementType == CeylonTokens.ws) {
+                        isWhitespace(n)) {
                     }
                     else {
                         break;
