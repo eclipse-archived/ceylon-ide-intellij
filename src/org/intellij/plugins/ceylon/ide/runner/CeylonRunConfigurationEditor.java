@@ -16,6 +16,7 @@ public class CeylonRunConfigurationEditor extends SettingsEditor<CeylonRunConfig
     private JTextField myCeylonModule;
     private JPanel myPanel;
     private RawCommandLineEditor myArguments;
+    private RawCommandLineEditor myVmOptions;
 
     public CeylonRunConfigurationEditor(Project project) {
 //        myFileName.addBrowseFolderListener("Choose .ceylon file", "Please choose the path to the Ceylon file to run",
@@ -28,6 +29,7 @@ public class CeylonRunConfigurationEditor extends SettingsEditor<CeylonRunConfig
         myRunnableName.setText(config.getTopLevelNameFull());
         myCeylonModule.setText(config.getCeylonModule());
         myArguments.setText(config.getArguments());
+        myVmOptions.setText(config.getVmOptions());
     }
 
     @Override
@@ -35,6 +37,7 @@ public class CeylonRunConfigurationEditor extends SettingsEditor<CeylonRunConfig
         s.setTopLevelNameFull(myRunnableName.getText());
         s.setCeylonModule(myCeylonModule.getText());
         s.setArguments(myArguments.getText());
+        s.setVmOptions(myVmOptions.getText());
     }
 
     @NotNull

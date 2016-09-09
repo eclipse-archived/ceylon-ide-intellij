@@ -42,6 +42,8 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
 
     private String arguments;
 
+    private String vmOptions;
+
     private Backend backend = Backend.Java;
 
     CeylonRunConfiguration(String name, RunConfigurationModule configurationModule, ConfigurationFactory factory) {
@@ -74,6 +76,7 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
                 params.setJdk(projectJdk);
                 final String repoDir = CeylonIdePlugin.getEmbeddedCeylonRepository().getAbsolutePath();
                 params.getVMParametersList().add("-Dceylon.system.repo=" + repoDir);
+                params.getVMParametersList().addParametersString(getVmOptions());
 
                 params.setMainClass("com.redhat.ceylon.launcher.Bootstrap");
                 params.getClassPath().add(getBootstrapJarPath());
@@ -114,6 +117,7 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         setTopLevelNameFull(element.getAttributeValue("top-level"));
         setBackend(Backend.fromAnnotation(element.getAttributeValue("backend")));
         setArguments(element.getAttributeValue("arguments"));
+        setVmOptions(element.getAttributeValue("vm-options"));
     }
 
     @Override
@@ -124,6 +128,7 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         element.setAttribute("top-level", (String) ObjectUtils.defaultIfNull(getTopLevelNameFull(), ""));
         element.setAttribute("backend", (String) ObjectUtils.defaultIfNull(getBackend().nativeAnnotation, ""));
         element.setAttribute("arguments", (String) ObjectUtils.defaultIfNull(getArguments(), ""));
+        element.setAttribute("vm-options", (String) ObjectUtils.defaultIfNull(getVmOptions(), ""));
     }
 
     private static Iterable<String> getOutputPaths(Project project) {
@@ -150,6 +155,14 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         }
 
         return ProjectRootManager.getInstance(getConfigurationModule().getProject()).getProjectSdk();
+    }
+
+    String getVmOptions() {
+        return vmOptions;
+    }
+
+    void setVmOptions(String vmOptions) {
+        this.vmOptions = vmOptions;
     }
 
     String getArguments() {
