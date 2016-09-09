@@ -76,7 +76,7 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
                                         
                                         <anno>shared</anno> void run() {
                                             String myStr = "hello, world";
-                                            print("myString=``<interp>myStr</interp>``");
+                                            print("myString=<interp>``myStr``</interp>");
                                             value number = 13.37;
                                             value char = 'a';
                                             Duck().<member>fly</member>();
