@@ -276,7 +276,8 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             exists cu = pu.compilationUnit) {
 
             for (decl in pu.declarations) {
-                if (exists ceylonName = getCeylonSimpleName(cls),
+                if (decl.toplevel || cls.containingClass exists,
+                    exists ceylonName = getCeylonSimpleName(cls),
                     exists declName = decl.name,
                     declName == ceylonName) {
 
