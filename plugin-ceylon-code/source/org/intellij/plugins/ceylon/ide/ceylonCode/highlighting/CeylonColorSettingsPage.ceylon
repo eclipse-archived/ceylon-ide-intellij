@@ -4,13 +4,14 @@ import ceylon.interop.java {
 }
 
 import com.intellij.openapi.editor {
-    DefaultLanguageHighlighterColors {
-        strings = STRING
+    DefaultColors=DefaultLanguageHighlighterColors {
+        strings=\iSTRING,
+        ...
     }
 }
 import com.intellij.openapi.editor.colors {
     TextAttributesKey {
-        createTextAttributesKey
+        createKey=createTextAttributesKey
     },
     EditorColors,
     CodeInsightColors,
@@ -29,7 +30,6 @@ import java.lang {
     JString=String
 }
 import java.util {
-    JMap=Map,
     HashMap
 }
 
@@ -40,54 +40,54 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsPage {
     
-    AttributesDescriptor[] ourDescriptors = [
-        AttributesDescriptor("Other unqualified identifiers", ceylonHighlightingColors.identifier),
-        AttributesDescriptor("Type identifiers", ceylonHighlightingColors.type),
-        AttributesDescriptor("String interpolation delimiters", ceylonHighlightingColors.typeLiteral),
-        AttributesDescriptor("Keywords", ceylonHighlightingColors.keyword),
-        AttributesDescriptor("Numeric literals", ceylonHighlightingColors.number),
-        AttributesDescriptor("Comments", ceylonHighlightingColors.comment),
-        AttributesDescriptor("String literals", ceylonHighlightingColors.strings),
-        AttributesDescriptor("Character literals", ceylonHighlightingColors.char),
-        AttributesDescriptor("Interpolated", ceylonHighlightingColors.interp),
-        AttributesDescriptor("Strings in annotations", ceylonHighlightingColors.annotationString),
-        AttributesDescriptor("Annotations", ceylonHighlightingColors.annotation),
-        AttributesDescriptor("Todos", ceylonHighlightingColors.todo),
-        AttributesDescriptor("Semicolons", ceylonHighlightingColors.semi),
-        AttributesDescriptor("Braces", ceylonHighlightingColors.brace),
-        AttributesDescriptor("Package identifiers", ceylonHighlightingColors.packages),
-        AttributesDescriptor("Other qualified identifiers", ceylonHighlightingColors.member)
-    ];
+    value ourDescriptors = [
+        ["Other unqualified identifiers", ceylonHighlightingColors.identifier],
+        ["Type identifiers", ceylonHighlightingColors.type],
+        ["String interpolation delimiters", ceylonHighlightingColors.typeLiteral],
+        ["Keywords", ceylonHighlightingColors.keyword],
+        ["Numeric literals", ceylonHighlightingColors.number],
+        ["Comments", ceylonHighlightingColors.comment],
+        ["String literals", ceylonHighlightingColors.strings],
+        ["Character literals", ceylonHighlightingColors.char],
+        ["Interpolated", ceylonHighlightingColors.interp],
+        ["Strings in annotations", ceylonHighlightingColors.annotationString],
+        ["Annotations", ceylonHighlightingColors.annotation],
+        ["Todos", ceylonHighlightingColors.todo],
+        ["Semicolons", ceylonHighlightingColors.semi],
+        ["Braces", ceylonHighlightingColors.brace],
+        ["Package identifiers", ceylonHighlightingColors.packages],
+        ["Other qualified identifiers", ceylonHighlightingColors.member]
+    ]
+    .collect(([name, key])=>AttributesDescriptor(name, key));
 
-    JMap<JString,TextAttributesKey> ourTags = HashMap<JString,TextAttributesKey>();
+    value ourTags = HashMap<JString,TextAttributesKey>();
     ourTags[javaString("anno")] = ceylonHighlightingColors.annotation;
     ourTags[javaString("interp")] = ceylonHighlightingColors.interp;
     ourTags[javaString("stringInAnno")] = ceylonHighlightingColors.annotationString;
     ourTags[javaString("member")] = ceylonHighlightingColors.member;
     ourTags[javaString("pkg")] = ceylonHighlightingColors.packages;
-    
+
     additionalHighlightingTagToDescriptorMap => ourTags;
     
     attributeDescriptors => createJavaObjectArray(ourDescriptors);
     
     colorDescriptors => ColorDescriptor.emptyArray;
     
-    shared actual String demoText => """import <pkg>ceylon</pkg>.<pkg>math</pkg>.<pkg>integer</pkg> { smallest }
-                                        
-                                        <anno>shared</anno> void run() {
-                                            String myStr = "hello, world";
-                                            print("myString=<interp>``myStr``</interp>");
-                                            value number = 13.37;
-                                            value char = 'a';
-                                            Duck().<member>fly</member>();
-                                        }
-                                        
-                                        // Cool class
-                                        <anno>by</anno>(<stringInAnno>"Trompon"</stringInAnno>)
-                                        class Duck() {
-                                            <anno>shared</anno> void fly() {}
-                                        }
-                                      """;
+    demoText => """import <pkg>ceylon</pkg>.<pkg>math</pkg>.<pkg>integer</pkg> { smallest }
+
+                   <anno>shared</anno> void run() {
+                       String myStr = "hello, world";
+                       print("myString=<interp>``myStr``</interp>");
+                       value number = 13.37;
+                       value char = 'a';
+                       Duck().<member>fly</member>();
+                    }
+
+                    // Cool class
+                    <anno>by</anno>(<stringInAnno>"Trompon"</stringInAnno>)
+                    class Duck() {
+                        <anno>shared</anno> void fly() {}
+                    }""";
     
     displayName => "Ceylon";
     
@@ -96,22 +96,22 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
 }
 
 shared object ceylonHighlightingColors {
-    shared TextAttributesKey identifier = createTextAttributesKey("CEYLON_IDENTIFIER", DefaultLanguageHighlighterColors.identifier);
-    shared TextAttributesKey type = createTextAttributesKey("CEYLON_TYPE", DefaultLanguageHighlighterColors.className);
-    shared TextAttributesKey typeLiteral = createTextAttributesKey("CEYLON_TYPE_LITERAL", DefaultLanguageHighlighterColors.identifier);
-    shared TextAttributesKey keyword = createTextAttributesKey("CEYLON_KEYWORD", DefaultLanguageHighlighterColors.keyword);
-    shared TextAttributesKey number = createTextAttributesKey("CEYLON_NUMBER", DefaultLanguageHighlighterColors.number);
-    shared TextAttributesKey comment = createTextAttributesKey("CEYLON_COMMENT", DefaultLanguageHighlighterColors.docComment);
-    shared TextAttributesKey strings = createTextAttributesKey("CEYLON_STRING", DefaultLanguageHighlighterColors.strings);
-    shared TextAttributesKey char = createTextAttributesKey("CEYLON_CHAR", DefaultLanguageHighlighterColors.strings);
-    shared TextAttributesKey interp = createTextAttributesKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
-    shared TextAttributesKey annotationString = createTextAttributesKey("CEYLON_ANNOTATION_STRING", DefaultLanguageHighlighterColors.strings);
-    shared TextAttributesKey annotation = createTextAttributesKey("CEYLON_ANNOTATION", DefaultLanguageHighlighterColors.metadata);
-    shared TextAttributesKey todo = createTextAttributesKey("CEYLON_TODO", CodeInsightColors.todoDefaultAttributes);
-    shared TextAttributesKey semi = createTextAttributesKey("CEYLON_SEMI", DefaultLanguageHighlighterColors.semicolon);
-    shared TextAttributesKey brace = createTextAttributesKey("CEYLON_BRACE", DefaultLanguageHighlighterColors.braces);
-    shared TextAttributesKey packages = createTextAttributesKey("CEYLON_PACKAGE", DefaultLanguageHighlighterColors.identifier);
-    shared TextAttributesKey member = createTextAttributesKey("CEYLON_MEMBER", DefaultLanguageHighlighterColors.instanceField);
+    shared TextAttributesKey identifier = createKey("CEYLON_IDENTIFIER", DefaultColors.identifier);
+    shared TextAttributesKey type = createKey("CEYLON_TYPE", DefaultColors.className);
+    shared TextAttributesKey typeLiteral = createKey("CEYLON_TYPE_LITERAL", DefaultColors.identifier);
+    shared TextAttributesKey keyword = createKey("CEYLON_KEYWORD", DefaultColors.keyword);
+    shared TextAttributesKey number = createKey("CEYLON_NUMBER", DefaultColors.number);
+    shared TextAttributesKey comment = createKey("CEYLON_COMMENT", DefaultColors.docComment);
+    shared TextAttributesKey strings = createKey("CEYLON_STRING", DefaultColors.strings);
+    shared TextAttributesKey char = createKey("CEYLON_CHAR", DefaultColors.strings);
+    shared TextAttributesKey interp = createKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
+    shared TextAttributesKey annotationString = createKey("CEYLON_ANNOTATION_STRING", DefaultColors.strings);
+    shared TextAttributesKey annotation = createKey("CEYLON_ANNOTATION", DefaultColors.metadata);
+    shared TextAttributesKey todo = createKey("CEYLON_TODO", CodeInsightColors.todoDefaultAttributes);
+    shared TextAttributesKey semi = createKey("CEYLON_SEMI", DefaultColors.semicolon);
+    shared TextAttributesKey brace = createKey("CEYLON_BRACE", DefaultColors.braces);
+    shared TextAttributesKey packages = createKey("CEYLON_PACKAGE", DefaultColors.identifier);
+    shared TextAttributesKey member = createKey("CEYLON_MEMBER", DefaultColors.instanceField);
 }
 
 shared TextAttributes textAttributes(TextAttributesKey key)
