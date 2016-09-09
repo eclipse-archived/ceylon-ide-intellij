@@ -198,7 +198,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                     platformUtils.log(Status._ERROR, "Can't add required artifacts to classpath", e);
                 }
             });
-            application.invokeAndWait(runnable, ModalityState.any());
+            application.invokeAndWait(runnable, ModalityState.current());
 
             dumbService(model.ideaProject).waitForSmartMode();
 
@@ -216,7 +216,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                             );
 
                             value sourcesRunnable = JavaRunnable(() => attachSources(artifacts));
-                            application.invokeAndWait(sourcesRunnable, ModalityState.any());
+                            application.invokeAndWait(sourcesRunnable, ModalityState.current());
                         }
                 } , ProgressIndicatorBase());
             }
