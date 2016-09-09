@@ -21,8 +21,13 @@ import com.intellij.openapi.editor {
     Editor
 }
 import com.intellij.openapi.\imodule {
-    ModuleUtilCore,
+    ModuleUtilCore {
+        findModuleForFile
+    },
     ModuleManager
+}
+import com.intellij.openapi.progress {
+    ProcessCanceledException
 }
 import com.intellij.openapi.util {
     Key
@@ -55,6 +60,9 @@ import com.redhat.ceylon.model.typechecker.model {
 import java.lang {
     CharArray
 }
+import java.util.concurrent {
+    TimeUnit
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerProvider
@@ -81,7 +89,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
     CeylonFile,
-    CeylonTokens,
+    CeylonTokens {
+        ...
+    },
     descriptions,
     CeylonPsi
 }
@@ -92,26 +102,15 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     resolveDeclaration,
     CeylonSourceNavigator
 }
-import java.util.concurrent {
-    TimeUnit
-}
-import com.intellij.openapi.progress {
-    ProcessCanceledException
-}
 
 shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
     value typesToIgnore = [
-        CeylonTokens.ws,
-        CeylonTokens.lineComment,
-        CeylonTokens.comma,
-        CeylonTokens.semicolon,
-        CeylonTokens.lbrace,
-        CeylonTokens.rbrace,
-        CeylonTokens.lbracket,
-        CeylonTokens.rbracket,
-        CeylonTokens.lparen,
-        CeylonTokens.rparen
+        ws, lineComment,
+        comma, semicolon,
+        lbrace, rbrace,
+        lbracket, rbracket,
+        lparen, rparen
     ];
 
     shared actual String? getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
@@ -128,7 +127,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
     function moduleForFile(PsiFile file)
             => if (exists virtualFile = file.virtualFile)
-            then ModuleUtilCore.findModuleForFile(virtualFile, file.project)
+            then findModuleForFile(virtualFile, file.project)
             else null;
 
     function typeCheckerForElement(PsiElement? element) {
@@ -194,10 +193,11 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                 }
             }
 
-            PsiElement? sourcePsiElement = let (navigationElement = element.navigationElement)
-            if (is CeylonSourceNavigator.DelegatingClass navigationElement) 
-            then navigationElement.delegate 
-            else navigationElement;
+            PsiElement? sourcePsiElement
+                    = let (navigationElement = element.navigationElement)
+                    if (is CeylonSourceNavigator.DelegatingClass navigationElement)
+                    then navigationElement.delegate
+                    else navigationElement;
             
             //special case for Navigate > Class
             if (is CeylonPsi.DeclarationPsi sourcePsiElement) {
@@ -230,7 +230,10 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
     shared actual PsiElement? getDocumentationElementForLookupItem(PsiManager psiManager, Object arg, PsiElement element) {
         if (is Referenceable arg,
-            exists decl = if (is FakeCompletionDeclaration arg) then arg.realDeclaration else arg) {
+            exists decl
+                    = if (is FakeCompletionDeclaration arg)
+                    then arg.realDeclaration
+                    else arg) {
 
             value target = resolveDeclaration(decl, element.project);
             return if (is DeclarationPsiNameIdOwner target)
@@ -248,11 +251,16 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             exists analysisResult = file.availableAnalysisResult,
             exists pu = analysisResult.typecheckedPhasedUnit) {
 
-            value cu = pu.compilationUnit;
+            value rootNode = pu.compilationUnit;
 
             if (link.startsWith("stp:"),
-                exists offset = parseInteger(link.substring(4)),
-                is Tree.Type node = nodes.findNode(cu, null, offset, offset+1)) {
+                exists offset = parseInteger(link[4...]),
+                is Tree.Type node = nodes.findNode {
+                    node = rootNode;
+                    tokens = null;
+                    startOffset = offset;
+                    endOffset = offset+1;
+                }) {
 
                 if (exists hint
                         = DocumentationManager.getInstance(context.project).docInfoHint) {
@@ -267,7 +275,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                         value data = IdeaQuickFixData {
                             message = UnexpectedError(null, null);
                             nativeDoc = doc;
-                            rootNode = cu;
+                            rootNode = rootNode;
                             phasedUnit = pu;
                             node = node;
                             ideaModule = mod;
