@@ -42,7 +42,9 @@ class IdeaImportedModulePackageProposal(Integer offset, String prefix, String me
             => newDeclarationLookup {
                 description = description;
                 text = text;
-                icon = icons.packageArchives;
+                icon = candidate.\imodule.java
+                    then icons.packageArchives
+                    else icons.packageFolders;
                 declaration = candidate;
             }
             .withInsertHandler(CompletionHandler((context) {
