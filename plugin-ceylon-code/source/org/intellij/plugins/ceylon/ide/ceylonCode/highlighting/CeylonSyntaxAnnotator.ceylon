@@ -99,7 +99,8 @@ shared class CeylonSyntaxAnnotator()
     shared actual void visitElement(PsiElement element) {
         super.visitElement(element);
         IElementType elementType = element.node.elementType;
-        if (elementType == CeylonTokens.astringLiteral || elementType == CeylonTokens.averbatimString) {
+        if (elementType == CeylonTokens.astringLiteral
+         || elementType == CeylonTokens.averbatimString) {
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.textAttributes = ceylonHighlightingColors.annotationString;
         }
