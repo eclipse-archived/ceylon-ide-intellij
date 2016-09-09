@@ -63,7 +63,7 @@ shared object icons {
     shared Icon imports => IconLoader.getIcon("/icons/ceylonImports.png");
     shared Icon singleImport => IconLoader.getIcon("/icons/ceylonImport.png");
 //    shared Icon packages => IconLoader.getIcon("/icons/ceylonPackage.png");
-    shared Icon packageFolders => PlatformIcons.packageIcon;
+    shared Icon packageFolders => IconLoader.getIcon("/icons/sourceFolder.png");
     shared Icon packageArchives => PlatformIcons.packageIcon;
     shared Icon moduleFolders => IconLoader.getIcon("/icons/moduleFolder.png");
     shared Icon moduleArchives => IconLoader.getIcon("/icons/moduleArchive.png");

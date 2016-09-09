@@ -9,7 +9,9 @@ import com.intellij.ide.projectView {
 }
 import com.intellij.ide.projectView.impl.nodes {
     ClassTreeNode,
-    NamedLibraryElementNode
+    NamedLibraryElementNode,
+    PsiDirectoryNode,
+    PsiFileNode
 }
 import com.intellij.navigation {
     ColoredItemPresentation,
@@ -158,6 +160,18 @@ shared class CeylonClassDecorator()
                 data.setIcon(icons.forClass(psiClass));
             }
             return;
+        }
+
+        if (is PsiDirectoryNode node) {
+            for (child in node.children) {
+                if (is PsiFileNode child,
+                    exists file = child.virtualFile,
+                    file.name == "module.ceylon"
+                 || file.name == "package.ceylon") {
+                    data.setIcon(icons.packageFolders);
+                    break;
+                }
+            }
         }
 
         if (is NamedLibraryElementNode parentDescriptor = node.parentDescriptor,
