@@ -284,8 +284,7 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
     
     shared actual void appendPageProlog(StringBuilder builder) {
         value css = `module`.resourceByPath("ceylondoc.css");
-        value style = if (exists css) then css.textContent() else "";
-        builder.append("<html><head><style>``style``</style></head><body>");
+        builder.append("<html><head><style>``css?.textContent() else ""``</style></head><body>");
     }
     
     appendPageEpilog(StringBuilder builder) => builder.append("</body></html>");
