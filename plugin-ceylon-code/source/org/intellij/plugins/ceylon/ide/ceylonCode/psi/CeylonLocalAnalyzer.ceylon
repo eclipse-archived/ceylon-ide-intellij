@@ -154,26 +154,26 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         value taskId => makeTaskId(typecheckingTask);
         
         if (disposed) {
-            logger.debug(()=>"ERROR : Submitted local tyechecking task `` taskId `` while the CeylonLocalAnalyzer is already disposed.
+            logger.debug(()=>"ERROR : Submitted local typechecking task `` taskId `` while the CeylonLocalAnalyzer is already disposed.
                                   Returning directly");
             return;
         }
         
         if (exists p=ceylonProject,
             ! p.typechecked) {
-            logger.debug(()=>"ERROR : Submitted local tyechecking task `` taskId `` while the Ceylon project global model is not available.
+            logger.debug(()=>"ERROR : Submitted local typechecking task `` taskId `` while the Ceylon project global model is not available.
                                   Returning directly");
             return;
         }
         
-        logger.debug(()=>"Submitted local tyechecking task `` taskId `` with delay `` delayToStartLocalAnalysisAfterParsing ``");
+        logger.debug(()=>"Submitted local typechecking task `` taskId `` with delay `` delayToStartLocalAnalysisAfterParsing ``");
 
         if (exists cachedDocument = FileDocumentManager.instance.getCachedDocument(virtualFile),
             PsiDocumentManager.getInstance(ideaProject).isUncommited(cachedDocument)) {
-            logger.debug(()=>"ERROR : Submitted local tyechecking task `` taskId `` while the document is still uncommitted
+            logger.debug(()=>"ERROR : Submitted local typechecking task `` taskId `` while the document is still uncommitted
                                   => schedule a submit as soon as the document is committed", 20);
             PsiDocumentManager.getInstance(ideaProject).performForCommittedDocument(cachedDocument, JavaRunnable(() {
-                logger.debug(()=>"Submit again the local tyechecking task `` taskId `` now the document has been committed");
+                logger.debug(()=>"Submit again the local typechecking task `` taskId `` now the document has been committed");
                 submitLocalTypechecking(typecheckingTask, delay);
             }));
             return;
