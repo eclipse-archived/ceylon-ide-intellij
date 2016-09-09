@@ -13,7 +13,10 @@ import com.intellij.openapi.vfs {
 }
 import com.intellij.psi {
     PsiElement,
-    PsiElementVisitor
+    PsiElementVisitor,
+    PsiNameIdentifierOwner,
+    PsiMethod,
+    PsiField
 }
 import com.intellij.psi.impl.compiled {
     ClsClassImpl,
@@ -128,13 +131,13 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
     }
 
 
-    function isGetter(ClsMethodImpl member)
+    function isGetter(PsiMethod member)
             => let (name = member.name)
                    name.startsWith("get")
                 && name.longerThan(3)
                 && member.parameterList.parametersCount == 0;
 
-    function isSetter(ClsMethodImpl member)
+    function isSetter(PsiMethod member)
             => let (name = member.name)
                    name.startsWith("set")
                 && name.longerThan(3)
@@ -160,46 +163,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
 
             function sourcePsi() {
                 if (exists [decl, cu] = findClassModel(parent, file)) {
-                    value matchingName = ArrayList<Declaration>();
-                    value ceylonName = getCeylonSimpleName(element);
-
-                    for (member in decl.members) {
-                        if (exists memberName = member.name,
-                            exists clsName = ceylonName,
-                            memberName == clsName) {
-
-                            switch (element)
-                            case (is ClsMethodImpl) {
-                                if (isGetter(element)) {
-                                    if (is Value member) {
-                                        matchingName.add(member);
-                                    }
-                                } else if (isSetter(element)) {
-                                    if (is TypedDeclaration member,
-                                        member.variable) {
-                                        matchingName.add(member);
-                                    }
-                                } else {
-                                    matchingName.add(member);
-                                }
-                            }
-                            case (is ClsFieldImpl) {
-                                if (is Value member) {
-                                    matchingName.add(member);
-                                }
-                            }
-                        }
-                    }
-
-                    if (matchingName.empty, is TypeDeclaration decl) {
-                        for (inherited in decl.getInheritedMembers(ceylonName)) {
-                            if (inherited.default) {
-                                matchingName.add(inherited);
-                            }
-                        }
-                    }
-
-                    if (exists first = matchingName.first,
+                    if (exists first = findMatchingDeclaration(decl, element),
                         exists psi = modelToPsi(first, cu, file)) {
 
                         return psi;
@@ -218,8 +182,49 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
         return super.getOriginalElements(element);
     }
 
-    String? getCeylonSimpleName(ClsMemberImpl<out Anything> member) {
-        variable value name = member.name;
+    "Finds a member of [[parent]] that matches the given PSI [[element]]."
+    shared Declaration? findMatchingDeclaration(Declaration parent, PsiMethod|PsiField element) {
+        value matchingName = ArrayList<Declaration>();
+        value ceylonName = getCeylonSimpleName(element);
+
+        for (member in parent.members) {
+            if (exists memberName = member.name,
+                exists clsName = ceylonName,
+                memberName == clsName) {
+
+                if (is PsiMethod element) {
+                    if (isGetter(element)) {
+                        if (is Value member) {
+                            matchingName.add(member);
+                        }
+                    } else if (isSetter(element)) {
+                        if (is TypedDeclaration member,
+                            member.variable) {
+                            matchingName.add(member);
+                        }
+                    } else {
+                        matchingName.add(member);
+                    }
+                }
+                else if (is Value member) {
+                    matchingName.add(member);
+                }
+            }
+        }
+
+        if (matchingName.empty, is TypeDeclaration parent) {
+            for (inherited in parent.getInheritedMembers(ceylonName)) {
+                if (inherited.default) {
+                    matchingName.add(inherited);
+                }
+            }
+        }
+
+        return matchingName.first;
+    }
+
+    shared String? getCeylonSimpleName(PsiNameIdentifierOwner member) {
+        variable value name = member.name else "<unknown>";
 
         switch (member)
         case (is ClsMethodImpl) {

@@ -4,7 +4,8 @@ import ceylon.interop.java {
 
 import com.intellij.psi {
     PsiElement,
-    PsiClass
+    PsiClass,
+    PsiMethod
 }
 import com.intellij.psi.search.searches {
     DefinitionsScopedSearch {
@@ -57,9 +58,8 @@ shared class CeylonImplementationsSearch()
     }
 
     void findImplementors(PsiElement sourceElement, void consumer(PsiElement element)) {
-        if (is PsiClass sourceElement) {
-            if (exists name = concurrencyManager.needReadAccess(() => sourceElement.qualifiedName),
-                exists psiFile = sourceElement.containingFile,
+        if (is PsiClass|PsiMethod sourceElement) {
+            if (exists psiFile = sourceElement.containingFile,
                 is TypeDeclaration|TypedDeclaration decl = declarationFromPsiElement(sourceElement),
                 exists pus = getCeylonProject(psiFile)?.typechecker?.phasedUnits) {
 

@@ -32,6 +32,10 @@ import java.lang {
     Class
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
+    ceylonSourceNavigator
+}
+
 Class<IdeaCeylonProjects> ceylonProjectsClass = javaClass<IdeaCeylonProjects>();
 
 shared IdeaCeylonProjects? getCeylonProjects(Project project)
@@ -64,12 +68,19 @@ shared Package? packageFromJavaPsiFile(PsiJavaFile psiFile) {
 shared Declaration? declarationFromPsiElement(PsiClass|PsiMethod psiElement) {
     if (is PsiJavaFile psiFile = psiElement.containingFile,
         exists pkg = packageFromJavaPsiFile(psiFile),
-        exists modelLoader = getCeylonProject(psiFile)?.modelLoader) {
-        return modelLoader.convertToDeclaration(pkg.\imodule,
-            "``pkg.nameAsString ``.``getCeylonSimpleName(psiElement) else ""``",
+        exists modelLoader = getCeylonProject(psiFile)?.modelLoader,
+        exists cls = if (is PsiClass psiElement) then psiElement else psiElement.containingClass) {
+
+        value clsDeclaration = modelLoader.convertToDeclaration(pkg.\imodule,
+            "``pkg.nameAsString``.``ceylonSourceNavigator.getCeylonSimpleName(cls) else ""``",
             DeclarationType.type);
+
+        return if (is PsiClass psiElement)
+        then clsDeclaration
+        else if (exists clsDeclaration)
+        then ceylonSourceNavigator.findMatchingDeclaration(clsDeclaration, psiElement)
+        else null;
     }
-        
     return null;
 }
 
@@ -82,95 +93,4 @@ shared Module? findModuleByName(Project project, String moduleName) {
         }
     }
     return null;
-}
-
-/*
- * returns null if it's a method with no Ceylon equivalent
- * (internal getter of a Ceylon object value)
- */
-shared String? getCeylonSimpleName(PsiClass|PsiMethod dec) {
-    String? name = if (is PsiMethod dec)
-    then dec.name
-    else dec.nameIdentifier?.text;
-
-/*    
-    TODO : convert this for the Idea APIs
- 
-    String nameAnnotationValue = 
-            getCeylonNameAnnotationValue(dec);
-    if (nameAnnotationValue != null) {
-        return nameAnnotationValue;
-    }
-    
-    if (dec instanceof IMethod) {
-        if (name.startsWith(Prefix.$default$.name())) {
-            name = name.substring(
-                Prefix.$default$.name()
-                        .length());
-        } else if (name.equals("get_")) {
-            boolean isStatic = false;
-            int parameterCount = 0;
-            IMethod method = (IMethod) dec;
-            try {
-                isStatic = 
-                        (method.getFlags() & 
-                    Flags.AccStatic) 
-                        != 0;
-                parameterCount = 
-                        method.getParameterNames()
-                        .length;
-            } catch (JavaModelException e) {
-                e.printStackTrace();
-            }
-            if (isStatic && parameterCount == 0) {
-                name = null;
-            }
-        } else if (name.startsWith("$")) {
-            name = name.substring(1);
-        } else if ((name.startsWith("get") 
-            || name.startsWith("set")) 
-                && name.length() > 3) {
-            StringBuffer newName = 
-                    new StringBuffer(
-                Character.toLowerCase(
-                    name.charAt(3)));
-            if (name.length() > 4) { 
-                newName.append(name.substring(4));
-            }
-            name = newName.toString();
-        } else if (name.equals("toString")) {
-            name = "string";
-        } else if (name.equals("hashCode")) {
-            name = "hash";
-        } else if (name.contains("$")) {
-            IMethod method = (IMethod) dec;
-            JdtDefaultArgumentMethodSearch.Result searchResult = 
-                    new JdtDefaultArgumentMethodSearch()
-                    .search(method);
-            if (searchResult.defaultArgumentName != null) {
-                name = searchResult.defaultArgumentName;
-            }
-        }
-        if (name.endsWith(Suffix.$canonical$.name())) {
-            name = name.substring(0, 
-                name.length() - 
-                        Suffix.$canonical$.name().length());
-        }
-        if (name.endsWith(Suffix.$priv$.name())) {
-            name = name.substring(0, 
-                name.length() - 
-                        Suffix.$priv$.name().length());
-        }
-    } else if (dec instanceof IType) {
-        IType type = (IType) dec;
-        if (name.endsWith("_")) {
-            if (isCeylonObject(type) ||
-                isCeylonMethod(type)) {
-                name = name.substring(0, 
-                    name.length()-1);
-            }
-        }
-    }
- */
-    return name;
 }
