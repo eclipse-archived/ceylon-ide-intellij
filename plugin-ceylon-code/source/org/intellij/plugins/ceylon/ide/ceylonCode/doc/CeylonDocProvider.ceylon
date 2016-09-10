@@ -249,9 +249,9 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
         if (exists tc = typeCheckerForElement(context),
             is CeylonFile file = context.containingFile,
             exists analysisResult = file.availableAnalysisResult,
-            exists pu = analysisResult.typecheckedPhasedUnit) {
+            exists phasedUnit = analysisResult.typecheckedPhasedUnit) {
 
-            value rootNode = pu.compilationUnit;
+            value rootNode = phasedUnit.compilationUnit;
 
             if (link.startsWith("stp:"),
                 exists offset = parseInteger(link[4...]),
@@ -276,7 +276,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                             message = UnexpectedError(null, null);
                             nativeDoc = doc;
                             rootNode = rootNode;
-                            phasedUnit = pu;
+                            phasedUnit = phasedUnit;
                             node = node;
                             ideaModule = mod;
                             annotation = null;
@@ -290,7 +290,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
 
             value gen = IdeaDocGenerator(tc);
             if (exists target
-                    = gen.getLinkedModel(link, gen.DocParams(pu, context.project))) {
+                    = gen.getLinkedModel(link, gen.DocParams(phasedUnit, context.project))) {
 
                 if (link.startsWith("doc:")) {
                     return DummyPsiElement(target, file);
