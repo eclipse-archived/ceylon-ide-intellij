@@ -83,14 +83,15 @@ shared class IdeaProposalsHolder(CompletionResultSet? result = null) satisfies P
     
     shared List<LookupElement> proposals => _proposals;
 
+    shared actual variable Integer size = 0;
+
     shared void add(LookupElement element) {
+        size++;
         if (exists result) {
             result.addElement(element);
         } else {
             _proposals.add(element);
         }
     }
-
-    size => _proposals.size;
     
 }
