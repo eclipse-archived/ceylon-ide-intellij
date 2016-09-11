@@ -38,8 +38,8 @@ import com.redhat.ceylon.ide.common.platform {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
-    IdeaProposalsHolder,
-    installCustomLookupCellRenderer
+    installCustomLookupCellRenderer,
+    IdeaListProposalsHolder
 }
 
 shared class IdeaLinkedMode(IdeaDocument document) extends LinkedMode(document) {
@@ -54,7 +54,7 @@ shared class IdeaLinkedMode(IdeaDocument document) extends LinkedMode(document) 
     shared actual void addEditableRegion(Integer start, Integer length, Integer exitSeqNumber,
         ProposalsHolder holder) {
 
-        if (is IdeaProposalsHolder holder) {
+        if (is IdeaListProposalsHolder holder) {
             model.addEditableRegion(start, length, holder.proposals.sequence());
         }
     }

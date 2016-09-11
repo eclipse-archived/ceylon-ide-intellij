@@ -264,7 +264,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
         }
     }
     
-    createProposalsHolder() => IdeaProposalsHolder();
+    createProposalsHolder() => IdeaListProposalsHolder();
     
     shared actual void addNestedProposal(ProposalsHolder proposals, Icons|Declaration icon,
             String description, DefaultRegion region, String text) {

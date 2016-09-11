@@ -2,6 +2,9 @@ import ceylon.collection {
     ArrayList
 }
 
+import com.intellij.codeInsight.completion {
+    CompletionResultSet
+}
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
@@ -27,18 +30,15 @@ import com.redhat.ceylon.ide.common.model {
 import com.redhat.ceylon.ide.common.settings {
     CompletionOptions
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    LocalAnalysisResult
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
-}
-import com.redhat.ceylon.ide.common.typechecker {
-    LocalAnalysisResult
-}
-import com.intellij.codeInsight.completion {
-    CompletionResultSet
 }
 
 shared class IdeaCompletionContext(file, localAnalysisResult, editor, options, result)
@@ -52,7 +52,7 @@ shared class IdeaCompletionContext(file, localAnalysisResult, editor, options, r
     shared actual CompletionOptions options;
 
     shared actual IdeaDocument commonDocument = IdeaDocument(editor.document);
-    shared actual IdeaProposalsHolder proposals = IdeaProposalsHolder(result);
+    shared actual IdeaProposalsHolder proposals = IdeaCompletionResultSetProposalsHolder(result);
     shared actual BaseCeylonProject? ceylonProject => localAnalysisResult.ceylonProject;
 
     parsedRootNode => localAnalysisResult.parsedRootNode;
@@ -78,20 +78,34 @@ shared class IdeaCompletionContext(file, localAnalysisResult, editor, options, r
     proposalFilters => empty;
 }
 
-shared class IdeaProposalsHolder(CompletionResultSet? result = null) satisfies ProposalsHolder {
-    value _proposals = ArrayList<LookupElement>();
+shared interface IdeaProposalsHolder satisfies ProposalsHolder {
+
+    shared formal void add(LookupElement element);
     
-    shared List<LookupElement> proposals => _proposals;
+}
+
+shared class IdeaCompletionResultSetProposalsHolder(CompletionResultSet result)
+        satisfies IdeaProposalsHolder {
 
     shared actual variable Integer size = 0;
 
-    shared void add(LookupElement element) {
+    shared actual void add(LookupElement element) {
         size++;
-        if (exists result) {
-            result.addElement(element);
-        } else {
-            _proposals.add(element);
-        }
+        result.addElement(element);
     }
-    
+
+}
+
+shared class IdeaListProposalsHolder()
+        satisfies IdeaProposalsHolder {
+    value _proposals = ArrayList<LookupElement>();
+
+    shared List<LookupElement> proposals => _proposals;
+
+    size => _proposals.size;
+
+    shared actual void add(LookupElement element) {
+        _proposals.add(element);
+    }
+
 }
