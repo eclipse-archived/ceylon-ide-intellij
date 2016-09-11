@@ -32,7 +32,7 @@ import java.util {
 
 shared object ceylonFileFactory {
     shared PsiElement createModuleDescriptor(PsiDirectory dir, String name, String version,
-        Backend? backend = null, {String*} imports = empty) {
+        Backend? backend = null, {String*} imports = []) {
 
         value tplManager = fileTemplateManager(dir.project);
         value props = HashMap<JString,Object>();

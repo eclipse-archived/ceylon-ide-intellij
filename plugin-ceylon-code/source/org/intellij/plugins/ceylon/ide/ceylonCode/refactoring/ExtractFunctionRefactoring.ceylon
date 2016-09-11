@@ -122,7 +122,7 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
             rootNode = typecheckedRootNode;
             tokens = localAnalysisResult.tokens;
             target = scope;
-            moduleUnits = empty;
+            moduleUnits = [];
             vfile = phasedUnit.unitFile;
         }
         else null;

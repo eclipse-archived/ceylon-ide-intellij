@@ -206,7 +206,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
 
         try {
             value cls = cl.loadClass("com.android.tools.idea.gradle.project.GradleProjectImporter");
-            value instance = cls.getDeclaredMethod("getInstance").invoke(null, *empty);
+            value instance = cls.getDeclaredMethod("getInstance").invoke(null);
 
             for (m in cls.declaredMethods) {
                 if (m.name == "syncProjectSynchronously") {

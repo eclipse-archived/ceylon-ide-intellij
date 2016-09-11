@@ -74,7 +74,7 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
         value roots = concurrencyManager.needReadAccess(() => moduleRootManager(ceylonProject.ideArtifact)
             ?.getSourceRoots(JavaResourceRootType.resource));
 
-        return if (exists roots) then CeylonIterable(roots) else empty;
+        return if (exists roots) then CeylonIterable(roots) else [];
     }
 
     scanRootFolder(RootFolderScanner<Module,VirtualFile,VirtualFile,VirtualFile> scanner)
@@ -88,7 +88,7 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
         value roots = concurrencyManager.needReadAccess(() => moduleRootManager(ceylonProject.ideArtifact)
             ?.getSourceRoots(JavaSourceRootType.source));
 
-        return if (exists roots) then CeylonIterable(roots) else empty;
+        return if (exists roots) then CeylonIterable(roots) else [];
     }
 
 }

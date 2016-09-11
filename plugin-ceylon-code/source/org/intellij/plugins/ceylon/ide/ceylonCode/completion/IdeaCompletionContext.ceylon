@@ -75,7 +75,7 @@ shared class IdeaCompletionContext(file, localAnalysisResult, editor, options, r
         return lastPhasedUnit;
     }
 
-    proposalFilters => empty;
+    proposalFilters => [];
 }
 
 shared interface IdeaProposalsHolder satisfies ProposalsHolder {

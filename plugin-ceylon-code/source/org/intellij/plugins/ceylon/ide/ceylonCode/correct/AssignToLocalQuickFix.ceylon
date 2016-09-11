@@ -52,7 +52,7 @@ class AssignToLocalElement(IdeaQuickFixData data, Editor editor, CeylonFile file
     
     shared actual variable Integer exitPos = 0;
     
-    shared actual variable {String*} names = empty;
+    shared actual variable {String*} names = [];
     
     shared actual variable Integer offset = 0;
     
