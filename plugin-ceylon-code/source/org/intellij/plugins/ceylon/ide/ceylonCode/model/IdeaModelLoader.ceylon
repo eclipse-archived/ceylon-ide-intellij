@@ -169,7 +169,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     shared actual Boolean moduleContainsClass(BaseIdeModule ideModule,
         String packageName, String className) {
         
-        assert(is IdeaModule ideModule);
+        assert (is IdeaModule ideModule);
         
         if (exists ceylonProject = ideModule.ceylonProject) {
             updateIndexIfnecessary();
@@ -177,15 +177,16 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             value name = packageName + "." + className;
             value scope = ideaModule.getModuleScope(true);
             value facade = javaPsiFacade(ideaModule.project);
-            return concurrencyManager.needIndexes(ideaModule.project, () => concurrencyManager.needReadAccess(() 
-                => facade.findClass(name, scope) exists));
+            return concurrencyManager.needIndexes(ideaModule.project,
+                () => concurrencyManager.needReadAccess(()
+                    => facade.findClass(name, scope) exists));
         }
         
         return false;
     }
 
     function pointer<Psi>(Psi el) given Psi satisfies PsiElement {
-        assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
+        assert (exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
         return SmartPointerManager.getInstance(project).createSmartPsiElementPointer(el);
     }
     
@@ -199,17 +200,18 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         value project = ceylonProject.ideArtifact.project;
         updateIndexIfnecessary();
 
-        return concurrencyManager.needIndexes(project, () => concurrencyManager.needReadAccess(() {
-            if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) { 
-                value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
-                value facade = javaPsiFacade(m.project);
-                
-                if (exists psi = facade.findClass(name, scope)) {
-                    return PSIClass(pointer(psi));
+        return concurrencyManager.needIndexes(project,
+            () => concurrencyManager.needReadAccess(() {
+                if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) {
+                    value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
+                    value facade = javaPsiFacade(m.project);
+
+                    if (exists psi = facade.findClass(name, scope)) {
+                        return PSIClass(pointer(psi));
+                    }
                 }
-            }
-            return null;
-        }));
+                return null;
+            }));
     }
 
     "Reads a module descriptor from bytecode instead of adding its containing artifact to
