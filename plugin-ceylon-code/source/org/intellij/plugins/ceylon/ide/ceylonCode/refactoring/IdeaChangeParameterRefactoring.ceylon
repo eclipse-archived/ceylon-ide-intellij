@@ -460,7 +460,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
                 myNameEditor.addDocumentListener(RowEditorChangeListener(1));
                 add(createLabeledPanel("Name:", myNameEditor));
 
-                myDefaultedCb = JCheckBox("Use default arg", item.parameter.param.defaulted);
+                myDefaultedCb = JCheckBox("Use default argument", item.parameter.param.defaulted);
                 myDefaultedCb.addActionListener(object satisfies ActionListener {
                     shared actual void actionPerformed(ActionEvent e) {
                         item.parameter.param.defaulted = myDefaultedCb.selected;
@@ -483,7 +483,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
                     }
 
                 });
-                add(createLabeledPanel("Default arg:", myDefaultArgEditor));
+                add(createLabeledPanel("Default argument:", myDefaultArgEditor));
             }
 
             \ivalue => object satisfies JBTableRow {
