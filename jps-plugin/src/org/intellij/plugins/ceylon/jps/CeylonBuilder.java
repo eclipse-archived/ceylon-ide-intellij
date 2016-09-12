@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathUtil;
+import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.common.config.CeylonConfig;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
@@ -289,8 +290,9 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
             // filesToBuild contains file for every module we're building, we need to filter
             // files for the current module only.
+            List<File> modulePaths = ContainerUtil.concat(srcPath, resourcePath);
             for (File f : filesToBuild) {
-                for (File src : srcPath) {
+                for (File src : modulePaths) {
                     if (f.toPath().startsWith(src.toPath())) {
                         filteredFiles.add(f);
                         break;
