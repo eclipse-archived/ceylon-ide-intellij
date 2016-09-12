@@ -64,6 +64,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
         configuration.setName(topLevelNameFull + " ➝ " + getBackend().nativeAnnotation);
         configuration.setCeylonModule(params.module);
         configuration.setBackend(getBackend());
+        configuration.getConfigurationModule().setModule(context.getModule());
         return true;
     }
 
