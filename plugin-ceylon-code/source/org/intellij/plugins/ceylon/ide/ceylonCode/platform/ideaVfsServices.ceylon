@@ -1,5 +1,19 @@
+import ceylon.interop.java {
+    javaClass,
+    JavaRunnable
+}
+
+import com.intellij.openapi.application {
+    ApplicationManager
+}
+import com.intellij.openapi.fileEditor {
+    FileDocumentManager
+}
 import com.intellij.openapi.\imodule {
     Module
+}
+import com.intellij.openapi.project {
+    ProjectManager
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
@@ -20,9 +34,6 @@ import com.redhat.ceylon.ide.common.platform {
 import com.redhat.ceylon.ide.common.util {
     Path
 }
-import com.redhat.ceylon.ide.common.vfs {
-    FolderVirtualFile
-}
 import com.redhat.ceylon.model.typechecker.model {
     Package
 }
@@ -42,19 +53,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
     IdeaVirtualFolder,
     VirtualFileVirtualFile
-}
-import ceylon.interop.java {
-    javaClass,
-    JavaRunnable
-}
-import com.intellij.openapi.fileEditor {
-    FileDocumentManager
-}
-import com.intellij.openapi.application {
-    ApplicationManager
-}
-import com.intellij.openapi.project {
-    ProjectManager
 }
 
 object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,VirtualFile> {
@@ -82,29 +80,28 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
     }
     
     getPackagePropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder)
-            => WeakReference(folder.getUserData(nativeFolderProperties(ceylonProject).packageModel));
+            => folder.getUserData(nativeFolderProperties(ceylonProject).packageModel);
     
     getParent(VirtualFile resource) => resource.parent;
 
     getRootIsSourceProperty(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile rootFolder)
         => rootFolder.getUserData(nativeFolderProperties(ceylonProject).rootIsSource);
     
-    getRootPropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder)
-            => WeakReference<FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>>(folder.getUserData(nativeFolderProperties(ceylonProject).root));
+    shared actual WeakReference<FolderVirtualFileAlias>? getRootPropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder)
+            => folder.getUserData(nativeFolderProperties(ceylonProject).root);
     
     getShortName(VirtualFile resource) => resource.name;
     
     isFolder(VirtualFile resource) => resource.directory;
     
     setPackagePropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder, WeakReference<Package> p) => 
-            folder.putUserData(nativeFolderProperties(ceylonProject).packageModel, p.get());
+            folder.putUserData(nativeFolderProperties(ceylonProject).packageModel, p);
     
     setRootIsSourceProperty(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile rootFolder, Boolean isSource) => 
             rootFolder.putUserData(nativeFolderProperties(ceylonProject).rootIsSource, isSource);
     
-    shared actual void setRootPropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder, WeakReference<FolderVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>> root) {
-        assert(is IdeaVirtualFolder r = root.get());
-        folder.putUserData(nativeFolderProperties(ceylonProject).root, r);
+    shared actual void setRootPropertyForNativeFolder(CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile> ceylonProject, VirtualFile folder, WeakReference<FolderVirtualFileAlias> root) {
+        folder.putUserData(nativeFolderProperties(ceylonProject).root, root);
     }
     
     shared actual String[] toPackageName(VirtualFile resource, VirtualFile sourceDir) {

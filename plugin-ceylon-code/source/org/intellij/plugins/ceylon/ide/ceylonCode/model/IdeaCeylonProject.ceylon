@@ -113,6 +113,9 @@ import java.lang {
     System,
     Thread
 }
+import java.lang.ref {
+    WeakReference
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
     ITypeCheckerInvoker
@@ -123,17 +126,14 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode.vfs {
-    IdeaVirtualFolder
-}
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
     variable Boolean languageModuleAdded = false;
     
     shared object nativeFolderProperties {
-        shared Key<Package> packageModel = Key<Package>("CeylonPlugin.nativeFolder_packageModel");
-        shared Key<IdeaVirtualFolder> root = Key<IdeaVirtualFolder>("CeylonPlugin.nativeFolder_root");
+        shared Key<WeakReference<Package>> packageModel = Key<WeakReference<Package>>("CeylonPlugin.nativeFolder_packageModel");
+        shared Key<WeakReference<FolderVirtualFileAlias>> root = Key<WeakReference<FolderVirtualFileAlias>>("CeylonPlugin.nativeFolder_root");
         shared Key<Boolean> rootIsSource = Key<Boolean>("CeylonPlugin.nativeFolder_rootIsSource");
     }
 
