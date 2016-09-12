@@ -95,7 +95,7 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             callback(project, editor, psiFile);
 
         } finally {
-            modelManager.resumeAutomaticModelUpdate(0);
+            modelManager.resumeAutomaticModelUpdate();
         }
                 
     }
