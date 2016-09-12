@@ -128,7 +128,8 @@ class CustomIntention(Integer position, String desc,
     TextRange? selection = null, Icon? image = null,
     Boolean qualifiedNameIsPath = false,
     [String,TextRange]? hint = null,
-    Anything callback(Project project, Editor editor, PsiFile psiFile) => noop())
+    Anything callback(Project project, Editor editor, PsiFile psiFile) => noop(),
+    Boolean affectsOtherUnits = false)
         extends BaseIntentionAction()
         satisfies Iconable & Comparable<IntentionAction> /*& HintAction*/ {
 
@@ -194,7 +195,11 @@ class CustomIntention(Integer position, String desc,
             }
             callback(project, editor, psiFile);
         } finally {
-            modelManager.resumeAutomaticModelUpdate(0);
+            if (affectsOtherUnits) {
+                modelManager.resumeAutomaticModelUpdate(0);
+            } else {
+                modelManager.resumeAutomaticModelUpdate();
+            }
         }
     }
     
@@ -253,9 +258,11 @@ shared class IdeaQuickFixData(
         <PlatformTextChange|Anything()>? change,
         TextRange? selection = null, Icon? image = null,
         Boolean qualifiedNameIsPath = false, String? hint = null,
-        Anything callback(Project project, Editor editor, PsiFile psiFile) => noop()) {
+        Anything callback(Project project, Editor editor, PsiFile psiFile) => noop(),
+        Boolean affectsOtherUnits = false) {
         
         if (exists annotation) {
+            // Register the quick fix in a list
             value intention
                 = CustomIntention {
                     position = annotation.quickFixes?.size() else 0;
@@ -266,9 +273,11 @@ shared class IdeaQuickFixData(
                     qualifiedNameIsPath = qualifiedNameIsPath;
                     callback = callback;
                     hint = if (exists hint) then [hint, textRange(annotation)] else null;
+                    affectsOtherUnits = affectsOtherUnits;
                 };
             annotation.registerFix(intention);
         } else {
+            // Apply the quick fix immediately
             try {
                 modelManager.pauseAutomaticModelUpdate();
 
@@ -286,7 +295,11 @@ shared class IdeaQuickFixData(
                     e.caretModel.moveToOffset(selection.endOffset);
                 }
             } finally {
-                modelManager.resumeAutomaticModelUpdate(0);
+                if (affectsOtherUnits) {
+                    modelManager.resumeAutomaticModelUpdate(0);
+                } else {
+                    modelManager.resumeAutomaticModelUpdate();
+                }
             }
         }
     }
@@ -304,7 +317,9 @@ shared class IdeaQuickFixData(
         PlatformTextChange|Anything() change,
         DefaultRegion? selection, Boolean qualifiedNameIsPath,
         Icons? icon, QuickFixKind kind, String? hint,
-        Boolean asynchronous, Referenceable|ModuleVersionDetails? declaration) {
+        Boolean asynchronous, Referenceable|ModuleVersionDetails? declaration,
+        Boolean affectsOtherUnits) {
+
         value range = toRange(selection);
 
         if (asynchronous) {
@@ -375,6 +390,7 @@ shared class IdeaQuickFixData(
                         null,
                         PerformInBackgroundOption.alwaysBackground);
                 }
+                affectsOtherUnits = affectsOtherUnits;
             };
         } else if (exists candidates = resolutions) {
             candidates.add(Resolution {
@@ -409,6 +425,7 @@ shared class IdeaQuickFixData(
                 image = icons.correction;
                 qualifiedNameIsPath = qualifiedNameIsPath;
                 hint = hint;
+                affectsOtherUnits = affectsOtherUnits;
             };
         }
     }

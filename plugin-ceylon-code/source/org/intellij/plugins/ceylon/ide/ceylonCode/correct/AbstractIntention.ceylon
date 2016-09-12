@@ -137,7 +137,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
                 ) {
                     shared actual void addQuickFix(String desc, PlatformTextChange|Anything() change,
                         DefaultRegion? selection, Boolean ignored, Icons? icon, QuickFixKind kind,
-                        String? hint, Boolean async, Referenceable|ModuleVersionDetails? declaration) {
+                        String? hint, Boolean async, Referenceable|ModuleVersionDetails? declaration,
+                        Boolean affectsOtherUnits) {
                         if (is IdeaTextChange|Anything() change) {
                             makeAvailable(outerProject, desc, change, selection);
                         }
@@ -145,7 +146,8 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
 
                     shared actual void registerFix(String desc, <PlatformTextChange|Anything()>? change,
                         TextRange? selection, Icon? image, Boolean qualifiedNameIsPath, String? hint,
-                        Anything callback(Project project, Editor editor, PsiFile psiFile)) {
+                        Anything callback(Project project, Editor editor, PsiFile psiFile),
+                        Boolean affectsOtherUnits) {
 
                         value sel = if (exists selection)
                                     then DefaultRegion(selection.startOffset, selection.length)
