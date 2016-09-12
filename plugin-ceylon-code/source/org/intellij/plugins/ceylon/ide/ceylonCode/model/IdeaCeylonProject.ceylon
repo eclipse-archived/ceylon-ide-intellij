@@ -16,7 +16,8 @@ import com.intellij.openapi.application {
     ApplicationManager {
         application
     },
-    ModalityState
+    ModalityState,
+    ApplicationInfo
 }
 import com.intellij.openapi.extensions {
     Extensions
@@ -148,6 +149,10 @@ shared class IdeaCeylonProject(ideArtifact, model)
         }
     }
 
+    value modality => ApplicationInfo.instance.build.baselineVersion >= 163
+    then ModalityState.current()
+    else ModalityState.any();
+
     object addModuleArchiveHook
             satisfies BuildHook<Module, VirtualFile, VirtualFile, VirtualFile> {
 
@@ -198,7 +203,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                     platformUtils.log(Status._ERROR, "Can't add required artifacts to classpath", e);
                 }
             });
-            application.invokeAndWait(runnable, ModalityState.current());
+            application.invokeAndWait(runnable, modality);
 
             dumbService(model.ideaProject).waitForSmartMode();
 
@@ -216,7 +221,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                             );
 
                             value sourcesRunnable = JavaRunnable(() => attachSources(artifacts));
-                            application.invokeAndWait(sourcesRunnable, ModalityState.current());
+                            application.invokeAndWait(sourcesRunnable, modality);
                         }
                 } , ProgressIndicatorBase());
             }
