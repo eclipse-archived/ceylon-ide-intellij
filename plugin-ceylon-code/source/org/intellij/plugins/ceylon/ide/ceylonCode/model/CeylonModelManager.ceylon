@@ -177,7 +177,7 @@ Anything() withOriginalModelUpdatePriority() {
     }
 }
 
-shared class CeylonModelManager(model)
+shared class CeylonModelManager(IdeaCeylonProjects model_)
         satisfies ProjectComponent
         & Disposable
         & VirtualFileListener
@@ -191,17 +191,19 @@ shared class CeylonModelManager(model)
     value pauseRequests = AtomicInteger();
     variable Integer? lastRequestedDelay = null;
     pauseRequests.set(0);
-
-    shared IdeaCeylonProjects model;
+    variable MessageBusConnection? busConnection = null;
+    
     shared Integer delayBeforeUpdatingAfterChange => ceylonSettings.autoUpdateInterval;
     shared Integer modelUpdateTimeoutMinutes => ceylonSettings.modelUpdateTimeoutMinutes;
     variable value automaticModelUpdateEnabled_ = true;
     variable value ideaProjectReady = false;
     variable Boolean cancelledBecauseOfSyntaxErrors = false;
     variable Boolean cancelledBecauseOfAPause = false;
-    late variable Alarm buildTriggeringAlarm;
+    variable Alarm? buildTriggeringAlarm = null;
     variable value busy_ = false;
+    variable Anything()? stopWaitingForModelUpdate = null;
 
+    shared IdeaCeylonProjects model => model_;
     shared Boolean busy => busy_;
     value lowerPriority {
         value lowerModelUpdatePriority = ceylonSettings.lowerModelUpdatePriority;
@@ -266,8 +268,6 @@ shared class CeylonModelManager(model)
         }
     }
 
-    late MessageBusConnection busConnection;
-    
     shared Boolean modelUpdateWasCannceledBecauseOfSyntaxErrors => cancelledBecauseOfSyntaxErrors;
     
     void scheduleSubmitChanges()
@@ -290,17 +290,101 @@ shared class CeylonModelManager(model)
 
     function delayToUse(Integer requestedDelay) => min({requestedDelay, if (exists theLastDelay = lastRequestedDelay) theLastDelay});
 
+    class ModelUpdateBackgroundTask(Ref<ProgressIndicator> buildProgressIndicator, CountDownLatch bakgroundBuildLatch) extends Backgroundable(
+        model.ideaProject,
+        "Ceylon model update",
+        true,
+        PerformInBackgroundOption.alwaysBackground) {
+        
+        shared actual void run(ProgressIndicator progressIndicator) {
+            value currentThread = Thread.currentThread();
+            value currentPriority = currentThread.priority;
+            modelUpdateOriginalPriority.set(currentPriority);
+            busy_ = true;
+            buildProgressIndicator.set(progressIndicator);
+            value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
+            value ticks = model.ceylonProjectNumber * 1000;
+            try (progress = monitor.Progress(ticks, "Updating Ceylon model")) {
+                if (lowerPriority) {
+                    currentThread.priority = currentPriority - (currentPriority  - Thread.minPriority) / 2;
+                }
+                
+                concurrencyManager.withUpToDateIndexes(() {
+                    for (ceylonProject in model
+                        .ceylonProjectsInTopologicalOrder.sequence()
+                            .reversed) {
+                        setTitle("Ceylon model update for module `` ceylonProject.name ``");
+                        ceylonProject.build.performBuild(progress.newChild(1000));
+                    }
+                });
+            } catch(Throwable t) {
+                if (is ProcessCanceledException t) {
+                    throw t;
+                } else {
+                    automaticModelUpdateEnabled = false;
+                    
+                    Notification(
+                        "Ceylon Model Update",
+                        "Ceylon model update failed",
+                        "The Ceylon model update triggered an unexpected exception: `` t `` that will be reported in the Event View.
+                               To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                               You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
+                        warning
+                    ).notify(model.ideaProject);
+                    throw t;
+                }
+            } finally {
+                currentThread.priority = currentPriority;
+                modelUpdateOriginalPriority.set(null);
+                busy_ = false;
+            }
+        }
+        onSuccess() => bakgroundBuildLatch.countDown();
+        onCancel() => bakgroundBuildLatch.countDown();
+    }
+
+    void runModelUpdate() {
+        value bakgroundBuildLatch = CountDownLatch(1);
+        value buildProgressIndicator = Ref<ProgressIndicator>();
+        stopWaitingForModelUpdate = () {
+            bakgroundBuildLatch.countDown();
+        };
+
+        try {
+            application.invokeAndWait(JavaRunnable {
+                run() => progressManager.run(ModelUpdateBackgroundTask(buildProgressIndicator, bakgroundBuildLatch));
+            }, ModalityState.any());
+            
+            if (! bakgroundBuildLatch.await(modelUpdateTimeoutMinutes, TimeUnit.minutes)) {
+                automaticModelUpdateEnabled_ = false;
+                try {
+                    buildProgressIndicator.get()?.cancel();
+                } catch(Exception e) {
+                    logger.warnThrowable(e, () => "Error when trying to cancel a timed-out model update");
+                }
+                Notification(
+                    "Ceylon Model Update",
+                    "Ceylon model update stalled",
+                    "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                     You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
+                    warning).notify(model.ideaProject);
+            }
+        } finally {
+            stopWaitingForModelUpdate = null;
+        }
+    }
+    
     shared void scheduleModelUpdate(Integer delay = delayBeforeUpdatingAfterChange, Boolean force = false) {
         if (ideaProjectReady &&
             (automaticModelUpdateEnabled_ || force)) {
             value plannedDelay = delayToUse(delay);
             lastRequestedDelay = plannedDelay;
-            buildTriggeringAlarm.cancelAllRequests();
-            buildTriggeringAlarm.addRequest(JavaRunnable {
+            buildTriggeringAlarm?.cancelAllRequests();
+            buildTriggeringAlarm?.addRequest(JavaRunnable {
                 void run() {
                     cancelledBecauseOfSyntaxErrors = false;
                     cancelledBecauseOfAPause = false;
-                    buildTriggeringAlarm.cancelAllRequests();
+                    buildTriggeringAlarm?.cancelAllRequests();
                     
                     void resetLastRequestedDelay() {
                         if (exists theLastDelay = lastRequestedDelay,
@@ -403,76 +487,9 @@ shared class CeylonModelManager(model)
                     
                     resetLastRequestedDelay();                            
                     DumbService.getInstance(model.ideaProject).waitForSmartMode();
-                    value bakgroundBuildLatch = CountDownLatch(1);
-                    value buildProgressIndicator = Ref<ProgressIndicator>();
-                    application.invokeAndWait(JavaRunnable {
-                        run() => progressManager.run(object extends Backgroundable(
-                            model.ideaProject,
-                            "Ceylon model update",
-                            true,
-                            PerformInBackgroundOption.alwaysBackground) {
-                            
-                            shared actual void run(ProgressIndicator progressIndicator) {
-                                value currentThread = Thread.currentThread();
-                                value currentPriority = currentThread.priority;
-                                modelUpdateOriginalPriority.set(currentPriority);
-                                busy_ = true;
-                                buildProgressIndicator.set(progressIndicator);
-                                value monitor = ProgressIndicatorMonitor.wrap(progressIndicator);
-                                value ticks = model.ceylonProjectNumber * 1000;
-                                try (progress = monitor.Progress(ticks, "Updating Ceylon model")) {
-                                    if (lowerPriority) {
-                                        currentThread.priority = currentPriority - (currentPriority  - Thread.minPriority) / 2;
-                                    }
-
-                                    concurrencyManager.withUpToDateIndexes(() {
-                                        for (ceylonProject in model
-                                                .ceylonProjectsInTopologicalOrder.sequence()
-                                                .reversed) {
-                                            setTitle("Ceylon model update for module `` ceylonProject.name ``");
-                                            ceylonProject.build.performBuild(progress.newChild(1000));
-                                        }
-                                    });
-                                } catch(Throwable t) {
-                                    if (is ProcessCanceledException t) {
-                                        throw t;
-                                    } else {
-                                        automaticModelUpdateEnabled = false;
-
-                                        Notification(
-                                            "Ceylon Model Update",
-                                            "Ceylon model update failed",
-                                            "The Ceylon model update triggered an unexpected exception: `` t `` that will be reported in the Event View.
-                                                   To avoid performance issues the automatic update of the Ceylon model has been disabled.
-                                                   You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                                            warning
-                                        ).notify(model.ideaProject);
-                                        throw t;
-                                    }
-                                } finally {
-                                    currentThread.priority = currentPriority;
-                                    modelUpdateOriginalPriority.set(null);
-                                    busy_ = false;
-                                }
-                            }
-                            onSuccess() => bakgroundBuildLatch.countDown();
-                            onCancel() => bakgroundBuildLatch.countDown();
-                        });
-                    }, ModalityState.any());
-                    if (! bakgroundBuildLatch.await(modelUpdateTimeoutMinutes, TimeUnit.minutes)) {
-                        automaticModelUpdateEnabled_ = false;
-                        try {
-                            buildProgressIndicator.get()?.cancel();
-                        } catch(Exception e) {
-                            logger.warnThrowable(e, () => "Error when trying to cancel a timed-out model update");
-                        }
-                        Notification(
-                            "Ceylon Model Update",
-                            "Ceylon model update stalled",
-                            "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
-                             You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                            warning).notify(model.ideaProject);
-                    }
+                   
+                    runModelUpdate();
+                    
                 }
             }, plannedDelay);
         }
@@ -502,18 +519,25 @@ shared class CeylonModelManager(model)
     
     shared actual void disposeComponent() {
         dispose();
-        busConnection.disconnect();
+        busConnection?.disconnect();
+        busConnection = null;
         VirtualFileManager.instance.removeVirtualFileListener(this);
         model.removeModelListener(this);
         submitChangesFuture?.cancel(true);
+        submitChangesFuture = null; 
+        buildTriggeringAlarm = null;
+        if (exists reallyStop = stopWaitingForModelUpdate) {
+            reallyStop();
+        }
     }
     
     shared actual void initComponent() {
         buildTriggeringAlarm = Alarm(Alarm.ThreadToUse.pooledThread, this);
-        busConnection = model.ideaProject.messageBus.connect();
-        busConnection.subscribe(fileEditorManagerTopic, this);
-        busConnection.subscribe(psiDocumentTransactionTopic, this);
-        busConnection.subscribe(buildManagerTopic, this);
+        value theBusConnection = model.ideaProject.messageBus.connect();
+        busConnection = theBusConnection;
+        theBusConnection.subscribe(fileEditorManagerTopic, this);
+        theBusConnection.subscribe(psiDocumentTransactionTopic, this);
+        theBusConnection.subscribe(buildManagerTopic, this);
         VirtualFileManager.instance.addVirtualFileListener(this);
         model.addModelListener(this);
     }
