@@ -142,7 +142,7 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
                                         }
                                     };
                                 }
-                                root.putUserData(parserConstants._POST_PARSE_ACTION, postParseAction);
+                                root.putUserData(parserConstants.postParseAction, postParseAction);
                                 return root;
                             }
                         }
@@ -176,7 +176,7 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
             if (exists localAnalyzer) {
                 if (! CompletionInitializationContext.dummyIdentifierTrimmed in file.text) {
                     assert(exists lastCommittedDocument);
-                    root.putUserData(parserConstants._POST_PARSE_ACTION, void () {
+                    root.putUserData(parserConstants.postParseAction, void () {
                         localAnalyzer.parsedProjectSource(
                             lastCommittedDocument,
                             parseResult.compilationUnit,

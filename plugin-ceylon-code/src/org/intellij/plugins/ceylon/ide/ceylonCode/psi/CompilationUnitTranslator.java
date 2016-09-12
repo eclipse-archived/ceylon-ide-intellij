@@ -99,7 +99,7 @@ public class CompilationUnitTranslator extends Visitor {
                 parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), token));
             }
 
-            if (verbose && !parserConstants_.get_().get_NODES_ALLOWED_AT_EOF().contains(token.getType())) {
+            if (verbose && !parserConstants_.get_().getNodesAllowedAtEof().contains(token.getType())) {
                 LOGGER.error("Unexpected token " + token + " in " + file.getName());
             }
         }
@@ -181,7 +181,7 @@ public class CompilationUnitTranslator extends Visitor {
                 parent = new CompositeElement(type);
                 oldParent.rawAddChildrenWithoutNotifications(parent);
             }
-            parent.putUserData(parserConstants_.get_().get_CEYLON_NODE_KEY(), that);
+            parent.putUserData(parserConstants_.get_().getCeylonNodeKey(), that);
 
             for (Node child : visitor.getChildren()) {
                 visitAny(child);
@@ -217,11 +217,11 @@ public class CompilationUnitTranslator extends Visitor {
                     throw new UnsupportedOperationException("Unsupported token type " + token);
             }
         }
-        if (parserConstants_.get_().get_LEAVES_TO_WRAP().contains(type)) {
+        if (parserConstants_.get_().getLeavesToWrap().contains(type)) {
             CompositeElement comp = new CompositeElement(type);
             LeafPsiElement leaf = new LeafPsiElement(TokenTypes.fromInt(token.getType()), tokenText);
             comp.rawAddChildrenWithoutNotifications(leaf);
-            comp.putUserData(parserConstants_.get_().get_CEYLON_NODE_KEY(), ceylonNode);
+            comp.putUserData(parserConstants_.get_().getCeylonNodeKey(), ceylonNode);
             return comp;
         } else if (type == TokenType.WHITE_SPACE || token.getType() == CeylonLexer.WS) {
             return new PsiWhiteSpaceImpl(tokenText);

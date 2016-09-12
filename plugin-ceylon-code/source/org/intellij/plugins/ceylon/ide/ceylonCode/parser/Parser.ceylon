@@ -63,9 +63,9 @@ shared class CeylonParserDefinition() satisfies ParserDefinition {
         } else {
             value elem = CeylonPsiFactory.createElement(node);
             if (is CeylonPsi.CompilationUnitPsi elem,
-                exists postParseAction = node.getUserData(parserConstants._POST_PARSE_ACTION)) {
+                exists postParseAction = node.getUserData(parserConstants.postParseAction)) {
                 postParseAction();
-                node.putUserData(parserConstants._POST_PARSE_ACTION, null);
+                node.putUserData(parserConstants.postParseAction, null);
             }
             return elem;
         }
