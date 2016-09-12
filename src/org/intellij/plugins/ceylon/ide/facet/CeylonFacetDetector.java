@@ -3,10 +3,13 @@ package org.intellij.plugins.ceylon.ide.facet;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
+import com.intellij.ide.projectView.actions.MarkRootActionBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.util.indexing.FileContent;
@@ -19,8 +22,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
-import org.intellij.plugins.ceylon.ide.project.CeylonModuleBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.jps.model.java.JavaResourceRootType;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,6 +71,19 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
                 }
                 File outputDirectory = new File(project.getRootDirectory(), outputRepo);
                 setCompilerOutput(model, outputDirectory);
+
+                String[] resources = config.getOptionValues(DefaultToolOptions.COMPILER_RESOURCE);
+                if (resources != null) {
+                    for (String res : resources) {
+                        File resourceFile = new File(res);
+                        if (!resourceFile.isAbsolute()) {
+                            resourceFile = new File(project.getRootDirectory(), res);
+                        }
+                        addResourceRoot(model, resourceFile);
+                    }
+                } else {
+                    addResourceRoot(model, new File(project.getRootDirectory(), "resource"));
+                }
             }
         } catch (IOException | ConfigurationException e) {
             e.printStackTrace();
@@ -82,6 +98,18 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
         TypeCheckerProvider tcp = (TypeCheckerProvider) facet.getModule().getComponent(ITypeCheckerProvider.class);
         if (tcp != null) {
             tcp.moduleAdded();
+        }
+    }
+
+    private void addResourceRoot(ModifiableRootModel model, File resourceDir) {
+        if (resourceDir.exists()) {
+            VirtualFile vFile = VfsUtil.findFileByIoFile(resourceDir, false);
+            if (vFile != null) {
+                ContentEntry contentEntry = MarkRootActionBase.findContentEntry(model, vFile);
+                if (contentEntry != null) {
+                    contentEntry.addSourceFolder(vFile, JavaResourceRootType.RESOURCE);
+                }
+            }
         }
     }
 }
