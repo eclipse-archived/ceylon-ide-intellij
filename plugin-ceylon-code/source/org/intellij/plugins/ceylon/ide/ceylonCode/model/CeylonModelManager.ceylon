@@ -547,7 +547,7 @@ shared class CeylonModelManager(model)
         }
     }
     
-    shared void notifyFileContenChange(VirtualFile file) {
+    shared void notifyFileContentChange(VirtualFile file) {
         if (! isProjectOrWorkspaceFile(file)) {
             notifyChanges { NativeFileContentChange(file) };
         }
@@ -561,7 +561,7 @@ shared class CeylonModelManager(model)
             projectRootManager(model.ideaProject).fileIndex.isInContent(virtualFile) &&
             ! projectRootManager(model.ideaProject).fileIndex.isExcluded(virtualFile) &&
             ! fileDocumentManager.getCachedDocument(virtualFile) exists) {
-            notifyFileContenChange(virtualFile);
+            notifyFileContentChange(virtualFile);
         }
     }
     
@@ -609,7 +609,7 @@ shared class CeylonModelManager(model)
     shared actual void transactionCompleted(Document document, PsiFile file) {
         value virtualFile = file.virtualFile;
         if (! file.directory) {
-            notifyFileContenChange(virtualFile);
+            notifyFileContentChange(virtualFile);
         }
     }
     

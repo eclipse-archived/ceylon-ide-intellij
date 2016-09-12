@@ -137,7 +137,7 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
                         fileDocumentManager.saveDocument(document);
                         for (project in ProjectManager.instance.openProjects) {
                             if (exists modelManager = project.getComponent(javaClass<CeylonModelManager>())) {
-                                modelManager.notifyFileContenChange(resource);
+                                modelManager.notifyFileContentChange(resource);
                             }
                         }
                     }));
