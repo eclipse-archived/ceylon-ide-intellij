@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.runner;
 
+import com.intellij.application.options.ModulesComboBox;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
@@ -17,6 +18,7 @@ public class CeylonRunConfigurationEditor extends SettingsEditor<CeylonRunConfig
     private JPanel myPanel;
     private RawCommandLineEditor myArguments;
     private RawCommandLineEditor myVmOptions;
+    private ModulesComboBox myIdeModule;
 
     public CeylonRunConfigurationEditor(Project project) {
 //        myFileName.addBrowseFolderListener("Choose .ceylon file", "Please choose the path to the Ceylon file to run",
@@ -30,6 +32,8 @@ public class CeylonRunConfigurationEditor extends SettingsEditor<CeylonRunConfig
         myCeylonModule.setText(config.getCeylonModule());
         myArguments.setText(config.getArguments());
         myVmOptions.setText(config.getVmOptions());
+        myIdeModule.setModules(config.getValidModules());
+        myIdeModule.setSelectedModule(config.getConfigurationModule().getModule());
     }
 
     @Override
@@ -38,6 +42,7 @@ public class CeylonRunConfigurationEditor extends SettingsEditor<CeylonRunConfig
         s.setCeylonModule(myCeylonModule.getText());
         s.setArguments(myArguments.getText());
         s.setVmOptions(myVmOptions.getText());
+        s.getConfigurationModule().setModule(myIdeModule.getSelectedModule());
     }
 
     @NotNull

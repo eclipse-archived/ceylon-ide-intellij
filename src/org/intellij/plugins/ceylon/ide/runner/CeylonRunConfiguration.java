@@ -7,7 +7,6 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.CompilerProjectExtension;
@@ -26,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 
 import static org.intellij.plugins.ceylon.ide.ceylonCode.model.findModuleByName_.findModuleByName;
 
@@ -82,10 +80,7 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
                 params.getClassPath().add(getBootstrapJarPath());
                 params.getProgramParametersList().add(backend == Backend.JavaScript ? "run-js" : "run");
                 params.getProgramParametersList().add("--run", topLevelNameFull);
-                final Iterable<String> outputPaths = getOutputPaths(CeylonRunConfiguration.this.getProject());
-                for (String outputPath : outputPaths) {
-                    params.getProgramParametersList().add("--rep", outputPath);
-                }
+                params.getProgramParametersList().add("--rep", getOutputPath());
                 params.getProgramParametersList().add(getCeylonModuleOrDft());
                 params.getProgramParametersList().addParametersString(getArguments());
 
@@ -103,12 +98,6 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         };
     }
 
-/*
-    public static File getPluginDir() {
-        return PluginManager.getPlugin(PluginId.getId("org.intellij.plugins.ceylon")).getPath();
-    }
-*/
-
     @Override
     public void readExternal(Element element) throws InvalidDataException {
         super.readExternal(element);
@@ -118,6 +107,7 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         setBackend(Backend.fromAnnotation(element.getAttributeValue("backend")));
         setArguments(element.getAttributeValue("arguments"));
         setVmOptions(element.getAttributeValue("vm-options"));
+        readModule(element);
     }
 
     @Override
@@ -129,22 +119,24 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         element.setAttribute("backend", (String) ObjectUtils.defaultIfNull(getBackend().nativeAnnotation, ""));
         element.setAttribute("arguments", (String) ObjectUtils.defaultIfNull(getArguments(), ""));
         element.setAttribute("vm-options", (String) ObjectUtils.defaultIfNull(getVmOptions(), ""));
+        writeModule(element);
     }
 
-    private static Iterable<String> getOutputPaths(Project project) {
-        final Collection<String> paths = new LinkedHashSet<>();
-        final CompilerProjectExtension cpe = CompilerProjectExtension.getInstance(project);
-        if (cpe != null && cpe.getCompilerOutput() != null) {
-            paths.add(cpe.getCompilerOutput().getCanonicalPath());
-        }
-        final Module[] modules = ModuleManager.getInstance(project).getModules();
-        for (Module module : modules) {
-            final CompilerModuleExtension cme = CompilerModuleExtension.getInstance(module);
-            if (cme != null&& cme.getCompilerOutputPath() != null) {
-                paths.add(cme.getCompilerOutputPath().getCanonicalPath());
+    private String getOutputPath() {
+        Module module = getConfigurationModule().getModule();
+        if (module != null) {
+            CompilerModuleExtension cme = CompilerModuleExtension.getInstance(module);
+            if (cme != null && cme.getCompilerOutputUrl() != null) {
+                return cme.getCompilerOutputUrl();
             }
         }
-        return paths;
+
+        CompilerProjectExtension cpe = CompilerProjectExtension.getInstance(getProject());
+        if (cpe != null && cpe.getCompilerOutput() != null) {
+            return cpe.getCompilerOutput().getCanonicalPath();
+        }
+
+        return null;
     }
 
     private Sdk getProjectSdk() {
