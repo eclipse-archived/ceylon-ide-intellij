@@ -290,8 +290,13 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 description = description;
                 text = text;
                 icon
-                    = if (is Declaration icon)
-                    then icons.forDeclaration(icon)
+                    = switch (icon)
+                    case (is Declaration) icons.forDeclaration(icon)
+                    case (Icons.modules) icons.moduleDescriptors
+                    case (Icons.packages) icons.packageDescriptors
+                    case (Icons.correction) icons.correction
+                    case (Icons.localAttribute) icons.local
+                    case (Icons.ceylonLiteral) null //todo: keyword proposal!
                     else null;
             }
             .withInsertHandler(CompletionHandler((context) {
