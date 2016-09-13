@@ -27,6 +27,12 @@ shared object ideaPlatformUtils satisfies IdeUtils {
     value logger = Logger.getInstance("ideaPlatformUtils");
     
     shared actual void log(Status status, String message, Exception? e) {
+        if (is ProcessCanceledException e) {
+            // to avoid "Control-flow exceptions (like Xyz) should never be logged"
+            log(status, "``message`` (``className(e)``)");
+            return;
+        }
+
         switch (status)
         case (Status._OK) {
             logger.debug(message, e);
