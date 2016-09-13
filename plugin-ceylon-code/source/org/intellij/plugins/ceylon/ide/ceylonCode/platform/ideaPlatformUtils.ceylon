@@ -29,7 +29,7 @@ shared object ideaPlatformUtils satisfies IdeUtils {
     shared actual void log(Status status, String message, Exception? e) {
         if (is ProcessCanceledException e) {
             // to avoid "Control-flow exceptions (like Xyz) should never be logged"
-            log(status, "``message`` (``className(e)``)");
+            log(status, "``message`` (``e.string``)");
             return;
         }
 
