@@ -41,7 +41,8 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
     @Override
     public PsiElement getNameIdentifier() {
         CeylonPsi.BaseMemberExpressionPsi baseExpr;
-        CeylonPsi.ParameterizedExpressionPsi pExpr = findChildByClass(CeylonPsi.ParameterizedExpressionPsi.class);
+        CeylonPsi.ParameterizedExpressionPsi pExpr
+                = findChildByClass(CeylonPsi.ParameterizedExpressionPsi.class);
 
         if (pExpr != null) {
             baseExpr = findChildOfType(pExpr, CeylonPsi.BaseMemberExpressionPsi.class);
