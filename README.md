@@ -1,36 +1,28 @@
 Ceylon IDE for IntelliJ [![Join the chat at https://gitter.im/ceylon/ceylon-ide-intellij](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ceylon/ceylon-ide-intellij) [![Build Status](https://ci-ceylon.rhcloud.com/buildStatus/icon?job=ceylon.formatter)](https://ci-ceylon.rhcloud.com/job/ceylon.formatter)
 =======================
 
-This project is an IntelliJ IDEA-based IDE for the Ceylon programming language. It's not yet released,
-but it's already very usable.
+This project is an IntelliJ IDEA-based IDE for the [Ceylon programming language](http://ceylon-lang.org).
 
 # Requirements
 
-This plugin is being written using IntelliJ 2016.1. It will work on both Community and Ultimate editions.
+This plugin is developed against IntelliJ IDEA 2016.2. It works with both Community and Ultimate editions.
 
-We have a [dedicated branch](https://github.com/ceylon/ceylon-ide-intellij/tree/141.x-compat) for
-older versions of IntelliJ (IDEA 14 *and* Android Studio 1.5.1 which is based on IntelliJ 14.1).
-Please note that these older versions of the IntelliJ platform have slightly different APIs, which
-means a few things may not work as expected. In particular, they contain
-[a bug that is critical](https://youtrack.jetbrains.com/issue/IDEA-132606) to the correct loading of
-Ceylon classes, which has been fixed in IntelliJ 2016.1. We'll try to backport a fix on this branch
-for better user experience.
-
-We embed a full Ceylon distribution in the plugin, so you won't necessarily have to download Ceylon
-separately. You may need a local repository though.
+The plugin includes a full embedded distribution of Ceylon, so you don't necessarily have to download 
+and install Ceylon separately.
 
 # Installation
 
-For the moment, we do not provide an official release package in the JetBrains plugins repository,
-since it is still under development. However, installable archives of the current development version
-are generated and made available in an alternate plugin repository, on a regular basis (see below).
-You can either install the Ceylon IDE for IntelliJ from there, or build it from sources.
+Release packages are made available in the JetBrains plugins repository. Installable archives of 
+the current development version are generated and made available in an alternate plugin repository, 
+on a regular basis (see below). 
+
+You can install Ceylon IDE for IntelliJ from a repository, or build it from source.
 
 ## Common prerequisites
 
 The following software must be installed:
 
-- [IntelliJ 2016.1](http://www.jetbrains.com/idea/download/) Community or Ultimate
+- [IntelliJ IDEA 2016.2](http://www.jetbrains.com/idea/download/) Community or Ultimate
 - [JDK 7 or 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 ## Install from the Development plugin repository
