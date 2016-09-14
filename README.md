@@ -5,7 +5,8 @@ This project is an IntelliJ IDEA-based IDE for the [Ceylon programming language]
 
 # Requirements
 
-This plugin is developed against IntelliJ IDEA 2016.2. It works with both Community and Ultimate editions.
+This plugin is developed against IntelliJ IDEA 2016.2. It works with both Community and Ultimate editions,
+and also supports Android Studio.
 
 The plugin includes a full embedded distribution of Ceylon, so you don't necessarily have to download 
 and install Ceylon separately.
