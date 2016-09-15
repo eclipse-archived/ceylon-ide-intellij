@@ -150,6 +150,12 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                         => context.editor.caretModel
                         .moveToOffset(context.tailOffset - 3))));
             }
+            else if (val.endsWith("{}")) {
+                proposals.add(lookup.withInsertHandler(
+                    CompletionHandler((context)
+                    => context.editor.caretModel
+                        .moveToOffset(context.tailOffset - 1))));
+            }
             else {
                 proposals.add(lookup);
             }
