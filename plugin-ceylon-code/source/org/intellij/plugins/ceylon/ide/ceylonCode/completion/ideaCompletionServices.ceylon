@@ -103,13 +103,12 @@ shared object ideaCompletionServices satisfies CompletionServices {
     shared actual void newRefinementCompletionProposal(Integer offset, String prefix,
         Reference? pr, String desc, String text, CompletionContext ctx,
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType) {
-        
-        assert (exists pr);
+
         if (is IdeaCompletionContext ctx) {
             ctx.proposals.add(IdeaRefinementCompletionProposal {
                 offset = offset;
                 prefix = prefix;
-                pr = pr;
+                pr = pr else dec.reference;
                 desc = desc;
                 text = text;
                 ctx = ctx;
