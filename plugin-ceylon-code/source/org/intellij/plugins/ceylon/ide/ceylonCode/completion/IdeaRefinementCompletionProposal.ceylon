@@ -41,7 +41,9 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
                 description = desc;
                 text = text;
                 declaration = dec;
-                icon = dec.formal then icons.refinement else icons.extendedType;
+                icon = if (explicitReturnType) //only true for "real" refinements
+                    then (dec.formal then icons.refinement else icons.extendedType)
+                    else icons.param; //named argument
             }
             .withInsertHandler(
                 //use a new class here since LookupElement's equals() method depends on it
