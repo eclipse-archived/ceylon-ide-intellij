@@ -31,7 +31,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference pr,
         String desc, String text, IdeaCompletionContext ctx, Declaration dec, Scope scope,
-        Boolean fullType, Boolean explicitReturnType)
+        Boolean fullType, Boolean explicitReturnType, String? returnType)
         extends RefinementCompletionProposal
         (offset, prefix, pr, desc, text, ctx, dec, scope, fullType, explicitReturnType) 
         satisfies IdeaCompletionProposal {
@@ -68,7 +68,8 @@ class IdeaRefinementCompletionProposal(Integer offset, String prefix, Reference 
 
                 adjustSelection(ctx);
                 enterLinkedMode(doc);
-            }){});
+            }){})
+            .withTypeText(returnType);
     
     shared actual void newNestedCompletionProposal(ProposalsHolder proposals,
         Declaration dec, Integer loc) {

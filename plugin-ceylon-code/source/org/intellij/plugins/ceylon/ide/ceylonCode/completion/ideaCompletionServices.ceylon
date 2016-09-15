@@ -45,7 +45,9 @@ import com.redhat.ceylon.model.typechecker.model {
     Unit,
     Scope,
     Reference,
-    DeclarationWithProximity
+    DeclarationWithProximity,
+    NamedArgumentList,
+    Functional
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.compiled {
@@ -105,10 +107,11 @@ shared object ideaCompletionServices satisfies CompletionServices {
         Declaration dec, Scope scope, Boolean fullType, Boolean explicitReturnType) {
 
         if (is IdeaCompletionContext ctx) {
+            value reference = pr else dec.reference;
             ctx.proposals.add(IdeaRefinementCompletionProposal {
                 offset = offset;
                 prefix = prefix;
-                pr = pr else dec.reference;
+                pr = reference;
                 desc = desc;
                 text = text;
                 ctx = ctx;
@@ -116,6 +119,19 @@ shared object ideaCompletionServices satisfies CompletionServices {
                 scope = scope;
                 fullType = fullType;
                 explicitReturnType = explicitReturnType;
+                value returnType {
+                    if (scope is NamedArgumentList) {
+                        if (is Functional dec, dec.declaredVoid) {
+                            //a void named argument
+                            return null;
+                        }
+                        return (fullType then reference.fullType else reference.type)?.asString();
+                    }
+                    else {
+                        //a regular refinement
+                        return null;
+                    }
+                }
             }.lookupElement);
         }
     }
