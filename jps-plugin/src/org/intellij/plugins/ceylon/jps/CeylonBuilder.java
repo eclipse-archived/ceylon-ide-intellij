@@ -5,9 +5,6 @@ import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathUtil;
 import com.intellij.util.containers.ContainerUtil;
-import com.redhat.ceylon.common.config.CeylonConfig;
-import com.redhat.ceylon.common.config.CeylonConfigFinder;
-import com.redhat.ceylon.common.config.Repositories;
 import com.redhat.ceylon.compiler.java.runtime.tools.*;
 import com.redhat.ceylon.compiler.java.runtime.tools.Compiler;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +31,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static com.redhat.ceylon.common.config.DefaultToolOptions.*;
 import static com.redhat.ceylon.common.tools.ModuleWildcardsHelper.expandWildcards;
 import static java.nio.file.Files.readAllLines;
 import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isForcedRecompilationAllJavaModules;
@@ -242,13 +238,6 @@ class CeylonBuilder extends ModuleLevelBuilder {
         options.setSourcePath(srcPath);
         options.setResourcePath(resourcePath);
 
-        File outputDir = chunk.representativeTarget().getOutputDir();
-        if (outputDir != null) {
-            options.setOutputRepository(outputDir.getAbsolutePath());
-        } else {
-            throw new IllegalArgumentException("Can't detect compiler output path");
-        }
-
         if (StringUtil.isNotEmpty(facet.getProperties().getSystemRepository())) {
             options.setSystemRepository(facet.getProperties().getSystemRepository());
         } else {
@@ -259,29 +248,6 @@ class CeylonBuilder extends ModuleLevelBuilder {
         JpsModuleSourceRoot root = chunk.representativeTarget().getModule().getSourceRoots().get(0);
         if (root != null) {
             options.setWorkingDirectory(root.getFile().getParentFile().getAbsolutePath());
-
-            try {
-                CeylonConfig ceylonConfig = CeylonConfigFinder.loadLocalConfig(root.getFile());
-                Repositories repositories = Repositories.withConfig(ceylonConfig);
-
-                for (Repositories.Repository[] repo : repositories.getRepositories().values()) {
-                    if (repo != null) {
-                        for (Repositories.Repository r : repo) {
-                            options.addUserRepository(r.getUrl());
-                        }
-                    }
-                }
-
-                options.setOffline(getDefaultOffline(ceylonConfig));
-
-                if (options instanceof JavaCompilerOptions) {
-                    JavaCompilerOptions javaOptions = (JavaCompilerOptions) options;
-                    javaOptions.setFlatClasspath(getDefaultFlatClasspath(ceylonConfig));
-                    javaOptions.setAutoExportMavenDependencies(getDefaultAutoExportMavenDependencies(ceylonConfig));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         // Only the Java backend can do incremental builds
