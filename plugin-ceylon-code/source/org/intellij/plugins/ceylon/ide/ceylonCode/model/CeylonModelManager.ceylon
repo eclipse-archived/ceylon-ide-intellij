@@ -457,8 +457,12 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                                         exists modelPhasedUnit = ceylonProject.getParsedUnit(projectFile)) {
                                         
                                         try {
-                                            value deltas = deltaBuilderFactory.buildDeltas(
-                                                modelPhasedUnit, lastPhasedUnit);
+                                            value deltas = concurrencyManager.withAlternateResolution(() =>
+                                                deltaBuilderFactory.buildDeltas {
+                                                    referencePhasedUnit = modelPhasedUnit;
+                                                    changedPhasedUnit = lastPhasedUnit;
+                                                }
+                                            );
                                             if (deltas.changes.empty && 
                                                 deltas.childrenDeltas.empty) {
                                                 shouldCancel = true;
