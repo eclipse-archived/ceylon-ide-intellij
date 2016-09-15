@@ -15,7 +15,12 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.common.Backend;
+import com.redhat.ceylon.common.config.CeylonConfig;
+import com.redhat.ceylon.common.config.CeylonConfigFinder;
+import com.redhat.ceylon.common.config.DefaultToolOptions;
 import org.apache.commons.lang.ObjectUtils;
 import org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin;
 import org.jdom.Element;
@@ -26,6 +31,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static com.intellij.openapi.vfs.VfsUtilCore.virtualToIoFile;
+import static com.redhat.ceylon.common.config.CeylonConfigFinder.loadDefaultConfig;
+import static com.redhat.ceylon.common.config.DefaultToolOptions.getCompilerOutputRepo;
 import static org.intellij.plugins.ceylon.ide.ceylonCode.model.findModuleByName_.findModuleByName;
 
 /**
@@ -79,12 +87,17 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
                 params.setMainClass("com.redhat.ceylon.launcher.Bootstrap");
                 params.getClassPath().add(getBootstrapJarPath());
                 params.getProgramParametersList().add(backend == Backend.JavaScript ? "run-js" : "run");
+
+                Module module = getConfigurationModule().getModule();
+                if (module != null) {
+                    VirtualFile moduleRoot = module.getModuleFile().getParent();
+                    params.setWorkingDirectory(moduleRoot.getPath());
+                }
+
                 params.getProgramParametersList().add("--run", topLevelNameFull);
-                params.getProgramParametersList().add("--rep", getOutputPath());
                 params.getProgramParametersList().add(getCeylonModuleOrDft());
                 params.getProgramParametersList().addParametersString(getArguments());
 
-                params.setWorkingDirectory(getProject().getBasePath()); // todo: make settable
                 return params;
             }
 
@@ -120,23 +133,6 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
         element.setAttribute("arguments", (String) ObjectUtils.defaultIfNull(getArguments(), ""));
         element.setAttribute("vm-options", (String) ObjectUtils.defaultIfNull(getVmOptions(), ""));
         writeModule(element);
-    }
-
-    private String getOutputPath() {
-        Module module = getConfigurationModule().getModule();
-        if (module != null) {
-            CompilerModuleExtension cme = CompilerModuleExtension.getInstance(module);
-            if (cme != null && cme.getCompilerOutputUrl() != null) {
-                return cme.getCompilerOutputUrl();
-            }
-        }
-
-        CompilerProjectExtension cpe = CompilerProjectExtension.getInstance(getProject());
-        if (cpe != null && cpe.getCompilerOutput() != null) {
-            return cpe.getCompilerOutput().getCanonicalPath();
-        }
-
-        return null;
     }
 
     private Sdk getProjectSdk() {
