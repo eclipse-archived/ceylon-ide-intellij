@@ -210,7 +210,8 @@ shared class CeylonParameterInfoHandler()
                         highlightOffsetStart = builder.size;
                         highlightOffsetEnd = builder.size + paramLabel.size;
                     }
-                    builder.append(paramLabel).append(", ");
+                    builder.append(paramLabel)
+                           .append(", ");
                     i ++;
                 }
                 builder.deleteTerminal(2);
@@ -246,11 +247,12 @@ shared class CeylonParameterInfoHandler()
         if (exists type = param.type) {
             value paramType
                     = if (exists ref)
-                    then ref.getTypedParameter(param).fullType
+                    then ref.getTypedParameter(param).type
                     else type;
             if (param.sequenced) {
                 value elementType = unit.getSequentialElementType(paramType);
-                builder.append(printer.print(elementType, unit)).append("*");
+                builder.append(printer.print(elementType, unit))
+                       .append("*");
             } else {
                 builder.append(printer.print(paramType, unit));
             }
@@ -261,11 +263,11 @@ shared class CeylonParameterInfoHandler()
         if (is Function model = param.model) {
             builder.append("(");
             for (parameter in model.firstParameterList.parameters) {
-                builder.append(getParameterLabel(parameter, unit, ref));
-                builder.append(", ");
+                builder.append(getParameterLabel(parameter, unit, ref))
+                       .append(", ");
             }
-            builder.deleteTerminal(2);
-            builder.append(")");
+            builder.deleteTerminal(2)
+                   .append(")");
         }
 
         if (param.defaulted) {
