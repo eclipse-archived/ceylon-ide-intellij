@@ -91,21 +91,32 @@ Fragment createFragment(String text, SimpleTextAttributes atts)
 shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         extends LookupCellRenderer(lookup) {
 
-    function brighter(SimpleTextAttributes textAttributes)
-            => let (fg = textAttributes.fgColor)
-                SimpleTextAttributes(
-                    textAttributes.bgColor,
-                    fg.red+fg.green+fg.blue>=384
+    function brightness(Color color) => color.red + color.green + color.blue;
+    value midBrightness = #80 * 3;
+
+    function brighter(SimpleTextAttributes textAttributes, Color background) {
+        return let (fg = textAttributes.fgColor,
+                    bg = textAttributes.bgColor else background)
+                SimpleTextAttributes(bg,
+                    switch (brightness(bg) <=> midBrightness)
+                    //light background:
+                    case (larger)
+                        if (brightness(fg) >= midBrightness)
                         then fg.darker().darker()
-                        else fg.brighter().brighter(),
+                        else fg.brighter().brighter()
+                    //dark background:
+                    case (smaller)
+                        fg.brighter()
+                    else Color.magenta,
                     textAttributes.waveColor,
                     textAttributes.style);
+    }
 
     value searchMatch
             = SimpleTextAttributes(SimpleTextAttributes.styleSearchMatch, Color.black);
 
-    function highlighted(Fragment fragment, Boolean selected)
-            => selected then searchMatch else brighter(fragment.attributes);
+    function highlighted(Fragment fragment, Boolean selected, Color background)
+            => selected then searchMatch else brighter(fragment.attributes, background);
 
     shared void install()
             => ApplicationManager.application
@@ -230,6 +241,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 then let (it = ranges.iterator())
                 mergeHighlightAndMatches {
                     highlight = colors;
+                    background = nameComponent.background;
                     selected = selected;
                     from = name.firstInclusion(item.lookupString) else 0;
                     nextMatch() => it.hasNext() then it.next();
@@ -250,7 +262,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
     }
 
     shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
-            Integer from, TextRange? nextMatch(), Boolean selected) {
+            Integer from, TextRange? nextMatch(), Boolean selected, Color background) {
 
         value merged = ArrayList<Fragment>();
         variable value currentRange = nextMatch();
@@ -279,7 +291,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
                     if (range.endOffset + from > currentIndex + size) {
                         String subtext = text[sublength...];
-                        merged.add(createFragment(subtext, highlighted(fragment, selected)));
+                        merged.add(createFragment(subtext, highlighted(fragment, selected, background)));
                         consumedFromRange += size - sublength;
                         currentRange = null;
                     }
@@ -295,7 +307,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                             subtext = text[sublength:range.length];
                             sublength += range.length;
                         }
-                        merged.add(createFragment(subtext, highlighted(fragment, selected)));
+                        merged.add(createFragment(subtext, highlighted(fragment, selected, background)));
 
                         value nextRange = nextMatch();
                         consumedFromRange = 0;
