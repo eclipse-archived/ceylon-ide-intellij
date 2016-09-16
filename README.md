@@ -26,9 +26,15 @@ The following software must be installed:
 - [IntelliJ IDEA 2016.2](http://www.jetbrains.com/idea/download/) Community or Ultimate
 - [JDK 7 or 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
+## Install stable version from the JetBrains repository
+
+_This is the simplest way to install **stable versions** of Ceyon IDE for IntelliJ._
+
+Inside the IDE, go to `Preferences > Plugins > Browse repositories...` and type `Ceylon`, then install the plugin named `Ceylon IDE`.
+
 ## Install from the Development plugin repository
 
-_This is the simplest way to install Ceyon IDE for IntelliJ._
+_This is the simplest way to install **development versions** of Ceyon IDE for IntelliJ._
 
 Inside the Intellij IDEA environment, follow
 [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
