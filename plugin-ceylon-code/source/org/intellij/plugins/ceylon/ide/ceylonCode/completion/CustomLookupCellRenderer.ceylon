@@ -235,6 +235,10 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 then ""
                 else lookup.itemPattern(item);
 
+        value lookupString = item.lookupString;
+        value realLookupString
+                = if (exists loc = lookupString.lastOccurrence(':'))
+                then lookupString[0:loc] else lookupString;
         value colorsWithPrefix
                 = if (/*selected &&*/ !prefix.empty,
                       exists ranges = getMatchingFragments(prefix, item.lookupString))
@@ -243,7 +247,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                     highlight = colors;
                     background = nameComponent.background;
                     selected = selected;
-                    from = name.firstInclusion(item.lookupString) else 0;
+                    from = name.firstInclusion(realLookupString) else 0;
                     nextMatch() => it.hasNext() then it.next();
                 }
                 else colors;
