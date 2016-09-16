@@ -7,6 +7,11 @@ import com.intellij.codeInsight.completion {
     },
     CompletionInitializationContext
 }
+import com.intellij.codeInsight.completion.impl {
+    CompletionServiceImpl {
+        completionServiceImpl=completionService
+    }
+}
 import com.intellij.codeInsight.lookup {
     LookupElementWeigher,
     LookupElement
@@ -22,6 +27,9 @@ import com.intellij.openapi.application.ex {
 import com.intellij.openapi.progress {
     EmptyProgressIndicator,
     ProcessCanceledException
+}
+import com.intellij.openapi.ui {
+    MessageType
 }
 import com.intellij.psi.impl.source.tree {
     LeafPsiElement
@@ -56,14 +64,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonTokens
 }
-import com.intellij.codeInsight.completion.impl {
-    CompletionServiceImpl {
-        completionServiceImpl = completionService
-    }
-}
-import com.intellij.openapi.ui {
-    MessageType
-}
 
 shared abstract class IdeaCompletionProvider()
         extends CompletionProvider<CompletionParameters>()  {
@@ -92,15 +92,17 @@ shared abstract class IdeaCompletionProvider()
 
             if (is LeafPsiElement position = parameters.position) {
                 if (position.elementType == CeylonTokens.astringLiteral) {
+                    //TODO: figure out the doc link prefix
                     result = result.withPrefixMatcher("");
                 }
                 if (position.elementType == CeylonTokens.pidentifier) {
                     // In case of a package identifier like `ceylon.collection`, we compute a reference
-                    // on the whold path, which will lead IntelliJ to create prefixes like `ceylon.col`
+                    // on the whole path, which will lead IntelliJ to create prefixes like `ceylon.col`
                     // whereas completionManager will return things like `collection`, which won't match
                     // the prefix. We thus have to change the prefix to what's after the dot.
-                    value prefix = position.text.spanTo(position.text.size
-                        - CompletionInitializationContext.dummyIdentifierTrimmed.size - 1);
+                    String text = position.text;
+                    value loc = text.firstInclusion(CompletionInitializationContext.dummyIdentifierTrimmed);
+                    String prefix = if (exists loc) then text[0:loc] else text;
                     result = result.withPrefixMatcher(prefix);
                 }
             }
