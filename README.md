@@ -1,7 +1,9 @@
-Ceylon IDE for IntelliJ [![Join the chat at https://gitter.im/ceylon/ceylon-ide-intellij](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ceylon/ceylon-ide-intellij) [![Build Status](https://ci-ceylon.rhcloud.com/buildStatus/icon?job=ceylon.formatter)](https://ci-ceylon.rhcloud.com/job/ceylon.formatter)
+Ceylon IDE for IntelliJ [![Join the chat at https://gitter.im/ceylon/ceylon-ide-intellij](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ceylon/ceylon-ide-intellij) [![Build Status](https://ci-ceylon.rhcloud.com/buildStatus/icon?job=ceylon-ide-intellij)](https://ci-ceylon.rhcloud.com/job/ceylon-ide-intellij)
 =======================
 
 This project is an IntelliJ IDEA-based IDE for the [Ceylon programming language](http://ceylon-lang.org).
+
+![Ceylon IDE](https://plugins.jetbrains.com/files/8625/screenshot_16167.png)
 
 # Requirements
 
