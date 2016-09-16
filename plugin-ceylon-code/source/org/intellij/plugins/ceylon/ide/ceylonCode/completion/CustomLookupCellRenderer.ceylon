@@ -15,7 +15,6 @@ import com.intellij.codeInsight.lookup {
     LookupManager
 }
 import com.intellij.codeInsight.lookup.impl {
-    EmptyLookupItem,
     LookupImpl,
     LookupCellRenderer
 }
@@ -230,10 +229,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                         is ModuleVersionDetails|Package|Module;
                 };
 
-        String prefix
-                = item is EmptyLookupItem
-                then ""
-                else lookup.itemPattern(item);
+        String prefix = lookup.itemPattern(item);
 
         value colorsWithPrefix
                 = if (/*selected &&*/ !prefix.empty,
