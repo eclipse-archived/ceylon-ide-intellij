@@ -93,7 +93,20 @@ shared abstract class IdeaCompletionProvider()
             if (is LeafPsiElement position = parameters.position) {
                 if (position.elementType == CeylonTokens.astringLiteral) {
                     //TODO: figure out the doc link prefix
-                    result = result.withPrefixMatcher("");
+                    String text = position.text;
+                    if (exists end = text.firstInclusion(CompletionInitializationContext.dummyIdentifierTrimmed)) {
+                        String textBefore = text[0:end];
+                        if (exists start = textBefore.lastInclusion("[[")) {
+                            String prefix = textBefore[start+2...];
+                            result = result.withPrefixMatcher(prefix);
+                        }
+                        else {
+                            result = result.withPrefixMatcher("");
+                        }
+                    }
+                    else {
+                        result = result.withPrefixMatcher("");
+                    }
                 }
                 if (position.elementType == CeylonTokens.pidentifier) {
                     // In case of a package identifier like `ceylon.collection`, we compute a reference
