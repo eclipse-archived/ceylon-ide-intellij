@@ -225,7 +225,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 else lookup.itemPattern(item);
 
         value colorsWithPrefix
-                = if (/*selected &&*/ prefix.size>0,
+                = if (/*selected &&*/ !prefix.empty,
                       exists ranges = getMatchingFragments(prefix, item.lookupString))
                 then let (it = ranges.iterator())
                 mergeHighlightAndMatches {
