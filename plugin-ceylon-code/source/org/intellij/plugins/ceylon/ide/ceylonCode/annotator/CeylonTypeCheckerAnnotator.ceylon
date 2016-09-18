@@ -174,7 +174,11 @@ shared class CeylonTypeCheckerAnnotator()
             };
             
             try {
-                ideQuickFixManager.addQuickFixes(data, tc);
+                if (is UsageWarning error) {
+                    ideQuickFixManager.addWarningFixes(data, error);
+                } else {
+                    ideQuickFixManager.addQuickFixes(data, tc);
+                }
             } catch (Exception|AssertionError e) {
                 e.printStackTrace();
             }
