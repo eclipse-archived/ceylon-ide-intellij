@@ -83,6 +83,7 @@
         <javac srcdir="${basedir}/jps-plugin/src"
                destdir="${build.dir}/CeylonIDEA/classes"
                debug="true" debuglevel="lines,vars,source"
+               source="1.7" target="1.7"
                classpathref="compile.ide.classpath">
         </javac>
         <copy todir="${build.dir}/CeylonIDEA/classes">
