@@ -15,12 +15,12 @@
       <root url="jar://$CEYLON_DIST$/repo/org/apache/httpcomponents/httpclient/4.3.2/org.apache.httpcomponents.httpclient-4.3.2.jar!/" />
 
       <root url="jar://$CEYLON_DIST$/lib/ceylon-bootstrap.jar!/" />
-      <root url="jar://$CEYLON_DIST$/repo/ceylon/runtime/1.3.0/ceylon.runtime-1.3.0.jar!/" />
-      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/cli/1.3.0/com.redhat.ceylon.cli-1.3.0.jar!/" />
-      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/compiler/js/1.3.0/com.redhat.ceylon.compiler.js-1.3.0.jar!/" />
-      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/typechecker/1.3.0/com.redhat.ceylon.typechecker-1.3.0.jar!/" />
-      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/compiler/java/1.3.0/com.redhat.ceylon.compiler.java-1.3.0.jar!/" />
-      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/tool/provider/1.3.0/com.redhat.ceylon.tool.provider-1.3.0.jar!/" />
+      <root url="jar://$CEYLON_DIST$/repo/ceylon/runtime/1.3.1/ceylon.runtime-1.3.1.jar!/" />
+      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/cli/1.3.1/com.redhat.ceylon.cli-1.3.1.jar!/" />
+      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/compiler/js/1.3.1/com.redhat.ceylon.compiler.js-1.3.1.jar!/" />
+      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/typechecker/1.3.1/com.redhat.ceylon.typechecker-1.3.1.jar!/" />
+      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/compiler/java/1.3.1/com.redhat.ceylon.compiler.java-1.3.1.jar!/" />
+      <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/tool/provider/1.3.1/com.redhat.ceylon.tool.provider-1.3.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
