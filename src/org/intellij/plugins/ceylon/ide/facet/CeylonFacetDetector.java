@@ -62,7 +62,15 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
         IdeaCeylonProject project = (IdeaCeylonProject) ceylonModel.getProject(facet.getModule());
 
         try {
-            VirtualFile virtualFile = model.getSourceRoots()[0];
+            VirtualFile virtualFile;
+            if (model.getSourceRoots().length > 0) {
+                virtualFile = model.getSourceRoots()[0];
+            } else {
+                virtualFile = project.getModuleRoot();
+            }
+            if (virtualFile == null) {
+                return;
+            }
             CeylonConfig config = CeylonConfigFinder.loadLocalConfig(new File(virtualFile.getCanonicalPath()));
             if (config != null) {
                 String outputRepo = DefaultToolOptions.getCompilerOutputRepo(config);
