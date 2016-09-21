@@ -15,7 +15,8 @@ import com.intellij.psi {
     PsiMethod,
     PsiType,
     PsiArrayType,
-    PsiAnnotationMemberValue
+    PsiAnnotationMemberValue,
+    PsiPrefixExpression
 }
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
@@ -68,7 +69,7 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
         else if (is PsiClassObjectAccessExpression v) {
             return PSIType(v.operand.type);
         }
-        else if (is PsiLiteralExpression v) {
+        else if (is PsiLiteralExpression|PsiPrefixExpression v) {
             // TODO this is super ultra ugly, but we can't get the type associated
             // to a PsiArrayInitializerMemberValue, and IJ parses shorts as ints :(
             if (concurrencyManager.needReadAccess(() => psi.qualifiedName else "")
@@ -76,13 +77,14 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
                 paramName == "arguments") {
                 return JShort(v.text);
             }
-            return toListIfNeeded(v.\ivalue, type);
+
+            if (is PsiLiteralExpression v) {
+                return toListIfNeeded(v.\ivalue, type);
+            }
         }
-        else {
-            platformUtils.log(Status._WARNING,
-                "unsupported PsiAnnotationMemberValue ``className(v)``");
-            return v;
-        }
+        platformUtils.log(Status._WARNING,
+            "unsupported PsiAnnotationMemberValue ``className(v)``");
+        return v;
     }
 
     concurrencyManager.needReadAccess(() {
