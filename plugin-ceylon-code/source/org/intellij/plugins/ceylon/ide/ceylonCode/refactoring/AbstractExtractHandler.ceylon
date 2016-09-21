@@ -60,7 +60,8 @@ import java.lang {
 import java.util {
     HashMap,
     JList=List,
-    Arrays
+    Arrays,
+    ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
@@ -230,10 +231,10 @@ class ExtractedVariableRenameHandler(TextRange[] usages = [])
                     => noop();
 
             collectRefs(SearchScope referencesSearchScope)
-                    => Arrays.asList(
+                    => ArrayList(Arrays.asList(
                         for (r in usages)
                         if (exists e = elementToRename.containingFile.findReferenceAt(r.startOffset))
-                        e);
+                        e));
 
             checkLocalScope() => elementToRename.containingFile;
         };
