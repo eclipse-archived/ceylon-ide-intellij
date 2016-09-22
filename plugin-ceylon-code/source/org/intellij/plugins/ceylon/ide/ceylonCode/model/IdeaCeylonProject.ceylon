@@ -31,7 +31,8 @@ import com.intellij.openapi.\imodule {
 import com.intellij.openapi.progress {
     ProgressManager,
     Task,
-    ProgressIndicator
+    ProgressIndicator,
+    ProcessCanceledException
 }
 import com.intellij.openapi.progress.util {
     ProgressIndicatorBase
@@ -65,7 +66,8 @@ import com.intellij.openapi.vfs {
     VfsUtilCore
 }
 import com.intellij.psi {
-    PsiFile
+    PsiFile,
+    JavaPsiFacade
 }
 import com.redhat.ceylon.cmr.api {
     ArtifactContext
@@ -125,6 +127,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
+}
+import com.intellij.psi.search {
+    GlobalSearchScope
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -203,7 +208,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                     platformUtils.log(Status._ERROR, "Can't add required artifacts to classpath", e);
                 }
             });
-            application.invokeAndWait(runnable, modality);
+            application.invokeAndWait(runnable, ModalityState.nonModal);
 
             dumbService(model.ideaProject).waitForSmartMode();
 
@@ -224,6 +229,39 @@ shared class IdeaCeylonProject(ideArtifact, model)
                             application.invokeAndWait(sourcesRunnable, modality);
                         }
                 } , ProgressIndicatorBase());
+            }
+
+            // Special case for Android Studio: when the Ceylon facet is added to a module,
+            // it will trigger a Gradle build which will prevent depencies we add to the classpath
+            // from being indexed immediately. We *have* to wait for them to be indexed,
+            // otherwise it leads to errors like https://github.com/ceylon/ceylon-ide-intellij/issues/497
+            if (compileToJava) {
+                value ds = DumbService.getInstance(model.ideaProject);
+                value facade = JavaPsiFacade.getInstance(model.ideaProject);
+                value scope = GlobalSearchScope.moduleWithLibrariesScope(ideArtifact);
+                value ceylonCls = "ceylon.language.String";
+
+                function ceylonLanguageIndexed() {
+                    value ref = Ref<Boolean>();
+                    ds.runReadActionInSmartMode(JavaRunnable(
+                        () => ref.set(facade.findClass(ceylonCls, scope) exists)
+                    ));
+                    return ref.get();
+                }
+
+                variable value counter = 0;
+
+                while (!ceylonLanguageIndexed(), counter < 5) {
+                    progress.subTask("Waiting for indices");
+                    counter++;
+                    Thread.sleep(1000);
+                }
+
+                if (!ceylonLanguageIndexed()) {
+                    throw ProcessCanceledException();
+                }
+
+                progress.subTask("Scanning source archives");
             }
         }
     }
