@@ -24,17 +24,22 @@ import javax.swing.*;
 public class CeylonAddModuleAction extends CeylonAddingFilesAction {
 
     @Override
-    protected void createFiles(final AnActionEvent e, @Nullable  final IdeaCeylonProject project,
+    protected void createFiles(final AnActionEvent e, @Nullable final IdeaCeylonProject project,
                                final VirtualFile srcRoot, final String eventPackage,
                                final PsiDirectory srcRootDir) {
 
-        CeylonModelManager modelManager = project.getModel().getIdeaProject().getComponent(CeylonModelManager.class);
+        CeylonModelManager modelManager = null;
+        if (project != null) {
+            modelManager = project.getModel().getIdeaProject().getComponent(CeylonModelManager.class);
+        }
 
         final CreateCeylonModuleWizard wizard = new CreateCeylonModuleWizard(e.getProject(), project);
 
         boolean madeTheChange = true;
         try {
-            modelManager.pauseAutomaticModelUpdate();
+            if (modelManager != null) {
+                modelManager.pauseAutomaticModelUpdate();
+            }
             wizard.show();
 
             if (wizard.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
@@ -98,10 +103,12 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                 madeTheChange = false;
             }
         } finally {
-            if (madeTheChange) {
-                modelManager.resumeAutomaticModelUpdate(0);
-            } else {
-                modelManager.resumeAutomaticModelUpdate();
+            if (modelManager != null) {
+                if (madeTheChange) {
+                    modelManager.resumeAutomaticModelUpdate(0);
+                } else {
+                    modelManager.resumeAutomaticModelUpdate();
+                }
             }
         }
     }

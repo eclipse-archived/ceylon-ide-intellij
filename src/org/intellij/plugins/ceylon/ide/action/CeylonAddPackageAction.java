@@ -25,14 +25,19 @@ import static org.intellij.plugins.ceylon.ide.validate.NameValidator.packageName
 public class CeylonAddPackageAction extends CeylonAddingFilesAction {
 
     @Override
-    protected void createFiles(final AnActionEvent e, final IdeaCeylonProject project,
+    protected void createFiles(final AnActionEvent e, @Nullable final IdeaCeylonProject project,
                                final VirtualFile srcRoot, final String eventPackage,
                                final PsiDirectory eventPsiDir) {
 
         boolean madeTheChange = false;
-        CeylonModelManager modelManager = project.getModel().getIdeaProject().getComponent(CeylonModelManager.class);
+        CeylonModelManager modelManager = null;
+        if (project != null) {
+            modelManager = project.getModel().getIdeaProject().getComponent(CeylonModelManager.class);
+        }
         try {
-            modelManager.pauseAutomaticModelUpdate();
+            if (modelManager != null) {
+                modelManager.pauseAutomaticModelUpdate();
+            }
 
             final String packageName = Messages.showInputDialog(
                     e.getProject(),
@@ -67,10 +72,12 @@ public class CeylonAddPackageAction extends CeylonAddingFilesAction {
                 });
             }
         } finally {
-            if (madeTheChange) {
-                modelManager.resumeAutomaticModelUpdate(0);
-            } else {
-                modelManager.resumeAutomaticModelUpdate();
+            if (modelManager != null) {
+                if (madeTheChange) {
+                    modelManager.resumeAutomaticModelUpdate(0);
+                } else {
+                    modelManager.resumeAutomaticModelUpdate();
+                }
             }
         }
     }
