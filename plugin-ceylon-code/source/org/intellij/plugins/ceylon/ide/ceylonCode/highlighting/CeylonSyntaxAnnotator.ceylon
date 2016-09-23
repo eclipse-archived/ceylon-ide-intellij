@@ -2,7 +2,6 @@ import com.intellij.lang {
     ASTNode
 }
 import com.intellij.lang.annotation {
-    Annotation,
     AnnotationHolder,
     Annotator
 }
@@ -11,9 +10,6 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiElement
-}
-import com.intellij.psi.tree {
-    IElementType
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
@@ -44,13 +40,13 @@ shared class CeylonSyntaxAnnotator()
 
     shared actual void visitCompilerAnnotationPsi(CeylonPsi.CompilerAnnotationPsi element) {
         super.visitCompilerAnnotationPsi(element);
-        Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+        value anno = annotationHolder.createInfoAnnotation(element, null);
         anno.textAttributes = ceylonHighlightingColors.annotation;
     }
 
     shared actual void visitMetaLiteralPsi(CeylonPsi.MetaLiteralPsi element) {
         super.visitMetaLiteralPsi(element);
-        Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+        value anno = annotationHolder.createInfoAnnotation(element, null);
         anno.textAttributes = ceylonHighlightingColors.meta;
     }
 
@@ -59,7 +55,7 @@ shared class CeylonSyntaxAnnotator()
 
     shared actual void visitStringTemplatePsi(CeylonPsi.StringTemplatePsi element) {
         super.visitStringTemplatePsi(element);
-        for (PsiElement child in element.children) {
+        for (child in element.children) {
             if (is CeylonPsi.ExpressionPsi child) {
                 variable PsiElement? prev = child;
                 while (true) {
@@ -81,16 +77,16 @@ shared class CeylonSyntaxAnnotator()
                         break;
                     }
                 }
-                Integer startOffset
+                value startOffset
                         = if (exists p = prev, p.text.endsWith("\`\`"))
                         then p.textRange.endOffset - 2
                         else child.textRange.startOffset;
-                Integer endOffset
+                value endOffset
                         = if (exists n = next, n.text.startsWith("\`\`"))
                         then n.textRange.startOffset + 2
                         else child.textRange.endOffset;
-                TextRange range = TextRange(startOffset, endOffset);
-                Annotation anno = annotationHolder.createInfoAnnotation(range, null);
+                value range = TextRange(startOffset, endOffset);
+                value anno = annotationHolder.createInfoAnnotation(range, null);
                 anno.textAttributes = ceylonHighlightingColors.interp;
             }
         }
@@ -98,10 +94,10 @@ shared class CeylonSyntaxAnnotator()
 
     shared actual void visitElement(PsiElement element) {
         super.visitElement(element);
-        IElementType elementType = element.node.elementType;
+        value elementType = element.node.elementType;
         if (elementType == CeylonTokens.astringLiteral
          || elementType == CeylonTokens.averbatimString) {
-            Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+            value anno = annotationHolder.createInfoAnnotation(element, null);
             anno.textAttributes = ceylonHighlightingColors.annotationString;
         }
         if (is CeylonPsi.StringTemplatePsi element) {
@@ -118,19 +114,19 @@ shared class CeylonSyntaxAnnotator()
             firstChildNode.elementType == CeylonTokens.lidentifier,
             exists prevSibling,
             prevSibling.node.elementType == CeylonTokens.memberOp) {
-            Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+            value anno = annotationHolder.createInfoAnnotation(element, null);
             anno.textAttributes = ceylonHighlightingColors.member;
         }
         if (exists firstChildNode,
             firstChildNode.elementType == CeylonTokens.aidentifier) {
-            Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+            value anno = annotationHolder.createInfoAnnotation(element, null);
             anno.textAttributes = ceylonHighlightingColors.annotation;
         }
     }
 
     shared actual void visitImportPathPsi(CeylonPsi.ImportPathPsi element) {
         super.visitImportPathPsi(element);
-        Annotation anno = annotationHolder.createInfoAnnotation(element, null);
+        value anno = annotationHolder.createInfoAnnotation(element, null);
         anno.textAttributes = ceylonHighlightingColors.packages;
     }
 }
