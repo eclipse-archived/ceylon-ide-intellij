@@ -93,8 +93,8 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             shared actual void run() {
                 value modified = object extends WriteCommandAction<Boolean>(mod.project) {
                     shared actual void run(Result<Boolean> result) {
-                        variable value modified = updateGradleModel(mod);
-                        modified ||= addCeylonModule(mod);
+                        variable value modified = updateGradleModel(ceylonProject);
+                        modified ||= addCeylonModule(ceylonProject);
                         result.setResult(modified);
                     }
                 }.execute();
@@ -111,8 +111,9 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
         }, "Configure Ceylon", null);
     }
 
-    Boolean addCeylonModule(Module mod) {
-        assert (exists src = VfsUtil.findRelativeFile(mod.moduleFile?.parent, "src", "main", "ceylon"));
+    Boolean addCeylonModule(IdeaCeylonProject ceylonProject) {
+        value mod = ceylonProject.ideaModule;
+        assert (exists src = VfsUtil.findRelativeFile(ceylonProject.moduleRoot, "src", "main", "ceylon"));
 
         variable value hasModule = false;
         VfsUtil.visitChildrenRecursively(src, object extends VirtualFileVisitor<Boolean>() {
@@ -139,7 +140,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
 
             ceylonFileFactory.createFileFromTemplate(psiDir, "CeylonMainActivity.ceylon");
 
-            assert (exists layout = VfsUtil.findRelativeFile(mod.moduleFile?.parent, "src", "main", "res", "layout"));
+            assert (exists layout = VfsUtil.findRelativeFile(ceylonProject.moduleRoot, "src", "main", "res", "layout"));
             assert (exists layoutPsi = PsiManager.getInstance(mod.project).findDirectory(layout));
             value props = Properties();
             props.setProperty("ACTIVITY_NAME", modName[0] + ".CeylonMainActivity");
@@ -154,11 +155,12 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
         return false;
     }
 
-    Boolean updateGradleModel(Module mod) {
+    Boolean updateGradleModel(IdeaCeylonProject ceylonProject) {
         variable Boolean wasModified = false;
+        value mod = ceylonProject.ideaModule;
 
         if (exists buildFile = findGradleBuild(mod)) {
-            VfsUtil.createDirectoryIfMissing(mod.moduleFile?.parent, "src/main/ceylon");
+            VfsUtil.createDirectoryIfMissing(ceylonProject.moduleRoot, "src/main/ceylon");
 
             wasModified ||= groovyFileManipulator.configureSourceSet(buildFile);
             wasModified ||= groovyFileManipulator.configureLint(buildFile);
