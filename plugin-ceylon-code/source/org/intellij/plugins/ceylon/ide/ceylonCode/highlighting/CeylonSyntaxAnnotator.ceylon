@@ -51,7 +51,7 @@ shared class CeylonSyntaxAnnotator()
     shared actual void visitMetaLiteralPsi(CeylonPsi.MetaLiteralPsi element) {
         super.visitMetaLiteralPsi(element);
         Annotation anno = annotationHolder.createInfoAnnotation(element, null);
-        anno.textAttributes = ceylonHighlightingColors.interp;
+        anno.textAttributes = ceylonHighlightingColors.meta;
     }
 
     function isWhitespace(PsiElement p)
@@ -82,7 +82,7 @@ shared class CeylonSyntaxAnnotator()
                     }
                 }
                 Integer startOffset
-                        = if (exists p=prev, p.text.endsWith("\`\`"))
+                        = if (exists p = prev, p.text.endsWith("\`\`"))
                         then p.textRange.endOffset - 2
                         else child.textRange.startOffset;
                 Integer endOffset
