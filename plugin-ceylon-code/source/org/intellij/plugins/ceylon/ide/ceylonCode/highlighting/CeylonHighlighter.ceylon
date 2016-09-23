@@ -29,15 +29,15 @@ import java.util {
     HashMap
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    ceylonFileType
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.parser {
     CeylonAntlrToIntellijLexerAdapter
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTokens,
     TokenTypes
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    ceylonFileType
 }
 
 shared object ceylonHighlighter extends SyntaxHighlighterBase() {
@@ -93,26 +93,38 @@ shared object ceylonHighlighter extends SyntaxHighlighterBase() {
         keys[kw] = ceylonHighlightingColors.keyword;
     }
 
-    keys[TokenTypes.multiComment.tokenType] = ceylonHighlightingColors.comment;
-    keys[TokenTypes.lineComment.tokenType] = ceylonHighlightingColors.comment;
+    keys[TokenTypes.uidentifier.tokenType] = ceylonHighlightingColors.type;
+    keys[TokenTypes.lidentifier.tokenType] = ceylonHighlightingColors.identifier;
+
+    keys[TokenTypes.multiComment.tokenType] = ceylonHighlightingColors.blockComment;
+    keys[TokenTypes.lineComment.tokenType] = ceylonHighlightingColors.lineComment;
     keys[TokenTypes.naturalLiteral.tokenType] = ceylonHighlightingColors.number;
     keys[TokenTypes.floatLiteral.tokenType] = ceylonHighlightingColors.number;
     keys[TokenTypes.charLiteral.tokenType] = ceylonHighlightingColors.char;
+
     keys[CeylonTokens.stringStart] = ceylonHighlightingColors.strings;
     keys[CeylonTokens.stringMid] = ceylonHighlightingColors.strings;
     keys[CeylonTokens.stringEnd] = ceylonHighlightingColors.strings;
     keys[CeylonTokens.stringLiteral] = ceylonHighlightingColors.strings;
-    keys[CeylonTokens.stringInterp] = ceylonHighlightingColors.strings;
     keys[CeylonTokens.verbatimString] = ceylonHighlightingColors.strings;
-    keys[TokenTypes.lparen.tokenType] = ceylonHighlightingColors.brace;
-    keys[TokenTypes.rparen.tokenType] = ceylonHighlightingColors.brace;
+
+    keys[TokenTypes.lparen.tokenType] = ceylonHighlightingColors.paren;
+    keys[TokenTypes.rparen.tokenType] = ceylonHighlightingColors.paren;
     keys[TokenTypes.lbrace.tokenType] = ceylonHighlightingColors.brace;
     keys[TokenTypes.rbrace.tokenType] = ceylonHighlightingColors.brace;
-    keys[TokenTypes.lbracket.tokenType] = ceylonHighlightingColors.brace;
-    keys[TokenTypes.rbracket.tokenType] = ceylonHighlightingColors.brace;
+    keys[TokenTypes.lbracket.tokenType] = ceylonHighlightingColors.bracket;
+    keys[TokenTypes.rbracket.tokenType] = ceylonHighlightingColors.bracket;
+
     keys[TokenTypes.semicolon.tokenType] = ceylonHighlightingColors.semi;
-    keys[TokenTypes.uidentifier.tokenType] = ceylonHighlightingColors.type;
-    keys[TokenTypes.lidentifier.tokenType] = ceylonHighlightingColors.identifier;
+    keys[TokenTypes.comma.tokenType] = ceylonHighlightingColors.comma;
+
+    keys[TokenTypes.specify.tokenType] = ceylonHighlightingColors.assignment;
+    keys[TokenTypes.compute.tokenType] = ceylonHighlightingColors.assignment;
+
+    keys[TokenTypes.memberOp.tokenType] = ceylonHighlightingColors.dot;
+    keys[TokenTypes.safeMemberOp.tokenType] = ceylonHighlightingColors.dot;
+    keys[TokenTypes.spreadOp.tokenType] = ceylonHighlightingColors.dot;
+
     keys[TokenType.badCharacter] = HighlighterColors.badCharacter;
 
     highlightingLexer => CeylonAntlrToIntellijLexerAdapter();
