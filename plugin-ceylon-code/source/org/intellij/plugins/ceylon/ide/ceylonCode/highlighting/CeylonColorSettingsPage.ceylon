@@ -92,7 +92,7 @@ shared abstract class AbstractCeylonColorSettingsPage()
 
     additionalHighlightingTagToDescriptorMap => JavaMap(JavaStringMap(ourTags));
     
-    demoText => """import <pkg>ceylon</pkg>.<pkg>math</pkg>.<pkg>integer</pkg> { smallest }
+    demoText => """import <pkg>ceylon</pkg>.<pkg>numeric</pkg>.<pkg>integer</pkg> { smallest }
 
                    /*
                      The entry point.
