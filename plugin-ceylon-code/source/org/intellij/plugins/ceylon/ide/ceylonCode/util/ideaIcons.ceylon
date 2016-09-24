@@ -209,6 +209,9 @@ shared object icons {
                 if (final) {
                     decorations.add(AllIcons.Nodes.finalMark);
                 }
+                if (model.staticallyImportable) {
+                    decorations.add(AllIcons.Nodes.staticMark);
+                }
                 value readonly
                         = model.toplevel
                         && !model.unit is AnyModifiableSourceFile;
@@ -231,12 +234,29 @@ shared object icons {
             }
         }
         else if (is Tree.Declaration obj) {
-            for (a in obj.annotationList.annotations) {
+            value annotations = obj.annotationList.annotations;
+            Icon visibility;
+            for (a in annotations) {
                 if (a.primary.token.text=="shared") {
-                    return createIcon([], baseIcon, PlatformIcons.publicIcon);
+                    visibility = PlatformIcons.publicIcon;
+                    break;
                 }
             }
-            return createIcon([], baseIcon, PlatformIcons.privateIcon);
+            else {
+                visibility = PlatformIcons.privateIcon;
+            }
+            value decorations = ArrayList<Icon>();
+            for (a in annotations) {
+                switch (a.primary.token.text)
+                case ("static") {
+                    decorations.add(AllIcons.Nodes.staticMark);
+                }
+                case ("final") {
+                    decorations.add(AllIcons.Nodes.finalMark);
+                }
+                else {}
+            }
+            return createIcon(decorations, baseIcon, visibility);
         }
         else if (is Tree.SpecifierStatement obj) {
             return createIcon([], baseIcon, PlatformIcons.publicIcon);
@@ -260,6 +280,9 @@ shared object icons {
                 && baseIcon!=interfaces
             || baseIcon==annotationClasses) {
             decorations.add(AllIcons.Nodes.finalMark);
+        }
+        if (cls.hasModifierProperty(PsiModifier.static)) {
+            decorations.add(AllIcons.Nodes.staticMark);
         }
         decorations.add(PlatformIcons.lockedIcon);
         return createIcon(decorations, baseIcon, visibility);
