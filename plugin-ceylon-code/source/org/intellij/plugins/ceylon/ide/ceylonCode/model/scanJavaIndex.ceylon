@@ -40,7 +40,7 @@ import com.redhat.ceylon.ide.common.completion {
     }
 }
 import com.redhat.ceylon.ide.common.model.asjava {
-    getJavaQualifiedName
+    javaQualifiedName
 }
 import com.redhat.ceylon.model.loader {
     AbstractModelLoader {
@@ -147,7 +147,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             }
             if (exists qName = cls.qualifiedName) {
                 for (imp in sourceUnit.imports) {
-                    if (getJavaQualifiedName(imp.declaration) == qName) {
+                    if (javaQualifiedName(imp.declaration) == qName) {
                         return null;
                     }
                 }

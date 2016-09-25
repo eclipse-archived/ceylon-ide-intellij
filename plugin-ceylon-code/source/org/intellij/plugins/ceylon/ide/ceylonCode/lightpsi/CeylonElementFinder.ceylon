@@ -19,7 +19,7 @@ import com.redhat.ceylon.ide.common.model {
     CeylonUnit
 }
 import com.redhat.ceylon.ide.common.model.asjava {
-    getJavaQualifiedName
+    javaQualifiedName
 }
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
@@ -50,7 +50,7 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     
                     for (pack in newArrayList(mod.packages)) {
                         for (dec in newArrayList(pack.members)) {
-                            if (fqName == getJavaQualifiedName(dec)) {
+                            if (fqName == javaQualifiedName(dec)) {
                                 if (is ClassOrInterface|Value dec,
                                     is CeylonUnit unit = dec.unit) {
                                     return CeyLightClass(dec, p);
