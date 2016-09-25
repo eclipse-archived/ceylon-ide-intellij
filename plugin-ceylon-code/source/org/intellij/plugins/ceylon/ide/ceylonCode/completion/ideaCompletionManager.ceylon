@@ -215,10 +215,8 @@ shared class IdeaCompletionProvider()
 
             installCustomLookupCellRenderer(project);
 
-            if (!isSecondLevel) {
-                if (!modelManager.busy) {
-                    result.addLookupAdvertisement("Call again to toggle second-level completions");
-                }
+            if (!isSecondLevel && !modelManager.busy) {
+                result.addLookupAdvertisement("Call again to toggle second-level completions");
             }
         }
     }
