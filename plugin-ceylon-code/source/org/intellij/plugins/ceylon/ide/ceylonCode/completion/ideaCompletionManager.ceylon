@@ -65,10 +65,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTokens
 }
 
-shared abstract class IdeaCompletionProvider()
+shared class IdeaCompletionProvider(CompletionOptions options)
         extends CompletionProvider<CompletionParameters>()  {
-    
-    shared formal CompletionOptions options;
     
     shared actual void addCompletions(CompletionParameters parameters,
         ProcessingContext context, variable CompletionResultSet result) {
