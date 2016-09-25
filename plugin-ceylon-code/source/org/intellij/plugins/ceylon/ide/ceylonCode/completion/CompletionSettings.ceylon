@@ -30,6 +30,6 @@ shared class CompletionSettings() satisfies PersistentStateComponent<CompletionO
 }
 
 shared CompletionSettings completionSettings
-        => if (ApplicationManager.application.isDisposed())
+        => ApplicationManager.application.isDisposed()
         then CompletionSettings()
         else ServiceManager.getService(javaClass<CompletionSettings>());
