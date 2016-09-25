@@ -5,7 +5,9 @@ import com.intellij.codeInsight.completion {
     CompletionService {
         completionService
     },
-    CompletionInitializationContext
+    CompletionInitializationContext {
+        dummyIdentifierTrimmed
+    }
 }
 import com.intellij.codeInsight.completion.impl {
     CompletionServiceImpl {
@@ -48,7 +50,6 @@ import com.redhat.ceylon.ide.common.typechecker {
 }
 
 import java.lang {
-    Comparable,
     JInteger=Integer
 }
 
@@ -62,14 +63,39 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model.parsing {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
-    CeylonTokens
+    CeylonTokens,
+    CeylonLocalAnalyzer
 }
 
 shared class IdeaCompletionProvider()
         extends CompletionProvider<CompletionParameters>()  {
 
+    function getAnalysisResult(CeylonModelManager modelManager, CompletionParameters parameters,
+            CeylonLocalAnalyzer localAnalyzer, ProgressIndicatorMonitor progressMonitor) {
+        value busy = modelManager.busy;
+        value autoPopup = parameters.autoPopup;
+
+        if (autoPopup || busy,
+            parameters.position.text != dummyIdentifierTrimmed, //we're just typing within an identifier
+            exists result = localAnalyzer.result, result.lastCompilationUnit exists) {
+            if (busy, exists completion = completionServiceImpl.currentCompletion) {
+                completion.addAdvertisement(
+                    "The results might be incomplete during a Ceylon model update",
+                    MessageType.warning.popupBackground);
+            }
+            return result;
+        }
+
+        return if (busy) then null
+            else localAnalyzer.ensureTypechecked {
+                cancellable = progressMonitor;
+                waitForModelInSeconds = autoPopup then 0 else 4;
+            };
+    }
+
     shared actual void addCompletions(CompletionParameters parameters,
         ProcessingContext context, variable CompletionResultSet result) {
+
         assert (exists project = parameters.editor.project,
                 exists modelManager = getModelManager(project));
         try {
@@ -88,7 +114,7 @@ shared class IdeaCompletionProvider()
                 if (position.elementType == CeylonTokens.astringLiteral) {
                     //TODO: figure out the doc link prefix
                     String text = position.text;
-                    if (exists end = text.firstInclusion(CompletionInitializationContext.dummyIdentifierTrimmed)) {
+                    if (exists end = text.firstInclusion(dummyIdentifierTrimmed)) {
                         String textBefore = text[0:end];
                         if (exists start = textBefore.lastInclusion("[[")) {
                             String prefix = textBefore[start+2...];
@@ -108,65 +134,50 @@ shared class IdeaCompletionProvider()
                     // whereas completionManager will return things like `collection`, which won't match
                     // the prefix. We thus have to change the prefix to what's after the dot.
                     String text = position.text;
-                    value loc = text.firstInclusion(CompletionInitializationContext.dummyIdentifierTrimmed);
+                    value loc = text.firstInclusion(dummyIdentifierTrimmed);
                     String prefix = if (exists loc) then text[0:loc] else text;
                     result = result.withPrefixMatcher(prefix);
                 }
             }
-            
-            value progressMonitor = ProgressIndicatorMonitor.wrap {
-                object monitor extends EmptyProgressIndicator() {
-                    // hashCode() seems to be quite slow when used in CoreProgressManager.threadsUnderIndicator
-                    hash => 43;
-                    
-                }
-            };
-            object listener extends ApplicationAdapter() {
-                shared actual void beforeWriteActionStart(Object action) {
-                    if (!progressMonitor.cancelled) {
-                        progressMonitor.wrapped.cancel();
+
+            if (!application.writeActionPending) {
+                value progressMonitor = ProgressIndicatorMonitor.wrap {
+                    object monitor extends EmptyProgressIndicator() {
+                        // hashCode() seems to be quite slow when used
+                        // in CoreProgressManager.threadsUnderIndicator
+                        hash => 43;
+                    }
+                };
+
+                object listener extends ApplicationAdapter() {
+                    shared actual void beforeWriteActionStart(Object action) {
+                        if (!progressMonitor.cancelled) {
+                            progressMonitor.wrapped.cancel();
+                        }
                     }
                 }
-            }
-            if (! application.writeActionPending) {
                 application.addApplicationListener(listener);
+
                 try {
                     concurrencyManager.withAlternateResolution(() {
                         if (is CeylonFile ceylonFile = parameters.originalFile,
-                            exists localAnalyzer = ceylonFile.localAnalyzer) {
-                            LocalAnalysisResult? analysisResult;
-                            if (! modelManager.busy) {
-                                if (parameters.autoPopup) {
-                                    analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 0);
-                                } else {
-                                    analysisResult = localAnalyzer.ensureTypechecked(progressMonitor, 4);
-                                }
-                            } else {
-                                if (parameters.autoPopup) {
-                                    analysisResult = null;
-                                } else {
-                                    if (exists result = localAnalyzer.result,
-                                        exists lastTypecheckedCU = result.lastCompilationUnit) {
-                                        analysisResult = result;
-                                        completionServiceImpl.currentCompletion?.addAdvertisement(
-                                            "The results might be incomplete during a Ceylon model update",
-                                            MessageType.warning.popupBackground);
-                                    } else {
-                                        analysisResult = null;
-                                    }
-                                }
-                            }
-                            if (exists analysisResult) {
-                                addCompletionsInternal {
-                                    modelManager = modelManager;
-                                    parameters = parameters;
-                                    context = context;
-                                    result = result;
-                                    analysisResult = analysisResult;
-                                    options = completionSettings.options;
-                                    progressMonitor = progressMonitor;
-                                };
-                            }
+                            exists localAnalyzer = ceylonFile.localAnalyzer,
+                            exists analysisResult = getAnalysisResult {
+                                modelManager = modelManager;
+                                parameters = parameters;
+                                localAnalyzer = localAnalyzer;
+                                progressMonitor = progressMonitor;
+                            }) {
+
+                            addCompletionsInternal {
+                                modelManager = modelManager;
+                                parameters = parameters;
+                                context = context;
+                                result = result;
+                                analysisResult = analysisResult;
+                                options = completionSettings.options;
+                                progressMonitor = progressMonitor;
+                            };
                         }
                     });
                 } catch (ProcessCanceledException e) {
@@ -194,7 +205,7 @@ shared class IdeaCompletionProvider()
                     = parameters.invocationCount > 0
                     && parameters.invocationCount % 2 == 0;
 
-            value params = IdeaCompletionContext {
+            value ctx = IdeaCompletionContext {
                 file = ceylonFile;
                 localAnalysisResult = analysisResult;
                 editor = parameters.editor;
@@ -203,8 +214,8 @@ shared class IdeaCompletionProvider()
             };
             value doc = parameters.editor.document;
             completionManager.getContentProposals {
-                typecheckedRootNode = params.lastCompilationUnit;
-                ctx = params;
+                typecheckedRootNode = ctx.lastCompilationUnit;
+                ctx = ctx;
                 offset = parameters.editor.caretModel.offset;
                 line = doc.getLineNumber(element.textOffset);
                 secondLevel = isSecondLevel;
