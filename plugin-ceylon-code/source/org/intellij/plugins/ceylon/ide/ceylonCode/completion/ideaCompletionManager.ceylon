@@ -65,9 +65,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTokens
 }
 
-shared class IdeaCompletionProvider(CompletionOptions options)
+shared class IdeaCompletionProvider()
         extends CompletionProvider<CompletionParameters>()  {
-    
+
     shared actual void addCompletions(CompletionParameters parameters,
         ProcessingContext context, variable CompletionResultSet result) {
         assert (exists project = parameters.editor.project,
@@ -167,7 +167,7 @@ shared class IdeaCompletionProvider(CompletionOptions options)
                                     context = context;
                                     result = result;
                                     analysisResult = analysisResult;
-                                    options = options;
+                                    options = completionSettings.options;
                                     progressMonitor = progressMonitor;
                                 };
                             }

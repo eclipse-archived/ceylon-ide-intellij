@@ -22,7 +22,7 @@ shared class CeylonCompletionContributor extends CompletionContributor {
         extend(
             CompletionType.basic,
             PlatformPatterns.psiElement(),
-            IdeaCompletionProvider(completionSettings.options)
+            IdeaCompletionProvider()
         );
     }
 
