@@ -409,12 +409,12 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
         }
     }
 
-    value before = system.milliseconds;
+//    value before = system.milliseconds;
     AllClassesGetter.processJavaClasses(object extends CamelHumpMatcher(startingWith) {
         prefixMatches(String name)
                 => name[0..0]==startingWith[0..0]
                 && super.prefixMatches(name);
     }, mod.project, scope, processor);
-    print("processed Java index in ``system.milliseconds - before``ms => ``result.size()`` results");
+//    print("processed Java index in ``system.milliseconds - before``ms => ``result.size()`` results");
     return result;
 }
