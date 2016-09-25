@@ -76,13 +76,9 @@ shared class IdeaCompletionProvider()
             modelManager.pauseAutomaticModelUpdate();
         
             value sorter = completionService.emptySorter().weigh(
-                object extends LookupElementWeigher("keepInitialOrderWeigher", false, false) {
-                    variable Integer i = 0;
-                    
-                    shared actual Comparable<JInteger> weigh(LookupElement element) {
-                        i++;
-                        return JInteger(i);
-                    }
+                object extends LookupElementWeigher("keepInitialOrderWeigher") {
+                    variable value i = 0;
+                    weigh(LookupElement element) => JInteger(i++);
                 }
             );
             
