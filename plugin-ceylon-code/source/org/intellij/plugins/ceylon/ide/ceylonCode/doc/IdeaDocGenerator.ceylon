@@ -18,6 +18,9 @@ import com.intellij.psi.impl.compiled {
 import com.intellij.psi.javadoc {
     PsiDocComment
 }
+import com.intellij.ui {
+    JBColor
+}
 import com.intellij.util.concurrency {
     FixedFuture
 }
@@ -126,10 +129,13 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
 
     shared actual String color(Object? what, Colors how) {
         value attributes = textAttributes(getAttributes(how));
+        value foregroundColor
+                = attributes.foregroundColor
+                else JBColor.foreground();
         value color = hexColor {
-            red = attributes.foregroundColor.red;
-            green = attributes.foregroundColor.green;
-            blue = attributes.foregroundColor.blue;
+            red = foregroundColor.red;
+            green = foregroundColor.green;
+            blue = foregroundColor.blue;
         };
         value fontBold = if (attributes.fontType.and(bold) != 0) then "font-weight:bold;" else "";
         value fontItalic = if (attributes.fontType.and(italic) != 0) then "font-style:italic;" else "";

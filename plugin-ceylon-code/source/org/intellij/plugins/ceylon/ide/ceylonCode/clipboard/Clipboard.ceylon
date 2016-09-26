@@ -61,7 +61,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     ceylonHighlightingColors,
-    textAttributes
+    foregroundColor
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     IdeaDocument,
@@ -140,9 +140,9 @@ shared class CeylonCopyPastePostProcessor()
     function color(Declaration dec)
             => switch (dec)
             case (is TypeDeclaration)
-                textAttributes(ceylonHighlightingColors.type).foregroundColor
+                foregroundColor(ceylonHighlightingColors.type)
             case (is TypedDeclaration)
-                textAttributes(ceylonHighlightingColors.identifier).foregroundColor
+                foregroundColor(ceylonHighlightingColors.identifier)
             else SimpleTextAttributes.regularAttributes.fgColor;
 
     shared actual void processTransferableData(Project project, Editor editor, RangeMarker bounds,
