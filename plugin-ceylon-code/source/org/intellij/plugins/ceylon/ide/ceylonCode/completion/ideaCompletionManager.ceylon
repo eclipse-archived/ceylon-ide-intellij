@@ -76,7 +76,7 @@ shared class IdeaCompletionProvider()
         value autoPopup = parameters.autoPopup;
 
         if (autoPopup || busy,
-            parameters.position.text != dummyIdentifierTrimmed, //we're just typing within an identifier
+            parameters.position.text.indexOf(dummyIdentifierTrimmed)>1, //we're just typing within an identifier
             exists result = localAnalyzer.result, result.lastCompilationUnit exists) {
             if (busy, exists completion = completionServiceImpl.currentCompletion) {
                 completion.addAdvertisement(
