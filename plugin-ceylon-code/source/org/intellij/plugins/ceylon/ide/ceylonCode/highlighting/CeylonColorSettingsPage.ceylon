@@ -131,7 +131,7 @@ shared object ceylonHighlightingColors {
 
     shared TextAttributesKey number = createKey("CEYLON_NUMBER", DefaultColors.number);
     shared TextAttributesKey strings = createKey("CEYLON_STRING", DefaultColors.strings);
-    shared TextAttributesKey char = createKey("CEYLON_CHAR", DefaultColors.strings);
+    shared TextAttributesKey char = createKey("CEYLON_CHARACTER", DefaultColors.strings);
     shared TextAttributesKey annotationString = createKey("CEYLON_ANNOTATION_STRING", DefaultColors.docComment);
 
     shared TextAttributesKey interp = createKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
