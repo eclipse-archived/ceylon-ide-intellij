@@ -39,7 +39,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 
 shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsPage {
-    
+
     value ourDescriptors = [
         ["Other unqualified identifiers", ceylonHighlightingColors.identifier],
         ["Type identifiers", ceylonHighlightingColors.type],
@@ -68,9 +68,9 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
     ourTags[javaString("pkg")] = ceylonHighlightingColors.packages;
 
     additionalHighlightingTagToDescriptorMap => ourTags;
-    
+
     attributeDescriptors => createJavaObjectArray(ourDescriptors);
-    
+
     colorDescriptors => ColorDescriptor.emptyArray;
     
     demoText => """import <pkg>ceylon</pkg>.<pkg>math</pkg>.<pkg>integer</pkg> { smallest }
@@ -90,9 +90,9 @@ shared abstract class AbstractCeylonColorSettingsPage() satisfies ColorSettingsP
                     }""";
     
     displayName => "Ceylon";
-    
+
     icon => icons.ceylon;
-    
+
 }
 
 shared object ceylonHighlightingColors {
@@ -103,7 +103,9 @@ shared object ceylonHighlightingColors {
     shared TextAttributesKey number = createKey("CEYLON_NUMBER", DefaultColors.number);
     shared TextAttributesKey comment = createKey("CEYLON_COMMENT", DefaultColors.docComment);
     shared TextAttributesKey strings = createKey("CEYLON_STRING", DefaultColors.strings);
-    shared TextAttributesKey char = createKey("CEYLON_CHAR", DefaultColors.strings);
+    shared TextAttributesKey char = createKey("CEYLON_CHARACTER", DefaultColors.strings);
+    shared TextAttributesKey annotationString = createKey("CEYLON_ANNOTATION_STRING", DefaultColors.docComment);
+
     shared TextAttributesKey interp = createKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
     shared TextAttributesKey annotationString = createKey("CEYLON_ANNOTATION_STRING", DefaultColors.strings);
     shared TextAttributesKey annotation = createKey("CEYLON_ANNOTATION", DefaultColors.metadata);
