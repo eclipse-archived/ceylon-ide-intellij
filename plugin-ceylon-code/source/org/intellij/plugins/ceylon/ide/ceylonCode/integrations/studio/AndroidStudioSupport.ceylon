@@ -1,5 +1,10 @@
+import ceylon.collection {
+    ArrayList
+}
 import ceylon.interop.java {
-    javaClass
+    javaClass,
+    javaString,
+    createJavaObjectArray
 }
 
 import com.intellij.codeInsight {
@@ -43,6 +48,9 @@ import com.redhat.ceylon.common {
     Constants,
     Backend
 }
+import com.redhat.ceylon.common.config {
+    ConfigWriter
+}
 
 import java.io {
     File
@@ -51,6 +59,9 @@ import java.lang {
     Runnable,
     ReflectiveOperationException,
     JBoolean=Boolean
+}
+import java.util {
+    Properties
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
@@ -68,9 +79,6 @@ import org.jetbrains.plugins.gradle.util {
 }
 import org.jetbrains.plugins.groovy.lang.psi {
     GroovyFile
-}
-import java.util {
-    Properties
 }
 
 shared interface AndroidStudioSupport {
@@ -104,11 +112,36 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                     buildGradleProject(mod);
                 }
 
+                syncAptDependencies(ceylonProject);
+
                 object extends WriteCommandAction<Nothing>(mod.project) {
                     run(Result<Nothing> result) => addFacet(ceylonProject);
                 }.execute();
             }
         }, "Configure Ceylon", null);
+    }
+
+    void syncAptDependencies(IdeaCeylonProject ceylonProject) {
+        value mod = ceylonProject.ideaModule;
+
+        if (exists file = findGradleBuild(mod)) {
+            value existingApt = ArrayList {
+                    *(ceylonProject.configuration.ceylonConfig
+                        .getOptionValues("compiler.apt")?.iterable else [])
+            };
+
+            for (dep in groovyFileManipulator.findAptDependencies(file)) {
+                if (!existingApt.contains(javaString(dep))) {
+                    existingApt.add(javaString(dep));
+                }
+            }
+
+            ceylonProject.configuration.ceylonConfig.setOptionValues("compiler.apt",
+                createJavaObjectArray(existingApt));
+
+            ConfigWriter.instance().write(ceylonProject.configuration.ceylonConfig,
+                ceylonProject.configuration.projectConfigFile);
+        }
     }
 
     Boolean addCeylonModule(IdeaCeylonProject ceylonProject) {
@@ -135,7 +168,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             ceylonFileFactory.createModuleDescriptor(psiDir, modName[0], modName[1], Backend.java, {
                 "java.base \"7\"",
                 "android \"``groovyFileManipulator.findAndroidVersion(buildFile) else "23"``\"",
-                "\"com.android.support.appcompat-v7\" \"``groovyFileManipulator.findAppCompatVersion(buildFile) else "23.1.1"``\""
+                *groovyFileManipulator.findCompileDependencies(buildFile)
             });
 
             ceylonFileFactory.createFileFromTemplate(psiDir, "CeylonMainActivity.ceylon");

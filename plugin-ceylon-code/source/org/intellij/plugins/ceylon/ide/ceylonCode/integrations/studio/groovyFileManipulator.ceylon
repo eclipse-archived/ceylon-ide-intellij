@@ -1,3 +1,6 @@
+import ceylon.collection {
+    HashMap
+}
 import ceylon.interop.java {
     javaClass,
     javaString
@@ -11,6 +14,10 @@ import com.intellij.psi.codeStyle {
 }
 import com.intellij.psi.util {
     PsiTreeUtil
+}
+
+import java.util.regex {
+    Pattern
 }
 
 import org.jetbrains.plugins.groovy.lang.psi {
@@ -39,6 +46,7 @@ object groovyFileManipulator {
     value sourceSet = "main.java.srcDirs += 'src/main/ceylon'\n";
     value ceylonAndroidDep = "classpath 'com.redhat.ceylon.gradle:android:1.0.1'\n";
     value repositoryName = "jcenter()\n";
+    value dependencyRegex = Pattern.compile("^['\"](.*):([^:]+)['\"]$");
 
     GrClosableBlock getAndroidBlock(GroovyFile buildFile)
         => getBlockOrCreate(buildFile, "android");
@@ -129,23 +137,38 @@ object groovyFileManipulator {
         return null;
     }
 
-    shared String? findAppCompatVersion(GroovyFile file) {
+    shared {String*} findCompileDependencies(GroovyFile file) {
+        return findDependencies(file, "compile")
+            .map((name->version) => "\"``name``\" \"``version``\"");
+    }
+
+    <String->String>[] findDependencies(GroovyFile file, String type) {
         if (exists blck = getBlockByName(file, "dependencies"),
             exists allExpressions = PsiTreeUtil.getChildrenOfType(blck, javaClass<GrMethodCall>())) {
 
-            value lookupString = "'com.android.support:appcompat-v7:";
+            value modules = HashMap<String, String>();
 
             for (expr in allExpressions) {
-                if (expr.invokedExpression.text == "compile",
-                    exists arg = expr.argumentList.allArguments.get(0),
-                    arg.text.startsWith(lookupString)) {
+                if (expr.invokedExpression.text == type,
+                    exists arg = expr.argumentList.allArguments.get(0)) {
 
-                    return arg.text.spanFrom(lookupString.size).trimTrailing('\''.equals);
+                    value matcher = dependencyRegex.matcher(javaString(arg.text));
+
+                    if (matcher.matches()) {
+                        modules.put(matcher.group(1).replace(":", "."), matcher.group(2));
+                    }
                 }
             }
+
+            return modules.sequence();
         }
 
-        return null;
+        return [];
+    }
+
+    shared {String*} findAptDependencies(GroovyFile file) {
+        return findDependencies(file, "apt")
+            .map((name->version) => "``name``/``version``");
     }
 
     shared [String,String]? findModuleName(GroovyFile file) {
