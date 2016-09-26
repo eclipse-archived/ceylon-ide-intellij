@@ -106,7 +106,7 @@ import javax.swing {
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter,
     ceylonHighlightingColors,
-    textAttributes
+    foregroundColor
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     concurrencyManager,
@@ -411,9 +411,9 @@ shared class IdeaQuickFixData(
                     else icons.moduleArchives;
                 color
                     = switch (declaration)
-                    case (is TypeDeclaration) textAttributes(ceylonHighlightingColors.type).foregroundColor
-                    case (is TypedDeclaration) textAttributes(ceylonHighlightingColors.identifier).foregroundColor
-                    case (is Module|ModuleVersionDetails) textAttributes(ceylonHighlightingColors.packages).foregroundColor
+                    case (is TypeDeclaration) foregroundColor(ceylonHighlightingColors.type)
+                    case (is TypedDeclaration) foregroundColor(ceylonHighlightingColors.identifier)
+                    case (is Module|ModuleVersionDetails) foregroundColor(ceylonHighlightingColors.packages)
                     else SimpleTextAttributes.regularAttributes.fgColor;
                 change = change;
             });

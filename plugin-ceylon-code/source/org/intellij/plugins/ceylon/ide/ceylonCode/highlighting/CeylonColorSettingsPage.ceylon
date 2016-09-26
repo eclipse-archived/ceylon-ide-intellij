@@ -30,6 +30,13 @@ import com.intellij.psi.codeStyle {
     DisplayPrioritySortable,
     DisplayPriority
 }
+import com.intellij.ui {
+    JBColor
+}
+
+import java.awt {
+    Color
+}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
@@ -149,3 +156,7 @@ shared object ceylonHighlightingColors {
 
 shared TextAttributes textAttributes(TextAttributesKey key)
         => EditorColorsManager.instance.globalScheme.getAttributes(key);
+
+shared Color foregroundColor(TextAttributesKey key)
+        => textAttributes(key).foregroundColor
+        else JBColor.foreground();

@@ -31,8 +31,8 @@ import com.redhat.ceylon.ide.common.doc {
 
 import java.awt {
     Font {
-        bold=BOLD,
-        italic=ITALIC
+        bold=\iBOLD,
+        italic=\iITALIC
     }
 }
 import java.lang {
@@ -193,7 +193,7 @@ shared object highlighter {
     shared String toColoredHtml(String token, TextAttributes attr) {
         String? color =
             if (exists fg = attr.foregroundColor, fg!=JBColor.black)
-            then "<font color='#``ColorUtil.toHex(attr.foregroundColor)``'>"
+            then "<font color='#``ColorUtil.toHex(fg)``'>"
             else null;
 
         Boolean isBold = attr.fontType.and(bold) != 0;
