@@ -205,7 +205,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
             ];
         }
         else {
-            value pattern = qualifiedNameIsPath then "()[]{}<>,+*&|?;= " else "()[]{}<>,.+*&|?;= ";
+            value pattern = qualifiedNameIsPath then "()[]{}<>,+*&|?;:= " else "()[]{}<>,.+*&|?;:= ";
             return [
                 for (token in text.split(pattern.contains, false, false)) if (!token.empty)
                 createFragment(token, SimpleTextAttributes(style, color(token, qualifiedNameIsPath)))
