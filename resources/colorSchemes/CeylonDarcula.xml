@@ -36,16 +36,6 @@
             <option name="FONT_TYPE" value="2"/>
         </value>
     </option>
-    <option name="CEYLON_LINE_COMMENT">
-        <value>
-            <option name="FONT_TYPE" value="2"/>
-        </value>
-    </option>
-    <option name="CEYLON_BLOCK_COMMENT">
-        <value>
-            <option name="FONT_TYPE" value="2"/>
-        </value>
-    </option>
     <!--option name="CEYLON_STRING">
         <value>
             <option name="FOREGROUND" value="50875C"/>
