@@ -155,15 +155,18 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             // read lock
             return;
         }
-        resetJavaModelSourceIfNecessary(JavaRunnable { 
-                run() => application.invokeAndWait(JavaRunnable { 
-                    void run() { 
-                        assert (exists project = 
-                            ideaModuleManager.ceylonProject?.ideArtifact?.project);
+        if (exists strategy = concurrencyManager.noIndexStrategy,
+            strategy == NoIndexStrategy.waitForIndexes) {
+            resetJavaModelSourceIfNecessary(JavaRunnable {
+                run() => application.invokeAndWait(JavaRunnable {
+                    void run() {
+                        assert (exists project =
+                                ideaModuleManager.ceylonProject?.ideArtifact?.project);
                         dumbService(project).queueTask(UnindexedFilesUpdater(project, false));
                     }
                 }, ModalityState.nonModal);
-        });
+            });
+        }
     }
 
     shared actual Boolean moduleContainsClass(BaseIdeModule ideModule,
