@@ -30,4 +30,14 @@
             <option name="FONT_TYPE" value="2"/>
         </value>
     </option>
+    <option name="CEYLON_STRING">
+        <value>
+            <option name="FOREGROUND" value="008000"/>
+        </value>
+    </option>
+    <option name="CEYLON_CHARACTER">
+        <value>
+            <option name="FOREGROUND" value="008000"/>
+        </value>
+    </option>
 </list>
