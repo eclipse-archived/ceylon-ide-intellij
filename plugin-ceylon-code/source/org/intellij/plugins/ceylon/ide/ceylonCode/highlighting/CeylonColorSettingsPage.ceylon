@@ -63,15 +63,15 @@ shared abstract class AbstractCeylonColorSettingsPage()
         ["Literals//String literals", ceylonHighlightingColors.strings],
         ["Literals//Character literals", ceylonHighlightingColors.char],
         ["Literals//Strings in annotations", ceylonHighlightingColors.annotationString],
-        ["Literals//Escape sequence", ceylonHighlightingColors.escape],
+        ["Literals//Escape sequences", ceylonHighlightingColors.escape],
 
         ["Comments//Block comments", ceylonHighlightingColors.blockComment],
         ["Comments//Line comments", ceylonHighlightingColors.lineComment],
         ["Comments//Todos", ceylonHighlightingColors.todo],
 
-        ["Metamodel expressions", ceylonHighlightingColors.meta],
-        ["Interpolated expressions", ceylonHighlightingColors.interpolation],
-        ["Documentation links", ceylonHighlightingColors.docLink],
+        ["Miscellaneous//Metamodel expressions", ceylonHighlightingColors.meta],
+        ["Miscellaneous//Interpolated expressions", ceylonHighlightingColors.interpolation],
+        ["Miscellaneous//Documentation links", ceylonHighlightingColors.docLink],
 
         ["Punctuation//Braces", ceylonHighlightingColors.brace],
         ["Punctuation//Parentheses", ceylonHighlightingColors.paren],
@@ -90,37 +90,42 @@ shared abstract class AbstractCeylonColorSettingsPage()
     priority = DisplayPriority.keyLanguageSettings;
 
     value ourTags = map {
-        "anno" -> ceylonHighlightingColors.annotation,
-        "interp" -> ceylonHighlightingColors.interpolation,
-        "meta" -> ceylonHighlightingColors.meta,
-        "stringInAnno" -> ceylonHighlightingColors.annotationString,
-        "member" -> ceylonHighlightingColors.member,
-        "pkg" -> ceylonHighlightingColors.packages,
-        "todo" -> ceylonHighlightingColors.todo
+        "a" -> ceylonHighlightingColors.annotation,
+        "i" -> ceylonHighlightingColors.interpolation,
+        "dl" -> ceylonHighlightingColors.docLink,
+        "m" -> ceylonHighlightingColors.meta,
+        "as" -> ceylonHighlightingColors.annotationString,
+        "q" -> ceylonHighlightingColors.member,
+        "p" -> ceylonHighlightingColors.packages,
+        "td" -> ceylonHighlightingColors.todo,
+        "e" -> ceylonHighlightingColors.escape
     };
 
     additionalHighlightingTagToDescriptorMap => JavaMap(JavaStringMap(ourTags));
 
-    demoText => """import <pkg>ceylon</pkg>.<pkg>math</pkg>.<pkg>integer</pkg> { smallest }
+    demoText => """import <p>ceylon</p>.<p>numeric</p>.<p>integer</p> { smallest }
 
                    /*
                      The entry point.
                     */
-                   <anno>see</anno>(<meta>`class Duck`</meta>)
-                   <anno>shared</anno> void run() {
-                       String greeting = "hello, world";
-                       print("This program prints <interp>``mygreeting``</interp>");
+                   <as>"Uses the <dl>[[Duck]]</dl>!"</as>
+                   <a>see</a>(<m>`class Duck`</m>)
+                   <a>shared</a> void run() {
+                       String greeting = "hello world";
+                       print("This program prints <i>``mygreeting``</i>");
                        value number = 13.37;
                        value char = 'X';
-                       Duck().<member>quack</member>();
+                       value otherChar = '<e>\n</e>';
+                       value string = "Eat more <e>\{GREEK SMALL LETTER PI}</e>";
+                       Duck().<q>quack</q>();
                     }
 
                     //Cool class
-                    <todo>//TODO: make it way cooler</todo>
-                    "Represents a duck"
-                    <anno>by</anno>(<stringInAnno>"Trompon"</stringInAnno>)
+                    <td>//TODO: make it way cooler</td>
+                    <as>"Represents a duck"</as>
+                    <a>by</a>(<as>"Trompon"</as>)
                     class Duck() {
-                        <anno>shared</anno> void quack() => print("Quack!");
+                        <a>shared</a> void quack() => print("Quack quack!");
                     }""";
 
 }
