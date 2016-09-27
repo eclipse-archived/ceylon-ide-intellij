@@ -158,6 +158,18 @@ shared class CeylonLocalAnalyzerManager(model)
         editedFilesAnalyzersMap.clear().items.each((analyzer) => 
             analyzer.dispose());
     }
+
+    "Reinstantiates local analyzers for currently open files, when a Ceylon facet
+     is added to a module. This is necessary because the `CeylonLocalAnalyzer.ceylonProject`
+     attribute needs to be recomputed after the project is added to `IdeaCeylonProjects`."
+    shared void ceylonFacetAdded(FileEditorManager fileEditorManager) {
+        for (file in fileEditorManager.openFiles) {
+            if (file.fileType == ceylonFileType) {
+                editedFilesAnalyzersMap.remove(file)?.dispose();
+                fileOpened(fileEditorManager, file);
+            }
+        }
+    }
     
     shared actual void fileClosed(FileEditorManager fileEditorManager, VirtualFile virtualFile) {
         if (!fileEditorManager.isFileOpen(virtualFile)) {

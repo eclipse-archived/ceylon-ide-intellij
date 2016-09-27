@@ -4,6 +4,7 @@ import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
 import com.intellij.framework.detection.FileContentPattern;
 import com.intellij.ide.projectView.actions.MarkRootActionBase;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.roots.ContentEntry;
@@ -21,6 +22,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonLocalAnalyzerManager;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaResourceRootType;
@@ -106,6 +108,12 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
         TypeCheckerProvider tcp = (TypeCheckerProvider) facet.getModule().getComponent(ITypeCheckerProvider.class);
         if (tcp != null) {
             tcp.moduleAdded();
+        }
+
+        CeylonLocalAnalyzerManager analyzerManager = model.getProject().getComponent(CeylonLocalAnalyzerManager.class);
+        if (analyzerManager != null) {
+            FileEditorManager fem = FileEditorManager.getInstance(model.getProject());
+            analyzerManager.ceylonFacetAdded(fem);
         }
     }
 
