@@ -149,7 +149,7 @@ shared object ceylonHighlightingColors {
     shared TextAttributesKey escape = createKey("CEYLON_ESCAPE", DefaultColors.validStringEscape);
     shared TextAttributesKey annotationString = createKey("CEYLON_ANNOTATION_STRING", DefaultColors.docComment);
 
-    shared TextAttributesKey interpolation = createKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
+    shared TextAttributesKey interpolation = createKey("CEYLON_INTERPOLATION", EditorColors.injectedLanguageFragment);
     shared TextAttributesKey meta = createKey("CEYLON_META", EditorColors.injectedLanguageFragment);
     shared TextAttributesKey docLink = createKey("CEYLON_DOCLINK", DefaultColors.docCommentTagValue);
 
