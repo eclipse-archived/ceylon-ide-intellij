@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    javaString
+}
+
 import com.intellij.lang {
     ASTNode
 }
@@ -5,6 +9,9 @@ import com.intellij.lang.annotation {
     Annotation,
     AnnotationHolder,
     Annotator
+}
+import com.intellij.openapi.editor.colors {
+    TextAttributesKey
 }
 import com.intellij.openapi.util {
     TextRange
@@ -14,6 +21,10 @@ import com.intellij.psi {
 }
 import com.intellij.psi.tree {
     IElementType
+}
+
+import java.util.regex {
+    Pattern
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
@@ -30,6 +41,9 @@ shared class CeylonSyntaxAnnotator()
         satisfies Annotator {
 
     variable AnnotationHolder? holder = null;
+
+    value docLinkPattern = Pattern.compile("""\[\[([^\]\[]*)\]\]""");
+    value escapePattern = Pattern.compile("""\\[^{]|\\\{[^}]*\}""");
 
     value annotationHolder {
         assert (exists annotationHolder = holder);
@@ -53,6 +67,12 @@ shared class CeylonSyntaxAnnotator()
         Annotation anno = annotationHolder.createInfoAnnotation(element, null);
         anno.textAttributes = ceylonHighlightingColors.meta;
     }
+
+    /*shared actual void visitDocLinkPsi(CeylonPsi.DocLinkPsi element) {
+        super.visitDocLinkPsi(element);
+        value anno = annotationHolder.createInfoAnnotation(element, null);
+        anno.textAttributes = ceylonHighlightingColors.interp;
+    }*/
 
     function isWhitespace(PsiElement p)
             => p.node.elementType == CeylonTokens.ws;
@@ -91,8 +111,20 @@ shared class CeylonSyntaxAnnotator()
                         else child.textRange.endOffset;
                 TextRange range = TextRange(startOffset, endOffset);
                 Annotation anno = annotationHolder.createInfoAnnotation(range, null);
-                anno.textAttributes = ceylonHighlightingColors.interp;
+                anno.textAttributes = ceylonHighlightingColors.interpolation;
             }
+        }
+    }
+
+    void createAnnotations(Pattern pattern, PsiElement element, TextAttributesKey key) {
+        value offset = element.textOffset;
+        value matcher = pattern.matcher(javaString(element.text));
+        while (matcher.find()) {
+            value anno = annotationHolder.createInfoAnnotation(
+                TextRange(offset + matcher.start(0),
+                          offset + matcher.end(0)),
+                null);
+            anno.textAttributes = key;
         }
     }
 
@@ -103,7 +135,18 @@ shared class CeylonSyntaxAnnotator()
          || elementType == CeylonTokens.averbatimString) {
             Annotation anno = annotationHolder.createInfoAnnotation(element, null);
             anno.textAttributes = ceylonHighlightingColors.annotationString;
+            createAnnotations(docLinkPattern, element, ceylonHighlightingColors.docLink);
         }
+
+        if (elementType == CeylonTokens.astringLiteral
+         || elementType == CeylonTokens.stringLiteral
+         || elementType == CeylonTokens.stringStart
+         || elementType == CeylonTokens.stringEnd
+         || elementType == CeylonTokens.stringMid
+         || elementType == CeylonTokens.charLiteral) {
+            createAnnotations(escapePattern, element, ceylonHighlightingColors.escape);
+        }
+
         if (is CeylonPsi.StringTemplatePsi element) {
             visitStringTemplatePsi(element);
         }

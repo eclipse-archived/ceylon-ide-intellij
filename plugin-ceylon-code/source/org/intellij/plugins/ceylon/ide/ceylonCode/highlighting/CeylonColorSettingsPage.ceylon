@@ -63,13 +63,15 @@ shared abstract class AbstractCeylonColorSettingsPage()
         ["Literals//String literals", ceylonHighlightingColors.strings],
         ["Literals//Character literals", ceylonHighlightingColors.char],
         ["Literals//Strings in annotations", ceylonHighlightingColors.annotationString],
+        ["Literals//Escape sequence", ceylonHighlightingColors.escape],
 
         ["Comments//Block comments", ceylonHighlightingColors.blockComment],
         ["Comments//Line comments", ceylonHighlightingColors.lineComment],
         ["Comments//Todos", ceylonHighlightingColors.todo],
 
         ["Metamodel expressions", ceylonHighlightingColors.meta],
-        ["Interpolated expressions", ceylonHighlightingColors.interp],
+        ["Interpolated expressions", ceylonHighlightingColors.interpolation],
+        ["Documentation links", ceylonHighlightingColors.docLink],
 
         ["Punctuation//Braces", ceylonHighlightingColors.brace],
         ["Punctuation//Parentheses", ceylonHighlightingColors.paren],
@@ -89,7 +91,7 @@ shared abstract class AbstractCeylonColorSettingsPage()
 
     value ourTags = map {
         "anno" -> ceylonHighlightingColors.annotation,
-        "interp" -> ceylonHighlightingColors.interp,
+        "interp" -> ceylonHighlightingColors.interpolation,
         "meta" -> ceylonHighlightingColors.meta,
         "stringInAnno" -> ceylonHighlightingColors.annotationString,
         "member" -> ceylonHighlightingColors.member,
@@ -139,10 +141,12 @@ shared object ceylonHighlightingColors {
     shared TextAttributesKey number = createKey("CEYLON_NUMBER", DefaultColors.number);
     shared TextAttributesKey strings = createKey("CEYLON_STRING", DefaultColors.strings);
     shared TextAttributesKey char = createKey("CEYLON_CHARACTER", DefaultColors.strings);
+    shared TextAttributesKey escape = createKey("CEYLON_ESCAPE", DefaultColors.validStringEscape);
     shared TextAttributesKey annotationString = createKey("CEYLON_ANNOTATION_STRING", DefaultColors.docComment);
 
-    shared TextAttributesKey interp = createKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
+    shared TextAttributesKey interpolation = createKey("CEYLON_INTERP", EditorColors.injectedLanguageFragment);
     shared TextAttributesKey meta = createKey("CEYLON_META", EditorColors.injectedLanguageFragment);
+    shared TextAttributesKey docLink = createKey("CEYLON_DOCLINK", DefaultColors.docCommentTagValue);
 
     shared TextAttributesKey brace = createKey("CEYLON_BRACE", DefaultColors.braces);
     shared TextAttributesKey paren = createKey("CEYLON_PAREN", DefaultColors.parentheses);
