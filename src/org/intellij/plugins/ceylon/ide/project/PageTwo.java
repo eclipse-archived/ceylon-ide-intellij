@@ -1,8 +1,11 @@
 package org.intellij.plugins.ceylon.ide.project;
 
 import ceylon.language.Boolean;
-import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.ide.fileTemplates.FileTemplate;
+import com.intellij.ide.fileTemplates.FileTemplateManager;
+import com.intellij.ide.highlighter.XmlFileType;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
@@ -12,12 +15,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.util.Consumer;
 import com.intellij.util.PlatformIcons;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.Repositories;
 import com.redhat.ceylon.ide.common.configuration.CeylonRepositoryConfigurator;
 import org.apache.commons.lang.StringUtils;
-import org.intellij.plugins.ceylon.ide.CeylonBundle;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +31,13 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import static com.intellij.openapi.fileChooser.FileChooser.chooseFile;
+import static com.intellij.openapi.fileChooser.FileChooserDescriptorFactory.createSingleFileDescriptor;
+import static com.intellij.openapi.fileChooser.FileChooserDescriptorFactory.createSingleFolderDescriptor;
+import static javax.swing.JOptionPane.showMessageDialog;
+import static org.intellij.plugins.ceylon.ide.CeylonBundle.message;
 
 public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfigForm {
     private CollectionListModel<String> listModel = new CollectionListModel<>();
@@ -44,6 +54,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     private JButton addRepo;
     private JButton addRemoteRepo;
     private JList<String> repoList;
+    private TextFieldWithBrowseButton moduleOverrides;
+    private JButton createOverridesButton;
     private Module module;
 
     public PageTwo() {
@@ -65,7 +77,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         repoList.setModel(listModel);
         repoList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
                 Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
                 if (isFixedRepoIndex(index)) {
@@ -80,7 +93,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
             }
         });
 
-        systemRepository.addBrowseFolderListener(CeylonBundle.message("ceylon.facet.settings.selectsystemrepo"), null, null, FileChooserDescriptorFactory.createSingleFolderDescriptor());
+        systemRepository.addBrowseFolderListener(message("ceylon.facet.settings.selectsystemrepo"),
+                null, null, createSingleFolderDescriptor());
         outputDirectory.addBrowseFolderListener(new BrowseOutputDirectoryListener());
         repoList.addListSelectionListener(new RepoListSelectionListener());
         addRemoteRepo.addActionListener(new AddRemoteRepoListener());
@@ -89,11 +103,64 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         downButton.addActionListener(new MoveDownListener());
         addExternalRepo.addActionListener(new AddExternalRepoListener());
         addMavenRepo.addActionListener(new AddMavenRepoListener());
+        moduleOverrides.addBrowseFolderListener(new BrowseOverridesListener());
 
         JTextField textField = systemRepository.getTextField();
         if (textField instanceof JBTextField) {
             ((JBTextField) textField).getEmptyText().setText("Use IDE system modules");
         }
+        createOverridesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final Project project = module == null ? null : module.getProject();
+
+                Consumer<VirtualFile> consumer = new Consumer<VirtualFile>() {
+                    @Override
+                    public void consume(final VirtualFile folder) {
+                        if (folder.findChild("overrides.xml") != null) {
+                            showMessageDialog(
+                                    panel,
+                                    message("project.wizard.overrides.exists"),
+                                    message("project.wizard.overrides.title"),
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+                        } else {
+                            final FileTemplate tpl = FileTemplateManager.getDefaultInstance()
+                                    .getInternalTemplate("overrides.xml");
+                                ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            VirtualFile file = folder.createChildData(this, "overrides.xml");
+                                            file.setBinaryContent(tpl.getText().getBytes());
+
+                                            if (project != null && VfsUtil.isAncestor(project.getBaseDir(), file, true)) {
+                                                //noinspection ConstantConditions
+                                                moduleOverrides.setText(VfsUtil.getRelativePath(file, project.getBaseDir()));
+                                            } else {
+                                                moduleOverrides.setText(file.getPath());
+                                            }
+
+                                            if (project != null) {
+                                                FileEditorManager.getInstance(project).openFile(file, true);
+                                            }
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                });
+                        }
+                    }
+                };
+
+                chooseFile(
+                        createSingleFolderDescriptor().withTitle("Select Destination Folder"),
+                        project,
+                        null,
+                        consumer
+                );
+            }
+        });
     }
 
     @Override
@@ -109,6 +176,7 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     public void apply(IdeaCeylonProject config) {
         config.getIdeConfiguration().setSystemRepository(ceylon.language.String.instance(systemRepository.getText()));
         config.getConfiguration().setOutputRepo(outputDirectory.getText());
+        config.getConfiguration().setProjectOverrides(ceylon.language.String.instance(moduleOverrides.getText()));
         config.getConfiguration().setProjectFlatClasspath(Boolean.instance(flatClasspath.isSelected()));
         config.getConfiguration().setProjectAutoExportMavenDependencies(Boolean.instance(exportMavenDeps.isSelected()));
         applyToConfiguration(config.getConfiguration());
@@ -117,8 +185,10 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     @Override
     public boolean isModified(IdeaCeylonProject config) {
         ceylon.language.String systemRepo = config.getIdeConfiguration().getSystemRepository();
+        ceylon.language.String overrides = config.getConfiguration().getProjectOverrides();
         return !StringUtils.equals(systemRepo == null ? null : systemRepo.toString(), systemRepository.getText())
                 || !StringUtils.equals(config.getConfiguration().getOutputRepo(), outputDirectory.getText())
+                || !StringUtils.equals(overrides == null ? null : overrides.toString(), moduleOverrides.getText())
                 || !Boolean.equals(flatClasspath.isSelected(), config.getConfiguration().getProjectFlatClasspath())
                 || !Boolean.equals(exportMavenDeps.isSelected(), config.getConfiguration().getProjectAutoExportMavenDependencies())
                 || isRepoConfigurationModified(config.getConfiguration())
@@ -131,6 +201,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         ceylon.language.String systemRepository = config.getIdeConfiguration().getSystemRepository();
         this.systemRepository.setText(systemRepository == null ? null : systemRepository.toString());
         outputDirectory.setText(config.getConfiguration().getOutputRepo());
+        ceylon.language.String overrides = config.getConfiguration().getProjectOverrides();
+        moduleOverrides.setText(overrides == null ? null : overrides.toString());
         flatClasspath.setSelected(boolValue(config.getConfiguration().getProjectFlatClasspath()));
         exportMavenDeps.setSelected(boolValue(config.getConfiguration().getProjectAutoExportMavenDependencies()));
 
@@ -190,8 +262,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
 
     private class BrowseOutputDirectoryListener extends TextBrowseFolderListener {
 
-        public BrowseOutputDirectoryListener() {
-            super(FileChooserDescriptorFactory.createSingleFolderDescriptor());
+        BrowseOutputDirectoryListener() {
+            super(createSingleFolderDescriptor());
         }
 
         @Nullable
@@ -223,10 +295,46 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         }
     }
 
+    private class BrowseOverridesListener extends TextBrowseFolderListener {
+
+        BrowseOverridesListener() {
+            super(createSingleFileDescriptor(XmlFileType.INSTANCE));
+        }
+
+        @Nullable
+        @Override
+        protected Project getProject() {
+            return module == null ? null : module.getProject();
+        }
+
+        @Nullable
+        @Override
+        protected VirtualFile getInitialFile() {
+            Project project = getProject();
+            if (project != null) {
+                return project.getBaseDir();
+            }
+            return super.getInitialFile();
+        }
+
+        @NotNull
+        @Override
+        protected String chosenFileToResultingText(@NotNull VirtualFile file) {
+            Project project = getProject();
+
+            if (project != null && VfsUtil.isAncestor(project.getBaseDir(), file, true)) {
+                //noinspection ConstantConditions
+                return VfsUtil.getRelativePath(file, project.getBaseDir());
+            }
+
+            return super.chosenFileToResultingText(file);
+        }
+    }
+
     private class AddExternalRepoListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            VirtualFile file = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFolderDescriptor(), null, null);
+            VirtualFile file = chooseFile(createSingleFolderDescriptor(), null, null);
             if (file != null) {
                 addExternalRepo(file.getPresentableUrl());
             }
@@ -236,7 +344,10 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     private class AddRemoteRepoListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String uri = JOptionPane.showInputDialog(PageTwo.this.panel, CeylonBundle.message("project.wizard.repo.uri.description"), CeylonBundle.message("project.wizard.repo.uri.title"), JOptionPane.QUESTION_MESSAGE);
+            String uri = JOptionPane.showInputDialog(PageTwo.this.panel,
+                    message("project.wizard.repo.uri.description"),
+                    message("project.wizard.repo.uri.title"),
+                    JOptionPane.QUESTION_MESSAGE);
 
             if (StringUtils.isNotBlank(uri)) {
                 addRemoteRepo(uri);
