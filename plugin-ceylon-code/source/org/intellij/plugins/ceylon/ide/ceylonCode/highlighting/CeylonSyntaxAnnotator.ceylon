@@ -40,6 +40,7 @@ shared class CeylonSyntaxAnnotator()
 
     value docLinkPattern = Pattern.compile("""\[\[([^\]\[]*)\]\]""");
     value escapePattern = Pattern.compile("""\\[^{]|\\\{[^}]*\}""");
+    value codePattern = Pattern.compile("""`[^`]*`""");
 
     value annotationHolder {
         assert (exists annotationHolder = holder);
@@ -132,7 +133,9 @@ shared class CeylonSyntaxAnnotator()
          || elementType == CeylonTokens.averbatimString) {
             value anno = annotationHolder.createInfoAnnotation(element, null);
             anno.textAttributes = ceylonHighlightingColors.annotationString;
+            createAnnotations(codePattern, element, ceylonHighlightingColors.code);
             createAnnotations(docLinkPattern, element, ceylonHighlightingColors.docLink);
+            //TODO: detect code blocks
         }
 
         if (elementType == CeylonTokens.astringLiteral

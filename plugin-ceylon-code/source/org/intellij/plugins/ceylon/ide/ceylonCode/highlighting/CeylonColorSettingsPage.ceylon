@@ -72,6 +72,7 @@ shared abstract class AbstractCeylonColorSettingsPage()
         ["Miscellaneous//Metamodel expressions", ceylonHighlightingColors.meta],
         ["Miscellaneous//Interpolated expressions", ceylonHighlightingColors.interpolation],
         ["Miscellaneous//Documentation links", ceylonHighlightingColors.docLink],
+        ["Miscellaneous//Code spans", ceylonHighlightingColors.code],
 
         ["Punctuation//Braces", ceylonHighlightingColors.brace],
         ["Punctuation//Parentheses", ceylonHighlightingColors.paren],
@@ -152,6 +153,7 @@ shared object ceylonHighlightingColors {
     shared TextAttributesKey interpolation = createKey("CEYLON_INTERPOLATION", EditorColors.injectedLanguageFragment);
     shared TextAttributesKey meta = createKey("CEYLON_META", EditorColors.injectedLanguageFragment);
     shared TextAttributesKey docLink = createKey("CEYLON_DOCLINK", DefaultColors.docCommentTagValue);
+    shared TextAttributesKey code = createKey("CEYLON_CODE", DefaultColors.docCommentMarkup);
 
     shared TextAttributesKey brace = createKey("CEYLON_BRACE", DefaultColors.braces);
     shared TextAttributesKey paren = createKey("CEYLON_PAREN", DefaultColors.parentheses);
