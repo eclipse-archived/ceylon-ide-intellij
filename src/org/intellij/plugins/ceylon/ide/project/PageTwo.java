@@ -176,7 +176,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     public void apply(IdeaCeylonProject config) {
         config.getIdeConfiguration().setSystemRepository(ceylon.language.String.instance(systemRepository.getText()));
         config.getConfiguration().setOutputRepo(outputDirectory.getText());
-        config.getConfiguration().setProjectOverrides(ceylon.language.String.instance(moduleOverrides.getText()));
+        String overrides = moduleOverrides.getText().isEmpty() ? null : moduleOverrides.getText();
+        config.getConfiguration().setProjectOverrides(ceylon.language.String.instance(overrides));
         config.getConfiguration().setProjectFlatClasspath(Boolean.instance(flatClasspath.isSelected()));
         config.getConfiguration().setProjectAutoExportMavenDependencies(Boolean.instance(exportMavenDeps.isSelected()));
         applyToConfiguration(config.getConfiguration());
