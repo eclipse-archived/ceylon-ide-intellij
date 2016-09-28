@@ -40,4 +40,14 @@
             <option name="FOREGROUND" value="008000"/>
         </value>
     </option>
+    <option name="CEYLON_CODE">
+        <value>
+            <option name="FOREGROUND" value="#7A3D00"/>
+        </value>
+    </option>
+    <option name="CEYLON_DOCLINK">
+        <value>
+            <option name="FOREGROUND" value="3D3D3D"/>
+        </value>
+    </option>
 </list>
