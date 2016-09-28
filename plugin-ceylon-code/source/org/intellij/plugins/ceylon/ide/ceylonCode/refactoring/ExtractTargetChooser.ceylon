@@ -84,7 +84,7 @@ shared void showChooser<out T>
                         "<html>``highlighter.highlight {
                             rawText = rawText;
                             project = expr.project;
-                            qualifiedNameIsPath = text.startsWith("package");
+//                            qualifiedNameIsPath = text.startsWith("package");
                         }``</html>";
                 }
             } else {

@@ -47,7 +47,7 @@ shared object highlighter {
     "Highlights a message that contains code snippets in single quotes, and returns
      an HTML representation of that message surrounded by `<html>` tags."
     shared String highlightQuotedMessage(String description, Project project,
-        Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
+        /*Boolean qualifiedNameIsPath = false,*/ Boolean eliminateQuotes = true) {
 
         value result = StringBuffer();
         result.append("<html>");
@@ -55,7 +55,7 @@ shared object highlighter {
         iterateTokens(description, eliminateQuotes, (token, highlightMode) {
             switch(highlightMode)
             case (is Boolean) {
-                result.append(highlight(token, project, qualifiedNameIsPath));
+                result.append(highlight(token, project/*, qualifiedNameIsPath*/));
             }
             case (is TextAttributes) {
                 result.append(toColoredHtml(token, highlightMode));
@@ -73,12 +73,12 @@ shared object highlighter {
     "Highlights a message that contains code snippets in single quotes, and add colored
      fragments to the given [[data]]."
     shared void highlightPresentationData(PresentationData data, String description,
-        Project project, Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
+        Project project, /*Boolean qualifiedNameIsPath = false,*/ Boolean eliminateQuotes = true) {
 
         iterateTokens(description, eliminateQuotes, (token, highlight) {
             switch(highlight)
             case (is Boolean) {
-                highlightInternal(token, project, qualifiedNameIsPath, (token, attrs) {
+                highlightInternal(token, project, /*qualifiedNameIsPath,*/ (token, attrs) {
                     data.addText(token, SimpleTextAttributes.fromTextAttributes(attrs));
                 });
             }
@@ -94,13 +94,13 @@ shared object highlighter {
     "Highlights a message that contains code snippets in single quotes, and add colored
      fragments to the given [[appearance]]."
     shared void highlightCompositeAppearance(CompositeAppearance appearance, String description,
-            Project project, Boolean qualifiedNameIsPath = false, Boolean eliminateQuotes = true) {
+            Project project, /*Boolean qualifiedNameIsPath = false,*/ Boolean eliminateQuotes = true) {
 
         value data = appearance.ending;
         iterateTokens(description, eliminateQuotes, (token, highlight) {
             switch(highlight)
             case (is Boolean) {
-                highlightInternal(token, project, qualifiedNameIsPath, (token, attrs) {
+                highlightInternal(token, project, /*qualifiedNameIsPath,*/ (token, attrs) {
                     data.addText(token, SimpleTextAttributes.fromTextAttributes(attrs));
                 });
             }
@@ -115,10 +115,10 @@ shared object highlighter {
 
     "Highlights a snippet of Ceylon code and returns its HTML representation *without*
      surrounding `<html>` tags."
-    shared String highlight(String rawText, Project project, Boolean qualifiedNameIsPath = false) {
+    shared String highlight(String rawText, Project project/*, Boolean qualifiedNameIsPath = false*/) {
         value builder = StringBuilder();
 
-        highlightInternal(rawText, project, qualifiedNameIsPath, (token, attrs) {
+        highlightInternal(rawText, project, /*qualifiedNameIsPath,*/ (token, attrs) {
             builder.append(toColoredHtml(token, attrs));
         });
 
@@ -165,7 +165,7 @@ shared object highlighter {
         }
     }
 
-    void highlightInternal(String rawText, Project project, Boolean qualifiedNameIsPath,
+    void highlightInternal(String rawText, Project project, //Boolean qualifiedNameIsPath,
         Anything(String, TextAttributes) consume) {
 
         value highlighter
@@ -179,11 +179,11 @@ shared object highlighter {
             value end = iterator.end;
             value token = rawText[start..end-1];
             value attrs =
-                if (qualifiedNameIsPath
+                /*if (qualifiedNameIsPath
                     //&& token.every((ch)=>ch.letter) //TODO: this is wrong!!
                     && (rawText[start-1:1]=="." || rawText[end:1]==".") || token==".")
                 then textAttributes(ceylonHighlightingColors.packages)
-                else iterator.textAttributes;
+                else*/ iterator.textAttributes;
 
             consume(token, attrs);
             iterator.advance();

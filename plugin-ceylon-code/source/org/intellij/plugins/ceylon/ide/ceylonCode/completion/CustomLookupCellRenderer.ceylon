@@ -171,7 +171,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         }
     }
 
-    Color color(String token, Boolean qualifiedNameIsPath) {
+    Color color(String token/*, Boolean qualifiedNameIsPath*/) {
         if (token.whitespace
               || token.size==1 && token in "()[]{}<>,.+*&|?;="
               || token == "...") {
@@ -186,14 +186,14 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         else {
             assert (exists first = token[0]);
             value key
-                = if (qualifiedNameIsPath) then ceylonHighlightingColors.packages
-                else if (first.uppercase) then ceylonHighlightingColors.type
+                = /*if (qualifiedNameIsPath) then ceylonHighlightingColors.packages
+                else*/ if (first.uppercase) then ceylonHighlightingColors.type
                 else ceylonHighlightingColors.identifier;
             return foregroundColor(key);
         }
     }
 
-    Fragment[] colorizeTokens(Boolean selected, String text, Integer style, Boolean qualifiedNameIsPath) {
+    Fragment[] colorizeTokens(Boolean selected, String text, Integer style/*, Boolean qualifiedNameIsPath*/) {
         if (selected) {
             return Singleton(createFragment(text, SimpleTextAttributes(style, JBColor.white)));
         }
@@ -201,14 +201,32 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
             value color = foregroundColor(ceylonHighlightingColors.annotation);
             return [
                 createFragment("shared actual ", SimpleTextAttributes(style, color)),
-                *colorizeTokens(selected, text[14...], style, qualifiedNameIsPath)
+                *colorizeTokens(selected, text[14...], style/*, qualifiedNameIsPath*/)
             ];
         }
         else {
-            value pattern = qualifiedNameIsPath then "()[]{}<>,+*&|?;:= " else "()[]{}<>,.+*&|?;:= ";
+            /*value pattern = qualifiedNameIsPath then "()[]{}<>,+*&|?;:= " else "()[]{}<>,.+*&|?;:= ";*/
+            variable value quoted = false;
+            value tokens
+                    = text.split {
+                        discardSeparators = false;
+                        groupSeparators = false;
+                        function splitting(Character ch) {
+                            if (ch=='"') {
+                                quoted = !quoted;
+                                return false;
+                            }
+                            else if (quoted) {
+                                return false;
+                            }
+                            else {
+                                return ch in "()[]{}<>,.+*&|?;:= ";
+                            }
+                        }
+                    };
             return [
-                for (token in text.split(pattern.contains, false, false)) if (!token.empty)
-                createFragment(token, SimpleTextAttributes(style, color(token, qualifiedNameIsPath)))
+                for (token in tokens) if (!token.empty)
+                createFragment(token, SimpleTextAttributes(style, color(token/*, qualifiedNameIsPath*/)))
             ];
 
         }
@@ -224,9 +242,9 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                     style = strikeout
                         then SimpleTextAttributes.styleStrikeout
                         else SimpleTextAttributes.stylePlain;
-                    qualifiedNameIsPath
+                    /*qualifiedNameIsPath
                         = item.\iobject
-                        is ModuleVersionDetails|Package|Module;
+                        is ModuleVersionDetails|Package|Module;*/
                 };
 
         String prefix = lookup.itemPattern(item);

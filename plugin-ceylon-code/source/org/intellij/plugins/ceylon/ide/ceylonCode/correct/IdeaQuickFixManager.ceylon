@@ -126,7 +126,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 class CustomIntention(Integer position, String desc,
     <PlatformTextChange|Anything()>? change,
     TextRange? selection = null, Icon? image = null,
-    Boolean qualifiedNameIsPath = false,
+//    Boolean qualifiedNameIsPath = false,
     [String,TextRange]? hint = null,
     Anything callback(Project project, Editor editor, PsiFile psiFile) => noop(),
     Boolean affectsOtherUnits = false)
@@ -209,7 +209,7 @@ class CustomIntention(Integer position, String desc,
     }
     
     text => if (exists p = project) 
-        then highlighter.highlightQuotedMessage(desc, p, qualifiedNameIsPath) 
+        then highlighter.highlightQuotedMessage(desc, p/*, qualifiedNameIsPath*/)
         else desc;
     
     getIcon(Integer int) => image;
@@ -257,7 +257,8 @@ shared class IdeaQuickFixData(
     shared default void registerFix(String desc,
         <PlatformTextChange|Anything()>? change,
         TextRange? selection = null, Icon? image = null,
-        Boolean qualifiedNameIsPath = false, String? hint = null,
+        Boolean qualifiedNameIsPath = false,
+        String? hint = null,
         Anything callback(Project project, Editor editor, PsiFile psiFile) => noop(),
         Boolean affectsOtherUnits = false) {
         
@@ -270,7 +271,7 @@ shared class IdeaQuickFixData(
                     change = change;
                     selection = selection;
                     image = image;
-                    qualifiedNameIsPath = qualifiedNameIsPath;
+//                    qualifiedNameIsPath = qualifiedNameIsPath;
                     callback = callback;
                     hint = if (exists hint) then [hint, textRange(annotation)] else null;
                     affectsOtherUnits = affectsOtherUnits;
@@ -367,7 +368,7 @@ shared class IdeaQuickFixData(
                                                 value text = highlighter.highlightQuotedMessage {
                                                     description = "Automatically resolved '``resolution.description``' ('``qualifier``')";
                                                     project = project;
-                                                    qualifiedNameIsPath = true;
+                                                    //qualifiedNameIsPath = true;
                                                 };
                                                 //TODO: the icon?
                                                 HintManager.instance.showInformationHint(editor, JBLabel(text));
@@ -403,7 +404,7 @@ shared class IdeaQuickFixData(
                     else if (is Module declaration) then declaration.version
                     else if (is ModuleVersionDetails declaration) then declaration.version
                     else null;
-                qualifiedNameIsPath = qualifiedNameIsPath;
+//                qualifiedNameIsPath = qualifiedNameIsPath;
                 icon
                     = if (is Declaration declaration,
                           exists icon = icons.forDeclaration(declaration))
@@ -448,12 +449,12 @@ shared class IdeaQuickFixData(
     
 }
 
-shared class Resolution(description, icon, change, qualifiedNameIsPath, qualifier, color) {
+shared class Resolution(description, icon, change, /*qualifiedNameIsPath,*/ qualifier, color) {
     shared PlatformTextChange|Anything() change;
     shared Icon icon;
     shared String description;
     shared String? qualifier;
-    shared Boolean qualifiedNameIsPath;
+//    shared Boolean qualifiedNameIsPath;
     shared Color color;
 }
 
