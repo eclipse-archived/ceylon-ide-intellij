@@ -129,6 +129,25 @@ shared class CeylonSyntaxAnnotator()
         }
     }
 
+    void highlightCodeBlocks(PsiElement element) {
+        variable value offset = element.textOffset;
+        variable value inCode = false;
+        for (line in element.text.linesWithBreaks) {
+            value length = javaString(line).length();
+            if (line.startsWith("    ")) {
+                if (inCode) {
+                    value ann = annotationHolder.createInfoAnnotation(
+                        TextRange(offset, offset + length), null);
+                    ann.textAttributes = ceylonHighlightingColors.code;
+                }
+            }
+            else {
+                inCode = line.whitespace;
+            }
+            offset += length;
+        }
+    }
+
     shared actual void visitElement(PsiElement element) {
         super.visitElement(element);
         IElementType elementType = element.node.elementType;
@@ -138,7 +157,7 @@ shared class CeylonSyntaxAnnotator()
             anno.textAttributes = ceylonHighlightingColors.annotationString;
             createAnnotations(codePattern, element, ceylonHighlightingColors.code);
             createAnnotations(docLinkPattern, element, ceylonHighlightingColors.docLink);
-            //TODO: detect code blocks
+            highlightCodeBlocks(element);
         }
 
         if (elementType == CeylonTokens.astringLiteral
