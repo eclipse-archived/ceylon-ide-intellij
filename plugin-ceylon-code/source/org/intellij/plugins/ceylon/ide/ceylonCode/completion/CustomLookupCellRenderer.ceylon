@@ -36,15 +36,8 @@ import com.intellij.ui {
     SimpleColoredComponent,
     SimpleTextAttributes
 }
-import com.redhat.ceylon.cmr.api {
-    ModuleVersionDetails
-}
 import com.redhat.ceylon.ide.common.util {
     escaping
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Package,
-    Module
 }
 
 import java.awt {
