@@ -129,15 +129,17 @@ shared class CeylonSyntaxAnnotator()
         }
     }
 
-    void highlightCodeBlocks(PsiElement element) {
+    void highlightCodeBlocks(PsiElement element, Integer quoteSize) {
+        value indent = " ".repeat(quoteSize+4);
         variable value offset = element.textOffset;
         variable value inCode = false;
         for (line in element.text.linesWithBreaks) {
             value length = javaString(line).length();
-            if (line.startsWith("    ")) {
+            if (line.startsWith(indent)) {
                 if (inCode) {
                     value ann = annotationHolder.createInfoAnnotation(
-                        TextRange(offset, offset + length), null);
+                        TextRange(offset+quoteSize+4, offset+length-1),
+                        null);
                     ann.textAttributes = ceylonHighlightingColors.code;
                 }
             }
@@ -157,7 +159,8 @@ shared class CeylonSyntaxAnnotator()
             anno.textAttributes = ceylonHighlightingColors.annotationString;
             createAnnotations(codePattern, element, ceylonHighlightingColors.code);
             createAnnotations(docLinkPattern, element, ceylonHighlightingColors.docLink);
-            highlightCodeBlocks(element);
+            highlightCodeBlocks(element,
+                elementType == CeylonTokens.averbatimString then 3 else 1);
         }
 
         if (elementType == CeylonTokens.astringLiteral
