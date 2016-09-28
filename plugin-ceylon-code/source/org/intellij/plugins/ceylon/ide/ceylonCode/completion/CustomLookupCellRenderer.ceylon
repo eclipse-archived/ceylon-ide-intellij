@@ -17,7 +17,8 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.codeInsight.lookup.impl {
     EmptyLookupItem,
     LookupImpl,
-    LookupCellRenderer
+    LookupCellRenderer,
+    EmptyLookupItem
 }
 import com.intellij.ide.util.treeView {
     PresentableNodeDescriptor
@@ -145,8 +146,10 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
             Object? element, Integer index, Boolean isSelected, Boolean hasFocus) {
         Component component
                 = super.getListCellRendererComponent(list, element, index, isSelected, hasFocus);
-        assert (is LookupElement element);
-        customize(component, element, isSelected);
+        if (is LookupElement element,
+            !is EmptyLookupItem element) {
+            customize(component, element, isSelected);
+        }
         return component;
     }
 
