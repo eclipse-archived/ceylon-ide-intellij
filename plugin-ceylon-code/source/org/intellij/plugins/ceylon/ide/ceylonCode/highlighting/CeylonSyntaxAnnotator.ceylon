@@ -33,7 +33,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
     CeylonPsiVisitor,
-    CeylonTokens
+    CeylonTokens,
+    CeylonCompositeElement
 }
 
 shared class CeylonSyntaxAnnotator()
@@ -135,7 +136,10 @@ shared class CeylonSyntaxAnnotator()
         variable value inCode = false;
         for (line in element.text.linesWithBreaks) {
             value length = javaString(line).length();
-            if (line.startsWith(indent)) {
+            if (line.whitespace) {
+                inCode = true;
+            }
+            else if (line.startsWith(indent)) {
                 if (inCode) {
                     value ann = annotationHolder.createInfoAnnotation(
                         TextRange(offset+quoteSize+4, offset+length-1),
@@ -144,7 +148,7 @@ shared class CeylonSyntaxAnnotator()
                 }
             }
             else {
-                inCode = line.whitespace;
+                inCode = false;
             }
             offset += length;
         }
@@ -159,8 +163,10 @@ shared class CeylonSyntaxAnnotator()
             anno.textAttributes = ceylonHighlightingColors.annotationString;
             createAnnotations(codePattern, element, ceylonHighlightingColors.code);
             createAnnotations(docLinkPattern, element, ceylonHighlightingColors.docLink);
+            assert (is CeylonCompositeElement parent = element.parent);
             highlightCodeBlocks(element,
-                elementType == CeylonTokens.averbatimString then 3 else 1);
+                parent.ceylonNode.token.charPositionInLine +
+                (elementType == CeylonTokens.averbatimString then 3 else 1));
         }
 
         if (elementType == CeylonTokens.astringLiteral
