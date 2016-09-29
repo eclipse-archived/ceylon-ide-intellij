@@ -42,4 +42,8 @@
     <module module="com.intellij.util">
         <add module="com.intellij.idea" version="current" shared="false"/>
     </module>
+
+    <module module="org.jetbrains.plugins.gradle">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+    </module>
 </overrides>
