@@ -4,11 +4,15 @@ import ceylon.collection {
 import ceylon.interop.java {
     javaClass,
     javaString,
-    createJavaObjectArray
+    createJavaObjectArray,
+    JavaRunnable
 }
 
 import com.intellij.codeInsight {
     CodeInsightUtilCore
+}
+import com.intellij.execution.executors {
+    DefaultRunExecutor
 }
 import com.intellij.ide.actions {
     OpenFileAction
@@ -19,7 +23,8 @@ import com.intellij.notification {
     NotificationType
 }
 import com.intellij.openapi.application {
-    Result
+    Result,
+    ApplicationManager
 }
 import com.intellij.openapi.command {
     CommandProcessor,
@@ -30,11 +35,21 @@ import com.intellij.openapi.extensions {
         create
     }
 }
+import com.intellij.openapi.externalSystem.model.execution {
+    ExternalSystemTaskExecutionSettings
+}
+import com.intellij.openapi.externalSystem.service.execution {
+    ProgressExecutionMode
+}
+import com.intellij.openapi.externalSystem.task {
+    TaskCallback
+}
+import com.intellij.openapi.externalSystem.util {
+    ExternalSystemUtil,
+    ExternalSystemApiUtil
+}
 import com.intellij.openapi.\imodule {
     Module
-}
-import com.intellij.openapi.project {
-    Project
 }
 import com.intellij.openapi.vfs {
     VfsUtil,
@@ -56,12 +71,13 @@ import java.io {
     File
 }
 import java.lang {
+    JBoolean=Boolean,
     Runnable,
-    ReflectiveOperationException,
-    JBoolean=Boolean
+    ReflectiveOperationException
 }
 import java.util {
-    Properties
+    Properties,
+    Arrays
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode {
@@ -69,7 +85,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
-    getCeylonProjects
+    getCeylonProjects,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     ceylonFileFactory
@@ -93,6 +110,10 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     value applyCeylonAndroidPlugin = "apply plugin: 'com.redhat.ceylon.gradle.android'";
 
     shared actual void setupModule(Module mod) {
+        value modelManager = mod.project.getComponent(javaClass<CeylonModelManager>());
+        modelManager.automaticModelUpdateEnabled = false;
+        modelManager.pauseAutomaticModelUpdate();
+
         assert (exists projects = getCeylonProjects(mod.project));
         projects.addProject(mod);
         assert (is IdeaCeylonProject ceylonProject = projects.getProject(mod));
@@ -107,16 +128,20 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                     }
                 }.execute();
 
-                if (modified.resultObject) {
-                    syncGradleProject(mod);
-                    buildGradleProject(mod);
+                void callback() {
+                    syncAptDependencies(ceylonProject);
+                    addFacet(ceylonProject);
+
+                    modelManager.automaticModelUpdateEnabled = true;
+                    modelManager.resumeAutomaticModelUpdate(0);
                 }
 
-                syncAptDependencies(ceylonProject);
-
-                object extends WriteCommandAction<Nothing>(mod.project) {
-                    run(Result<Nothing> result) => addFacet(ceylonProject);
-                }.execute();
+                if (modified.resultObject) {
+                    syncGradleProject(mod);
+                    buildGradleProject(mod, callback);
+                } else {
+                    callback();
+                }
             }
         }, "Configure Ceylon", null);
     }
@@ -232,7 +257,9 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
 
             value version = groovyFileManipulator.findAndroidVersion(file) else "unknown";
 
-            cmp.addFacetToModule(project.ideArtifact, "android/" + version);
+            ApplicationManager.application.runWriteAction(JavaRunnable(
+                () => cmp.addFacetToModule(project.ideArtifact, "android/" + version)
+            ));
         }
     }
 
@@ -258,25 +285,31 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
         }
     }
 
-    void buildGradleProject(Module mod) {
-        value cl = javaClass<AndroidStudioSupport>().classLoader;
+    "Call the Gradle build synchronously to populate the local repository."
+    void buildGradleProject(Module mod, Anything() callback) {
+        value settings = ExternalSystemTaskExecutionSettings();
+        settings.externalProjectPath = ExternalSystemApiUtil.getExternalProjectPath(mod) else "";
+        settings.taskNames = Arrays.asList(javaString("compileDebugJavaWithJavac"), javaString("compileDebugCeylonWithCeylonc"));
+        settings.vmOptions = "";
+        settings.externalSystemIdString = GradleConstants.systemId.id;
+        ExternalSystemUtil.runTask(
+            settings,
+            DefaultRunExecutor.executorId,
+            mod.project,
+            GradleConstants.systemId,
+            object satisfies TaskCallback {
+                onFailure()
+                        => Notifications.Bus.notify(Notification("Ceylon", "Ceylon error",
+                        "The Gradle build failed. Please re-run a clean build and do Tools > Ceylon > Reset Ceylon model.",
+                        NotificationType.error));
 
-        try {
-            value cls = cl.loadClass("com.android.tools.idea.gradle.invoker.GradleInvoker");
-            value instance = cls.getDeclaredMethod("getInstance", javaClass<Project>()).invoke(null, mod.project);
-
-            for (m in cls.declaredMethods) {
-                if (m.name == "rebuild") {
-                    m.invoke(instance);
+                shared actual void onSuccess() {
+                    ApplicationManager.application.invokeLater(JavaRunnable(() {
+                        callback();
+                    }));
                 }
-            }
-        } catch (ReflectiveOperationException exception) {
-            exception.printStackTrace();
-            Notifications.Bus.notify(Notification("ceylon", "Configure Ceylon",
-                "The gradle project could not be built automatically, please build it manually "
-                + "to apply changes.",
-                NotificationType.error
-            ));
-        }
+            },
+            ProgressExecutionMode.inBackgroundAsync
+        );
     }
 }
