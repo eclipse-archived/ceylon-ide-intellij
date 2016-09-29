@@ -8,6 +8,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentEntry;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -22,15 +24,19 @@ import com.redhat.ceylon.common.config.Repositories;
 import com.redhat.ceylon.ide.common.configuration.CeylonRepositoryConfigurator;
 import org.apache.commons.lang.StringUtils;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
+import org.intellij.plugins.ceylon.ide.settings.JLabelLinkListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 
 import static com.intellij.openapi.fileChooser.FileChooser.chooseFile;
@@ -56,6 +62,7 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     private JList<String> repoList;
     private TextFieldWithBrowseButton moduleOverrides;
     private JButton createOverridesButton;
+    private JLabel overridesLink;
     private Module module;
 
     public PageTwo() {
@@ -133,10 +140,11 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
                                         try {
                                             VirtualFile file = folder.createChildData(this, "overrides.xml");
                                             file.setBinaryContent(tpl.getText().getBytes());
+                                            VirtualFile moduleRoot = getModuleRoot();
 
-                                            if (project != null && VfsUtil.isAncestor(project.getBaseDir(), file, true)) {
+                                            if (moduleRoot != null && VfsUtil.isAncestor(moduleRoot, file, true)) {
                                                 //noinspection ConstantConditions
-                                                moduleOverrides.setText(VfsUtil.getRelativePath(file, project.getBaseDir()));
+                                                moduleOverrides.setText(VfsUtil.getRelativePath(file, moduleRoot));
                                             } else {
                                                 moduleOverrides.setText(file.getPath());
                                             }
@@ -159,6 +167,54 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
                         null,
                         consumer
                 );
+            }
+        });
+        JLabelLinkListener linkListener = new JLabelLinkListener() {
+            @Override
+            public void onLinkClicked(String href) {
+                File file = new File(moduleOverrides.getText());
+                VirtualFile virtualFile;
+                Project project = getProject();
+                VirtualFile moduleRoot = getModuleRoot();
+
+                if (file.isAbsolute()) {
+                    virtualFile = VfsUtil.findFileByIoFile(file, false);
+                } else if (moduleRoot != null) {
+                    virtualFile = VfsUtil.findRelativeFile(moduleRoot, moduleOverrides.getText());
+                } else {
+                    virtualFile = null;
+                }
+
+                if (virtualFile != null && project != null) {
+                    FileEditorManager.getInstance(project).openFile(virtualFile, true);
+                }
+            }
+        };
+        overridesLink.addMouseListener(linkListener);
+        overridesLink.addMouseMotionListener(linkListener);
+        moduleOverrides.getTextField().getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateOverridesLink();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateOverridesLink();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateOverridesLink();
+            }
+
+            private void updateOverridesLink() {
+                if (moduleOverrides.getText().isEmpty()) {
+                    overridesLink.setText("Module overrides file (customize module resolution):");
+                } else {
+                    overridesLink.setText("<html>Module <a href=\"\">" +
+                            "overrides file</a> (customize module resolution):</html>");
+                }
             }
         });
     }
@@ -261,6 +317,22 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         return null;
     }
 
+    @Nullable
+    private Project getProject() {
+        return module == null ? null : module.getProject();
+    }
+
+    @Nullable
+    private VirtualFile getModuleRoot() {
+        if (module != null) {
+            ContentEntry[] contentEntries = ModuleRootManager.getInstance(module).getContentEntries();
+            if (contentEntries.length > 0) {
+                return contentEntries[0].getFile();
+            }
+        }
+        return null;
+    }
+
     private class BrowseOutputDirectoryListener extends TextBrowseFolderListener {
 
         BrowseOutputDirectoryListener() {
@@ -270,15 +342,15 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         @Nullable
         @Override
         protected Project getProject() {
-            return module == null ? null : module.getProject();
+            return PageTwo.this.getProject();
         }
 
         @Nullable
         @Override
         protected VirtualFile getInitialFile() {
-            Project project = getProject();
-            if (project != null) {
-                return project.getBaseDir();
+            VirtualFile moduleRoot = getModuleRoot();
+            if (moduleRoot != null) {
+                return moduleRoot;
             }
             return super.getInitialFile();
         }
@@ -286,10 +358,10 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         @NotNull
         @Override
         protected String chosenFileToResultingText(@NotNull VirtualFile file) {
-            Project project = getProject();
+            VirtualFile modRoot = getModuleRoot();
 
-            if (project != null && VfsUtil.isAncestor(project.getBaseDir(), file, true)) {
-                return "./" + VfsUtil.getRelativePath(file, project.getBaseDir());
+            if (modRoot != null && VfsUtil.isAncestor(modRoot, file, true)) {
+                return "./" + VfsUtil.getRelativePath(file, modRoot);
             }
 
             return super.chosenFileToResultingText(file);
@@ -305,15 +377,15 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         @Nullable
         @Override
         protected Project getProject() {
-            return module == null ? null : module.getProject();
+            return PageTwo.this.getProject();
         }
 
         @Nullable
         @Override
         protected VirtualFile getInitialFile() {
-            Project project = getProject();
-            if (project != null) {
-                return project.getBaseDir();
+            VirtualFile moduleRoot = getModuleRoot();
+            if (moduleRoot != null) {
+                return moduleRoot;
             }
             return super.getInitialFile();
         }
@@ -321,11 +393,11 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         @NotNull
         @Override
         protected String chosenFileToResultingText(@NotNull VirtualFile file) {
-            Project project = getProject();
+            VirtualFile modRoot = getModuleRoot();
 
-            if (project != null && VfsUtil.isAncestor(project.getBaseDir(), file, true)) {
+            if (modRoot != null && VfsUtil.isAncestor(modRoot, file, true)) {
                 //noinspection ConstantConditions
-                return VfsUtil.getRelativePath(file, project.getBaseDir());
+                return VfsUtil.getRelativePath(file, modRoot);
             }
 
             return super.chosenFileToResultingText(file);
