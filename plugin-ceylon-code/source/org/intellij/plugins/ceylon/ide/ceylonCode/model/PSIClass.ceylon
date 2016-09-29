@@ -13,7 +13,8 @@ import com.intellij.psi {
     PsiTypeParameter,
     PsiManager,
     PsiNameIdentifierOwner,
-    SmartPsiElementPointer
+    SmartPsiElementPointer,
+    PsiNamedElement
 }
 import com.intellij.psi.impl.compiled {
     ClsClassImpl
@@ -55,7 +56,6 @@ import java.util {
     Arrays
 }
 
-// TODO investigate why psi.containingFile is sometimes null
 shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
         extends PSIAnnotatedMirror(psiPointer)
         satisfies IdeClassMirror {
@@ -67,7 +67,15 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     }
     
     variable String? cacheKey = null;
-    
+
+    "This is needed when a PsiClass is removed from the index, and the model loader
+     tries to unload the corresponding mirror. When that happens, we still need to access
+     the qualified name although the PSI has been invalidated."
+    variable value cacheQualifiedName = concurrencyManager.needReadAccess(() =>
+        if (is PsiTypeParameter tp = psi)
+        then PSIPackage(psiPointer).qualifiedName + "." + ((psi of PsiNamedElement).name else "")
+        else (psi.qualifiedName else ""));
+
     Boolean hasAnnotation(Annotations annotation)
         => let (cn = annotation.className)
             concurrencyManager.needReadAccess(() =>
@@ -192,10 +200,19 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     
     public => psi.hasModifierProperty(PsiModifier.public);
     
-    qualifiedName => 
-            if (is PsiTypeParameter tp = psi)
+    shared actual String qualifiedName {
+        try {
+            value qName = if (is PsiTypeParameter tp = psi)
             then \ipackage.qualifiedName + "." + name
             else (concurrencyManager.needReadAccess(() => psi.qualifiedName else ""));
+
+            cacheQualifiedName = qName; // in case the class was renamed
+            return qName;
+        } catch (AssertionError e) {
+            // PSI was invalidated, use the cached qualified name.
+            return cacheQualifiedName;
+        }
+    }
     
     static => psi.hasModifierProperty(PsiModifier.static);
     
