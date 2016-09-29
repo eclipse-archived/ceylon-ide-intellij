@@ -46,6 +46,6 @@ public abstract class JLabelLinkListener extends MouseAdapter {
         int pos = ctx.getIndexAtPoint(point);
         AttributeSet as = ctx.getCharacterAttribute(pos);
 
-        return (SimpleAttributeSet) as.getAttribute(HTML.Tag.A);
+        return as == null ? null : (SimpleAttributeSet) as.getAttribute(HTML.Tag.A);
     }
 }
