@@ -34,7 +34,9 @@ public class PageOne implements CeylonConfigForm {
         project.getIdeConfiguration().setCompileToJvm(ceylon.language.Boolean.instance(compileForJvm.isSelected()));
         project.getIdeConfiguration().setCompileToJs(ceylon.language.Boolean.instance(compileToJs.isSelected()));
         project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(workOffline.isSelected()));
-        project.getConfiguration().setProjectSuppressWarningsEnum(EnumSet.copyOf(parseWarnings(suppressedWarnings.getText())));
+        List<Warning> warnings = parseWarnings(suppressedWarnings.getText());
+        EnumSet<Warning> enumSet = warnings.isEmpty() ? EnumSet.noneOf(Warning.class) : EnumSet.copyOf(warnings);
+        project.getConfiguration().setProjectSuppressWarningsEnum(enumSet);
     }
 
     @Override
