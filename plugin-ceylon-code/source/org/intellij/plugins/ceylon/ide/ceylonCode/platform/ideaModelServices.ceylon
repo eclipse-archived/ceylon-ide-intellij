@@ -41,6 +41,9 @@ import org.jetbrains.jps.model.java {
     JavaResourceRootType,
     JavaSourceRootType
 }
+import com.intellij.util.containers {
+    ContainerUtil
+}
 
 shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, VirtualFile,VirtualFile> {
     newCrossProjectSourceFile(CrossProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile> phasedUnit)
@@ -85,10 +88,14 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
         );
 
     shared actual {VirtualFile*} sourceNativeFolders(CeylonProjectAlias ceylonProject) {
-        value roots = concurrencyManager.needReadAccess(() => moduleRootManager(ceylonProject.ideArtifact)
-            ?.getSourceRoots(JavaSourceRootType.source));
+        value roots = concurrencyManager.needReadAccess(() {
+            value rootManager = moduleRootManager(ceylonProject.ideArtifact);
+            return ContainerUtil.concat(
+                rootManager.getSourceRoots(JavaSourceRootType.source),
+                rootManager.getSourceRoots(JavaSourceRootType.testSource)
+            );
+        });
 
-        return if (exists roots) then CeylonIterable(roots) else [];
+        return CeylonIterable(roots);
     }
-
 }
