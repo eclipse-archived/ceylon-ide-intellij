@@ -77,8 +77,9 @@ shared class RefinementsSearch() extends
             is TypeDeclaration|TypedDeclaration decl = node.declarationModel,
             decl.formal || decl.default,
             is CeylonFile ceylonFile = sourceElement.containingFile,
-            exists project = concurrencyManager.needReadAccess(()
-            => findProjectForFile(ceylonFile)),
+            exists project
+                    = concurrencyManager.needReadAccess(()
+                    => findProjectForFile(ceylonFile)),
             exists modules = project.modules) {
 
             if (exists pus = project.typechecker?.phasedUnits) {
@@ -127,8 +128,7 @@ shared class RefinementsSearch() extends
         for (pu in pus) {
             value vis = FindRefinementsVisitor(decl);
             pu.compilationUnit.visit(vis);
-            Set<Node> declarationNodes = vis.declarationNodes;
-            for (dnode in declarationNodes) {
+            for (dnode in vis.declarationNodes) {
                 if (exists node) {
                     if (dnode==node) {
                         continue;
