@@ -31,7 +31,8 @@ import java.util.regex {
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonPsi
+    CeylonPsi,
+    CeylonTokens
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     CeylonNamedCompositeElementImpl
@@ -42,24 +43,11 @@ shared class CeylonResolvable(ASTNode node)
 
     reference
             => if (is CeylonPsi.ImportPathPsi parent = this.parent)
-            then CeylonReference {
-                element = parent;
-                range = TextRange.from(0, parent.textLength);
-                soft = true;
-            }
-            else CeylonReference {
-                element = this;
-                range = TextRange.from(0, textLength);
-                soft = true;
-            };
+            then CeylonReference(this, parent)
+            else CeylonReference(this);
 
     function backendRef(Backends backend)
-            => CeylonReference {
-                element = this;
-                range = TextRange.from(0, textLength);
-                soft = true;
-                backend = backend;
-            };
+            => CeylonReference(this);
 
     references
             => if (is CeylonPsi.MemberOrTypeExpressionPsi parent = this.parent,
@@ -88,14 +76,15 @@ shared class CeylonDocResolvable(ASTNode node)
         extends CeylonNamedCompositeElementImpl(node) {
 
     shared actual ObjectArray<PsiReference> references {
-        if (parent is CeylonPsi.AnonymousAnnotationPsi) {
+        value type = node.firstChildNode.elementType;
+        if (type == CeylonTokens.astringLiteral
+         || type == CeylonTokens.averbatimString) {
             value list = ArrayList<PsiReference>();
             value matcher = docLinkPattern.matcher(javaString(node.text));
             while (matcher.find()) {
                 list.add(CeylonReference {
                     element = this;
                     range = TextRange(matcher.start(1), matcher.end(1));
-                    soft = true;
                 });
             }
             return createJavaObjectArray(list);
@@ -105,6 +94,8 @@ shared class CeylonDocResolvable(ASTNode node)
         }
     }
 
-    shared actual PsiElement setName(String s) => nothing;
+    shared actual PsiElement setName(String s) {
+        throw UnsupportedOperationException("Not yet");
+    }
 
 }

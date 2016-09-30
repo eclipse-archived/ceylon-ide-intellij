@@ -1,9 +1,6 @@
 import com.intellij.openapi.application {
     QueryExecutorBase
 }
-import com.intellij.openapi.util {
-    TextRange
-}
 import com.intellij.psi {
     PsiReference,
     PsiElement,
@@ -110,16 +107,11 @@ shared class RefinementsSearch() extends
 
     void action(PsiFile? declaringFile, Node dnode,
                 void consumer(PsiReference element)) {
-        variable CeylonReference<PsiElement>? ref = null;
+        variable CeylonReference? ref = null;
         concurrencyManager.needReadAccess(() {
-            if (is PsiNameIdentifierOwner psiElement = findPsiElement(dnode, declaringFile)) {
-                if (exists id = psiElement.nameIdentifier) {
-                    ref = CeylonReference {
-                        element = id;
-                        range = TextRange.from(0, id.textLength);
-                        soft = true;
-                    };
-                }
+            if (is PsiNameIdentifierOwner psiElement = findPsiElement(dnode, declaringFile),
+                exists id = psiElement.nameIdentifier) {
+                ref = CeylonReference(id);
             }
         });
         if (exists r = ref) {
