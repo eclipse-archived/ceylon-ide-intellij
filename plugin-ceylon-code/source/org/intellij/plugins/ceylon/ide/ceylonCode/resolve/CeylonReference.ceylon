@@ -17,9 +17,12 @@ import com.intellij.psi {
 import com.redhat.ceylon.common {
     Backends
 }
+import com.redhat.ceylon.compiler.typechecker.analyzer {
+    AnnotationVisitor
+}
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Node,
-    Tree
+    Tree,
+    Node
 }
 import com.redhat.ceylon.ide.common.model {
     IResourceAware,
@@ -93,14 +96,58 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         }
     }
 
+    function resolvedElement(Node target, Project project) {
+        if (exists targetUnit = target.unit,
+            exists file = getVirtualFile(targetUnit)) {
+            value psiFile = PsiManager.getInstance(project).findFile(file);
+            Node currentTarget;
+            if (is CeylonFile psiFile,
+                exists localAnalysisResult
+                        = psiFile.localAnalyzer?.result,
+                exists targetModel
+                        = nodes.getReferencedModel(nodes.getIdentifyingNode(target) else target),
+                exists targetInEditor
+                        = concurrencyManager.withAlternateResolution(()
+                        => nodes.getReferencedNode(targetModel, localAnalysisResult.parsedRootNode))) {
+                currentTarget = targetInEditor;
+            } else {
+                currentTarget = target;
+            }
+            return CeylonTreeUtil.findPsiElement(currentTarget, psiFile);
+        }
+        else {
+            return null;
+        }
+    }
+
+    function createDocLink(Unit unit, Scope scope) {
+        value docLink = Tree.DocLink(null);
+        docLink.text
+                = element.text.substring {
+                    from = rangeInElement.startOffset;
+                    end = rangeInElement.endOffset;
+                };
+        docLink.unit = unit;
+        docLink.scope = scope;
+        AnnotationVisitor().visit(docLink);
+        return docLink;
+    }
+
+    value referenceNode
+            => if (is Tree.AnonymousAnnotation node = this.node,
+                    exists unit = node.unit,
+                    exists scope = node.scope)
+            then createDocLink(unit, scope)
+            else node;
+
     shared actual PsiElement? resolve() {
+
         if (is Tree.Declaration node = this.node) {
             if (is TypedDeclaration model = node.declarationModel,
                 model.originalDeclaration exists) {
                 //noop
                 // we need to resolve the original declaration
-            }
-            else if (ApplicationInfo.instance.build.baselineVersion >= 145) {
+            } else if (ApplicationInfo.instance.build.baselineVersion>=145) {
                 // IntelliJ 15+ can show usages on ctrl-click, if we return null here
                 // For older versions, we have to continue resolving
                 return null;
@@ -108,31 +155,24 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         }
 
         value project = myElement.project;
-        assert (is CeylonFile ceylonFile = myElement.containingFile);
 
-        if (exists rootNode = ceylonFile.availableAnalysisResult?.typecheckedRootNode) {
-            function searchForTarget(Tree.CompilationUnit cu, Node searchedNode) =>
-                IdeaNavigation(project).getTarget(cu, searchedNode, backend);
-
-            if (exists target = concurrencyManager.withAlternateResolution(() => searchForTarget(rootNode, node)),
-                exists unit = target.unit,
-                exists file = getVirtualFile(unit)) {
-                value psiFile = PsiManager.getInstance(project).findFile(file);
-                if (is CeylonFile psiFile,
-                    exists localAnalysisResult = psiFile.localAnalyzer?.result,
-                    exists targetModel = nodes.getReferencedModel(nodes.getIdentifyingNode(target) else target)) {
-                    if (exists targetInEditor = concurrencyManager.withAlternateResolution(()
-                        => nodes.getReferencedNode(targetModel, localAnalysisResult.parsedRootNode))) {
-                        return CeylonTreeUtil.findPsiElement(targetInEditor, psiFile);
-                    }
-                }
-                return CeylonTreeUtil.findPsiElement(target, psiFile);
-            }
+        if (is CeylonFile ceylonFile = myElement.containingFile,
+            exists rootNode
+                    = ceylonFile.availableAnalysisResult?.typecheckedRootNode,
+            exists target
+                    = concurrencyManager.withAlternateResolution(()
+            => IdeaNavigation(project)
+                .getTarget(rootNode, referenceNode, backend)),
+            exists result = resolvedElement(target, project)) {
+            return result;
+        } else if (exists declaration = nodes.getReferencedModel(node),
+            exists location = resolveDeclaration(original(declaration), project)) {
+            return location;
+        }
+        else {
+            return null;
         }
 
-        return if (exists declaration = nodes.getReferencedModel(node),
-                   exists location = resolveDeclaration(original(declaration), project))
-            then location else null; //myElement.containingFile;
     }
 
     Referenceable original(Referenceable dec)

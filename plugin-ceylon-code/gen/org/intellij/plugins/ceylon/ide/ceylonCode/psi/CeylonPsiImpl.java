@@ -3,9 +3,8 @@ package org.intellij.plugins.ceylon.ide.ceylonCode.psi;
 import com.intellij.lang.ASTNode;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;
-import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonResolvable;
+import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.*;
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.*;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.CeylonCompositeElementImpl;
 /* Generated using Antlr by PsiImplGen.g */
 
 public class CeylonPsiImpl {
@@ -1701,7 +1700,7 @@ public class CeylonPsiImpl {
         @Override public Tree.CharLiteral getCeylonNode() { return (Tree.CharLiteral) super.getCeylonNode(); }
     }
 
-    public static class StringLiteralPsiImpl extends LiteralPsiImpl
+    public static class StringLiteralPsiImpl extends CeylonDocResolvable
             implements CeylonPsi.StringLiteralPsi {
         public StringLiteralPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.StringLiteral getCeylonNode() { return (Tree.StringLiteral) super.getCeylonNode(); }

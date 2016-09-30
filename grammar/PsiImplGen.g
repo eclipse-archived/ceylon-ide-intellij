@@ -13,9 +13,8 @@ nodeList : {
            println("import com.intellij.lang.ASTNode;");
            println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
            println("import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;");
-           println("import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.CeylonResolvable;");
+           println("import org.intellij.plugins.ceylon.ide.ceylonCode.resolve.*;");
            println("import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.*;");
-           println("import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl.CeylonCompositeElementImpl;");
            println("/* Generated using Antlr by PsiImplGen.g */");
            println("\npublic class CeylonPsiImpl {\n");
            println("    public static class GuardedVariablePsiImpl extends CeylonCompositeElementImpl");
@@ -44,6 +43,11 @@ node : '^' '('
            |
            { $n.text.equals("IDENTIFIER") }?=> (
              { print("IdentifierPsiImpl extends CeylonResolvable"); }
+             (':' NODE_NAME)?
+           )
+           |
+           { $n.text.equals("STRING_LITERAL") }?=> (
+             { print("StringLiteralPsiImpl extends CeylonDocResolvable"); }
              (':' NODE_NAME)?
            )
            |
