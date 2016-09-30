@@ -17,8 +17,7 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.codeInsight.lookup.impl {
     EmptyLookupItem,
     LookupImpl,
-    LookupCellRenderer,
-    EmptyLookupItem
+    LookupCellRenderer
 }
 import com.intellij.ide.util.treeView {
     PresentableNodeDescriptor
@@ -37,8 +36,15 @@ import com.intellij.ui {
     SimpleColoredComponent,
     SimpleTextAttributes
 }
+import com.redhat.ceylon.cmr.api {
+    ModuleVersionDetails
+}
 import com.redhat.ceylon.ide.common.util {
     escaping
+}
+import com.redhat.ceylon.model.typechecker.model {
+    Package,
+    Module
 }
 
 import java.awt {
