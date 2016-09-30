@@ -65,10 +65,23 @@ shared PsiElement? resolveDeclaration(Referenceable? declaration, Project projec
     }
 }
 
-shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
-            Backends backend = Backends.any)
-        extends PsiReferenceBase<T>(element, range, soft)
-        given T satisfies PsiElement {
+shared class CeylonReference(element, span = element,
+                range = TextRange.from(0, span.textLength),
+                backend = Backends.any)
+        extends PsiReferenceBase<PsiElement>(span, range, true) {
+
+    "The clicked identifier or annotation string"
+    PsiElement element;
+
+    "The element within which the range is located
+     (the parent, in case of a package path)"
+    PsiElement span;
+
+    "The clicked text range (a subrange of the
+     annotation string, in case of a doc link)"
+    TextRange range;
+
+    Backends backend;
 
     function getVirtualFile(Unit unit) {
         if (is SourceAware unit) {
@@ -85,15 +98,8 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
     }
 
     value node {
-        if (is CeylonPsi.ImportPathPsi myElement) {
-            return myElement.ceylonNode;
-        }
-        else if (is CeylonCompositeElement parent = myElement.parent) {
-            return parent.ceylonNode;
-        }
-        else {
-            assert (false);
-        }
+        assert (is CeylonCompositeElement parent = element.parent);
+        return parent.ceylonNode;
     }
 
     function resolvedElement(Node target, Project project) {
@@ -133,12 +139,16 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
         return docLink;
     }
 
-    value referenceNode
-            => if (is Tree.AnonymousAnnotation node = this.node,
-                    exists unit = node.unit,
-                    exists scope = node.scope)
-            then createDocLink(unit, scope)
-            else node;
+    value referenceNode {
+        if (is CeylonDocResolvable element,
+            exists unit = node.unit,
+            exists scope = node.scope) {
+            return createDocLink(unit, scope);
+        }
+        else {
+            return node;
+        }
+    }
 
     shared actual PsiElement? resolve() {
 
@@ -154,9 +164,9 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
             }
         }
 
-        value project = myElement.project;
+        value project = element.project;
 
-        if (is CeylonFile ceylonFile = myElement.containingFile,
+        if (is CeylonFile ceylonFile = element.containingFile,
             exists rootNode
                     = ceylonFile.availableAnalysisResult?.typecheckedRootNode,
             exists target
@@ -200,8 +210,8 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
             Value? getter;
             if (is CeylonPsi.AttributeDeclarationPsi resolved) {
                 getter = resolved.ceylonNode?.declarationModel;
-            } else if (is CeylonPsi.IdentifierPsi myElement,
-                    is Value scope = myElement.ceylonNode.scope) {
+            } else if (is CeylonPsi.IdentifierPsi id = this.element,
+                    is Value scope = id.ceylonNode.scope) {
                 getter = scope;
             }
             else {
@@ -216,8 +226,8 @@ shared class CeylonReference<T>(T element, TextRange range, Boolean soft,
             Setter? setter;
             if (is CeylonPsi.AttributeSetterDefinitionPsi resolved) {
                 setter = resolved.ceylonNode?.declarationModel;
-            } else if (is CeylonPsi.IdentifierPsi myElement,
-                    is Setter scope = myElement.ceylonNode?.scope) {
+            } else if (is CeylonPsi.IdentifierPsi id = this.element,
+                    is Setter scope = id.ceylonNode?.scope) {
                 setter = scope;
             }
             else {
