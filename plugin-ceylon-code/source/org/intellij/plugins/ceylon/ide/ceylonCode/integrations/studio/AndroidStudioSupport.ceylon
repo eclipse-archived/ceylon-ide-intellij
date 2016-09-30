@@ -256,10 +256,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             exists cmp = project.ideArtifact.getComponent(javaClass<ITypeCheckerProvider>())) {
 
             value version = groovyFileManipulator.findAndroidVersion(file) else "unknown";
-
-            ApplicationManager.application.runWriteAction(JavaRunnable(
-                () => cmp.addFacetToModule(project.ideArtifact, "android/" + version)
-            ));
+            cmp.addFacetToModule(project.ideArtifact, "android/" + version);
         }
     }
 
