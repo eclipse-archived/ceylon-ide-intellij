@@ -1,5 +1,9 @@
+import ceylon.collection {
+    ArrayList
+}
 import ceylon.interop.java {
-    createJavaObjectArray
+    createJavaObjectArray,
+    javaString
 }
 
 import com.intellij.lang {
@@ -9,7 +13,8 @@ import com.intellij.openapi.util {
     TextRange
 }
 import com.intellij.psi {
-    PsiElement
+    PsiElement,
+    PsiReference
 }
 import com.redhat.ceylon.common {
     Backends {
@@ -18,7 +23,11 @@ import com.redhat.ceylon.common {
 }
 
 import java.lang {
-    UnsupportedOperationException
+    UnsupportedOperationException,
+    ObjectArray
+}
+import java.util.regex {
+    Pattern
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
@@ -70,5 +79,32 @@ shared class CeylonResolvable(ASTNode node)
     shared actual PsiElement setName(String name) {
         throw UnsupportedOperationException("Not yet");
     }
+
+}
+
+Pattern docLinkPattern = Pattern.compile("""\[\[([^\]\[]*)\]\]""");
+
+shared class CeylonDocResolvable(ASTNode node)
+        extends CeylonNamedCompositeElementImpl(node) {
+
+    shared actual ObjectArray<PsiReference> references {
+        if (parent is CeylonPsi.AnonymousAnnotationPsi) {
+            value list = ArrayList<PsiReference>();
+            value matcher = docLinkPattern.matcher(javaString(node.text));
+            while (matcher.find()) {
+                list.add(CeylonReference {
+                    element = this;
+                    range = TextRange(matcher.start(1), matcher.end(1));
+                    soft = true;
+                });
+            }
+            return createJavaObjectArray(list);
+        }
+        else {
+            return PsiReference.emptyArray;
+        }
+    }
+
+    shared actual PsiElement setName(String s) => nothing;
 
 }
