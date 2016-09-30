@@ -1,9 +1,11 @@
 package org.intellij.plugins.ceylon.ide.annotator;
 
 import com.intellij.facet.FacetManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
+import com.intellij.openapi.util.Computable;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
@@ -34,7 +36,7 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     }
 
     @Override
-    public void addFacetToModule(Module module, @Nullable String jdkProvider) {
+    public void addFacetToModule(final Module module, @Nullable String jdkProvider) {
         if (ceylonModel == null) {
             ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
             ceylonModel.addProject(module);
@@ -48,9 +50,14 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
         CeylonFacet facet = CeylonFacet.forModule(module);
         if (facet == null) {
-            facet = FacetManager.getInstance(module)
-                    .addFacet(CeylonFacet.getFacetType(),
-                            CeylonFacet.getFacetType().getPresentableName(), null);
+            facet = ApplicationManager.getApplication().runWriteAction(new Computable<CeylonFacet>() {
+                @Override
+                public CeylonFacet compute() {
+                    return FacetManager.getInstance(module)
+                            .addFacet(CeylonFacet.getFacetType(),
+                                    CeylonFacet.getFacetType().getPresentableName(), null);
+                }
+            });
             facet.getConfiguration().setModule(module);
         }
 
