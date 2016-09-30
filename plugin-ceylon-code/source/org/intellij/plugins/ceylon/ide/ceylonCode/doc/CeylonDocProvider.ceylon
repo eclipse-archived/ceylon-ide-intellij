@@ -225,7 +225,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
     }
 
     getCustomDocumentationElement(Editor editor, PsiFile file, PsiElement? contextElement)
-            => if (exists contextElement, !contextElement.node.elementType in typesToIgnore)
+            => if (is CeylonFile file, exists contextElement, !contextElement.node.elementType in typesToIgnore)
             then contextElement else null;
 
     shared actual PsiElement? getDocumentationElementForLookupItem(PsiManager psiManager, Object arg, PsiElement element) {
