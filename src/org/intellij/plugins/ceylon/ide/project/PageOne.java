@@ -32,6 +32,7 @@ public class PageOne implements CeylonConfigForm {
 
     public PageOne() {
         String defaultVm = ceylonSettings_.get_().getDefaultTargetVm();
+        warnings = new ArrayList<>();
         compileForJvm.setSelected(!defaultVm.equals("js"));
         compileToJs.setSelected(!defaultVm.equals("jvm"));
         table = new JBTable();
