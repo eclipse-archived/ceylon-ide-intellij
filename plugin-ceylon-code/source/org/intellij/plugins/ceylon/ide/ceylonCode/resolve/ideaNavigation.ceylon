@@ -105,6 +105,12 @@ shared class IdeaNavigation(Project project)
     }
     
     PsiClass? getJavaClass(ClassOrInterface cls) {
+        if (is LazyClass cls, is PSIClass mirror = cls.classMirror) {
+            return mirror.psi;
+        }
+        else if (is LazyInterface cls, is PSIClass mirror = cls.classMirror) {
+            return mirror.psi;
+        }
         value qn = cls.qualifiedNameString.replace("::", ".");
 
         return concurrencyManager.withAlternateResolution {
