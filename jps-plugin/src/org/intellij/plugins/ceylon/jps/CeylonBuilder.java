@@ -5,6 +5,8 @@ import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathUtil;
 import com.intellij.util.containers.ContainerUtil;
+import com.redhat.ceylon.common.config.CeylonConfig;
+import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.compiler.java.runtime.tools.*;
 import com.redhat.ceylon.compiler.java.runtime.tools.Compiler;
 import org.jetbrains.annotations.NotNull;
@@ -194,9 +196,22 @@ class CeylonBuilder extends ModuleLevelBuilder {
     }
 
     private CompilerOptions buildOptions(ModuleChunk chunk, List<File> filesToBuild, boolean fullBuild) {
+        // TODO we should find where chunk.representativeTarget().getModule() is located instead
+        JpsModuleSourceRoot root = chunk.representativeTarget().getModule().getSourceRoots().get(0);
+        CeylonConfig config;
+        if (root == null) {
+            config = new CeylonConfig();
+        } else {
+            try {
+                config = CeylonConfigFinder.loadLocalConfig(root.getFile());
+            } catch (IOException e) {
+                config = new CeylonConfig();
+            }
+        }
+
         CompilerOptions options = (backend == Backend.Java)
-                ? new JavaCompilerOptions()
-                : new CompilerOptions();
+                ? JavaCompilerOptions.fromConfig(config)
+                : CompilerOptions.fromConfig(config);
 
         List<File> srcPath = new ArrayList<>();
         List<File> resourcePath = new ArrayList<>();
@@ -244,8 +259,6 @@ class CeylonBuilder extends ModuleLevelBuilder {
             options.setSystemRepository(getSystemRepoPath());
         }
 
-        // TODO we should find where chunk.representativeTarget().getModule() is located instead
-        JpsModuleSourceRoot root = chunk.representativeTarget().getModule().getSourceRoots().get(0);
         if (root != null) {
             options.setWorkingDirectory(root.getFile().getParentFile().getAbsolutePath());
         }
