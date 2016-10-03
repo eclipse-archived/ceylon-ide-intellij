@@ -14,6 +14,10 @@ import com.intellij.ide.util.projectWizard.importSources.ProjectStructureDetecto
 import com.intellij.ide.util.projectWizard.importSources.util.CommonSourceRootDetectionUtil;
 import com.intellij.openapi.util.Pair;
 import com.intellij.util.NullableFunction;
+import com.intellij.util.Processor;
+import com.redhat.ceylon.common.config.CeylonConfig;
+import com.redhat.ceylon.common.config.CeylonConfigFinder;
+import com.redhat.ceylon.common.config.DefaultToolOptions;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
 import com.redhat.ceylon.compiler.typechecker.parser.CeylonParser;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
@@ -25,8 +29,11 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.intellij.openapi.util.io.FileUtil.processFilesRecursively;
 
 public class CeylonProjectStructureDetector extends ProjectStructureDetector {
 
@@ -49,13 +56,54 @@ public class CeylonProjectStructureDetector extends ProjectStructureDetector {
 
     @NotNull
     @Override
-    public DirectoryProcessingResult detectRoots(@NotNull File dir, @NotNull File[] children, @NotNull File base, @NotNull List<DetectedProjectRoot> result) {
+    public DirectoryProcessingResult detectRoots(@NotNull File dir, @NotNull File[] children, @NotNull File base, @NotNull final List<DetectedProjectRoot> result) {
+        // Try locating a Ceylon configuration in the root folder
+        if (dir == base) {
+            try {
+                File localConfig = CeylonConfigFinder.DEFAULT.findLocalConfig(base);
+                // try finding source roots in .ceylon/config
+                if (localConfig != null) {
+                    CeylonConfig config = CeylonConfigFinder.DEFAULT.loadConfigFromFile(localConfig);
+                    List<File> sourceDirs = DefaultToolOptions.getCompilerSourceDirs(config);
+                    for (File sourceDir : sourceDirs) {
+                        File absolute = sourceDir.isAbsolute() ? sourceDir : new File(base, sourceDir.getPath()).toPath().normalize().toFile();
+                        if (absolute.isDirectory()) {
+                            result.add(new JavaModuleSourceRoot(absolute, null, "Ceylon"));
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (result.isEmpty()) {
+                // try the default "source" folder
+                final File source = new File(base, "source");
+
+                if (source.isDirectory()) {
+                    processFilesRecursively(source, new Processor<File>() {
+                        @Override
+                        public boolean process(File file) {
+                            if (file.isFile() && file.getName().endsWith(".ceylon")) {
+                                result.add(new JavaModuleSourceRoot(source, null, "Ceylon"));
+                                return false;
+                            }
+                            return true;
+                        }
+                    });
+                }
+            }
+
+            if (!result.isEmpty()) {
+                return DirectoryProcessingResult.SKIP_CHILDREN;
+            }
+        }
+
+        // try scanning children for Ceylon files
         for (File child : children) {
-            // FIXME does not work for default module, which has no module.ceylon :(
             if (child.isFile() && child.getName().equals("module.ceylon")) {
-                Pair<File, String> root = CommonSourceRootDetectionUtil.IO_FILE.suggestRootForFileWithPackageStatement(child, base,
-                        getPackageNameFetcher(),
-                        true);
+                Pair<File, String> root = CommonSourceRootDetectionUtil.IO_FILE
+                        .suggestRootForFileWithPackageStatement(child, base, getPackageNameFetcher(), true);
                 if (root != null) {
                     result.add(new JavaModuleSourceRoot(root.getFirst(), root.getSecond(), "Ceylon"));
                     return DirectoryProcessingResult.skipChildrenAndParentsUpTo(root.getFirst());
@@ -64,11 +112,12 @@ public class CeylonProjectStructureDetector extends ProjectStructureDetector {
                 }
             }
         }
+
         return DirectoryProcessingResult.PROCESS_CHILDREN;
     }
 
     @NotNull
-    protected NullableFunction<CharSequence, String> getPackageNameFetcher() {
+    private NullableFunction<CharSequence, String> getPackageNameFetcher() {
         return new NullableFunction<CharSequence, String>() {
             @Nullable
             @Override
