@@ -141,7 +141,7 @@
         <moveLeftRightHandler language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonMoveLeftRightHandler"/>
         <lang.unwrapDescriptor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonUnwrapDescriptor"/>
         <lang.surroundDescriptor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.CeylonSurroundDescriptor"/>
-        <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.structureView.CeylonStructureViewFactory"/>
+        <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.structureView.CeylonStructureViewFactory"/>
         <treeStructureProvider implementation="org.intellij.plugins.ceylon.ide.projectView.ModuleTreeStructureProvider" order="last"/>
         <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.EnterInStringHandler"/>
         <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.ceylonCode.codeInsight.EnterInCommentHandler"/>
