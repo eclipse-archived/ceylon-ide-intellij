@@ -213,6 +213,9 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 ? JavaCompilerOptions.fromConfig(config)
                 : CompilerOptions.fromConfig(config);
 
+        // Undo unwanted behavior (defaults to unexpanded "*")
+        options.setModules(Collections.<String>emptyList());
+
         List<File> srcPath = new ArrayList<>();
         List<File> resourcePath = new ArrayList<>();
 
