@@ -1,13 +1,18 @@
 package org.intellij.plugins.ceylon.ide.project;
 
+import ceylon.interop.java.CeylonStringIterable;
+import ceylon.language.Iterable;
 import com.intellij.ui.BooleanTableCellEditor;
+import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.TableUtil;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.execution.ParametersListUtil;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ListTableModel;
 import com.redhat.ceylon.compiler.typechecker.analyzer.Warning;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -15,11 +20,13 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import static ceylon.interop.java.createJavaStringArray_.createJavaStringArray;
 import static com.intellij.ui.ScrollPaneFactory.createScrollPane;
+import static java.util.Arrays.asList;
 
 public class PageOne implements CeylonConfigForm {
     private JCheckBox compileForJvm;
@@ -27,6 +34,7 @@ public class PageOne implements CeylonConfigForm {
     private JPanel panel;
     private JCheckBox workOffline;
     private JPanel warningsPanel;
+    private RawCommandLineEditor javacOptions;
     private JBTable table;
     private List<Warning> warnings;
 
@@ -57,6 +65,9 @@ public class PageOne implements CeylonConfigForm {
         project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(workOffline.isSelected()));
         EnumSet<Warning> enumSet = warnings.isEmpty() ? EnumSet.noneOf(Warning.class) : EnumSet.copyOf(warnings);
         project.getConfiguration().setProjectSuppressWarningsEnum(enumSet);
+
+        List<String> opts = ParametersListUtil.DEFAULT_LINE_PARSER.fun(javacOptions.getText());
+        project.getConfiguration().setJavacOptions(new CeylonStringIterable(opts));
     }
 
     @Override
@@ -68,6 +79,7 @@ public class PageOne implements CeylonConfigForm {
                 || project.getIdeConfiguration().getCompileToJs().booleanValue() != compileToJs.isSelected()
                 || project.getConfiguration().getProjectOffline().booleanValue() != workOffline.isSelected()
                 // TODO || warningsAsString(project.getConfiguration().getSuppressWarningsEnum()) != suppressedWarnings.getText()
+                || !getJavacOpts(project).equals(javacOptions.getText())
                 ;
     }
 
@@ -80,6 +92,20 @@ public class PageOne implements CeylonConfigForm {
 
         warnings = new ArrayList<>(project.getConfiguration().getSuppressWarningsEnum());
         createTableModel(warnings);
+
+        javacOptions.setText(getJavacOpts(project));
+    }
+
+    @NotNull
+    private String getJavacOpts(IdeaCeylonProject project) {
+        Iterable<? extends ceylon.language.String, ?> it = project.getConfiguration().getJavacOptions();
+        List<String> opts;
+        if (it != null) {
+            opts = asList(createJavaStringArray(it));
+        } else {
+            opts = Collections.emptyList();
+        }
+        return ParametersListUtil.DEFAULT_LINE_JOINER.fun(opts);
     }
 
     private void createTableModel(final List<Warning> warnings) {
@@ -132,7 +158,7 @@ public class PageOne implements CeylonConfigForm {
                             }
                         }
                 },
-                Arrays.asList(Warning.values())
+                asList(Warning.values())
         );
         table.setModel(model);
         table.setTableHeader(null);
