@@ -18,6 +18,11 @@ import com.redhat.ceylon.model.loader.mirror {
     AnnotatedMirror,
     AnnotationMirror
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    concurrencyManager {
+        needReadAccess
+    }
+}
 
 shared abstract class PSIAnnotatedMirror(psiPointer)
         satisfies AnnotatedMirror {
@@ -35,15 +40,14 @@ shared abstract class PSIAnnotatedMirror(psiPointer)
     variable Map<String,AnnotationMirror>? annotationMap = null;
 
     String? getAnnotationName(PsiAnnotation psi) {
-        value qualifiedName = psi.qualifiedName;
-        if (! exists qualifiedName) {
+        value qualifiedName = needReadAccess(() => psi.qualifiedName);
+        if (!exists qualifiedName) {
             return null;
         }
         value resolveScope = psi.resolveScope;
         value facade = javaFacade(psi.project);
 
-        if (exists cls = concurrencyManager.needReadAccess(() =>
-        facade.findClass(qualifiedName, resolveScope))) {
+        if (exists cls = needReadAccess(() => facade.findClass(qualifiedName, resolveScope))) {
             assert(exists qName = cls.qualifiedName);
             return qName;
         }
@@ -52,7 +56,7 @@ shared abstract class PSIAnnotatedMirror(psiPointer)
             value parts = qualifiedName.split('.'.equals).sequence();
             assert(nonempty reversedParts = parts.reversed);
 
-            if (exists clsName = concurrencyManager.needReadAccess(() {
+            if (exists clsName = needReadAccess(() {
                 if (exists foundClass = searchForClass {
                     potentialClass = reversedParts.first;
                     potentialPackageParts = reversedParts.rest;
@@ -72,7 +76,7 @@ shared abstract class PSIAnnotatedMirror(psiPointer)
 
     value annotations
             => annotationMap
-            else (annotationMap = concurrencyManager.needReadAccess(()
+            else (annotationMap = needReadAccess(()
                     => map {
                         if (exists ml = psi.modifierList)
                         for (a in ml.annotations)
@@ -84,5 +88,5 @@ shared abstract class PSIAnnotatedMirror(psiPointer)
 
     annotationNames => JavaMap(JavaStringMap(annotations)).keySet();
 
-    name = concurrencyManager.needReadAccess(() => psi.name else "unknown");
+    name = needReadAccess(() => psi.name else "unknown");
 }
