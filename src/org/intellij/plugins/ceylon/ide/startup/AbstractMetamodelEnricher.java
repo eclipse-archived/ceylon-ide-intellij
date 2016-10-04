@@ -107,17 +107,37 @@ abstract class AbstractMetamodelEnricher implements ApplicationComponent {
         File[] modulesArchives = getArchives(pluginDescriptor, new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                Matcher matcher = moduleArchivePatternCar.matcher(name);
-                if (!matcher.matches()) {
-                    matcher = moduleArchivePatternJar.matcher(name);
-                }
-                if (!"ceylon-bootstrap.jar".equals(name)
-                        && !name.equals(pluginDescriptor.getPath().getName() + ".jar")
-                        && matcher.matches()) {
-                    String moduleName = matcher.group(1);
-                    String moduleVersion = matcher.group(2);
-                    String moduleType = matcher.group(3).equalsIgnoreCase("C") ?
+                String moduleName;
+                String moduleVersion;
+                String moduleType;
+
+                if (dir.getName().equals("lib")) {
+                    // try to guess name and version from file name
+                    Matcher matcher = moduleArchivePatternCar.matcher(name);
+                    if (!matcher.matches()) {
+                        matcher = moduleArchivePatternJar.matcher(name);
+                    }
+                    if (matcher.matches()) {
+                        moduleName = matcher.group(1);
+                        moduleVersion = matcher.group(2);
+                        moduleType = matcher.group(3).equalsIgnoreCase("C") ?
+                                ArtifactContext.CAR : ArtifactContext.JAR;
+                    } else {
+                        return false;
+                    }
+                } else if (name.endsWith(".car") || name.endsWith(".jar")){
+                    // Use the repo layout to determine name and version
+                    moduleVersion = dir.getName();
+                    int versionPos = name.indexOf(moduleVersion);
+                    moduleName = name.substring(0, versionPos - 1);
+                    moduleType = name.endsWith(".car") ?
                             ArtifactContext.CAR : ArtifactContext.JAR;
+                } else {
+                    return false;
+                }
+
+                if (!"ceylon-bootstrap.jar".equals(name)
+                        && !name.equals(pluginDescriptor.getPath().getName() + ".jar")) {
                     if (artifacts.containsKey(moduleName)) {
                         throw new RuntimeException("Ceylon Metamodel Registering failed : several versions of the module '" + moduleName + "' are referenced from the plugin '" + getClass().getName() + "'");
                     }
