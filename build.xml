@@ -5,6 +5,12 @@
         <format property="NOW" pattern="yyyyMMddHHmm" />
     </tstamp>
 
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="${basedir}/../ceylon/lib/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+
     <property name="ceylon.root.dir" value="${basedir}/../ceylon" />
     <property file="${basedir}/plugin-ceylon-code/build.properties"/>
     <property name="projects.base.dir" value="${basedir}/.." />
@@ -105,10 +111,21 @@
         <copy todir="${build.dir}/CeylonIDEA">
             <fileset dir="${basedir}" includes="META-INF/**"/>
         </copy>
-        <replace file="${build.dir}/CeylonIDEA/META-INF/plugin.xml"
-                 value="${module.com.redhat.ceylon.ide.intellij.version}-${NOW}">
-            <replacetoken>$pluginVersion$</replacetoken>
-        </replace>
+        <if>
+            <contains string="${module.com.redhat.ceylon.ide.intellij.version}" substring="-SNAPSHOT"/>
+            <then>
+                <replace file="${build.dir}/CeylonIDEA/META-INF/plugin.xml"
+                         value="${module.com.redhat.ceylon.ide.intellij.version}-${NOW}">
+                    <replacetoken>$pluginVersion$</replacetoken>
+                </replace>
+            </then>
+            <else>
+                <replace file="${build.dir}/CeylonIDEA/META-INF/plugin.xml"
+                         value="${module.com.redhat.ceylon.ide.intellij.version}">
+                    <replacetoken>$pluginVersion$</replacetoken>
+                </replace>
+            </else>
+        </if>
         <copy todir="${build.dir}/CeylonIDEA/lib" flatten="true">
            <path refid="dist.classpath"/>
         </copy>
