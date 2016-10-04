@@ -3,6 +3,7 @@ package org.intellij.plugins.ceylon.ide.project;
 import ceylon.interop.java.CeylonStringIterable;
 import ceylon.language.Iterable;
 import com.intellij.ui.BooleanTableCellEditor;
+import com.intellij.ui.BooleanTableCellRenderer;
 import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.TableUtil;
 import com.intellij.ui.table.JBTable;
@@ -16,12 +17,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.*;
 import java.util.List;
 
 import static ceylon.interop.java.createJavaStringArray_.createJavaStringArray;
@@ -37,14 +41,38 @@ public class PageOne implements CeylonConfigForm {
     private RawCommandLineEditor javacOptions;
     private JBTable table;
     private List<Warning> warnings;
+    private ListTableModel<Warning> model;
 
     public PageOne() {
         String defaultVm = ceylonSettings_.get_().getDefaultTargetVm();
         warnings = new ArrayList<>();
         compileForJvm.setSelected(!defaultVm.equals("js"));
         compileToJs.setSelected(!defaultVm.equals("jvm"));
-        table = new JBTable();
+        table = new JBTable() {
+            public TableCellRenderer getCellRenderer(final int row, final int column) {
+                final ColumnInfo columnInfo = ((ListTableModel) getModel()).getColumnInfos()[column];
+                return columnInfo.getRenderer(((ListTableModel) getModel()).getItem(row));
+            }
+        };
         table.setShowGrid(false);
+        table.setTableHeader(null);
+        table.setRowSelectionAllowed(true);
+        table.registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int[] selectedRows = table.getSelectedRows();
+                for (int selectedRow : selectedRows) {
+                    Warning warning = model.getRowValue(selectedRow);
+                    if (warnings.contains(warning)) {
+                        warnings.remove(warning);
+                    } else {
+                        warnings.add(warning);
+                    }
+                }
+                table.repaint();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_FOCUSED);
+
         JScrollPane installedScrollPane = createScrollPane(
                 table,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -78,7 +106,7 @@ public class PageOne implements CeylonConfigForm {
                 || project.getIdeConfiguration().getCompileToJvm().booleanValue() != compileForJvm.isSelected()
                 || project.getIdeConfiguration().getCompileToJs().booleanValue() != compileToJs.isSelected()
                 || project.getConfiguration().getProjectOffline().booleanValue() != workOffline.isSelected()
-                // TODO || warningsAsString(project.getConfiguration().getSuppressWarningsEnum()) != suppressedWarnings.getText()
+                || !project.getConfiguration().getSuppressWarningsEnum().equals(new TreeSet<>(warnings))
                 || !getJavacOpts(project).equals(javacOptions.getText())
                 ;
     }
@@ -109,13 +137,26 @@ public class PageOne implements CeylonConfigForm {
     }
 
     private void createTableModel(final List<Warning> warnings) {
-        ListTableModel<Warning> model = new ListTableModel<>(
+        model = new ListTableModel<>(
                 new ColumnInfo[]{
                         new ColumnInfo<Warning, String>("Suppressed warnings") {
                             @Nullable
                             @Override
                             public String valueOf(Warning o) {
                                 return o.getDescription();
+                            }
+
+                            @Nullable
+                            @Override
+                            public TableCellRenderer getRenderer(Warning warning) {
+                                return new DefaultTableCellRenderer() {
+                                    @Override
+                                    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                                        Component cmp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                                        setBorder(null);
+                                        return cmp;
+                                    }
+                                };
                             }
                         },
                         new ColumnInfo<Warning, Boolean>("") {
@@ -148,22 +189,31 @@ public class PageOne implements CeylonConfigForm {
 
                             @Nullable
                             @Override
-                            public TableCellEditor getEditor(Warning warning) {
-                                return new BooleanTableCellEditor();
+                            public TableCellRenderer getRenderer(Warning warning) {
+                                return new BooleanTableCellRenderer() {
+                                    @Override
+                                    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSel, boolean hasFocus, int row, int column) {
+                                        Component cmp = super.getTableCellRendererComponent(table, value, isSel, hasFocus, row, column);
+                                        setBorder(null);
+                                        return cmp;
+                                    }
+                                };
                             }
 
+                            @Nullable
                             @Override
-                            public int getWidth(JTable table) {
-                                return new JCheckBox().getPreferredSize().width;
+                            public TableCellEditor getEditor(Warning warning) {
+                                return new BooleanTableCellEditor();
                             }
                         }
                 },
                 asList(Warning.values())
         );
         table.setModel(model);
-        table.setTableHeader(null);
-        table.setRowSelectionAllowed(false);
-        table.setCellSelectionEnabled(false);
+        int cbWidth = new JCheckBox().getPreferredSize().width + 4;
+        table.getColumnModel().getColumn(1).setMinWidth(cbWidth);
+        table.getColumnModel().getColumn(1).setMaxWidth(cbWidth);
+
         for (int i = 0; i < model.getColumnCount(); i++) {
             TableColumn column = table.getColumnModel().getColumn(i);
             final ColumnInfo columnInfo = model.getColumnInfos()[i];
