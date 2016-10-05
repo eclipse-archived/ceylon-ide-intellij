@@ -6,6 +6,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting.highlighter_;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
@@ -23,7 +24,7 @@ public class ModuleChooserDialog extends DialogWrapper {
     private JPanel contentPane;
     private JTree modulesTree;
 
-    ModuleChooserDialog(Project project) {
+    ModuleChooserDialog(final Project project) {
         super(project, false);
         init();
         setTitle("Select a Ceylon Module");
@@ -46,6 +47,7 @@ public class ModuleChooserDialog extends DialogWrapper {
                         setIcon(ModuleType.get((Module) object).getIcon());
                     } else if (object instanceof com.redhat.ceylon.model.typechecker.model.Module) {
                         setIcon(icons_.get_().getModuleDescriptors());
+                        setText("<html>" + highlighter_.get_().highlight(getText(), project) + "</html>");
                     }
                 }
                 return cmp;
