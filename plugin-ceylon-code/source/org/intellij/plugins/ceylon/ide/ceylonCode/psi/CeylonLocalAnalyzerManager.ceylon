@@ -356,7 +356,11 @@ shared class CeylonLocalAnalyzerManager(model)
                         }
                     }));
                 }
-                
+
+                if (!fileViewProvider.virtualFile.valid) {
+                    return;
+                }
+
                 if (synchronously) {
                     assert(application.dispatchThread);
                     commitAndReloadContent();
