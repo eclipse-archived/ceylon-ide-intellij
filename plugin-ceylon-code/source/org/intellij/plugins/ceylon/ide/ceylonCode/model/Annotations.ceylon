@@ -61,4 +61,8 @@ shared class Annotations {
     shared
     new moduleDescriptor extends create("moduleDescriptor",
         "com.redhat.ceylon.compiler.java.metadata.Module") {}
+
+    shared
+    new constructorName extends create("constructorName",
+        "com.redhat.ceylon.compiler.java.metadata.ConstructorName") {}
 }

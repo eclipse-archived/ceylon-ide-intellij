@@ -257,6 +257,7 @@ shared class CeylonSourceNavigator() extends GeneratedSourcesFilter() {
             if (name.endsWith("_"),
                 member.modifierList.findAnnotation(Annotations.\iobject.className) exists
                 || member.modifierList.findAnnotation(Annotations.attribute.className) exists
+                || member.modifierList.findAnnotation(Annotations.constructorName.className) exists
                 || member.modifierList.findAnnotation(Annotations.method.className) exists) {
 
                 name = name.trimTrailing('_'.equals);
