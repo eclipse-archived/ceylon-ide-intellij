@@ -8,19 +8,13 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.CompilerModuleExtension;
-import com.intellij.openapi.roots.CompilerProjectExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.common.Backend;
-import com.redhat.ceylon.common.config.CeylonConfig;
-import com.redhat.ceylon.common.config.CeylonConfigFinder;
-import com.redhat.ceylon.common.config.DefaultToolOptions;
 import org.apache.commons.lang.ObjectUtils;
 import org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin;
 import org.jdom.Element;
@@ -31,9 +25,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static com.intellij.openapi.vfs.VfsUtilCore.virtualToIoFile;
-import static com.redhat.ceylon.common.config.CeylonConfigFinder.loadDefaultConfig;
-import static com.redhat.ceylon.common.config.DefaultToolOptions.getCompilerOutputRepo;
 import static org.intellij.plugins.ceylon.ide.ceylonCode.model.findModuleByName_.findModuleByName;
 
 /**

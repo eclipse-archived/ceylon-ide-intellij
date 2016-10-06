@@ -26,7 +26,7 @@ public class RunnableChooserDialog extends DialogWrapper {
     RunnableChooserDialog(@Nullable final Project project, IdeaModule module) {
         super(project, false);
         init();
-        setTitle("Choose a Runnable Declaration");
+        setTitle("Select a Runnable Declaration");
 
         this.module = module;
 
