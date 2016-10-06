@@ -232,7 +232,7 @@
         <!-- Run/Debug -->
         <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationType"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationProducer"/>
-        <!--<runLineMarkerContributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.runner.CeylonRunLineMarkerContributor"/>-->
+        <runLineMarkerContributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.runner.CeylonRunLineMarkerContributor"/>
         <debugger.javaDebugAware implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonDebugAware"/>
         <debugger.positionManagerFactory implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonPositionManagerFactory"/>
         <debugger.nodeRenderer implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonNodeRenderer"/>
