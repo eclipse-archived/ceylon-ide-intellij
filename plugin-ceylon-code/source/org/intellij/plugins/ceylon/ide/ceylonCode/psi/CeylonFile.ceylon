@@ -129,7 +129,7 @@ AnalysisResult? returnIt(AnalysisResult? result)
         => result;
 
 AsyncFuture<AnalysisResult> wrapItInFuture(AnalysisResult? result)
-        => AsyncFutureFactory.instance.wrap(result);
+        => AsyncFutureFactory.wrap(result);
 
 Null giveUp(AsyncFuture<AnalysisResult>() futureBuilder)
         => null;
@@ -381,7 +381,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
                 then phasedUnit.ceylonProject
                 else phasedUnit.moduleSourceMapper?.ceylonProject;
 
-                phasedUnitWhenTypechecked => AsyncFutureFactory.instance.wrap(phasedUnit);
+                phasedUnitWhenTypechecked => AsyncFutureFactory.wrap(phasedUnit);
             };
         }
 

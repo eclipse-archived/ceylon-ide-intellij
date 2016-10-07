@@ -1,10 +1,43 @@
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonPsi,
-    CeylonFile,
-    descriptions
+import ceylon.interop.java {
+    javaClass
 }
+
 import com.intellij.ide.structureView {
     StructureViewTreeElement
+}
+import com.intellij.ide.structureView.impl.common {
+    PsiTreeElementBase
+}
+import com.intellij.ide.structureView.impl.java {
+    AccessLevelProvider
+}
+import com.intellij.ide.util.treeView.smartTree {
+    SortableTreeElement
+}
+import com.intellij.navigation {
+    ColoredItemPresentation
+}
+import com.intellij.psi {
+    PsiElement
+}
+import com.intellij.psi.util {
+    PsiTreeUtil,
+    PsiUtil
+}
+import com.intellij.util.ui {
+    UIUtil
+}
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree,
+    CustomTree
+}
+import com.redhat.ceylon.model.typechecker.model {
+    ClassOrInterface
+}
+
+import java.lang {
+    Class,
+    ObjectArray
 }
 import java.util {
     ArrayList,
@@ -12,47 +45,14 @@ import java.util {
     List,
     Collections
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
-    Tree,
-    CustomTree
-}
-import com.intellij.psi.util {
-    PsiTreeUtil,
-    PsiUtil
-}
-import ceylon.interop.java {
-    javaClass
-}
-import com.intellij.ide.structureView.impl.common {
-    PsiTreeElementBase
-}
-import java.lang {
-    Class,
-    ObjectArray
-}
-import com.intellij.psi {
-    PsiElement
-}
-import com.intellij.ide.util.treeView.smartTree {
-    SortableTreeElement
-}
-import com.intellij.ide.structureView.impl.java {
-    AccessLevelProvider
-}
-import javax.swing {
-    Icon
+
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonPsi,
+    CeylonFile,
+    descriptions
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
-}
-import com.intellij.navigation {
-    ColoredItemPresentation
-}
-import com.redhat.ceylon.model.typechecker.model {
-    ClassOrInterface
-}
-import com.intellij.util.ui {
-    UIUtil
 }
 
 class CeylonAttributeTreeElement(CeylonPsi.AnyAttributePsi declaration, Boolean isInherited)

@@ -595,7 +595,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
             }
             else {
                 if (exists existingResult = result_) {
-                    return AsyncFutureFactory.instance.wrap(existingResult of LocalAnalysisResult);
+                    return AsyncFutureFactory.wrap(existingResult of LocalAnalysisResult);
                 } else {
                     resultFuture = AsyncFutureFactory.instance.createAsyncFutureResult<LocalAnalysisResult>();
                     resultFuture_ = resultFuture;
