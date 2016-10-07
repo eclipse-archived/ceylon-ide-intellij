@@ -23,7 +23,7 @@
         <properties/>
         <border type="none" title="Repositories"/>
         <children>
-          <component id="612d9" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="systemRepository" custom-create="true">
+          <component id="612d9" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="systemRepository">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false">
                 <preferred-size width="368" height="28"/>
