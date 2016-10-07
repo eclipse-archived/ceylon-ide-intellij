@@ -282,30 +282,40 @@ StructureViewTreeElement? getTreeElementForDeclaration(CeylonFile myFile,
         return parent;
     }
 
-    if (is CustomTree.ClassOrInterface declaration) {
+    switch (declaration)
+    case (is CustomTree.ClassOrInterface) {
         value psiClass = parentOfType(javaClass<CeylonPsi.ClassOrInterfacePsi>());
         return CeylonClassTreeElement(psiClass, isInherited);
-    } else if (is Tree.AnyMethod declaration) {
+    }
+    case (is Tree.AnyMethod) {
         value psiMethod = parentOfType(javaClass<CeylonPsi.AnyMethodPsi>());
         return CeylonFunctionTreeElement(psiMethod, isInherited);
-    } else if (is Tree.ObjectDefinition declaration) {
+    }
+    case (is Tree.ObjectDefinition) {
         value psiObject = parentOfType(javaClass<CeylonPsi.ObjectDefinitionPsi>());
         return CeylonObjectTreeElement(psiObject, isInherited);
-    } else if (is Tree.AnyAttribute declaration) {
+    }
+    case (is Tree.AnyAttribute) {
         value psiDecl = parentOfType(javaClass<CeylonPsi.AnyAttributePsi>());
         return CeylonAttributeTreeElement(psiDecl, isInherited);
-    } else if (is Tree.Variable declaration) {
+    }
+    case (is Tree.Variable) {
         value psiDecl = parentOfType(javaClass<CeylonPsi.VariablePsi>());
         return CeylonVariableTreeElement(psiDecl, isInherited);
-    } else if (is Tree.Constructor declaration) {
+    }
+    case (is Tree.Constructor) {
         value psiDecl = parentOfType(javaClass<CeylonPsi.ConstructorPsi>());
         return CeylonConstructorTreeElement(psiDecl);
-    } else if (is Tree.Enumerated declaration) {
+    }
+    case (is Tree.Enumerated) {
         value psiDecl = parentOfType(javaClass<CeylonPsi.EnumeratedPsi>());
         return CeylonEnumeratedTreeElement(psiDecl);
-    } else if (is Tree.TypeAliasDeclaration declaration) {
+    }
+    case (is Tree.TypeAliasDeclaration) {
         value psiDecl = parentOfType(javaClass<CeylonPsi.TypeAliasDeclarationPsi>());
         return CeylonTypeAliasTreeElement(psiDecl);
     }
-    return null;
+    else {
+        return null;
+    }
 }
