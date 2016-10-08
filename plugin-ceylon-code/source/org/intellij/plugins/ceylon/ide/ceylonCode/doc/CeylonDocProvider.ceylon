@@ -254,7 +254,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
             value rootNode = phasedUnit.compilationUnit;
 
             if (link.startsWith("stp:"),
-                exists offset = parseInteger(link[4...]),
+                is Integer offset = Integer.parse(link[4...]),
                 is Tree.Type node = nodes.findNode {
                     node = rootNode;
                     tokens = null;

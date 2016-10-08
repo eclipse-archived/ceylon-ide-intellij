@@ -112,10 +112,10 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
     }
 
     String hexColor(Integer red, Integer green, Integer blue) 
-            => "#" 
-            + formatInteger(red, 16).padLeading(2, '0') 
-            + formatInteger(green, 16).padLeading(2, '0') 
-            + formatInteger(blue, 16).padLeading(2, '0');
+            => "#"
+            + Integer.format(red, 16).padLeading(2, '0')
+            + Integer.format(green, 16).padLeading(2, '0')
+            + Integer.format(blue, 16).padLeading(2, '0');
 
     TextAttributesKey getAttributes(Colors color) 
             => switch (color)
