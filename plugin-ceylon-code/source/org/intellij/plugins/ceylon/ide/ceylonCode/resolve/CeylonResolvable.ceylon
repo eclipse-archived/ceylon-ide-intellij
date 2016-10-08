@@ -85,9 +85,17 @@ shared class CeylonDocResolvable(ASTNode node)
             value list = ArrayList<PsiReference>();
             value matcher = docLinkPattern.matcher(javaString(node.text));
             while (matcher.find()) {
+                value textRange
+                        = TextRange(matcher.start(1),
+                                    matcher.end(1));
                 list.add(CeylonReference {
                     element = this;
-                    range = TextRange(matcher.start(1), matcher.end(1));
+                    range = textRange;
+                });
+                list.add(CeylonReference {
+                    element = this;
+                    range = textRange;
+                    backend = Backends.header;
                 });
             }
             return createJavaObjectArray(list);
