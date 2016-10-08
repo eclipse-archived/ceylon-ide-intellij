@@ -89,8 +89,9 @@ shared class CeylonReference(element, span = element,
             value prefix = "!/" in path then "jar" else "file";
             return VirtualFileManager.instance.findFileByUrl(prefix + "://" + path);
         }
-        else if (is IResourceAware<out Anything, VirtualFile, VirtualFile> unit) {
-            return unit.resourceFile;
+        else if (is IResourceAware<out Anything, out Anything, out Anything> unit,
+                 is VirtualFile file = unit.resourceFile) {
+            return file;
         }
         else {
             return null;
