@@ -209,7 +209,7 @@ shared object icons {
                 if (final) {
                     decorations.add(AllIcons.Nodes.finalMark);
                 }
-                if (model.staticallyImportable) {
+                if (model.static) {
                     decorations.add(AllIcons.Nodes.staticMark);
                 }
                 value readonly
