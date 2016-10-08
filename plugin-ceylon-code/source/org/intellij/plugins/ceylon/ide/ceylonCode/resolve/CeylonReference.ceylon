@@ -172,11 +172,12 @@ shared class CeylonReference(element, span = element,
                     = ceylonFile.availableAnalysisResult?.typecheckedRootNode,
             exists target
                     = concurrencyManager.withAlternateResolution(()
-            => IdeaNavigation(project)
-                .getTarget(rootNode, referenceNode, backend)),
+                        => IdeaNavigation(project)
+                            .getTarget(rootNode, referenceNode, backend)),
             exists result = resolvedElement(target, project)) {
             return result;
-        } else if (exists declaration = nodes.getReferencedModel(node),
+        }
+        else if (exists declaration = nodes.getReferencedModel(node),
             exists location = resolveDeclaration(original(declaration), project)) {
             return location;
         }
