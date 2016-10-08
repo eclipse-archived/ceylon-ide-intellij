@@ -47,7 +47,10 @@ shared class CeylonResolvable(ASTNode node)
             else CeylonReference(this);
 
     function backendRef(Backends backend)
-            => CeylonReference(this);
+            => CeylonReference {
+                element = this;
+                backend = backend;
+            };
 
     references
             => if (is CeylonPsi.MemberOrTypeExpressionPsi parent = this.parent,
