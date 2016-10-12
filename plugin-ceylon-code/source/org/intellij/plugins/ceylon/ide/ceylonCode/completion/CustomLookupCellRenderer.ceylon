@@ -46,8 +46,7 @@ import java.awt {
     Insets
 }
 import java.lang {
-    ReflectiveOperationException,
-    Runnable
+    ReflectiveOperationException
 }
 
 import javax.swing {
@@ -113,26 +112,24 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
     shared void install()
             => ApplicationManager.application
-                .invokeLater(object satisfies Runnable {
-            shared actual void run() {
-                try {
-                    value field
-                            = javaClass<LookupImpl>()
-                            .getDeclaredField("myCellRenderer");
-                    field.accessible = true;
-                    field.set(lookup, outer);
-                    field.accessible = false;
-                    value method
-                            = javaClass<JList<out Object>>()
-                            .getDeclaredMethod("setCellRenderer",
-                                javaClass<ListCellRenderer<out Object>>());
-                    method.invoke(lookup.list, outer);
-                }
-                catch (ReflectiveOperationException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+                .invokeLater(() {
+                    try {
+                        value field
+                                = javaClass<LookupImpl>()
+                                .getDeclaredField("myCellRenderer");
+                        field.accessible = true;
+                        field.set(lookup, this);
+                        field.accessible = false;
+                        value method
+                                = javaClass<JList<out Object>>()
+                                .getDeclaredMethod("setCellRenderer",
+                                    javaClass<ListCellRenderer<out Object>>());
+                        method.invoke(lookup.list, this);
+                    }
+                    catch (ReflectiveOperationException e) {
+                        e.printStackTrace();
+                    }
+                });
 
     shared actual Component getListCellRendererComponent(JList<out Object>? list,
             Object? element, Integer index, Boolean isSelected, Boolean hasFocus) {

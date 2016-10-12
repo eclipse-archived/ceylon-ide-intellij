@@ -31,9 +31,6 @@ import com.intellij.psi {
     PsiModifierList,
     PsiType
 }
-import com.intellij.util {
-    Processor
-}
 import com.redhat.ceylon.ide.common.completion {
     completionManager {
         Proposals
@@ -120,7 +117,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             then lang.artifact
             else null;
 
-    object processor satisfies Processor<PsiClass> {
+    Boolean processor(PsiClass cls) {
         String? findName(PsiClass cls) {
             value defaultName = (cls of PsiNamedElement).name;
 
@@ -351,26 +348,25 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             unit.\ipackage = pkg;
             lightModel.unit = unit;
 
-            lightModel.shared = langTrue;
+            lightModel.shared = true;
 
             return lightModel;
         }
 
-        shared actual Boolean process(PsiClass cls) {
-            if (exists modifiers = cls.modifierList,
-                modifiers.hasExplicitModifier(PsiModifier.public),
-                is PsiClassOwner file = cls.containingFile,
-                exists pkg = moduleManager.modelLoader.findPackage(file.packageName),
-                exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
-                exists qname = cls.qualifiedName) {
-                result[javaString(qname)]
-                    = DeclarationWithProximity(lightModel,
-                        getUnimportedProximity(proximity, pkg.languagePackage, lightModel.name),
-                        langTrue);
-            }
-            return langTrue;
+        if (exists modifiers = cls.modifierList,
+            modifiers.hasExplicitModifier(PsiModifier.public),
+            is PsiClassOwner file = cls.containingFile,
+            exists pkg = moduleManager.modelLoader.findPackage(file.packageName),
+            exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
+            exists qname = cls.qualifiedName) {
+            result[javaString(qname)]
+                = DeclarationWithProximity(lightModel,
+                    getUnimportedProximity(proximity, pkg.languagePackage, lightModel.name),
+                    true);
         }
+        return true;
     }
+
     object scope extends ModuleWithDependenciesScope(mod, ModuleWithDependenciesScope.libraries) {
         shared actual Boolean contains(VirtualFile file) {
             if (exists jar = JarFileSystem.instance.getVirtualFileForJar(file)) {

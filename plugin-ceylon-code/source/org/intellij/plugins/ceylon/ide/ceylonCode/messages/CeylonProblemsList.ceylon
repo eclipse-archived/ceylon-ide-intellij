@@ -2,6 +2,9 @@ import ceylon.interop.java {
     javaString
 }
 
+import com.intellij.ide.projectView {
+    TreeStructureProvider
+}
 import com.intellij.ide.util.treeView {
     NodeRenderer,
     AbstractTreeBuilder,
@@ -32,6 +35,9 @@ import com.redhat.ceylon.ide.common.model {
 import java.awt {
     BorderLayout
 }
+import java.util {
+    Collections
+}
 
 import javax.swing {
     JScrollPane,
@@ -44,15 +50,6 @@ import javax.swing.tree {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject
-}
-import java.lang {
-    Runnable
-}
-import com.intellij.ide.projectView {
-    TreeStructureProvider
-}
-import java.util {
-    Collections
 }
 
 shared alias BuildMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.BuildMessage;
@@ -114,7 +111,7 @@ class CeylonProblemsList(Project project)
         {SourceMsg*}? backendMessages, {ProjectMsg*}? projectMessages) {
 
         model.updateProblems(project, frontendMessages, backendMessages, projectMessages);
-        builder.queueUpdate().doWhenDone(object satisfies Runnable { run = expand; });
+        builder.queueUpdate().doWhenDone(expand);
     }
 
     shared actual Object? getData(String dataId) {

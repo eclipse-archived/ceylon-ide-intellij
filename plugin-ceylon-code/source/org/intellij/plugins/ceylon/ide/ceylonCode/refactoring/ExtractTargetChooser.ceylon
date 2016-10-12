@@ -16,7 +16,7 @@ import com.intellij.psi {
 }
 import com.intellij.ui {
     JBColor {
-        red=RED
+        red=\iRED
     }
 }
 import com.intellij.ui.components {
@@ -25,9 +25,6 @@ import com.intellij.ui.components {
 
 import java.awt {
     Component
-}
-import java.lang {
-    Runnable
 }
 import java.util {
     Collections
@@ -114,12 +111,10 @@ shared void showChooser<out T>
         .setMovable(true)
         .setResizable(true)
         .setRequestFocus(true)
-        .setItemChoosenCallback(object satisfies Runnable {
-            shared actual void run() {
-                assert (is SmartPsiElementPointer<out Anything>? pointer = myList.selectedValue);
-                if (is T expr = pointer?.element) {
-                    callback(expr);
-                }
+        .setItemChoosenCallback(() {
+            assert (is SmartPsiElementPointer<out Anything>? pointer = myList.selectedValue);
+            if (is T expr = pointer?.element) {
+                callback(expr);
             }
         })
         .addListener(object extends JBPopupAdapter() {

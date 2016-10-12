@@ -51,7 +51,6 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
-    Runnable,
     ObjectArray,
     JString=String
 }
@@ -82,8 +81,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
 
 shared Set<PhasedUnit> collectPhasedUnits(Project project, Boolean sourcesOnly = false) {
     value result = HashSet<PhasedUnit>();
-    ProgressManager.instance.runProcessWithProgressSynchronously(object satisfies Runnable {
-        shared actual void run() {
+    ProgressManager.instance.runProcessWithProgressSynchronously(() {
             value indicator = ProgressManager.instance.progressIndicator;
             assert (exists ceylonProjects = getCeylonProjects(project));
             for (mod in ModuleManager.getInstance(project).modules) {
@@ -106,8 +104,8 @@ shared Set<PhasedUnit> collectPhasedUnits(Project project, Boolean sourcesOnly =
                     }
                 }
             }
-        }
-    }, "Indexing Hierarchy", true, project);
+            return "";
+        }, "Indexing Hierarchy", true, project);
     return result;
 }
 

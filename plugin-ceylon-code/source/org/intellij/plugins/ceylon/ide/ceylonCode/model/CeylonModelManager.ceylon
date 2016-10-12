@@ -112,7 +112,6 @@ import com.redhat.ceylon.ide.common.model {
 }
 
 import java.lang {
-    Runnable,
     InterruptedException,
     Error,
     Thread,
@@ -229,43 +228,42 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
         }
     }
     
-    object submitChangesTask satisfies Runnable { 
-        shared actual void run() {
-            variable NativeResourceChange? firstChange = null;
-            try {
-                firstChange = accumulatedChanges.take();
-            } catch(InterruptedException ie) {}
+    Object submitChangesTask() {
+        variable NativeResourceChange? firstChange = null;
+        try {
+            firstChange = accumulatedChanges.take();
+        } catch(InterruptedException ie) {}
 
-            value changeSet = JHashSet<NativeResourceChange>();
-            if (exists first=firstChange) {
-                changeSet.add(first);
-            }
-            accumulatedChanges.drainTo(changeSet);
-
-            try {
-                if (! changeSet.empty) {
-                    logger.debug(() => "Submitting ``changeSet.size()`` changes to the model");
-                    model.fileTreeChanged(CeylonIterable(changeSet));
-                    scheduleModelUpdate();
-                }
-            } catch(Throwable t) {
-                Exception e;
-                if (is Exception t) {
-                    e = t;
-                } else {
-                    e = Exception(null, t);
-                }
-                if (! e is ProcessCanceledException) {
-                    logger.warnThrowable(e, () => "An exception as thrown during the change submission task");
-                }
-                accumulatedChanges.addAll(changeSet);
-                Thread.sleep(1000);
-            }
-            
-            if (ideaProjectReady) {
-                scheduleSubmitChanges();
-            }
+        value changeSet = JHashSet<NativeResourceChange>();
+        if (exists first=firstChange) {
+            changeSet.add(first);
         }
+        accumulatedChanges.drainTo(changeSet);
+
+        try {
+            if (! changeSet.empty) {
+                logger.debug(() => "Submitting ``changeSet.size()`` changes to the model");
+                model.fileTreeChanged(CeylonIterable(changeSet));
+                scheduleModelUpdate();
+            }
+        } catch(Throwable t) {
+            Exception e;
+            if (is Exception t) {
+                e = t;
+            } else {
+                e = Exception(null, t);
+            }
+            if (! e is ProcessCanceledException) {
+                logger.warnThrowable(e, () => "An exception as thrown during the change submission task");
+            }
+            accumulatedChanges.addAll(changeSet);
+            Thread.sleep(1000);
+        }
+
+        if (ideaProjectReady) {
+            scheduleSubmitChanges();
+        }
+        return "";
     }
 
     shared Boolean modelUpdateWasCannceledBecauseOfSyntaxErrors => cancelledBecauseOfSyntaxErrors;

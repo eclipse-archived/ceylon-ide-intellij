@@ -72,7 +72,6 @@ import java.io {
 }
 import java.lang {
     JBoolean=Boolean,
-    Runnable,
     ReflectiveOperationException
 }
 import java.util {
@@ -118,8 +117,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
         projects.addProject(mod);
         assert (is IdeaCeylonProject ceylonProject = projects.getProject(mod));
 
-        CommandProcessor.instance.executeCommand(object satisfies Runnable {
-            shared actual void run() {
+        CommandProcessor.instance.executeCommand(() {
                 value modified = object extends WriteCommandAction<Boolean>(mod.project) {
                     shared actual void run(Result<Boolean> result) {
                         variable value modified = updateGradleModel(ceylonProject);
@@ -142,7 +140,6 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                 } else {
                     callback();
                 }
-            }
         }, "Configure Ceylon", null);
     }
 
