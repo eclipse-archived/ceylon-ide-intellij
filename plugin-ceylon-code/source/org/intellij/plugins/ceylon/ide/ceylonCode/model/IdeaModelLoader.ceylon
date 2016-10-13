@@ -39,6 +39,9 @@ import com.intellij.psi {
 import com.intellij.psi.impl.compiled {
     ClsFileImpl
 }
+import com.intellij.psi.impl.java.stubs.impl {
+    PsiJavaFileStubImpl
+}
 import com.intellij.psi.search {
     GlobalSearchScope
 }
@@ -59,8 +62,7 @@ import com.redhat.ceylon.model.loader.mirror {
     ClassMirror,
     MethodMirror,
     FunctionalInterfaceType,
-    TypeMirror,
-    TypeKind
+    TypeMirror
 }
 import com.redhat.ceylon.model.typechecker.model {
     Modules
@@ -69,21 +71,15 @@ import com.redhat.ceylon.model.typechecker.model {
 import java.lang {
     ThreadLocal
 }
+import java.util {
+    Arrays
+}
 import java.util.concurrent {
     Callable
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
     ideaPlatformUtils
-}
-import com.intellij.psi.impl.java.stubs.impl {
-    PsiJavaFileStubImpl
-}
-import com.redhat.ceylon.model.loader {
-    ModelResolutionException
-}
-import java.util {
-    Arrays
 }
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
@@ -300,18 +296,16 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
            else null;
 
     shared actual FunctionalInterfaceType? getFunctionalInterfaceType(TypeMirror typeMirror) {
-        if (typeMirror.kind != TypeKind.declared) {
-            throw ModelResolutionException("Failed to find functional interface type in ``typeMirror``");
-        }
         if (is PSIType typeMirror,
-            exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi)) {
+            exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi),
+            exists returnType = LambdaUtil.getFunctionalInterfaceReturnType(typeMirror.psi)) {
 
-            value returnType = if (exists rt = method.returnType) then PSIType(rt) else null;
             value parameterTypes = Arrays.asList<TypeMirror>(
-                for (p in method.parameterList.parameters)
-                PSIType(p.type)
+                for (idx in 0..method.parameterList.parametersCount)
+                if (exists pType = LambdaUtil.getLambdaParameterFromType(typeMirror.psi, idx))
+                PSIType(pType)
             );
-            return FunctionalInterfaceType(returnType, parameterTypes, method.varArgs);
+            return FunctionalInterfaceType(PSIType(returnType), parameterTypes, method.varArgs);
         }
         return super.getFunctionalInterfaceType(typeMirror);
     }
@@ -327,4 +321,4 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                     exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi))
                 then true
                 else false;
-    }
+}
