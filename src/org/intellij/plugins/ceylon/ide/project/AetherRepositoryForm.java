@@ -19,7 +19,7 @@ public class AetherRepositoryForm {
                 .withFileFilter(new Condition<VirtualFile>() {
                     @Override
                     public boolean value(VirtualFile virtualFile) {
-                        return virtualFile.getName().equals("settings.xml");
+                        return virtualFile.getName().endsWith("settings.xml");
                     }
                 });
         repoField.addBrowseFolderListener(CeylonBundle.message("project.wizard.repo.maven.selectpath"), null, null, descriptor);
