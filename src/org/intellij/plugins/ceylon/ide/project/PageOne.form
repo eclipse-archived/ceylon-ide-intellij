@@ -48,17 +48,9 @@
         <properties/>
         <border type="none" title="Compiler settings"/>
         <children>
-          <component id="d9575" class="javax.swing.JCheckBox" binding="workOffline">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Work offline (disable connection to remote module repositories)"/>
-            </properties>
-          </component>
           <component id="3c81f" class="javax.swing.JLabel">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Javac options:"/>
@@ -66,10 +58,18 @@
           </component>
           <component id="c05d4" class="com.intellij.ui.RawCommandLineEditor" binding="javacOptions">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <dialogCaption value="Enter Javac options"/>
+            </properties>
+          </component>
+          <component id="d9575" class="javax.swing.JCheckBox" binding="workOffline">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Work offline (disable connection to remote module repositories)"/>
             </properties>
           </component>
         </children>
