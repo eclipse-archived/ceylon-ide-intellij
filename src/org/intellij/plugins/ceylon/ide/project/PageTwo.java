@@ -95,6 +95,9 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
                         setForeground(JBColor.GRAY);
                     }
                 }
+                else {
+                    setIcon(PlatformIcons.FOLDER_ICON);
+                }
 
                 return cmp;
             }
