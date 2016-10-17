@@ -34,7 +34,8 @@ import com.intellij.psi {
     PsiJavaFile,
     SmartPointerManager,
     PsiElement,
-    LambdaUtil
+    LambdaUtil,
+    PsiWildcardType
 }
 import com.intellij.psi.impl.compiled {
     ClsFileImpl
@@ -303,7 +304,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             value parameterTypes = Arrays.asList<TypeMirror>(
                 for (idx in 0..method.parameterList.parametersCount)
                 if (exists pType = LambdaUtil.getLambdaParameterFromType(typeMirror.psi, idx))
-                PSIType(pType)
+                PSIType(if (is PsiWildcardType pType, exists bound = pType.bound) then bound else pType)
             );
             return FunctionalInterfaceType(PSIType(returnType), parameterTypes, method.varArgs);
         }
