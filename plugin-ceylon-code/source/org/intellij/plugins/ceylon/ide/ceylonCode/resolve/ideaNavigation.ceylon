@@ -43,7 +43,8 @@ import com.redhat.ceylon.model.loader.model {
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     ClassOrInterface,
-    Referenceable
+    Referenceable,
+    Function
 }
 
 import java.lang {
@@ -78,7 +79,11 @@ shared class IdeaNavigation(Project project)
         return null;
     }
     
-    shared actual PsiNameIdentifierOwner? gotoJavaNode(Declaration declaration) {
+    shared actual PsiNameIdentifierOwner? gotoJavaNode(Declaration rawDeclaration) {
+        value declaration = if (is Function rawDeclaration, rawDeclaration.annotation)
+            then rawDeclaration.typeDeclaration
+            else rawDeclaration;
+
         if (is LazyClass declaration) {
             if (is PSIMethod meth = declaration.constructor,
                 meth.psi.canNavigate()) {

@@ -48,6 +48,9 @@ import com.redhat.ceylon.model.loader {
         ceylonAnnotationInstantiationAnnotation,
         ceylonObjectAnnotation,
         ceylonAttributeAnnotation
+    },
+    NamingBase {
+        getJavaBeanName
     }
 }
 import com.redhat.ceylon.model.typechecker.model {
@@ -356,13 +359,27 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
         if (exists modifiers = cls.modifierList,
             modifiers.hasExplicitModifier(PsiModifier.public),
             is PsiClassOwner file = cls.containingFile,
-            exists pkg = moduleManager.modelLoader.findPackage(file.packageName),
-            exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
-            exists qname = cls.qualifiedName) {
-            result[javaString(qname)]
-                = DeclarationWithProximity(lightModel,
-                    getUnimportedProximity(proximity, pkg.languagePackage, lightModel.name),
-                    true);
+            exists pkg = moduleManager.modelLoader.findPackage(file.packageName)) {
+
+            if (exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
+                exists qname = cls.qualifiedName) {
+                result[javaString(qname)]
+                    = DeclarationWithProximity(lightModel,
+                        getUnimportedProximity(proximity, pkg.languagePackage, lightModel.name),
+                        true);
+            }
+
+            // Expose annotation types as uncapitalized functions
+            // (e.g. `FunctionalInterface` -> `functionalInterface`)
+            if (cls.annotationType,
+                exists clsName = findName(cls),
+                exists annotationDecl = pkg.getMember(getJavaBeanName(clsName), noTypes, false)) {
+
+                result[javaString(annotationDecl.qualifiedNameString)]
+                    = DeclarationWithProximity(annotationDecl,
+                        getUnimportedProximity(proximity, pkg.languagePackage, annotationDecl.name),
+                        true);
+            }
         }
         return true;
     }
@@ -397,7 +414,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     value entryPath = file.path.spanFrom(sep + JarFileSystem.jarSeparator.size);
                     if (exists sep2 = entryPath.lastIndexWhere('/'.equals)) {
                         value pkg = entryPath[...sep2-1].replace("/", ".");
-                        if (moduleManager.modelLoader.findPackage(pkg) exists) {
+                        if (that.getPackage(pkg) exists) {
                             return true;
                         }
                     }
@@ -409,9 +426,14 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
 //    value before = system.milliseconds;
     AllClassesGetter.processJavaClasses(object extends CamelHumpMatcher(startingWith) {
+        function uncapitalize(String str)
+            => str[0..0].lowercased + str[1...];
+
         prefixMatches(String name)
-                => name[0..0]==startingWith[0..0]
-                && super.prefixMatches(name);
+                => (name[0..0]==startingWith[0..0] && super.prefixMatches(name))
+                // for Java annotations
+                || (name[0..0].lowercased==startingWith[0..0] && super.prefixMatches(uncapitalize(name)));
+
     }, mod.project, scope, processor);
 //    print("processed Java index in ``system.milliseconds - before``ms => ``result.size()`` results");
     return result;
