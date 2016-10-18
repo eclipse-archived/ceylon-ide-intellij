@@ -313,13 +313,15 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
 
     isFunctionalInterface(ClassMirror klass)
             => if (is PSIClass klass,
-                exists method = LambdaUtil.getFunctionalInterfaceMethod(klass.psi))
+                    exists method = LambdaUtil.getFunctionalInterfaceMethod(klass.psi),
+                    !method.hasTypeParameters())
             then method.name
             else null;
 
     isFunctionalInterfaceType(TypeMirror typeMirror)
             => if (is PSIType typeMirror,
-                    exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi))
+                    exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi),
+                    !method.hasTypeParameters())
                 then true
                 else false;
 }
