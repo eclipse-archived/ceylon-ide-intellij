@@ -3,7 +3,7 @@ import ceylon.collection {
 }
 import ceylon.interop.java {
     createJavaObjectArray,
-    CeylonIterable
+    javaObjectArray
 }
 
 import com.intellij.openapi.project {
@@ -53,28 +53,18 @@ String getJavaName(Declaration decl)
 
 shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache() {
     
-    shared actual ObjectArray<JString> allClassNames {
-        value classes = ArrayList<JString>();
-        
-        if (exists projects = getCeylonProjects(project)) {
-            for (proj in projects.ceylonProjects) {
-                for (mod in proj.modules?.fromProject else []) {
-                    for (pack in mod.packages) {
-                        classes.addAll(
-                            CeylonIterable(pack.members)
-                                .narrow<ClassOrInterface|FunctionOrValue>()
-                                .filter((c) => c.unit is CeylonUnit)
-                                .map((c) => JString(getJavaName(c)))
-                        );
-                    }
-                }
-                
-            }
-        }
-
-        print(classes);
-        return createJavaObjectArray(classes);
-    }
+    allClassNames
+            => javaObjectArray(Array<JString?> {
+                if (exists projects = getCeylonProjects(project))
+                for (proj in projects.ceylonProjects)
+                if (exists modules = proj.modules)
+                for (mod in modules.fromProject)
+                for (pack in mod.packages)
+                for (m in pack.members)
+                if (is ClassOrInterface|FunctionOrValue m,
+                    m.unit is CeylonUnit)
+                JString(getJavaName(m))
+            });
     
     allFieldNames
             => ObjectArray<JString>(0);
