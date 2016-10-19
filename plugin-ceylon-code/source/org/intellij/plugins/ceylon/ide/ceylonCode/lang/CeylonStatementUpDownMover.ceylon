@@ -61,7 +61,7 @@ shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
             moveInfo.toMove = LineRange(first, last);
             moveInfo.toMove2 = LineRange(other);
             if (other is CeylonPsi.ControlStatementPsi) {
-                value blocks = { for (block in findChildrenOfType(other, blockClass)) block };
+                value blocks = { *findChildrenOfType(other, blockClass) };
                 if (exists block = if (down) then blocks.first else blocks.last,
                     exists brace = if (down) then block.firstChild else block.lastChild) {
                     moveInfo.toMove2 = LineRange(brace);

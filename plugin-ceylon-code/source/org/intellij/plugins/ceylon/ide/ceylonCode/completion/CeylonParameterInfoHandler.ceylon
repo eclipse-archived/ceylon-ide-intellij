@@ -76,12 +76,12 @@ shared class CeylonParameterInfoHandler()
 
     function overloadedVersions(Declaration&Functional declaration) {
         if (ModelUtil.isAbstraction(declaration)) {
-            return Array<Object?> { for (dec in declaration.overloads) dec };
+            return Array<Object?> { *declaration.overloads };
         }
         else if (ModelUtil.isOverloadedVersion(declaration)) {
             value abstraction
                     = declaration.scope.getDirectMember(declaration.name, null, false);
-            return Array<Object?> { for (dec in abstraction.overloads) dec };
+            return Array<Object?> { *abstraction.overloads };
         }
         else {
             return Array<Object?> { declaration };
