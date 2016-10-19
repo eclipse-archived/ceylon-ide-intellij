@@ -69,7 +69,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
             return ExitCode.NOTHING_DONE;
         }
 
-        final Map<JpsModule, Boolean> compileForBackend = new HashMap<>();
+        final Map<JpsModule, Boolean> compileForBackend = new HashMap<JpsModule, Boolean>();
         for (JpsModule module : chunk.getModules()) {
             JpsCeylonModuleExtension facet = module.getContainer().getChild(JpsCeylonModuleExtension.KIND);
 
@@ -88,7 +88,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
         }
 
         try {
-            final Set<File> filesToBuild = new HashSet<>();
+            final Set<File> filesToBuild = new HashSet<File>();
             File storage = context.getProjectDescriptor().dataManager.getDataPaths().getDataStorageRoot();
             File ceylonFiles = new File(storage, "ceylonFiles.txt");
             if (ceylonFiles.isFile()) {
@@ -107,7 +107,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 }
             });
 
-            return compile(context, chunk, new ArrayList<>(filesToBuild), settings);
+            return compile(context, chunk, new ArrayList<File>(filesToBuild), settings);
         } catch (Exception e) {
             context.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR, "Could not launch compiler"));
             context.processMessage(new CompilerMessage(BUILDER_NAME, e));
@@ -216,8 +216,8 @@ class CeylonBuilder extends ModuleLevelBuilder {
         // Undo unwanted behavior (defaults to unexpanded "*")
         options.setModules(Collections.<String>emptyList());
 
-        List<File> srcPath = new ArrayList<>();
-        List<File> resourcePath = new ArrayList<>();
+        List<File> srcPath = new ArrayList<File>();
+        List<File> resourcePath = new ArrayList<File>();
 
         for (JpsModule module : chunk.getModules()) {
             for (JpsModuleSourceRoot sourceRoot : module.getSourceRoots()) {
@@ -268,7 +268,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
         // Only the Java backend can do incremental builds
         if (backend == Backend.Java && !fullBuild) {
-            List<File> filteredFiles = new ArrayList<>();
+            List<File> filteredFiles = new ArrayList<File>();
 
             // filesToBuild contains file for every module we're building, we need to filter
             // files for the current module only.
@@ -284,7 +284,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
             options.setFiles(filteredFiles);
         } else {
-            List<String> moduleNames = new ArrayList<>(expandWildcards(
+            List<String> moduleNames = new ArrayList<String>(expandWildcards(
                     getSourceRoots(chunk),
                     Collections.singletonList("*"),
                     (backend == Backend.Java)
@@ -337,7 +337,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
     }
 
     private List<File> getSourceRoots(ModuleChunk chunk) {
-        List<File> roots = new ArrayList<>();
+        List<File> roots = new ArrayList<File>();
         JpsModuleSourceRootType<?> expectedSrcRootType;
 
         if (chunk.containsTests()) {

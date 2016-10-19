@@ -7,6 +7,7 @@ import org.jetbrains.jps.incremental.BuilderService;
 import org.jetbrains.jps.incremental.ModuleLevelBuilder;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CeylonBuilderService extends BuilderService {
@@ -14,6 +15,11 @@ public class CeylonBuilderService extends BuilderService {
     @NotNull
     @Override
     public List<? extends ModuleLevelBuilder> createModuleLevelBuilders() {
+        // Our builders won't work on Java < 7
+        if (Integer.parseInt(System.getProperty("java.version").split("\\.")[1]) < 7) {
+            return Collections.emptyList();
+        }
+
         return Arrays.asList(
                 // We need to call the JVM backend before the Java compiler
                 new CeylonBuilder(Backend.Java, BuilderCategory.SOURCE_PROCESSOR),
