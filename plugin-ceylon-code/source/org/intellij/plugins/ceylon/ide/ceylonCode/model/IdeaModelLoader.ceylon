@@ -35,7 +35,8 @@ import com.intellij.psi {
     SmartPointerManager,
     PsiElement,
     LambdaUtil,
-    PsiWildcardType
+    PsiWildcardType,
+    PsiType
 }
 import com.intellij.psi.impl.compiled {
     ClsFileImpl
@@ -297,6 +298,9 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
            else null;
 
     shared actual FunctionalInterfaceType? getFunctionalInterfaceType(TypeMirror typeMirror) {
+        function noWildcard(PsiType type)
+            => if (is PsiWildcardType type, exists bound = type.bound) then bound else type;
+
         if (is PSIType typeMirror,
             exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi),
             exists returnType = LambdaUtil.getFunctionalInterfaceReturnType(typeMirror.psi)) {
@@ -304,9 +308,9 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             value parameterTypes = Arrays.asList<TypeMirror>(
                 for (idx in 0..method.parameterList.parametersCount)
                 if (exists pType = LambdaUtil.getLambdaParameterFromType(typeMirror.psi, idx))
-                PSIType(if (is PsiWildcardType pType, exists bound = pType.bound) then bound else pType)
+                PSIType(noWildcard(pType))
             );
-            return FunctionalInterfaceType(PSIType(returnType), parameterTypes, method.varArgs);
+            return FunctionalInterfaceType(PSIType(noWildcard(returnType)), parameterTypes, method.varArgs);
         }
         return super.getFunctionalInterfaceType(typeMirror);
     }
