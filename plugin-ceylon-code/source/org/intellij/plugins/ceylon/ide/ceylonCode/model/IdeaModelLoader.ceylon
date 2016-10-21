@@ -310,7 +310,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                 if (exists pType = LambdaUtil.getLambdaParameterFromType(typeMirror.psi, idx))
                 PSIType(noWildcard(pType))
             );
-            return FunctionalInterfaceType(PSIType(noWildcard(returnType)), parameterTypes, method.varArgs);
+            return FunctionalInterfaceType(PSIMethod(pointer(method)), PSIType(noWildcard(returnType)), parameterTypes, method.varArgs);
         }
         return super.getFunctionalInterfaceType(typeMirror);
     }
