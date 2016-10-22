@@ -192,14 +192,15 @@ shared class CeylonParameterInfoHandler()
 
         value ref = getReference(context.parameterOwner);
 
-        value unit = fun.unit;
         value builder = StringBuilder();
 
         variable Integer highlightOffsetStart = -1;
         variable Integer highlightOffsetEnd = -1;
         variable Integer i = 0;
         if (!ModelUtil.isAbstraction(fun),
-            exists parameters = fun.firstParameterList?.parameters) {
+            exists parameterList = fun.firstParameterList) {
+            value parameters = parameterList.parameters;
+            value unit = fun.unit;
             if (parameters.empty) {
                 builder.append(noparams);
             }
