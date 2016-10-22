@@ -262,13 +262,16 @@ shared class CeylonParameterInfoHandler()
         builder.append(param.name);
 
         if (is Function model = param.model) {
-            builder.append("(");
-            for (parameter in model.firstParameterList.parameters) {
-                builder.append(getParameterLabel(parameter, unit, ref))
-                       .append(", ");
+            if (exists parameterList = model.firstParameterList) {
+                builder.append("(");
+                for (parameter in parameterList.parameters) {
+                    if (!builder.endsWith("(")) {
+                        builder.append(", ");
+                    }
+                    builder.append(getParameterLabel(parameter, unit, ref));
+                }
+                builder.append(")");
             }
-            builder.deleteTerminal(2)
-                   .append(")");
         }
 
         if (param.defaulted) {
