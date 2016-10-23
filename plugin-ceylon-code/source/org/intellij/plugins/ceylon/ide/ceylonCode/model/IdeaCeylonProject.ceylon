@@ -241,7 +241,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 value scope = GlobalSearchScope.moduleWithLibrariesScope(ideArtifact);
                 value ceylonCls = "ceylon.language.String";
 
-                function ceylonLanguageIndexed() {
+                Boolean ceylonLanguageIndexed() {
                     value ref = Ref<Boolean>();
                     ds.runReadActionInSmartMode(JavaRunnable(
                         () => ref.set(facade.findClass(ceylonCls, scope) exists)
@@ -517,10 +517,10 @@ shared class IdeaCeylonProject(ideArtifact, model)
         }
 
         if (!repoPath in configuration.projectLocalRepos) {
-            configuration.projectLocalRepos = {
+            configuration.projectLocalRepos = [
                 repoPath,
                 *configuration.projectLocalRepos
-            };
+            ];
         }
 
         configuration.projectJdkProvider = jdkProvider;
