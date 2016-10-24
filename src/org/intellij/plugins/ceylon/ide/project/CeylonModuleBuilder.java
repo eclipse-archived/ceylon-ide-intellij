@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.project;
 
+import ceylon.interop.java.CeylonStringIterable;
 import com.intellij.facet.FacetManager;
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleBuilderListener;
@@ -17,20 +18,27 @@ import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
+import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.jps.model.JpsElement;
+import org.jetbrains.jps.model.java.JavaResourceRootType;
+import org.jetbrains.jps.model.java.JavaSourceRootType;
+import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
+
 public class CeylonModuleBuilder extends JavaModuleBuilder {
 
     private PageOne pageOne;
     private PageTwo pageTwo;
+    private CeylonSettings ceylonSettings = ceylonSettings_.get_();
 
     private List<Pair<String, String>> mySourcePaths;
 
@@ -59,7 +67,15 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
                     new File(first).mkdirs();
                     VirtualFile sourceRoot = LocalFileSystem.getInstance().refreshAndFindFileByPath(FileUtil.toSystemIndependentName(first));
                     if (sourceRoot != null) {
-                        contentEntry.addSourceFolder(sourceRoot, false, sourcePath.second);
+                        JpsModuleSourceRootType<? extends JpsElement> elType =
+                                "resource".equals(sourcePath.second)
+                                        ? JavaResourceRootType.RESOURCE
+                                        : JavaSourceRootType.SOURCE;
+
+                        contentEntry.addSourceFolder(
+                                sourceRoot,
+                                elType
+                        );
                     }
                 }
             }
@@ -100,6 +116,12 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
         pageOne.apply(ceylonProject);
         pageTwo.apply(ceylonProject);
 
+        ceylonProject.getConfiguration().setProjectSourceDirectories(
+                new CeylonStringIterable(singletonList(ceylonSettings.getDefaultSourceFolder()))
+        );
+        ceylonProject.getConfiguration().setProjectResourceDirectories(
+                new CeylonStringIterable(singletonList(ceylonSettings.getDefaultResourceFolder()))
+        );
         ceylonProject.getConfiguration().save();
         ceylonProject.getIdeConfiguration().save();
         CeylonFacet facet = FacetManager.getInstance(module).addFacet(CeylonFacet.getFacetType(), CeylonFacet.getFacetType().getPresentableName(), null);
@@ -115,10 +137,14 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
     public List<Pair<String, String>> getSourcePaths() {
         if (mySourcePaths == null) {
             final List<Pair<String, String>> paths = new ArrayList<>();
-            String folder = ceylonSettings_.get_().getDefaultSourceFolder();
-            @NonNls final String path = getContentEntryPath() + File.separator + folder;
-            new File(path).mkdirs();
-            paths.add(Pair.create(path, ""));
+            String source = ceylonSettings.getDefaultSourceFolder();
+            String resource = ceylonSettings.getDefaultResourceFolder();
+            String sourcePath = getContentEntryPath() + File.separator + source;
+            String resourcePath = getContentEntryPath() + File.separator + resource;
+            new File(sourcePath).mkdirs();
+            new File(resourcePath).mkdirs();
+            paths.add(Pair.create(sourcePath, "source"));
+            paths.add(Pair.create(resourcePath, "resource"));
             return paths;
         }
         return mySourcePaths;

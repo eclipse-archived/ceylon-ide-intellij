@@ -216,45 +216,8 @@ class CeylonBuilder extends ModuleLevelBuilder {
         // Undo unwanted behavior (defaults to unexpanded "*")
         options.setModules(Collections.<String>emptyList());
 
-        List<File> srcPath = new ArrayList<File>();
-        List<File> resourcePath = new ArrayList<File>();
-
-        for (JpsModule module : chunk.getModules()) {
-            for (JpsModuleSourceRoot sourceRoot : module.getSourceRoots()) {
-                JpsModuleSourceRootType<?> expectedSrcRootType;
-                JpsModuleSourceRootType<?> expectedResourceRootType;
-
-                if (chunk.containsTests()) {
-                    expectedSrcRootType = JavaSourceRootType.TEST_SOURCE;
-                    expectedResourceRootType = JavaResourceRootType.TEST_RESOURCE;
-                } else {
-                    expectedSrcRootType = JavaSourceRootType.SOURCE;
-                    expectedResourceRootType = JavaResourceRootType.RESOURCE;
-                }
-
-                if (sourceRoot.getRootType() == expectedSrcRootType) {
-                    srcPath.add(sourceRoot.getFile());
-                }
-                if (sourceRoot.getRootType() == expectedResourceRootType) {
-                    resourcePath.add(sourceRoot.getFile());
-                }
-            }
-
-            if (chunk.containsTests()) {
-                // This is because test modules will be built in a second pass, and they rely
-                // on the result of the first pass.
-                File out = ProjectPaths.getModuleOutputDir(module, false);
-                if (out != null && out.isDirectory()) {
-                    options.addUserRepository(out.getAbsolutePath());
-                }
-            }
-        }
-
         JpsCeylonModuleExtension facet = chunk.representativeTarget().getModule().getContainer()
                 .getChild(JpsCeylonModuleExtension.KIND);
-
-        options.setSourcePath(srcPath);
-        options.setResourcePath(resourcePath);
 
         if (StringUtil.isNotEmpty(facet.getProperties().getSystemRepository())) {
             options.setSystemRepository(facet.getProperties().getSystemRepository());
@@ -264,6 +227,17 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
         if (root != null) {
             options.setWorkingDirectory(root.getFile().getParentFile().getAbsolutePath());
+            List<File> absoluteSources = new ArrayList<File>();
+            for (File path : options.getSourcePath()) {
+                absoluteSources.add(new File(root.getFile().getParentFile(), path.getPath()));
+            }
+            options.setSourcePath(absoluteSources);
+
+            List<File> absoluteResources = new ArrayList<File>();
+            for (File path : options.getResourcePath()) {
+                absoluteResources.add(new File(root.getFile().getParentFile(), path.getPath()));
+            }
+            options.setResourcePath(absoluteResources);
         }
 
         // Only the Java backend can do incremental builds
@@ -272,7 +246,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
             // filesToBuild contains file for every module we're building, we need to filter
             // files for the current module only.
-            List<File> modulePaths = ContainerUtil.concat(srcPath, resourcePath);
+            List<File> modulePaths = ContainerUtil.concat(options.getSourcePath(), options.getResourcePath());
             for (File f : filesToBuild) {
                 for (File src : modulePaths) {
                     if (f.toPath().startsWith(src.toPath())) {
