@@ -276,8 +276,10 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         shared actual Boolean packageExists(String quotedPackageName) 
             => concurrencyManager.needReadAccess(() => facade.findPackage(quotedPackageName) exists);
         
-        shared actual {PsiClass*}? packageMembers(String quotedPackageName)
-            => concurrencyManager.needReadAccess(() {
+        packageMembers(String quotedPackageName) =>
+            if (ideaModuleManager.isExternalModuleLoadedFromSource(ideModule.nameAsString))
+            then null
+            else concurrencyManager.needReadAccess(() {
                 if (exists pkg = facade.findPackage(quotedPackageName)) {
                     value classes = pkg.getClasses(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(mod));
                     
