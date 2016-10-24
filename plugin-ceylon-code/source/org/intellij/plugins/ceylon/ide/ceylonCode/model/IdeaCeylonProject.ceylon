@@ -131,6 +131,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import com.intellij.psi.search {
     GlobalSearchScope
 }
+import com.intellij.openapi.util.io {
+    FileUtil
+}
 
 shared class IdeaCeylonProject(ideArtifact, model)
         extends CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>() {
@@ -316,8 +319,14 @@ shared class IdeaCeylonProject(ideArtifact, model)
     shared actual void createNewOutputFolder(String relativePath) {
         function createDirectory()
             =>  object extends WriteAction<Nothing>() {
-                    run(Result<Nothing> result)
-                            => VfsUtil.createDirectoryIfMissing(moduleRoot, relativePath);
+                    shared actual void run(Result<Nothing> result) {
+                        // Our dialog actually allows paths outside the current project
+                        if (FileUtil.isAbsolute(relativePath)) {
+                            VfsUtil.createDirectoryIfMissing(relativePath);
+                        } else {
+                            VfsUtil.createDirectoryIfMissing(moduleRoot, relativePath);
+                        }
+                    }
                 }.execute().throwException();
 
         if (exists outputFolder = findModuleFileWithRefresh(relativePath)) {
@@ -331,7 +340,9 @@ shared class IdeaCeylonProject(ideArtifact, model)
     }
 
     shared actual void deleteOldOutputFolder(String folderProjectRelativePath) {
-        if (exists oldOutputRepoFolder = findModuleFile(folderProjectRelativePath)) {
+        if (exists oldOutputRepoFolder = findModuleFile(folderProjectRelativePath),
+            oldOutputRepoFolder != moduleRoot,
+            !oldOutputRepoFolder in sourceNativeFolders) {
             if (Messages.showYesNoDialog(ideaModule.project,
                     "The Ceylon output repository has changed.
                      Do you want to remove the old output repository folder \

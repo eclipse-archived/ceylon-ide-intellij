@@ -363,7 +363,7 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         protected String chosenFileToResultingText(@NotNull VirtualFile file) {
             VirtualFile modRoot = getModuleRoot();
 
-            if (modRoot != null && VfsUtil.isAncestor(modRoot, file, true)) {
+            if (modRoot != null && VfsUtil.isAncestor(modRoot, file, false)) {
                 return "./" + VfsUtil.getRelativePath(file, modRoot);
             }
 
