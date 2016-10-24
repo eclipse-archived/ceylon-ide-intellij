@@ -239,6 +239,18 @@ shared class CeylonReference(element, span = element,
                 return s == g;
             }
         }
+        if (is CeylonPsi.TypeParameterDeclarationPsi element,
+            is Tree.TypeConstraint decl = this.node,
+            decl.declarationModel == element.ceylonNode.declarationModel) {
+
+            return true;
+        }
+        if (is CeylonPsi.TypeConstraintPsi element,
+            exists model = nodes.getReferencedModel(this.node),
+            model == element.ceylonNode.declarationModel) {
+
+            return true;
+        }
         return false;
     }
 }
