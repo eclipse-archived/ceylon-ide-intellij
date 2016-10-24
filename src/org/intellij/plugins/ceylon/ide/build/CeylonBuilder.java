@@ -9,6 +9,8 @@ import com.intellij.openapi.compiler.CompileTask;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.containers.MultiMap;
+import com.redhat.ceylon.common.Backend;
 import com.redhat.ceylon.ide.common.model.CeylonProjectBuild;
 import com.redhat.ceylon.ide.common.vfs.FileVirtualFile;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.ConcurrencyManagerForJava;
@@ -22,8 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class CeylonBuilder implements CompileTask {
@@ -43,7 +45,7 @@ public class CeylonBuilder implements CompileTask {
                             compileContext.getProgressIndicator()
                     );
 
-                    return (Boolean)ConcurrencyManagerForJava.withUpToDateIndexes(new Callable<Object>() {
+                    return (Boolean) ConcurrencyManagerForJava.withUpToDateIndexes(new Callable<Object>() {
                         @Override
                         public Object call() throws Exception {
                             project.getBuild().performBuild(monitor);
@@ -70,7 +72,7 @@ public class CeylonBuilder implements CompileTask {
 
     private void registerFilesToCompile(Project project,
                                         Set<? extends FileVirtualFile<Module, VirtualFile, VirtualFile, VirtualFile>> filesToBuild) {
-        List<String> files = new ArrayList<>();
+        MultiMap<Backend, String> files = new MultiMap<>();
         Iterator it = filesToBuild.iterator();
 
         while (true) {
@@ -78,20 +80,29 @@ public class CeylonBuilder implements CompileTask {
 
             if (next == finished_.get_()) {
                 break;
-            } else if (next instanceof VirtualFileVirtualFile){
-                VirtualFile vfile = ((VirtualFileVirtualFile) next).getNativeResource();
-                File file = new File(vfile.getCanonicalPath());
+            } else if (next instanceof VirtualFileVirtualFile) {
+                VirtualFileVirtualFile vfile = (VirtualFileVirtualFile) next;
+                File file = new File(vfile.getNativeResource().getCanonicalPath());
 
                 if (file.exists()) {
-                    files.add(file.getAbsolutePath());
+                    if (vfile.getCeylonModule().getNativeBackends().none()) {
+                        files.putValue(Backend.Java, file.getAbsolutePath());
+                        files.putValue(Backend.JavaScript, file.getAbsolutePath());
+                    } else {
+                        for (Backend backend : vfile.getCeylonModule().getNativeBackends()) {
+                            files.putValue(backend, file.getAbsolutePath());
+                        }
+                    }
                 }
             }
         }
 
         File builderDir = BuildManager.getInstance().getProjectSystemDirectory(project);
-        File ceylonFiles = new File(builderDir, "ceylonFiles.txt");
         try {
-            Files.write(ceylonFiles.toPath(), files, StandardCharsets.UTF_8);
+            for (Map.Entry<Backend, Collection<String>> entry : files.entrySet()) {
+                File ceylonFiles = new File(builderDir, "ceylonFiles-" + entry.getKey().name + ".txt");
+                Files.write(ceylonFiles.toPath(), entry.getValue(), StandardCharsets.UTF_8);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

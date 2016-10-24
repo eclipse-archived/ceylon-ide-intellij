@@ -90,13 +90,13 @@ class CeylonBuilder extends ModuleLevelBuilder {
         try {
             final Set<File> filesToBuild = new HashSet<File>();
             File storage = context.getProjectDescriptor().dataManager.getDataPaths().getDataStorageRoot();
-            File ceylonFiles = new File(storage, "ceylonFiles.txt");
+            File ceylonFiles = new File(storage, "ceylonFiles-" + backend.name() + ".txt");
             if (ceylonFiles.isFile()) {
                 for (String line : readAllLines(ceylonFiles.toPath(), StandardCharsets.UTF_8)) {
                     filesToBuild.add(new File(line));
                 }
             }
-            dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
+            /*dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
                 @Override
                 public boolean apply(ModuleBuildTarget target, File file, JavaSourceRootDescriptor root) throws IOException {
                     if (Boolean.TRUE.equals(compileForBackend.get(target.getModule()))
@@ -105,7 +105,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                     }
                     return true;
                 }
-            });
+            });*/
 
             return compile(context, chunk, new ArrayList<File>(filesToBuild), settings);
         } catch (Exception e) {
