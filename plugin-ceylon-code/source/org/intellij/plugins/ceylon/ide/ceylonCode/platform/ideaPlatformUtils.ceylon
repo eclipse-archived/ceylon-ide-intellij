@@ -21,6 +21,9 @@ import com.intellij.openapi.project {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     ConcurrencyError
 }
+import com.redhat.ceylon.model.loader {
+    ModelResolutionException
+}
 
 shared object ideaPlatformUtils satisfies IdeUtils {
     
@@ -31,6 +34,12 @@ shared object ideaPlatformUtils satisfies IdeUtils {
             // to avoid "Control-flow exceptions (like Xyz) should never be logged"
             log(status, "``message`` (``e.string``)");
             return;
+        }
+
+        if (is ModelResolutionException e) {
+            // We can certainly recover from ModelResolutionException so we don't need to show
+            // them to the user. The IDE will likely reindex JARs later and a model reset will fix them.
+            log(Status._WARNING, "``message`` (``e.string``)");
         }
 
         switch (status)
