@@ -2,6 +2,20 @@ import ceylon.interop.java {
     javaString
 }
 
+import com.intellij.diff {
+    DiffContentFactory {
+        diffContentFactory=instance
+    },
+    DiffManager {
+        diffManager=instance
+    }
+}
+import com.intellij.diff.requests {
+    SimpleDiffRequest
+}
+import com.intellij.icons {
+    AllIcons
+}
 import com.intellij.ide.projectView {
     TreeStructureProvider
 }
@@ -11,7 +25,15 @@ import com.intellij.ide.util.treeView {
     AbstractTreeStructureBase
 }
 import com.intellij.openapi.actionSystem {
-    CommonDataKeys
+    CommonDataKeys,
+    ActionManager,
+    IdeActions,
+    DefaultActionGroup,
+    ActionPlaces,
+    PlatformDataKeys,
+    AnAction,
+    AnActionEvent,
+    CommonShortcuts
 }
 import com.intellij.openapi.\imodule {
     Module
@@ -25,6 +47,10 @@ import com.intellij.openapi.ui {
 import com.intellij.openapi.vfs {
     VirtualFile
 }
+import com.intellij.ui {
+    PopupHandler,
+    TreeCopyProvider
+}
 import com.intellij.util {
     EditSourceOnDoubleClickHandler
 }
@@ -33,7 +59,8 @@ import com.redhat.ceylon.ide.common.model {
 }
 
 import java.awt {
-    BorderLayout
+    BorderLayout,
+    Component
 }
 import java.util {
     Collections
@@ -48,6 +75,9 @@ import javax.swing.tree {
     DefaultMutableTreeNode
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    CeylonFileType
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject
 }
@@ -88,7 +118,65 @@ class CeylonProblemsList(Project project)
             myTree.expandRow(i++);
         }
     }
-    
+
+    object diffAction extends AnAction() {
+        function findSelectedMessage() {
+            return if (is DefaultMutableTreeNode node = myTree.selectionPath.lastPathComponent,
+                is ProblemNode problem = node.userObject,
+                is SourceFileMessage message = problem.message)
+            then message
+            else null;
+        }
+
+        shared actual void update(AnActionEvent e) {
+            e.presentation.visible = false;
+            if (exists message = findSelectedMessage(),
+                message.typecheckerMessage.code == 2100) {
+
+                e.presentation.visible = true;
+                e.presentation.text = "Compare parameter lists";
+                e.presentation.setIcon(AllIcons.Actions.diff);
+            }
+        }
+
+        shared actual void actionPerformed(AnActionEvent e) {
+            if (exists message = findSelectedMessage(),
+                exists firstColon = message.message.firstInclusion(": "),
+                exists isNotAssignableTo = message.message.firstInclusion(" is not assignable to "),
+                firstColon < isNotAssignableTo) {
+
+                value expected = diffContentFactory.create(
+                    message.message[firstColon + 2..isNotAssignableTo - 1].trim('\''.equals),
+                    CeylonFileType.instance
+                );
+                value actual = diffContentFactory.create(
+                    message.message[isNotAssignableTo + 22...].trim('\''.equals),
+                    CeylonFileType.instance
+                );
+                diffManager.showDiff(
+                    project,
+                    SimpleDiffRequest(
+                        "Compare parameter lists",
+                        expected, actual,
+                        "Expected", "Actual"
+                    )
+                );
+            }
+        }
+    }
+
+    object mouseListener extends PopupHandler() {
+        shared actual void invokePopup(Component comp, Integer x, Integer y) {
+            value group = DefaultActionGroup();
+
+            group.add(ActionManager.instance.getAction(IdeActions.actionCopy));
+            group.add(diffAction);
+
+            ActionManager.instance.createActionPopupMenu(ActionPlaces.unknown, group)
+                .component.show(comp, x, y);
+        }
+    }
+
     shared void setup() {
         this.layout = BorderLayout();
         add(JScrollPane(myTree), javaString(BorderLayout.center));
@@ -97,7 +185,9 @@ class CeylonProblemsList(Project project)
         value treeModel = DefaultTreeModel(DefaultMutableTreeNode());
         myTree.model = treeModel;
         myTree.cellRenderer = NodeRenderer();
+        myTree.addMouseListener(mouseListener);
         EditSourceOnDoubleClickHandler.install(myTree);
+        diffAction.registerCustomShortcutSet(CommonShortcuts.diff, myTree);
 
         builder = ProblemsTreeBuilder(myTree, treeModel, project);
         builder.initRootNode();
@@ -121,6 +211,8 @@ class CeylonProblemsList(Project project)
             is ProblemNode userObject = node.userObject) {
 
             return userObject;
+        } else if (PlatformDataKeys.copyProvider.\iis(dataId)) {
+            return TreeCopyProvider(myTree);
         }
         return super.getData(dataId);
     }

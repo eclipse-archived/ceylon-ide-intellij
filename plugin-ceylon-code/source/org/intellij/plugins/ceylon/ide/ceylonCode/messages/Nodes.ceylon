@@ -111,7 +111,7 @@ class FileNode(Project project, VirtualFile file, Severity severity,
 
 }
 
-class ProblemNode(Project project, BuildMessage message)
+class ProblemNode(Project project, shared BuildMessage message)
         extends AbstractTreeNode<BuildMessage>(project, message) {
 
     children => Collections.emptyList();
@@ -124,7 +124,7 @@ class ProblemNode(Project project, BuildMessage message)
                     SimpleTextAttributes.grayedAttributes);
             highlighter.highlightPresentationData {
                 data = presentation;
-                description = message.message;
+                description = message.message.size > 1000 then message.message[...1000] + "…" else message.message;
                 project = project;
             };
         }
