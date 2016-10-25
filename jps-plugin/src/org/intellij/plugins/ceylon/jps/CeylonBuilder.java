@@ -11,7 +11,6 @@ import com.redhat.ceylon.compiler.java.runtime.tools.*;
 import com.redhat.ceylon.compiler.java.runtime.tools.Compiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
-import org.jetbrains.jps.ProjectPaths;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
 import org.jetbrains.jps.builders.FileProcessor;
@@ -20,7 +19,6 @@ import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.fs.FilesDelta;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
-import org.jetbrains.jps.model.java.JavaResourceRootType;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
@@ -51,8 +49,8 @@ class CeylonBuilder extends ModuleLevelBuilder {
     @Override
     public List<String> getCompilableFileExtensions() {
         return backend == Backend.Java
-                ? Arrays.asList("java", "ceylon")
-                : Arrays.asList("js", "ceylon");
+                ? Collections.singletonList("java")
+                : Collections.singletonList("js");
     }
 
     @Override
@@ -96,7 +94,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                     filesToBuild.add(new File(line));
                 }
             }
-            /*dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
+            dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
                 @Override
                 public boolean apply(ModuleBuildTarget target, File file, JavaSourceRootDescriptor root) throws IOException {
                     if (Boolean.TRUE.equals(compileForBackend.get(target.getModule()))
@@ -105,7 +103,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                     }
                     return true;
                 }
-            });*/
+            });
 
             return compile(context, chunk, new ArrayList<File>(filesToBuild), settings);
         } catch (Exception e) {
