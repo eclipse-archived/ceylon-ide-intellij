@@ -95,7 +95,7 @@ public class CompilationUnitTranslator extends Visitor {
         while (!customizedTokens.isEmpty()) {
             Token token = customizedTokens.remove();
 
-            if (token.getType() != CeylonLexer.EOF) {
+            if (token.getType() != CeylonLexer.EOF && token.getTokenIndex() != -1) {
                 parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), token));
             }
 
