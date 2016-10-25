@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -35,7 +36,21 @@ public class CeylonBuilder implements CompileTask {
         IdeaCeylonProjects projects = compileContext.getProject()
                 .getComponent(IdeaCeylonProjects.class);
 
+        boolean result = true;
+
         if (projects != null) {
+            File builderDir = BuildManager.getInstance().getProjectSystemDirectory(compileContext.getProject());
+            if (builderDir != null) {
+                File[] files = builderDir.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.isFile() && file.getName().startsWith("ceylonFiles-")) {
+                            file.delete();
+                        }
+                    }
+                }
+            }
+
             for (Module mod : compileContext.getCompileScope().getAffectedModules()) {
                 final IdeaCeylonProject project = (IdeaCeylonProject) projects.getProject(mod);
 
@@ -45,7 +60,7 @@ public class CeylonBuilder implements CompileTask {
                             compileContext.getProgressIndicator()
                     );
 
-                    return (Boolean) ConcurrencyManagerForJava.withUpToDateIndexes(new Callable<Object>() {
+                    result &= (Boolean) ConcurrencyManagerForJava.withUpToDateIndexes(new Callable<Object>() {
                         @Override
                         public Object call() throws Exception {
                             project.getBuild().performBuild(monitor);
@@ -67,7 +82,7 @@ public class CeylonBuilder implements CompileTask {
                 }
             }
         }
-        return true;
+        return result;
     }
 
     private void registerFilesToCompile(Project project,
@@ -101,7 +116,8 @@ public class CeylonBuilder implements CompileTask {
         try {
             for (Map.Entry<Backend, Collection<String>> entry : files.entrySet()) {
                 File ceylonFiles = new File(builderDir, "ceylonFiles-" + entry.getKey().name + ".txt");
-                Files.write(ceylonFiles.toPath(), entry.getValue(), StandardCharsets.UTF_8);
+                Files.write(ceylonFiles.toPath(), entry.getValue(), StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);
             }
         } catch (IOException e) {
             e.printStackTrace();
