@@ -65,7 +65,9 @@ public class CompilationUnitTranslator extends Visitor {
                     CommonToken badToken = new CommonToken(token.getInputStream(), -2, 0,
                             lastStopIndex + 1,
                             token.getStartIndex() - 1);
-                    customizedTokens.add(badToken);
+                    if (badToken.getStopIndex() >= badToken.getStartIndex()) {
+                        customizedTokens.add(badToken);
+                    }
                 }
                 customizedTokens.add(token);
                 lastToken.set(token);
@@ -76,7 +78,9 @@ public class CompilationUnitTranslator extends Visitor {
             CommonToken badToken = new CommonToken(lastToken.get().getInputStream(), -2, 0,
                     lastToken.get().getStopIndex() + 1,
                     file.getTextLength() - 1);
-            customizedTokens.add(badToken);
+            if (badToken.getStopIndex() >= badToken.getStartIndex()) {
+                customizedTokens.add(badToken);
+            }
         }
 
         visit(cu);
@@ -95,7 +99,7 @@ public class CompilationUnitTranslator extends Visitor {
         while (!customizedTokens.isEmpty()) {
             Token token = customizedTokens.remove();
 
-            if (token.getType() != CeylonLexer.EOF && token.getTokenIndex() != -1) {
+            if (token.getType() != CeylonLexer.EOF) {
                 parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.getType()), token));
             }
 
