@@ -79,8 +79,8 @@ shared class CeylonDocResolvable(ASTNode node)
         extends CeylonNamedCompositeElementImpl(node) {
 
     shared actual ObjectArray<PsiReference> references {
-        value type = node.firstChildNode.elementType;
-        if (type == CeylonTokens.astringLiteral
+        if (exists type = node.firstChildNode?.elementType,
+            type == CeylonTokens.astringLiteral
          || type == CeylonTokens.averbatimString) {
             value list = ArrayList<PsiReference>();
             value matcher = docLinkPattern.matcher(javaString(node.text));
