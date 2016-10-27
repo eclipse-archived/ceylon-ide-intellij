@@ -54,7 +54,7 @@ public class CeylonBuilder implements CompileTask {
             for (Module mod : compileContext.getCompileScope().getAffectedModules()) {
                 final IdeaCeylonProject project = (IdeaCeylonProject) projects.getProject(mod);
 
-                if (project != null && project.getCompileToJava()) {
+                if (project != null && (project.getCompileToJava() || project.getCompileToJs())) {
                     final ProgressIndicatorMonitor monitor = new ProgressIndicatorMonitor(
                             ProgressIndicatorMonitor.wrap_,
                             compileContext.getProgressIndicator()
