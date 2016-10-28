@@ -3,7 +3,8 @@ import ceylon.interop.java {
 }
 
 import com.intellij.openapi.\imodule {
-    ModuleUtilCore
+    ModuleUtilCore,
+    IdeaModule=Module
 }
 import com.intellij.openapi.project {
     Project
@@ -46,10 +47,14 @@ Class<CeylonModelManager> modelManagerClass = javaClass<CeylonModelManager>();
 shared CeylonModelManager? getModelManager(Project project)
         => project.getComponent(modelManagerClass);
 
-shared IdeaCeylonProject? getCeylonProject(PsiFile psiFile) {
-    if (exists projects = getCeylonProjects(psiFile.project),
+shared IdeaCeylonProject? getCeylonProject(PsiFile|IdeaModule fileOrModule) {
+    if (is IdeaModule fileOrModule) {
+        return if (is IdeaCeylonProject project = getCeylonProjects(fileOrModule.project)?.getProject(fileOrModule))
+        then project
+        else null;
+    } else if (exists projects = getCeylonProjects(fileOrModule.project),
         exists mod = concurrencyManager.needReadAccess(
-            ()=> ModuleUtilCore.findModuleForPsiElement(psiFile)),
+            ()=> ModuleUtilCore.findModuleForPsiElement(fileOrModule)),
         is IdeaCeylonProject project = projects.getProject(mod)) {
 
         return project;

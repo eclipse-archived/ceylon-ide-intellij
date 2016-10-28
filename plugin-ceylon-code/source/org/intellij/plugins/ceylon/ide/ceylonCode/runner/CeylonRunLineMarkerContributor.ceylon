@@ -8,13 +8,17 @@ import com.intellij.icons {
 import com.intellij.psi {
     PsiElement
 }
+import com.intellij.psi.impl.source.tree {
+    LeafPsiElement
+}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi,
-    CeylonFile
+    CeylonFile,
+    CeylonTokens
 }
 
 shared class CeylonRunLineMarkerContributor()
@@ -38,7 +42,17 @@ shared class CeylonRunLineMarkerContributor()
             return Info(AllIcons.RunConfigurations.TestState.run,
                 null, *ExecutorAction.getActions(0).iterable.coalesced);
         }
-        
+
+        // we can also target "Swarm" modules
+        if (is LeafPsiElement psiElement,
+            psiElement.elementType == CeylonTokens.\imodule,
+            is CeylonPsi.ModuleDescriptorPsi descriptor = psiElement.parent,
+            importsJavaEE(descriptor.ceylonNode.importModuleList.importModules)) {
+
+            return Info(AllIcons.RunConfigurations.TestState.run,
+                null, *ExecutorAction.getActions(0).iterable.coalesced);
+        }
+
         return null;
     }
     

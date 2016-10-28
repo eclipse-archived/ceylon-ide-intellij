@@ -21,6 +21,7 @@
         <add module="com.intellij.util" version="current" shared="false"/>
         <add module="com.intellij.openapi" version="current" shared="false"/>
         <add module="com.intellij.asm" version="current" shared="true"/>
+        <add module="org.jdom" version="current"/>
         <!--<filter>-->
             <!--<exclude path="com/intellij/util/containers/*"/>-->
             <!--<exclude path="com/intellij/codeInsight/highlighting/*"/>-->
