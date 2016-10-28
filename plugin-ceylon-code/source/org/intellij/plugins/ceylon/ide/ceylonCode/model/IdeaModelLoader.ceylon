@@ -102,35 +102,31 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             isSynchronizing.set(true);
             try {
                 if (application.readAccessAllowed) {
-                    ref.set(action.call() else null);
+                    ref.set(action.call());
                 } else {
                     if (exists currentStrategy = concurrencyManager.noIndexStrategy,
                         currentStrategy == NoIndexStrategy.waitForIndexes) {
                         updateIndexIfnecessary();
-                        assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
+                        assert (exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
                         dumbService(project).runReadActionInSmartMode(() {
                             value restoreCurrentPriority = withOriginalModelUpdatePriority();
                             try {
-                                return concurrencyManager.outsideDumbMode(() {
-                                    ref.set(action.call() else null);
-                                });
+                                return concurrencyManager.outsideDumbMode(()
+                                    => ref.set(action.call()));
                             } finally {
-                                    restoreCurrentPriority();
-
+                                restoreCurrentPriority();
                             }
                         });
                     } else {
-                        application.runReadAction(() {
-                            ref.set(action.call() else null);
-                            return true; //yew, hack around SAM typing
-                        });
+                        application.runReadAction(()
+                            => ref.set(action.call()) else null);
                     }
                 }
             } finally {
                 isSynchronizing.set(false);
             }
         } else {
-            ref.set(action.call() else null);
+            ref.set(action.call());
         }
         return  ref.get();
     }
@@ -169,7 +165,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             resetJavaModelSourceIfNecessary(JavaRunnable(()
                 => application.invokeAndWait(() {
                     assert (exists project =
-                            ideaModuleManager.ceylonProject ?. ideArtifact ?. project);
+                            ideaModuleManager.ceylonProject?.ideArtifact?.project);
                     dumbService(project).queueTask(UnindexedFilesUpdater(project, false));
                 }, ModalityState.nonModal)));
         }

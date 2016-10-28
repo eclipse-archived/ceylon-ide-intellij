@@ -327,7 +327,7 @@ shared class CeylonLocalAnalyzerManager(model)
                                 psiDocMgr.commitDocument(cachedDocument);
                             }
                             fileViewProvider.onContentReload();
-                        } catch(Throwable t) {
+                        } catch (Throwable t) {
                             cleanOnFailure(virtualFile, t);
                             throw t;
                         }
@@ -351,11 +351,11 @@ shared class CeylonLocalAnalyzerManager(model)
                             } else {
                                 logger.warn(() => "ceylonFile is `null` at the end of a triggered reparse of file `` virtualFile.path ``");
                             }
-                        } catch(Throwable t) {
+                        } catch (Throwable t) {
                             cleanOnFailure(virtualFile, t);
                             throw t;
                         }
-                        return true; //yew, hack around SAM typing
+                        return null; //yew, hack around SAM typing
                     });
                 }
 
