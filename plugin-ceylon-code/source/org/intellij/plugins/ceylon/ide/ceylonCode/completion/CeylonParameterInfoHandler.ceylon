@@ -1,6 +1,5 @@
 import ceylon.interop.java {
     javaClass,
-    javaString,
     javaObjectArray
 }
 
@@ -27,9 +26,6 @@ import com.intellij.psi.util {
         getParentOfType
     }
 }
-import com.intellij.util {
-    IJFunction=Function
-}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
@@ -48,7 +44,6 @@ import com.redhat.ceylon.model.typechecker.util {
 }
 
 import java.lang {
-    JString=String,
     ObjectArray
 }
 
@@ -220,14 +215,12 @@ shared class CeylonParameterInfoHandler()
         }
 
         if (is ParameterInfoUIContextEx context) {
-            context.setEscapeFunction(object satisfies IJFunction<JString, JString> {
-                fun(JString string)
-                        => javaString(highlighter.highlight {
+            context.setEscapeFunction((string)
+                        => highlighter.highlight {
                             rawText = convertFromHTML(string.string).replace(noparams, "$$");
                             project = context.parameterOwner.project;
                         }
                         .replace("$$", "<i>no parameters</i>"));
-            });
         }
 
         context.setupUIComponentPresentation(builder.string,

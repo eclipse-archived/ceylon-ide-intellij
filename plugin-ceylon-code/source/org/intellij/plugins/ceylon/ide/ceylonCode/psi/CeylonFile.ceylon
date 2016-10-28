@@ -22,7 +22,6 @@ import com.intellij.openapi.progress {
     ProcessCanceledException
 }
 import com.intellij.openapi.util {
-    Computable,
     Ref
 }
 import com.intellij.openapi.vfs {
@@ -101,11 +100,9 @@ JClass<IdeaCeylonProjects> ideaCeylonProjectsClass = javaClass<IdeaCeylonProject
 ObjectArray<PsiClass> noPsiClasses = ObjectArray<PsiClass>(0);
 
 ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit(CeylonFile file) {
-    Module? mod = ApplicationManager.application.runReadAction(
-        object satisfies Computable<Module> {
-            compute() => ModuleUtil.findModuleForPsiElement(file);
-        }
-    );
+    Module? mod
+            = ApplicationManager.application.runReadAction(()
+                => ModuleUtil.findModuleForPsiElement(file));
 
     value ceylonProjects = file.project.getComponent(ideaCeylonProjectsClass);
     if (exists ceylonProject = ceylonProjects.getProject(mod),

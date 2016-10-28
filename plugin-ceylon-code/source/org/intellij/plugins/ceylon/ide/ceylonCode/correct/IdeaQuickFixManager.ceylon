@@ -3,7 +3,6 @@ import ceylon.collection {
     ListMutator
 }
 import ceylon.interop.java {
-    JavaRunnable,
     JavaList
 }
 
@@ -337,11 +336,12 @@ shared class IdeaQuickFixData(
                     resolutions = candidates;
                     ProgressManager.instance
                             .runProcessWithProgressAsynchronously(
-                        project, "Searching...",
-                        JavaRunnable(() =>
-                            concurrencyManager.withAlternateResolution(() =>
-                                ApplicationManager.application.runReadAction(JavaRunnable(change)))),
-                        JavaRunnable(() {
+                        project,
+                        "Searching...",
+                        () => concurrencyManager.withAlternateResolution(()
+                                => ApplicationManager.application.runReadAction(()
+                                        => change() else null)),
+                        () {
                             resolutions = null;
                             if (candidates.empty) {
                                 //TODO show it at the right location!
@@ -387,8 +387,8 @@ shared class IdeaQuickFixData(
                                     project = project;
                                 };
                             }
-                        }),
-                        null,
+                        },
+                        noop,
                         PerformInBackgroundOption.alwaysBackground);
                 }
                 affectsOtherUnits = affectsOtherUnits;
@@ -498,7 +498,7 @@ shared void showPopup(Editor editor, List<Resolution> candidates, String title, 
         .createListPopupBuilder(list)
         .setTitle(title)
         .setMovable(true)
-        .setItemChoosenCallback(JavaRunnable(() {
+        .setItemChoosenCallback(() {
             if (exists candidate = candidates[list.selectedIndex]) {
                 object extends WriteCommandAction<Nothing>(editor.project) {
                     shared actual void run(Result<Nothing> result) {
@@ -519,7 +519,7 @@ shared void showPopup(Editor editor, List<Resolution> candidates, String title, 
                     }
                 }.execute();
             }
-        }))
+        })
         .createPopup()
         .showInBestPositionFor(editor);
 }

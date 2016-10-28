@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaString
-}
-
 import com.intellij.codeHighlighting {
     Pass
 }
@@ -39,9 +35,6 @@ import com.intellij.psi {
     PsiElement,
     PsiFile
 }
-import com.intellij.util {
-    Function
-}
 import com.redhat.ceylon.ide.common.util {
     types
 }
@@ -52,9 +45,6 @@ import com.redhat.ceylon.model.typechecker.model {
 
 import java.awt.event {
     MouseEvent
-}
-import java.lang {
-    JString=String
 }
 import java.util {
     List,
@@ -83,10 +73,8 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
         GutterIconNavigationHandler<PsiElement> handler)
             extends LineMarkerInfo<PsiElement>(
                 element, range, icon, updatePass,
-                object satisfies Function<PsiElement,JString> {
-                    fun(PsiElement? param) => javaString(tooltip);
-                },
-                handler, alignment) {}
+                (PsiElement? param) => tooltip,
+                handler.navigate, alignment) {}
 
     Declaration? getModel(CeylonPsi.DeclarationPsi|CeylonPsi.SpecifierStatementPsi decl)
             => if (is CeylonPsi.DeclarationPsi decl)

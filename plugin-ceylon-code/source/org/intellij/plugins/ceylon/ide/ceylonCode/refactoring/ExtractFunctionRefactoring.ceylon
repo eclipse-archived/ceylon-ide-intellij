@@ -15,8 +15,7 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.openapi.util {
-    TextRange,
-    Condition
+    TextRange
 }
 import com.intellij.psi {
     PsiDocumentManager,
@@ -54,11 +53,9 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
     function findContainer(CeylonPsi.DeclarationPsi element) {
         assert (is CeylonPsi.DeclarationPsi? result 
             = PsiTreeUtil.findFirstParent(element,
-                    object satisfies Condition<PsiElement> {
-                        \ivalue(PsiElement cand)
-                                => cand is CeylonPsi.DeclarationPsi
-                                && cand!=element;
-                    }));
+                    (PsiElement cand)
+                            => cand is CeylonPsi.DeclarationPsi
+                            && cand!=element));
         return result;
     }
 

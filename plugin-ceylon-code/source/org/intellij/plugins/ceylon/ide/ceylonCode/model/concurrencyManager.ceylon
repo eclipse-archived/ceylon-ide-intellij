@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    JavaRunnable
-}
-
 import com.intellij.openapi.application {
     ApplicationAdapter
 }
@@ -31,7 +27,6 @@ import java.lang {
     Thread,
     InterruptedException,
     ThreadLocal,
-    Runnable,
     System
 }
 import java.util.concurrent {
@@ -95,21 +90,21 @@ shared object concurrencyManager {
 
     shared Return dontCancel<Return>(Return() func) {
         value ref = Ref<Return>();
-        ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() => ref.set(func())));
+        ProgressManager.instance.executeNonCancelableSection(() => ref.set(func()));
         return ref.get();
     }
 
     shared Return needReadAccess<Return>(Return() func, Integer timeout = deadLockDetectionTimeout) {
         value ref = Ref<Return>();
 
-        value funcRunnable = JavaRunnable(() {
+        function funcRunnable() {
             value restoreCurrentPriority = withOriginalModelUpdatePriority();
             try {
                 return ref.set(func());
             } finally {
                 restoreCurrentPriority();
             }
-        });
+        }
 
         if (application.readAccessAllowed) {
             ProgressManager.instance.executeNonCancelableSection(funcRunnable);
@@ -119,7 +114,7 @@ shared object concurrencyManager {
              [[com.intellij.openapi.progress.util::ProgressIndicatorUtils.runInReadActionWithWriteActionPriority]]
              but doesn't fail when a write action is only pending, since this would lead to deadlocks when another read action is
              preventing a pending write action to acquire its lock"
-            Boolean runInReadActionWithWriteActionPriority(Runnable action) {
+            Boolean runInReadActionWithWriteActionPriority(void action()) {
                 value progressIndicator = object extends EmptyProgressIndicator() {
                     // hashCode() seems to be quite slow when used in CoreProgressManager.threadsUnderIndicator
                     hash => 42;
@@ -131,9 +126,9 @@ shared object concurrencyManager {
                         }
                     }
                 };
-                value succeededWithAddingListener = application.tryRunReadAction(JavaRunnable {
-                    run() => application.addApplicationListener(listener);
-                });
+                value succeededWithAddingListener
+                        = application.tryRunReadAction(() =>
+                            application.addApplicationListener(listener));
                 if (!succeededWithAddingListener) { // second catch: writeLock.lock() acquisition is in progress or already acquired
                     if (!progressIndicator.canceled) {
                         progressIndicator.cancel();
@@ -142,16 +137,16 @@ shared object concurrencyManager {
                 }
                 value wasCancelled = Ref<Boolean>();
                 try {
-                    progressManager.runProcess(JavaRunnable {
-                        void run() {
-                            try {
-                                wasCancelled.set(!application.tryRunReadAction(action));
-                            }
-                            catch (ProcessCanceledException ignore) {
-                                wasCancelled.set(true);
-                            }
+                    progressManager.runProcess(() {
+                        try {
+                            wasCancelled.set(!application.tryRunReadAction(action));
                         }
-                    }, progressIndicator);
+                        catch (ProcessCanceledException ignore) {
+                            wasCancelled.set(true);
+                        }
+                        return true; //yew, hack around issue in SAM typing
+                    },
+                    progressIndicator);
                 }
                 finally {
                     application.removeApplicationListener(listener);
@@ -241,7 +236,7 @@ shared object concurrencyManager {
         value ds = dumbService(p);
 
         value ref = Ref<Return>();
-        value runnable = JavaRunnable(() => ref.set(func()));
+        function runnable() => ref.set(func());
 
         switch(indexStragey = noIndexStrategy_.get())
         case(NoIndexStrategy.useAlternateResolution) {

@@ -4,8 +4,7 @@ import ceylon.collection {
 import ceylon.interop.java {
     javaClass,
     javaString,
-    createJavaObjectArray,
-    JavaRunnable
+    createJavaObjectArray
 }
 
 import com.intellij.codeInsight {
@@ -297,11 +296,8 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                         "The Gradle build failed. Please re-run a clean build and do Tools > Ceylon > Reset Ceylon model.",
                         NotificationType.error));
 
-                shared actual void onSuccess() {
-                    ApplicationManager.application.invokeLater(JavaRunnable(() {
-                        callback();
-                    }));
-                }
+                onSuccess()
+                        => ApplicationManager.application.invokeLater(() => callback());
             },
             ProgressExecutionMode.inBackgroundAsync
         );

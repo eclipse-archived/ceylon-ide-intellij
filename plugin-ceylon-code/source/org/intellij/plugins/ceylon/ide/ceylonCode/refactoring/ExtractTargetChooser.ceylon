@@ -36,10 +36,6 @@ import javax.swing {
     JList,
     ListSelectionModel
 }
-import javax.swing.event {
-    ListSelectionListener,
-    ListSelectionEvent
-}
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter
@@ -92,15 +88,13 @@ shared void showChooser<out T>
         }
     });
 
-    myList.addListSelectionListener(object satisfies ListSelectionListener {
-        shared actual void valueChanged(ListSelectionEvent e) {
-            rangeHighlighter.dropHighlight();
-            value index = myList.selectedIndex;
-            if (index>=0) {
-                if (is PsiElement expr = model.get(index)?.element) {
-                    rangeHighlighter.highlight(expr,
-                        Collections.singletonList<PsiElement>(expr));
-                }
+    myList.addListSelectionListener((event) {
+        rangeHighlighter.dropHighlight();
+        value index = myList.selectedIndex;
+        if (index>=0) {
+            if (is PsiElement expr = model.get(index)?.element) {
+                rangeHighlighter.highlight(expr,
+                    Collections.singletonList<PsiElement>(expr));
             }
         }
     });

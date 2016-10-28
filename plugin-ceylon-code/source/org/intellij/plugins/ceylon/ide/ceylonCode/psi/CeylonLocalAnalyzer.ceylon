@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    JavaRunnable
-}
-
 import com.intellij.codeInsight.daemon {
     DaemonCodeAnalyzer
 }
@@ -172,10 +168,10 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
             PsiDocumentManager.getInstance(ideaProject).isUncommited(cachedDocument)) {
             logger.debug(()=>"ERROR : Submitted local typechecking task `` taskId `` while the document is still uncommitted
                                   => schedule a submit as soon as the document is committed", 20);
-            PsiDocumentManager.getInstance(ideaProject).performForCommittedDocument(cachedDocument, JavaRunnable(() {
+            PsiDocumentManager.getInstance(ideaProject).performForCommittedDocument(cachedDocument, () {
                 logger.debug(()=>"Submit again the local typechecking task `` taskId `` now the document has been committed");
                 submitLocalTypechecking(typecheckingTask, delay);
-            }));
+            });
             return;
         }
 
@@ -189,7 +185,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
         logger.debug(()=>"Setting the `cancelledToRestart_` flag to stop any already-running typechecking task before adding task `` taskId `` to the Alarm");
         cancelledToRestart_ = true;
         logger.debug(()=>"Adding task `` taskId `` to the Alarm");
-        localTypecheckingAlarm.addRequest(JavaRunnable(() {
+        localTypecheckingAlarm.addRequest(() {
             logger.debug(()=>"Typechecking task `` taskId `` selected by the Alarm as the running Request");
             localTypecheckingAlarm.cancelAllRequests();
             if (backgroundAnalysisDisabled) {
@@ -233,10 +229,9 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
             } catch(ProcessCanceledException e) {
                 logger.debug(()=>"Read acces was not immediately available after task `` taskId ``
                                       => try to restart the DaemonCodeAnalyzer asynchronously on the Dispath Thread");
-                ApplicationManager.application.invokeLater(
-                    JavaRunnable(restartDaemonCodeAnalyzer));
+                ApplicationManager.application.invokeLater(restartDaemonCodeAnalyzer);
             }
-        }), delay);
+        }, delay);
     }
     
     shared void fileChanged() {
@@ -613,9 +608,8 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
             if (isInSourceArchive(virtualFile)) {
                 manager.scheduleExternalSourcePreparation(virtualFile);
             } else {
-                ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
-                    manager.triggerReparse(virtualFile);
-                }));
+                ApplicationManager.application.executeOnPooledThread(()
+                    => manager.triggerReparse(virtualFile) else null);
             }
         } finally {
             ceylonLocalAnalyzerLogger.trace(()=> "Exit initialize(`` manager ``)", 10);

@@ -97,10 +97,6 @@ import java.awt {
     GridLayout,
     BorderLayout
 }
-import java.awt.event {
-    ActionListener,
-    ActionEvent
-}
 import java.lang {
     ObjectArray,
     JString=String
@@ -436,12 +432,12 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
             late variable EditorTextField myDefaultArgEditor;
 
             focusableComponents
-                    => createJavaObjectArray<JComponent>({
+                    => createJavaObjectArray<JComponent> {
                         myTypeEditor.focusTarget,
                         myNameEditor.focusTarget,
                         myDefaultedCb,
                         myDefaultArgEditor.focusTarget
-                    });
+                    };
 
             preferredFocusedComponent => myTypeEditor.focusTarget;
 
@@ -461,11 +457,9 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
                 add(createLabeledPanel("Name:", myNameEditor));
 
                 myDefaultedCb = JCheckBox("Use default argument", item.parameter.param.defaulted);
-                myDefaultedCb.addActionListener(object satisfies ActionListener {
-                    shared actual void actionPerformed(ActionEvent e) {
-                        item.parameter.param.defaulted = myDefaultedCb.selected;
-                        updateSignature();
-                    }
+                myDefaultedCb.addActionListener((event) {
+                    item.parameter.param.defaulted = myDefaultedCb.selected;
+                    updateSignature();
                 });
                 add(createLabeledPanel("Defaulted:", myDefaultedCb));
 
