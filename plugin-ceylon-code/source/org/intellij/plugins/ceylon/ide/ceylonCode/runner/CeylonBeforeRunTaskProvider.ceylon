@@ -86,9 +86,13 @@ shared class CeylonBeforeRunTaskProvider extends BeforeRunTaskProvider<CeylonBef
     configurable => true;
 
     shared actual Boolean configureTask(RunConfiguration runConfiguration, CeylonBeforeRunTask task) {
-        // TODO!!
+        value dialog = CeylonBeforeRunEditor(runConfiguration.project);
+        dialog.loadTask(task);
+        dialog.title = "Configure Ceylon command";
 
-        print("configureTask");
+        if (dialog.showAndGet()) {
+            dialog.updateTask(task);
+        }
         return true;
     }
 
