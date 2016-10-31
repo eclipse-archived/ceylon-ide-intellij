@@ -53,31 +53,37 @@ shared object classFileDecompilerUtil {
         value isCeylon = Ref(false);
         value isIgnore = Ref(false);
         value isInner = Ref(false);
-        value reader = ClassReader(file.contentsToByteArray());
-        value className = reader.className;
 
-        reader.accept(object extends ClassVisitor(Opcodes.asm5) {
+        try {
+            value reader = ClassReader(file.contentsToByteArray());
+            value className = reader.className;
 
-            shared actual AnnotationVisitor? visitAnnotation(String desc, Boolean visible) {
-                if (desc == ann(Annotations.ceylon.className)) {
-                    isCeylon.set(true);
-                }
-                if (desc == ann(Annotations.ignore.className)) {
-                    isIgnore.set(true);
-                }
-                return super.visitAnnotation(desc, visible);
-            }
+            reader.accept(
+                object extends ClassVisitor(Opcodes.asm5) {
+                    shared actual AnnotationVisitor? visitAnnotation(String desc, Boolean visible) {
+                        if (desc ==ann(Annotations.ceylon.className)) {
+                            isCeylon.set(true);
+                        }
+                        if (desc ==ann(Annotations.ignore.className)) {
+                            isIgnore.set(true);
+                        }
+                        return super.visitAnnotation(desc, visible);
+                    }
 
-            visitOuterClass(String owner, String name, String desc) => isInner.set(true);
+                    visitOuterClass(String owner, String name, String desc) => isInner.set(true);
 
-            shared actual void visitInnerClass(String name, String outerString, String inner, Integer access) {
-                if (className==name) {
-                    isInner.set(true);
-                }
-            }
-        },
-            ObjectArray<Attribute>(0, null),
-            skipCode.or(skipDebug).or(skipFrames));
+                    shared actual void visitInnerClass(String name, String outerString, String inner, Integer access) {
+                        if (className == name) {
+                            isInner.set(true);
+                        }
+                    }
+                },
+                ObjectArray<Attribute>(0, null),
+                skipCode.or(skipDebug).or(skipFrames)
+            );
+        } catch (e) {
+            // just say this is not a Ceylon class
+        }
 
         value data = CeylonBinaryData {
             timestamp = file.timeStamp;
