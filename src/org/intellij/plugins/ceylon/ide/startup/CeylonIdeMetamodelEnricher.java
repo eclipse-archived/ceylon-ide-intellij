@@ -132,9 +132,25 @@ class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
                     }
 
                     @Override
-                    public ImportType importType() {
-                        return ImportType.EXPORT;
+                    public boolean optional() {
+                        return false;
                     }
+
+                    @Override
+                    public boolean exported() {
+                        return true;
+                    }
+
+                    @Override
+                    public ModuleScope moduleScope() {
+                        return ModuleScope.COMPILE;
+                    }
+
+                    @Override
+                    public List<Exclusion> getExclusions() {
+                        return null;
+                    }
+
 
                     @Override
                     public ArtifactResultType type() {
