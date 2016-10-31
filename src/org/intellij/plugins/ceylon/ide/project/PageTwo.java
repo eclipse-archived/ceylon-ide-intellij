@@ -51,7 +51,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
     private TextFieldWithBrowseButton systemRepository;
     private TextFieldWithBrowseButton outputDirectory;
     private JCheckBox flatClasspath;
-    private JCheckBox exportMavenDeps;
+    private JCheckBox autoExportMavenDeps;
+    private JCheckBox fullyExportMavenDeps;
     private JButton addExternalRepo;
     private JButton addMavenRepo;
     private JButton removeRepo;
@@ -238,7 +239,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         String overrides = moduleOverrides.getText().isEmpty() ? null : moduleOverrides.getText();
         config.getConfiguration().setProjectOverrides(ceylon.language.String.instance(overrides));
         config.getConfiguration().setProjectFlatClasspath(Boolean.instance(flatClasspath.isSelected()));
-        config.getConfiguration().setProjectAutoExportMavenDependencies(Boolean.instance(exportMavenDeps.isSelected()));
+        config.getConfiguration().setProjectAutoExportMavenDependencies(Boolean.instance(autoExportMavenDeps.isSelected()));
+        config.getConfiguration().setProjectFullyExportMavenDependencies(Boolean.instance(fullyExportMavenDeps.isSelected()));
         applyToConfiguration(config.getConfiguration());
     }
 
@@ -250,7 +252,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
                 || !StringUtils.equals(config.getConfiguration().getOutputRepo(), outputDirectory.getText())
                 || !StringUtils.equals(overrides == null ? null : overrides.toString(), moduleOverrides.getText())
                 || !Boolean.equals(flatClasspath.isSelected(), config.getConfiguration().getProjectFlatClasspath())
-                || !Boolean.equals(exportMavenDeps.isSelected(), config.getConfiguration().getProjectAutoExportMavenDependencies())
+                || !Boolean.equals(autoExportMavenDeps.isSelected(), config.getConfiguration().getProjectAutoExportMavenDependencies())
+                || !Boolean.equals(fullyExportMavenDeps.isSelected(), config.getConfiguration().getProjectFullyExportMavenDependencies())
                 || isRepoConfigurationModified(config.getConfiguration())
                 ;
     }
@@ -264,7 +267,8 @@ public class PageTwo extends CeylonRepositoryConfigurator implements CeylonConfi
         ceylon.language.String overrides = config.getConfiguration().getProjectOverrides();
         moduleOverrides.setText(overrides == null ? null : overrides.toString());
         flatClasspath.setSelected(boolValue(config.getConfiguration().getProjectFlatClasspath()));
-        exportMavenDeps.setSelected(boolValue(config.getConfiguration().getProjectAutoExportMavenDependencies()));
+        autoExportMavenDeps.setSelected(boolValue(config.getConfiguration().getProjectAutoExportMavenDependencies()));
+        fullyExportMavenDeps.setSelected(boolValue(config.getConfiguration().getProjectFullyExportMavenDependencies()));
 
         listModel.removeAll();
         loadFromConfiguration(config.getConfiguration());
