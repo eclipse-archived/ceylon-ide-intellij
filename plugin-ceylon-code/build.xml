@@ -88,6 +88,7 @@
 		<mkdir dir="${intellij.repo.dir}"/>
         <fail unless="ideaRootDefined"
         	message="Please set the 'ideaRoot' property to the root of the IntelliJ IDEA installation (which must contain a 'lib' sub-folder)"/>
+        <copy file="${java.home}/../lib/tools.jar" tofile="${intellij.repo.dir}/jdk.tools-current.jar"/>
 		<foreach list="${modulesToImport}" param="moduleToImport" target="importModule">
 		</foreach>
         <!-- Merge several jars -->
