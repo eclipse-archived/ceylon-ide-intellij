@@ -14,6 +14,7 @@ import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
 import org.jetbrains.jps.builders.FileProcessor;
+import org.jetbrains.jps.builders.java.JavaBuilderUtil;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.fs.FilesDelta;
@@ -33,6 +34,7 @@ import java.util.*;
 
 import static com.redhat.ceylon.common.tools.ModuleWildcardsHelper.expandWildcards;
 import static java.nio.file.Files.readAllLines;
+import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isCompileJavaIncrementally;
 import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isForcedRecompilationAllJavaModules;
 
 class CeylonBuilder extends ModuleLevelBuilder {
@@ -119,7 +121,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                              List<File> filesToBuild,
                              JpsCeylonGlobalSettings settings) throws IOException {
 
-        if (filesToBuild.isEmpty()) {
+        if (filesToBuild.isEmpty() && isCompileJavaIncrementally(ctx)) {
             return ExitCode.NOTHING_DONE;
         }
 
