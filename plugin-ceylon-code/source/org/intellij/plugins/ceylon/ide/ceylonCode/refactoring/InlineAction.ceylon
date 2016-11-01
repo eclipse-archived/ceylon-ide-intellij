@@ -1,3 +1,6 @@
+import com.intellij.codeInsight.hint {
+    HintManager
+}
 import com.intellij.lang {
     Language
 }
@@ -65,9 +68,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonCompositeElement
 }
-import com.intellij.codeInsight.hint {
-    HintManager
-}
 
 shared class InlineAction() extends InlineActionHandler() {
 
@@ -75,9 +75,13 @@ shared class InlineAction() extends InlineActionHandler() {
         if (is CeylonFile file = element.containingFile,
             is CeylonCompositeElement element,
             is Tree.Declaration td = element.ceylonNode,
-            is Declaration decl = td.declarationModel) {
+            exists decl = td.declarationModel) {
 
-            return isInlineRefactoringAvailable(decl, file.compilationUnit, true);
+            return isInlineRefactoringAvailable {
+                declaration = decl;
+                rootNode = file.compilationUnit;
+                inSameProject = true;
+            };
         }
 
         return false;
@@ -90,34 +94,37 @@ shared class InlineAction() extends InlineActionHandler() {
 
             if (is CeylonFile file = element.containingFile,
                 exists localAnalysisResult = file.localAnalyzer?.result,
-                exists phasedUnit = localAnalysisResult.typecheckedPhasedUnit) {
-                value node = nodes.findNode(
-                    phasedUnit.compilationUnit, localAnalysisResult.tokens,
-                    editor.selectionModel.selectionStart,
-                    editor.selectionModel.selectionEnd
-                );
-                
-                if (exists node,
-                    is Declaration decl = nodes.getReferencedDeclaration(node)) {
-                    
-                    value refactoring = IdeaInlineRefactoring(phasedUnit, localAnalysisResult.tokens, node, decl, editor);
-                    value dialog = InlineDialog(proj, element, refactoring);
-                    
-                    if (dialog.showAndGet()) {
-                        if (is String availability = refactoring.checkAvailability()) {
-                            HintManager.instance.showErrorHint(editor, availability);
-                            return;
-                        }
+                exists phasedUnit = localAnalysisResult.typecheckedPhasedUnit,
+                exists node
+                        = nodes.findNode {
+                            node = phasedUnit.compilationUnit;
+                            tokens = localAnalysisResult.tokens;
+                            startOffset = editor.selectionModel.selectionStart;
+                            endOffset = editor.selectionModel.selectionEnd;
+                        },
+                is Declaration decl = nodes.getReferencedDeclaration(node)) {
 
-                        value change = IdeaCompositeChange();
-                        refactoring.build(change);
-                        
-                        object extends WriteCommandAction<Nothing>(proj, file) {
-                            shared actual void run(Result<Nothing> result) {
-                                change.applyChanges(project);
-                            }
-                        }.execute();
+                value refactoring = IdeaInlineRefactoring {
+                    phasedUnit = phasedUnit;
+                    theTokens = localAnalysisResult.tokens;
+                    node = node;
+                    decl = decl;
+                    editor = editor;
+                };
+                value dialog = InlineDialog(proj, element, refactoring);
+
+                if (dialog.showAndGet()) {
+                    if (is String availability = refactoring.checkAvailability()) {
+                        HintManager.instance.showErrorHint(editor, availability);
+                        return;
                     }
+
+                    value change = IdeaCompositeChange();
+                    refactoring.build(change);
+
+                    object extends WriteCommandAction<Nothing>(proj, file) {
+                        run(Result<Nothing> result) => change.applyChanges(project);
+                    }.execute();
                 }
             }
 
