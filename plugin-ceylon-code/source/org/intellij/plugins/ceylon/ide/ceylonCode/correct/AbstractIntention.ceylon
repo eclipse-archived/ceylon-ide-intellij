@@ -194,4 +194,12 @@ abstract shared class AbstractIntention() extends BaseIntentionAction() {
             selection = null;
         }
     }
+
+    "Called when the project is disposed to free resources."
+    shared void clear() {
+        change = null;
+        selection = null;
+        available = false;
+        callback = noop;
+    }
 }

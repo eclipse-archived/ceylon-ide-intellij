@@ -28,6 +28,12 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
+import com.intellij.codeInsight.intention {
+    IntentionManager
+}
+import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
+    AbstractIntention
+}
 
 shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
         extends CeylonProjects<IdeaModule,VirtualFile,VirtualFile,VirtualFile>()
@@ -49,7 +55,14 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
     disposeComponent() => removeModelListener(ceylonProjectCleaner);
 
 
-    projectClosed() => clearProjects();
+    shared actual void projectClosed() {
+        clearProjects();
+        for (intention in IntentionManager.instance.intentionActions) {
+            if (is AbstractIntention intention) {
+                intention.clear();
+            }
+        }
+    }
 
     shared actual void projectOpened() {
 

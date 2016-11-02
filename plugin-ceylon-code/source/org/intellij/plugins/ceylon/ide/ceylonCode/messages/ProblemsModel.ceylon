@@ -56,4 +56,8 @@ class ProblemsModel() {
             => problemsByProject.items.fold(0)((sum, item) => sum + item.countErrors());
 
     shared {BuildMsg*} allMessages => expand(problemsByProject.items.map(Problems.allMessages));
+
+    shared void clear() {
+        problemsByProject.clear();
+    }
 }

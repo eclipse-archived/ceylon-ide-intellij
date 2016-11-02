@@ -81,6 +81,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject
 }
+import com.intellij.openapi {
+    Disposable
+}
 
 shared alias BuildMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.BuildMessage;
 shared alias SourceMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.SourceFileMessage;
@@ -104,7 +107,8 @@ class ProblemsTreeStructure(Project project, ProblemsModel model)
 }
 
 class CeylonProblemsList(Project project)
-        extends SimpleToolWindowPanel(false, true) {
+        extends SimpleToolWindowPanel(false, true)
+        satisfies Disposable {
 
     value myTree = JTree();
     late ProblemsModel model;
@@ -215,5 +219,9 @@ class CeylonProblemsList(Project project)
             return TreeCopyProvider(myTree);
         }
         return super.getData(dataId);
+    }
+
+    shared actual void dispose() {
+        model.clear();
     }
 }
