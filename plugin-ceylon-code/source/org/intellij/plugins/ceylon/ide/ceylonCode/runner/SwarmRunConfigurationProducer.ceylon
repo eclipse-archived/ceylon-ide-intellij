@@ -69,7 +69,8 @@ shared class SwarmRunConfigurationProducer()
         ConfigurationContext context) {
 
         if (exists element = context.psiLocation,
-            exists ceylonProject = getCeylonProject(element.containingFile),
+            exists file = element.containingFile,
+            exists ceylonProject = getCeylonProject(file),
             exists mod = PsiTreeUtil.getParentOfType(element, javaClass<CeylonPsi.ModuleDescriptorPsi>()),
             importsJavaEE(mod.ceylonNode.importModuleList.importModules)) {
 
