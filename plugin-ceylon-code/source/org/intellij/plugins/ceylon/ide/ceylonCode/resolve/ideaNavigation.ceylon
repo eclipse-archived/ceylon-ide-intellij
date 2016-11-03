@@ -38,13 +38,15 @@ import com.redhat.ceylon.model.loader.model {
     LazyClass,
     LazyInterface,
     JavaMethod,
-    FieldValue
+    FieldValue,
+    AnnotationProxyClass
 }
 import com.redhat.ceylon.model.typechecker.model {
     Declaration,
     ClassOrInterface,
     Referenceable,
-    Function
+    Function,
+    Value
 }
 
 import java.lang {
@@ -104,6 +106,11 @@ shared class IdeaNavigation(Project project)
 
                 return cls.findFieldByName(declaration.realName, true);
             }
+        } else if (is Value declaration,
+            is AnnotationProxyClass container = declaration.container,
+            is PSIClass cls = container.iface.classMirror) {
+
+            return cls.psi.findMethodsByName(declaration.name, false).array.first;
         }
         
         return null;
