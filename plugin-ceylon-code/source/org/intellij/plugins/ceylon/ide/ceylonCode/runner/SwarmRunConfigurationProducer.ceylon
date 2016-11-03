@@ -107,7 +107,8 @@ shared class SwarmRunConfigurationProducer()
 
             value swarmTask = CeylonBeforeRunTask {
                 command = "swarm";
-                parameters = {"--provided-module", "javax:javaee-api", modName + "/" + modVersion};
+                "--provided-module", "javax:javaee-api",
+                modName + "/" + modVersion
             };
             swarmTask.enabled = true;
 
