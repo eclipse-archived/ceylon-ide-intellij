@@ -16,7 +16,8 @@ import com.redhat.ceylon.ide.common.util {
 }
 import com.redhat.ceylon.model.loader.model {
     LazyClass,
-    JavaMethod
+    JavaMethod,
+    LazyInterface
 }
 
 shared interface IdeaJavaModelAware
@@ -27,6 +28,9 @@ shared interface IdeaJavaModelAware
 
         toJavaElement(Declaration ceylonDeclaration, BaseProgressMonitor? monitor)
             => if (is LazyClass cls = ceylonDeclaration,
+                   is PSIClass mirror = cls.classMirror)
+               then mirror.psi
+               else if (is LazyInterface cls = ceylonDeclaration,
                    is PSIClass mirror = cls.classMirror)
                then mirror.psi
                else if (is JavaMethod meth = ceylonDeclaration,
