@@ -9,7 +9,8 @@ import com.intellij.psi {
     PsiMethod
 }
 import com.redhat.ceylon.model.typechecker.model {
-    Declaration
+    Declaration,
+    Value
 }
 import com.redhat.ceylon.ide.common.util {
     BaseProgressMonitor
@@ -17,7 +18,8 @@ import com.redhat.ceylon.ide.common.util {
 import com.redhat.ceylon.model.loader.model {
     LazyClass,
     JavaMethod,
-    LazyInterface
+    LazyInterface,
+    AnnotationProxyClass
 }
 
 shared interface IdeaJavaModelAware
@@ -36,5 +38,10 @@ shared interface IdeaJavaModelAware
                else if (is JavaMethod meth = ceylonDeclaration,
                         is PSIMethod mirror = meth.mirror)
                then mirror.psi
+               else if (is Value val = ceylonDeclaration,
+                        is AnnotationProxyClass cls = val.container,
+                        is PSIClass mirror = cls.iface.classMirror,
+                        exists meth = mirror.psi.findMethodsByName(val.name, false).array.first)
+               then meth
                else null;
 }
