@@ -49,10 +49,10 @@ Boolean importsJavaEE(List<Tree.ImportModule> importModules) {
         }
 
         if (exists path = imp.importPath) {
-            value importName = ".".join({
+            value importName = ".".join {
                 for (id in path.identifiers)
                 id.text
-            });
+            };
             if (importName == "javax.javaeeapi") {
                 return true;
             }
