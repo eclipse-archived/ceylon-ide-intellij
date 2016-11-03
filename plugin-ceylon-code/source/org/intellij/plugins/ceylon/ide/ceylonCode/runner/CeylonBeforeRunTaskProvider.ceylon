@@ -112,6 +112,7 @@ shared class CeylonBeforeRunTaskProvider extends BeforeRunTaskProvider<CeylonBef
 
             try {
                 value ceylonBinary = File(tcInvoker.embeddedCeylonDist, "bin/ceylon");
+                ceylonBinary.setExecutable(true, true);
                 value command = GeneralCommandLine(ceylonBinary.absolutePath, task.command, *task.parameters)
                     .withWorkDirectory(workingDirectory);
                 value processHandler = OSProcessHandler(command);
