@@ -17,7 +17,8 @@ import com.intellij.notification {
     Notification,
     NotificationType {
         warning
-    }
+    },
+    Notifications
 }
 import com.intellij.openapi {
     Disposable
@@ -68,7 +69,8 @@ import com.intellij.openapi.project {
 import com.intellij.openapi.roots {
     ProjectRootManager {
         projectRootManager=getInstance
-    }
+    },
+    ModuleRootManager
 }
 import com.intellij.openapi.startup {
     StartupManager {
@@ -390,7 +392,18 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                             lastRequestedDelay = null;
                         }
                     }
-                    
+
+                    for (project in model.ceylonProjects) {
+                        if (project.build.fullBuildRequested,
+                            project.ideConfiguration.compileToJvm else false,
+                            ModuleRootManager.getInstance(project.ideArtifact).sdk is Null) {
+
+                            Notifications.Bus.notify(Notification("Ceylon", "Missing JDK",
+                                "The module '``project.ideArtifact.name``' should be compiled for the JVM but has no JDK configured.",
+                                NotificationType.error));
+                        }
+                    }
+
                     if (! model.ceylonProjects.any((ceylonProject)
                         => ceylonProject.build.somethingToDo)) {
                         if (!force) {
