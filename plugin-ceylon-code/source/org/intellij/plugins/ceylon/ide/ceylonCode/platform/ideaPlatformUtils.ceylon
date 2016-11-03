@@ -40,6 +40,7 @@ shared object ideaPlatformUtils satisfies IdeUtils {
             // We can certainly recover from ModelResolutionException so we don't need to show
             // them to the user. The IDE will likely reindex JARs later and a model reset will fix them.
             log(Status._WARNING, "``message`` (``e.string``)");
+            return;
         }
 
         switch (status)
