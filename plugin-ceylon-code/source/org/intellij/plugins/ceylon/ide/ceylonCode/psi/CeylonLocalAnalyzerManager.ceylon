@@ -321,6 +321,9 @@ shared class CeylonLocalAnalyzerManager(model)
                 void commitAndReloadContent() {
                     application.runWriteAction(JavaRunnable(() {
                         try {
+                            if (!fileViewProvider.virtualFile.valid) {
+                                return;
+                            }
                             value psiDocMgr = psiDocumentManager(model.ideaProject);
                             if (exists cachedDocument = fileDocumentManager.getCachedDocument(virtualFile),
                                 psiDocMgr.isUncommited(cachedDocument)) {
@@ -336,6 +339,9 @@ shared class CeylonLocalAnalyzerManager(model)
 
                 void triggerReparse() {
                     application.runReadAction(JavaRunnable(() {
+                        if (!fileViewProvider.virtualFile.valid) {
+                            return;
+                        }
                         try {
                             if (exists cachedPsi = fileViewProvider.getCachedPsi(ceylonLanguage)) {
                                 suppressWarnings("unusedDeclaration")
@@ -355,10 +361,6 @@ shared class CeylonLocalAnalyzerManager(model)
                             throw t;
                         }
                     }));
-                }
-
-                if (!fileViewProvider.virtualFile.valid) {
-                    return;
                 }
 
                 if (synchronously) {
