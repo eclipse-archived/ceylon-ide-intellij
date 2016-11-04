@@ -9,6 +9,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.redhat.ceylon.common.Backend;
+import com.redhat.ceylon.common.Backends;
+import com.redhat.ceylon.common.Nullable;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.model.CeylonProject;
 import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProjects;
@@ -97,12 +99,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
                                 final IdeaModule mdl = (IdeaModule) cu.getUnit().getPackage().getModule();
                                 final String moduleName = mdl.getNameAsString();
                                 final String packageName = cu.getUnit().getPackage().getNameAsString();
-                                Backend backend =
-                                        mdl.getNativeBackends().none() || mdl.getNativeBackends().supports(Backend.Java)
-                                                ? Backend.Java
-                                                : mdl.getNativeBackends().supports(Backend.JavaScript)
-                                                ? Backend.JavaScript
-                                                : null;
+                                Backend backend = findBackend(ceylonNode, mdl);
 
                                 if (backend != null) {
                                     return new RunConfigParams(moduleName, packageName, identifier, backend);
@@ -114,6 +111,24 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
             }
         }
         return null;
+    }
+
+    @Nullable
+    private Backend findBackend(Tree.Declaration declaration, IdeaModule mod) {
+        Backends backends;
+
+        if (declaration.getDeclarationModel() != null
+                && !declaration.getDeclarationModel().getNativeBackends().none()) {
+            backends = declaration.getDeclarationModel().getNativeBackends();
+        } else {
+            backends = mod.getNativeBackends();
+        }
+
+        return backends.none() || backends.supports(Backend.Java)
+                ? Backend.Java
+                : backends.supports(Backend.JavaScript)
+                ? Backend.JavaScript
+                : null;
     }
 
     private CeylonCompositeElement getTopMostElement(CeylonPsi.DeclarationPsi toplevel, Tree.Declaration ceylonNode) {
