@@ -1,3 +1,6 @@
+import ceylon.collection {
+    ArrayList
+}
 import ceylon.interop.java {
     javaString
 }
@@ -414,13 +417,49 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                     value entryPath = file.path.spanFrom(sep + JarFileSystem.jarSeparator.size);
                     if (exists sep2 = entryPath.lastIndexWhere('/'.equals)) {
                         value pkg = entryPath[...sep2-1].replace("/", ".");
-                        if (that.getPackage(pkg) exists) {
+                        if (isJdkPackage(pkg)) {
                             return true;
                         }
                     }
                 }
             }
             return false;
+        }
+
+        Boolean isJdkPackage(String pkg) {
+            if (moduleManager.modelLoader.findPackage(pkg) exists) {
+                return true;
+            }
+            // Try packages from JDK modules that might not be loaded yet
+            value jdkProvider = moduleManager.modelLoader.jdkProvider;
+            value visited = ArrayList<Module_>();
+
+            Boolean inModuleImports(Module_ mod) {
+                if (visited.contains(mod)) {
+                    return false;
+                }
+
+                visited.add(mod);
+
+                if (jdkProvider.isJDKModule(mod.nameAsString),
+                    jdkProvider.isJDKPackage(mod.nameAsString, pkg)) {
+
+                    // makes sure the LazyPackage exists because it will be used later
+                    moduleManager.modelLoader.findOrCreatePackage(mod, pkg);
+
+                    return true;
+                }
+
+                for (imp in mod.imports) {
+                    if (inModuleImports(imp.\imodule)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            return inModuleImports(that);
         }
     }
 
