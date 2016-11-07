@@ -157,22 +157,28 @@
 
     <target name="build"
             description="Builds the IDE plugin">
+        <ant antfile="${basedir}/grammar/GenerateGrammarSources.xml"
+             target="generateSources"
+             dir="${basedir}/grammar"
+             inheritall="false"/>
         <ant antfile="${basedir}/plugin-ceylon-code/build.xml"
              target="build"
              dir="${basedir}/plugin-ceylon-code"
-             inheritall="false">
-        </ant>
+             inheritall="false"/>
         <antcall target="build-ide"/>
         <antcall target="generate-update-site"/>
     </target>
 
     <target name="clean"
             description="Cleans the build environment">
+        <ant antfile="${basedir}/grammar/GenerateGrammarSources.xml"
+             target="clean"
+             dir="${basedir}/grammar"
+             inheritall="false"/>
         <ant antfile="${basedir}/plugin-ceylon-code/build.xml"
              target="clean"
              dir="${basedir}/plugin-ceylon-code"
-             inheritall="false">
-        </ant>
+             inheritall="false"/>
         <delete dir="${build.dir}"/>
     </target>
 </project>

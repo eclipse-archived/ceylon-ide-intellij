@@ -14,6 +14,7 @@ nodeList : {
             println("");
             println("import com.intellij.psi.tree.IElementType;");
             println("import com.redhat.ceylon.compiler.typechecker.tree.Node;");
+            println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
             println("import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;");
             println("");
             println("import java.util.HashMap;");
@@ -27,6 +28,8 @@ nodeList : {
             println("    }");
             println("");
             println("    static {");
+            println("        map.put(CustomTree.ExtendedTypeExpression.class, CeylonTypes.EXTENDED_TYPE_EXPRESSION);");
+            println("        map.put(CustomTree.IsCase.class, CeylonTypes.IS_CASE);");
             println("        map.put(CustomTree.GuardedVariable.class, CeylonTypes.GUARDED_VARIABLE);");
            }
            (nodeDescription? node)+ 
@@ -38,7 +41,7 @@ nodeList : {
 node : '^' '(' 
        ('abstract')?
        n=NODE_NAME
-       { println("        map.put(CustomTree." + className($n.text) + ".class, CeylonTypes." + $n.text + ");"); }
+       { println("        map.put(Tree." + className($n.text) + ".class, CeylonTypes." + $n.text + ");"); }
        extendsNode?
        (memberDescription? subnode)*
        (memberDescription? field)*

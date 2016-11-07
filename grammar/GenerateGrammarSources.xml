@@ -18,6 +18,7 @@
 
     <property file="../../ceylon/common-build.properties"/>
     <property file="../../ceylon/lib/build.properties"/>
+    <property file="../plugin-ceylon-code/build.properties"/>
 
     <property name="src" location="src"/>
     <property name="gensrc" location="gensrc"/>
@@ -31,7 +32,6 @@
 
     <target name="clean" depends="clean.antlr, clean.generated"
             description="Clean up everything.">
-        <echoproperties/>
         <delete dir="${build.dir}"/>
     </target>
 
@@ -85,13 +85,12 @@
         </javac>
     </target>
 
-    <property name="idea.home" location="${ant.home}/../.."/>
     <fail message="The 'openapi.jar' archive of the IDEA installation could not be found.
     Please check that the 'idea.home' property is set or
  that the ant process is started with the IDEA-bundle Ant tool.">
         <condition>
             <not>
-                <available file="${idea.home}/lib/openapi.jar" />
+                <available file="${ideaRoot}/lib/openapi.jar" />
             </not>
         </condition>
     </fail>
@@ -119,6 +118,9 @@
                 <pathelement location="${antlr.lib}"/>
                 <pathelement location="${ceylon.typechecker.lib}"/>
                 <pathelement location="${ceylon.model.lib}"/>
+                <pathelement location="${ideaRoot}/lib/openapi.jar"/>
+                <pathelement location="${ideaRoot}/lib/util.jar"/>
+                <pathelement location="${ideaRoot}/lib/annotations.jar"/>
             </classpath>
 
             <include name="*.java"/>
@@ -140,8 +142,8 @@
                 <pathelement location="${ceylon.typechecker.lib}"/>
                 <pathelement location="${ceylon.model.lib}"/>
                 <pathelement location="${build.classes}"/>
-                <pathelement location="${idea.home}/lib/openapi.jar"/>
-                <pathelement location="${idea.home}/lib/util.jar"/>
+                <pathelement location="${ideaRoot}/lib/openapi.jar"/>
+                <pathelement location="${ideaRoot}/lib/util.jar"/>
             </classpath>
         </java>
     </target>
