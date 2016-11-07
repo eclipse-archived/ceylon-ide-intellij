@@ -5,14 +5,15 @@
         <add module="com.intellij.annotations" version="current" shared="true"/>
         <add module="com.intellij.util" version="current" shared="true"/>
         <add module="org.jdom" version="current"/>
+        <add module="jdk.tools" version="current"/>
     </module>
 
     <module module="com.intellij.extensions">
-        <filter>
-            <include path="com/intellij/openapi/extensions/*"/>
-            <include path="com/intellij/openapi/extensions/impl/*"/>
-            <exclude path="com/intellij/openapi/*"/>
-        </filter>
+        <!--<filter>-->
+            <!--<include path="com/intellij/openapi/extensions/*"/>-->
+            <!--<include path="com/intellij/openapi/extensions/impl/*"/>-->
+            <!--<exclude path="com/intellij/openapi/*"/>-->
+        <!--</filter>-->
     </module>
 
     <module module="com.intellij.idea">
