@@ -94,10 +94,10 @@ shared class SwarmRunConfigurationProducer()
             exists ceylonProject = getCeylonProject(file),
             exists mod = PsiTreeUtil.getParentOfType(el, javaClass<CeylonPsi.ModuleDescriptorPsi>()),
             importsJavaEE(mod.ceylonNode.importModuleList.importModules),
-            is RunManagerEx runManager = context.runManager) {
+            is RunManagerEx runManager = context.runManager,
+            exists modName = mod.ceylonNode.importPath?.model?.nameAsString,
+            exists modVersion = mod.ceylonNode.version?.text?.trim('"'.equals)) {
 
-            value modName = mod.ceylonNode.importPath.model.nameAsString;
-            value modVersion = mod.ceylonNode.version.text.trim('"'.equals);
             value dir = ceylonProject.rootDirectory.absolutePath;
 
             configuration.setName(modName + " in Swarm");
