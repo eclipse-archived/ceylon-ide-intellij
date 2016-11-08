@@ -11,6 +11,9 @@ import ceylon.language {
     langFalse=false
 }
 
+import com.intellij.codeInsight.completion.impl {
+    CamelHumpMatcher
+}
 import com.intellij.openapi.application {
     ApplicationManager {
         application
@@ -50,9 +53,6 @@ import java.lang {
 import java.util {
     JMap=Map,
     Collections
-}
-import com.intellij.codeInsight.completion.impl {
-    CamelHumpMatcher
 }
 
 shared class IdeaModule(
@@ -192,16 +192,15 @@ shared class IdeaModule(
     void listPackagesInternal(VirtualFile vfile, MutableSet<String> packageList,
         String parentPackage = "") {
 
-        vfile.children.array.coalesced
-            .filter((file) => file.directory)
-            .each((child) {
+        for (child in vfile.children) {
+            if (child.directory) {
                 String pack =
                         (parentPackage.empty then "" else parentPackage + ".")
                         + child.name;
                 packageList.add(pack);
                 listPackagesInternal(child, packageList, pack);
             }
-        );
+        }
     }
 
     modelLoader => moduleManager.modelLoader;

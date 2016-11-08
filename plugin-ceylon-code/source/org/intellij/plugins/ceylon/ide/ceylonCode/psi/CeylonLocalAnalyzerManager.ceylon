@@ -208,9 +208,9 @@ shared class CeylonLocalAnalyzerManager(model)
 
     shared actual void modelPhasedUnitsTypechecked({ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile>*} typecheckedUnits) {
         logger.trace(()=>"Enter modelPhasedUnitsTypechecked(``typecheckedUnits``)", 10);
-        value ceylonEditedFiles = concurrencyManager.needReadAccess(() =>
-            fileEditorManagerInstance(model.ideaProject)
-                .openFiles.array.coalesced).sequence();
+        value ceylonEditedFiles
+                = concurrencyManager.needReadAccess(()
+                    => [*fileEditorManagerInstance(model.ideaProject).openFiles]);
 
         for (unit in typecheckedUnits) {
             value virtualFile = unit.unitFile.nativeResource;
@@ -228,9 +228,9 @@ shared class CeylonLocalAnalyzerManager(model)
     }
 
     shared actual void ceylonModelParsed(CeylonProject<Module, VirtualFile, VirtualFile, VirtualFile> project) {
-        value ceylonEditedFiles = concurrencyManager.needReadAccess(() =>
-            fileEditorManagerInstance(model.ideaProject)
-                .openFiles.array.coalesced).sequence();
+        value ceylonEditedFiles
+                = concurrencyManager.needReadAccess(()
+                    => [*fileEditorManagerInstance(model.ideaProject).openFiles]);
         for (externalFile in ceylonEditedFiles.filter(isInSourceArchive)) {
             if (exists analyzer = editedFilesAnalyzersMap.get(externalFile)) {
                 scheduleExternalSourcePreparation(externalFile);

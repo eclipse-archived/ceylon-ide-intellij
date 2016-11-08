@@ -70,14 +70,11 @@ shared class IdeaVirtualFolder(VirtualFile folder, Module mod)
     shared actual List<out IdeaResource> children {
         value result = JArrayList<IdeaResource>();
         
-        folder.children.array.coalesced.each((child) {
-            if (child.directory) {
-                result.add(IdeaVirtualFolder(child, mod));
-            } else {
-                
-                result.add(VirtualFileVirtualFile(child, mod));
-            }
-        });
+        for (child in folder.children) {
+            result.add(child.directory
+                then IdeaVirtualFolder(child, mod)
+                else VirtualFileVirtualFile(child, mod));
+        }
         
         return result;
     }

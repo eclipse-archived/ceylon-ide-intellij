@@ -17,6 +17,9 @@ import com.intellij.openapi.vfs {
     VirtualFileVisitor,
     VfsUtil
 }
+import com.intellij.util.containers {
+    ContainerUtil
+}
 import com.redhat.ceylon.ide.common.model {
     EditedSourceFile,
     ProjectSourceFile,
@@ -41,9 +44,6 @@ import org.jetbrains.jps.model.java {
     JavaResourceRootType,
     JavaSourceRootType
 }
-import com.intellij.util.containers {
-    ContainerUtil
-}
 
 shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, VirtualFile,VirtualFile> {
     newCrossProjectSourceFile(CrossProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile> phasedUnit)
@@ -56,18 +56,24 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
             => ProjectSourceFile(phasedUnit);
 
     // TODO : review this to use : ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(virtualFile);
-    shared actual Boolean isResourceContainedInProject(VirtualFile resource, CeylonProjectAlias ceylonProject) =>
-            concurrencyManager.needReadAccess(() => 
-                moduleRootManager(ceylonProject.ideArtifact)
-                    .contentRoots.array.coalesced.any((root) 
-                            => VfsUtil.isAncestor(root, resource, true)));
+    shared actual Boolean isResourceContainedInProject(VirtualFile resource, CeylonProjectAlias ceylonProject)
+            => concurrencyManager.needReadAccess(() {
+                for (root in  moduleRootManager(ceylonProject.ideArtifact).contentRoots) {
+                    if (VfsUtil.isAncestor(root, resource, true)) {
+                        return true;
+                    }
+                }
+                else {
+                    return false;
+                }
+            });
 
 
     // TODO check if the module is open?
     nativeProjectIsAccessible(Module nativeProject) => true;
 
     referencedNativeProjects(Module mod)
-            => concurrencyManager.needReadAccess(() => moduleRootManager(mod).dependencies.array.coalesced);
+            => concurrencyManager.needReadAccess(() => {*moduleRootManager(mod).dependencies});
 
     referencingNativeProjects(Module mod)
             => CeylonIterable(concurrencyManager.needReadAccess(() => ModuleManager.getInstance(mod.project)

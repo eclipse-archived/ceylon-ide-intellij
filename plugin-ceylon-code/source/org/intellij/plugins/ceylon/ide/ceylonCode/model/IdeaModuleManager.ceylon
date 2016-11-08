@@ -57,10 +57,14 @@ shared class IdeaModuleManager(
         value mod = ceylonProject.ideaModule;
         value modulePath = moduleName.replace(".", "/") + "/module.ceylon";
 
-        return ModuleRootManager.getInstance(mod)
-                .sourceRoots.array.coalesced
-                .find((el) => el.findChild(modulePath) exists)
-                exists;
+        for (root in ModuleRootManager.getInstance(mod).sourceRoots) {
+            if (root.findChild(modulePath) exists) {
+                return true;
+            }
+        }
+        else {
+            return false;
+        }
     }
     
     shared actual BaseIdeModule newModule(String moduleName, String version) {
@@ -68,12 +72,9 @@ shared class IdeaModuleManager(
         value roots = ArrayList<VirtualFile>();
         
         if (moduleName==CeylonModule.defaultModuleName) {
-            roots.addAll(ModuleRootManager.getInstance(mod)
-                    .getSourceRoots(true).array.coalesced);
+            roots.addAll { *ModuleRootManager.getInstance(mod).getSourceRoots(true) };
         } else {
-            value sr = ModuleRootManager.getInstance(mod).getSourceRoots(true);
-            
-            for (root in sr.iterable) {
+            for (root in ModuleRootManager.getInstance(mod).getSourceRoots(true)) {
                 if (JDKUtils.isJDKModule(moduleName)) {
                     for (pkg in JDKUtils.getJDKPackagesByModule(moduleName)) {
                         // TODO
