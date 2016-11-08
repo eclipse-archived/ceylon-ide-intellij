@@ -158,7 +158,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
     }
 
     value modality => ApplicationInfo.instance.build.baselineVersion >= 163
-    then ModalityState.current()
+    then ModalityState.defaultModalityState()
     else ModalityState.any();
 
     object addModuleArchiveHook

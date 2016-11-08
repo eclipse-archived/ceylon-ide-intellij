@@ -7,8 +7,8 @@ This project is an IntelliJ IDEA-based IDE for the [Ceylon programming language]
 
 # Requirements
 
-This plugin is developed against IntelliJ IDEA 2016.2. It works with both Community and Ultimate editions,
-and also supports Android Studio.
+This plugin is developed against IntelliJ IDEA 2016.2, but is compatible with 2016.1+.
+It works with both Community and Ultimate editions, and also supports Android Studio 2.x.
 
 The plugin includes a full embedded distribution of Ceylon, so you don't necessarily have to download 
 and install Ceylon separately.
@@ -25,7 +25,7 @@ You can install Ceylon IDE for IntelliJ from a repository, or build it from sour
 
 The following software must be installed:
 
-- [IntelliJ IDEA 2016.2](http://www.jetbrains.com/idea/download/) Community or Ultimate
+- [IntelliJ IDEA 2016.1+](http://www.jetbrains.com/idea/download/) Community or Ultimate
 - [JDK 7 or 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 ## Install stable version from the JetBrains repository
@@ -44,25 +44,14 @@ to add one of the following custom repository URLs. From the repository, you wil
 a plugin named 'Ceylon IDE'. After installing the plugin and restarting IntelliJ IDEA, you will
 have the ability to create Ceylon IntelliJ modules in which you can develop and run Ceylon code.
 
-
-#### For IntelliJ 15/2016.1+ and Android Studio 2.0+
-
-Development builds are published irregularly to this repository:
+*Development builds* are published irregularly to this repository:
 
 <http://downloads.ceylon-lang.org/ide/intellij/development/updatePlugins.xml>
 
 
-Nightly builds are published here:
+*Nightly builds* are published here:
 
 <https://ci-ceylon.rhcloud.com/job/ceylon-ide-intellij/ws/out/installation-packages/updatePlugins.xml>
-
-
-#### For IntelliJ 14 and Android Studio 1.5:
-
-Development builds are published irregularly to this repository:
-
-<http://downloads.ceylon-lang.org/ide/intellij/development/legacy/updatePlugins.xml>
-
 
 ## Build and install from sources
 
@@ -78,7 +67,7 @@ Development builds are published irregularly to this repository:
 2. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and change the following line
    so that it points to your IntelliJ installation:
 
-        ideaRoot=/Applications/IntelliJ IDEA 2016.1 CE.app/Contents/
+        ideaRoot=/Applications/IntelliJ IDEA 2016.2 CE.app/Contents/
 
 3. Build the Ceylon distribution, SDK, and Ceylon IDE:
 
@@ -93,8 +82,7 @@ Development builds are published irregularly to this repository:
 
 If you want to debug or hack this plugin, you'll need to build it from sources.
 
-1. Make sure you're using IntelliJ 2016.1 (support for IntelliJ 14/15 and Android Studio is
-   planned in a [separate branch](https://github.com/ceylon/ceylon-ide-intellij/tree/141.x-compat))
+1. Make sure you're using IntelliJ 2016.2.
    A clone of `https://github.com/JetBrains/intellij-community` is highly recommended for hacking
    since you will likely have to debug code from the IntelliJ platform
 
@@ -116,7 +104,7 @@ If you want to debug or hack this plugin, you'll need to build it from sources.
 4. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and change the following line
    so that it points to your IntelliJ installation:
 
-        ideaRoot=/Applications/IntelliJ IDEA 2016.1 CE.app/Contents/
+        ideaRoot=/Applications/IntelliJ IDEA 2016.2 CE.app/Contents/
 
 5. Build the Ceylon distribution, SDK, and Ceylon IDE. In the directory `../ceylon`, type:
 

@@ -12,7 +12,10 @@ import com.intellij.openapi.application {
     ApplicationManager {
         application
     },
-    ModalityState
+    ModalityState,
+    ApplicationInfo,
+    TransactionGuardImpl,
+    TransactionGuard
 }
 import com.intellij.openapi.components {
     ProjectComponent
@@ -368,14 +371,20 @@ shared class CeylonLocalAnalyzerManager(model)
                     commitAndReloadContent();
                     triggerReparse();
                 } else {
+                    value runnable =
+                            if (ApplicationInfo.instance.build.baselineVersion>=163,
+                                is TransactionGuardImpl guard = TransactionGuard.instance)
+                            then guard.wrapLaterInvocation(commitAndReloadContent, ModalityState.defaultModalityState())
+                            else JavaRunnable(commitAndReloadContent);
+
                     application.invokator.invokeLater(
-                        JavaRunnable(commitAndReloadContent), ModalityState.any(), 
+                        runnable, ModalityState.defaultModalityState(),
                         model.ideaProject.disposed)
                             .doWhenDone(JavaRunnable(triggerReparse))
                             .doWhenRejected(JavaRunnable(void () {
-                            logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
-                            cleanOnFailure(virtualFile);
-                        }));
+                                logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
+                                cleanOnFailure(virtualFile);
+                            }));
                 }
             }
         logger.trace(()=>"Exit scheduleReparse(``virtualFile``)");
