@@ -148,14 +148,6 @@
         </java>
     </target>
 
-    <fail message="The ceylon Git repo is not accessible locally">
-        <condition>
-            <not>
-                <available file="${build.dist}" />
-            </not>
-        </condition>
-    </fail>
-
     <target name="generateSources" depends="clean, tree" >
         <mkdir dir="../plugin-ceylon-code/gen"/>
         <copy todir="../plugin-ceylon-code/gen" overwrite="true" >
