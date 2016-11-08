@@ -178,7 +178,9 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
             assert (exists first = token[0]);
             value key
                 = /*if (qualifiedNameIsPath) then ceylonHighlightingColors.packages
-                else*/ if (first.uppercase) then ceylonHighlightingColors.type
+                else*/
+                if (first.uppercase)
+                then ceylonHighlightingColors.type
                 else ceylonHighlightingColors.identifier;
             return foregroundColor(key);
         }
