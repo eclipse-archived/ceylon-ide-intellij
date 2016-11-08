@@ -126,14 +126,14 @@ shared class CeylonLocalAnalyzerManager(model)
     defines(VirtualFile key) => editedFilesAnalyzers.defines(key);
     get(VirtualFile key) => editedFilesAnalyzers[key];
 
-    shared actual String componentName => "CeylonLocalAnalyzerManager";
+    componentName => "CeylonLocalAnalyzerManager";
     
-    shared actual void dispose() {
-        editedFilesAnalyzersMap.clear().items.each((localAnalyzer) {
-           localAnalyzer.dispose(); 
-        });
-    }
-    
+    shared actual void dispose()
+            => editedFilesAnalyzersMap.clear().items
+                .each((analyzer) => analyzer.dispose());
+
+    shared actual void projectClosed() => dispose();
+
     shared actual void disposeComponent() {
         dispose();
         busConnection.disconnect();
@@ -157,11 +157,6 @@ shared class CeylonLocalAnalyzerManager(model)
         model.addModelListener(this);
     }
     
-    shared actual void projectClosed() {
-        editedFilesAnalyzersMap.clear().items.each((analyzer) => 
-            analyzer.dispose());
-    }
-
     "Reinstantiates local analyzers for currently open files, when a Ceylon facet
      is added to a module. This is necessary because the `CeylonLocalAnalyzer.ceylonProject`
      attribute needs to be recomputed after the project is added to `IdeaCeylonProjects`."
