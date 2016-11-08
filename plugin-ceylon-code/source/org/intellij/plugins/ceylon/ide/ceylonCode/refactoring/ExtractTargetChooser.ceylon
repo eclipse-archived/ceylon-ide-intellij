@@ -19,9 +19,6 @@ import com.intellij.ui {
         red=\iRED
     }
 }
-import com.intellij.ui.components {
-    JBList
-}
 
 import java.awt {
     Component
@@ -44,6 +41,9 @@ import javax.swing.event {
 import org.intellij.plugins.ceylon.ide.ceylonCode.highlighting {
     highlighter
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.util {
+    UnparameterizedJBList
+}
 
 shared void showChooser<out T>
         (Editor editor, {T*} expressions, String title, Integer? selection = null)
@@ -57,7 +57,7 @@ shared void showChooser<out T>
     for (expr in expressions) {
         model.addElement(SmartPointerManager.getInstance(expr.project).createSmartPsiElementPointer(expr));
     }
-    value myList = JBList(model);
+    value myList = UnparameterizedJBList(model);
 
     myList.selectionModel.selectionMode = ListSelectionModel.singleSelection;
     if (exists selection) {
