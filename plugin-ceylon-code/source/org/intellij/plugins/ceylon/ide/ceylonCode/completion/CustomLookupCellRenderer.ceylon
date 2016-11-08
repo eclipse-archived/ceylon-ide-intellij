@@ -131,10 +131,10 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
     shared actual Component getListCellRendererComponent(JList<out Object>? list,
             Object? element, Integer index, Boolean isSelected, Boolean hasFocus) {
-        Component component
-                = super.getListCellRendererComponent(list, element, index, isSelected, hasFocus);
-        if (is LookupElement element,
-            !is EmptyLookupItem element) {
+        value component
+                = super.getListCellRendererComponent(list,
+                        element, index, isSelected, hasFocus);
+        if (is LookupElement element, !is EmptyLookupItem element) {
             customize(component, element, isSelected);
         }
         return component;
@@ -275,7 +275,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
         value merged = ArrayList<ColoredFragment>();
         variable value currentRange = nextMatch();
-        variable Integer currentIndex = 0;
+        variable value currentIndex = 0;
         for (fragment in highlight) {
             value text = fragment.text;
             value size = text.size;
@@ -287,9 +287,9 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 merged.add(fragment);
             }
             else {
-                variable Integer substart = 0;
-                variable Integer sublength = 0;
-                variable Integer consumedFromRange = 0;
+                variable value substart = 0;
+                variable value sublength = 0;
+                variable value consumedFromRange = 0;
                 while (exists range = currentRange) {
 
                     if (currentIndex < range.startOffset + from) {
@@ -308,7 +308,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
 
                         String subtext;
                         if (consumedFromRange > 0) {
-                            Integer toConsume = range.length - consumedFromRange;
+                            value toConsume = range.length - consumedFromRange;
                             subtext = text[0:toConsume];
                             sublength = toConsume;
                         }
