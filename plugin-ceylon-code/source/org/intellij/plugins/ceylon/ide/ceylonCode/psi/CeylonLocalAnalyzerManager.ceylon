@@ -141,14 +141,16 @@ shared class CeylonLocalAnalyzerManager(model)
         model.removeModelListener(this);
     }
     
-    shared actual void projectOpened() {
-        startupManager(model.ideaProject)
-                .runWhenProjectIsInitialized(() {
-            value openedCeylonFiles = fileEditorManagerInstance(model.ideaProject).openFiles.array.coalesced
-                    .filter((vf) => vf.fileType == ceylonFileType);
-            editedFilesAnalyzersMap.putAllKeys(openedCeylonFiles, newCeylonLocalAnalyzer, true);
-        });
-    }
+    shared actual void projectOpened()
+            => startupManager(model.ideaProject)
+                .runWhenProjectIsInitialized(()
+                    => editedFilesAnalyzersMap.putAllKeys {
+                        toItem = newCeylonLocalAnalyzer;
+                        reuseExistingItems = true;
+                        for (file in fileEditorManagerInstance(model.ideaProject).openFiles)
+                        if (file.fileType == ceylonFileType)
+                            file
+                    });
 
     shared actual void initComponent() {
         busConnection = model.ideaProject.messageBus.connect();
