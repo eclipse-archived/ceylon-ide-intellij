@@ -20,7 +20,9 @@ import com.intellij.codeInsight.lookup.impl {
     EmptyLookupItem
 }
 import com.intellij.ide.util.treeView {
-    PresentableNodeDescriptor
+    PresentableNodeDescriptor {
+        ColoredFragment
+    }
 }
 import com.intellij.openapi.application {
     ApplicationManager
@@ -76,10 +78,6 @@ shared void installCustomLookupCellRenderer(Project project) {
     }
 }
 
-shared alias Fragment => PresentableNodeDescriptor<Anything>.ColoredFragment;
-Fragment createFragment(String text, SimpleTextAttributes atts)
-        => PresentableNodeDescriptor<Anything>.ColoredFragment(text, atts);
-
 shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         extends LookupCellRenderer(lookup) {
 
@@ -107,7 +105,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
     value searchMatch
             = SimpleTextAttributes(SimpleTextAttributes.styleSearchMatch, Color.black);
 
-    function highlighted(Fragment fragment, Boolean selected, Color background)
+    function highlighted(ColoredFragment fragment, Boolean selected, Color background)
             => selected then searchMatch else brighter(fragment.attributes, background);
 
     shared void install()
@@ -186,14 +184,14 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         }
     }
 
-    Fragment[] colorizeTokens(Boolean selected, String text, Integer style/*, Boolean qualifiedNameIsPath*/) {
+    ColoredFragment[] colorizeTokens(Boolean selected, String text, Integer style/*, Boolean qualifiedNameIsPath*/) {
         if (selected) {
-            return Singleton(createFragment(text, SimpleTextAttributes(style, JBColor.white)));
+            return Singleton(ColoredFragment(text, SimpleTextAttributes(style, JBColor.white)));
         }
         else if (text.startsWith("shared actual ")) {
             value color = foregroundColor(ceylonHighlightingColors.annotation);
             return [
-                createFragment("shared actual ", SimpleTextAttributes(style, color)),
+                ColoredFragment("shared actual ", SimpleTextAttributes(style, color)),
                 *colorizeTokens(selected, text[14...], style/*, qualifiedNameIsPath*/)
             ];
         }
@@ -219,7 +217,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                     };
             return [
                 for (token in tokens) if (!token.empty)
-                createFragment(token, SimpleTextAttributes(style, color(token/*, qualifiedNameIsPath*/)))
+                ColoredFragment(token, SimpleTextAttributes(style, color(token/*, qualifiedNameIsPath*/)))
             ];
 
         }
@@ -272,10 +270,10 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
         coloredComponent.ipad = ipad;
     }
 
-    shared List<Fragment> mergeHighlightAndMatches(List<Fragment> highlight,
+    shared List<ColoredFragment> mergeHighlightAndMatches(List<ColoredFragment> highlight,
             Integer from, TextRange? nextMatch(), Boolean selected, Color background) {
 
-        value merged = ArrayList<Fragment>();
+        value merged = ArrayList<ColoredFragment>();
         variable value currentRange = nextMatch();
         variable Integer currentIndex = 0;
         for (fragment in highlight) {
@@ -297,12 +295,12 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                     if (currentIndex < range.startOffset + from) {
                         sublength = range.startOffset + from - currentIndex;
                         String subtext = text.substring(substart, sublength);
-                        merged.add(createFragment(subtext, fragment.attributes));
+                        merged.add(ColoredFragment(subtext, fragment.attributes));
                     }
 
                     if (range.endOffset + from > currentIndex + size) {
                         String subtext = text[sublength...];
-                        merged.add(createFragment(subtext, highlighted(fragment, selected, background)));
+                        merged.add(ColoredFragment(subtext, highlighted(fragment, selected, background)));
                         consumedFromRange += size - sublength;
                         currentRange = null;
                     }
@@ -318,7 +316,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                             subtext = text[sublength:range.length];
                             sublength += range.length;
                         }
-                        merged.add(createFragment(subtext, highlighted(fragment, selected, background)));
+                        merged.add(ColoredFragment(subtext, highlighted(fragment, selected, background)));
 
                         value nextRange = nextMatch();
                         consumedFromRange = 0;
@@ -329,7 +327,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                         else {
                             if (sublength < size) {
                                 String rest = text[sublength...];
-                                merged.add(createFragment(rest, fragment.attributes));
+                                merged.add(ColoredFragment(rest, fragment.attributes));
                             }
                             currentRange = null;
                         }
