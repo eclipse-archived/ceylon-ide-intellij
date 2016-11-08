@@ -85,19 +85,16 @@
         </javac>
     </target>
 
-    <fail message="The 'openapi.jar' archive of the IDEA installation could not be found.
-    Please check that the 'idea.home' property is set or
- that the ant process is started with the IDEA-bundle Ant tool.">
-        <condition>
-            <not>
-                <available file="${ideaRoot}/lib/openapi.jar" />
-            </not>
-        </condition>
-    </fail>
-
-
     <target name="tree" depends="treegen"
             description="Generate the tree builder code">
+        <fail message="The 'openapi.jar' archive of the IDEA installation could not be found. Please check that the 'ideaRoot' property is set or that the ant process is started with the IDEA-bundle Ant tool.">
+            <condition>
+                <not>
+                    <available file="${ideaRoot}/lib/openapi.jar" />
+                </not>
+            </condition>
+        </fail>
+
         <property name="NodesFile" location="../../ceylon/typechecker/antlr/Ceylon.nodes"/>
         <java classname="com.redhat.ceylon.compiler.typechecker.treegen.GenerateIdeaElements" dir="${basedir}" fork="yes">
             <arg value="${NodesFile}"/>
