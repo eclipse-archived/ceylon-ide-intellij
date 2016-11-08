@@ -143,11 +143,11 @@ shared class CeylonLocalAnalyzerManager(model)
     
     shared actual void projectOpened() {
         startupManager(model.ideaProject)
-                .runWhenProjectIsInitialized(JavaRunnable(() {
+                .runWhenProjectIsInitialized(() {
             value openedCeylonFiles = fileEditorManagerInstance(model.ideaProject).openFiles.array.coalesced
                     .filter((vf) => vf.fileType == ceylonFileType);
             editedFilesAnalyzersMap.putAllKeys(openedCeylonFiles, newCeylonLocalAnalyzer, true);
-        }));
+        });
     }
 
     shared actual void initComponent() {
@@ -264,14 +264,14 @@ shared class CeylonLocalAnalyzerManager(model)
 
     shared void scheduleExternalSourcePreparation(VirtualFile virtualFile) {
         logger.trace(()=>"Enter prepareExternalSource() for file ``virtualFile.name``", 20);
-        ApplicationManager.application.executeOnPooledThread(JavaRunnable(() {
+        ApplicationManager.application.executeOnPooledThread(() {
             value phasedUnit = getCeylonProjects(model.ideaProject)?.findExternalPhasedUnit(virtualFile);
             if (exists phasedUnit) {
                 triggerReparse(virtualFile, phasedUnit);
             } else {
                 logger.debug(()=>"External phased unit not found in prepareExternalSource() for file ``virtualFile.name``");
             }
-        }));
+        });
         logger.trace(()=>"Exit prepareExternalSource() for file ``virtualFile.name``");
     }
 
@@ -310,11 +310,13 @@ shared class CeylonLocalAnalyzerManager(model)
     shared void triggerReparse(VirtualFile virtualFile, ExternalPhasedUnit? externalPhasedUnit = null, Boolean synchronously = false) {
         logger.trace(()=>"Enter scheduleReparse(``virtualFile``)", 10);
             Ref<FileViewProvider> providerRef = Ref<FileViewProvider>();
-            ProgressManager.instance.executeNonCancelableSection(JavaRunnable(() {
-                providerRef.set(
-                    application.runReadAction(object satisfies Computable<FileViewProvider> { compute()
-                    => psiManager(model.ideaProject).findViewProvider(virtualFile);}));
-            }));
+            ProgressManager.instance.executeNonCancelableSection(()
+                => providerRef.set(
+                    application.runReadAction(object satisfies Computable<FileViewProvider> {
+                        compute()
+                            => psiManager(model.ideaProject)
+                                .findViewProvider(virtualFile);
+                    })));
 
             if (is SingleRootFileViewProvider fileViewProvider = providerRef.get()) {
                 if (exists externalPhasedUnit) {
@@ -322,7 +324,7 @@ shared class CeylonLocalAnalyzerManager(model)
                 }
                 
                 void commitAndReloadContent() {
-                    application.runWriteAction(JavaRunnable(() {
+                    application.runWriteAction(() {
                         try {
                             if (!fileViewProvider.virtualFile.valid) {
                                 return;
@@ -337,11 +339,11 @@ shared class CeylonLocalAnalyzerManager(model)
                             cleanOnFailure(virtualFile, t);
                             throw t;
                         }
-                    }));
+                    });
                 }
 
                 void triggerReparse() {
-                    application.runReadAction(JavaRunnable(() {
+                    application.runReadAction(() {
                         if (!fileViewProvider.virtualFile.valid) {
                             return;
                         }
@@ -363,7 +365,7 @@ shared class CeylonLocalAnalyzerManager(model)
                             cleanOnFailure(virtualFile, t);
                             throw t;
                         }
-                    }));
+                    });
                 }
 
                 if (synchronously) {
@@ -377,14 +379,16 @@ shared class CeylonLocalAnalyzerManager(model)
                             then guard.wrapLaterInvocation(commitAndReloadContent, ModalityState.defaultModalityState())
                             else JavaRunnable(commitAndReloadContent);
 
-                    application.invokator.invokeLater(
-                        runnable, ModalityState.defaultModalityState(),
-                        model.ideaProject.disposed)
-                            .doWhenDone(JavaRunnable(triggerReparse))
-                            .doWhenRejected(JavaRunnable(void () {
-                                logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
-                                cleanOnFailure(virtualFile);
-                            }));
+                    application.invokator
+                        .invokeLater(
+                            runnable,
+                            ModalityState.defaultModalityState(),
+                            model.ideaProject.disposed)
+                        .doWhenDone(triggerReparse)
+                        .doWhenRejected(() {
+                            logger.error(() => "Reparse of file `` virtualFile.name`` was rejected", 20);
+                            cleanOnFailure(virtualFile);
+                        });
                 }
             }
         logger.trace(()=>"Exit scheduleReparse(``virtualFile``)");

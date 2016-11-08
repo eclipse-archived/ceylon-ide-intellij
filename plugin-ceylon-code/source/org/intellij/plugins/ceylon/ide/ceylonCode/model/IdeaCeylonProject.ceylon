@@ -3,7 +3,6 @@ import ceylon.collection {
 }
 import ceylon.interop.java {
     javaClass,
-    JavaRunnable,
     javaString
 }
 
@@ -56,6 +55,9 @@ import com.intellij.openapi.util {
     Key,
     Ref
 }
+import com.intellij.openapi.util.io {
+    FileUtil
+}
 import com.intellij.openapi.vfs {
     VirtualFile,
     VfsUtil,
@@ -68,6 +70,9 @@ import com.intellij.openapi.vfs {
 import com.intellij.psi {
     PsiFile,
     JavaPsiFacade
+}
+import com.intellij.psi.search {
+    GlobalSearchScope
 }
 import com.redhat.ceylon.cmr.api {
     ArtifactContext
@@ -127,12 +132,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.platform {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
-}
-import com.intellij.psi.search {
-    GlobalSearchScope
-}
-import com.intellij.openapi.util.io {
-    FileUtil
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -199,14 +198,14 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
             value sourcesToAttach = Ref<{ArtifactContext*}>();
 
-            value runnable = JavaRunnable(() {
+            void runnable() {
                 try {
                     sourcesToAttach.set(addLibraries(dependenciesToAdd, true));
                     validatingDependencies = false;
                 } catch (IOException e) {
                     platformUtils.log(Status._ERROR, "Can't add required artifacts to classpath", e);
                 }
-            });
+            }
             application.invokeAndWait(runnable, ModalityState.nonModal);
 
             dumbService(model.ideaProject).waitForSmartMode();
@@ -223,9 +222,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                                     return ctx -> (repositoryManager.getArtifactResult(ctx) else null);
                                 }
                             );
-
-                            value sourcesRunnable = JavaRunnable(() => attachSources(artifacts));
-                            application.invokeAndWait(sourcesRunnable, modality);
+                            application.invokeAndWait(() => attachSources(artifacts), modality);
                         }
                 } , ProgressIndicatorBase());
             }
@@ -242,9 +239,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
                 Boolean ceylonLanguageIndexed() {
                     value ref = Ref<Boolean>();
-                    ds.runReadActionInSmartMode(JavaRunnable(
-                        () => ref.set(facade.findClass(ceylonCls, scope) exists)
-                    ));
+                    ds.runReadActionInSmartMode(()
+                        => ref.set(facade.findClass(ceylonCls, scope) exists));
                     return ref.get();
                 }
 

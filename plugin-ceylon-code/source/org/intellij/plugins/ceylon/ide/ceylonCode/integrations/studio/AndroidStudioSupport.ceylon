@@ -4,8 +4,7 @@ import ceylon.collection {
 import ceylon.interop.java {
     javaClass,
     javaString,
-    createJavaObjectArray,
-    JavaRunnable
+    createJavaObjectArray
 }
 
 import com.intellij.codeInsight {
@@ -298,9 +297,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
                         NotificationType.error));
 
                 shared actual void onSuccess() {
-                    ApplicationManager.application.invokeLater(JavaRunnable(() {
-                        callback();
-                    }));
+                    ApplicationManager.application.invokeLater(callback);
                 }
             },
             ProgressExecutionMode.inBackgroundAsync

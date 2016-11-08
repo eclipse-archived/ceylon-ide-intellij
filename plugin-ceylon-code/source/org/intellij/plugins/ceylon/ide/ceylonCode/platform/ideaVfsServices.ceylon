@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaClass,
-    JavaRunnable
+    javaClass
 }
 
 import com.intellij.openapi.application {
@@ -130,14 +129,14 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
                     // on the UI thread.
                     // So do it asynchronously, and further notify the change to the
                     // model manager in case that should trigger a model update.
-                    application.invokeLater(JavaRunnable(() {
+                    application.invokeLater(() {
                         fileDocumentManager.saveDocument(document);
                         for (project in ProjectManager.instance.openProjects) {
                             if (exists modelManager = project.getComponent(javaClass<CeylonModelManager>())) {
                                 modelManager.notifyFileContentChange(resource);
                             }
                         }
-                    }));
+                    });
                     return false;
                 }
             } else {

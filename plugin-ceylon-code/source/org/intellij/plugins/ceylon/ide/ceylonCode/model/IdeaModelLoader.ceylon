@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    JavaRunnable
-}
-
 import com.intellij.openapi.application {
     ApplicationManager {
         application
@@ -108,7 +104,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                         currentStrategy == NoIndexStrategy.waitForIndexes) {
                         updateIndexIfnecessary();
                         assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
-                        dumbService(project).runReadActionInSmartMode(JavaRunnable(() {
+                        dumbService(project).runReadActionInSmartMode(() {
                             value restoreCurrentPriority = withOriginalModelUpdatePriority();
                             try {
                                 return concurrencyManager.outsideDumbMode(() {
@@ -118,11 +114,9 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                                     restoreCurrentPriority();
 
                             }
-                        }));
+                        });
                     } else {
-                        application.runReadAction(JavaRunnable(() {
-                            ref.set(action.call() else null);
-                        }));
+                        application.runReadAction(() => ref.set(action.call() else null));
                     }
                 }
             } finally {
@@ -165,15 +159,13 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         }
         if (exists strategy = concurrencyManager.noIndexStrategy,
             strategy == NoIndexStrategy.waitForIndexes) {
-            resetJavaModelSourceIfNecessary(JavaRunnable {
-                run() => application.invokeAndWait(JavaRunnable {
-                    void run() {
+            resetJavaModelSourceIfNecessary(()
+                => application.invokeAndWait(() {
                         assert (exists project =
                                 ideaModuleManager.ceylonProject?.ideArtifact?.project);
                         dumbService(project).queueTask(UnindexedFilesUpdater(project, false));
-                    }
-                }, ModalityState.nonModal);
-            });
+                    },
+                    ModalityState.nonModal));
         }
     }
 

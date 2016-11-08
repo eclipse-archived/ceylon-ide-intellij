@@ -2,7 +2,6 @@ import ceylon.collection {
     HashSet
 }
 import ceylon.interop.java {
-    JavaRunnable,
     CeylonIterable,
     javaClass,
     javaClassFromInstance
@@ -351,9 +350,9 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
         };
 
         try {
-            application.invokeAndWait(JavaRunnable {
-                run() => progressManager.run(ModelUpdateBackgroundTask(buildProgressIndicator, bakgroundBuildLatch));
-            }, ModalityState.any());
+            application.invokeAndWait(
+                () => progressManager.run(ModelUpdateBackgroundTask(buildProgressIndicator, bakgroundBuildLatch)),
+                ModalityState.any());
             
             if (! bakgroundBuildLatch.await(modelUpdateTimeoutMinutes, TimeUnit.minutes)) {
                 automaticModelUpdateEnabled_ = false;
@@ -380,8 +379,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
             value plannedDelay = delayToUse(delay);
             lastRequestedDelay = plannedDelay;
             buildTriggeringAlarm?.cancelAllRequests();
-            buildTriggeringAlarm?.addRequest(JavaRunnable {
-                void run() {
+            buildTriggeringAlarm?.addRequest(() {
                     cancelledBecauseOfSyntaxErrors = false;
                     cancelledBecauseOfAPause = false;
                     buildTriggeringAlarm?.cancelAllRequests();
@@ -505,8 +503,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                    
                     runModelUpdate();
                     
-                }
-            }, plannedDelay);
+                }, plannedDelay);
         }
     }
     
@@ -559,11 +556,11 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
     
     shared actual void projectOpened() => 
             startupManager(model.ideaProject)
-            .runWhenProjectIsInitialized(JavaRunnable(() {
-        ideaProjectReady = true;
-        scheduleModelUpdate(500);
-        scheduleSubmitChanges();
-    }));
+            .runWhenProjectIsInitialized(() {
+                ideaProjectReady = true;
+                scheduleModelUpdate(500);
+                scheduleSubmitChanges();
+            });
     
     projectClosed() => ideaProjectReady = false;
     

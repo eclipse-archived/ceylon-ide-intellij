@@ -2,8 +2,7 @@ import ceylon.collection {
     ArrayList
 }
 import ceylon.interop.java {
-    javaClass,
-    JavaRunnable
+    javaClass
 }
 
 import com.intellij.ide.impl {
@@ -64,7 +63,7 @@ shared class CeylonProblemsViewImpl(project, startupManager, toolWindowManager)
     variable value initialized = false;
     value myPostponedRunnables = ArrayList<Anything()>();
 
-    value runnable = JavaRunnable(() {
+    void runnable() {
         myToolWindow = toolWindowManager.registerToolWindow(
             toolWindowId,
             false,
@@ -88,7 +87,7 @@ shared class CeylonProblemsViewImpl(project, startupManager, toolWindowManager)
         myPostponedRunnables.clear();
 
         myToolWindow.hide(null);
-    });
+    }
 
     if (project.initialized) {
         ApplicationManager.application.invokeLater(runnable);
@@ -118,7 +117,7 @@ shared class CeylonProblemsViewImpl(project, startupManager, toolWindowManager)
         }
 
         if (initialized) {
-            ApplicationManager.application.invokeLater(JavaRunnable(func), ModalityState.any());
+            ApplicationManager.application.invokeLater(func, ModalityState.any());
         } else {
             myPostponedRunnables.add(func);
         }
