@@ -275,7 +275,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                 if (exists pkg = facade.findPackage(quotedPackageName)) {
                     value classes = pkg.getClasses(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(mod));
                     
-                    return classes.iterable.coalesced;
+                    return {*classes};
                 }
                 return null;
             });

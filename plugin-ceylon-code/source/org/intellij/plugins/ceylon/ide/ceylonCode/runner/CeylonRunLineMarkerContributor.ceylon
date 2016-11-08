@@ -40,7 +40,7 @@ shared class CeylonRunLineMarkerContributor()
             isShared(node)) {
             
             return Info(AllIcons.RunConfigurations.TestState.run,
-                null, *ExecutorAction.getActions(0).iterable.coalesced);
+                null, *{*ExecutorAction.getActions(0)});
         }
 
         // we can also target "Swarm" modules
@@ -50,7 +50,7 @@ shared class CeylonRunLineMarkerContributor()
             importsJavaEE(descriptor.ceylonNode.importModuleList.importModules)) {
 
             return Info(AllIcons.RunConfigurations.TestState.run,
-                null, *ExecutorAction.getActions(0).iterable.coalesced);
+                null, *{*ExecutorAction.getActions(0)});
         }
 
         return null;

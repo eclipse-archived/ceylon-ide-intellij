@@ -127,7 +127,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             value allParentExpressions
                 = psiElements<CeylonPsi.TermPsi> {
                     file = file;
-                    elements = visitor.elements.iterable.coalesced;
+                    *visitor.elements
                 };
             if (!nonempty allParentExpressions) {
                 //noop
