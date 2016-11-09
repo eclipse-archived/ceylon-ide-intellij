@@ -126,10 +126,11 @@ shared class CeylonGotoSuperHandler()
                 fun.actual,
                 is ClassOrInterface bottom = fun.container) {
                 value signature = ModelUtil.getSignature(fun);
+                value variadic = ModelUtil.isVariadic(fun);
                 for (type in bottom.supertypeDeclarations) {
                     if (type!=bottom,
                         is Function dec
-                            = type.getDirectMember(fun.name, signature, false, true),
+                            = type.getDirectMember(fun.name, signature, variadic, true),
                         dec.shared) {
                         list.add(dec);
                     }
@@ -223,8 +224,8 @@ shared class CeylonGotoSuperHandler()
                 exists root = ref.refinedDeclaration,
                 is ClassOrInterface bottom = ref.container,
                 is ClassOrInterface top = root.container) {
-                for (dec in ModelUtil.getInterveningRefinements(ref.name,
-                                ModelUtil.getSignature(ref), root, bottom, top)) {
+                for (dec in ModelUtil.getInterveningRefinements(ref,
+                                root, bottom, top)) {
                     list.add(dec);
                 }
             }
