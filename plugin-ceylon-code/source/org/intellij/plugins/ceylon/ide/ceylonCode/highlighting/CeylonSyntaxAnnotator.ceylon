@@ -158,12 +158,25 @@ shared class CeylonSyntaxAnnotator()
          || elementType == CeylonTokens.averbatimString) {
             value anno = annotationHolder.createInfoAnnotation(element, null);
             anno.textAttributes = ceylonHighlightingColors.annotationString;
-            createAnnotations(codePattern, element, ceylonHighlightingColors.code);
-            createAnnotations(docLinkPattern, element, ceylonHighlightingColors.docLink);
+            createAnnotations {
+                pattern = codePattern;
+                element = element;
+                key = ceylonHighlightingColors.code;
+            };
+            createAnnotations {
+                pattern = docLinkPattern;
+                element = element;
+                key = ceylonHighlightingColors.docLink;
+            };
             assert (is CeylonCompositeElement parent = element.parent);
-            highlightCodeBlocks(element,
-                parent.ceylonNode.token.charPositionInLine +
-                (elementType == CeylonTokens.averbatimString then 3 else 1));
+            if (exists node = parent.ceylonNode) {
+                highlightCodeBlocks {
+                    element = element;
+                    quoteSize
+                        = node.token.charPositionInLine
+                        + (elementType == CeylonTokens.averbatimString then 3 else 1);
+                };
+            }
         }
 
         if (elementType == CeylonTokens.astringLiteral
@@ -172,7 +185,11 @@ shared class CeylonSyntaxAnnotator()
          || elementType == CeylonTokens.stringEnd
          || elementType == CeylonTokens.stringMid
          || elementType == CeylonTokens.charLiteral) {
-            createAnnotations(escapePattern, element, ceylonHighlightingColors.escape);
+            createAnnotations {
+                pattern = escapePattern;
+                element = element;
+                key = ceylonHighlightingColors.escape;
+            };
         }
 
         if (is CeylonPsi.StringTemplatePsi element) {
