@@ -17,6 +17,9 @@ import com.intellij.psi {
 import com.intellij.psi.impl.source {
     PsiClassReferenceType
 }
+import com.intellij.psi.search {
+    GlobalSearchScope
+}
 import com.redhat.ceylon.ide.common.model {
     unknownClassMirror
 }
@@ -35,55 +38,58 @@ import java.util {
     Map,
     Arrays
 }
-import com.intellij.psi.search {
-    GlobalSearchScope
-}
 
-shared PsiClass? searchForClass(String potentialClass, [String*] potentialPackageParts, JavaPsiFacade facade, GlobalSearchScope resolveScope) {
-    String prefixedPotentialClass = StringBuilder().appendCharacter('$').append(potentialClass).string;
-    value pkg = facade.findPackage(".".join(potentialPackageParts.reversed)) else null;
-    if (exists pkg) {
-        if (exists found = pkg.findClassByShortName(potentialClass, resolveScope).array.first) {
-            return found;
-        }
-        if (exists found = pkg.findClassByShortName(prefixedPotentialClass, resolveScope).array.first) {
-            return found;
-        }
-    } else {
-        if (nonempty potentialPackageParts) {
-            if (exists first = potentialClass.first) {
-                if (first == 'i' && potentialClass == "impl" ||
-                first == 'a' && (potentialClass == "annotation$" || potentialClass == "annotations$")) {
-                    if (exists found = searchForClass {
-                        potentialClass = StringBuilder()
-                            .append(potentialPackageParts.first)
-                            .appendCharacter('$')
-                            .append(potentialClass).string;
+shared PsiClass? searchForClass(String potentialClass, [String*] potentialPackageParts,
+        JavaPsiFacade facade, GlobalSearchScope resolveScope) {
+
+    String prefixedPotentialClass
+            = StringBuilder()
+            .appendCharacter('$')
+            .append(potentialClass).string;
+
+    if (exists pkg = facade.findPackage(".".join(potentialPackageParts.reversed))) {
+        return pkg.findClassByShortName(potentialClass, resolveScope).array.first
+          else pkg.findClassByShortName(prefixedPotentialClass, resolveScope).array.first;
+    }
+    else if (nonempty potentialPackageParts) {
+
+        if (exists first = potentialClass.first,
+            first == 'i' && potentialClass == "impl" ||
+            first == 'a' && (potentialClass == "annotation$" ||
+                             potentialClass == "annotations$"),
+            exists found
+                    = searchForClass {
+                        potentialClass
+                                = StringBuilder()
+                                .append(potentialPackageParts.first)
+                                .appendCharacter('$')
+                                .append(potentialClass).string;
                         potentialPackageParts = potentialPackageParts.rest;
                         facade = facade;
                         resolveScope = resolveScope;
                     }) {
-                        return found;
-                    }
-                }
-            }
-            if (exists parentClass = searchForClass {
-                potentialClass = potentialPackageParts.first;
-                potentialPackageParts = potentialPackageParts.rest;
-                facade = facade;
-                resolveScope = resolveScope;
-            }) {
-                if (exists found = parentClass.findInnerClassByName(potentialClass, false)) {
-                    return found;
-                }
-                if (exists found = parentClass.findInnerClassByName(prefixedPotentialClass, false)) {
-                    return found;
-                }
-            }
+            return found;
         }
 
+        if (exists parentClass
+                = searchForClass {
+                    potentialClass = potentialPackageParts.first;
+                    potentialPackageParts = potentialPackageParts.rest;
+                    facade = facade;
+                    resolveScope = resolveScope;
+                },
+            exists found
+                    = parentClass.findInnerClassByName(potentialClass, false)
+                    else parentClass.findInnerClassByName(prefixedPotentialClass, false)) {
+            return found;
+        }
+
+        return null;
+
     }
-    return null;
+    else {
+        return null;
+    }
 }
 
 
@@ -158,35 +164,33 @@ shared class PSIType(psi,
     primitive => psi is PsiPrimitiveType;
 
     String computedQualifiedName {
-        value canonicalText = PsiNameHelper.getQualifiedClassName(psi.canonicalText, false);
+        value canonicalText
+                = PsiNameHelper.getQualifiedClassName(psi.canonicalText, false);
 
         if (is PsiClassReferenceType psi) {
             value resolveScope = psi.resolveScope;
             value facade = javaFacade(psi.reference.project);
 
-            if (exists cls = concurrencyManager.needReadAccess(() =>
-                    facade.findClass(canonicalText, resolveScope))) {
-                assert(exists qName = cls.qualifiedName);
-                return qName;
+            if (exists cls
+                    = concurrencyManager.needReadAccess(()
+                        => facade.findClass(canonicalText, resolveScope))) {
+                assert (exists qualifiedName = cls.qualifiedName);
+                return qualifiedName;
             }
 
             if ('.' in canonicalText) {
                 value parts = canonicalText.split('.'.equals).sequence();
-                assert(nonempty reversedParts = parts.reversed);
+                assert (nonempty reversedParts = parts.reversed);
 
 
-                if (exists clsName = concurrencyManager.needReadAccess(() {
-                    if (exists foundClass = searchForClass {
-                            potentialClass = reversedParts.first;
-                            potentialPackageParts = reversedParts.rest;
-                            facade = facade;
-                            resolveScope = resolveScope;
-                        }, exists qualifiedName = foundClass.qualifiedName) {
-                        return qualifiedName;
-                    }
-
-                    return null;
-                })) {
+                if (exists clsName
+                        = concurrencyManager.needReadAccess(()
+                            => searchForClass {
+                                potentialClass = reversedParts.first;
+                                potentialPackageParts = reversedParts.rest;
+                                facade = facade;
+                                resolveScope = resolveScope;
+                            }?.qualifiedName)) {
                     return clsName;
                 }
             }
@@ -195,7 +199,9 @@ shared class PSIType(psi,
         return canonicalText;
     }
 
-    qualifiedName => cachedQualifiedName else (cachedQualifiedName = concurrencyManager.needReadAccess(() => computedQualifiedName));
+    qualifiedName
+            => cachedQualifiedName
+            else (cachedQualifiedName = concurrencyManager.needReadAccess(() => computedQualifiedName));
     
     // TODO
     qualifyingType => null; //enclosing;
@@ -227,7 +233,7 @@ shared class PSIType(psi,
             => Arrays.asList<TypeMirror>(
                 if (exists types = getTypeArguments(psi))
                 for (t in types)
-                    PSIType(t, originatingTypes, this));
+                PSIType(t, originatingTypes, this));
 
     string => "PSIType[``qualifiedName``]";
     
