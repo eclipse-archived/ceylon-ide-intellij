@@ -98,7 +98,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             isSynchronizing.set(true);
             try {
                 if (application.readAccessAllowed) {
-                    ref.set(action.call() else null);
+                    ref.set(action.call());
                 } else {
                     if (exists currentStrategy = concurrencyManager.noIndexStrategy,
                         currentStrategy == NoIndexStrategy.waitForIndexes) {
@@ -108,7 +108,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                             value restoreCurrentPriority = withOriginalModelUpdatePriority();
                             try {
                                 return concurrencyManager.outsideDumbMode(() {
-                                    ref.set(action.call() else null);
+                                    ref.set(action.call());
                                 });
                             } finally {
                                     restoreCurrentPriority();
@@ -116,14 +116,14 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                             }
                         });
                     } else {
-                        application.runReadAction(() => ref.set(action.call() else null));
+                        application.runReadAction(() => ref.set(action.call()));
                     }
                 }
             } finally {
                 isSynchronizing.set(false);
             }
         } else {
-            ref.set(action.call() else null);
+            ref.set(action.call());
         }
         return  ref.get();
     }

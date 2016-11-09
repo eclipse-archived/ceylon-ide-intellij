@@ -54,7 +54,8 @@ shared class NoIndexStrategy
     string => str;
 }
 
-shared abstract class ConcurrencyError(String? description=null, Throwable? cause=null) extends Exception(description, cause) {}
+shared abstract class ConcurrencyError(String? description=null, Throwable? cause=null)
+        extends Exception(description, cause) {}
 
 shared class CannotWaitForIndexesInReadAccessError()
         extends ConcurrencyError("Waiting for up-to-date indexes inside a read-allowed section is dead-lock-prone.") {}
@@ -62,11 +63,12 @@ shared class CannotWaitForIndexesInReadAccessError()
 shared class DumbModeNotSupported()
         extends ConcurrencyError("This code should never be called while Dumb mode is on.") {}
 
-String noIndexStrategyMessage = """Entering in a section that would need indexes, but no strategy has been specified.
-                                     The stragtegy used when indexes are unavailable can be specificied by one of the following methods:
-                                     - concurrencyManager.withUpToDateIndexes()
-                                     - concurrencyManager.withAlternateResolution()
-                                     - concurrencyManager.outsideDumbMode()""";
+String noIndexStrategyMessage
+        = """Entering in a section that would need indexes, but no strategy has been specified.
+             The strategy used when indexes are unavailable can be specified by one of the following methods:
+             - concurrencyManager.withUpToDateIndexes()
+             - concurrencyManager.withAlternateResolution()
+             - concurrencyManager.outsideDumbMode()""";
 
 shared class IndexNeededWithNoIndexStrategy()
         extends ConcurrencyError(noIndexStrategyMessage) {}
@@ -80,7 +82,7 @@ shared object concurrencyManager {
 
     shared NoIndexStrategy? noIndexStrategy => noIndexStrategy_.get();
 
-    shared Return|ProcessCanceledException tryReadAccess<Return>(Return() func) {
+    shared Return|ProcessCanceledException tryReadAccess<Return>(Return func()) {
         try {
             return needReadAccess(func, 0);
         } catch(ProcessCanceledException e) {
@@ -88,13 +90,13 @@ shared object concurrencyManager {
         }
     }
 
-    shared Return dontCancel<Return>(Return() func) {
+    shared Return dontCancel<Return>(Return func()) {
         value ref = Ref<Return>();
         ProgressManager.instance.executeNonCancelableSection(() => ref.set(func()));
         return ref.get();
     }
 
-    shared Return needReadAccess<Return>(Return() func, Integer timeout = deadLockDetectionTimeout) {
+    shared Return needReadAccess<Return>(Return func(), Integer timeout = deadLockDetectionTimeout) {
         value ref = Ref<Return>();
 
         function funcRunnable() {
@@ -266,7 +268,7 @@ shared object concurrencyManager {
                 logger.errorThrowable(exception);
                 throw exception;
             } else {
-                logger.debug(()=>noIndexStrategyMessage, 20);
+                logger.debug(() => noIndexStrategyMessage, 20);
                 return func();
             }
         }

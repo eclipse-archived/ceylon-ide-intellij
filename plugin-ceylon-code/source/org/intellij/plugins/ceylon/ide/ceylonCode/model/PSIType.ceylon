@@ -108,7 +108,7 @@ shared class PSIType(psi,
     
     declaredClass
             => if (is PsiClassType psi,
-                   exists cls = concurrencyManager.needReadAccess(() => psi.resolve() else null))
+                   exists cls = concurrencyManager.needReadAccess(() => psi.resolve()))
                then PSIClass(SmartPointerManager.getInstance(cls.project).createSmartPsiElementPointer(cls))
                else unknownClassMirror;
 
