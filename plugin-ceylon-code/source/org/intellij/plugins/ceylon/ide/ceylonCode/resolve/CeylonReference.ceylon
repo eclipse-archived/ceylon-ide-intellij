@@ -241,13 +241,15 @@ shared class CeylonReference(element, span = element,
         }
         if (is CeylonPsi.TypeParameterDeclarationPsi element,
             is Tree.TypeConstraint decl = this.node,
-            decl.declarationModel == element.ceylonNode.declarationModel) {
+            exists node = element.ceylonNode,
+            decl.declarationModel == node.declarationModel) {
 
             return true;
         }
         if (is CeylonPsi.TypeConstraintPsi element,
             exists model = nodes.getReferencedModel(this.node),
-            model == element.ceylonNode.declarationModel) {
+            exists node = element.ceylonNode,
+            model == node.declarationModel) {
 
             return true;
         }
