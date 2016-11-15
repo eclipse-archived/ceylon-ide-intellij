@@ -33,7 +33,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
-    CeylonPsi
+    CeylonPsi,
+    CeylonFile
 }
 
 "Finds references to import aliases. For example, when Find Usages is called on `String`,
@@ -47,8 +48,10 @@ shared class ImportAliasReferencesSearch() extends
         QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters>() {
 
     shared actual void processQuery(ReferencesSearch.SearchParameters params, Processor<PsiReference> consumer) {
-        if (is PsiNameIdentifierOwner toSearch = params.elementToSearch, 
-                exists name = toSearch.name) {
+        if (is PsiNameIdentifierOwner toSearch = params.elementToSearch,
+            toSearch.containingFile is CeylonFile,
+            exists name = toSearch.name) {
+
             value helper = ServiceManager.getService(params.project, javaClass<PsiSearchHelper>());
             value scope = concurrencyManager.needReadAccess(() => params.effectiveSearchScope);
             value processor = object satisfies TextOccurenceProcessor {
