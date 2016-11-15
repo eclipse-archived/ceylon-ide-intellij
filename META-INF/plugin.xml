@@ -151,7 +151,7 @@
         <liveTemplateContext implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplateContext"/>
         <!--<codeInsight.template.postfixTemplateProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.templates.CeylonPostfixTemplateProvider"/>-->
 
-        <psi.classFileDecompiler implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler"/>
+        <psi.classFileDecompiler implementation="org.intellij.plugins.ceylon.ide.ceylonCode.compiled.CeylonDecompiler"/>
         <psi.clsCustomNavigationPolicy implementation="org.intellij.plugins.ceylon.ide.ceylonCode.compiled.CeylonClsNavigationPolicy"/>
         <stubElementTypeHolder class="org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonTypes"/>
         <qualifiedNameProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.lang.CeylonQualifiedNameProvider"/>
