@@ -200,7 +200,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     psiClass => cls;
 
-                    members => realIntf?.members;
+                    members => realIntf?.members else emptyList<Declaration>();
                 };
 
             } else if (modifiers.findAnnotation(ceylonMethodAnnotation) exists) {
@@ -342,7 +342,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                     psiClass => cls;
 
-                    members => realClass?.members;
+                    members => realClass?.members else emptyList<Declaration>();
 
                 };
             }
