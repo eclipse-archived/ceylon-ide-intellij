@@ -51,7 +51,12 @@ public class CeylonTreeUtil {
             }
         }
 
-        PsiElement candidate = PsiUtilCore.getElementAtOffset(file, ceylonNode.getStartIndex());
+        Integer index = ceylonNode.getStartIndex();
+        if (index==null) {
+            return null;
+        }
+
+        PsiElement candidate = PsiUtilCore.getElementAtOffset(file, index);
 
         ArrayList<Node> ceylonNodeCandidates = new ArrayList<>();
         ArrayList<PsiElement> candidates = new ArrayList<>();
