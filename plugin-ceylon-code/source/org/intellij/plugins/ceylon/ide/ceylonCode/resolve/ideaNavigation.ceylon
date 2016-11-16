@@ -15,7 +15,9 @@ import com.intellij.psi {
     PsiFile,
     JavaPsiFacade,
     PsiClass,
-    PsiElement
+    PsiElement,
+    PsiMethod,
+    PsiField
 }
 import com.intellij.psi.search {
     GlobalSearchScope
@@ -62,7 +64,66 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
 }
 
-shared class IdeaNavigation(Project project) 
+shared PsiNameIdentifierOwner? declarationToPsi(Declaration rawDeclaration) {
+    PsiClass? getJavaClass(ClassOrInterface cls) {
+        if (is LazyClass cls, is PSIClass mirror = cls.classMirror) {
+            return mirror.psi;
+        }
+        else if (is LazyInterface cls, is PSIClass mirror = cls.classMirror) {
+            return mirror.psi;
+        }
+        return null;
+//        value qn = cls.qualifiedNameString.replace("::", ".");
+//
+//        return concurrencyManager.withAlternateResolution {
+//            func() => concurrencyManager.needIndexes(project, () {
+//                value facade = JavaPsiFacade.getInstance(project);
+//                value scope = GlobalSearchScope.allScope(project);
+//
+//                if (exists psi = facade.findClass(qn, scope)) {
+//                    return psi;
+//                }
+//                return null;
+//            });
+//        };
+    }
+
+    value declaration = if (is Function rawDeclaration, rawDeclaration.annotation)
+            then rawDeclaration.typeDeclaration
+            else rawDeclaration;
+    if (is LazyClass declaration) {
+        if (is PSIMethod meth = declaration.constructor,
+            meth.psi.canNavigate()) {
+            return meth.psi;
+        }
+        if (is PSIClass cls = declaration.classMirror) {
+            return cls.psi;
+        }
+    } else if (is LazyInterface declaration,
+        is PSIClass cls = declaration.classMirror) {
+        return cls.psi;
+    } else if (is JavaMethod declaration,
+        is PSIMethod meth = declaration.mirror) {
+        return meth.psi;
+    } else if (is JavaBeanValue declaration,
+        is PSIMethod meth = declaration.mirror) {
+        return meth.psi;
+    } else if (is FieldValue declaration) {
+        if (is ClassOrInterface container = declaration.container,
+            exists cls = getJavaClass(container)) {
+
+            return cls.findFieldByName(declaration.realName, true);
+        }
+    } else if (is Value declaration,
+        is AnnotationProxyClass container = declaration.container,
+        is PSIClass cls = container.iface.classMirror) {
+
+        return cls.psi.findMethodsByName(declaration.name, false).array.first;
+    }
+    return null;
+}
+
+shared class IdeaNavigation(Project project)
         extends AbstractNavigation<PsiElement,VirtualFile>() {
     
     filePath(VirtualFile file) => Path(file.path);
@@ -82,62 +143,9 @@ shared class IdeaNavigation(Project project)
     }
     
     shared actual PsiNameIdentifierOwner? gotoJavaNode(Declaration rawDeclaration) {
-        value declaration = if (is Function rawDeclaration, rawDeclaration.annotation)
-            then rawDeclaration.typeDeclaration
-            else rawDeclaration;
-
-        if (is LazyClass declaration) {
-            if (is PSIMethod meth = declaration.constructor,
-                meth.psi.canNavigate()) {
-                return meth.psi;
-            }
-            if (is PSIClass cls = declaration.classMirror) {
-                return cls.psi;
-            }
-        } else if (is LazyInterface declaration, is PSIClass cls = declaration.classMirror) {
-            return cls.psi;
-        } else if (is JavaMethod declaration, is PSIMethod meth = declaration.mirror) {
-            return meth.psi;
-        } else if (is JavaBeanValue declaration, is PSIMethod meth = declaration.mirror) {
-            return meth.psi;
-        } else if (is FieldValue declaration) {
-            if (is ClassOrInterface container = declaration.container,
-                exists cls = getJavaClass(container)) {
-
-                return cls.findFieldByName(declaration.realName, true);
-            }
-        } else if (is Value declaration,
-            is AnnotationProxyClass container = declaration.container,
-            is PSIClass cls = container.iface.classMirror) {
-
-            return cls.psi.findMethodsByName(declaration.name, false).array.first;
-        }
-        
-        return null;
+        return declarationToPsi(rawDeclaration);
     }
-    
-    PsiClass? getJavaClass(ClassOrInterface cls) {
-        if (is LazyClass cls, is PSIClass mirror = cls.classMirror) {
-            return mirror.psi;
-        }
-        else if (is LazyInterface cls, is PSIClass mirror = cls.classMirror) {
-            return mirror.psi;
-        }
-        value qn = cls.qualifiedNameString.replace("::", ".");
 
-        return concurrencyManager.withAlternateResolution {
-            func() => concurrencyManager.needIndexes(project, () {
-                value facade = JavaPsiFacade.getInstance(project);
-                value scope = GlobalSearchScope.allScope(project);
-    
-                if (exists psi = facade.findClass(qn, scope)) {
-                    return psi;
-                }
-                return null;
-            });
-        };
-    }
-    
     shared actual PsiElement? gotoLocation(Path? path,
         Integer offset, Integer length) {
         
