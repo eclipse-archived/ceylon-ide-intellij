@@ -13,14 +13,8 @@ import com.intellij.psi {
     PsiManager,
     PsiNameIdentifierOwner,
     PsiFile,
-    JavaPsiFacade,
     PsiClass,
-    PsiElement,
-    PsiMethod,
-    PsiField
-}
-import com.intellij.psi.search {
-    GlobalSearchScope
+    PsiElement
 }
 import com.intellij.psi.util {
     PsiTreeUtil
