@@ -12,13 +12,12 @@
 
     <!-- Set build directories for all formats. -->
     <property name="build.dir" value="${basedir}/build"/>
-    <property name="build.dist" value="../../ceylon/dist/dist"/>
-    <property name="ceylon.repo.dir" value="${build.dist}/repo"/>
     <property name="build.classes" location="${build.dir}/classes"/>
 
+    <property file="../plugin-ceylon-code/build.properties"/>
+    <property name="ceylon.repo.dir" value="${dist.repo.dir}"/>
     <property file="../../ceylon/common-build.properties"/>
     <property file="../../ceylon/lib/build.properties"/>
-    <property file="../plugin-ceylon-code/build.properties"/>
 
     <property name="src" location="src"/>
     <property name="gensrc" location="gensrc"/>
