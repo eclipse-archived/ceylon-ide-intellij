@@ -77,6 +77,10 @@ class IdeaInvocationCompletionProposal(Integer offset, String prefix, String des
                 declaration = declaration;
                 qualifyingDeclaration = qualifyingDeclaration;
                 value aliasedName {
+                    value nameInUnit = declaration.getName(ctx.lastCompilationUnit.unit);
+                    if (nameInUnit != declaration.name) {
+                        return nameInUnit;
+                    }
                     for (name in declaration.aliases) {
                         if (desc.startsWith(name.string)) {
                             return name.string;
