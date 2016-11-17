@@ -67,6 +67,12 @@
         </delete>
     </target>
 
+    <path id="grammar-common-classpath">
+        <pathelement location="${antlr.lib}"/>
+        <pathelement location="${dist.repo.dir}/${ceylon.typechecker.jar}"/>
+        <pathelement location="${dist.repo.dir}/${ceylon.model.jar}"/>
+    </path>
+
     <target name="treegen" depends="antlr.tree">
         <mkdir dir="${build.classes}"/>
         <javac
@@ -74,12 +80,7 @@
                 destdir="${build.classes}"
                 debug="true"
                 encoding="UTF-8">
-            <classpath>
-                <pathelement location="${antlr.lib}"/>
-                <pathelement location="${ceylon.typechecker.lib}"/>
-                <pathelement location="${ceylon.model.lib}"/>
-            </classpath>
-
+            <classpath refid="grammar-common-classpath"/>
             <include name="com/redhat/ceylon/compiler/typechecker/treegen/*.java"/>
         </javac>
     </target>
@@ -99,9 +100,7 @@
             <arg value="${NodesFile}"/>
             <arg path="gen"/>
             <classpath>
-                <pathelement location="${antlr.lib}"/>
-                <pathelement location="${ceylon.typechecker.lib}"/>
-                <pathelement location="${ceylon.model.lib}"/>
+                <path refid="grammar-common-classpath"/>
                 <pathelement location="${build.classes}"/>
             </classpath>
         </java>
@@ -111,9 +110,7 @@
                 debug="true"
                 encoding="UTF-8">
             <classpath>
-                <pathelement location="${antlr.lib}"/>
-                <pathelement location="${ceylon.typechecker.lib}"/>
-                <pathelement location="${ceylon.model.lib}"/>
+                <path refid="grammar-common-classpath"/>
                 <pathelement location="${ideaRoot}/lib/openapi.jar"/>
                 <pathelement location="${ideaRoot}/lib/util.jar"/>
                 <pathelement location="${ideaRoot}/lib/annotations.jar"/>
@@ -125,18 +122,14 @@
         <java classname="TokenTypesGenerator" dir="${basedir}" fork="yes">
             <arg path="gen"/>
             <classpath>
-                <pathelement location="${antlr.lib}"/>
-                <pathelement location="${ceylon.typechecker.lib}"/>
-                <pathelement location="${ceylon.model.lib}"/>
+                <path refid="grammar-common-classpath"/>
                 <pathelement location="${build.classes}"/>
             </classpath>
         </java>
         <java classname="CeylonPsiVisitorGenerator" dir="${basedir}" fork="yes">
             <arg path="gen"/>
             <classpath>
-                <pathelement location="${antlr.lib}"/>
-                <pathelement location="${ceylon.typechecker.lib}"/>
-                <pathelement location="${ceylon.model.lib}"/>
+                <path refid="grammar-common-classpath"/>
                 <pathelement location="${build.classes}"/>
                 <pathelement location="${ideaRoot}/lib/openapi.jar"/>
                 <pathelement location="${ideaRoot}/lib/util.jar"/>
