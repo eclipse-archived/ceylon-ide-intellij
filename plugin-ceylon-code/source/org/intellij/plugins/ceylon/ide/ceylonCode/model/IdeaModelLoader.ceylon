@@ -291,23 +291,24 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
            then project.configuration.projectJdkProvider
            else null;
 
-    shared actual FunctionalInterfaceType? getFunctionalInterfaceType(TypeMirror typeMirror) {
-        function noWildcard(PsiType type)
-            => if (is PsiWildcardType type, exists bound = type.bound) then bound else type;
+    getFunctionalInterfaceType(TypeMirror typeMirror) =>
+        concurrencyManager.dontCancel(() {
+            function noWildcard(PsiType type)
+                => if (is PsiWildcardType type, exists bound = type.bound) then bound else type;
 
-        if (is PSIType typeMirror,
-            exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi),
-            exists returnType = LambdaUtil.getFunctionalInterfaceReturnType(typeMirror.psi)) {
+            if (is PSIType typeMirror,
+                exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi),
+                exists returnType = LambdaUtil.getFunctionalInterfaceReturnType(typeMirror.psi)) {
 
-            value parameterTypes = Arrays.asList<TypeMirror>(
-                for (idx in 0..method.parameterList.parametersCount)
-                if (exists pType = LambdaUtil.getLambdaParameterFromType(typeMirror.psi, idx))
-                PSIType(noWildcard(pType))
-            );
-            return FunctionalInterfaceType(PSIMethod(pointer(method)), PSIType(noWildcard(returnType)), parameterTypes, method.varArgs);
-        }
-        return super.getFunctionalInterfaceType(typeMirror);
-    }
+                value parameterTypes = Arrays.asList<TypeMirror>(
+                    for (idx in 0..method.parameterList.parametersCount)
+                    if (exists pType = LambdaUtil.getLambdaParameterFromType(typeMirror.psi, idx))
+                    PSIType(noWildcard(pType))
+                );
+                return FunctionalInterfaceType(PSIMethod(pointer(method)), PSIType(noWildcard(returnType)), parameterTypes, method.varArgs);
+            }
+            return super.getFunctionalInterfaceType(typeMirror);
+        });
 
     isFunctionalInterface(ClassMirror klass) =>
             concurrencyManager.dontCancel(() =>
