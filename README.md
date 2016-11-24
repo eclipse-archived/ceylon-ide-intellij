@@ -64,10 +64,10 @@ have the ability to create Ceylon IntelliJ modules in which you can develop and 
    This will clone sibling projects including `../ceylon-sdk`, `../ceylon-ide-common`, and
    `../ceylon-ide-intellij`.
 
-2. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and change the following line
+2. Create a file `../ceylon-ide-intellij/plugin-ceylon-code/user-build.properties` and add the following line
    so that it points to your IntelliJ installation:
 
-        ideaRoot=/Applications/IntelliJ IDEA 2016.2 CE.app/Contents/
+        ideaRoot=/path/to/your/idea/install/
 
 3. Build the Ceylon distribution, SDK, and Ceylon IDE:
 

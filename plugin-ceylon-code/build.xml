@@ -1,5 +1,6 @@
 <project name="ceylon-ide-intellij (Ceylon code)" basedir="." default="build">
 
+    <property file="user-build.properties" />
     <property file="build.properties" />
     <property name="ceylon.verbosity" value="false" />
     <property name="ceylon.executable" value="${dist.bin.dir}/ceylon" />
