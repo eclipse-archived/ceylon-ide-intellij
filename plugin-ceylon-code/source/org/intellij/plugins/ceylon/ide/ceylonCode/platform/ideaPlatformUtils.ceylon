@@ -61,8 +61,8 @@ shared object ideaPlatformUtils satisfies IdeUtils {
         }
     }
 
-    newOperationCanceledException(String message) => ProcessCanceledException(OperationCanceledException(message));
-
+    newOperationCanceledException(String message)
+            => ProcessCanceledException(OperationCanceledException(message));
 
     isOperationCanceledException(Exception exception)
             => exception is ProcessCanceledException;
