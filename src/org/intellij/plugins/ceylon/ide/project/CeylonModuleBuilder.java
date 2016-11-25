@@ -2,8 +2,8 @@ package org.intellij.plugins.ceylon.ide.project;
 
 import ceylon.interop.java.CeylonStringIterable;
 import com.intellij.facet.FacetManager;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
-import com.intellij.ide.util.projectWizard.ModuleBuilderListener;
+import com.intellij.ide.util.projectWizard.*;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
@@ -22,6 +22,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.settings.CeylonSettings;
 import org.intellij.plugins.ceylon.ide.ceylonCode.settings.ceylonSettings_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.JpsElement;
 import org.jetbrains.jps.model.java.JavaResourceRootType;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
@@ -33,11 +34,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
+import static org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin.getEmbeddedCeylonDist;
 
 public class CeylonModuleBuilder extends JavaModuleBuilder {
 
     private PageOne pageOne;
     private PageTwo pageTwo;
+    private PageZero pageZero;
     private CeylonSettings ceylonSettings = ceylonSettings_.get_();
 
     private List<Pair<String, String>> mySourcePaths;
@@ -50,6 +53,12 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
                 ((TypeCheckerProvider) module.getComponent(ITypeCheckerProvider.class)).moduleAdded();
             }
         });
+    }
+
+    @Nullable
+    @Override
+    public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
+        return new PageZeroWizardStep(this);
     }
 
     @Override
@@ -113,6 +122,10 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
         projects.addProject(module);
         IdeaCeylonProject ceylonProject = (IdeaCeylonProject) projects.getProject(module);
 
+        if (pageZero.isCreateBootstrapFiles()) {
+            ceylonProject.createBootstrapFiles(getEmbeddedCeylonDist(), pageZero.getVersion());
+        }
+
         pageOne.apply(ceylonProject);
         pageTwo.apply(ceylonProject);
 
@@ -163,11 +176,15 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
         mySourcePaths.add(sourcePathInfo);
     }
 
-    public void setPageOne(PageOne pageOne) {
+    void setPageOne(PageOne pageOne) {
         this.pageOne = pageOne;
     }
 
-    public void setPageTwo(PageTwo pageTwo) {
+    void setPageTwo(PageTwo pageTwo) {
         this.pageTwo = pageTwo;
+    }
+
+    void setPageZero(PageZero pageZero) {
+        this.pageZero = pageZero;
     }
 }
