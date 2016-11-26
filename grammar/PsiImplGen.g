@@ -104,6 +104,8 @@ field : t=TYPE_NAME f=FIELD_NAME
         ';'
       | 'boolean' f=FIELD_NAME
         ';'
+      | 'string' f=FIELD_NAME
+        ';'
       | l=TYPE_NAME '<' t=TYPE_NAME '>' f=FIELD_NAME
         ';'
       | 'abstract' t=TYPE_NAME f=FIELD_NAME
