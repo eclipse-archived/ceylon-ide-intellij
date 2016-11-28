@@ -8,6 +8,7 @@ import com.intellij.ide.projectView.impl.ProjectRootsUtil;
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode;
 import com.intellij.ide.projectView.impl.nodes.PsiFileNode;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -15,6 +16,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.problems.WolfTheProblemSolver;
 import com.intellij.psi.PsiDirectory;
 import org.intellij.plugins.ceylon.ide.ceylonCode.util.icons_;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
@@ -194,6 +196,22 @@ public class ModuleTreeStructureProvider implements TreeStructureProvider, DumbA
         public void update(PresentationData presentation) {
             presentation.setPresentableText(moduleName);
             presentation.setIcon(icons_.get_().getModuleFolders());
+
+            Project project = getProject();
+
+            if (project != null
+                    && WolfTheProblemSolver.getInstance(project).hasProblemFilesBeneath(this::someChildContainsFile)) {
+
+                presentation.setAttributesKey(CodeInsightColors.ERRORS_ATTRIBUTES);
+            }
+        }
+
+        @NotNull
+        @Override
+        public Collection<VirtualFile> getRoots() {
+            return directory == null
+                    ? Collections.emptyList()
+                    : Collections.singletonList(directory.getVirtualFile());
         }
 
         @Override
