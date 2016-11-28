@@ -177,7 +177,7 @@ shared class CeylonReference(element, span = element,
             exists result = resolvedElement(target, project)) {
             return result;
         }
-        else if (exists declaration = nodes.getReferencedModel(node),
+        else if (exists declaration = nodes.getReferencedModel(referenceNode),
             exists location = resolveDeclaration(original(declaration), project)) {
             return location;
         }
