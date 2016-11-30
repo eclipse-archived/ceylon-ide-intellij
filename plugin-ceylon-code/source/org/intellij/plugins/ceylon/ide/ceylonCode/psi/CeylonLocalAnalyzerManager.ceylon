@@ -341,7 +341,7 @@ shared class CeylonLocalAnalyzerManager(model)
 
                 void triggerReparse() {
                     application.runReadAction(() {
-                        if (!fileViewProvider.virtualFile.valid) {
+                        if (model.ideaProject.isDisposed() || !fileViewProvider.virtualFile.valid) {
                             return;
                         }
                         try {
