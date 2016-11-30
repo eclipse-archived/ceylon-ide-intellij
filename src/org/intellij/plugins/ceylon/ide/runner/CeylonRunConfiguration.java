@@ -13,9 +13,9 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.ceylon.common.Backend;
 import org.apache.commons.lang.ObjectUtils;
+import org.intellij.plugins.ceylon.ide.ceylonCode.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.intellij.plugins.ceylon.ide.ceylonCode.model.findModuleByName_.findModuleByName;
+import static org.intellij.plugins.ceylon.ide.ceylonCode.model.getCeylonProject_.getCeylonProject;
 
 /**
  * Run configuration for Ceylon files.
@@ -81,8 +82,8 @@ class CeylonRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMo
 
                 Module module = getConfigurationModule().getModule();
                 if (module != null) {
-                    VirtualFile moduleRoot = module.getModuleFile().getParent();
-                    params.setWorkingDirectory(moduleRoot.getPath());
+                    IdeaCeylonProject ceylonProject = getCeylonProject(module);
+                    params.setWorkingDirectory(ceylonProject.getCeylonModulesOutputDirectory().getParentFile().getPath());
                 }
 
                 params.getProgramParametersList().add("--run", topLevelNameFull);
