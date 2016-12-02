@@ -70,6 +70,25 @@ shared object highlighter {
         return result.string;
     }
 
+    "Parses a message that contains code snippets in single quotes, and delegates the actual
+     highlighting to a callback."
+    shared void parseQuotedMessage(String message, Project project,
+        Boolean eliminateQuotes, Anything(String, TextAttributes?) callback) {
+
+        iterateTokens(message, eliminateQuotes, (token, highlightMode) {
+            switch(highlightMode)
+            case (is Boolean) {
+                highlightInternal(token, project, callback);
+            }
+            case (is TextAttributes) {
+                callback(token, highlightMode);
+            }
+            else {
+                callback(token, null);
+            }
+        });
+    }
+
     "Highlights a message that contains code snippets in single quotes, and add colored
      fragments to the given [[data]]."
     shared void highlightPresentationData(PresentationData data, String description,

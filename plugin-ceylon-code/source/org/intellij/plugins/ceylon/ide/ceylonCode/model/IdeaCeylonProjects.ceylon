@@ -34,10 +34,21 @@ import com.intellij.codeInsight.intention {
 import org.intellij.plugins.ceylon.ide.ceylonCode.correct {
     AbstractIntention
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode.messages {
+    BackendMessageHandler
+}
+import com.intellij.compiler.server {
+    BuildManagerListener,
+    CustomBuilderMessageHandler
+}
+import com.intellij.util.messages {
+    MessageBusConnection
+}
 
 shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
         extends CeylonProjects<IdeaModule,VirtualFile,VirtualFile,VirtualFile>()
         satisfies ProjectComponent {
+
     ideaPlatformServices.register();
     
     object ceylonProjectCleaner satisfies ModelListenerAdapter<IdeaModule,VirtualFile,VirtualFile,VirtualFile> {
@@ -46,13 +57,25 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
             ceylonProject.clean();
         }
     }
-    
+
+    value buildListener = BackendMessageHandler(ideaProject);
+    late MessageBusConnection busConnection;
+
     newNativeProject(IdeaModule ideArtifact) => IdeaCeylonProject(ideArtifact, this);
 
     componentName => "CeylonProjects";
 
-    initComponent() => addModelListener(ceylonProjectCleaner);
-    disposeComponent() => removeModelListener(ceylonProjectCleaner);
+    shared actual void initComponent() {
+        addModelListener(ceylonProjectCleaner);
+        busConnection = ideaProject.messageBus.connect();
+        busConnection.subscribe(BuildManagerListener.topic, buildListener);
+        busConnection.subscribe(CustomBuilderMessageHandler.topic, buildListener);
+    }
+
+    shared actual void disposeComponent() {
+        removeModelListener(ceylonProjectCleaner);
+        busConnection.disconnect();
+    }
 
 
     shared actual void projectClosed() {

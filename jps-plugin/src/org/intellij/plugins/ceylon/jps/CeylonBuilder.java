@@ -14,12 +14,12 @@ import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
 import org.jetbrains.jps.builders.FileProcessor;
-import org.jetbrains.jps.builders.java.JavaBuilderUtil;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.fs.FilesDelta;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
+import org.jetbrains.jps.incremental.messages.CustomBuilderMessage;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
@@ -36,6 +36,7 @@ import static com.redhat.ceylon.common.tools.ModuleWildcardsHelper.expandWildcar
 import static java.nio.file.Files.readAllLines;
 import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isCompileJavaIncrementally;
 import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isForcedRecompilationAllJavaModules;
+import static org.jetbrains.jps.model.serialization.JpsModelSerializationDataService.getBaseDirectory;
 
 class CeylonBuilder extends ModuleLevelBuilder {
 
@@ -117,7 +118,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
     }
 
     private ExitCode compile(final CompileContext ctx,
-                             ModuleChunk chunk,
+                             final ModuleChunk chunk,
                              List<File> filesToBuild,
                              JpsCeylonGlobalSettings settings) throws IOException {
 
@@ -162,6 +163,36 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 String absolutePath = file == null ? null : file.getAbsolutePath();
                 ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR,
                         message, absolutePath, -1, -1, -1, line, column));
+                customLog("error", file, line, column, message);
+            }
+
+            private void customLog(String kind, File file, long line, long column, String message) {
+
+                //noinspection Since15
+                String fileName = "";
+                if (file != null) {
+                    fileName = file.getPath();
+
+                    File baseDirectory = getBaseDirectory(ctx.getProjectDescriptor().getProject());
+                    if (baseDirectory != null) {
+                        fileName = baseDirectory.toPath().relativize(file.toPath()).toString();
+                    }
+
+                    fileName += "✝:" + line + ": ";
+                }
+
+                ctx.processMessage(
+                        new CustomBuilderMessage(
+                                BUILDER_NAME,
+                                kind,
+                                String.format(
+                                        "%s✝%s✝: %s",
+                                        fileName,
+                                        kind,
+                                        message
+                                )
+                        )
+                );
             }
 
             @Override
@@ -169,6 +200,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 String absolutePath = file == null ? null : file.getAbsolutePath();
                 ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.WARNING,
                         message, absolutePath, -1, -1, -1, line, column));
+                customLog("warning", file, line, column, message);
             }
 
             @Override
