@@ -75,18 +75,24 @@ shared class BackendMessageHandler(Project project)
                         else ConsoleViewContentType.normalOutput;
                     console.print(what, contentType);
                 });
+
             function part(Integer index)
                     => parts[index] else "";
 
+            value attrs = switch(messageType)
+            case ("error") errorAttrs
+            case ("warning") warningAttrs
+            else ConsoleViewContentType.normalOutput;
+
             if (parts.size == 3) {
                 console.print(part(0), ConsoleViewContentType.normalOutput);
-                console.print(part(1), messageType == "error" then errorAttrs else warningAttrs);
+                console.print(part(1), attrs);
                 color(part(2));
             }
             else {
                 console.print(part(0), fileAttrs);
                 console.print(part(1), ConsoleViewContentType.normalOutput);
-                console.print(part(2), messageType == "error" then errorAttrs else warningAttrs);
+                console.print(part(2), attrs);
                 color(part(3));
             }
 

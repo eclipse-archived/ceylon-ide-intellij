@@ -163,36 +163,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 String absolutePath = file == null ? null : file.getAbsolutePath();
                 ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR,
                         message, absolutePath, -1, -1, -1, line, column));
-                customLog("error", file, line, column, message);
-            }
-
-            private void customLog(String kind, File file, long line, long column, String message) {
-
-                //noinspection Since15
-                String fileName = "";
-                if (file != null) {
-                    fileName = file.getPath();
-
-                    File baseDirectory = getBaseDirectory(ctx.getProjectDescriptor().getProject());
-                    if (baseDirectory != null) {
-                        fileName = baseDirectory.toPath().relativize(file.toPath()).toString();
-                    }
-
-                    fileName += "✝:" + line + ": ";
-                }
-
-                ctx.processMessage(
-                        new CustomBuilderMessage(
-                                BUILDER_NAME,
-                                kind,
-                                String.format(
-                                        "%s✝%s✝: %s",
-                                        fileName,
-                                        kind,
-                                        message
-                                )
-                        )
-                );
+                customLog(ctx, "error", file, line, column, message);
             }
 
             @Override
@@ -200,7 +171,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
                 String absolutePath = file == null ? null : file.getAbsolutePath();
                 ctx.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.WARNING,
                         message, absolutePath, -1, -1, -1, line, column));
-                customLog("warning", file, line, column, message);
+                customLog(ctx, "warning", file, line, column, message);
             }
 
             @Override
@@ -225,6 +196,35 @@ class CeylonBuilder extends ModuleLevelBuilder {
         }
 
         return ExitCode.OK;
+    }
+
+    private void customLog(CompileContext ctx, String kind, File file, long line, long column, String message) {
+
+        //noinspection Since15
+        String fileName = "";
+        if (file != null) {
+            fileName = file.getPath();
+
+            File baseDirectory = getBaseDirectory(ctx.getProjectDescriptor().getProject());
+            if (baseDirectory != null) {
+                fileName = baseDirectory.toPath().relativize(file.toPath()).toString();
+            }
+
+            fileName += "✝:" + line + ": ";
+        }
+
+        ctx.processMessage(
+                new CustomBuilderMessage(
+                        BUILDER_NAME,
+                        kind,
+                        String.format(
+                                "%s✝%s✝: %s",
+                                fileName,
+                                kind,
+                                message
+                        )
+                )
+        );
     }
 
     private CompilerOptions buildOptions(ModuleChunk chunk, List<File> filesToBuild, boolean fullBuild) {
@@ -407,7 +407,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
         return "Ceylon " + backend.name() + " compiler";
     }
 
-    private static class CompileContextWriter extends Writer {
+    private class CompileContextWriter extends Writer {
         private final CompileContext ctx;
         private String previousLine;
 
@@ -457,6 +457,11 @@ class CeylonBuilder extends ModuleLevelBuilder {
                     kind,
                     msg
             ));
+            CeylonBuilder.this.customLog(
+                    ctx,
+                    kind.name().toLowerCase(),
+                    null, 0, 0, msg
+            );
         }
 
         @Override
