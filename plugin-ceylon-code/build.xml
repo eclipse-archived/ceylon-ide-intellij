@@ -178,7 +178,7 @@
             </classpath>
         </java>
         <javac
-                srcdir="${src}:${gen}"
+                srcdir="${src}:${gen}:grammar"
                 destdir="${build.classes}"
                 debug="true"
                 encoding="UTF-8">
@@ -229,5 +229,7 @@
     <target name="clean" description="Deletes the test-modules and modules directories">
         <delete dir="${out.repo}" />
         <delete dir="${gen}" />
+        <delete dir="${gensrc}" />
+        <delete dir="${build.classes}" />
     </target>
 </project>
