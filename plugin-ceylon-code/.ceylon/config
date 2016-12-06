@@ -11,6 +11,5 @@ lookup=../../ceylon-ide-common/repo
 
 [compiler]
 source=source
-source=src
 source=gen
 resource=resource
