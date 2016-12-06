@@ -12,7 +12,6 @@
     <property name="base.path" location="../../ceylon/lib"/>
     <property file="../../ceylon/lib/build.properties"/>
     <property file="../../ceylon/common-build.properties"/>
-    <property name="src" location="src"/>
     <property name="gensrc" location="gensrc"/>
     <property name="gen" location="gen"/>
     <property name="antlr.src" location="Ceylon.g"/>
@@ -178,7 +177,7 @@
             </classpath>
         </java>
         <javac
-                srcdir="${src}:${gen}:grammar"
+                srcdir="source:${gen}:grammar"
                 destdir="${build.classes}"
                 debug="true"
                 encoding="UTF-8">
@@ -219,7 +218,6 @@
                         mavenoverrides="${basedir}/overrides.xml"
                         out="${out.repo}">
             <source value="${basedir}/source"/>
-            <source value="${src}"/>
             <source value="${gen}"/>
             <reposet refid="reposet.compile"/>
             <moduleset refid="modules.source"/>

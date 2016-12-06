@@ -95,7 +95,7 @@
         <copy todir="${build.dir}/CeylonIDEA/classes">
             <fileset dir="${basedir}/jps-plugin/src" includes="META-INF/**"/>
         </copy>
-        <javac2 srcdir="${basedir}/src:${basedir}/plugin-ceylon-code/src:${basedir}/plugin-ceylon-code/gen"
+        <javac2 srcdir="${basedir}/src:${basedir}/plugin-ceylon-code/gen"
                destdir="${build.dir}/CeylonIDEA/classes"
                debug="true" debuglevel="lines,vars,source"
                classpathref="compile.ide.classpath">
