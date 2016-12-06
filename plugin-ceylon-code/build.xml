@@ -8,7 +8,17 @@
 
     <property name="ceylon.repo.dir" location="${user.home}/.ceylon/repo" />
 
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+    <!-- ANTLR -->
+    <property name="base.path" location="../../ceylon/lib"/>
+    <property file="../../ceylon/lib/build.properties"/>
+    <property file="../../ceylon/common-build.properties"/>
+    <property name="src" location="src"/>
+    <property name="gensrc" location="gensrc"/>
+    <property name="gen" location="gen"/>
+    <property name="antlr.src" location="Ceylon.g"/>
+    <property name="antlr.dst" location="${gensrc}"/>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
         <classpath>
             <pathelement location="${ceylon.root.dir}/lib/ant-contrib-1.0b3.jar"/>
         </classpath>
@@ -107,7 +117,100 @@
         <zip destfile="${intellij.repo.dir}/com.intellij.util-current.jar" whenempty="create" basedir="." excludes="**"/>
 	</target>
 
-    <target name="build" depends="ceylondefs,copy-intellij-dependencies">
+    <target name="antlr.tree"
+            description="Generate code from ANTLR grammar">
+        <mkdir dir="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"/>
+        <java classname="org.antlr.Tool" dir="${basedir}" fork="yes">
+            <arg value="-fo"/>
+            <arg value="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"/>
+            <arg value="grammar/IdeaAstTypesGen.g"/>
+            <arg value="grammar/PsiIntfGen.g"/>
+            <arg value="grammar/PsiImplGen.g"/>
+            <arg value="grammar/PsiFactoryGen.g"/>
+            <arg value="grammar/NodeToIElementTypeMapGen.g"/>
+            <classpath>
+                <pathelement location="${antlr.lib}"/>
+            </classpath>
+        </java>
+        <delete>
+            <fileset dir="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"
+                     includes="*.tokens"/>
+        </delete>
+    </target>
+
+    <path id="grammar-common-classpath">
+        <pathelement location="${antlr.lib}"/>
+        <pathelement location="${dist.repo.dir}/${ceylon.typechecker.jar}"/>
+        <pathelement location="${dist.repo.dir}/${ceylon.model.jar}"/>
+    </path>
+
+    <target name="treegen" depends="antlr.tree">
+        <mkdir dir="${build.classes}"/>
+        <javac
+                srcdir="grammar:${gensrc}"
+                destdir="${build.classes}"
+                debug="true"
+                encoding="UTF-8">
+            <classpath refid="grammar-common-classpath"/>
+            <include name="com/redhat/ceylon/compiler/typechecker/treegen/*.java"/>
+        </javac>
+    </target>
+
+    <target name="tree" depends="treegen"
+            description="Generate the tree builder code">
+        <fail message="The 'openapi.jar' archive of the IDEA installation could not be found. Please check that the 'ideaRoot' property is set or that the ant process is started with the IDEA-bundle Ant tool.">
+            <condition>
+                <not>
+                    <available file="${ideaRoot}/lib/openapi.jar" />
+                </not>
+            </condition>
+        </fail>
+
+        <mkdir dir="${basedir}/gen"/>
+
+        <property name="NodesFile" location="../../ceylon/typechecker/antlr/Ceylon.nodes"/>
+        <java classname="com.redhat.ceylon.compiler.typechecker.treegen.GenerateIdeaElements" dir="${basedir}" fork="yes">
+            <arg value="${NodesFile}"/>
+            <arg path="${gen}"/>
+            <classpath>
+                <path refid="grammar-common-classpath"/>
+                <pathelement location="${build.classes}"/>
+            </classpath>
+        </java>
+        <javac
+                srcdir="${src}:${gen}"
+                destdir="${build.classes}"
+                debug="true"
+                encoding="UTF-8">
+            <classpath>
+                <path refid="grammar-common-classpath"/>
+                <pathelement location="${ideaRoot}/lib/openapi.jar"/>
+                <pathelement location="${ideaRoot}/lib/util.jar"/>
+                <pathelement location="${ideaRoot}/lib/annotations.jar"/>
+            </classpath>
+
+            <include name="*.java"/>
+            <include name="org/intellij/plugins/ceylon/ide/ceylonCode/psi/CeylonPsi.java"/>
+        </javac>
+        <java classname="TokenTypesGenerator" dir="${basedir}" fork="yes">
+            <arg path="gen"/>
+            <classpath>
+                <path refid="grammar-common-classpath"/>
+                <pathelement location="${build.classes}"/>
+            </classpath>
+        </java>
+        <java classname="CeylonPsiVisitorGenerator" dir="${basedir}" fork="yes">
+            <arg path="gen"/>
+            <classpath>
+                <path refid="grammar-common-classpath"/>
+                <pathelement location="${build.classes}"/>
+                <pathelement location="${ideaRoot}/lib/openapi.jar"/>
+                <pathelement location="${ideaRoot}/lib/util.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="build" depends="tree,ceylondefs,copy-intellij-dependencies">
         <ceylon-compile executable="${ceylon.executable}"
                         verbose="${ceylon.verbosity}"
                         encoding="UTF-8"
@@ -116,8 +219,8 @@
                         mavenoverrides="${basedir}/overrides.xml"
                         out="${out.repo}">
             <source value="${basedir}/source"/>
-            <source value="${basedir}/src"/>
-            <source value="${basedir}/gen"/>
+            <source value="${src}"/>
+            <source value="${gen}"/>
             <reposet refid="reposet.compile"/>
             <moduleset refid="modules.source"/>
         </ceylon-compile>
@@ -125,5 +228,6 @@
 
     <target name="clean" description="Deletes the test-modules and modules directories">
         <delete dir="${out.repo}" />
+        <delete dir="${gen}" />
     </target>
 </project>
