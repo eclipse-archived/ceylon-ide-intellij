@@ -52,18 +52,23 @@ class IdeaModuleCompletionProposal(Integer offset, String prefix,
                applyInternal(doc);
             }));
 
+    "Used for nested proposals (autocompletion of module versions)."
     shared actual void newModuleProposal(ProposalsHolder proposals,
             ModuleVersionDetails details, DefaultRegion selection, LinkedMode linkedMode) {
         if (is IdeaProposalsHolder proposals) {
-            // TODO icon
             value version = details.version;
             proposals.add(newLookup {
                 description = version;
                 text = version;
-                icon = null;
+                icon = icons.moduleArchives;
             }
-            .withInsertHandler(CompletionHandler((context)
-                    => setSelection(ctx, selection.start, selection.end))));
+            .withInsertHandler((context, element) =>
+                setSelection {
+                    data = ctx;
+                    start = selection.start+element.lookupString.size+2;
+                    end = selection.start+element.lookupString.size+2;
+                }
+            ));
         }
     }
 
