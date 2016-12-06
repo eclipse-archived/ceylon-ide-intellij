@@ -152,7 +152,7 @@ public class CompilationUnitTranslator extends Visitor {
             that.handleException(e, visitor);
         }
 
-        if (that.getToken() != null && visitor.children.isEmpty()) {
+        if (token != null && that.getToken() != null && visitor.children.isEmpty()) {
             Token peek = customizedTokens.peek();
             if (getTokenLength(peek) == that.getEndIndex() - that.getStartIndex()) {
                 Token toRemove = customizedTokens.remove();
