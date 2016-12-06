@@ -213,18 +213,17 @@ class CeylonBuilder extends ModuleLevelBuilder {
             fileName += "✝:" + line + ": ";
         }
 
-        ctx.processMessage(
-                new CustomBuilderMessage(
-                        BUILDER_NAME,
-                        kind,
-                        String.format(
-                                "%s✝%s✝: %s",
-                                fileName,
-                                kind,
-                                message
-                        )
-                )
+        String toPrint = String.format(
+                "%s✝%s✝: %s",
+                fileName,
+                kind,
+                message
         );
+        if (kind.equals("")) {
+            toPrint = message;
+        }
+
+        ctx.processMessage(new CustomBuilderMessage(BUILDER_NAME, kind, toPrint));
     }
 
     private CompilerOptions buildOptions(ModuleChunk chunk, List<File> filesToBuild, boolean fullBuild) {
@@ -459,7 +458,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
             ));
             CeylonBuilder.this.customLog(
                     ctx,
-                    kind.name().toLowerCase(),
+                    "",
                     null, 0, 0, msg
             );
         }
