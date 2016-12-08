@@ -319,6 +319,15 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
             } catch(Throwable t) {
                 if (is ProcessCanceledException t) {
                     throw t;
+                } else if (is AssertionError t,
+                    t.message == "The PSI element should still exist") {
+
+                    // A PSI element has been invalidated, we should rebuild the project
+                    // to make sure we keep a consistent state.
+                    for (project in model.ceylonProjects) {
+                        project.build.requestFullBuild();
+                    }
+                    scheduleModelUpdate(0);
                 } else {
                     automaticModelUpdateEnabled = false;
                     

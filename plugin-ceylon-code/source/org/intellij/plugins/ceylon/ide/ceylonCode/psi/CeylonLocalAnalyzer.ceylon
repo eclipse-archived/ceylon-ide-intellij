@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    javaClass
+}
+
 import com.intellij.codeInsight.daemon {
     DaemonCodeAnalyzer
 }
@@ -96,7 +100,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
     concurrencyManager,
     getCeylonProjects,
-    getModelManager
+    getModelManager,
+    CeylonModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     CeylonLogger,
@@ -385,6 +390,21 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
             }
             typecheckSourceFile(currentResult, waitForModelInSeconds, cancellable);
             return currentResult.immutable;
+        } catch (AssertionError e) {
+            if (e.message == "The PSI element should still exist",
+                exists modelManager = ideaProject.getComponent(javaClass<CeylonModelManager>()),
+                exists projects = getCeylonProjects(ideaProject)) {
+
+                for (p in projects.ceylonProjects) {
+                    p.build.requestFullBuild();
+                }
+
+                modelManager.scheduleModelUpdate(0);
+            } else {
+                logger.errorThrowable(e);
+            }
+
+            return null;
         } finally {
             backgroundAnalysisDisabled = false;
             if (exists toSubmitAgain = 
