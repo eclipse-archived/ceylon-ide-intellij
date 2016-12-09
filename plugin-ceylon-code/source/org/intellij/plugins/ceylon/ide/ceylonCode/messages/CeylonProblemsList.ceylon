@@ -88,7 +88,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
-    CeylonModelManager,
     getCeylonProjects,
     getModelManager
 }
