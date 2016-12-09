@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.lang.cacheBuilder {
     DefaultWordsScanner
 }
@@ -21,12 +17,18 @@ import com.intellij.psi.tree {
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
+import com.redhat.ceylon.ide.common.typechecker {
+    AnalysisResult
+}
 import com.redhat.ceylon.ide.common.util {
     nodes
 }
 
 import java.lang {
     UnsupportedOperationException
+}
+import java.util.concurrent {
+    TimeUnit
 }
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.parser {
@@ -42,16 +44,10 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
     DeclarationPsiNameIdOwner
 }
-import com.redhat.ceylon.ide.common.typechecker {
-    AnalysisResult
-}
-import java.util.concurrent {
-    TimeUnit
-}
 
 shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
 
-    value logger = Logger.getInstance(javaClass<CeylonFindUsagesProvider>());
+    value logger = Logger.getInstance(`CeylonFindUsagesProvider`);
 
     wordsScanner
             => DefaultWordsScanner(CeylonAntlrToIntellijLexerAdapter(),

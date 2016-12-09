@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.lang.java {
     JavaLanguage
 }
@@ -158,12 +154,12 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
         });
     
     enclosingClass
-            => if (exists outerClass = getContextOfType(psi, javaClass<PsiClass>()))
+            => if (exists outerClass = getContextOfType(psi, `PsiClass`))
             then PSIClass(pointer(outerClass))
             else null;
     
     enclosingMethod
-            => if (exists outerMeth = getContextOfType(psi, javaClass<PsiMethod>()))
+            => if (exists outerMeth = getContextOfType(psi, `PsiMethod`))
             then PSIMethod(pointer(outerMeth))
             else null;
     

@@ -2,7 +2,6 @@ import ceylon.collection {
     ArrayList
 }
 import ceylon.interop.java {
-    javaClass,
     createJavaStringArray,
     createJavaObjectArray
 }
@@ -158,7 +157,7 @@ shared class CeylonGotoSymbolContributor() extends CeylonGotoContributor() {
 
 shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
 
-    value logger = Logger.getInstance(javaClass<CeylonGotoClassContributor>());
+    value logger = Logger.getInstance(`CeylonGotoClassContributor`);
 
     shared actual ObjectArray<NavigationItem> getItemsByName(String name, String pattern,
         Project project, Boolean includeNonProjectItems) {

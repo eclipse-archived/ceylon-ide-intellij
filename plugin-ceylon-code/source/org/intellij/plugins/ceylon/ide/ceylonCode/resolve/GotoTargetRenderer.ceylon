@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.codeInsight.navigation {
     GotoTargetRendererProvider,
     GotoTargetHandler
@@ -34,8 +30,6 @@ shared class GotoTargetRenderer()
         extends PsiElementListCellRenderer<PsiElement>()
         satisfies GotoTargetRendererProvider {
 
-    value declarationClass = javaClass<CeylonPsi.DeclarationPsi>();
-
     getRenderer(PsiElement psiElement, GotoTargetHandler.GotoData gotoData)
             => this;
 
@@ -47,7 +41,7 @@ shared class GotoTargetRenderer()
             exists loc = p.locationString) {
             return loc;
         }
-        else if (exists parent = PsiTreeUtil.getParentOfType(element, declarationClass)) {
+        else if (exists parent = PsiTreeUtil.getParentOfType(element, `CeylonPsi.DeclarationPsi`)) {
             return getContainerText(parent, string);
         }
         else {
@@ -61,7 +55,7 @@ shared class GotoTargetRenderer()
             exists text = p.presentableText) {
             return text;
         }
-        else if (exists parent = PsiTreeUtil.getParentOfType(element, declarationClass)) {
+        else if (exists parent = PsiTreeUtil.getParentOfType(element, `CeylonPsi.DeclarationPsi`)) {
             return getElementText(parent);
         }
         else {

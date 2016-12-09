@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.codeInsight.editorActions {
     CopyPastePreProcessor,
     CopyPastePostProcessor,
@@ -74,7 +70,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-DataFlavor flavor = DataFlavor(javaClass<CopiedReferences>(), "Copied References");
+DataFlavor flavor = DataFlavor(`CopiedReferences`, "Copied References");
 
 shared class CopiedReferences({<Declaration->String>*} references)
         satisfies TextBlockTransferableData {

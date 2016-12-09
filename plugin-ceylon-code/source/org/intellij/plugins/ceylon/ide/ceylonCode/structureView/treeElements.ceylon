@@ -87,7 +87,7 @@ class CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi myClass, Boolean isIn
             } else if (is Tree.SpecifierStatement node, node.refinement) {
                 value spec = PsiTreeUtil.getParentOfType(
                     myClass.containingFile.findElementAt(node.startIndex.intValue()),
-                    javaClass<CeylonPsi.SpecifierStatementPsi>()
+                    `CeylonPsi.SpecifierStatementPsi`
                 );
                 assert(exists spec);
                 elements.add(CeylonSpecifierTreeElement(spec));
@@ -120,7 +120,7 @@ class CeylonFileTreeElement(CeylonFile myElement)
         if (!compilationUnit.importList.imports.empty) {
             value imports = PsiTreeUtil.getChildrenOfType(
                 myElement.firstChild.firstChild,
-                javaClass<CeylonPsi.ImportPsi>()
+                `CeylonPsi.ImportPsi`
             );
             if (exists imports, imports.size>0) {
                 elements.add(CeylonImportListTreeElement(imports));
@@ -196,7 +196,7 @@ class CeylonObjectTreeElement(CeylonPsi.ObjectDefinitionPsi psiElement, Boolean 
                 } else if (is Tree.SpecifierStatement statement) {
                     value spec = PsiTreeUtil.getParentOfType(
                         el.containingFile.findElementAt(statement.startIndex.intValue()),
-                        javaClass<CeylonPsi.SpecifierStatementPsi>()
+                        `CeylonPsi.SpecifierStatementPsi`
                     );
                     assert(exists spec);
                     children.add(CeylonSpecifierTreeElement(spec));

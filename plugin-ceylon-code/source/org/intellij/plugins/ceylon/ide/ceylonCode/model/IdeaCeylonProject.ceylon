@@ -412,7 +412,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
             };
 
     void doWithLibraryModel(void func(IdeModifiableModelsProviderImpl provider, ModifiableRootModel mrm)) {
-        value lock = application.acquireWriteActionLock(javaClass<IdeaCeylonProject>());
+        value lock = application.acquireWriteActionLock(`IdeaCeylonProject`);
         value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
         value mrm = provider.getModifiableRootModel(ideArtifact);
 

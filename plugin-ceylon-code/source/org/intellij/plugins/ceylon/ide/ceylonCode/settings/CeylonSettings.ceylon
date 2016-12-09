@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.application {
     ApplicationManager
 }
@@ -15,7 +11,7 @@ import com.intellij.openapi.components {
 shared CeylonSettings ceylonSettings
         => if (ApplicationManager.application.isDisposed())
         then CeylonSettings()
-        else ServiceManager.getService(javaClass<CeylonSettings>());
+        else ServiceManager.getService(`CeylonSettings`);
 
 shared class CeylonOptions() {
     shared variable String defaultTargetVm = "jvm";

@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.codeInsight.editorActions.moveUpDown {
     LineRange,
     StatementUpDownMover
@@ -28,8 +24,8 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 
 shared class CeylonStatementUpDownMover() extends StatementUpDownMover() {
 
-    value statementClass = javaClass<CeylonPsi.StatementOrArgumentPsi>();
-    value blockClass = javaClass<CeylonPsi.BlockPsi>();
+    value statementClass = `CeylonPsi.StatementOrArgumentPsi`;
+    value blockClass = `CeylonPsi.BlockPsi`;
 
     object condition satisfies Condition<PsiElement> {
         \ivalue(PsiElement element)

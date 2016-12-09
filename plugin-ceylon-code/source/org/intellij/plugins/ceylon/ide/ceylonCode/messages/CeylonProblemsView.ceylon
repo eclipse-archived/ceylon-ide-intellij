@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    javaClass
-}
 
 import com.intellij.ide.impl {
     ContentManagerWatcher
@@ -44,7 +41,7 @@ String ceylonProblemsContentId = "";
 String toolWindowId = "Ceylon Problems";
 
 shared CeylonProblemsView getCeylonProblemsView(Project project)
-        => ServiceManager.getService(project, javaClass<CeylonProblemsView>());
+        => ServiceManager.getService(project, `CeylonProblemsView`);
 
 shared interface CeylonProblemsView {
     shared formal ContentManager contentManager;

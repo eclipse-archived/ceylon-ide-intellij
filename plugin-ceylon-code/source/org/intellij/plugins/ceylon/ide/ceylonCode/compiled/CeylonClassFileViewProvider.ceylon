@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.components {
     ServiceManager
 }
@@ -52,7 +48,7 @@ class CeylonClassFileFileViewProvider(VirtualFile virtualFile, PsiManager manage
     contents => ClsFileImpl.decompile(virtualFile);
 
     shared actual PsiFile? createFile(Project project, VirtualFile file, FileType fileType) {
-        value fileIndex = ServiceManager.getService(project, javaClass<FileIndexFacade>());
+        value fileIndex = ServiceManager.getService(project, `FileIndexFacade`);
         if (!fileIndex.isInLibraryClasses(file) && fileIndex.isInSource(file)) {
             assert (is PsiManagerImpl manager = this.manager);
             return PsiBinaryFileImpl(manager, this);

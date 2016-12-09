@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    createJavaObjectArray,
-    javaClass
+    createJavaObjectArray
 }
 
 import com.intellij.codeInsight.unwrap {
@@ -26,15 +25,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 }
 
 shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
-    value controlStatementClass = javaClass<CeylonPsi.ControlStatementPsi>();
-    value blockClass = javaClass<CeylonPsi.BlockPsi>();
 
     shared class Context() extends AbstractContext() {
 
         isWhiteSpace(PsiElement element) => element is PsiWhiteSpace;
 
         shared void extractStatements(PsiElement parent, PsiElement clause) {
-            if (exists block = PsiTreeUtil.getChildOfType(clause, blockClass),
+            if (exists block = PsiTreeUtil.getChildOfType(clause, `CeylonPsi.BlockPsi`),
                 block.children.size>0) {
                 value statements = block.children.array;
                 extract(statements.first, statements.last, parent);
@@ -53,12 +50,12 @@ shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
                 else super.getDescription(element);
 
         function controlStatementParent(PsiElement element) {
-            assert (exists immediate = PsiTreeUtil.getParentOfType(element, controlStatementClass));
+            assert (exists immediate = PsiTreeUtil.getParentOfType(element, `CeylonPsi.ControlStatementPsi`));
             variable value result = immediate;
             //jump up to the top of a chain of if/elses
             while (is CeylonPsi.BodyPsi body = result.parent,
                 body.ceylonNode.text != "{}",
-                exists parent = PsiTreeUtil.getParentOfType(result, controlStatementClass)) {
+                exists parent = PsiTreeUtil.getParentOfType(result, `CeylonPsi.ControlStatementPsi`)) {
                 result = parent;
             }
             return result;
@@ -77,7 +74,7 @@ shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
 
         isApplicableTo(PsiElement element)
                 => if (element is CeylonPsi.ControlClausePsi,
-                       exists block = PsiTreeUtil.getChildOfType(element, blockClass))
+                       exists block = PsiTreeUtil.getChildOfType(element, `CeylonPsi.BlockPsi`))
                 then block.children.size>0
                 else false;
     }

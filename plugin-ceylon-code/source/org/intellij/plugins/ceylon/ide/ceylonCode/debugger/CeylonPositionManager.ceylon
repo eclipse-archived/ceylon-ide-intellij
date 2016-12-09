@@ -1,6 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
 import ceylon.language {
     Integer
 }
@@ -173,14 +170,14 @@ class CeylonPositionManager(DebugProcess process) satisfies PositionManager {
 
     String? findClassBySourcePosition(SourcePosition position) {
         variable CeylonPsi.DeclarationPsi? declaration
-                = getParentOfType(position.elementAt, javaClass<CeylonPsi.ClassDefinitionPsi>(), javaClass<CeylonPsi.InterfaceDefinitionPsi>());
+                = getParentOfType(position.elementAt, `CeylonPsi.ClassDefinitionPsi`, `CeylonPsi.InterfaceDefinitionPsi`);
         variable Boolean useUnderscoreSuffix = false;
         if (!exists _ = declaration) {
-            declaration = getParentOfType(position.elementAt, javaClass<CeylonPsi.ObjectDefinitionPsi>());
+            declaration = getParentOfType(position.elementAt, `CeylonPsi.ObjectDefinitionPsi`);
             useUnderscoreSuffix = true;
         }
         if (!exists _ = declaration) {
-            declaration = getParentOfType(position.elementAt, javaClass<CeylonPsi.MethodDefinitionPsi>());
+            declaration = getParentOfType(position.elementAt, `CeylonPsi.MethodDefinitionPsi`);
             useUnderscoreSuffix = true;
         }
         if (exists decl = declaration,

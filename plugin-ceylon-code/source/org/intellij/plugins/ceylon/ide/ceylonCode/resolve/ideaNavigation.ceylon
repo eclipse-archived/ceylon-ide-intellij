@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.project {
     Project
 }
@@ -130,7 +126,7 @@ shared class IdeaNavigation(Project project)
         
         if (is PsiFile psiFile = PsiManager.getInstance(project).findFile(file)) {
             return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(),
-               javaClass<PsiElement>(), false);
+               `PsiElement`, false);
         }
         platformUtils.log(Status._WARNING, "Can't navigate to file " + file.path);
         return null;
@@ -149,7 +145,7 @@ shared class IdeaNavigation(Project project)
             is CeylonFile psiFile = PsiManager.getInstance(project).findFile(file)) {
 
             return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(),
-                javaClass<PsiElement>(), false);
+                `PsiElement`, false);
         }
         
         return null;

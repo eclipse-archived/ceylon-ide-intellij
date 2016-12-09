@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    javaClass,
     createJavaObjectArray
 }
 
@@ -38,12 +37,12 @@ import java.util {
     ArrayList
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
+    ceylonFileType
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonCompositeElement,
     CeylonPsi
-}
-import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
-    ceylonFileType
 }
 
 abstract class AbstractSurrounder() satisfies Surrounder {
@@ -88,22 +87,22 @@ object withIfSurrounder extends AbstractSurrounder() satisfies Surrounder {
 
         assert (exists ifStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
-            javaClass<CeylonPsi.IfStatementPsi>(), true));
+            `CeylonPsi.IfStatementPsi`, true));
         assert (exists block
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 17,
-            javaClass<CeylonPsi.BlockPsi>(), true));
+            `CeylonPsi.BlockPsi`, true));
         assert (exists throwStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 18,
-            javaClass<CeylonPsi.ThrowPsi>(), true));
+            `CeylonPsi.ThrowPsi`, true));
 
         value formatted = surround(elements, ifStatement, block, throwStatement);
 
         assert (exists ic
                 = PsiTreeUtil.findChildOfType(formatted,
-                    javaClass<CeylonPsi.IfClausePsi>(), true));
+                    `CeylonPsi.IfClausePsi`, true));
         assert (exists cl
                 = PsiTreeUtil.findChildOfType(ic,
-                    javaClass<CeylonPsi.ConditionListPsi>(), true));
+                    `CeylonPsi.ConditionListPsi`, true));
 
         value loc = cl.textOffset + 1;
         value len = cl.textLength - 2;
@@ -125,22 +124,22 @@ object withIfElseSurrounder extends AbstractSurrounder() satisfies Surrounder {
 
         assert (exists ifStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
-            javaClass<CeylonPsi.IfStatementPsi>(), true));
+            `CeylonPsi.IfStatementPsi`, true));
         assert (exists block
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 17,
-            javaClass<CeylonPsi.BlockPsi>(), true));
+            `CeylonPsi.BlockPsi`, true));
         assert (exists throwStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 18,
-            javaClass<CeylonPsi.ThrowPsi>(), true));
+            `CeylonPsi.ThrowPsi`, true));
 
         value formatted = surround(elements, ifStatement, block, throwStatement);
 
         assert (exists ic
                 = PsiTreeUtil.findChildOfType(formatted,
-                    javaClass<CeylonPsi.IfClausePsi>(), true));
+                    `CeylonPsi.IfClausePsi`, true));
         assert (exists cl
                 = PsiTreeUtil.findChildOfType(ic,
-                    javaClass<CeylonPsi.ConditionListPsi>(), true));
+                    `CeylonPsi.ConditionListPsi`, true));
 
         value loc = cl.textOffset + 1;
         value len = cl.textLength - 2;
@@ -162,25 +161,25 @@ object withTryCatchSurrounder extends AbstractSurrounder() satisfies Surrounder 
 
         assert (exists tryStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
-                    javaClass<CeylonPsi.TryCatchStatementPsi>(), true));
+                    `CeylonPsi.TryCatchStatementPsi`, true));
         assert (exists block
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 12,
-                    javaClass<CeylonPsi.BlockPsi>(), true));
+                    `CeylonPsi.BlockPsi`, true));
         assert (exists throwStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 13,
-                    javaClass<CeylonPsi.ThrowPsi>(), true));
+                    `CeylonPsi.ThrowPsi`, true));
 
         value formatted = surround(elements, tryStatement, block, throwStatement);
 
         assert (exists ct
                 = PsiTreeUtil.findChildOfType(formatted,
-                    javaClass<CeylonPsi.CatchClausePsi>(), true));
+                    `CeylonPsi.CatchClausePsi`, true));
         assert (exists bl
                 = PsiTreeUtil.findChildOfType(ct,
-                    javaClass<CeylonPsi.BlockPsi>(), true));
+                    `CeylonPsi.BlockPsi`, true));
         assert (exists pst
                 = PsiTreeUtil.findChildOfType(ct,
-                    javaClass<CeylonPsi.ExpressionStatementPsi>(), true));
+                    `CeylonPsi.ExpressionStatementPsi`, true));
 
         value loc = pst.textOffset;
         value len = pst.textLength - 1;
@@ -202,22 +201,22 @@ object withTryFinallySurrounder extends AbstractSurrounder() satisfies Surrounde
 
         assert (exists tryStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
-                    javaClass<CeylonPsi.TryCatchStatementPsi>(), true));
+                    `CeylonPsi.TryCatchStatementPsi`, true));
         assert (exists block
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 12,
-                    javaClass<CeylonPsi.BlockPsi>(), true));
+                    `CeylonPsi.BlockPsi`, true));
         assert (exists throwStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 13,
-                    javaClass<CeylonPsi.ThrowPsi>(), true));
+                    `CeylonPsi.ThrowPsi`, true));
 
         value formatted = surround(elements, tryStatement, block, throwStatement);
 
         assert (exists fin
                 = PsiTreeUtil.findChildOfType(formatted,
-                    javaClass<CeylonPsi.FinallyClausePsi>(), true));
+                    `CeylonPsi.FinallyClausePsi`, true));
         assert (exists bl
                 = PsiTreeUtil.findChildOfType(fin,
-                    javaClass<CeylonPsi.BlockPsi>(), true));
+                    `CeylonPsi.BlockPsi`, true));
 
         value loc = bl.textOffset + 1;
         return TextRange(loc, loc);
@@ -238,22 +237,22 @@ object withTryResourcesSurrounder extends AbstractSurrounder() satisfies Surroun
 
         assert (exists tryStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
-                    javaClass<CeylonPsi.TryCatchStatementPsi>(), true));
+                    `CeylonPsi.TryCatchStatementPsi`, true));
         assert (exists block
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 14,
-                    javaClass<CeylonPsi.BlockPsi>(), true));
+                    `CeylonPsi.BlockPsi`, true));
         assert (exists throwStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 15,
-                    javaClass<CeylonPsi.ThrowPsi>(), true));
+                    `CeylonPsi.ThrowPsi`, true));
 
         value formatted = surround(elements, tryStatement, block, throwStatement);
 
         assert (exists tc
                 = PsiTreeUtil.findChildOfType(formatted,
-                    javaClass<CeylonPsi.TryClausePsi>(), true));
+                    `CeylonPsi.TryClausePsi`, true));
         assert (exists rl
                 = PsiTreeUtil.findChildOfType(tc,
-                    javaClass<CeylonPsi.ResourceListPsi>(), true));
+                    `CeylonPsi.ResourceListPsi`, true));
 
         value loc = rl.textOffset + 1;
         value len = rl.textLength - 2;
@@ -275,22 +274,22 @@ object withWhileSurrounder extends AbstractSurrounder() satisfies Surrounder {
 
         assert (exists tryStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
-                    javaClass<CeylonPsi.WhileStatementPsi>(), true));
+                    `CeylonPsi.WhileStatementPsi`, true));
         assert (exists block
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 20,
-                    javaClass<CeylonPsi.BlockPsi>(), true));
+                    `CeylonPsi.BlockPsi`, true));
         assert (exists throwStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 21,
-                    javaClass<CeylonPsi.ThrowPsi>(), true));
+                    `CeylonPsi.ThrowPsi`, true));
 
         value formatted = surround(elements, tryStatement, block, throwStatement);
 
         assert (exists wc
                 = PsiTreeUtil.findChildOfType(formatted,
-                    javaClass<CeylonPsi.WhileClausePsi>(), true));
+                    `CeylonPsi.WhileClausePsi`, true));
         assert (exists cl
                 = PsiTreeUtil.findChildOfType(wc,
-                    javaClass<CeylonPsi.ConditionListPsi>(), true));
+                    `CeylonPsi.ConditionListPsi`, true));
 
         value loc = cl.textOffset + 1;
         value len = cl.textLength - 2;
@@ -312,22 +311,22 @@ object withForSurrounder extends AbstractSurrounder() satisfies Surrounder {
 
         assert (exists forStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 9,
-                    javaClass<CeylonPsi.ForStatementPsi>(), true));
+                    `CeylonPsi.ForStatementPsi`, true));
         assert (exists block
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 23,
-                    javaClass<CeylonPsi.BlockPsi>(), true));
+                    `CeylonPsi.BlockPsi`, true));
         assert (exists throwStatement
                 = PsiTreeUtil.findElementOfClassAtOffset(file, 24,
-                    javaClass<CeylonPsi.ThrowPsi>(), true));
+                    `CeylonPsi.ThrowPsi`, true));
 
         value formatted = surround(elements, forStatement, block, throwStatement);
 
         assert (exists fr
                 = PsiTreeUtil.findChildOfType(formatted,
-                    javaClass<CeylonPsi.ForClausePsi>(), true));
+                    `CeylonPsi.ForClausePsi`, true));
         assert (exists it
                 = PsiTreeUtil.findChildOfType(fr,
-                    javaClass<CeylonPsi.ForIteratorPsi>(), true));
+                    `CeylonPsi.ForIteratorPsi`, true));
 
         value loc = it.textOffset + 1;
         value len = it.textLength - 2;
@@ -361,12 +360,12 @@ shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
         value start
                 = if (is PsiWhiteSpace startElem)
                 then PsiTreeUtil.getNextSiblingOfType(startElem,
-                        javaClass<CeylonCompositeElement>())
+                        `CeylonCompositeElement`)
                 else startElem;
         value end
                 = if (is PsiWhiteSpace endElem)
                 then PsiTreeUtil.getPrevSiblingOfType(endElem,
-                        javaClass<CeylonCompositeElement>())
+                        `CeylonCompositeElement`)
                 else endElem;
 
         value first = PsiTreeUtil.findFirstParent(start, condition);
@@ -383,7 +382,7 @@ shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
         while (exists statement = current, statement!=last) {
             list.add(statement);
             current = PsiTreeUtil.getNextSiblingOfType(current,
-                        javaClass<CeylonPsi.StatementPsi>());
+                        `CeylonPsi.StatementPsi`);
         }
         list.add(last);
         return list.toArray(PsiElement.emptyArray);

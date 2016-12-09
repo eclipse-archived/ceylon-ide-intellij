@@ -3,7 +3,6 @@ import ceylon.collection {
 }
 import ceylon.interop.java {
     CeylonIterable,
-    javaClass,
     javaClassFromInstance
 }
 
@@ -463,7 +462,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                         
                         if (exists changedFile = changedCurrentlyEditedFiles.first,
                             changedCurrentlyEditedFiles.rest.empty) {
-                            value analyzerManager = model.ideaProject.getComponent(javaClass<CeylonLocalAnalyzerManager>());
+                            value analyzerManager = model.ideaProject.getComponent(`CeylonLocalAnalyzerManager`);
                             if (exists localAnalysisResult = analyzerManager[changedFile]?.result) {
                                 variable value shouldCancel = false;
                                 if (! localAnalysisResult.parsedRootNode.errors.empty) {

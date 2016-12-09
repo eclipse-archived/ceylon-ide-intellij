@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.execution {
     RunManagerEx
 }
@@ -26,6 +22,9 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
 
+import java.io {
+    File
+}
 import java.util {
     List
 }
@@ -36,9 +35,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile,
     CeylonPsi
-}
-import java.io {
-    File
 }
 
 Boolean importsJavaEE(List<Tree.ImportModule> importModules) {
@@ -71,7 +67,7 @@ shared class SwarmRunConfigurationProducer()
         if (exists element = context.psiLocation,
             exists file = element.containingFile,
             exists ceylonProject = getCeylonProject(file),
-            exists mod = PsiTreeUtil.getParentOfType(element, javaClass<CeylonPsi.ModuleDescriptorPsi>()),
+            exists mod = PsiTreeUtil.getParentOfType(element, `CeylonPsi.ModuleDescriptorPsi`),
             importsJavaEE(mod.ceylonNode.importModuleList.importModules)) {
 
             value modName = mod.ceylonNode.importPath.model.nameAsString;
@@ -92,7 +88,7 @@ shared class SwarmRunConfigurationProducer()
 
         if (is CeylonFile file = el.containingFile,
             exists ceylonProject = getCeylonProject(file),
-            exists mod = PsiTreeUtil.getParentOfType(el, javaClass<CeylonPsi.ModuleDescriptorPsi>()),
+            exists mod = PsiTreeUtil.getParentOfType(el, `CeylonPsi.ModuleDescriptorPsi`),
             importsJavaEE(mod.ceylonNode.importModuleList.importModules),
             is RunManagerEx runManager = context.runManager,
             exists modName = mod.ceylonNode.importPath?.model?.nameAsString,

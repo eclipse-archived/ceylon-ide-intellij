@@ -2,7 +2,6 @@ import ceylon.collection {
     HashMap
 }
 import ceylon.interop.java {
-    javaClass,
     javaString
 }
 
@@ -144,7 +143,7 @@ object groovyFileManipulator {
 
     <String->String>[] findDependencies(GroovyFile file, String type) {
         if (exists blck = getBlockByName(file, "dependencies"),
-            exists allExpressions = PsiTreeUtil.getChildrenOfType(blck, javaClass<GrMethodCall>())) {
+            exists allExpressions = PsiTreeUtil.getChildrenOfType(blck, `GrMethodCall`)) {
 
             value modules = HashMap<String, String>();
 
@@ -203,7 +202,7 @@ object groovyFileManipulator {
     }
 
     GrMethodCall? getCallExpressionByName(GrStatementOwner parent, String name) {
-        if (exists allExpressions = PsiTreeUtil.getChildrenOfType(parent, javaClass<GrMethodCall>())) {
+        if (exists allExpressions = PsiTreeUtil.getChildrenOfType(parent, `GrMethodCall`)) {
             for (expression in allExpressions) {
                 if (expression.invokedExpression.text == name) {
                     return expression;
@@ -239,7 +238,7 @@ object groovyFileManipulator {
     }
 
     GrClosableBlock? getBlockByName(PsiElement parent, String name) {
-        if (exists allExpressions = PsiTreeUtil.getChildrenOfType(parent, javaClass<GrMethodCallExpression>())) {
+        if (exists allExpressions = PsiTreeUtil.getChildrenOfType(parent, `GrMethodCallExpression`)) {
             for (expression in allExpressions) {
                 if (exists closureArg = expression.closureArguments[0],
                     expression.invokedExpression.text == name) {
@@ -287,7 +286,7 @@ object groovyFileManipulator {
     }
 
     GrApplicationStatement? getApplyStatement(GroovyFile file) {
-        if (exists applyStatement = PsiTreeUtil.getChildrenOfType(file, javaClass<GrApplicationStatement>())) {
+        if (exists applyStatement = PsiTreeUtil.getChildrenOfType(file, `GrApplicationStatement`)) {
             for (callExpression in applyStatement) {
                 if (callExpression.invokedExpression.text=="apply") {
                     return callExpression;
