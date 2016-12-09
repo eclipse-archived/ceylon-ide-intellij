@@ -68,8 +68,10 @@ shared class ExtractFunctionHandler() extends AbstractExtractHandler() {
         
         file.compilationUnit.visit(object extends Visitor() {
             shared actual void visit(Tree.Declaration that) {
-                if (that.startIndex.intValue()<=range.startOffset,
-                    that.endIndex.intValue()>=range.endOffset) {
+                if (exists start = that.startIndex,
+                    exists end = that.endIndex,
+                    start.intValue() <= range.startOffset,
+                    end.intValue() >= range.endOffset) {
                     super.visit(that);
                     if (!that is Tree.AttributeDeclaration) {
                         declarations.add(that);
