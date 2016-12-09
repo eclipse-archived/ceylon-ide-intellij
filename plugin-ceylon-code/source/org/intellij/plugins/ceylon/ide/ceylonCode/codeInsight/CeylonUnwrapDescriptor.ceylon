@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    createJavaObjectArray,
     javaClass
 }
 
@@ -23,6 +22,9 @@ import java.util {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonPsi
+}
+import java.lang {
+    ObjectArray
 }
 
 shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
@@ -82,6 +84,6 @@ shared class CeylonUnwrapDescriptor() extends UnwrapDescriptorBase() {
                 else false;
     }
 
-    createUnwrappers() => createJavaObjectArray { unwrapper };
+    createUnwrappers() => ObjectArray.with { unwrapper };
 
 }

@@ -2,7 +2,6 @@ import ceylon.collection {
     ArrayList
 }
 import ceylon.interop.java {
-    createJavaObjectArray,
     javaString
 }
 
@@ -57,13 +56,13 @@ shared class CeylonResolvable(ASTNode node)
                     exists model = parent.ceylonNode?.declaration,
                     model.native)
             //for native decs we need a ref per backend
-            then createJavaObjectArray {
+            then ObjectArray.with {
                 backendRef(Backends.header),
                 backendRef(Backends.java),
                 backendRef(Backends.js)
             }
             //otherwise there is just one
-            else createJavaObjectArray { reference };
+            else ObjectArray.with { reference };
 
     name => this is CeylonPsi.IdentifierPsi then text;
 
@@ -98,7 +97,7 @@ shared class CeylonDocResolvable(ASTNode node)
                     backend = Backends.header;
                 });
             }
-            return createJavaObjectArray(list);
+            return ObjectArray.with(list);
         }
         else {
             return PsiReference.emptyArray;

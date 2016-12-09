@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    createJavaObjectArray
-}
 
 import com.intellij.openapi.project {
     Project
@@ -53,7 +50,7 @@ String getJavaName(Declaration decl)
 shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache() {
     
     allClassNames
-            => createJavaObjectArray {
+            => ObjectArray.with {
                 if (exists projects = getCeylonProjects(project))
                 for (proj in projects.ceylonProjects)
                 if (exists modules = proj.modules)
@@ -117,7 +114,7 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
             }
         }
         
-        return createJavaObjectArray(classes);
+        return ObjectArray.with(classes);
     }
     
     getFieldsByName(String string, GlobalSearchScope globalSearchScope)

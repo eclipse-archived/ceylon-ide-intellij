@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaClass,
-    createJavaObjectArray
+    javaClass
 }
 
 import com.intellij.codeInsight {
@@ -389,7 +388,7 @@ shared class CeylonSurroundDescriptor() satisfies SurroundDescriptor {
         return list.toArray(PsiElement.emptyArray);
     }
 
-    surrounders => createJavaObjectArray {
+    surrounders => ObjectArray.with {
         withIfSurrounder,
         withIfElseSurrounder,
         withTryCatchSurrounder,

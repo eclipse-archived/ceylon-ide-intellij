@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    createJavaObjectArray
-}
-
 import com.intellij.lang {
     BracePair,
     PairedBraceMatcher
@@ -19,10 +15,13 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     TokenTypes,
     CeylonTokens
 }
+import java.lang {
+    ObjectArray
+}
 
 shared class CeylonBraceMatcher() satisfies PairedBraceMatcher {
 
-    pairs = createJavaObjectArray {
+    pairs = ObjectArray.with {
         BracePair(TokenTypes.lparen.tokenType, TokenTypes.rparen.tokenType, false),
         BracePair(TokenTypes.lbrace.tokenType, TokenTypes.rbrace.tokenType, true),
         BracePair(TokenTypes.lbracket.tokenType, TokenTypes.rbracket.tokenType, false)

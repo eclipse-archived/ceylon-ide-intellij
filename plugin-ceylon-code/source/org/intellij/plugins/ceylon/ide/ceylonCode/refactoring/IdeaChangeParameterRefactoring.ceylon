@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    createJavaObjectArray,
     javaString,
     CeylonIterable
 }
@@ -292,7 +291,7 @@ class MyParameterTableModel(IdeaChangeParameterRefactoring.ParameterList params,
         value typeColumn = MyTypeColumn();
         value nameColumn = MyNameColumn();
 
-        setColumnInfos(createJavaObjectArray<AnyColumnInfo>({typeColumn, nameColumn}));
+        setColumnInfos(ObjectArray<AnyColumnInfo>.with {typeColumn, nameColumn});
 
         return this;
     }
@@ -436,12 +435,12 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
             late variable EditorTextField myDefaultArgEditor;
 
             focusableComponents
-                    => createJavaObjectArray<JComponent>({
+                    => ObjectArray<JComponent>.with {
                         myTypeEditor.focusTarget,
                         myNameEditor.focusTarget,
                         myDefaultedCb,
                         myDefaultArgEditor.focusTarget
-                    });
+                    };
 
             preferredFocusedComponent => myTypeEditor.focusTarget;
 

@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    createJavaObjectArray,
     CeylonIterable
 }
 
@@ -53,8 +52,12 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
             if (exists psiElement = resolveDeclaration(refined, project)) {
                 value parentDescriptor = build(psiElement, refined);
                 value nodeDescriptor
-                        = CeylonHierarchyNodeDescriptor(element, model, parentDescriptor);
-                parentDescriptor.children = createJavaObjectArray { nodeDescriptor };
+                        = CeylonHierarchyNodeDescriptor {
+                            element = element;
+                            model = model;
+                            parent = parentDescriptor;
+                        };
+                parentDescriptor.children = ObjectArray(1, nodeDescriptor);
                 return nodeDescriptor;
             }
         }
@@ -65,11 +68,11 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
     aggregateSubtypes(CeylonHierarchyNodeDescriptor descriptor) {
         if (exists model = descriptor.model) {
             value subtypes = hierarchyManager.findSubtypes(model, CeylonIterable(phasedUnits));
-            return createJavaObjectArray({
+            return ObjectArray.with {
                 for (declaration in subtypes)
                     if (exists psiElement = resolveDeclaration(declaration, project))
                         CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor)
-            });
+            };
         }
         return noDescriptors;
     }
@@ -78,11 +81,11 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
     aggregateSupertypes(CeylonHierarchyNodeDescriptor descriptor) {
         if (exists model = descriptor.model) {
             value supertypes = hierarchyManager.findSupertypes(model);
-            return createJavaObjectArray({
+            return ObjectArray.with {
                 for (declaration in supertypes)
                 if (exists psiElement = resolveDeclaration(declaration, project))
                     CeylonHierarchyNodeDescriptor(psiElement, declaration, descriptor)
-            });
+            };
         }
         return noDescriptors;
     }

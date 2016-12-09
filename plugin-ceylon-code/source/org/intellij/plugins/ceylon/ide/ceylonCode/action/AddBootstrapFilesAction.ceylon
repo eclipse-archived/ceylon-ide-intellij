@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    createJavaStringArray
-}
-
 import com.intellij.notification {
     Notifications,
     Notification,
@@ -33,6 +29,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     getCeylonProjects
 }
+import java.lang {
+    ObjectArray
+}
 
 shared class AddBootstrapFilesAction() extends AnAction() {
     
@@ -49,7 +48,7 @@ shared class AddBootstrapFilesAction() extends AnAction() {
                         "Select a Ceylon version",
                         messages.bootstrap.title,
                         JOptionPane.questionMessage, null,
-                        createJavaStringArray(versions),
+                        ObjectArray.with(versions),
                         versions.first)) {
 
             value repo = tcInvoker.embeddedCeylonDist;

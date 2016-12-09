@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    createJavaObjectArray
-}
 
 import com.intellij.codeInsight.navigation.actions {
     TypeDeclarationProvider
@@ -94,7 +91,10 @@ shared class CeylonTypeDeclarationProvider() satisfies TypeDeclarationProvider {
             return null;
         }
         value project = psiElement.project;
-        return createJavaObjectArray { for (dec in list) resolveDeclaration(dec, project) };
+        return ObjectArray.with {
+                for (dec in list)
+                resolveDeclaration(dec, project)
+        };
     }
 
 }

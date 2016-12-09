@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    createJavaObjectArray,
     JavaStringMap,
     JavaMap
 }
@@ -40,6 +39,9 @@ import java.awt {
 
 import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
+}
+import java.lang {
+    ObjectArray
 }
 
 
@@ -84,7 +86,7 @@ shared abstract class AbstractCeylonColorSettingsPage()
     ]
     .collect(([name, key]) => AttributesDescriptor(name, key));
 
-    attributeDescriptors => createJavaObjectArray(ourDescriptors);
+    attributeDescriptors => ObjectArray.with(ourDescriptors);
 
     colorDescriptors => ColorDescriptor.emptyArray;
 

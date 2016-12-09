@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    createJavaObjectArray,
     javaClass
 }
 
@@ -36,7 +35,8 @@ import com.redhat.ceylon.model.typechecker.model {
 
 import java.lang {
     Class,
-    UnsupportedOperationException
+    UnsupportedOperationException,
+    ObjectArray
 }
 import java.util {
     ...
@@ -165,13 +165,22 @@ class CeylonFileTreeModel(CeylonFile psiFile)
         name => "KIND";
     }
 
-    value _nodeProviders = Collections.singletonList<NodeProvider<out TreeElement>>(CeylonInheritedMembersNodeProvider());
-    value _sorters = createJavaObjectArray<Sorter>({
-        KindSorter(), VisibilitySorter.instance, Sorter.alphaSorter });
-    value _classes = createJavaObjectArray<Class<out Object>>({
-        javaClass<CeylonPsi.DeclarationPsi>(), javaClass<CeylonPsi.SpecifierStatementPsi>() });
-    value _filters = createJavaObjectArray<Filter>({ UnsharedDeclarationsFilter() });
-    value _groupers = createJavaObjectArray<Grouper>({ SupertypesGrouper() });
+    value _nodeProviders
+            = Collections.singletonList<NodeProvider<out TreeElement>>
+                (CeylonInheritedMembersNodeProvider());
+    value _sorters
+            = ObjectArray<Sorter>.with {
+                KindSorter(),
+                VisibilitySorter.instance,
+                Sorter.alphaSorter };
+    value _classes
+            = ObjectArray<Class<out Object>>.with {
+                javaClass<CeylonPsi.DeclarationPsi>(),
+                javaClass<CeylonPsi.SpecifierStatementPsi>() };
+    value _filters
+            = ObjectArray<Filter>.with { UnsharedDeclarationsFilter() };
+    value _groupers
+            = ObjectArray<Grouper>.with { SupertypesGrouper() };
 
     nodeProviders => _nodeProviders;
 

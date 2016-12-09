@@ -1,7 +1,4 @@
-/*import ceylon.interop.java {
-    createJavaObjectArray
-}
-import ceylon.language {
+/*import ceylon.language {
     Tuple
 }
 
@@ -141,7 +138,7 @@ shared class CeylonDocProvider()
                     generator.DocParams(pu, element.project));
             }
             if (element.containingFile exists) {
-                value puRef = createJavaObjectArray<PhasedUnit> { null };
+                value puRef = ObjectArray<PhasedUnit>.with { null };
                 ConcurrencyManagerForJava.withAlternateResolution(object satisfies Callable<Object> {
                     shared actual Object? call() {
                         assert (is CeylonFile file = element.containingFile);

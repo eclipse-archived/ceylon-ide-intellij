@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    createJavaObjectArray
-}
 
 import com.intellij.codeInsight.lookup {
     LookupElement
@@ -40,6 +37,9 @@ import com.redhat.ceylon.ide.common.platform {
 import org.intellij.plugins.ceylon.ide.ceylonCode.completion {
     installCustomLookupCellRenderer,
     IdeaListProposalsHolder
+}
+import java.lang {
+    ObjectArray
 }
 
 shared class IdeaLinkedMode(IdeaDocument document) extends LinkedMode(document) {
@@ -89,7 +89,7 @@ class IdeaLinkedModeModel() {
             value text = editor.document.getText(range);
             value proposals = object extends Expression() {
                 calculateLookupItems(ExpressionContext? expressionContext)
-                        => createJavaObjectArray(elements);
+                        => ObjectArray.with(elements);
                 calculateQuickResult(ExpressionContext? expressionContext) => TextResult(text);
                 calculateResult(ExpressionContext? expressionContext) => TextResult(text);
             };

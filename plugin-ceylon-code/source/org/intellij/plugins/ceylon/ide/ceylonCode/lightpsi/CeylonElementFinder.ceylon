@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    createJavaObjectArray
-}
-
 import com.intellij.psi {
     PsiElementFinder,
     PsiClass,
@@ -85,7 +81,7 @@ shared class CeylonElementFinder() extends PsiElementFinder() {
                     
                     for (pack in newArrayList(mod.packages)) {
                         if (pack.qualifiedNameString == fqName) {
-                            return createJavaObjectArray<PsiClass> {
+                            return ObjectArray<PsiClass>.with {
                                 for (dec in pack.members)
                                 if (is ClassOrInterface|FunctionOrValue dec,
                                     dec.unit is CeylonUnit)

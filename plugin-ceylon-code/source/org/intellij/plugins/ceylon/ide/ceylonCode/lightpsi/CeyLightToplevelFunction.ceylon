@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    createJavaObjectArray
-}
-
 import com.intellij.openapi.project {
     Project
 }
@@ -160,10 +156,11 @@ class CeyLightToplevelFunction(declaration, project)
     
     superTypes => ObjectArray<PsiClassType>(0);
     
-    supers => createJavaObjectArray<PsiClass>({
+    supers => ObjectArray<PsiClass>.with {
         JavaPsiFacade.getInstance(project)
-            .findClass(CommonClassNames.javaLangObject, GlobalSearchScope.allScope(project))
-    });
+            .findClass(CommonClassNames.javaLangObject,
+                       GlobalSearchScope.allScope(project))
+    };
     
     typeParameterList => null;
     
@@ -176,7 +173,7 @@ class CeyLightToplevelFunction(declaration, project)
     variable ObjectArray<PsiMethod>? lazyMethods = null;
 
     allMethods
-            => lazyMethods else (lazyMethods = createJavaObjectArray {
+            => lazyMethods else (lazyMethods = ObjectArray.with {
             for (m in mirror.directMethods)
             if (is AbstractMethodMirror m)
             CeyLightMethod(this, m, project)

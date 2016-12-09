@@ -3,8 +3,7 @@ import ceylon.collection {
 }
 import ceylon.interop.java {
     javaClass,
-    javaString,
-    createJavaObjectArray
+    javaString
 }
 
 import com.intellij.codeInsight {
@@ -71,7 +70,8 @@ import java.io {
 }
 import java.lang {
     JBoolean=Boolean,
-    ReflectiveOperationException
+    ReflectiveOperationException,
+    ObjectArray
 }
 import java.util {
     Properties,
@@ -158,7 +158,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             }
 
             ceylonProject.configuration.ceylonConfig.setOptionValues("compiler.apt",
-                createJavaObjectArray(existingApt));
+                ObjectArray.with(existingApt));
 
             ConfigWriter.instance().write(ceylonProject.configuration.ceylonConfig,
                 ceylonProject.configuration.projectConfigFile);

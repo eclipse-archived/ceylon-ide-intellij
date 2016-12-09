@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    createJavaObjectArray
-}
-
 import com.intellij.ide.hierarchy {
     HierarchyNodeDescriptor,
     HierarchyProvider,
@@ -74,8 +70,12 @@ class CeylonTypeHierarchyBrowser(Project project, PsiElement element)
                 if (exists psiElement = resolveDeclaration(extended, project),
                     exists parentDescriptor = build(skipConstructorElement(psiElement), extended)) {
                     value nodeDescriptor
-                            = CeylonHierarchyNodeDescriptor(element, dec, parentDescriptor);
-                    parentDescriptor.children = createJavaObjectArray { nodeDescriptor };
+                            = CeylonHierarchyNodeDescriptor {
+                                element = element;
+                                model = dec;
+                                parent = parentDescriptor;
+                            };
+                    parentDescriptor.children = ObjectArray(1, nodeDescriptor);
                     return nodeDescriptor;
                 }
             }

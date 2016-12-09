@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    createJavaObjectArray
-}
-
 import com.intellij.ide.structureView.impl.common {
     PsiTreeElementBase
 }
@@ -58,8 +54,8 @@ shared class UnsharedDeclarationsFilter()
     }
 
     shared /*actual*/ ObjectArray<Shortcut> shortcut {
-        return createJavaObjectArray<Shortcut>({
+        return ObjectArray<Shortcut>.with {
             KeyboardShortcut.fromString(if (SystemInfo.isMac) then "meta U" else "control U")
-        });
+        };
     }
 }

@@ -3,8 +3,7 @@ import ceylon.collection {
 }
 import ceylon.interop.java {
     javaClass,
-    createJavaStringArray,
-    createJavaObjectArray
+    javaString
 }
 
 import com.intellij.navigation {
@@ -172,7 +171,7 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
             return true;
         });
 
-        return createJavaObjectArray(items);
+        return ObjectArray.with(items);
     }
 
     shared actual ObjectArray<JString> getNames(Project project, Boolean includeNonProjectItems) {
@@ -187,7 +186,7 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
 
         logger.debug("Got names in ``system.nanoseconds - start``ns");
 
-        return createJavaStringArray(names);
+        return ObjectArray.with(names.map(javaString));
     }
 
     shared actual String? getQualifiedName(NavigationItem item) {
