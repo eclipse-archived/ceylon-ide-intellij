@@ -87,6 +87,13 @@
                           tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
                 </then>
             </elseif>
+            <elseif>
+                <available file="${ideaRoot}/plugins/maven/lib/${moduleToImport}"/>
+                <then>
+                    <copy file="${ideaRoot}/plugins/maven/lib/${moduleToImport}"
+                          tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+                </then>
+            </elseif>
             <else>
                 <fail message="Failed to find required dependency '${moduleToImport}' in IntelliJ installation"/>
             </else>

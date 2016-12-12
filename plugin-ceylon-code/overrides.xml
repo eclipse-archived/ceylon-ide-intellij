@@ -41,6 +41,12 @@
         <add module="com.intellij.openapi" version="current" shared="false"/>
     </module>
 
+    <module module="org.intellij.maven">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+        <add module="com.intellij.openapi" version="current" shared="false"/>
+        <add module="org.jdom" version="current"/>
+    </module>
+
     <module module="com.intellij.util">
         <add module="com.intellij.idea" version="current" shared="false"/>
     </module>
