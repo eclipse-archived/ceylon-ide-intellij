@@ -36,7 +36,8 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
     }
 
     @Override
-    public void addFacetToModule(final Module module, @Nullable String jdkProvider) {
+    public void addFacetToModule(final Module module, @Nullable String jdkProvider,
+                                 boolean forAndroid, boolean showSettings) {
         if (ceylonModel == null) {
             ceylonModel = module.getProject().getComponent(IdeaCeylonProjects.class);
             ceylonModel.addProject(module);
@@ -44,7 +45,9 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
 
         IdeaCeylonProject ceylonProject = (IdeaCeylonProject) ceylonModel.getProject(module);
 
-        ceylonProject.$setupForAndroid(jdkProvider);
+        if (forAndroid) {
+            ceylonProject.$setupForAndroid(jdkProvider);
+        }
 
         ceylonProject.getConfiguration().save();
 
@@ -61,8 +64,9 @@ public class TypeCheckerProvider implements ModuleComponent, ITypeCheckerProvide
             facet.getConfiguration().setModule(module);
         }
 
-        ModulesConfigurator.showFacetSettingsDialog(facet, CeylonFacetConfiguration.COMPILATION_TAB);
-
+        if (showSettings) {
+            ModulesConfigurator.showFacetSettingsDialog(facet, CeylonFacetConfiguration.COMPILATION_TAB);
+        }
     }
 
     @Override

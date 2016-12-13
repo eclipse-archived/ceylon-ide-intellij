@@ -9,5 +9,6 @@ public interface ITypeCheckerProvider {
     TypeChecker getTypeChecker();
 
     // TODO move somewhere else
-    void addFacetToModule(Module module, @Nullable String jdkProvider);
+    void addFacetToModule(Module module, @Nullable String jdkProvider,
+                          boolean forAndroid, boolean showSettings);
 }

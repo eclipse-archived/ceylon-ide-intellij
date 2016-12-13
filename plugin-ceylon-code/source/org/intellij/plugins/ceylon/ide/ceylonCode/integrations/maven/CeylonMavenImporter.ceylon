@@ -23,6 +23,9 @@ import java.util {
     Map
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode.model {
+    getCeylonProjects
+}
 import org.jdom {
     Element
 }
@@ -45,31 +48,73 @@ import org.jetbrains.jps.model.java {
 import org.jetbrains.jps.model.\imodule {
     JpsModuleSourceRootType
 }
+import org.intellij.plugins.ceylon.ide.ceylonCode {
+    ITypeCheckerProvider
+}
 
 "Automatically configures Ceylon source roots from the POM."
 shared class CeylonMavenImporter()
         extends WorkaroundForIssue6829("org.ceylon-lang", "ceylon-maven-plugin") {
 
-    preProcess(Module \imodule, MavenProject mavenProject,
+    shared actual void preProcess(Module \imodule, MavenProject mavenProject,
         MavenProjectChanges mavenProjectChanges,
-        IdeModifiableModelsProvider ideModifiableModelsProvider)
-            => noop();
+        IdeModifiableModelsProvider ideModifiableModelsProvider) {
 
-    process(IdeModifiableModelsProvider ideModifiableModelsProvider,
-        Module \imodule, MavenRootModelAdapter mavenRootModelAdapter,
+        if (exists model = getCeylonProjects(\imodule.project)) {
+            model.addProject(\imodule);
+        }
+    }
+
+    function pluginConfiguration(MavenProject mavenProject) =>
+            mavenProject.getPluginExecutionConfiguration(
+                "org.ceylon-lang",
+                "ceylon-maven-plugin",
+                "default"
+            );
+
+    shared actual void process(IdeModifiableModelsProvider ideModifiableModelsProvider,
+        Module mod, MavenRootModelAdapter mavenRootModelAdapter,
         MavenProjectsTree mavenProjectsTree, MavenProject mavenProject,
         MavenProjectChanges mavenProjectChanges,
-        Map<MavenProject,JString> map, JList<MavenProjectsProcessorTask> list)
-            => noop();
+        Map<MavenProject,JString> map, JList<MavenProjectsProcessorTask> list) {
+
+        if (exists project = getCeylonProjects(mod.project)?.getProject(mod),
+            exists el = pluginConfiguration(mavenProject)) {
+
+            value sources = getChildren(el, "sources", "source", "directory");
+            if (sources.empty) {
+                project.configuration.projectSourceDirectories = {"src/main/ceylon"};
+            } else {
+                project.configuration.projectSourceDirectories = sources.map(Element.text);
+            }
+
+            value resources = getChildren(el, "resources", "resource", "directory");
+            project.configuration.projectResourceDirectories = resources.map(Element.text);
+
+            value userRepos = getChildren(el, "userRepos", "userRepo");
+            project.configuration.projectLocalRepos = userRepos.map(Element.text).sequence();
+
+            if (exists outputRepo = getChildren(el, "out").first) {
+                project.configuration.outputRepo = outputRepo.text;
+            } else {
+                project.configuration.outputRepo = "target/modules";
+            }
+
+            value javacOptions = getChildren(el, "javacOptions");
+            project.configuration.javacOptions = javacOptions.map(Element.text);
+
+            project.configuration.save();
+
+            if (exists provider = mod.getComponent(`ITypeCheckerProvider`)) {
+                provider.addFacetToModule(mod, null, false, false);
+            }
+        }
+    }
 
     shared actual void myCollectSourceRoots(MavenProject mavenProject,
         PairConsumer<JString,JpsModuleSourceRootType<out JpsElement>> result) {
 
-        Element? el = mavenProject.getPluginExecutionConfiguration(
-            "org.ceylon-lang",
-            "ceylon-maven-plugin",
-            "default"
-        );
+        Element? el = pluginConfiguration(mavenProject);
 
         value sources = getChildren(el, "sources", "source", "directory");
 
