@@ -23,6 +23,7 @@
         <add module="com.intellij.asm" version="current" shared="true"/>
         <add module="org.jdom" version="current"/>
         <add module="jdk.tools" version="current"/>
+        <add module="java.base" version="7"/>
         <!--<filter>-->
             <!--<exclude path="com/intellij/util/containers/*"/>-->
             <!--<exclude path="com/intellij/codeInsight/highlighting/*"/>-->
