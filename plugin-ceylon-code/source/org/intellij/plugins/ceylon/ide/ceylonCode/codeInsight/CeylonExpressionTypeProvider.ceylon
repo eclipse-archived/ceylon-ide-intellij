@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.lang {
     ExpressionTypeProvider
 }
@@ -43,20 +39,17 @@ shared class CeylonExpressionTypeProvider()
 
     errorHint => "No expression found";
 
-    value termType = javaClass<CeylonPsi.TermPsi>();
-    value modifierType = javaClass<CeylonPsi.LocalModifierPsi>();
-
     shared actual List<CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi>
     getExpressionsAt(PsiElement psiElement) {
         value list = ArrayList<CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi>();
         //TODO: this doesn't work because there are never any
         //      CeylonPsi.LocalModifierPsi nodes in the tree!
-        if (exists mod = getParentOfType(psiElement, modifierType)) {
+        if (exists mod = getParentOfType(psiElement, `CeylonPsi.LocalModifierPsi`)) {
             list.add(mod);
         }
         else {
             variable value expression = psiElement;
-            while (exists ex = getParentOfType(expression, termType)) {
+            while (exists ex = getParentOfType(expression, `CeylonPsi.TermPsi`)) {
                 if (!ex is CeylonPsi.ExpressionPsi, !ex in list) {
                     list.add(ex);
                 }

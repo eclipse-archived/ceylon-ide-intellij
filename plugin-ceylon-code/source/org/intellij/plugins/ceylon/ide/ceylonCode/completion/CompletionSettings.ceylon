@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.application {
     ApplicationManager
 }
@@ -32,4 +28,4 @@ shared class CompletionSettings() satisfies PersistentStateComponent<CompletionO
 shared CompletionSettings completionSettings
         => ApplicationManager.application.isDisposed()
         then CompletionSettings()
-        else ServiceManager.getService(javaClass<CompletionSettings>());
+        else ServiceManager.getService(`CompletionSettings`);

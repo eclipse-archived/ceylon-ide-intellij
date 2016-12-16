@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.lang.refactoring {
     NamesValidator
 }
@@ -59,7 +55,7 @@ shared class CeylonRenameTypeInputValidator() satisfies RenameInputValidatorEx {
 
     isInputValid(String newName, PsiElement element, ProcessingContext processingContext) => true;
 
-    pattern => PlatformPatterns.psiElement(javaClass<CeylonPsi.TypeDeclarationPsi>());
+    pattern => PlatformPatterns.psiElement(`CeylonPsi.TypeDeclarationPsi`);
 
 }
 
@@ -87,7 +83,7 @@ shared class CeylonRenameTypedInputValidator() satisfies RenameInputValidatorEx 
 
     isInputValid(String newName, PsiElement element, ProcessingContext processingContext) => true;
 
-    pattern => PlatformPatterns.psiElement(javaClass<CeylonPsi.TypedDeclarationPsi>());
+    pattern => PlatformPatterns.psiElement(`CeylonPsi.TypedDeclarationPsi`);
 
 }
 

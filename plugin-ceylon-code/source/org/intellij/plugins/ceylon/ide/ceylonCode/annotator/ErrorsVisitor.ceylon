@@ -15,6 +15,9 @@ import com.redhat.ceylon.compiler.typechecker.tree {
     Node,
     UnexpectedError
 }
+import com.redhat.ceylon.compiler.typechecker.util {
+    WarningSuppressionVisitor
+}
 import com.redhat.ceylon.ide.common.util {
     ErrorVisitor
 }
@@ -24,12 +27,6 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
-}
-import com.redhat.ceylon.compiler.typechecker.util {
-    WarningSuppressionVisitor
-}
-import ceylon.interop.java {
-    javaClass
 }
 
 
@@ -44,7 +41,7 @@ shared class ErrorsVisitor(Tree.CompilationUnit compilationUnit, CeylonFile file
     
     shared {[Message, TextRange?]*} extractMessages() {
         if (exists ceylonProject = findProjectForFile(file)) {
-            compilationUnit.visit(WarningSuppressionVisitor(javaClass<Warning>(),
+            compilationUnit.visit(WarningSuppressionVisitor(`Warning`,
                 ceylonProject.configuration.suppressWarningsEnum));
         }
         compilationUnit.visit(this);

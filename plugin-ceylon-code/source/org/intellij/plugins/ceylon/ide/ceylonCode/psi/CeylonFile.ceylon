@@ -65,8 +65,7 @@ import com.redhat.ceylon.ide.common.util {
 
 import java.lang {
     ObjectArray,
-    JBoolean=Boolean,
-    JClass=Class
+    JBoolean=Boolean
 }
 import java.util.concurrent {
     ExecutionException,
@@ -93,11 +92,6 @@ import org.jetbrains.ide {
 }
 
 CeylonLogger<CeylonFile> ceylonFileLogger = CeylonLogger<CeylonFile>();
-
-JClass<CeylonPsi.DeclarationPsi> declarationClass = javaClass<CeylonPsi.DeclarationPsi>();
-JClass<CeylonPsi.CompilationUnitPsi> compilationUnitClass = javaClass<CeylonPsi.CompilationUnitPsi>();
-JClass<CeylonLocalAnalyzerManager> localAnalyzerManagerClass = javaClass<CeylonLocalAnalyzerManager>();
-JClass<IdeaCeylonProjects> ideaCeylonProjectsClass = javaClass<IdeaCeylonProjects>();
 ObjectArray<PsiClass> noPsiClasses = ObjectArray<PsiClass>(0);
 
 ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit(CeylonFile file) {
@@ -107,7 +101,7 @@ ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPh
         }
     );
 
-    value ceylonProjects = file.project.getComponent(ideaCeylonProjectsClass);
+    value ceylonProjects = file.project.getComponent(javaClass<IdeaCeylonProjects>());
     if (exists ceylonProject = ceylonProjects.getProject(mod),
         exists vf = file.realVirtualFile(),
         exists ceylonVirtualFile = ceylonProject.projectFileFromNative(vf)) {
@@ -151,7 +145,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
     putUserData(BlockSupport.treeDepthLimitExceeded, JBoolean.true);
 
     value compilationUnitPsi {
-        assert (exists psi = PsiTreeUtil.findChildOfType(this, compilationUnitClass));
+        assert (exists psi = PsiTreeUtil.findChildOfType(this, javaClass<CeylonPsi.CompilationUnitPsi>()));
         return psi;
     }
 
@@ -175,14 +169,14 @@ shared class CeylonFile(FileViewProvider viewProvider)
      The current [[LocalAnalysisResult]]
      can be retrieved through the [[result|CeylonLocalAnalyzer.result]] member."
     shared CeylonLocalAnalyzer? localAnalyzer
-            => let (localAnalyzerManager = project.getComponent(localAnalyzerManagerClass))
+            => let (localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>()))
             if (exists vf = realVirtualFile())
             then localAnalyzerManager[vf]
             else null;
 
     shared TypeChecker? typechecker {
         if (isInSourceArchive(realVirtualFile())) {
-            value ceylonProjects = project.getComponent(ideaCeylonProjectsClass);
+            value ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>());
             if (exists mod = ceylonProjects.findModuleForExternalPhasedUnit(realVirtualFile()),
                 exists ceylonProject = mod.ceylonProject) {
 
@@ -428,7 +422,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
                             }
                         });
 
-                        value localAnalyzerManager = project.getComponent(localAnalyzerManagerClass);
+                        value localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>());
                         if (ApplicationManager.application.dispatchThread) {
                             localAnalyzerManager.retrieveTypecheckedAndBridgedExternalSource(vf);
                         } else {

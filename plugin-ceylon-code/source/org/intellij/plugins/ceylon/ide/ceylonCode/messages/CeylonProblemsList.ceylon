@@ -24,6 +24,9 @@ import com.intellij.ide.util.treeView {
     AbstractTreeBuilder,
     AbstractTreeStructureBase
 }
+import com.intellij.openapi {
+    Disposable
+}
 import com.intellij.openapi.actionSystem {
     CommonDataKeys,
     ActionManager,
@@ -62,13 +65,18 @@ import java.awt {
     BorderLayout,
     Component
 }
+import java.awt.event {
+    FocusEvent,
+    FocusAdapter
+}
 import java.util {
     Collections
 }
 
 import javax.swing {
     JScrollPane,
-    JTree
+    JTree,
+    JPanel
 }
 import javax.swing.tree {
     DefaultTreeModel,
@@ -79,10 +87,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.lang {
     CeylonFileType
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
-    IdeaCeylonProject
-}
-import com.intellij.openapi {
-    Disposable
+    IdeaCeylonProject,
+    getCeylonProjects,
+    getModelManager
 }
 
 shared alias BuildMsg => CeylonProjectBuild<Module,VirtualFile,VirtualFile,VirtualFile>.BuildMessage;
@@ -181,6 +188,31 @@ class CeylonProblemsList(Project project)
         }
     }
 
+    function createActionsToolbar() {
+        value group = DefaultActionGroup();
+
+        group.add(object extends AnAction("Refresh", "Refresh messages", AllIcons.Actions.refresh) {
+            actionPerformed(AnActionEvent? e) => updateModel();
+        });
+        group.add(object extends AnAction("Reset", "Reset Ceylon model", AllIcons.Actions.restart) {
+            shared actual void actionPerformed(AnActionEvent? e) {
+                if (exists mm = getModelManager(project),
+                    exists projects = getCeylonProjects(project)) {
+
+                    for (p in projects.ceylonProjects) {
+                        p.build.requestFullBuild();
+                        p.build.classPathChanged();
+                    }
+
+                    mm.scheduleModelUpdate(0, true);
+                }
+            }
+        });
+
+        value actionToolbar = ActionManager.instance.createActionToolbar(ActionPlaces.usageViewToolbar, group, false);
+        return actionToolbar.component;
+    }
+
     shared void setup() {
         this.layout = BorderLayout();
         add(JScrollPane(myTree), javaString(BorderLayout.center));
@@ -199,6 +231,13 @@ class CeylonProblemsList(Project project)
         model = ProblemsModel();
         builder.treeStructure = ProblemsTreeStructure(project, model);
 
+        value toolbar = JPanel(BorderLayout());
+        toolbar.add(createActionsToolbar(), javaString(BorderLayout.west));
+        setToolbar(toolbar);
+
+        myTree.addFocusListener(object extends FocusAdapter() {
+            focusGained(FocusEvent? e) => updateModel();
+        });
     }
 
     shared void updateErrors(IdeaCeylonProject project, {SourceMsg*}? frontendMessages,
@@ -223,5 +262,11 @@ class CeylonProblemsList(Project project)
 
     shared actual void dispose() {
         model.clear();
+    }
+
+    shared void updateModel() {
+        if (exists mm = getModelManager(project)) {
+            mm.scheduleModelUpdate(0, true);
+        }
     }
 }

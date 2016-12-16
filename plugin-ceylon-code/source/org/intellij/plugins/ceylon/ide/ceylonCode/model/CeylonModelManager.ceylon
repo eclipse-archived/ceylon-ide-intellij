@@ -3,7 +3,6 @@ import ceylon.collection {
 }
 import ceylon.interop.java {
     CeylonIterable,
-    javaClass,
     javaClassFromInstance
 }
 
@@ -319,6 +318,15 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
             } catch(Throwable t) {
                 if (is ProcessCanceledException t) {
                     throw t;
+                } else if (is AssertionError t,
+                    t.message == "The PSI element should still exist") {
+
+                    // A PSI element has been invalidated, we should rebuild the project
+                    // to make sure we keep a consistent state.
+                    for (project in model.ceylonProjects) {
+                        project.build.requestFullBuild();
+                    }
+                    scheduleModelUpdate(0);
                 } else {
                     automaticModelUpdateEnabled = false;
                     
@@ -454,7 +462,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                         
                         if (exists changedFile = changedCurrentlyEditedFiles.first,
                             changedCurrentlyEditedFiles.rest.empty) {
-                            value analyzerManager = model.ideaProject.getComponent(javaClass<CeylonLocalAnalyzerManager>());
+                            value analyzerManager = model.ideaProject.getComponent(`CeylonLocalAnalyzerManager`);
                             if (exists localAnalysisResult = analyzerManager[changedFile]?.result) {
                                 variable value shouldCancel = false;
                                 if (! localAnalysisResult.parsedRootNode.errors.empty) {

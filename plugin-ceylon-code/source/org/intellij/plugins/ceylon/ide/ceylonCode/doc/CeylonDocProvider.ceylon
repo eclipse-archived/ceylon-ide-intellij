@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.codeInsight.documentation {
     DocumentationManager
 }
@@ -138,7 +134,7 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     return typechecker;
                 }
                 if (exists mod = moduleForFile(file)) {
-                    value provider = mod.getComponent(javaClass<ITypeCheckerProvider>());
+                    value provider = mod.getComponent(`ITypeCheckerProvider`);
                     return provider.typeChecker;
                 }
             }

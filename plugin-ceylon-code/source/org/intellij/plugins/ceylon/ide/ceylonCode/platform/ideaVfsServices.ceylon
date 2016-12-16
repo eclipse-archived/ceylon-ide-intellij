@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.application {
     ApplicationManager
 }
@@ -132,7 +128,7 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
                     application.invokeLater(() {
                         fileDocumentManager.saveDocument(document);
                         for (project in ProjectManager.instance.openProjects) {
-                            if (exists modelManager = project.getComponent(javaClass<CeylonModelManager>())) {
+                            if (exists modelManager = project.getComponent(`CeylonModelManager`)) {
                                 modelManager.notifyFileContentChange(resource);
                             }
                         }
@@ -163,7 +159,7 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
     shared actual String? getProjectRelativePathString(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>|Module project) {
         IdeaCeylonProject ceylonProject;
         if (is Module project) {
-            value model = project.project.getComponent(javaClass<IdeaCeylonProjects>());
+            value model = project.project.getComponent(`IdeaCeylonProjects`);
             value existingCeylonProject = model.getProject(project);
             if (is IdeaCeylonProject existingCeylonProject) {
                 ceylonProject = existingCeylonProject;

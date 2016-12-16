@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.application {
     QueryExecutorBase
 }
@@ -52,12 +48,12 @@ shared class ImportAliasReferencesSearch() extends
             toSearch.containingFile is CeylonFile,
             exists name = toSearch.name) {
 
-            value helper = ServiceManager.getService(params.project, javaClass<PsiSearchHelper>());
+            value helper = ServiceManager.getService(params.project, `PsiSearchHelper`);
             value scope = concurrencyManager.needReadAccess(() => params.effectiveSearchScope);
             value processor = object satisfies TextOccurenceProcessor {
                 shared actual Boolean execute(PsiElement element, Integer offsetInElement) {
                     if (is CeylonCompositeElement element,
-                        exists im = PsiTreeUtil.getParentOfType(element, javaClass<CeylonPsi.ImportMemberPsi>()),
+                        exists im = PsiTreeUtil.getParentOfType(element, `CeylonPsi.ImportMemberPsi`),
                         exists al = im.ceylonNode.\ialias,
                         im.ceylonNode.identifier.text == name) {
 

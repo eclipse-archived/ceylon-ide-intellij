@@ -8,6 +8,7 @@ module org.intellij.plugins.ceylon.ide.ceylonCode "current" {
     shared import com.intellij.idea "current";
     shared import org.jetbrains.plugins.gradle "current";
     shared import org.intellij.groovy "current";
+    shared import org.intellij.maven "current";
     shared import org.jdom "current";
     import com.github.rjeschke.txtmark "0.13";
     shared import java.desktop "7";

@@ -87,6 +87,13 @@
                           tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
                 </then>
             </elseif>
+            <elseif>
+                <available file="${ideaRoot}/plugins/maven/lib/${moduleToImport}"/>
+                <then>
+                    <copy file="${ideaRoot}/plugins/maven/lib/${moduleToImport}"
+                          tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+                </then>
+            </elseif>
             <else>
                 <fail message="Failed to find required dependency '${moduleToImport}' in IntelliJ installation"/>
             </else>
@@ -209,7 +216,7 @@
         </java>
     </target>
 
-    <target name="build" depends="tree,ceylondefs,copy-intellij-dependencies">
+    <target name="build-quick" depends="tree,ceylondefs">
         <ceylon-compile executable="${ceylon.executable}"
                         verbose="${ceylon.verbosity}"
                         encoding="UTF-8"
@@ -223,6 +230,8 @@
             <moduleset refid="modules.source"/>
         </ceylon-compile>
     </target>
+
+    <target name="build" depends="copy-intellij-dependencies,build-quick"/>
 
     <target name="clean" description="Deletes the test-modules and modules directories">
         <delete dir="${out.repo}" />

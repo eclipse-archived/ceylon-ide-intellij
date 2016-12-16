@@ -21,6 +21,7 @@
     <depends optional="true">org.jetbrains.plugins.gradle</depends>
     <depends optional="true">org.intellij.groovy</depends>
     <depends optional="true">org.jetbrains.android</depends>
+    <depends optional="true" config-file="maven-support.xml">org.jetbrains.idea.maven</depends>
 
     <project-components>
         <component>

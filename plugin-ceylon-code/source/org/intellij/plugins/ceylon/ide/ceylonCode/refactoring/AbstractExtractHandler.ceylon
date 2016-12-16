@@ -121,7 +121,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         }
         else {
             value visitor = FindContainingExpressionsVisitor(editor.caretModel.offset);
-            assert (exists cu = PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.CompilationUnitPsi>()));
+            assert (exists cu = PsiTreeUtil.findChildOfType(file, `CeylonPsi.CompilationUnitPsi`));
             visitor.visitAny(cu.ceylonNode);
 
             value allParentExpressions
@@ -182,7 +182,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
 
             assert (is CeylonPsi.DeclarationPsi inserted = identifierElement.parent.parent);
 
-            if (exists identifier = PsiTreeUtil.getChildOfType(inserted, javaClass<CeylonPsi.IdentifierPsi>())) {
+            if (exists identifier = PsiTreeUtil.getChildOfType(inserted, `CeylonPsi.IdentifierPsi`)) {
                 editor.caretModel.moveToOffset(identifier.textOffset);
                 ExtractedVariableRenameHandler(usages)
                     .invoke(proj, editor, file,

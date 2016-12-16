@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    javaClass,
     javaString,
     javaObjectArray
 }
@@ -66,11 +65,8 @@ shared class CeylonParameterInfoHandler()
     
     value printer = TypePrinter(true, true, false, true, false);
 
-    value argumentListClass = javaClass<CeylonPsi.ArgumentListPsi>();
-    value invocationExpressionClass = javaClass<CeylonPsi.InvocationExpressionPsi>();
-
     function findArgumentList(ParameterInfoContext context)
-            => getParentOfType(getElementAtOffset(context.file, context.offset), argumentListClass);
+            => getParentOfType(getElementAtOffset(context.file, context.offset), `CeylonPsi.ArgumentListPsi`);
 
     couldShowInLookup() => true;
 
@@ -92,7 +88,7 @@ shared class CeylonParameterInfoHandler()
     findElementForParameterInfo(CreateParameterInfoContext context) {
         if (is CeylonFile file = context.file,
             exists args = findArgumentList(context),
-            exists invocation = getParentOfType(args, invocationExpressionClass),
+            exists invocation = getParentOfType(args, `CeylonPsi.InvocationExpressionPsi`),
             exists node = invocation.ceylonNode,
             exists argList
                     = node.positionalArgumentList

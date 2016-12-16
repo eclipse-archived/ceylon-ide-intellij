@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.\imodule {
     ModuleUtilCore,
     IdeaModule=Module
@@ -29,23 +25,15 @@ import com.redhat.ceylon.model.typechecker.model {
     Module
 }
 
-import java.lang {
-    Class
-}
-
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     ceylonSourceNavigator
 }
 
-Class<IdeaCeylonProjects> ceylonProjectsClass = javaClass<IdeaCeylonProjects>();
-
 shared IdeaCeylonProjects? getCeylonProjects(Project project)
-        => project.getComponent(ceylonProjectsClass);
-
-Class<CeylonModelManager> modelManagerClass = javaClass<CeylonModelManager>();
+        => project.getComponent(`IdeaCeylonProjects`);
 
 shared CeylonModelManager? getModelManager(Project project)
-        => project.getComponent(modelManagerClass);
+        => project.getComponent(`CeylonModelManager`);
 
 shared IdeaCeylonProject? getCeylonProject(PsiFile|IdeaModule fileOrModule) {
     if (is IdeaModule fileOrModule) {

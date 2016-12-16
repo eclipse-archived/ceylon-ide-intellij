@@ -84,7 +84,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode {
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     IdeaCeylonProject,
     getCeylonProjects,
-    CeylonModelManager
+    getModelManager
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     ceylonFileFactory
@@ -108,7 +108,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     value applyCeylonAndroidPlugin = "apply plugin: 'com.redhat.ceylon.gradle.android'";
 
     shared actual void setupModule(Module mod) {
-        value modelManager = mod.project.getComponent(javaClass<CeylonModelManager>());
+        assert(exists modelManager = getModelManager(mod.project));
         modelManager.automaticModelUpdateEnabled = false;
         modelManager.pauseAutomaticModelUpdate();
 
@@ -249,10 +249,10 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
 
     void addFacet(IdeaCeylonProject project) {
         if (exists file = findGradleBuild(project.ideArtifact),
-            exists cmp = project.ideArtifact.getComponent(javaClass<ITypeCheckerProvider>())) {
+            exists cmp = project.ideArtifact.getComponent(`ITypeCheckerProvider`)) {
 
             value version = groovyFileManipulator.findAndroidVersion(file) else "unknown";
-            cmp.addFacetToModule(project.ideArtifact, "android/" + version);
+            cmp.addFacetToModule(project.ideArtifact, "android/" + version, true, true);
         }
     }
 
