@@ -1,5 +1,5 @@
-import ceylon.interop.java {
-    javaClass
+import ceylon.language.meta.model {
+    Class
 }
 
 import com.intellij.concurrency {
@@ -93,6 +93,8 @@ import org.jetbrains.ide {
 
 CeylonLogger<CeylonFile> ceylonFileLogger = CeylonLogger<CeylonFile>();
 ObjectArray<PsiClass> noPsiClasses = ObjectArray<PsiClass>(0);
+Class<IdeaCeylonProjects> projectsClass = `IdeaCeylonProjects`;
+Class<CeylonLocalAnalyzerManager> analyzerManagerClass = `CeylonLocalAnalyzerManager`;
 
 ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPhasedUnit(CeylonFile file) {
     Module? mod = ApplicationManager.application.runReadAction(
@@ -101,7 +103,7 @@ ProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile>? retrieveProjectPh
         }
     );
 
-    value ceylonProjects = file.project.getComponent(javaClass<IdeaCeylonProjects>());
+    value ceylonProjects = file.project.getComponent(projectsClass);
     if (exists ceylonProject = ceylonProjects.getProject(mod),
         exists vf = file.realVirtualFile(),
         exists ceylonVirtualFile = ceylonProject.projectFileFromNative(vf)) {
@@ -145,7 +147,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
     putUserData(BlockSupport.treeDepthLimitExceeded, JBoolean.true);
 
     value compilationUnitPsi {
-        assert (exists psi = PsiTreeUtil.findChildOfType(this, javaClass<CeylonPsi.CompilationUnitPsi>()));
+        assert (exists psi = PsiTreeUtil.findChildOfType(this, `CeylonPsi.CompilationUnitPsi`));
         return psi;
     }
 
@@ -169,14 +171,14 @@ shared class CeylonFile(FileViewProvider viewProvider)
      The current [[LocalAnalysisResult]]
      can be retrieved through the [[result|CeylonLocalAnalyzer.result]] member."
     shared CeylonLocalAnalyzer? localAnalyzer
-            => let (localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>()))
+            => let (localAnalyzerManager = project.getComponent(analyzerManagerClass))
             if (exists vf = realVirtualFile())
             then localAnalyzerManager[vf]
             else null;
 
     shared TypeChecker? typechecker {
         if (isInSourceArchive(realVirtualFile())) {
-            value ceylonProjects = project.getComponent(javaClass<IdeaCeylonProjects>());
+            value ceylonProjects = project.getComponent(projectsClass);
             if (exists mod = ceylonProjects.findModuleForExternalPhasedUnit(realVirtualFile()),
                 exists ceylonProject = mod.ceylonProject) {
 
@@ -253,22 +255,23 @@ shared class CeylonFile(FileViewProvider viewProvider)
     shared void doWhenAnalyzed(void action(AnalysisResult analysisResult)) {
         void doWithFuture<V>(AsyncFuture<V> future, void action(V? v)) {
             Ref<Boolean> consumerStarted = Ref(false);
-            future.addConsumer(SameThreadExecutor.instance, object satisfies ResultConsumer<V> {
-                shared actual void onFailure(Throwable throwable) {
-                    consumerStarted.set(true);
-                    ceylonFileLogger.warnThrowable(throwable);
-                }
-
-                shared actual void onSuccess(V? v) {
-                    consumerStarted.set(true);
-                    if (exists v) {
-                        action(v);
+            future.addConsumer(SameThreadExecutor.instance,
+                object satisfies ResultConsumer<V> {
+                    shared actual void onFailure(Throwable throwable) {
+                        consumerStarted.set(true);
+                        ceylonFileLogger.warnThrowable(throwable);
                     }
-                }
-            });
+
+                    shared actual void onSuccess(V? v) {
+                        consumerStarted.set(true);
+                        if (exists v) {
+                            action(v);
+                        }
+                    }
+                });
             if (future.done && !(consumerStarted.get() else false)) {
                 try {
-                    if(exists v = future.get()) {
+                    if (exists v = future.get()) {
                         action(v);
                     }
                 } catch(ExecutionException ee) {
@@ -281,8 +284,8 @@ shared class CeylonFile(FileViewProvider viewProvider)
             onExistingResult = wrapItInFuture;
             onNonExistingResult = returnTheFuture;
         };
-        doWithFuture<AnalysisResult>(resultFuture, (AnalysisResult? analysisResult) {
-            if(exists analysisResult) {
+        doWithFuture(resultFuture, (AnalysisResult? analysisResult) {
+            if (exists analysisResult) {
                 value phasedUnitFuture = unsafeCast<AsyncFuture<PhasedUnit>>(
                         analysisResult.phasedUnitWhenTypechecked);
                 doWithFuture(phasedUnitFuture, (Anything phasedUnit) {
@@ -410,19 +413,20 @@ shared class CeylonFile(FileViewProvider viewProvider)
                         }
 
                         value resultFuture = AsyncFutureFactory.instance.createAsyncFutureResult<AnalysisResult>();
-                        phasedUnitFuture.addConsumer(PooledThreadExecutor.instance, object satisfies ResultConsumer<ExternalPhasedUnit> {
-                            shared actual void onFailure(Throwable throwable) => resultFuture.setException(throwable);
+                        phasedUnitFuture.addConsumer(PooledThreadExecutor.instance,
+                            object satisfies ResultConsumer<ExternalPhasedUnit> {
+                                shared actual void onFailure(Throwable throwable) => resultFuture.setException(throwable);
 
-                            shared actual void onSuccess(ExternalPhasedUnit phasedUnit) {
-                                try {
-                                    resultFuture.set(checkPhasedUnit(phasedUnit));
-                                } catch(Throwable t) {
-                                    resultFuture.setException(t);
+                                shared actual void onSuccess(ExternalPhasedUnit phasedUnit) {
+                                    try {
+                                        resultFuture.set(checkPhasedUnit(phasedUnit));
+                                    } catch(Throwable t) {
+                                        resultFuture.setException(t);
+                                    }
                                 }
-                            }
-                        });
+                            });
 
-                        value localAnalyzerManager = project.getComponent(javaClass<CeylonLocalAnalyzerManager>());
+                        value localAnalyzerManager = project.getComponent(analyzerManagerClass);
                         if (ApplicationManager.application.dispatchThread) {
                             localAnalyzerManager.retrieveTypecheckedAndBridgedExternalSource(vf);
                         } else {
