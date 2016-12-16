@@ -47,24 +47,25 @@ shared class CeylonRunLineMarkerContributor()
         if (is LeafPsiElement psiElement,
             psiElement.elementType == CeylonTokens.\imodule,
             is CeylonPsi.ModuleDescriptorPsi descriptor = psiElement.parent,
-            importsJavaEE(descriptor.ceylonNode.importModuleList.importModules)) {
+            exists node = descriptor.ceylonNode,
+            importsJavaEE(node.importModuleList.importModules)) {
 
             return Info(AllIcons.RunConfigurations.TestState.run,
-                null, *{*ExecutorAction.getActions(0)});
+                null, *ExecutorAction.getActions(0));
         }
 
         return null;
     }
     
     Tree.ParameterList? parameterList(Tree.Declaration decl) {
+
         if (is Tree.AnyClass decl) {
             return decl.parameterList;
         }
         
         if (is Tree.AnyMethod decl,
             decl.parameterLists.size() == 1) {
-            
-            return decl.parameterLists.get(0);
+            return decl.parameterLists[0];
         }
         
         return null;
