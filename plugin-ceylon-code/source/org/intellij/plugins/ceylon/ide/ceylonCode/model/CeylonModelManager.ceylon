@@ -2,7 +2,6 @@ import ceylon.collection {
     HashSet
 }
 import ceylon.interop.java {
-    CeylonIterable,
     javaClassFromInstance
 }
 
@@ -243,7 +242,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
         try {
             if (! changeSet.empty) {
                 logger.debug(() => "Submitting ``changeSet.size()`` changes to the model");
-                model.fileTreeChanged(CeylonIterable(changeSet));
+                model.fileTreeChanged {*changeSet};
                 scheduleModelUpdate();
             }
         } catch(Throwable t) {

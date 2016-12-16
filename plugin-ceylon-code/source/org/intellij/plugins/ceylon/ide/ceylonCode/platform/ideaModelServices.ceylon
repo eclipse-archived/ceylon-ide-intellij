@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    CeylonIterable
-}
-
 import com.intellij.openapi.\imodule {
     Module,
     ModuleManager
@@ -76,14 +72,16 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
             => concurrencyManager.needReadAccess(() => {*moduleRootManager(mod).dependencies});
 
     referencingNativeProjects(Module mod)
-            => CeylonIterable(concurrencyManager.needReadAccess(() => ModuleManager.getInstance(mod.project)
-                    .getModuleDependentModules(mod)));
+            => { *concurrencyManager.needReadAccess(()
+                    => ModuleManager.getInstance(mod.project)
+                        .getModuleDependentModules(mod)) };
 
     shared actual {VirtualFile*} resourceNativeFolders(CeylonProjectAlias ceylonProject) {
-        value roots = concurrencyManager.needReadAccess(() => moduleRootManager(ceylonProject.ideArtifact)
-            ?.getSourceRoots(JavaResourceRootType.resource));
+        value roots = concurrencyManager.needReadAccess(()
+                => moduleRootManager(ceylonProject.ideArtifact)
+                    ?.getSourceRoots(JavaResourceRootType.resource));
 
-        return if (exists roots) then CeylonIterable(roots) else [];
+        return if (exists roots) then {*roots} else {};
     }
 
     scanRootFolder(RootFolderScanner<Module,VirtualFile,VirtualFile,VirtualFile> scanner)
@@ -102,6 +100,6 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
             );
         });
 
-        return CeylonIterable(roots);
+        return {*roots};
     }
 }

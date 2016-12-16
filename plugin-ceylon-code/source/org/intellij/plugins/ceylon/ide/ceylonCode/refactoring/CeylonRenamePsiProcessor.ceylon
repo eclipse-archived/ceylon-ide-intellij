@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    javaString
+}
+
 import com.intellij.openapi.editor {
     Editor
 }
@@ -15,6 +19,9 @@ import com.intellij.refactoring.rename {
     RenameProcessor,
     RenamePsiElementProcessor
 }
+import com.redhat.ceylon.ide.common.hierarchy {
+    hierarchyManager
+}
 
 import java.lang {
     JString=String
@@ -23,19 +30,12 @@ import java.util {
     Map
 }
 
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
-    CeylonFile,
-    CeylonPsi
-}
-import com.redhat.ceylon.ide.common.hierarchy {
-    hierarchyManager
-}
 import org.intellij.plugins.ceylon.ide.ceylonCode.hierarchy {
     collectPhasedUnits
 }
-import ceylon.interop.java {
-    CeylonIterable,
-    javaString
+import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
+    CeylonFile,
+    CeylonPsi
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.resolve {
     resolveDeclaration
@@ -70,7 +70,7 @@ shared class CeylonRenamePsiProcessor() extends RenamePsiElementProcessor() {
             exists model = element.ceylonNode.declarationModel) {
 
             value pus = collectPhasedUnits(element.project, true);
-            for (subtype in hierarchyManager.findSubtypes(model, CeylonIterable(pus))) {
+            for (subtype in hierarchyManager.findSubtypes { model; *pus }) {
                 if (exists psiElement = resolveDeclaration(subtype, element.project)) {
                     allRenames.put(psiElement, javaString(newName));
                 }

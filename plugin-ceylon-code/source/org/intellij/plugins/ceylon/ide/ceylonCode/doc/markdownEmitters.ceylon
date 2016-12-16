@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    CeylonIterable
-}
-
 import com.github.rjeschke.txtmark {
     SpanEmitter,
     BlockEmitter
@@ -152,7 +148,7 @@ class CeylonBlockEmitter(Project project) satisfies BlockEmitter {
         if (!lines.empty) {
             builder.append("<div style='margin-left: 5px'><pre>");
             
-            value code = "\n".join(CeylonIterable(lines)) + "\n";
+            value code = "\n".join { *lines } + "\n";
             
             if (exists meta, meta.empty || "ceylon"==meta) {
                 builder.append(highlighter.highlight(code.string, project));

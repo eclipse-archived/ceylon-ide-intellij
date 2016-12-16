@@ -1,6 +1,5 @@
 import ceylon.interop.java {
-    javaString,
-    CeylonIterable
+    javaString
 }
 
 import com.intellij.openapi.actionSystem {
@@ -107,8 +106,7 @@ import java.lang {
 import java.util {
     List,
     Set,
-    JArrayList=ArrayList,
-    Collections
+    JArrayList=ArrayList
 }
 
 import javax.swing {
@@ -219,10 +217,12 @@ class IdeaChangeParameterRefactoring(
     theTokens,
     IdeaDocument(editor.document),
     phasedUnit,
-    CeylonIterable(project.typechecker?.phasedUnits?.phasedUnits else Collections.emptyList<PhasedUnit>())
+    { if (exists units = project.typechecker?.phasedUnits?.phasedUnits)
+      for (unit in units)
+      unit }
 ) {
 
-    shared actual Boolean inSameProject(Functional&Declaration declaration) => true;
+    inSameProject(Functional&Declaration declaration) => true;
 
     searchInEditor() => true;
 
@@ -231,7 +231,8 @@ class IdeaChangeParameterRefactoring(
 }
 
 class MyParameterInfo(shared IdeaChangeParameterRefactoring.Param param) satisfies ParameterInfo {
-    shared actual String? defaultValue => param.defaultArgs;
+
+    defaultValue => param.defaultArgs;
 
     shared actual String name => param.name;
 
@@ -259,11 +260,11 @@ class MyMethodDescriptor(params, project) satisfies MethodDescriptor<MyParameter
 
     canChangeVisibility() => false;
 
-    shared actual PsiElement? method => null;
+    method => null;
 
     name => params.declaration.name;
 
-    shared actual List<MyParameterInfo> parameters = JArrayList<MyParameterInfo>();
+    parameters = JArrayList<MyParameterInfo>();
 
     params.parameters.each((p) => parameters.add(MyParameterInfo(p)));
 
@@ -271,7 +272,7 @@ class MyMethodDescriptor(params, project) satisfies MethodDescriptor<MyParameter
 
     parametersCount => params.size;
 
-    shared actual Null visibility => null;
+    visibility => null;
 
 }
 

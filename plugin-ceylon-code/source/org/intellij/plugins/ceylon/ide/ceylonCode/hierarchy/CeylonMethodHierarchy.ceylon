@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    CeylonIterable
-}
-
 import com.intellij.ide.hierarchy {
     HierarchyBrowser,
     HierarchyProvider,
@@ -67,7 +63,7 @@ class CeylonMethodHierarchyBrowser(Project project, PsiElement element)
     shared actual ObjectArray<CeylonHierarchyNodeDescriptor>
     aggregateSubtypes(CeylonHierarchyNodeDescriptor descriptor) {
         if (exists model = descriptor.model) {
-            value subtypes = hierarchyManager.findSubtypes(model, CeylonIterable(phasedUnits));
+            value subtypes = hierarchyManager.findSubtypes(model, {*phasedUnits});
             return ObjectArray.with {
                 for (declaration in subtypes)
                     if (exists psiElement = resolveDeclaration(declaration, project))
