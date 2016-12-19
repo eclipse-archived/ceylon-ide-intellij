@@ -14,6 +14,9 @@ import com.intellij.openapi.\imodule {
 import com.intellij.util {
     PairConsumer
 }
+import com.redhat.ceylon.common {
+    Backend
+}
 
 import java.lang {
     JString=String
@@ -23,6 +26,9 @@ import java.util {
     Map
 }
 
+import org.intellij.plugins.ceylon.ide.ceylonCode {
+    ITypeCheckerProvider
+}
 import org.intellij.plugins.ceylon.ide.ceylonCode.model {
     getCeylonProjects
 }
@@ -48,9 +54,6 @@ import org.jetbrains.jps.model.java {
 import org.jetbrains.jps.model.\imodule {
     JpsModuleSourceRootType
 }
-import org.intellij.plugins.ceylon.ide.ceylonCode {
-    ITypeCheckerProvider
-}
 
 "Automatically configures Ceylon source roots from the POM."
 shared class CeylonMavenImporter()
@@ -65,11 +68,11 @@ shared class CeylonMavenImporter()
         }
     }
 
-    function pluginConfiguration(MavenProject mavenProject) =>
-            mavenProject.getPluginExecutionConfiguration(
+    function pluginConfiguration(MavenProject mavenProject, String goal) =>
+            mavenProject.getPluginGoalConfiguration(
                 "org.ceylon-lang",
                 "ceylon-maven-plugin",
-                "default"
+                goal
             );
 
     shared actual void process(IdeModifiableModelsProvider ideModifiableModelsProvider,
@@ -78,30 +81,40 @@ shared class CeylonMavenImporter()
         MavenProjectChanges mavenProjectChanges,
         Map<MavenProject,JString> map, JList<MavenProjectsProcessorTask> list) {
 
-        if (exists project = getCeylonProjects(mod.project)?.getProject(mod),
-            exists el = pluginConfiguration(mavenProject)) {
+        if (exists project = getCeylonProjects(mod.project)?.getProject(mod)) {
+            if (exists el = pluginConfiguration(mavenProject, "compile")) {
 
-            value sources = getChildren(el, "sources", "source", "directory");
-            if (sources.empty) {
-                project.configuration.projectSourceDirectories = {"src/main/ceylon"};
-            } else {
-                project.configuration.projectSourceDirectories = sources.map(Element.text);
+                value sources = getChildren(el, "sources", "source", "directory");
+                if (sources.empty) {
+                    project.configuration.projectSourceDirectories = {"src/main/ceylon"};
+                } else {
+                    project.configuration.projectSourceDirectories = sources.map(Element.text);
+                }
+
+                value resources = getChildren(el, "resources", "resource", "directory");
+                project.configuration.projectResourceDirectories = resources.map(Element.text);
+
+                value userRepos = getChildren(el, "userRepos", "userRepo");
+                project.configuration.projectLocalRepos = userRepos.map(Element.text).sequence();
+
+                if (exists outputRepo = getChildren(el, "out").first) {
+                    project.configuration.outputRepo = outputRepo.text;
+                } else {
+                    project.configuration.outputRepo = "target/modules";
+                }
+
+                value javacOptions = getChildren(el, "javacOptions");
+                project.configuration.javacOptions = javacOptions.map(Element.text);
+
             }
+            if (exists el = pluginConfiguration(mavenProject, "run")) {
+                if (exists runConfig = getChildren(el, "module").first) {
+                    project.configuration.setProjectRunToolModule(runConfig.text, Backend.java);
+                }
 
-            value resources = getChildren(el, "resources", "resource", "directory");
-            project.configuration.projectResourceDirectories = resources.map(Element.text);
-
-            value userRepos = getChildren(el, "userRepos", "userRepo");
-            project.configuration.projectLocalRepos = userRepos.map(Element.text).sequence();
-
-            if (exists outputRepo = getChildren(el, "out").first) {
-                project.configuration.outputRepo = outputRepo.text;
-            } else {
-                project.configuration.outputRepo = "target/modules";
+                value args = getChildren(el, "arguments", "argument");
+                project.configuration.projectRunToolArgs = ArrayList {*args.map(Element.text)};
             }
-
-            value javacOptions = getChildren(el, "javacOptions");
-            project.configuration.javacOptions = javacOptions.map(Element.text);
 
             project.configuration.save();
 
@@ -114,7 +127,7 @@ shared class CeylonMavenImporter()
     shared actual void myCollectSourceRoots(MavenProject mavenProject,
         PairConsumer<JString,JpsModuleSourceRootType<out JpsElement>> result) {
 
-        Element? el = pluginConfiguration(mavenProject);
+        Element? el = pluginConfiguration(mavenProject, "compile");
 
         value sources = getChildren(el, "sources", "source", "directory");
 
