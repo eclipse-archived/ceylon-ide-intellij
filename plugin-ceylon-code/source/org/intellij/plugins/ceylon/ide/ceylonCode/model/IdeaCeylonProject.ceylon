@@ -411,22 +411,20 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             };
 
-    void doWithLibraryModel(void func(IdeModifiableModelsProviderImpl provider, ModifiableRootModel mrm)) {
-        value lock = application.acquireWriteActionLock(`IdeaCeylonProject`);
-        value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
-        value mrm = provider.getModifiableRootModel(ideArtifact);
+    void doWithLibraryModel(void func(IdeModifiableModelsProviderImpl provider, ModifiableRootModel mrm)) =>
+            application.runWriteAction(() {
+                value provider = IdeModifiableModelsProviderImpl(ideArtifact.project);
+                value mrm = provider.getModifiableRootModel(ideArtifact);
 
-        try {
-            func(provider, mrm);
+                try {
+                    func(provider, mrm);
 
-            provider.commit();
-        } catch (e) {
-            platformUtils.log(Status._ERROR, "Couldn't modify library", e);
-            provider.dispose();
-        } finally {
-            lock.finish();
-        }
-    }
+                    provider.commit();
+                } catch (e) {
+                    platformUtils.log(Status._ERROR, "Couldn't modify library", e);
+                    provider.dispose();
+                }
+            });
 
     {ArtifactContext*} addLibraries(List<ArtifactResult> libraries, Boolean clear = false) {
         doWithLibraryModel((provider, mrm) {

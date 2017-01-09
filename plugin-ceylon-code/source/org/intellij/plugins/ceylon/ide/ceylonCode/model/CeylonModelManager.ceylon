@@ -57,7 +57,7 @@ import com.intellij.openapi.progress {
     ProcessCanceledException
 }
 import com.intellij.openapi.project {
-    ProjectCoreUtil {
+    ProjectUtil {
         isProjectOrWorkspaceFile
     },
     DumbService,
