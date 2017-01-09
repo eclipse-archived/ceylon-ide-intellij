@@ -182,6 +182,10 @@ shared class IdeaCompletionProvider()
                     });
                 } catch (ProcessCanceledException e) {
                     noop();// for debugging purposes
+                } catch (AssertionError e) {
+                    if (!"The PSI element should still exist" in e.message) {
+                        throw e;
+                    }
                 } finally {
                     application.removeApplicationListener(listener);
                 }

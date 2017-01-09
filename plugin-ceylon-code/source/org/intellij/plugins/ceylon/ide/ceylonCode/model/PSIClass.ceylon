@@ -56,6 +56,8 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
         extends PSIAnnotatedMirror(psiPointer)
         satisfies IdeClassMirror {
 
+    shared Boolean valid => psiPointer.element exists;
+
     shared PsiClass psi {
         "The PSI element should still exist"
         assert(exists el = psiPointer.element);

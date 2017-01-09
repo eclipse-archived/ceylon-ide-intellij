@@ -352,4 +352,9 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                 then true
                 else false
             );
+
+    isValidMirror(ClassMirror mirror) =>
+            if (is PSIClass mirror)
+            then mirror.valid
+            else super.isValidMirror(mirror);
 }
