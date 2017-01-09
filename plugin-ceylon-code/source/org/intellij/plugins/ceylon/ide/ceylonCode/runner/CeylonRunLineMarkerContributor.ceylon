@@ -24,7 +24,7 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
 shared class CeylonRunLineMarkerContributor()
         extends RunLineMarkerContributor() {
     
-    shared actual Info? getInfo(PsiElement? psiElement) {
+    shared actual Info? getInfo(PsiElement psiElement) {
         // Note: the compilation unit has not yet been typechecked,
         // so we have to query nodes instead of the model
         if (is CeylonPsi.IdentifierPsi psiElement,

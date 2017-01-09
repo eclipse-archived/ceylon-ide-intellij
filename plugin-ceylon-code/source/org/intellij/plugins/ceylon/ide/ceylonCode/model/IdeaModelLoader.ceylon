@@ -1,3 +1,7 @@
+import ceylon.interop.java {
+    javaClass
+}
+
 import com.intellij.openapi.application {
     ApplicationManager {
         application
@@ -10,7 +14,8 @@ import com.intellij.openapi.\imodule {
 import com.intellij.openapi.project {
     DumbService {
         dumbService=getInstance
-    }
+    },
+    Project
 }
 import com.intellij.openapi.util {
     Ref
@@ -68,6 +73,9 @@ import com.redhat.ceylon.model.typechecker.model {
 
 import java.lang {
     ThreadLocal
+}
+import java.lang.reflect {
+    Modifier
 }
 import java.util {
     Arrays
@@ -159,14 +167,31 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         }
         if (exists strategy = concurrencyManager.noIndexStrategy,
             strategy == NoIndexStrategy.waitForIndexes) {
-            resetJavaModelSourceIfNecessary(()
-                => application.invokeAndWait(() {
+            resetJavaModelSourceIfNecessary(() =>
+                    application.invokeAndWait(() {
                         assert (exists project =
                                 ideaModuleManager.ceylonProject?.ideArtifact?.project);
-                        dumbService(project).queueTask(UnindexedFilesUpdater(project, false));
+
+                        dumbService(project).queueTask(newUnindexedFilesUpdater(project));
                     },
                     ModalityState.nonModal));
         }
+    }
+
+    UnindexedFilesUpdater newUnindexedFilesUpdater(Project project) {
+        for (ctor in javaClass<UnindexedFilesUpdater>().constructors) {
+            if (Modifier.isPublic(ctor.modifiers)) {
+                if (ctor.parameterCount == 1,
+                    is UnindexedFilesUpdater up = ctor.newInstance(project)) {
+                    return up;
+                } else if (ctor.parameterCount == 2,
+                    is UnindexedFilesUpdater up = ctor.newInstance(project, false)) {
+                    return up;
+                }
+            }
+        }
+
+        throw Exception("Could not instantiate UnindexedFilesUpdater");
     }
 
     shared actual Boolean moduleContainsClass(BaseIdeModule ideModule,
