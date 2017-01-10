@@ -72,7 +72,8 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
-    ThreadLocal
+    ThreadLocal,
+    JBoolean=Boolean
 }
 import java.lang.reflect {
     Modifier
@@ -185,7 +186,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                     is UnindexedFilesUpdater up = ctor.newInstance(project)) {
                     return up;
                 } else if (ctor.parameterCount == 2,
-                    is UnindexedFilesUpdater up = ctor.newInstance(project, false)) {
+                    is UnindexedFilesUpdater up = ctor.newInstance(project, JBoolean.false)) {
                     return up;
                 }
             }
