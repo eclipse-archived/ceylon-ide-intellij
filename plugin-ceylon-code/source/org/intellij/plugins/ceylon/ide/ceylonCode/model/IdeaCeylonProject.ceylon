@@ -386,8 +386,9 @@ shared class IdeaCeylonProject(ideArtifact, model)
         // TODO
     }
     
-    shared actual String systemRepository 
-            => interpolateVariablesInRepositoryPath(ideConfiguration.systemRepository else "${ceylon.repo}");
+    shared actual String systemRepository =>
+            let (path = if (exists val = ideConfiguration.systemRepository, !val.empty) then val else null)
+            interpolateVariablesInRepositoryPath(path else "${ceylon.repo}");
     
     String interpolateVariablesInRepositoryPath(String repoPath) {
         String userHomePath = System.getProperty("user.home");
