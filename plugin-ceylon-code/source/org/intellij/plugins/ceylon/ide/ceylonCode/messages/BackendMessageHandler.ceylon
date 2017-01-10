@@ -59,7 +59,8 @@ shared class BackendMessageHandler(Project project)
         if (builderId == "ceylon") {
             value messages = toolWindows(project).getToolWindow(messagesWindow);
             ApplicationManager.application.invokeLater(() {
-                if (!exists _ = messages.contentManager.getContent(console.component)) {
+                if (exists messages,
+                    !exists _ = messages.contentManager.getContent(console.component)) {
                     messages.contentManager.addContent(
                         messages.contentManager.factory.createContent(console.component, "Ceylon Build", true)
                     );
