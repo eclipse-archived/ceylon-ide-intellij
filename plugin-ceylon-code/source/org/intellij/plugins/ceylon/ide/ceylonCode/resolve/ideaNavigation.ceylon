@@ -10,7 +10,8 @@ import com.intellij.psi {
     PsiNameIdentifierOwner,
     PsiFile,
     PsiClass,
-    PsiElement
+    PsiElement,
+    PsiLiteralExpression
 }
 import com.intellij.psi.util {
     PsiTreeUtil
@@ -38,7 +39,8 @@ import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface,
     Referenceable,
     Function,
-    Value
+    Value,
+    ModelUtil
 }
 
 import java.lang {
@@ -52,6 +54,9 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.model {
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonFile
+}
+import ceylon.interop.java {
+    javaString
 }
 
 shared PsiNameIdentifierOwner? declarationToPsi(Declaration rawDeclaration) {
@@ -108,6 +113,19 @@ shared PsiNameIdentifierOwner? declarationToPsi(Declaration rawDeclaration) {
         is AnnotationProxyClass container = declaration.container,
         is PSIClass cls = container.iface.classMirror) {
 
+        return cls.psi.findMethodsByName(declaration.name, false).array.first;
+    } else if (ModelUtil.isConstructor(declaration),
+        is LazyClass container = declaration.container,
+        is PSIClass cls = container.classMirror) {
+
+        for (ctor in cls.psi.constructors) {
+            if (exists ann = ctor.modifierList.findAnnotation("com.redhat.ceylon.compiler.java.metadata.Name"),
+                is PsiLiteralExpression name = ann.findAttributeValue("value"),
+                (name.\ivalue else "") == javaString(declaration.name)) {
+
+                return ctor;
+            }
+        }
         return cls.psi.findMethodsByName(declaration.name, false).array.first;
     }
     return null;
