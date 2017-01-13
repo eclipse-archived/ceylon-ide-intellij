@@ -1,5 +1,6 @@
 package org.intellij.plugins.ceylon.ide.action;
 
+import com.intellij.ide.projectView.impl.ProjectRootsUtil;
 import com.intellij.ide.util.DirectoryUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -55,6 +56,7 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                 ApplicationManager.getApplication().runWriteAction(new Runnable() {
                     @Override
                     public void run() {
+                        configureSourceRootIfNeeded();
                         PsiDirectory subdirectory = findOrCreateModuleDirectory();
 
                         try {
@@ -87,6 +89,16 @@ public class CeylonAddModuleAction extends CeylonAddingFilesAction {
                         } catch (Exception e1) {
                             Logger.getInstance(CeylonAddModuleAction.class)
                                     .error("Can't create file from template", e1);
+                        }
+                    }
+
+                    private void configureSourceRootIfNeeded() {
+                        if (ProjectRootsUtil.isSourceRoot(srcRootDir)
+                                && project != null
+                                && !project.getConfiguration().getSourceDirectories().contains(srcRootDir.getVirtualFile())) {
+
+                            project.addSourceRoot(srcRootDir.getVirtualFile());
+                            project.getConfiguration().save();
                         }
                     }
 

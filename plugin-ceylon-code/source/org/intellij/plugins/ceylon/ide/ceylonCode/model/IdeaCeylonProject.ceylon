@@ -533,6 +533,13 @@ shared class IdeaCeylonProject(ideArtifact, model)
     }
 
     buildHooks => { addModuleArchiveHook };
+
+    shared void addSourceRoot(VirtualFile sourceRoot) {
+        if (exists relativePath = VfsUtil.getRelativePath(sourceRoot, moduleRoot)) {
+            configuration.projectSourceDirectories =
+                {relativePath, *configuration.sourceDirectories};
+        }
+    }
 }
 
 shared IdeaCeylonProject? findProjectForFile(PsiFile file) {
