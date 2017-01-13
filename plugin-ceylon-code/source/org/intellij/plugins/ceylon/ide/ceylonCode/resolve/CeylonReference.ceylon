@@ -153,6 +153,15 @@ shared class CeylonReference(element, span = element,
 
     shared actual PsiElement? resolve() {
 
+        value project = element.project;
+
+        if (is CeylonPsi.LocalModifierPsi modifier = this.element,
+            exists model = modifier.ceylonNode.typeModel.declaration,
+            exists location = resolveDeclaration(original(model), project)) {
+
+            return location;
+        }
+
         if (is Tree.Declaration node = this.node) {
             if (is TypedDeclaration model = node.declarationModel,
                 model.originalDeclaration exists) {
@@ -164,8 +173,6 @@ shared class CeylonReference(element, span = element,
                 return null;
             }
         }
-
-        value project = element.project;
 
         if (is CeylonFile ceylonFile = element.containingFile,
             exists rootNode

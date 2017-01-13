@@ -42,7 +42,12 @@ node : '^' '('
            )
            |
            { $n.text.equals("IDENTIFIER") }?=> (
-             { print("IdentifierPsiImpl extends CeylonResolvable"); }
+             { print("IdentifierPsiImpl extends ResolvableIdentifier"); }
+             (':' NODE_NAME)?
+           )
+           |
+           { $n.text.equals("LOCAL_MODIFIER") }?=> (
+             { print("LocalModifierPsiImpl extends ResolvableLocalModifier"); }
              (':' NODE_NAME)?
            )
            |

@@ -13,7 +13,8 @@ import com.intellij.openapi.util {
 }
 import com.intellij.psi {
     PsiElement,
-    PsiReference
+    PsiReference,
+    PsiNamedElement
 }
 import com.redhat.ceylon.common {
     Backends {
@@ -34,25 +35,45 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.psi {
     CeylonTokens
 }
 import org.intellij.plugins.ceylon.ide.ceylonCode.psi.impl {
-    CeylonNamedCompositeElementImpl
+    CeylonNamedCompositeElementImpl,
+    CeylonNamedTypePsiImpl
 }
 
-shared class CeylonResolvable(ASTNode node)
-        extends CeylonNamedCompositeElementImpl(node) {
+"Makes identifiers resolvable to navigate to their original declaration."
+shared abstract class ResolvableIdentifier(ASTNode node)
+        extends CeylonNamedCompositeElementImpl(node)
+        satisfies CeylonResolvable {
 
-    reference
-            => if (is CeylonPsi.ImportPathPsi parent = this.parent)
+    reference => (super of CeylonResolvable).reference;
+    references => (super of CeylonResolvable).references;
+}
+
+"Makes local modifiers (`value` and `function`) resolvable to navigate
+ to their inferred type."
+shared abstract class ResolvableLocalModifier(ASTNode node)
+        extends CeylonNamedTypePsiImpl(node)
+        satisfies CeylonResolvable {
+
+    reference => (super of CeylonResolvable).reference;
+    references => (super of CeylonResolvable).references;
+}
+
+"A mixin that makes PSI elements resolvable."
+shared interface CeylonResolvable satisfies PsiNamedElement {
+
+    shared actual default CeylonReference reference =>
+            if (is CeylonPsi.ImportPathPsi parent = this.parent)
             then CeylonReference(this, parent)
             else CeylonReference(this);
 
-    function backendRef(Backends backend)
-            => CeylonReference {
+    function backendRef(Backends backend) =>
+            CeylonReference {
                 element = this;
                 backend = backend;
             };
 
-    references
-            => if (is CeylonPsi.MemberOrTypeExpressionPsi parent = this.parent,
+    shared actual default ObjectArray<CeylonReference> references =>
+            if (is CeylonPsi.MemberOrTypeExpressionPsi parent = this.parent,
                     exists model = parent.ceylonNode?.declaration,
                     model.native)
             //for native decs we need a ref per backend
@@ -64,7 +85,8 @@ shared class CeylonResolvable(ASTNode node)
             //otherwise there is just one
             else ObjectArray.with { reference };
 
-    name => this is CeylonPsi.IdentifierPsi then text;
+    shared actual default String? name
+            => this is CeylonPsi.IdentifierPsi then text;
 
     shared actual PsiElement setName(String name) {
         throw UnsupportedOperationException("Not yet");
@@ -74,6 +96,8 @@ shared class CeylonResolvable(ASTNode node)
 
 Pattern docLinkPattern = Pattern.compile("""\[\[([^\]\[]*)\]\]""");
 
+"Makes links in documentation annotations resolvable to navigate to their
+ original declaration."
 shared class CeylonDocResolvable(ASTNode node)
         extends CeylonNamedCompositeElementImpl(node) {
 

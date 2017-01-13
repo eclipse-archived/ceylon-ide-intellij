@@ -4,7 +4,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiNamedElement;
 
 /**
- * Created by gavin on 7/6/16.
+ * Resolves inheritance ambiguities between PsiElementBase, PsiNamedElement and NavigationItem.
+ * @see CeylonNamedTypePsiImpl
  */
 public abstract class CeylonNamedCompositeElementImpl
         extends CeylonCompositeElementImpl

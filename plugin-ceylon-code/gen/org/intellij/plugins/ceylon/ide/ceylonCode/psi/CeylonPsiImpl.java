@@ -554,7 +554,7 @@ public class CeylonPsiImpl {
         @Override public Tree.DynamicModifier getCeylonNode() { return (Tree.DynamicModifier) super.getCeylonNode(); }
     }
 
-    public static abstract class LocalModifierPsiImpl extends TypePsiImpl
+    public static abstract class LocalModifierPsiImpl extends ResolvableLocalModifier
             implements CeylonPsi.LocalModifierPsi {
         public LocalModifierPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.LocalModifier getCeylonNode() { return (Tree.LocalModifier) super.getCeylonNode(); }
@@ -1778,7 +1778,7 @@ public class CeylonPsiImpl {
         @Override public Tree.AnnotationList getCeylonNode() { return (Tree.AnnotationList) super.getCeylonNode(); }
     }
 
-    public static class IdentifierPsiImpl extends CeylonResolvable
+    public static class IdentifierPsiImpl extends ResolvableIdentifier
             implements CeylonPsi.IdentifierPsi {
         public IdentifierPsiImpl(ASTNode astNode) { super(astNode); }
         @Override public Tree.Identifier getCeylonNode() { return (Tree.Identifier) super.getCeylonNode(); }
