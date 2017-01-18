@@ -43,12 +43,10 @@ shared class CeylonRunLineMarkerContributor()
                 null, *{*ExecutorAction.getActions(0)});
         }
 
-        // we can also target "Swarm" modules
+        // we can also target "Swarm" or "fat-jar" modules
         if (is LeafPsiElement psiElement,
             psiElement.elementType == CeylonTokens.\imodule,
-            is CeylonPsi.ModuleDescriptorPsi descriptor = psiElement.parent,
-            exists node = descriptor.ceylonNode,
-            importsJavaEE(node.importModuleList.importModules)) {
+            is CeylonPsi.ModuleDescriptorPsi descriptor = psiElement.parent) {
 
             return Info(AllIcons.RunConfigurations.TestState.run,
                 null, *ExecutorAction.getActions(0));

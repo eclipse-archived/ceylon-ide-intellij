@@ -234,6 +234,7 @@
         <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationType"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationProducer"/>
         <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.ceylonCode.runner.SwarmRunConfigurationProducer"/>
+        <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.ceylonCode.runner.FatJarRunConfigurationProducer"/>
         <runLineMarkerContributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.ceylonCode.runner.CeylonRunLineMarkerContributor"/>
         <stepsBeforeRunProvider implementation="org.intellij.plugins.ceylon.ide.ceylonCode.runner.CeylonBeforeRunTaskProvider"/>
         <debugger.javaDebugAware implementation="org.intellij.plugins.ceylon.ide.ceylonCode.debugger.CeylonDebugAware"/>
