@@ -45,48 +45,42 @@ import org.intellij.plugins.ceylon.ide.ceylonCode.util {
     icons
 }
 
-abstract class CeylonDeclarationTreeElement<Decl>(Decl psiElement, Boolean isInherited)
+abstract class CeylonDeclarationTreeElement<Decl>
+            (Decl psiElement, Boolean isInherited)
         extends PsiTreeElementBase<Decl>(psiElement)
         satisfies ColoredItemPresentation
                 & SortableTreeElement
                 & AccessLevelProvider
         given Decl satisfies CeylonPsi.DeclarationPsi {
 
-    shared actual default List<StructureViewTreeElement> childrenBase
-            => Collections.emptyList<StructureViewTreeElement>();
-
-    shared actual Boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
-        }
-        assert (is CeylonDeclarationTreeElement<out Anything> that = o);
-        return isInherited == that.isInherited;
-    }
-
-    shared actual String? string
-            => presentableText;
-
     Declaration? model
             => element?.ceylonNode?.declarationModel;
 
-    shared actual TextAttributesKey? textAttributesKey {
-        if (isInherited) {
-            return CodeInsightColors.notUsedElementAttributes;
-        } else if (exists m = model, m.deprecated) {
-            return CodeInsightColors.deprecatedAttributes;
-        } else {
-            return null;
-        }
-    }
+    shared actual default List<StructureViewTreeElement> childrenBase
+            => Collections.emptyList<StructureViewTreeElement>();
+
+    equals(Object that)
+        => if (!super.equals(that))
+            then false
+        else if (is CeylonDeclarationTreeElement<out Anything> that)
+            then isInherited == that.isInherited
+        else false;
+
+    textAttributesKey
+            => if (isInherited)
+                then CodeInsightColors.notUsedElementAttributes
+            else if (exists m = model, m.deprecated)
+                then CodeInsightColors.deprecatedAttributes
+            else null;
 
     shared ClassOrInterface? type {
         if (exists m = model, m.classOrInterfaceMember) {
             if (isInherited) {
-                assert(is ClassOrInterface? c = m.container);
+                assert (is ClassOrInterface? c = m.container);
                 return c;
             }
             if (exists refined = m.refinedDeclaration, refined != m) {
-                assert(is ClassOrInterface? c = refined.container);
+                assert (is ClassOrInterface? c = refined.container);
                 return c;
             }
         }
@@ -107,25 +101,22 @@ abstract class CeylonDeclarationTreeElement<Decl>(Decl psiElement, Boolean isInh
         return super.locationString;
     }
 
-    shared actual String? presentableText {
-        if (!valid) {
-            return "INVALID";
-        }
-        if (exists el = element) {
-            return descriptions.descriptionForPsi(el, false, false);
-        }
-        return null;
-    }
+    presentableText
+            => if (!valid)
+                then "INVALID"
+            else if (exists el = element)
+                then descriptions.descriptionForPsi(el, false, false)
+            else null;
 
-    shared actual Icon? getIcon(Boolean open) {
-        if (valid, exists node = element?.ceylonNode) {
-            return icons.forDeclaration(node);
-        }
-        return null;
-    }
+    getIcon(Boolean open)
+            => if (valid, exists node = element?.ceylonNode)
+            then icons.forDeclaration(node)
+            else null;
 
     alphaSortKey
-            => if (exists id = element?.ceylonNode?.identifier) then id.text else "";
+            => element?.ceylonNode?.identifier?.text else "";
+
+    string => presentableText else "";
 
     shared actual Integer accessLevel {
         if (isInherited) {
@@ -136,13 +127,13 @@ abstract class CeylonDeclarationTreeElement<Decl>(Decl psiElement, Boolean isInh
         }
 
         if (exists el = element) {
-            value annotationList = el.ceylonNode.annotationList;
-            for (a in annotationList.annotations) {
-                if (a.primary.text.equals("shared")) {
+            for (a in el.ceylonNode.annotationList.annotations) {
+                if (a.primary.text=="shared") {
                     return PsiUtil.accessLevelPublic;
                 }
             }
         }
+
         return PsiUtil.accessLevelPrivate;
     }
 
