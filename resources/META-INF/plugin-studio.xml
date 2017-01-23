@@ -1,0 +1,16 @@
+<idea-plugin url="https://www.jetbrains.com/idea">
+    <actions>
+        <action class="org.intellij.plugins.ceylon.ide.integrations.studio.ConfigureCeylonAction"
+                id="ConfigureCeylonAction"
+                text="Configure Ceylon in this module">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+    </actions>
+
+    <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>org.intellij.groovy</depends>
+
+    <extensions defaultExtensionNs="org.intellij.plugins.ceylon.ide">
+        <androidStudioSupport implementation="org.intellij.plugins.ceylon.ide.integrations.studio.AndroidStudioSupportImpl"/>
+    </extensions>
+</idea-plugin>

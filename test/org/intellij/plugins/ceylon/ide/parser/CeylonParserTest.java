@@ -1,7 +1,7 @@
 package org.intellij.plugins.ceylon.ide.parser;
 
 import com.intellij.testFramework.ParsingTestCase;
-import org.intellij.plugins.ceylon.ide.ceylonCode.parser.CeylonParserDefinition;
+import org.intellij.plugins.ceylon.ide.parser.CeylonParserDefinition;
 
 public class CeylonParserTest extends ParsingTestCase {
 

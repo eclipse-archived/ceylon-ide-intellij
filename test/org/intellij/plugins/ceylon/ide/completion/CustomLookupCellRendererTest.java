@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.intellij.plugins.ceylon.ide.ceylonCode.completion.mergeHighlightAndMatches_.mergeHighlightAndMatches;
+import static org.intellij.plugins.ceylon.ide.completion.mergeHighlightAndMatches_.mergeHighlightAndMatches;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 

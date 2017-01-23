@@ -1,0 +1,5 @@
+<idea-plugin url="https://www.jetbrains.com/idea">
+    <extensions defaultExtensionNs="org.jetbrains.idea.maven">
+        <importer implementation="org.intellij.plugins.ceylon.ide.integrations.maven.CeylonMavenImporter"/>
+    </extensions>
+</idea-plugin>

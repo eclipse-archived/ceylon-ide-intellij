@@ -12,9 +12,216 @@
     </taskdef>
 
     <property name="ceylon.root.dir" value="${basedir}/../ceylon" />
-    <property file="${basedir}/plugin-ceylon-code/build.properties"/>
     <property name="projects.base.dir" value="${basedir}/.." />
     <property name="build.dir" value="${basedir}/ant-build" />
+
+    <property file="user-build.properties" />
+    <property file="build.properties" />
+    <property name="ceylon.verbosity" value="false" />
+    <property name="ceylon.executable" value="${dist.bin.dir}/ceylon" />
+    <property name="out.repo" location="modules" />
+
+    <property name="ceylon.repo.dir" location="${user.home}/.ceylon/repo" />
+
+    <!-- ANTLR -->
+    <property name="base.path" location="../ceylon/lib"/>
+    <property file="../ceylon/lib/build.properties"/>
+    <property file="../ceylon/common-build.properties"/>
+    <property name="gensrc" location="gensrc"/>
+    <property name="gen" location="gen"/>
+    <property name="antlr.src" location="Ceylon.g"/>
+    <property name="antlr.dst" location="${gensrc}"/>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="${ceylon.root.dir}/lib/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+
+    <path id="ant-tasks">
+        <pathelement location="${ceylon.ant.lib}" />
+    </path>
+
+    <target name="ceylondefs">
+        <typedef resource="com/redhat/ceylon/ant/antlib.xml" classpathref="ant-tasks" />
+
+        <moduleset id="modules.source">
+            <module name="org.intellij.plugins.ceylon.ide" />
+        </moduleset>
+
+        <reposet id="reposet.compile">
+            <repo url="${out.repo}" />
+            <repo url="flat:${intellij.repo.dir}"/>
+            <repo url="${basedir}/../ceylon-ide-common/repo"/>
+            <repo url="${ceylon.repo.dir}" />
+        </reposet>
+    </target>
+
+    <condition property="ideaRootDefined">
+        <isset property="ideaRoot"/>
+    </condition>
+
+    <!-- Local repository -->
+    <property name="intellij.repo.dir" location="${basedir}/intellij-repository" />
+
+    <loadproperties srcfile="${basedir}/resources/IdeaModuleToImport.properties" prefix="moduleToImport."/>
+    <propertyselector property="modulesToImport"
+                      delimiter=","
+                      match="moduleToImport\.(.*)"
+                      select="\1"
+                      casesensitive="true" />
+
+    <target name="importModule">
+        <propertycopy name="moduleName" from="moduleToImport.${moduleToImport}" />
+        <echo>${moduleName}</echo>
+        <if>
+            <available file="${ideaRoot}/lib/${moduleToImport}"/>
+            <then>
+                <copy file="${ideaRoot}/lib/${moduleToImport}"
+                      tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+            </then>
+            <elseif>
+                <available file="${ideaRoot}/plugins/gradle/lib/${moduleToImport}"/>
+                <then>
+                    <copy file="${ideaRoot}/plugins/gradle/lib/${moduleToImport}"
+                          tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+                </then>
+            </elseif>
+            <elseif>
+                <available file="${ideaRoot}/plugins/Groovy/lib/${moduleToImport}"/>
+                <then>
+                    <copy file="${ideaRoot}/plugins/Groovy/lib/${moduleToImport}"
+                          tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+                </then>
+            </elseif>
+            <elseif>
+                <available file="${ideaRoot}/plugins/maven/lib/${moduleToImport}"/>
+                <then>
+                    <copy file="${ideaRoot}/plugins/maven/lib/${moduleToImport}"
+                          tofile="${intellij.repo.dir}/${moduleName}-current.jar"/>
+                </then>
+            </elseif>
+            <else>
+                <fail message="Failed to find required dependency '${moduleToImport}' in IntelliJ installation"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="copy-intellij-dependencies">
+        <delete dir="${intellij.repo.dir}" failonerror="false"/>
+        <mkdir dir="${intellij.repo.dir}"/>
+        <fail unless="ideaRootDefined"
+              message="Please set the 'ideaRoot' property to the root of the IntelliJ IDEA installation (which must contain a 'lib' sub-folder)"/>
+        <copy file="${java.home}/../lib/tools.jar" tofile="${intellij.repo.dir}/jdk.tools-current.jar"/>
+        <foreach list="${modulesToImport}" param="moduleToImport" target="importModule">
+        </foreach>
+        <!-- Merge several jars -->
+        <delete file="${intellij.repo.dir}/com.intellij.idea-current.jar"/>
+        <delete file="${intellij.repo.dir}/com.intellij.openapi-current.jar"/>
+        <delete file="${intellij.repo.dir}/com.intellij.util-current.jar"/>
+        <zip destfile="${intellij.repo.dir}/com.intellij.idea-current.jar">
+            <zipgroupfileset dir="${ideaRoot}/lib/">
+                <include name="idea.jar"/>
+                <include name="openapi.jar"/>
+                <include name="util.jar"/>
+            </zipgroupfileset>
+        </zip>
+        <zip destfile="${intellij.repo.dir}/com.intellij.openapi-current.jar" whenempty="create" basedir="." excludes="**"/>
+        <zip destfile="${intellij.repo.dir}/com.intellij.util-current.jar" whenempty="create" basedir="." excludes="**"/>
+    </target>
+
+    <target name="antlr.tree"
+            description="Generate code from ANTLR grammar">
+        <mkdir dir="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"/>
+        <java classname="org.antlr.Tool" dir="${basedir}" fork="yes">
+            <arg value="-fo"/>
+            <arg value="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"/>
+            <arg value="grammar/IdeaAstTypesGen.g"/>
+            <arg value="grammar/PsiIntfGen.g"/>
+            <arg value="grammar/PsiImplGen.g"/>
+            <arg value="grammar/PsiFactoryGen.g"/>
+            <arg value="grammar/NodeToIElementTypeMapGen.g"/>
+            <classpath>
+                <pathelement location="${antlr.lib}"/>
+            </classpath>
+        </java>
+        <delete>
+            <fileset dir="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"
+                     includes="*.tokens"/>
+        </delete>
+    </target>
+
+    <path id="grammar-common-classpath">
+        <pathelement location="${antlr.lib}"/>
+        <pathelement location="${dist.repo.dir}/${ceylon.typechecker.jar}"/>
+        <pathelement location="${dist.repo.dir}/${ceylon.model.jar}"/>
+    </path>
+
+    <target name="treegen" depends="antlr.tree">
+        <mkdir dir="${build.classes}"/>
+        <javac
+                srcdir="grammar:${gensrc}"
+                destdir="${build.classes}"
+                debug="true"
+                encoding="UTF-8">
+            <classpath refid="grammar-common-classpath"/>
+            <include name="com/redhat/ceylon/compiler/typechecker/treegen/*.java"/>
+        </javac>
+    </target>
+
+    <target name="tree" depends="treegen"
+            description="Generate the tree builder code">
+        <fail message="The 'openapi.jar' archive of the IDEA installation could not be found. Please check that the 'ideaRoot' property is set or that the ant process is started with the IDEA-bundle Ant tool.">
+            <condition>
+                <not>
+                    <available file="${ideaRoot}/lib/openapi.jar" />
+                </not>
+            </condition>
+        </fail>
+
+        <mkdir dir="${basedir}/gen"/>
+
+        <property name="NodesFile" location="../ceylon/typechecker/antlr/Ceylon.nodes"/>
+        <java classname="com.redhat.ceylon.compiler.typechecker.treegen.GenerateIdeaElements" dir="${basedir}" fork="yes">
+            <arg value="${NodesFile}"/>
+            <arg path="${gen}"/>
+            <classpath>
+                <path refid="grammar-common-classpath"/>
+                <pathelement location="${build.classes}"/>
+            </classpath>
+        </java>
+        <javac
+                srcdir="source:${gen}:grammar"
+                destdir="${build.classes}"
+                debug="true"
+                encoding="UTF-8">
+            <classpath>
+                <path refid="grammar-common-classpath"/>
+                <pathelement location="${ideaRoot}/lib/openapi.jar"/>
+                <pathelement location="${ideaRoot}/lib/util.jar"/>
+                <pathelement location="${ideaRoot}/lib/annotations.jar"/>
+            </classpath>
+
+            <include name="*.java"/>
+            <include name="org/intellij/plugins/ceylon/ide/psi/CeylonPsi.java"/>
+        </javac>
+        <java classname="TokenTypesGenerator" dir="${basedir}" fork="yes">
+            <arg path="gen"/>
+            <classpath>
+                <path refid="grammar-common-classpath"/>
+                <pathelement location="${build.classes}"/>
+            </classpath>
+        </java>
+        <java classname="CeylonPsiVisitorGenerator" dir="${basedir}" fork="yes">
+            <arg path="gen"/>
+            <classpath>
+                <path refid="grammar-common-classpath"/>
+                <pathelement location="${build.classes}"/>
+                <pathelement location="${ideaRoot}/lib/openapi.jar"/>
+                <pathelement location="${ideaRoot}/lib/util.jar"/>
+            </classpath>
+        </java>
+    </target>
 
     <target name="help">
         <echo>Options for building the Ceylon IDE plugins:
@@ -69,7 +276,7 @@
     </path>
 
     <path id="dist.classpath">
-        <pathelement path="${basedir}/plugin-ceylon-code/modules/org/intellij/plugins/ceylon/ide/ceylonCode/current/org.intellij.plugins.ceylon.ide.ceylonCode-current.car" />
+        <pathelement path="${basedir}/modules/org/intellij/plugins/ceylon/ide/current/org.intellij.plugins.ceylon.ide-current.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/${module.com.redhat.ceylon.ide.common.version}/com.redhat.ceylon.ide.common-${module.com.redhat.ceylon.ide.common.version}.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar" />
@@ -95,7 +302,7 @@
         <copy todir="${build.dir}/CeylonIDEA/classes">
             <fileset dir="${basedir}/jps-plugin/src" includes="META-INF/**"/>
         </copy>
-        <javac2 srcdir="${basedir}/src:${basedir}/plugin-ceylon-code/gen"
+        <javac2 srcdir="${basedir}/src"
                destdir="${build.dir}/CeylonIDEA/classes"
                debug="true" debuglevel="lines,vars,source"
                classpathref="compile.ide.classpath">
@@ -109,7 +316,7 @@
         </copy>
 
         <copy todir="${build.dir}/CeylonIDEA">
-            <fileset dir="${basedir}" includes="META-INF/**"/>
+            <fileset dir="${basedir}/resources" includes="META-INF/**"/>
         </copy>
         <if>
             <contains string="${module.com.redhat.ceylon.ide.intellij.version}" substring="-SNAPSHOT"/>
@@ -156,31 +363,36 @@
     </target>
 
     <target name="build"
+            depends="copy-intellij-dependencies,build-quick"
             description="Builds the IDE plugin">
-        <ant antfile="${basedir}/plugin-ceylon-code/build.xml"
-             target="build"
-             dir="${basedir}/plugin-ceylon-code"
-             inheritall="false"/>
-        <antcall target="build-ide"/>
-        <antcall target="generate-update-site"/>
     </target>
 
     <target name="build-quick"
-            description="Builds the IDE plugin">
-        <ant antfile="${basedir}/plugin-ceylon-code/build.xml"
-             target="build-quick"
-             dir="${basedir}/plugin-ceylon-code"
-             inheritall="false"/>
+            depends="tree,ceylondefs"
+            description="Builds the IDE plugin without rebuilding the flat repository">
+        <ceylon-compile executable="${ceylon.executable}"
+                        verbose="${ceylon.verbosity}"
+                        encoding="UTF-8"
+                        pack200="true"
+                        fork="true"
+                        mavenoverrides="${basedir}/overrides.xml"
+                        out="${out.repo}">
+            <source value="${basedir}/source"/>
+            <source value="${gen}"/>
+            <source value="${basedir}/src"/>
+            <reposet refid="reposet.compile"/>
+            <moduleset refid="modules.source"/>
+        </ceylon-compile>
         <antcall target="build-ide"/>
         <antcall target="generate-update-site"/>
     </target>
 
     <target name="clean"
             description="Cleans the build environment">
-        <ant antfile="${basedir}/plugin-ceylon-code/build.xml"
-             target="clean"
-             dir="${basedir}/plugin-ceylon-code"
-             inheritall="false"/>
+        <delete dir="${out.repo}" />
+        <delete dir="${gen}" />
+        <delete dir="${gensrc}" />
+        <delete dir="${build.classes}" />
         <delete dir="${build.dir}"/>
     </target>
 </project>

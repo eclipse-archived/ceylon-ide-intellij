@@ -15,8 +15,9 @@ testdata/CeylonTest/modules
 grammar/gen
 grammar/gensrc
 grammar/build
-plugin-ceylon-code/test-resources/modules
-plugin-ceylon-code/.ceylon/ide-config~
+test-resources/modules
+.ceylon/ide-config~
+intellij-repository
 out
 ant-build
 modules/

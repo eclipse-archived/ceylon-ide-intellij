@@ -1,0 +1,16 @@
+[defaults]
+encoding=UTF-8
+overrides=overrides.xml
+flatclasspath=false
+autoexportmavendependencies=false
+offline=false
+fullyexportmavendependencies=false
+
+[repositories]
+lookup=flat:./intellij-repository
+lookup=../ceylon-ide-common/repo
+
+[compiler]
+source=source
+source=gen
+resource=resource

@@ -5,10 +5,10 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.intellij.plugins.ceylon.ide.CeylonCodeInsightTestSupport;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonCompositeElement;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.ceylonCode.psi.CeylonPsi;
+import org.intellij.plugins.ceylon.ideInsightTestSupport;
+import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
+import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 
 import java.util.List;
 

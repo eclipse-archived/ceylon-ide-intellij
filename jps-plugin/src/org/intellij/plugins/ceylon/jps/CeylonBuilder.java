@@ -7,6 +7,7 @@ import com.intellij.util.PathUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.redhat.ceylon.common.config.CeylonConfig;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
+import com.redhat.ceylon.common.config.DefaultToolOptions;
 import com.redhat.ceylon.compiler.java.runtime.tools.*;
 import com.redhat.ceylon.compiler.java.runtime.tools.Compiler;
 import org.jetbrains.annotations.NotNull;
@@ -20,10 +21,8 @@ import org.jetbrains.jps.incremental.fs.FilesDelta;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.incremental.messages.CustomBuilderMessage;
-import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
-import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -97,18 +96,44 @@ class CeylonBuilder extends ModuleLevelBuilder {
                     filesToBuild.add(new File(line));
                 }
             }
+
+            // TODO we should find where chunk.representativeTarget().getModule() is located instead
+            JpsModuleSourceRoot root = chunk.representativeTarget().getModule().getSourceRoots().get(0);
+            CeylonConfig config;
+            if (root == null) {
+                config = new CeylonConfig();
+            } else {
+                try {
+                    config = CeylonConfigFinder.loadLocalConfig(root.getFile());
+                } catch (IOException e) {
+                    config = new CeylonConfig();
+                }
+            }
+
+            final List<File> sourceRoots = getSourceRoots(chunk, config);
+
             dirtyFilesHolder.processDirtyFiles(new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
+                private boolean isInSourceRoot(File file) {
+                    for (File root : sourceRoots) {
+                        if (file.toPath().startsWith(root.toPath())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
                 @Override
                 public boolean apply(ModuleBuildTarget target, File file, JavaSourceRootDescriptor root) throws IOException {
                     if (Boolean.TRUE.equals(compileForBackend.get(target.getModule()))
-                            && getCompilableFileExtensions().contains(FileUtilRt.getExtension(file.getName()))) {
+                            && getCompilableFileExtensions().contains(FileUtilRt.getExtension(file.getName()))
+                            && isInSourceRoot(file)) {
                         filesToBuild.add(file);
                     }
                     return true;
                 }
             });
 
-            return compile(context, chunk, new ArrayList<File>(filesToBuild), settings);
+            return compile(context, chunk, new ArrayList<File>(filesToBuild), settings, config);
         } catch (Exception e) {
             context.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR, "Could not launch compiler"));
             context.processMessage(new CompilerMessage(BUILDER_NAME, e));
@@ -120,7 +145,8 @@ class CeylonBuilder extends ModuleLevelBuilder {
     private ExitCode compile(final CompileContext ctx,
                              final ModuleChunk chunk,
                              List<File> filesToBuild,
-                             JpsCeylonGlobalSettings settings) throws IOException {
+                             JpsCeylonGlobalSettings settings,
+                             CeylonConfig config) throws IOException {
 
         if (filesToBuild.isEmpty() && isCompileJavaIncrementally(ctx)) {
             return ExitCode.NOTHING_DONE;
@@ -128,7 +154,7 @@ class CeylonBuilder extends ModuleLevelBuilder {
 
         boolean fullBuild = isForcedRecompilationAllJavaModules(ctx);
         Compiler compiler = CeylonToolProvider.getCompiler(backend);
-        CompilerOptions options = buildOptions(chunk, filesToBuild, fullBuild);
+        CompilerOptions options = buildOptions(chunk, filesToBuild, fullBuild, config);
 
         String message;
         if (backend == Backend.Java && !fullBuild) {
@@ -226,19 +252,8 @@ class CeylonBuilder extends ModuleLevelBuilder {
         ctx.processMessage(new CustomBuilderMessage(BUILDER_NAME, kind, toPrint));
     }
 
-    private CompilerOptions buildOptions(ModuleChunk chunk, List<File> filesToBuild, boolean fullBuild) {
-        // TODO we should find where chunk.representativeTarget().getModule() is located instead
+    private CompilerOptions buildOptions(ModuleChunk chunk, List<File> filesToBuild, boolean fullBuild, CeylonConfig config) {
         JpsModuleSourceRoot root = chunk.representativeTarget().getModule().getSourceRoots().get(0);
-        CeylonConfig config;
-        if (root == null) {
-            config = new CeylonConfig();
-        } else {
-            try {
-                config = CeylonConfigFinder.loadLocalConfig(root.getFile());
-            } catch (IOException e) {
-                config = new CeylonConfig();
-            }
-        }
 
         CompilerOptions options = (backend == Backend.Java)
                 ? JavaCompilerOptions.fromConfig(config)
@@ -290,13 +305,13 @@ class CeylonBuilder extends ModuleLevelBuilder {
             options.setFiles(filteredFiles);
         } else {
             List<String> moduleNames = new ArrayList<String>(expandWildcards(
-                    getSourceRoots(chunk),
+                    getSourceRoots(chunk, config),
                     Collections.singletonList("*"),
                     (backend == Backend.Java)
                             ? com.redhat.ceylon.common.Backend.Java
                             : com.redhat.ceylon.common.Backend.JavaScript
             ));
-            if (defaultModulePresent(chunk)) {
+            if (defaultModulePresent(chunk, config)) {
                 moduleNames.add("default");
             }
             options.setModules(moduleNames);
@@ -305,8 +320,8 @@ class CeylonBuilder extends ModuleLevelBuilder {
         return options;
     }
 
-    private boolean defaultModulePresent(ModuleChunk chunk) {
-        for (File root : getSourceRoots(chunk)) {
+    private boolean defaultModulePresent(ModuleChunk chunk, CeylonConfig config) {
+        for (File root : getSourceRoots(chunk, config)) {
             if (containsDefaultModule(root)) {
                 return true;
             }
@@ -341,20 +356,21 @@ class CeylonBuilder extends ModuleLevelBuilder {
         return false;
     }
 
-    private List<File> getSourceRoots(ModuleChunk chunk) {
+    private List<File> getSourceRoots(ModuleChunk chunk, CeylonConfig config) {
         List<File> roots = new ArrayList<File>();
-        JpsModuleSourceRootType<?> expectedSrcRootType;
 
-        if (chunk.containsTests()) {
-            expectedSrcRootType = JavaSourceRootType.TEST_SOURCE;
-        } else {
-            expectedSrcRootType = JavaSourceRootType.SOURCE;
-        }
+        File baseDir = getBaseDirectory(chunk.representativeTarget().getModule());
 
-        for (JpsModule module : chunk.getModules()) {
-            for (JpsModuleSourceRoot sourceRoot : module.getSourceRoots()) {
-                if (sourceRoot.getRootType() == expectedSrcRootType) {
-                    roots.add(sourceRoot.getFile());
+        if (baseDir != null) {
+            for (String root : config.getOptionValues(DefaultToolOptions.COMPILER_SOURCE)) {
+                if (chunk.containsTests()) {
+                    if (root.contains("test")) {
+                        roots.add(new File(baseDir, root));
+                    }
+                } else {
+                    if (!root.contains("test")) {
+                        roots.add(new File(baseDir, root));
+                    }
                 }
             }
         }

@@ -1,0 +1,434 @@
+<idea-plugin version="2">
+    <id>org.intellij.plugins.ceylon.ide</id>
+    <name>Ceylon IDE</name>
+    <version>$pluginVersion$</version>
+    <vendor url="https://ceylon-lang.org/">The Ceylon team</vendor>
+
+    <description>Provides support for the Ceylon programming language</description>
+
+    <change-notes>
+        Ceylon IDE for IntelliJ is a brand-new development tool for IntelliJ IDEA and Android Studio,
+        featuring incremental error reporting, code completion, basic refactoring,
+        many intention actions, sophisticated navigation, searching, type hierarchy and file structure,
+        online documentation, full integration with Ceylon Herd and much, much more.
+    </change-notes>
+
+    <!-- Supports IDEA 15+ and Android Studio 2.0+ -->
+    <idea-version since-build="143"/>
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends optional="true" config-file="plugin-studio.xml">com.intellij.modules.androidstudio</depends>
+    <depends optional="true">org.jetbrains.plugins.gradle</depends>
+    <depends optional="true">org.intellij.groovy</depends>
+    <depends optional="true">org.jetbrains.android</depends>
+    <depends optional="true" config-file="maven-support.xml">org.jetbrains.idea.maven</depends>
+
+    <project-components>
+        <component>
+            <implementation-class>org.intellij.plugins.ceylon.ide.model.IdeaCeylonProjects</implementation-class>
+        </component>
+        <component>
+            <implementation-class>org.intellij.plugins.ceylon.ide.model.CeylonModelManager</implementation-class>
+        </component>
+        <component>
+            <implementation-class>org.intellij.plugins.ceylon.ide.psi.CeylonLocalAnalyzerManager</implementation-class>
+        </component>
+    </project-components>
+
+    <module-components>
+        <component>
+            <interface-class>org.intellij.plugins.ceylon.ide.ITypeCheckerProvider</interface-class>
+            <implementation-class>org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider</implementation-class>
+        </component>
+    </module-components>
+
+    <actions>
+        <group text="Ceylon" icon="/icons/ceylon.png" popup="true">
+            <action class="org.intellij.plugins.ceylon.ide.action.UpdateModelAction"
+                    id="Ceylon.UpdateModel" text="Update Ceylon model">
+                <keyboard-shortcut first-keystroke="control alt U" keymap="$default"/>
+            </action>
+            <action class="org.intellij.plugins.ceylon.ide.action.ResetModelAction"
+                    id="Ceylon.ResetModel" text="Reset Ceylon model"/>
+            <action class="org.intellij.plugins.ceylon.ide.action.ToggleModelUpdateAction"
+                    id="Ceylon.ToggleAutoUpdate" text="Disable automatic update of model"/>
+            <action class="org.intellij.plugins.ceylon.ide.action.LowerModelUpdatePriorityAction"
+                    id="Ceylon.LowerModelUpdatePriority" text="Decrease the processing priority of Ceylon model updates"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </group>
+        <action id="Ceylon.AddCeylonModule"
+                class="org.intellij.plugins.ceylon.ide.action.CeylonAddModuleAction"
+                text="Ceylon _Module"
+                description="Add a new Ceylon module">
+            <add-to-group group-id="NewGroup1" anchor="before" relative-to-action="NewModuleInGroup"/>
+        </action>
+        <action id="Ceylon.AddCeylonPackage"
+                class="org.intellij.plugins.ceylon.ide.action.CeylonAddPackageAction"
+                text="Ceylon _Package"
+                description="Add a new Ceylon package">
+            <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="Ceylon.AddCeylonModule"/>
+        </action>
+        <action id="Ceylon.AddCeylonFile"
+                class="org.intellij.plugins.ceylon.ide.action.CeylonAddFileAction"
+                text="Ceylon File/Declaration"
+                description="Add a new Ceylon declaration">
+            <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="Ceylon.AddCeylonPackage"/>
+        </action>
+        <action id="Ceylon.RefineEqualsHash"
+                class="org.intellij.plugins.ceylon.ide.action.RefineEqualsHashAction"
+                text="Refine equals()/hash">
+            <add-to-group group-id="GenerateGroup"/>
+            <keyboard-shortcut first-keystroke="control shift 2" second-keystroke="H" keymap="$default"/>
+        </action>
+        <action id="Ceylon.RefineFormalMembers"
+                class="org.intellij.plugins.ceylon.ide.action.RefineFormalMembersAction"
+                text="Refine formal members">
+            <add-to-group group-id="GenerateGroup"/>
+            <keyboard-shortcut first-keystroke="control shift 2" second-keystroke="F" keymap="$default"/>
+        </action>
+        <action class="org.intellij.plugins.ceylon.ide.action.PasteJavaToCeylonAction"
+                id="Ceylon.PasteAsCeylon"
+                text="Paste Java as Ceylon">
+            <add-to-group group-id="CutCopyPasteGroup" anchor="last"/>
+        </action>
+        <action class="org.intellij.plugins.ceylon.ide.action.AddBootstrapFilesAction"
+                id="AddBootstrapFilesAction"
+                text="Create Ceylon Bootstrap Files">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+        <action id="ParticlesToggleAction"
+                class="org.intellij.plugins.ceylon.ide.action.ParticlesToggleAction"
+                text="I like ponies"/>
+    </actions>
+
+    <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
+    <extensionPoints>
+        <extensionPoint name="typecheckerInvoker" interface="org.intellij.plugins.ceylon.ide.ITypeCheckerInvoker"/>
+        <extensionPoint name="androidStudioSupport" interface="org.intellij.plugins.ceylon.ide.integrations.studio.AndroidStudioSupport"/>
+    </extensionPoints>
+
+    <extensions defaultExtensionNs="org.intellij.plugins.ceylon.ide">
+        <typecheckerInvoker implementation="org.intellij.plugins.ceylon.ide.annotator.TypeCheckerInvoker"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <breadcrumbsInfoProvider implementation="org.intellij.plugins.ceylon.ide.editor.CeylonBreadcrumbsInfoProvider"/>
+        <lang.fileViewProviderFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.psi.CeylonSourceFileViewProviderFactory"/>
+    
+        <ApplicationLoadListener implementation="org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin"/>
+        <lang.documentationProvider language="JAVA" implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonDocProvider" order="first"/>
+        <lang.documentationProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.doc.CeylonDocProvider"/>
+
+        <fileTypeFactory implementation="org.intellij.plugins.ceylon.ide.lang.CeylonFileTypeFactory"/>
+        <lang.parserDefinition language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.parser.CeylonParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonHighlighterFactory"/>
+        <annotator language="Ceylon"
+                   implementationClass="org.intellij.plugins.ceylon.ide.highlighting.CeylonSyntaxAnnotator"/>
+        <annotator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.annotator.CeylonTypeCheckerAnnotator"/>
+        <problemFileHighlightFilter implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonFileHighlightFilter"/>
+        <colorSettingsPage implementation="org.intellij.plugins.ceylon.ide.highlighting.CeylonColorSettingsPage"/>
+        <additionalTextAttributes scheme="Default" file="colorSchemes/CeylonDefault.xml"/>
+        <additionalTextAttributes scheme="Darcula" file="colorSchemes/CeylonDarcula.xml"/>
+
+        <moduleType id="CEYLON_MODULE" implementationClass="org.intellij.plugins.ceylon.ide.project.CeylonModuleType"/>
+
+        <lang.commenter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonCommenter"/>
+        <lang.braceMatcher language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonBraceMatcher"/>
+        <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.ide.lang.CeylonQuoteHandler"/>
+        <lang.foldingBuilder language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonFoldingBuilder"/>
+        <lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.formatting.CeylonFormattingModelBuilder"/>
+        <statementUpDownMover implementation="org.intellij.plugins.ceylon.ide.lang.CeylonStatementUpDownMover"/>
+        <moveLeftRightHandler language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonMoveLeftRightHandler"/>
+        <lang.unwrapDescriptor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.CeylonUnwrapDescriptor"/>
+        <lang.surroundDescriptor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.CeylonSurroundDescriptor"/>
+        <lang.psiStructureViewFactory language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.structureView.CeylonStructureViewFactory"/>
+        <treeStructureProvider implementation="org.intellij.plugins.ceylon.ide.projectView.ModuleTreeStructureProvider" order="last"/>
+        <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.codeInsight.EnterInStringHandler"/>
+        <enterHandlerDelegate implementation="org.intellij.plugins.ceylon.ide.codeInsight.EnterInCommentHandler"/>
+        <!--referenceImporter implementation="org.intellij.plugins.ceylon.ide.imports.CeylonReferenceImporter"/-->
+
+        <defaultLiveTemplatesProvider implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplatesProvider"/>
+        <liveTemplateContext implementation="org.intellij.plugins.ceylon.ide.templates.CeylonLiveTemplateContext"/>
+        <!--<codeInsight.template.postfixTemplateProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.templates.CeylonPostfixTemplateProvider"/>-->
+
+        <psi.classFileDecompiler implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonDecompiler"/>
+        <psi.clsCustomNavigationPolicy implementation="org.intellij.plugins.ceylon.ide.compiled.CeylonClsNavigationPolicy"/>
+        <stubElementTypeHolder class="org.intellij.plugins.ceylon.ide.psi.CeylonTypes"/>
+        <qualifiedNameProvider implementation="org.intellij.plugins.ceylon.ide.lang.CeylonQualifiedNameProvider"/>
+
+        <gotoClassContributor implementation="org.intellij.plugins.ceylon.ide.codeInsight.navigation.CeylonGotoClassContributor"/>
+        <gotoSymbolContributor implementation="org.intellij.plugins.ceylon.ide.codeInsight.navigation.CeylonGotoSymbolContributor"/>
+        <completion.contributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonCompletionContributor"/>
+        <codeInsight.parameterInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.completion.CeylonParameterInfoHandler"/>
+        <codeInsight.typeInfo language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.CeylonExpressionTypeProvider"/>
+        <codeInsight.gotoSuper language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.navigation.CeylonGotoSuperHandler"/>
+
+        <projectViewNodeDecorator
+                implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonClassDecorator"/>
+        <itemPresentationProvider forClass="com.intellij.psi.impl.compiled.ClsClassImpl" order="first"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.CeylonClassDecorator"/>
+        <itemPresentationProvider forClass="com.intellij.psi.impl.compiled.ClsMethodImpl" order="first"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.CeylonMethodDecorator"/>
+        <itemPresentationProvider forClass="com.intellij.psi.impl.compiled.ClsFieldImpl" order="first"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.CeylonFieldDecorator"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.psi.impl.DeclarationPsiNameIdOwner"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.DeclarationPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.psi.impl.SpecifierStatementPsiIdOwner"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.presentation.SpecifierPresentationProvider"/>
+        <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.codeInsight.navigation.DeclarationNavigationItem"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.navigation.DeclarationPresentationProvider"/>
+        <moduleRendererFactory implementation="org.intellij.plugins.ceylon.ide.codeInsight.navigation.DeclarationModuleRendererFactory"/>
+
+        <typeHierarchyProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.hierarchy.CeylonTypeHierarchyProvider"/>
+        <methodHierarchyProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.hierarchy.CeylonMethodHierarchyProvider"/>
+
+        <lang.refactoringSupport language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringSupportProvider"/>
+        <renameHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonVariableRenameHandler"/>
+        <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenameTypeInputValidator"/>
+        <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenameTypedInputValidator"/>
+        <lang.namesValidator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonNamesValidator"/>
+        <nameSuggestionProvider implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonNameSuggestionProvider"/>
+        <codeInsight.implementMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.action.CeylonImplementMembersAction"/>
+        <codeInsight.overrideMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.action.CeylonOverrideMembersAction"/>
+        <renamePsiElementProcessor implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenamePsiProcessor"/>
+        <refactoring.elementListenerProvider implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRefactoringListener"/>
+        <inlineActionHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.InlineAction"/>
+        <lang.importOptimizer language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonImportOptimizer"/>
+        <elementDescriptionProvider implementation="org.intellij.plugins.ceylon.ide.psi.CeylonElementDescriptionProvider"/>
+        <iconProvider implementation="org.intellij.plugins.ceylon.ide.presentation.CeylonIconProvider"/>
+        <codeInsight.lineMarkerProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.CeylonLineMarkerProvider"/>
+        <lang.smartEnterProcessor language="Ceylon"
+                                  implementationClass="org.intellij.plugins.ceylon.ide.editor.TerminateStatementAction"/>
+        <editorTypedHandler order="first" implementationClass="org.intellij.plugins.ceylon.ide.editor.Particles"/>
+        <copyPastePreProcessor implementation="org.intellij.plugins.ceylon.ide.clipboard.CeylonCopyPastePreProcessor"/>
+        <copyPastePostProcessor implementation="org.intellij.plugins.ceylon.ide.clipboard.CeylonCopyPastePostProcessor"/>
+
+        <projectStructureDetector implementation="org.intellij.plugins.ceylon.ide.project.CeylonProjectStructureDetector"/>
+        <facetType implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetType"/>
+        <framework.detector implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetDetector"/>
+
+        <lang.findUsagesProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.resolve.CeylonFindUsagesProvider"/>
+        <readWriteAccessDetector implementation="org.intellij.plugins.ceylon.ide.resolve.CeylonReadWriteAccessDetector"/>
+        <usageTypeProvider implementation="org.intellij.plugins.ceylon.ide.resolve.CeylonUsageTypeProvider"/>
+        <typeDeclarationProvider implementation="org.intellij.plugins.ceylon.ide.resolve.CeylonTypeDeclarationProvider"/>
+        <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.psi.CeylonPsi$IdentifierPsi"
+                                 implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
+        <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.psi.CeylonPsi$StringLiteralPsi"
+                                 implementationClass="org.intellij.plugins.ceylon.ide.refactoring.StringLiteralElementManipulator"/>
+        <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.resolve.CeylonTargetElementEvaluator"/>
+        <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.resolve.CeylonImplementationsSearch"/>
+        <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.resolve.GotoTargetRenderer"/>
+        <referencesSearch implementation="org.intellij.plugins.ceylon.ide.resolve.ImportAliasReferencesSearch"/>
+        <!--referencesSearch implementation="org.intellij.plugins.ceylon.ide.resolve.RefinementsSearch"/-->
+        <generatedSourcesFilter implementation="org.intellij.plugins.ceylon.ide.resolve.CeylonSourceNavigator"/>
+        <!--<java.elementFinder implementation="org.intellij.plugins.ceylon.ide.lightpsi.CeylonElementFinder"/>-->
+        <!--<java.shortNamesCache implementation="org.intellij.plugins.ceylon.ide.lightpsi.CeylonShortNamesCache"/>-->
+
+        <buildProcess.parametersProvider
+                implementation="org.intellij.plugins.ceylon.ide.build.BuildClasspathProvider"/>
+        <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonBuilder" execute="BEFORE"/>
+        <compiler.task implementation="org.intellij.plugins.ceylon.ide.build.CeylonJsBuilder" execute="AFTER"/>
+
+        <!-- Run/Debug -->
+        <configurationType implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationType"/>
+        <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.CeylonRunConfigurationProducer"/>
+        <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.SwarmRunConfigurationProducer"/>
+        <runConfigurationProducer implementation="org.intellij.plugins.ceylon.ide.runner.FatJarRunConfigurationProducer"/>
+        <runLineMarkerContributor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.runner.CeylonRunLineMarkerContributor"/>
+        <stepsBeforeRunProvider implementation="org.intellij.plugins.ceylon.ide.runner.CeylonBeforeRunTaskProvider"/>
+        <debugger.javaDebugAware implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonDebugAware"/>
+        <debugger.positionManagerFactory implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonPositionManagerFactory"/>
+        <debugger.nodeRenderer implementation="org.intellij.plugins.ceylon.ide.debugger.CeylonNodeRenderer"/>
+
+        <!-- Settings -->
+        <applicationConfigurable groupId="language" displayName="Ceylon" id="preferences.Ceylon"
+                                 instance="org.intellij.plugins.ceylon.ide.settings.CeylonConfigurable">
+            <configurable displayName="Completion" id="preferences.Ceylon.completion"
+                          instance="org.intellij.plugins.ceylon.ide.settings.CompletionConfigurable"/>
+            <configurable displayName="Model Update" id="preferences.Ceylon.modelUpdate"
+                          instance="org.intellij.plugins.ceylon.ide.settings.ModelUpdateConfigurable"/>
+        </applicationConfigurable>
+        <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.completion.CompletionSettings"/>
+        <applicationService serviceImplementation="org.intellij.plugins.ceylon.ide.settings.CeylonSettings"/>
+        <projectConfigurable instance="org.intellij.plugins.ceylon.ide.settings.CompilerConfigurable" id="preferences.Ceylon.compiler"
+                             displayName="Ceylon Compiler" parentId="project.propCompiler"/>
+
+        <projectService id="CeylonProblemsView"
+                        serviceInterface="org.intellij.plugins.ceylon.ide.messages.CeylonProblemsView"
+                        serviceImplementation="org.intellij.plugins.ceylon.ide.messages.CeylonProblemsViewImpl"/>
+
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertThenElseToIfElseIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertIfElseToThenElseIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ChangeAssertToIfIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AssertExistsDeclarationIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertSwitchStatementToExpressionIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertSwitchExpressionToStatementIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertSwitchToIfIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertIfToSwitchIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.SplitIfStatementIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.JoinIfStatementsIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertForToWhileIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.InvertIfElseIntention</className>
+            <category>Ceylon/Control flow</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ReverseOperatorIntention</className>
+            <category>Ceylon/Operators</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.InvertOperatorIntention</className>
+            <category>Ceylon/Operators</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.SwapBinaryOperandsIntention</className>
+            <category>Ceylon/Operators</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ParenthesesIntention</className>
+            <category>Ceylon/Operators</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.VerboseRefinementIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ShortcutRefinementIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.IdeaSpecifyTypeIntention</className>
+            <category>Ceylon/Typing</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.IdeaSpecifyTypeArgumentsIntention</className>
+            <category>Ceylon/Typing</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AnonymousFunctionIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.DeclarationIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertArgumentBlockIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.FillInArgumentNameIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertToNamedArgumentsIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertToPositionalArgumentsIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AssignToFieldIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AssignToLocalIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertToDefaultConstructorIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertToClassIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AddVariableAnnotationIntention</className>
+            <category>Ceylon/Annotations</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AddSharedAnnotationIntention</className>
+            <category>Ceylon/Annotations</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AddDefaultAnnotationIntention</className>
+            <category>Ceylon/Annotations</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AddFormalAnnotationIntention</className>
+            <category>Ceylon/Annotations</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.SplitDeclarationIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.JoinDeclarationIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AddThrowsAnnotationIntention</className>
+            <category>Ceylon/Annotations</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ExpandTypeIntention</className>
+            <category>Ceylon/Typing</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.RefineEqualsHashIntention</className>
+            <category>Ceylon/Declaration</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertStringToVerbatimIntention</className>
+            <category>Ceylon/Strings</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertVerbatimToStringIntention</className>
+            <category>Ceylon/Strings</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertToInterpolationIntention</className>
+            <category>Ceylon/Strings</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.ConvertToConcatenationIntention</className>
+            <category>Ceylon/Strings</category>
+        </intentionAction>
+    </extensions>
+</idea-plugin>

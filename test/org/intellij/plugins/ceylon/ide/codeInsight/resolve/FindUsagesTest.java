@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.usageView.UsageInfo;
-import org.intellij.plugins.ceylon.ide.CeylonCodeInsightTestSupport;
+import org.intellij.plugins.ceylon.ideInsightTestSupport;
 
 import java.util.Collection;
 

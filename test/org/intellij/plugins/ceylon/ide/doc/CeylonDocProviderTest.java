@@ -8,7 +8,7 @@ import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
-import org.intellij.plugins.ceylon.ide.ceylonCode.doc.IdeaDocGenerator;
+import org.intellij.plugins.ceylon.ide.doc.IdeaDocGenerator;
 
 import java.io.File;
 import java.io.IOException;
