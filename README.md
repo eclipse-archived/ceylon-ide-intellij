@@ -64,7 +64,7 @@ have the ability to create Ceylon IntelliJ modules in which you can develop and 
    This will clone sibling projects including `../ceylon-sdk`, `../ceylon-ide-common`, and
    `../ceylon-ide-intellij`.
 
-2. Create a file `../ceylon-ide-intellij/plugin-ceylon-code/user-build.properties` and add the following line
+2. Create a file `../ceylon-ide-intellij/user-build.properties` and add the following line
    so that it points to your IntelliJ installation:
 
         ideaRoot=/path/to/your/idea/install/
@@ -101,7 +101,7 @@ If you want to debug or hack this plugin, you'll need to build it from sources.
    This will clone sibling projects including `../ceylon-sdk`, `../ceylon-ide-common`, and
    `../ceylon-ide-intellij`.
 
-4. Edit `../ceylon-ide-intellij/plugin-ceylon-code/build.properties` and change the following line
+4. Edit `../ceylon-ide-intellij/user-build.properties` and change the following line
    so that it points to your IntelliJ installation:
 
         ideaRoot=/Applications/IntelliJ IDEA 2016.2 CE.app/Contents/
@@ -139,10 +139,3 @@ If you want to debug or hack this plugin, you'll need to build it from sources.
 
 9. In 'Run > Edit configurations', create a new run configuration with type 'Plugin' and leave the
     default options. Run this configuration to test the IDE.
-
-
-### Edit Ceylon code from Eclipse
-
-It is possible to edit the Ceylon part of this plugin, which is located in `plugin-ceylon-code`, in
-Eclipse. From Eclipse, do the usual 'File > Import > Existing Projects into Workspace' and make it
-point to `ceylon-ide-intellij/plugin-ceylon-code`. The project should already be correctly configured.
