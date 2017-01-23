@@ -139,3 +139,7 @@ If you want to debug or hack this plugin, you'll need to build it from sources.
 
 9. In 'Run > Edit configurations', create a new run configuration with type 'Plugin' and leave the
     default options. Run this configuration to test the IDE.
+
+# Getting started
+
+To create and run your first project in Ceylon IDE for IntelliJ, you can follow the [getting started guide](https://ceylon-lang.org/documentation/current/ide/intellij/getting-started/).
