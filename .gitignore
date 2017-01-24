@@ -12,9 +12,8 @@ testdata/CeylonTest/.idea/misc.xml
 testdata/CeylonTest/.idea/scopes/scope_settings.xml
 testdata/CeylonTest/.idea/workspace.xml
 testdata/CeylonTest/modules
-grammar/gen
-grammar/gensrc
-grammar/build
+/gen/
+/gensrc/
 test-resources/modules
 .ceylon/ide-config~
 intellij-repository

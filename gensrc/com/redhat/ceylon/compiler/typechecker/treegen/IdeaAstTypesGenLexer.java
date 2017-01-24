@@ -1,4 +1,4 @@
-// $ANTLR 3.4 grammar/IdeaAstTypesGen.g 2017-01-23 17:38:51
+// $ANTLR 3.4 grammar/IdeaAstTypesGen.g 2017-01-24 18:07:50
  
     package com.redhat.ceylon.compiler.typechecker.treegen; 
 
