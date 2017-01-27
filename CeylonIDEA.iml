@@ -88,7 +88,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="ceylon-ide-common" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/modules/org/intellij/plugins/ceylon/ide/current/org.intellij.plugins.ceylon.ide-current.car!/" />
