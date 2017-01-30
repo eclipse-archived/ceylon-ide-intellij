@@ -231,7 +231,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
             // it will trigger a Gradle build which will prevent depencies we add to the classpath
             // from being indexed immediately. We *have* to wait for them to be indexed,
             // otherwise it leads to errors like https://github.com/ceylon/ceylon-ide-intellij/issues/497
-            if (compileToJava) {
+            if (compileToJava,
+                !model.ideaProject.isDisposed()) {
                 value ds = DumbService.getInstance(model.ideaProject);
                 value facade = JavaPsiFacade.getInstance(model.ideaProject);
                 value scope = GlobalSearchScope.moduleWithLibrariesScope(ideArtifact);

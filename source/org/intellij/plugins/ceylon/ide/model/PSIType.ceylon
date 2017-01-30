@@ -171,7 +171,8 @@ shared class PSIType(psi,
             value resolveScope = psi.resolveScope;
             value facade = javaFacade(psi.reference.project);
 
-            if (exists cls
+            if (!psi.reference.project.isDisposed(),
+                exists cls
                     = concurrencyManager.needReadAccess(()
                         => facade.findClass(canonicalText, resolveScope))) {
                 assert (exists qualifiedName = cls.qualifiedName);

@@ -47,7 +47,8 @@ shared abstract class PSIAnnotatedMirror(psiPointer)
         value resolveScope = psi.resolveScope;
         value facade = javaFacade(psi.project);
 
-        if (exists cls = needReadAccess(() => facade.findClass(qualifiedName, resolveScope))) {
+        if (!psi.project.isDisposed(),
+            exists cls = needReadAccess(() => facade.findClass(qualifiedName, resolveScope))) {
             assert(exists qName = cls.qualifiedName);
             return qName;
         }

@@ -200,7 +200,8 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         
         assert (is IdeaModule ideModule);
         
-        if (exists ceylonProject = ideModule.ceylonProject) {
+        if (exists ceylonProject = ideModule.ceylonProject,
+            !ceylonProject.ideArtifact.isDisposed()) {
             updateIndexIfnecessary();
             value ideaModule = ceylonProject.ideArtifact;
             value name = packageName + "." + className;
@@ -231,7 +232,8 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
 
         return concurrencyManager.needIndexes(project,
             () => concurrencyManager.needReadAccess(() {
-                if (exists m = ideaModuleManager.ceylonProject?.ideArtifact) {
+                if (exists m = ideaModuleManager.ceylonProject?.ideArtifact,
+                    !m.isDisposed()) {
                     value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
                     value facade = javaPsiFacade(m.project);
 
