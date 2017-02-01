@@ -156,7 +156,7 @@ shared class CeylonReference(element, span = element,
         value project = element.project;
 
         if (is CeylonPsi.LocalModifierPsi modifier = this.element,
-            exists model = modifier.ceylonNode.typeModel.declaration,
+            exists model = modifier.ceylonNode.typeModel?.declaration,
             exists location = resolveDeclaration(original(model), project)) {
 
             return location;
