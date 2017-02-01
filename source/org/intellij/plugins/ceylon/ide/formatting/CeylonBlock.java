@@ -76,7 +76,8 @@ class CeylonBlock implements Block {
             CeylonTokens.OPTIONAL,
             CeylonTokens.ENTRY_OP, CeylonTypes.ENTRY_OP,
             CeylonTokens.SMALL_AS_OP, CeylonTokens.SMALLER_OP,
-            CeylonTokens.LARGE_AS_OP, CeylonTokens.LARGER_OP
+            CeylonTokens.LARGE_AS_OP, CeylonTokens.LARGER_OP,
+            CeylonTokens.RANGE_OP
     );
     //be very careful here not to mix up CeylonTokens vs CeylonTypes!
     private static final Collection<IElementType> TYPES_REQUIRING_NO_RIGHT_SPACING = Arrays.asList(
@@ -92,7 +93,9 @@ class CeylonBlock implements Block {
             CeylonTokens.SPREAD_OP, CeylonTypes.SPREAD_OP,
             CeylonTokens.ENTRY_OP, CeylonTypes.ENTRY_OP,
             CeylonTokens.SMALL_AS_OP, CeylonTokens.SMALLER_OP,
-            CeylonTokens.LARGE_AS_OP, CeylonTokens.LARGER_OP
+            CeylonTokens.LARGE_AS_OP, CeylonTokens.LARGER_OP,
+            CeylonTokens.RANGE_OP,
+            CeylonTokens.CONTINUE, CeylonTokens.BREAK
     );
     private static final Collection<IElementType> TYPES_REQUIRING_EMPTY_LINE = Arrays.asList(
             CeylonTypes.IMPORT_LIST, CeylonTypes.CLASS_DEFINITION, CeylonTypes.METHOD_DEFINITION
@@ -199,8 +202,9 @@ class CeylonBlock implements Block {
 
         if (block1 == null) {
             return NO_SPACING;
-        }
-        else if (type1 == CeylonTokens.MULTI_COMMENT
+        } else if (type1 == CeylonTokens.RETURN && type2 == CeylonTokens.SEMICOLON) {
+            return NO_SPACING;
+        } else if (type1 == CeylonTokens.MULTI_COMMENT
               || type2 == CeylonTokens.MULTI_COMMENT
               || type2 == CeylonTokens.LINE_COMMENT
               || type1 == CeylonTokens.LINE_COMMENT) {
