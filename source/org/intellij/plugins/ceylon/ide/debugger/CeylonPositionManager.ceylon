@@ -3,19 +3,30 @@ import ceylon.language {
 }
 
 import com.intellij.debugger {
-    PositionManager,
     PositionManagerFactory,
     NoDataException,
     SourcePosition
 }
 import com.intellij.debugger.engine {
-    DebugProcess
+    DebugProcess,
+    PositionManagerEx,
+    DebugProcessImpl
+}
+import com.intellij.debugger.engine.evaluation {
+    EvaluationContext
 }
 import com.intellij.debugger.engine.requests {
     RequestManagerImpl
 }
+import com.intellij.debugger.jdi {
+    StackFrameProxyImpl
+}
 import com.intellij.debugger.requests {
     ClassPrepareRequestor
+}
+import com.intellij.debugger.ui.impl.watch {
+    StackFrameDescriptorImpl,
+    MethodsTracker
 }
 import com.intellij.psi {
     PsiFile
@@ -24,6 +35,12 @@ import com.intellij.psi.util {
     PsiTreeUtil {
         getParentOfType
     }
+}
+import com.intellij.util {
+    ThreeState
+}
+import com.intellij.xdebugger.frame {
+    XStackFrame
 }
 import com.redhat.ceylon.ide.common.debug {
     getFirstValidLocation
@@ -67,7 +84,7 @@ import org.intellij.plugins.ceylon.ide.psi {
     }
 }
 
-class CeylonPositionManager(DebugProcess process) satisfies PositionManager {
+class CeylonPositionManager(DebugProcess process) extends PositionManagerEx() {
 
     //value logger = Logger.getInstance(`class`.qualifiedName);
 
@@ -192,6 +209,19 @@ class CeylonPositionManager(DebugProcess process) satisfies PositionManager {
         print("Can't find classes for source position ``position.file.name``:``position.line``");
         return null;
     }
+
+    shared actual XStackFrame? createStackFrame(StackFrameProxyImpl frame,
+        DebugProcessImpl debugProcess, Location location) {
+
+        if (location.sourceName().endsWith(".ceylon")) {
+            return CeylonStackFrame(StackFrameDescriptorImpl(frame, MethodsTracker()), true);
+        }
+
+        return null;
+    }
+
+    evaluateCondition(EvaluationContext context, StackFrameProxyImpl frame, Location location, String expression)
+            => ThreeState.unsure;
 }
 
 shared class CeylonPositionManagerFactory() extends PositionManagerFactory() {

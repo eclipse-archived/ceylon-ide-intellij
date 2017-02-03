@@ -17,5 +17,5 @@ module org.intellij.plugins.ceylon.ide "current" {
     import com.github.rjeschke.txtmark "0.13";
     shared import java.desktop "7";
     import java.compiler "7";
-    import jdk.tools "current";
+    shared import jdk.tools "current";
 }
