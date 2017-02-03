@@ -325,7 +325,10 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                             = !modifiers.findAnnotation(Annotations.ceylon.className) exists
                             && cls.constructors.size>1;
 
-                    extendedType => realClass?.extendedType;
+                    shared actual Type? extendedType => realClass?.extendedType;
+                    assign extendedType {
+                        // nope
+                    }
 
                     shared actual JList<Declaration>? overloads
                             => if (abstraction)
