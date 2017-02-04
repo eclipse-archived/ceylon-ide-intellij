@@ -362,7 +362,11 @@ class CeylonBuilder extends ModuleLevelBuilder {
         File baseDir = getBaseDirectory(chunk.representativeTarget().getModule());
 
         if (baseDir != null) {
-            for (String root : config.getOptionValues(DefaultToolOptions.COMPILER_SOURCE)) {
+            String[] sources = config.getOptionValues(DefaultToolOptions.COMPILER_SOURCE);
+            if (sources == null) {
+                sources = new String[]{"source"};
+            }
+            for (String root : sources) {
                 if (chunk.containsTests()) {
                     if (root.contains("test")) {
                         roots.add(new File(baseDir, root));
