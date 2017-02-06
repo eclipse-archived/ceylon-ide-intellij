@@ -9,6 +9,7 @@ fullyexportmavendependencies=false
 [repositories]
 lookup=flat:./intellij-repository
 lookup=../ceylon-ide-common/repo
+lookup=../ceylon-ide-common/modules
 
 [compiler]
 source=source

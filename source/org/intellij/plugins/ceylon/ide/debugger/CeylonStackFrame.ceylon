@@ -11,17 +11,16 @@ import com.intellij.debugger.jdi {
 import com.intellij.debugger.ui.impl.watch {
     StackFrameDescriptorImpl
 }
-import com.redhat.ceylon.common {
-    JVMModuleUtil
+import com.redhat.ceylon.ide.common.debug {
+    fixVariableName
 }
 
 import java.util {
     List
 }
-import java.util.regex {
-    Pattern
-}
 
+"Overrides the default Java stack frame to hide internal or duplicate variables like
+ `i$1`, `i$2` etc."
 class CeylonStackFrame(StackFrameDescriptorImpl descriptor, Boolean update)
         extends JavaStackFrame(descriptor, update) {
 
@@ -48,32 +47,3 @@ class CeylonStackFrame(StackFrameDescriptorImpl descriptor, Boolean update)
         return visibleVariables;
     }
 }
-
-Pattern localVariablePattern = Pattern.compile("([^$]+)\\$[0-9]+");
-
-String fixVariableName(variable String name, Boolean isLocalVariable, Boolean isSynthetic) {
-    if (isSynthetic, name.startsWith("val$")) {
-        name = name.removeInitial("val$");
-    }
-    if (exists c = name.first,
-        c == '$') {
-        if (JVMModuleUtil.isJavaKeyword(name, 1, name.size)) {
-            name = name.substring(1);
-        }
-    }
-
-    if (isLocalVariable || isSynthetic,
-        name.contains("$")) {
-
-        if (name.endsWith("$param$")) {
-            return name.substring(0, name.size - "$param$".size);
-        }
-        value matcher = localVariablePattern.matcher(name);
-        if (matcher.matches()) {
-            name = matcher.group(1);
-        }
-    }
-    return name;
-}
-
-
