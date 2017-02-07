@@ -14,8 +14,7 @@ import com.intellij.navigation {
     ColoredItemPresentation
 }
 import com.intellij.openapi.editor.colors {
-    CodeInsightColors,
-    TextAttributesKey
+    CodeInsightColors
 }
 import com.intellij.psi.util {
     PsiUtil
