@@ -93,7 +93,7 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
 
         return {
             for (dir in ceylonProject.configuration.sourceDirectories)
-            if (exists vfile = VfsUtil.findRelativeFile(ceylonProject.moduleRoot, *dir.split('/'.equals)))
+            if (exists vfile = VfsUtil.findRelativeFile(ceylonProject.moduleRoot, *dir.removeInitial("./").split('/'.equals)))
             vfile
         };
     }
