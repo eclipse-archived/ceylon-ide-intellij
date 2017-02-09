@@ -181,8 +181,7 @@ shared class PSIType(psi,
 
             if ('.' in canonicalText) {
                 value parts = canonicalText.split('.'.equals).sequence();
-                assert (nonempty reversedParts = parts.reversed);
-
+                value reversedParts = parts.reversed;
 
                 if (exists clsName
                         = concurrencyManager.needReadAccess(()

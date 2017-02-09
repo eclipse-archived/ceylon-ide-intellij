@@ -55,7 +55,7 @@ shared abstract class PSIAnnotatedMirror(psiPointer)
 
         if ('.' in qualifiedName) {
             value parts = qualifiedName.split('.'.equals).sequence();
-            assert(nonempty reversedParts = parts.reversed);
+            value reversedParts = parts.reversed;
 
             if (exists clsName = needReadAccess(() {
                 if (exists foundClass = searchForClass {
