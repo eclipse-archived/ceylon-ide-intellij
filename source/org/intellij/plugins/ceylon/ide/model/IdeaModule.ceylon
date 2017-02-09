@@ -70,14 +70,15 @@ shared class IdeaModule(
             return Collections.emptyMap<JString,DeclarationWithProximity>();
         }
 
-        if (startingWith.size>0,
-            exists mod = moduleSourceMapper.ceylonProject?.ideArtifact) {
+        if (exists project = moduleManager.ceylonProject,
+            project.compileToJava,
+            startingWith.size>0) {
 
             value proposals = scanJavaIndex {
                 that = this;
                 sourceUnit = unit;
                 moduleManager = moduleManager;
-                mod = mod;
+                mod = project.ideArtifact;
                 startingWith = startingWith;
                 proximity = proximity;
             };
