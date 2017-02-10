@@ -175,7 +175,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
 
                         dumbService(project).queueTask(newUnindexedFilesUpdater(project));
                     },
-                    ModalityState.nonModal));
+                    ModalityState.any()));
         }
     }
 
