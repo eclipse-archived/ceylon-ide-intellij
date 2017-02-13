@@ -213,8 +213,12 @@ class CeylonPositionManager(DebugProcess process) extends PositionManagerEx() {
     shared actual XStackFrame? createStackFrame(StackFrameProxyImpl frame,
         DebugProcessImpl debugProcess, Location location) {
 
-        if (location.sourceName().endsWith(".ceylon")) {
-            return CeylonStackFrame(StackFrameDescriptorImpl(frame, MethodsTracker()), true);
+        try {
+            if (location.sourceName().endsWith(".ceylon")) {
+                return CeylonStackFrame(StackFrameDescriptorImpl(frame, MethodsTracker()), true);
+            }
+        } catch (AbsentInformationException e) {
+            // probably not a Ceylon file anyway
         }
 
         return null;
