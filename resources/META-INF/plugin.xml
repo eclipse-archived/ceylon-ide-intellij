@@ -203,6 +203,7 @@
         <editorTypedHandler order="first" implementationClass="org.intellij.plugins.ceylon.ide.editor.Particles"/>
         <copyPastePreProcessor implementation="org.intellij.plugins.ceylon.ide.clipboard.CeylonCopyPastePreProcessor"/>
         <copyPastePostProcessor implementation="org.intellij.plugins.ceylon.ide.clipboard.CeylonCopyPastePostProcessor"/>
+        <refactoring.copyHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.CopyCeylonFileHandler" order="first"/>
 
         <projectStructureDetector implementation="org.intellij.plugins.ceylon.ide.project.CeylonProjectStructureDetector"/>
         <facetType implementation="org.intellij.plugins.ceylon.ide.facet.CeylonFacetType"/>
