@@ -31,6 +31,7 @@ import org.intellij.plugins.ceylon.ide.psi {
     CeylonPsi
 }
 
+"Validates uppercase names (types)."
 shared class CeylonRenameTypeInputValidator() satisfies RenameInputValidatorEx {
 
     shared actual String? getErrorMessage(String newName, Project project) {
@@ -59,6 +60,7 @@ shared class CeylonRenameTypeInputValidator() satisfies RenameInputValidatorEx {
 
 }
 
+"Validates lowercase names (typed values)."
 shared class CeylonRenameTypedInputValidator() satisfies RenameInputValidatorEx {
 
     shared actual String? getErrorMessage(String newName, Project project) {
@@ -84,6 +86,37 @@ shared class CeylonRenameTypedInputValidator() satisfies RenameInputValidatorEx 
     isInputValid(String newName, PsiElement element, ProcessingContext processingContext) => true;
 
     pattern => PlatformPatterns.psiElement(`CeylonPsi.TypedDeclarationPsi`);
+
+}
+
+"Validates module names."
+shared class CeylonModuleNameInputValidator() satisfies RenameInputValidatorEx {
+
+    shared actual String? getErrorMessage(String newName, Project project) {
+        if (newName.empty) {
+            return "module name cannot be empty";
+        }
+        if (!Pattern.matches("""^(\\i\w|[a-zA-Z_])\w*(\.(\\i\w|[a-zA-Z_])\w*)*$""", JString(newName))) {
+            return "'``newName``' is not a legal module name";
+        }
+        for (part in newName.split('.'.equals)) {
+            if (part.startsWith("""\i""")) {
+                continue;
+            }
+            if (escaping.isKeyword(part)) {
+                return "'``part``' is a keyword";
+            }
+            assert (exists first = part[0]);
+            if (!first.lowercase && first!='_') {
+                return "'``newName``' does not begin with lowercase";
+            }
+        }
+        return null;
+    }
+
+    isInputValid(String newName, PsiElement element, ProcessingContext processingContext) => true;
+
+    pattern => PlatformPatterns.psiElement(`CeylonPsi.ModuleDescriptorPsi`);
 
 }
 

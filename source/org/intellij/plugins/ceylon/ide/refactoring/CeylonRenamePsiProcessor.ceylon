@@ -41,10 +41,13 @@ import org.intellij.plugins.ceylon.ide.resolve {
     resolveDeclaration
 }
 
+"Applies special behavior when renaming Ceylon declarations."
 shared class CeylonRenamePsiProcessor() extends RenamePsiElementProcessor() {
 
-    canProcessElement(PsiElement element) => true;
+    canProcessElement(PsiElement element)
+            => element.containingFile is CeylonFile;
 
+    "Forces a reparse of the current file after the rename to update the global model."
     shared actual RenameDialog createRenameDialog(Project proj, PsiElement element,
             PsiElement nameSuggestionContext, Editor editor) {
         value file = nameSuggestionContext.containingFile;

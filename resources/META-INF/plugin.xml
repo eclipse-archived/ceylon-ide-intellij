@@ -187,6 +187,7 @@
         <renameHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonVariableRenameHandler"/>
         <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenameTypeInputValidator"/>
         <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonRenameTypedInputValidator"/>
+        <renameInputValidator implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonModuleNameInputValidator"/>
         <lang.namesValidator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.refactoring.CeylonNamesValidator"/>
         <nameSuggestionProvider implementation="org.intellij.plugins.ceylon.ide.refactoring.CeylonNameSuggestionProvider"/>
         <codeInsight.implementMethod language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.action.CeylonImplementMembersAction"/>
@@ -217,6 +218,8 @@
                                  implementationClass="org.intellij.plugins.ceylon.ide.refactoring.IdentifierElementManipulator"/>
         <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.psi.CeylonPsi$StringLiteralPsi"
                                  implementationClass="org.intellij.plugins.ceylon.ide.refactoring.StringLiteralElementManipulator"/>
+        <lang.elementManipulator forClass="org.intellij.plugins.ceylon.ide.psi.CeylonPsi$ImportPathPsi"
+                                 implementationClass="org.intellij.plugins.ceylon.ide.refactoring.ImportPathElementManipulator"/>
         <targetElementEvaluator language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.resolve.CeylonTargetElementEvaluator"/>
         <definitionsScopedSearch implementation="org.intellij.plugins.ceylon.ide.resolve.CeylonImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="org.intellij.plugins.ceylon.ide.resolve.GotoTargetRenderer"/>

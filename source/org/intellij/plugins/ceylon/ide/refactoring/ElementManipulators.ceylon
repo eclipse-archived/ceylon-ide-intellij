@@ -1,5 +1,6 @@
 import ceylon.interop.java {
-    javaString
+    javaString,
+    javaClass
 }
 
 import com.intellij.openapi.util {
@@ -15,6 +16,9 @@ import org.intellij.plugins.ceylon.ide.lang {
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonPsi
+}
+import com.intellij.psi.util {
+    PsiTreeUtil
 }
 
 shared class IdentifierElementManipulator()
@@ -49,6 +53,26 @@ shared class StringLiteralElementManipulator()
         if (exists str = file.findElementAt(0)) {
             assert (is CeylonPsi.StringLiteralPsi? psi
                     = element.replace(str.parent));
+            return psi;
+        }
+        else {
+            return null;
+        }
+    }
+}
+
+shared class ImportPathElementManipulator()
+        extends AbstractElementManipulator<CeylonPsi.ImportPathPsi>() {
+
+    shared actual CeylonPsi.ImportPathPsi? handleContentChange(CeylonPsi.ImportPathPsi element,
+            TextRange range, String newContent) {
+
+        value file = PsiFileFactory.getInstance(element.project)
+            .createFileFromText(CeylonLanguage.instance, javaString("import ``newContent`` {}"));
+
+        if (exists path = PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.ImportPathPsi>()),
+            exists psi = element.replace(path),
+            is CeylonPsi.ImportPathPsi psi) {
             return psi;
         }
         else {

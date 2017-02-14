@@ -57,6 +57,10 @@ public class NamedStatementOrArgumentPsi extends CeylonPsiImpl.StatementOrArgume
 
     @Override
     public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+        if (this instanceof CeylonPsi.ModuleDescriptorPsi) {
+            // already been renamed via a UsageInfo + ImportPathElementManipulator
+            return this;
+        }
         throw new UnsupportedOperationException("Not yet");
     }
 }

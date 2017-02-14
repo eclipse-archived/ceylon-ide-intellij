@@ -91,6 +91,9 @@ shared class CeylonFindUsagesProvider() satisfies FindUsagesProvider {
                 case (is Tree.InitializerParameter) {
                     return node.identifier.text;
                 }
+                case (is Tree.ModuleDescriptor) {
+                    return node.importPath.model.nameAsString;
+                }
                 else if (exists id = nodes.findDeclaration(typecheckedCompilationUnit, node)?.identifier) {
                     return id.text;
                 }
