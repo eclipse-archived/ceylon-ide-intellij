@@ -78,13 +78,11 @@ import java.util {
     Arrays
 }
 
-import org.intellij.plugins.ceylon.ide {
-    ITypeCheckerProvider
-}
 import org.intellij.plugins.ceylon.ide.model {
     IdeaCeylonProject,
     getCeylonProjects,
-    getModelManager
+    getModelManager,
+    CeylonProjectManager
 }
 import org.intellij.plugins.ceylon.ide.psi {
     ceylonFileFactory
@@ -248,11 +246,11 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     }
 
     void addFacet(IdeaCeylonProject project) {
-        if (exists file = findGradleBuild(project.ideArtifact),
-            exists cmp = project.ideArtifact.getComponent(`ITypeCheckerProvider`)) {
+        if (exists file = findGradleBuild(project.ideArtifact)) {
 
             value version = groovyFileManipulator.findAndroidVersion(file) else "unknown";
-            cmp.addFacetToModule(project.ideArtifact, "android/" + version, true, true);
+            CeylonProjectManager.forModule(project.ideArtifact)
+                .addFacetToModule(project.ideArtifact, "android/" + version, true, true);
         }
     }
 

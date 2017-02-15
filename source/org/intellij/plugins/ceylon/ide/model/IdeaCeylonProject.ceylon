@@ -18,9 +18,6 @@ import com.intellij.openapi.application {
     ModalityState,
     ApplicationInfo
 }
-import com.intellij.openapi.extensions {
-    Extensions
-}
 import com.intellij.openapi.externalSystem.service.project {
     IdeModifiableModelsProviderImpl
 }
@@ -124,14 +121,14 @@ import java.lang.ref {
     WeakReference
 }
 
-import org.intellij.plugins.ceylon.ide {
-    ITypeCheckerInvoker
-}
 import org.intellij.plugins.ceylon.ide.platform {
     ideaPlatformUtils
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile
+}
+import org.intellij.plugins.ceylon.ide.startup {
+    CeylonIdePlugin
 }
 
 shared class IdeaCeylonProject(ideArtifact, model)
@@ -392,9 +389,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
             interpolateVariablesInRepositoryPath(path else "${ceylon.repo}");
     
     String interpolateVariablesInRepositoryPath(String repoPath) {
-        String userHomePath = System.getProperty("user.home");
-        value ext = Extensions.getExtensions(ITypeCheckerInvoker.epName).get(0);
-        String pluginRepoPath = ext.embeddedCeylonRepository.absolutePath;
+        value userHomePath = System.getProperty("user.home");
+        value pluginRepoPath = CeylonIdePlugin.embeddedCeylonRepository.absolutePath;
         return repoPath.replace("${user.home}", userHomePath).replace("${ceylon.repo}", pluginRepoPath);
     }
 

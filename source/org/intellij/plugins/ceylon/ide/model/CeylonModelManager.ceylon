@@ -2,7 +2,8 @@ import ceylon.collection {
     HashSet
 }
 import ceylon.interop.java {
-    javaClassFromInstance
+    javaClassFromInstance,
+    javaClass
 }
 
 import com.intellij.compiler.server {
@@ -43,7 +44,8 @@ import com.intellij.openapi.fileEditor {
     }
 }
 import com.intellij.openapi.\imodule {
-    Module
+    Module,
+    ModuleComponent
 }
 import com.intellij.openapi.progress {
     ProgressManager {
@@ -75,7 +77,8 @@ import com.intellij.openapi.startup {
     }
 }
 import com.intellij.openapi.util {
-    Ref
+    Ref,
+    Computable
 }
 import com.intellij.openapi.vfs {
     VirtualFileListener,
@@ -146,6 +149,16 @@ import org.intellij.plugins.ceylon.ide.settings {
 }
 import org.intellij.plugins.ceylon.ide.util {
     CeylonLogger
+}
+import com.intellij.facet {
+    FacetManager
+}
+import org.intellij.plugins.ceylon.ide.facet {
+    CeylonFacet,
+    CeylonFacetConfiguration
+}
+import com.intellij.openapi.roots.ui.configuration {
+    ModulesConfigurator
 }
 
 final class ChangesInProject of noChange | changesThatAlwaysRequireModelUpdate {
@@ -690,4 +703,70 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
     /***************************************************************************
       Utility functions
      ***************************************************************************/
+}
+
+"Manages Ceylon projects in the global model when the corresponding
+ IJ module is opened/closed."
+shared class CeylonProjectManager satisfies ModuleComponent {
+
+    shared static CeylonProjectManager forModule(Module mod) {
+        return mod.getComponent(javaClass<CeylonProjectManager>());
+    }
+
+    Module mod;
+    variable IdeaCeylonProjects? ceylonModel;
+
+    shared new (Module mod, IdeaCeylonProjects? ceylonModel) {
+        this.mod = mod;
+        this.ceylonModel = ceylonModel;
+    }
+
+    componentName => "CeylonProjectManager";
+
+    shared actual void initComponent() {}
+
+    "Unregisters the Ceylon project."
+    shared actual void disposeComponent() {
+        ceylonModel?.removeProject(mod);
+    }
+
+    "Registers the Ceylon project if the Ceylon facet is configured on this IJ module."
+    shared actual void moduleAdded() {
+        if (!exists _ = FacetManager.getInstance(mod).getFacetByType(CeylonFacet.id)) {
+            return;
+        }
+
+        ceylonModel?.addProject(mod);
+    }
+
+    shared actual void projectOpened() {}
+    shared actual void projectClosed() {}
+
+    shared void addFacetToModule(Module mod, String? jdkProvider, Boolean forAndroid, Boolean showSettings) {
+        if (!exists _ = ceylonModel) {
+            value model = mod.project.getComponent(javaClass<IdeaCeylonProjects>());
+            model.addProject(mod);
+            ceylonModel = model;
+        }
+        assert (is IdeaCeylonProject ceylonProject = ceylonModel?.getProject(mod));
+        if (forAndroid, exists jdkProvider) {
+            ceylonProject.setupForAndroid(jdkProvider);
+        }
+        ceylonProject.configuration.save();
+        CeylonFacet facet;
+        if (exists f = CeylonFacet.forModule(mod)) {
+            facet = f;
+        } else {
+            facet = ApplicationManager.application.runWriteAction(
+                object satisfies Computable<CeylonFacet> {
+                    compute() =>
+                            FacetManager.getInstance(mod).addFacet(CeylonFacet.facetType, CeylonFacet.facetType.presentableName, null);
+                }
+            );
+            facet.configuration.setModule(mod);
+        }
+        if (showSettings) {
+            ModulesConfigurator.showFacetSettingsDialog(facet, CeylonFacetConfiguration.compilationTab);
+        }
+    }
 }

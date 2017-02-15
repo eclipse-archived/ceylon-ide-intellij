@@ -27,7 +27,6 @@ import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import com.redhat.ceylon.ide.common.util.FindNodeVisitor;
 import com.redhat.ceylon.model.typechecker.model.Type;
 import com.redhat.ceylon.model.typechecker.model.Unit;
-import org.intellij.plugins.ceylon.ide.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
@@ -102,7 +101,7 @@ public class ExistsPostfixTemplate extends SurroundPostfixTemplateBase {
         CeylonFile ceylonFile = (CeylonFile) expr.getContainingFile();
         final VirtualFile virtualFile = Objects.firstNonNull(ceylonFile.getVirtualFile(), ceylonFile.getUserData(CeylonPostfixTemplateProvider.ORIG_VFILE));
         Module module = ModuleUtil.findModuleForFile(virtualFile, ceylonFile.getProject());
-        TypeChecker typeChecker = module.getComponent(ITypeCheckerProvider.class).getTypeChecker();
+        TypeChecker typeChecker = org.intellij.plugins.ceylon.ide.model.getCeylonProject_.getCeylonProject(ceylonFile).getTypechecker();
 
         if (typeChecker == null) {
             // the typechecker was not correctly initialized, there's nothing we can do

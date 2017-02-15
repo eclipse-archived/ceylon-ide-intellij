@@ -26,11 +26,9 @@ import java.util {
     Map
 }
 
-import org.intellij.plugins.ceylon.ide {
-    ITypeCheckerProvider
-}
 import org.intellij.plugins.ceylon.ide.model {
-    getCeylonProjects
+    getCeylonProjects,
+    CeylonProjectManager
 }
 import org.jdom {
     Element
@@ -118,9 +116,7 @@ shared class CeylonMavenImporter()
 
             project.configuration.save();
 
-            if (exists provider = mod.getComponent(`ITypeCheckerProvider`)) {
-                provider.addFacetToModule(mod, null, false, false);
-            }
+            CeylonProjectManager.forModule(mod).addFacetToModule(mod, null, false, false);
         }
     }
 

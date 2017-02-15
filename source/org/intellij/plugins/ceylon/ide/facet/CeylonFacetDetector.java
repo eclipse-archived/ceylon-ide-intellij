@@ -17,8 +17,6 @@ import com.intellij.util.indexing.FileContent;
 import com.redhat.ceylon.common.config.CeylonConfig;
 import com.redhat.ceylon.common.config.CeylonConfigFinder;
 import com.redhat.ceylon.common.config.DefaultToolOptions;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.lang.CeylonFileType;
 import org.intellij.plugins.ceylon.ide.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.model.IdeaCeylonProjects;
@@ -105,10 +103,8 @@ public class CeylonFacetDetector extends FacetBasedFrameworkDetector<CeylonFacet
         project.getConfiguration().setProjectOffline(ceylon.language.Boolean.instance(false));
 
         ModulesConfigurator.showFacetSettingsDialog(facet, CeylonFacetConfiguration.COMPILATION_TAB);
-        TypeCheckerProvider tcp = (TypeCheckerProvider) facet.getModule().getComponent(ITypeCheckerProvider.class);
-        if (tcp != null) {
-            tcp.moduleAdded();
-        }
+        org.intellij.plugins.ceylon.ide.model.CeylonProjectManager.forModule(facet.getModule())
+                .moduleAdded();
 
         CeylonLocalAnalyzerManager analyzerManager = model.getProject().getComponent(CeylonLocalAnalyzerManager.class);
         if (analyzerManager != null) {

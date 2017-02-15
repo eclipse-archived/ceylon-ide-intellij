@@ -8,9 +8,6 @@ import com.intellij.openapi.actionSystem {
     AnActionEvent,
     LangDataKeys
 }
-import com.intellij.openapi.extensions {
-    Extensions
-}
 import com.intellij.openapi.ui {
     Messages
 }
@@ -19,18 +16,19 @@ import com.redhat.ceylon.ide.common.util {
     versionsAvailableForBoostrap
 }
 
+import java.lang {
+    ObjectArray
+}
+
 import javax.swing {
     JOptionPane
 }
 
-import org.intellij.plugins.ceylon.ide {
-    ITypeCheckerInvoker
-}
 import org.intellij.plugins.ceylon.ide.model {
     getCeylonProjects
 }
-import java.lang {
-    ObjectArray
+import org.intellij.plugins.ceylon.ide.startup {
+    CeylonIdePlugin
 }
 
 shared class AddBootstrapFilesAction() extends AnAction() {
@@ -41,8 +39,6 @@ shared class AddBootstrapFilesAction() extends AnAction() {
         value versions = versionsAvailableForBoostrap;
         
         if (exists project = projects.getProject(mod),
-            exists tcInvoker
-                    = Extensions.getExtensions(ITypeCheckerInvoker.epName)[0],
             exists version
                     = JOptionPane.showInputDialog(null,
                         "Select a Ceylon version",
@@ -51,7 +47,7 @@ shared class AddBootstrapFilesAction() extends AnAction() {
                         ObjectArray.with(versions),
                         versions.first)) {
 
-            value repo = tcInvoker.embeddedCeylonDist;
+            value repo = CeylonIdePlugin.embeddedCeylonDist;
             variable value success = false;
             variable value force = false;
             

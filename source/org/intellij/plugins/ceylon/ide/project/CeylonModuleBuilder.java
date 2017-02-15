@@ -2,7 +2,10 @@ package org.intellij.plugins.ceylon.ide.project;
 
 import ceylon.interop.java.CeylonStringIterable;
 import com.intellij.facet.FacetManager;
-import com.intellij.ide.util.projectWizard.*;
+import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
+import com.intellij.ide.util.projectWizard.ModuleBuilderListener;
+import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
@@ -14,13 +17,11 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider;
-import org.intellij.plugins.ceylon.ide.ITypeCheckerProvider;
+import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.intellij.plugins.ceylon.ide.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
 import org.intellij.plugins.ceylon.ide.settings.ceylonSettings_;
-import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.JpsElement;
@@ -50,7 +51,8 @@ public class CeylonModuleBuilder extends JavaModuleBuilder {
             @Override
             public void moduleCreated(@NotNull Module module) {
                 persistConfiguration(module);
-                ((TypeCheckerProvider) module.getComponent(ITypeCheckerProvider.class)).moduleAdded();
+                org.intellij.plugins.ceylon.ide.model.CeylonProjectManager.forModule(module)
+                        .moduleAdded();
             }
         });
     }

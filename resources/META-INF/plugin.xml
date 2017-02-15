@@ -37,8 +37,7 @@
 
     <module-components>
         <component>
-            <interface-class>org.intellij.plugins.ceylon.ide.ITypeCheckerProvider</interface-class>
-            <implementation-class>org.intellij.plugins.ceylon.ide.annotator.TypeCheckerProvider</implementation-class>
+            <implementation-class>org.intellij.plugins.ceylon.ide.model.CeylonProjectManager</implementation-class>
         </component>
     </module-components>
 

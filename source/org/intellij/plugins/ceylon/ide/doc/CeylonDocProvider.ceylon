@@ -60,9 +60,6 @@ import java.util.concurrent {
     TimeUnit
 }
 
-import org.intellij.plugins.ceylon.ide {
-    ITypeCheckerProvider
-}
 import org.intellij.plugins.ceylon.ide.correct {
     IdeaQuickFixData
 }
@@ -80,7 +77,8 @@ import org.intellij.plugins.ceylon.ide.lightpsi {
 }
 import org.intellij.plugins.ceylon.ide.model {
     getCeylonProjects,
-    FakeCompletionDeclaration
+    FakeCompletionDeclaration,
+    getCeylonProject
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonCompositeElement,
@@ -133,9 +131,8 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     exists typechecker = file.typechecker) {
                     return typechecker;
                 }
-                if (exists mod = moduleForFile(file)) {
-                    value provider = mod.getComponent(`ITypeCheckerProvider`);
-                    return provider.typeChecker;
+                if (exists project = getCeylonProject(file)) {
+                    return project.typechecker;
                 }
             }
             if (exists ceylonProjects = getCeylonProjects(element.project)) {

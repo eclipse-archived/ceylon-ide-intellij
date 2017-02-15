@@ -14,7 +14,6 @@ import com.redhat.ceylon.compiler.js.util.Options;
 import com.redhat.ceylon.compiler.typechecker.TypeChecker;
 import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
 import com.redhat.ceylon.compiler.typechecker.tree.Message;
-import org.intellij.plugins.ceylon.ide.ITypeCheckerProvider;
 import org.intellij.plugins.ceylon.ide.model.IdeaCeylonProject;
 import org.intellij.plugins.ceylon.ide.model.IdeaCeylonProjects;
 import org.intellij.plugins.ceylon.ide.settings.ceylonSettings_;
@@ -52,11 +51,7 @@ public class CeylonJsBuilder implements CompileTask {
                 Collection<VirtualFile> files = filesByModule.get(module);
                 List<File> jsFiles = new ArrayList<>();
 
-                ITypeCheckerProvider provider = module.getComponent(ITypeCheckerProvider.class);
-                if (provider == null) {
-                    continue;
-                }
-                TypeChecker tc = provider.getTypeChecker();
+                TypeChecker tc = project.getTypechecker();
                 if (tc == null) {
                     continue;
                 }

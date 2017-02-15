@@ -37,9 +37,6 @@ import com.intellij.openapi.compiler {
 import com.intellij.openapi.diagnostic {
     Logger
 }
-import com.intellij.openapi.extensions {
-    Extensions
-}
 import com.intellij.openapi.project {
     Project
 }
@@ -58,11 +55,11 @@ import java.io {
     File
 }
 
-import org.intellij.plugins.ceylon.ide {
-    ITypeCheckerInvoker
-}
 import org.intellij.plugins.ceylon.ide.model {
     getCeylonProject
+}
+import org.intellij.plugins.ceylon.ide.startup {
+    CeylonIdePlugin
 }
 import org.intellij.plugins.ceylon.ide.util {
     icons
@@ -107,11 +104,10 @@ shared class CeylonBeforeRunTaskProvider extends BeforeRunTaskProvider<CeylonBef
             then getCeylonProject(mod)?.rootDirectory
             else null;
 
-        if (exists workingDirectory,
-            exists tcInvoker = Extensions.getExtensions(ITypeCheckerInvoker.epName).get(0)) {
+        if (exists workingDirectory) {
 
             try {
-                value ceylonBinary = File(tcInvoker.embeddedCeylonDist, "bin/ceylon");
+                value ceylonBinary = File(CeylonIdePlugin.embeddedCeylonDist, "bin/ceylon");
                 ceylonBinary.setExecutable(true, true);
                 value command = GeneralCommandLine(ceylonBinary.absolutePath, task.command, *task.parameters)
                     .withWorkDirectory(workingDirectory);
