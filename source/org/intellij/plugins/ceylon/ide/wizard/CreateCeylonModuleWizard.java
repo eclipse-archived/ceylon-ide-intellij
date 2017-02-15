@@ -31,9 +31,9 @@ public class CreateCeylonModuleWizard extends DialogWrapper {
     private JTextField moduleVersion;
     private JTextField compilationUnit;
 
-    public CreateCeylonModuleWizard(@NotNull Project project, @Nullable IdeaCeylonProject ceylonProject) {
+    public CreateCeylonModuleWizard(@NotNull Project project, @Nullable Object ceylonProject) {
         super(project, true);
-        this.project = ceylonProject;
+        this.project = (org.intellij.plugins.ceylon.ide.model.IdeaCeylonProject) ceylonProject;
 
         $$$setupUI$$$();
         setTitle(message("ceylon.module.wizard.title"));
