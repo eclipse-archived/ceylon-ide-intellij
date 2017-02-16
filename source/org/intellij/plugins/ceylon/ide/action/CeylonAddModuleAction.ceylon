@@ -24,35 +24,33 @@ import com.intellij.openapi.vfs {
 }
 import com.intellij.psi {
     PsiDirectory,
-    PsiElement,
     PsiFile,
     PsiManager
 }
 import com.redhat.ceylon.common {
     Backend
 }
+
+import java.lang {
+    Runnable
+}
+
+import javax.swing {
+    ...
+}
+
 import org.intellij.plugins.ceylon.ide.model {
     CeylonModelManager,
     IdeaCeylonProject
+}
+import org.intellij.plugins.ceylon.ide.psi {
+    ceylonFileFactory
 }
 import org.intellij.plugins.ceylon.ide.util {
     icons
 }
 import org.intellij.plugins.ceylon.ide.wizard {
     CreateCeylonModuleWizard
-}
-import org.jetbrains.annotations {
-    NotNull,
-    Nullable
-}
-import javax.swing {
-    ...
-}
-import java.lang {
-    Runnable
-}
-import org.intellij.plugins.ceylon.ide.psi {
-    ceylonFileFactory
 }
 
 shared class CeylonAddModuleAction() extends CeylonAddingFilesAction() {
@@ -89,9 +87,7 @@ shared class CeylonAddModuleAction() extends CeylonAddingFilesAction() {
 
                         try {
                             variable Backend? backend;
-                            if (!exists project) {
-                                backend = null;
-                            } else if (project.compileToJs, !project.compileToJava) {
+                            if (project.compileToJs, !project.compileToJava) {
                                 backend = Backend.\iJavaScript;
                             } else if (!project.compileToJs, project.compileToJava) {
                                 backend = Backend.\iJava;
@@ -117,7 +113,6 @@ shared class CeylonAddModuleAction() extends CeylonAddingFilesAction() {
 
                     void configureSourceRootIfNeeded() {
                         if (ProjectRootsUtil.isSourceRoot(srcRootDir),
-                            exists project,
                             !project.configuration.sourceDirectories.contains(srcRootDir.virtualFile)) {
 
                             project.addSourceRoot(srcRootDir.virtualFile);
