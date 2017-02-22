@@ -39,7 +39,7 @@ ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.noneIndent, null)
 [IElementType*] indentChildrenNormal = [
     Types.importModuleList, Types.block, Types.classBody, Types.interfaceBody,
     Types.namedArgumentList, Types.sequencedArgument, Types.importMemberOrTypeList,
-    Types.conditionList
+    Types.conditionList, Types.resourceList
 ];
 [IElementType*] indentChildrenNone = [
     Types.compilationUnit,
@@ -48,7 +48,7 @@ ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.noneIndent, null)
     Types.ifStatement, Types.elseClause
 ];
 [IElementType*] indentChildrenContinue = [
-    Types.extendedType, Types.satisfiedTypes, Types.caseTypes,
+    Types.extendedType, Types.satisfiedTypes, Types.abstractedType, Types.caseTypes,
     Types.lazySpecifierExpression, Types.specifierExpression,
     Types.delegatedConstructor, Types.typeConstraintList
 ];
@@ -70,7 +70,11 @@ Spacing spacingComment = Spacing.createSpacing(0, 100, 0, true, 1);
 ];
 [IElementType*] typesRequiringNoSpacing = [
     Types.typeArgumentList, Types.typeParameterList,
-    Types.sequencedType, Types.indexExpression
+    Types.sequencedType, Types.indexExpression,
+    Types.negativeOp, Types.positiveOp,
+    Types.decrementOp, Types.postfixDecrementOp,
+    Types.incrementOp, Types.postfixIncrementOp,
+    Types.defaultTypeArgument
 ];
 //be very careful here not to mix up Tokens vs Types!
 [IElementType*] typesRequiringNoLeftSpacing = [
@@ -168,11 +172,20 @@ shared class CeylonBlock(ASTNode node, Indent myIndent) satisfies Block {
                 c.textLength > 0) {
 
                 value indent =
-                    if (type in [Tokens.rbrace, Tokens.lbrace]) then Indent.noneIndent
-                    else if (exists p = prevChildType, p == Types.annotationList) then Indent.noneIndent
-                    else if (type in memberOps) then Indent.normalIndent
-                    else if (type == Types.listedArgument) then Indent.normalIndent
-                    else if (nodeType == Types.letClause, type in [Types.variable, Types.destructure]) then Indent.normalIndent
+                    if (type in [Tokens.rbrace, Tokens.lbrace])
+                    then Indent.noneIndent
+                    else if (exists p = prevChildType, p == Types.annotationList)
+                    then Indent.noneIndent
+                    else if (type in memberOps)
+                    then Indent.normalIndent
+                    else if (nodeType == Types.sequencedArgument, node.treeParent.elementType == Types.namedArgumentList)
+                    then Indent.noneIndent // no extra indent for sequenced args in named args
+                    else if (type == Types.listedArgument)
+                    then Indent.normalIndent
+                    else if (nodeType == Types.letClause, type in [Types.variable, Types.destructure])
+                    then Indent.normalIndent // indent stuff in let() clause
+                    else if (nodeType == Types.specifierExpression, node.treeParent.elementType == Types.specifiedArgument)
+                    then Indent.noneIndent // no extra indent for named args
                     else normalChildIndent;
                 blocks.add(CeylonBlock(c, indent));
             }
@@ -224,6 +237,9 @@ shared class CeylonBlock(ASTNode node, Indent myIndent) satisfies Block {
         } else if (Types.\ialias in [nodeType, type1]) {
             // import { A=B }
             return spacingNone;
+        } else if (type1 == Types.identifier, type2 == Types.defaultTypeArgument) {
+            // <A=B>
+            return spacingNone;
         } else if (Tokens.intersectionOp in bothTypes && nodeType == Types.satisfiedTypes) {
             // satisfies A & B
             return spacingSingleSpace;
@@ -249,7 +265,7 @@ shared class CeylonBlock(ASTNode node, Indent myIndent) satisfies Block {
         } else if (type1 == Tokens.lbrace && type2 == Tokens.rbrace) {
             // {}
             return spacingNoneAllowNewLine;
-        } else if (nodeType == Types.spreadArgument && type1 == Tokens.productOp) {
+        } else if (nodeType in [Types.spreadArgument, Types.spreadType] && type1 == Tokens.productOp) {
             // *spreadArg
             return spacingNone;
         } else if (nodeType == Types.functionType) {
@@ -266,6 +282,10 @@ shared class CeylonBlock(ASTNode node, Indent myIndent) satisfies Block {
             return spacingInlineSingleSpace;
         } else if (Types.identifier in bothTypes && nodeType in classOrInterface) {
             return spacingInlineSingleSpace;
+        } else if ((type1 == Tokens.lbrace && type2 in [Types.sequencedArgument, Types.specifiedArgument])
+            || (type1 in [Types.sequencedArgument, Types.specifiedArgument] && type2 == Tokens.rbrace)) {
+            // allow { 1, 2, 3 } on a single line
+            return spacingSingleSpace;
         } else if (nodeType in indentChildrenNormal
             && type2 == Tokens.rbrace
             && type1 != Tokens.lbrace) {
