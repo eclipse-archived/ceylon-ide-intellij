@@ -439,7 +439,7 @@ shared class CeylonPageTwo()
 shared class PageTwoWizardStep(CeylonModuleBuilder moduleBuilder)
         extends ModuleWizardStep() {
 
-    value step = CeylonPageTwo();
+    value step = CeylonPageTwo().init();
 
     component => step.panel;
 

@@ -56,7 +56,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value=""/>
+              <text value="./modules"/>
             </properties>
           </component>
           <component id="b4e43" class="javax.swing.JLabel">
