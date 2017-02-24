@@ -22,13 +22,13 @@ import java.util {
     ArrayList
 }
 
+import org.intellij.plugins.ceylon.ide.highlighting {
+    ceylonHighlighter
+}
 import org.intellij.plugins.ceylon.ide.psi {
     Tokens=CeylonTokens,
     Types=CeylonTypes,
     CeylonPsi
-}
-import org.intellij.plugins.ceylon.ide.highlighting {
-    ceylonHighlighter
 }
 
 // child attributes
@@ -53,17 +53,6 @@ ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.noneIndent, null)
     Types.delegatedConstructor, Types.typeConstraintList
 ];
 
-// spacings
-Spacing spacingNone = Spacing.createSpacing(0, 0, 0, false, 0);
-Spacing spacingNoneAllowNewLine = Spacing.createSpacing(0, 0, 0, true, 0);
-Spacing spacingEmptyLine = Spacing.createSpacing(0, 0, 2, true, 0);
-Spacing spacingNewLine = Spacing.createSpacing(0, 0, 1, true, 1);
-Spacing spacingStrictNewLine = Spacing.createSpacing(0, 0, 1, false, 0);
-Spacing spacingSingleSpace = Spacing.createSpacing(1, 1, 0, true, 0);
-Spacing spacingInlineSingleSpace = Spacing.createSpacing(1, 1, 0, false, 0);
-Spacing spacingKeepSomeSpace = Spacing.createSpacing(1, 1, 0, true, 1);
-Spacing spacingComment = Spacing.createSpacing(0, 100, 0, true, 1);
-
 // Groups of element types
 [IElementType*] typesRequiringEmptyLine = [
     Types.importList, Types.classDefinition, Types.methodDefinition, Types.objectDefinition
@@ -73,8 +62,7 @@ Spacing spacingComment = Spacing.createSpacing(0, 100, 0, true, 1);
     Types.sequencedType, Types.indexExpression,
     Types.negativeOp, Types.positiveOp,
     Types.decrementOp, Types.postfixDecrementOp,
-    Types.incrementOp, Types.postfixIncrementOp,
-    Types.defaultTypeArgument
+    Types.incrementOp, Types.postfixIncrementOp
 ];
 //be very careful here not to mix up Tokens vs Types!
 [IElementType*] typesRequiringNoLeftSpacing = [
@@ -134,7 +122,55 @@ Spacing spacingComment = Spacing.createSpacing(0, 100, 0, true, 1);
     Types.classDefinition, Types.interfaceDefinition
 ];
 
-shared class CeylonBlock(ASTNode node, Indent myIndent) satisfies Block {
+class Spacings(CeylonCodeStyleSettings settings) {
+    shared Spacing none = Spacing.createSpacing(0, 0, 0, false, 0);
+    shared Spacing noneAllowNewLine = Spacing.createSpacing(0, 0, 0, true, 0);
+    shared Spacing emptyLine = Spacing.createSpacing(0, 0, 2, true, 0);
+    shared Spacing newLine = Spacing.createSpacing(0, 0, 1, true, 1);
+    shared Spacing strictNewLine = Spacing.createSpacing(0, 0, 1, false, 0);
+    shared Spacing singleSpace = Spacing.createSpacing(1, 1, 0, true, 0);
+    shared Spacing inlineSingleSpace = Spacing.createSpacing(1, 1, 0, false, 0);
+    shared Spacing keepSomeSpace = Spacing.createSpacing(1, 1, 0, true, 1);
+    shared Spacing comment = Spacing.createSpacing(0, 100, 0, true, 1);
+
+    shared Spacing beforePositionalArgs
+            => settings.spaceBeforePositionalArgs then singleSpace else none;
+    shared Spacing beforeAnnotationPositionalArgs
+            => settings.spaceBeforeAnnotationPositionalArgs then singleSpace else none;
+    shared Spacing inSatisfiesAndOf
+            => settings.spaceInSatisfiesAndOf then singleSpace else none;
+    shared Spacing aroundEqualsInImportAlias
+            => settings.spaceAroundEqualsInImportAlias then singleSpace else none;
+    shared Spacing afterTypeParam
+            => settings.spaceAfterTypeParam then singleSpace else none;
+    shared Spacing afterTypeArg
+            => settings.spaceAfterTypeArg then singleSpace else none;
+    shared Spacing aroundEqualsInTypeArgs
+            => settings.spaceAroundEqualsInTypeArgs then singleSpace else none;
+    shared Spacing afterKeyword
+            => settings.spaceAfterKeyword then singleSpace else none;
+
+    shared Spacing beforeParamListOpen
+            => settings.spaceBeforeParamListOpen then singleSpace else none;
+    shared Spacing afterParamListOpen
+            => settings.spaceAfterParamListOpen then singleSpace else none;
+    shared Spacing beforeParamListClose
+            => settings.spaceBeforeParamListClose then singleSpace else none;
+    shared Spacing afterParamListClose
+            => settings.spaceAfterParamListClose then singleSpace else none;
+
+    shared Spacing afterIterableEnumOpen
+            => settings.spaceAfterIterableEnumOpen then singleSpace else none;
+    shared Spacing beforeIterableEnumClose
+            => settings.spaceBeforeIterableEnumClose then singleSpace else none;
+
+    shared Spacing afterIteratorInLoopOpen
+            => settings.spaceAfterIteratorInLoopOpen then singleSpace else none;
+    shared Spacing beforeIteratorInLoopClose
+            => settings.spaceBeforeIteratorInLoopClose then singleSpace else none;
+}
+
+class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Block {
 
     alignment => null;
 
@@ -187,7 +223,8 @@ shared class CeylonBlock(ASTNode node, Indent myIndent) satisfies Block {
                     else if (nodeType == Types.specifierExpression, node.treeParent.elementType == Types.specifiedArgument)
                     then Indent.noneIndent // no extra indent for named args
                     else normalChildIndent;
-                blocks.add(CeylonBlock(c, indent));
+                blocks.add(CeylonBlock(c, indent, spacings));
+//                print(node.elementType.string + "/" + type.string + " => " + indent.type.string);
             }
 
             if (!type in [TokenType.whiteSpace, Tokens.lineComment, Tokens.multiComment]) {
@@ -206,7 +243,7 @@ shared class CeylonBlock(ASTNode node, Indent myIndent) satisfies Block {
 
     Spacing calcSpacing(CeylonBlock? block1, CeylonBlock block2) {
         if (!exists block1) {
-            return spacingNone;
+            return spacings.none;
         }
 
         value type1 = block1.node.elementType;
@@ -216,101 +253,130 @@ shared class CeylonBlock(ASTNode node, Indent myIndent) satisfies Block {
 
         if (type1 == Tokens.\ireturn && type2 == Tokens.semicolon) {
             // return;
-            return spacingNone;
+            return spacings.none;
+        } else if (type2 == Types.parameterList) {
+            return spacings.beforeParamListOpen;
+        } else if (type1 == Types.parameterList) {
+            return spacings.afterParamListClose;
+        } else if (type1 == Tokens.lparen, nodeType == Types.parameterList) {
+            return spacings.afterParamListOpen;
+        } else if (type2 == Tokens.rparen, nodeType == Types.parameterList) {
+            return spacings.beforeParamListClose;
+        } else if (type1 == Tokens.lparen, nodeType == Types.valueIterator) {
+            return spacings.afterIteratorInLoopOpen;
+        } else if (type2 == Tokens.rparen, nodeType == Types.valueIterator) {
+            return spacings.beforeIteratorInLoopClose;
         } else if (bothTypes.containsAny([Tokens.multiComment, Tokens.lineComment])) {
-            return spacingComment; //or just return null?
+            return spacings.comment; //or just return null?
         } else if (type1 in typesRequiringEmptyLine && type2 != Tokens.rbrace
             || type2 in typesRequiringEmptyLine && !type1 in [Tokens.lbrace, Types.annotationList]) {
-            return spacingEmptyLine;
+            return spacings.emptyLine;
         } else if (type1 == Types.importModule) {
-            return spacingNewLine;
+            return spacings.newLine;
         } else if (type2 == Types.importMember) {
-            return spacingNewLine;
+            return spacings.newLine;
         } else if (type1 == Types.anonymousAnnotation) {
-            return spacingNewLine;
+            return spacings.newLine;
         } else if (Tokens.unionOp in bothTypes && nodeType == Types.caseTypes) {
-            return spacingSingleSpace;
+            // of A | B
+            return spacings.inSatisfiesAndOf;
         } else if ((type1 == Types.variablePattern && type2 == Tokens.entryOp && block1.node.firstChildNode.firstChildNode.elementType == Types.baseType)
             || (type1 == Tokens.entryOp && type2 == Types.variablePattern && block2.node.firstChildNode.firstChildNode.elementType == Types.baseType)) {
             // value Boolean a -> Boolean b
-            return spacingSingleSpace;
+            return spacings.singleSpace;
         } else if (Types.\ialias in [nodeType, type1]) {
             // import { A=B }
-            return spacingNone;
-        } else if (type1 == Types.identifier, type2 == Types.defaultTypeArgument) {
+            return spacings.aroundEqualsInImportAlias;
+        } else if (Types.defaultTypeArgument in [nodeType, type2]) {
             // <A=B>
-            return spacingNone;
+            return spacings.aroundEqualsInTypeArgs;
+        } else if (type1 == Tokens.comma, nodeType == Types.typeParameterList) {
+            // <A, B> in type params
+            return spacings.afterTypeParam;
+        } else if (type1 == Tokens.comma, nodeType == Types.typeArgumentList) {
+            // <A, B> in type args
+            return spacings.afterTypeArg;
         } else if (Tokens.intersectionOp in bothTypes && nodeType == Types.satisfiedTypes) {
             // satisfies A & B
-            return spacingSingleSpace;
+            return spacings.inSatisfiesAndOf;
         } else if (type2 in memberOps) {
             return nodeType == Types.qualifiedMemberExpression
-            then spacingNoneAllowNewLine
-            else spacingNone;
+            then spacings.noneAllowNewLine
+            else spacings.none;
         } else if (type1 in typesRequiringNoRightSpacing
             || (type2 in typesRequiringNoLeftSpacing && !ceylonHighlighter.keywords.contains(type1))
             || (type1 == Types.smallerOp && type2 == Types.typeParameterDeclaration)
-            || (type1 == Types.typeParameterLiteral && type2 == Types.largerOp)
-            || (type2 == Types.positionalArgumentList && nodeType != Types.annotation)) {
-            return spacingNone;
+            || (type1 == Types.typeParameterLiteral && type2 == Types.largerOp)) {
+            return spacings.none;
+        } else if (type2 == Types.positionalArgumentList && nodeType != Types.annotation) {
+            // print("hello")
+            return spacings.beforePositionalArgs;
+        } else if (type2 == Types.positionalArgumentList && nodeType == Types.annotation) {
+            // by ("bye")
+            return spacings.beforeAnnotationPositionalArgs;
         } else if ((type1 in smallerOp && isType(block2))
             || (type2 in largerOp && isType(block1))) {
             // <TypeArgOrParam>
-            return spacingNone;
+            return spacings.none;
         } else if (type1 == Types.baseType && type2 == Tokens.productOp && node.treeNext.elementType == Types.identifier) {
             // String *a;
-            return spacingSingleSpace;
+            return spacings.singleSpace;
         } else if (nodeType in typesRequiringNoSpacing) {
-            return spacingNone;
+            return spacings.none;
         } else if (type1 == Tokens.lbrace && type2 == Tokens.rbrace) {
             // {}
-            return spacingNoneAllowNewLine;
+            return spacings.noneAllowNewLine;
         } else if (nodeType in [Types.spreadArgument, Types.spreadType] && type1 == Tokens.productOp) {
             // *spreadArg
-            return spacingNone;
+            return spacings.none;
         } else if (nodeType == Types.functionType) {
             return type1 == Tokens.comma
-            then spacingSingleSpace
-            else spacingNone;
+            then spacings.singleSpace
+            else spacings.none;
         } else if (type1 == Types.annotationList) {
-            return spacingKeepSomeSpace;
+            return spacings.keepSomeSpace;
         } else if (nodeType in inlineKeywords) {
-            return spacingInlineSingleSpace;
+            return spacings.inlineSingleSpace;
         } else if (nodeType == Types.annotationList && type1 == Types.stringLiteral) {
-            return spacingNewLine;
+            return spacings.newLine;
         } else if (nodeType == Types.methodDefinition && type2 == Types.block) {
-            return spacingInlineSingleSpace;
+            return spacings.inlineSingleSpace;
         } else if (Types.identifier in bothTypes && nodeType in classOrInterface) {
-            return spacingInlineSingleSpace;
-        } else if ((type1 == Tokens.lbrace && type2 in [Types.sequencedArgument, Types.specifiedArgument])
-            || (type1 in [Types.sequencedArgument, Types.specifiedArgument] && type2 == Tokens.rbrace)) {
-            // allow { 1, 2, 3 } on a single line
-            return spacingSingleSpace;
+            return spacings.inlineSingleSpace;
+        } else if (type1 == Tokens.lbrace && type2 in [Types.sequencedArgument, Types.specifiedArgument]) {
+            // { 1, 2, 3}
+            return spacings.afterIterableEnumOpen;
+        } else if (type1 in [Types.sequencedArgument, Types.specifiedArgument] && type2 == Tokens.rbrace) {
+            // {1, 2, 3 }
+            return spacings.beforeIterableEnumClose;
         } else if (nodeType in indentChildrenNormal
             && type2 == Tokens.rbrace
             && type1 != Tokens.lbrace) {
-            return spacingStrictNewLine;
+            return spacings.strictNewLine;
         } else if (nodeType in indentChildrenNormal
             && type1 == Tokens.lbrace
             && type2 != Tokens.rbrace) {
-            return spacingNewLine;
+            return spacings.newLine;
         } else if (isStatement(block1) && isStatement(block2)) {
-            return spacingNewLine;
+            return spacings.newLine;
         } else if (isMetaLiteral(this) && Tokens.backtick in bothTypes) {
-            return spacingNone;
-        } else if (nodeType == Types.annotation && type1 == Types.identifier) {
-            return spacingSingleSpace;
+            return spacings.none;
         } else if (bothTypes.containsAny([Tokens.elseClause, Types.elseClause])) {
             return nodeType == Types.switchCaseList
-            then spacingStrictNewLine
-            else spacingInlineSingleSpace;
+            then spacings.strictNewLine
+            else spacings.inlineSingleSpace;
         } else if (nodeType == Types.stringTemplate) {
-            return spacingNoneAllowNewLine; // TODO: spacing for longer expressions
+            return spacings.noneAllowNewLine; // TODO: spacing for longer expressions
         } else if (nodeType == Types.iterableType) {
-            return spacingNone;
+            return spacings.none;
+        } else if (type1 in [Tokens.ifClause, Tokens.elseClause, Tokens.forClause,
+            Tokens.whileClause, Tokens.switchClause, Tokens.caseClause, Tokens.\iassert,
+            Tokens.tryClause, Tokens.catchClause, Tokens.finallyClause, Tokens.\idynamic,
+            Tokens.\ilet]) {
+            return spacings.afterKeyword;
         }
 
-        return spacingSingleSpace;
+        return spacings.singleSpace;
     }
 
     Boolean isStatement(CeylonBlock block) {

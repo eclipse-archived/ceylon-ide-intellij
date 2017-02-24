@@ -137,6 +137,10 @@
         <quoteHandler fileType="Ceylon" className="org.intellij.plugins.ceylon.ide.lang.CeylonQuoteHandler"/>
         <lang.foldingBuilder language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonFoldingBuilder"/>
         <lang.formatter language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.formatting.CeylonFormattingModelBuilder"/>
+        <codeStyleSettingsProvider
+                implementation="org.intellij.plugins.ceylon.ide.formatting.CeylonCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider
+                implementation="org.intellij.plugins.ceylon.ide.formatting.CeylonLanguageCodeStyleSettingsProvider"/>
         <statementUpDownMover implementation="org.intellij.plugins.ceylon.ide.lang.CeylonStatementUpDownMover"/>
         <moveLeftRightHandler language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.lang.CeylonMoveLeftRightHandler"/>
         <lang.unwrapDescriptor language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.CeylonUnwrapDescriptor"/>

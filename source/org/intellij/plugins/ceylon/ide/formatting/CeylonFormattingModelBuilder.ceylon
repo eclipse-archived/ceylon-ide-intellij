@@ -24,7 +24,8 @@ shared class CeylonFormattingModelBuilder() satisfies FormattingModelBuilder {
     shared actual FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
         value containingFile = element.containingFile.viewProvider.getPsi(CeylonLanguage.instance);
         value fileNode = containingFile.node;
-        value block = CeylonBlock(fileNode, Indent.absoluteNoneIndent);
+        value spacings = Spacings(settings.getCustomSettings(`CeylonCodeStyleSettings`));
+        value block = CeylonBlock(fileNode, Indent.absoluteNoneIndent, spacings);
         return FormattingModelProvider.createFormattingModelForPsiFile(containingFile, block, settings);
     }
 
