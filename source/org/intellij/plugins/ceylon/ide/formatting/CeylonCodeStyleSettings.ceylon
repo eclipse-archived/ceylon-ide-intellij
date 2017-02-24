@@ -1,6 +1,7 @@
 import com.intellij.application.options {
     CodeStyleAbstractConfigurable,
-    TabbedLanguageCodeStylePanel
+    TabbedLanguageCodeStylePanel,
+    SmartIndentOptionsEditor
 }
 import com.intellij.application.options.codeStyle {
     CodeStyleSpacesPanel
@@ -13,6 +14,7 @@ import com.intellij.psi.codeStyle {
     },
     CodeStyleSettingsCustomizable
 }
+
 import org.intellij.plugins.ceylon.ide.lang {
     CeylonLanguage
 }
@@ -97,6 +99,8 @@ shared class CeylonLanguageCodeStyleSettingsProvider()
         else {}
     }
 
+    indentOptionsEditor => SmartIndentOptionsEditor();
+
     value codeSampleSpaces =>
             """import ceylon.file {
                    pp=parsePath,
@@ -153,12 +157,43 @@ shared class CeylonLanguageCodeStyleSettingsProvider()
                        => print(`Param1`.string + " " + `Param2`.string);
                """;
 
+    value codeSampleIndents =>
+            """shared class AccessCountingIterable<Element, Absent>(Iterable<Element,Absent> wrapped)
+                       extends Object()
+                       satisfies Iterable<Element,Absent>
+                       given Absent satisfies Null {
+
+                   variable Integer accessCounter = 0;
+                   shared Integer accessCount => accessCounter;
+
+                   shared actual Iterator<Element> iterator() {
+                       accessCounter++;
+                       return wrapped.iterator();
+                   }
+
+                   shared actual Boolean equals(Object that) {
+                       if (is Iterable<Element,Absent> that) {
+                           return wrapped == that;
+                       } else {
+                           return false;
+                       }
+                   }
+
+                   shared actual Integer hash =>
+                       sum {
+                           accessCounter.hash,
+                           wrapped.hash
+                       };
+               }
+               """;
+
     getCodeSample(SettingsType settingsType)
             => switch (settingsType)
                 case (SettingsType.spacingSettings) codeSampleSpaces
+                case (SettingsType.indentSettings) codeSampleIndents
                 else """shared class MyClass<A, B, C>()
                                        given A satisfies Object
-                                           & B satisfies Foo {
+                                       given B satisfies Foo {
                                    }
-                                   """;
+                        """;
 }
