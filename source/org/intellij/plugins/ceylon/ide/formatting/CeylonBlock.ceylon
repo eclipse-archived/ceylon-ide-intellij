@@ -45,7 +45,7 @@ ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.normalIndent, nul
     Types.conditionList, Types.resourceList
 ];
 [IElementType*] indentChildrenNone = [
-    Types.compilationUnit, Types.importList,
+    Types.compilationUnit, Types.importList, Types.moduleDescriptor,
     Types.switchStatement, Types.switchCaseList, Types.switchClause, Types.caseClause,
     Types.sequenceEnumeration, Types.annotationList, Types.typeConstraintList,
     Types.ifStatement, Types.elseClause
