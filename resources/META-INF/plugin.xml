@@ -182,6 +182,8 @@
         <itemPresentationProvider forClass="org.intellij.plugins.ceylon.ide.codeInsight.navigation.DeclarationNavigationItem"
                                   implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.navigation.DeclarationPresentationProvider"/>
         <moduleRendererFactory implementation="org.intellij.plugins.ceylon.ide.codeInsight.navigation.DeclarationModuleRendererFactory"/>
+        <codeInsight.parameterNameHints language="Ceylon"
+                                        implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.CeylonInlayParameterHintsProvider"/>
 
         <typeHierarchyProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.hierarchy.CeylonTypeHierarchyProvider"/>
         <methodHierarchyProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.hierarchy.CeylonMethodHierarchyProvider"/>
