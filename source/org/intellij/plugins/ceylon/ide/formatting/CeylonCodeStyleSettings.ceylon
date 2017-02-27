@@ -214,9 +214,7 @@ shared class CeylonLanguageCodeStyleSettingsProvider()
                       "are", "most", "appropriate"
                   };
 
-                  class ManyTypeParams<P1,
-                      P2,
-                      P3>() {
+                  class ManyTypeParams<P1, P2, P3>() {
                       String s1 = "";
 
                       // How many line breaks do you want to allow between this comment and other content?
