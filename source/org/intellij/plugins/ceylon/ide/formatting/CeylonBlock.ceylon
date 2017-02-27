@@ -45,7 +45,7 @@ ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.normalIndent, nul
     Types.conditionList, Types.resourceList
 ];
 [IElementType*] indentChildrenNone = [
-    Types.compilationUnit,
+    Types.compilationUnit, Types.importList,
     Types.switchStatement, Types.switchCaseList, Types.switchClause, Types.caseClause,
     Types.sequenceEnumeration, Types.annotationList, Types.typeConstraintList,
     Types.ifStatement, Types.elseClause
@@ -287,7 +287,7 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
         } else if (type1 == Types.methodDefinition && type2 != Tokens.rbrace
             || type2 == Types.methodDefinition && !type1 in [Tokens.lbrace, Types.annotationList]) {
             return spacings.aroundMethod;
-        } else if (type1 == Types.importModule) {
+        } else if (type1 in [Types.importModule, Types.\iimport]) {
             return spacings.newLine;
         } else if (type2 == Types.importMember) {
             return spacings.newLine;
