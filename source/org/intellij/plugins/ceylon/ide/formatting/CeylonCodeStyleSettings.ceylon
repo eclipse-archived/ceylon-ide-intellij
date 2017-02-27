@@ -57,7 +57,7 @@ shared class CeylonCodeStyleSettingsProvider extends CodeStyleSettingsProvider {
                     initCustomOptions(iteratorInLoopGroup);
                 }
             });
-            addWrappingAndBracesTab(mySettings);
+//            addWrappingAndBracesTab(mySettings);
             addBlankLinesTab(mySettings);
             // TODO tabs for imports etc.
         }
@@ -95,6 +95,17 @@ shared class CeylonLanguageCodeStyleSettingsProvider()
 
             consumer.showCustomOption(`CeylonCodeStyleSettings`, "spaceAfterIteratorInLoopOpen", "Space after opening '('", CeylonCodeStyleSettingsProvider.iteratorInLoopGroup);
             consumer.showCustomOption(`CeylonCodeStyleSettings`, "spaceBeforeIteratorInLoopClose", "Space before closing ')'", CeylonCodeStyleSettingsProvider.iteratorInLoopGroup);
+        }
+        case (SettingsType.blankLinesSettings) {
+            consumer.showStandardOptions(
+//                "KEEP_BLANK_LINES_IN_DECLARATIONS",
+                "KEEP_BLANK_LINES_IN_CODE",
+                "KEEP_BLANK_LINES_BEFORE_RBRACE",
+
+                "BLANK_LINES_AFTER_IMPORTS",
+                "BLANK_LINES_AROUND_CLASS",
+                "BLANK_LINES_AROUND_METHOD"
+            );
         }
         else {}
     }
@@ -187,10 +198,51 @@ shared class CeylonLanguageCodeStyleSettingsProvider()
                }
                """;
 
+    value codeSampleBlankLines
+            => """import ceylon.language {
+                      pub=shared,
+                      var=variable,
+                      Str=String
+                  }
+
+                  {String*} words = { "You", "may", "want", "to", "break", "this", "up", "into", "multiple", "lines", "because", "like", "this", "it", "can", "be", "hard", "to", "read" };
+                  {String*} moreWords = {
+                      "However", "keep", "in", "mind", "that",
+                      "the", "formatter", "can", "never", "be",
+                      "as", "clever", "as", "a", "human",
+                      "when", "deciding", "where", "line", "breaks",
+                      "are", "most", "appropriate"
+                  };
+
+                  class ManyTypeParams<P1,
+                      P2,
+                      P3>() {
+                      String s1 = "";
+
+                      // How many line breaks do you want to allow between this comment and other content?
+
+                      String s2 = "";
+
+                      /* How about your single line comments like this one? */
+
+                      String s3 = "";
+
+                      /*
+                       And how about your
+                       multiline comments
+                       like this one?
+                       */
+
+                      String s4 = "";
+                      "";
+                  }
+                  """;
+
     getCodeSample(SettingsType settingsType)
             => switch (settingsType)
                 case (SettingsType.spacingSettings) codeSampleSpaces
                 case (SettingsType.indentSettings) codeSampleIndents
+                case (SettingsType.blankLinesSettings) codeSampleBlankLines
                 else """shared class MyClass<A, B, C>()
                                        given A satisfies Object
                                        given B satisfies Foo {

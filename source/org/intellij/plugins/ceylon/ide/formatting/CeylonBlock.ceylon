@@ -30,6 +30,9 @@ import org.intellij.plugins.ceylon.ide.psi {
     Types=CeylonTypes,
     CeylonPsi
 }
+import com.intellij.psi.codeStyle {
+    CodeStyleSettings
+}
 
 // child attributes
 ChildAttributes childAttrNoIndent = ChildAttributes(Indent.normalIndent, null);
@@ -54,8 +57,8 @@ ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.noneIndent, null)
 ];
 
 // Groups of element types
-[IElementType*] typesRequiringEmptyLine = [
-    Types.importList, Types.classDefinition, Types.methodDefinition, Types.objectDefinition
+[IElementType*] typesLikeClass = [
+    Types.classDefinition, Types.interfaceDefinition, Types.objectDefinition
 ];
 [IElementType*] typesRequiringNoSpacing = [
     Types.typeArgumentList, Types.typeParameterList,
@@ -122,16 +125,21 @@ ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.noneIndent, null)
     Types.classDefinition, Types.interfaceDefinition
 ];
 
-class Spacings(CeylonCodeStyleSettings settings) {
+class Spacings(CodeStyleSettings globalSettings) {
+    value settings = globalSettings.getCustomSettings(`CeylonCodeStyleSettings`);
+
     shared Spacing none = Spacing.createSpacing(0, 0, 0, false, 0);
     shared Spacing noneAllowNewLine = Spacing.createSpacing(0, 0, 0, true, 0);
-    shared Spacing emptyLine = Spacing.createSpacing(0, 0, 2, true, 0);
-    shared Spacing newLine = Spacing.createSpacing(0, 0, 1, true, 1);
+    shared Spacing aroundClass = Spacing.createSpacing(0, 0, globalSettings.blankLinesAroundClass + 1, true, globalSettings.keepBlankLinesInCode);
+    shared Spacing aroundMethod = Spacing.createSpacing(0, 0, globalSettings.blankLinesAroundMethod + 1, true, globalSettings.keepBlankLinesInCode);
+    shared Spacing newLine = Spacing.createSpacing(0, 0, 1, true, globalSettings.keepBlankLinesInCode);
     shared Spacing strictNewLine = Spacing.createSpacing(0, 0, 1, false, 0);
+    shared Spacing beforeRbrace = Spacing.createSpacing(0, 0, 1, true, globalSettings.keepBlankLinesBeforeRbrace);
+    shared Spacing afterImportList = Spacing.createSpacing(0, 0, globalSettings.blankLinesAfterImports + 1, true, globalSettings.keepBlankLinesInCode);
     shared Spacing singleSpace = Spacing.createSpacing(1, 1, 0, true, 0);
     shared Spacing inlineSingleSpace = Spacing.createSpacing(1, 1, 0, false, 0);
-    shared Spacing keepSomeSpace = Spacing.createSpacing(1, 1, 0, true, 1);
-    shared Spacing comment = Spacing.createSpacing(0, 100, 0, true, 1);
+    shared Spacing keepSomeSpace = Spacing.createSpacing(1, 1, 0, true, globalSettings.keepBlankLinesInCode);
+    shared Spacing comment = Spacing.createSpacing(0, 100, 0, true, globalSettings.keepBlankLinesInCode);
 
     shared Spacing beforePositionalArgs
             => settings.spaceBeforePositionalArgs then singleSpace else none;
@@ -268,9 +276,14 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
             return spacings.beforeIteratorInLoopClose;
         } else if (bothTypes.containsAny([Tokens.multiComment, Tokens.lineComment])) {
             return spacings.comment; //or just return null?
-        } else if (type1 in typesRequiringEmptyLine && type2 != Tokens.rbrace
-            || type2 in typesRequiringEmptyLine && !type1 in [Tokens.lbrace, Types.annotationList]) {
-            return spacings.emptyLine;
+        } else if (type1 == Types.importList) {
+            return spacings.afterImportList;
+        } else if (type1 in typesLikeClass && type2 != Tokens.rbrace
+            || type2 in typesLikeClass && !type1 in [Tokens.lbrace, Types.annotationList]) {
+            return spacings.aroundClass;
+        } else if (type1 == Types.methodDefinition && type2 != Tokens.rbrace
+            || type2 == Types.methodDefinition && !type1 in [Tokens.lbrace, Types.annotationList]) {
+            return spacings.aroundMethod;
         } else if (type1 == Types.importModule) {
             return spacings.newLine;
         } else if (type2 == Types.importMember) {
@@ -352,7 +365,7 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
         } else if (nodeType in indentChildrenNormal
             && type2 == Tokens.rbrace
             && type1 != Tokens.lbrace) {
-            return spacings.strictNewLine;
+            return spacings.beforeRbrace;
         } else if (nodeType in indentChildrenNormal
             && type1 == Tokens.lbrace
             && type2 != Tokens.rbrace) {
