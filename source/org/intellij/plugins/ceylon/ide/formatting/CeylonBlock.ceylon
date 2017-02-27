@@ -266,6 +266,9 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
             return spacings.beforeParamListOpen;
         } else if (type1 == Types.parameterList) {
             return spacings.afterParamListClose;
+        } else if (type1 == Tokens.lparen || type2 == Tokens.rparen,
+            nodeType == Types.positionalArgumentList) {
+            return spacings.noneAllowNewLine;
         } else if (type1 == Tokens.lparen, nodeType == Types.parameterList) {
             return spacings.afterParamListOpen;
         } else if (type2 == Tokens.rparen, nodeType == Types.parameterList) {
