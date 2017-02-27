@@ -35,8 +35,8 @@ import com.intellij.psi.codeStyle {
 }
 
 // child attributes
-ChildAttributes childAttrNoIndent = ChildAttributes(Indent.normalIndent, null);
-ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.noneIndent, null);
+ChildAttributes childAttrNoIndent = ChildAttributes(Indent.noneIndent, null);
+ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.normalIndent, null);
 
 // indents
 [IElementType*] indentChildrenNormal = [
