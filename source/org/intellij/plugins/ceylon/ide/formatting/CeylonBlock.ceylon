@@ -10,6 +10,9 @@ import com.intellij.lang {
 import com.intellij.psi {
     TokenType
 }
+import com.intellij.psi.codeStyle {
+    CodeStyleSettings
+}
 import com.intellij.psi.formatter {
     FormatterUtil
 }
@@ -29,9 +32,6 @@ import org.intellij.plugins.ceylon.ide.psi {
     Tokens=CeylonTokens,
     Types=CeylonTypes,
     CeylonPsi
-}
-import com.intellij.psi.codeStyle {
-    CodeStyleSettings
 }
 
 // child attributes
@@ -198,6 +198,14 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
 
     leaf => !node.firstChildNode exists;
 
+    Boolean atStartOfLine(ASTNode node) =>
+            if (exists prev = node.treePrev,
+                prev.elementType == TokenType.whiteSpace,
+                prev.chars.length()>0,
+                prev.chars.charAt(prev.chars.length() - 1) == '\n')
+            then true
+            else false;
+
     shared actual List<Block> subBlocks {
         value blocks = ArrayList<Block>();
         value nodeType = node.elementType;
@@ -218,6 +226,8 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
                 value indent =
                     if (type in [Tokens.rbrace, Tokens.lbrace])
                     then Indent.noneIndent
+                    else if (type == Tokens.lineComment, atStartOfLine(c))
+                    then Indent.absoluteNoneIndent
                     else if (exists p = prevChildType, p == Types.annotationList)
                     then Indent.noneIndent
                     else if (type in memberOps)
