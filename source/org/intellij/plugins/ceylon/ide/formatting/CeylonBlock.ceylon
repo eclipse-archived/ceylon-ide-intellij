@@ -53,7 +53,7 @@ ChildAttributes childAttrNormalIndent = ChildAttributes(Indent.normalIndent, nul
 [IElementType*] indentChildrenContinue = [
     Types.extendedType, Types.satisfiedTypes, Types.abstractedType, Types.caseTypes,
     Types.lazySpecifierExpression, Types.specifierExpression,
-    Types.delegatedConstructor, Types.typeConstraintList
+    Types.delegatedConstructor, Types.typeConstraintList, Types.parameterList
 ];
 
 // Groups of element types
@@ -161,7 +161,7 @@ class Spacings(CodeStyleSettings globalSettings) {
     shared Spacing beforeParamListOpen
             => settings.spaceBeforeParamListOpen then singleSpace else none;
     shared Spacing afterParamListOpen
-            => settings.spaceAfterParamListOpen then singleSpace else none;
+            => settings.spaceAfterParamListOpen then singleSpace else noneAllowNewLine;
     shared Spacing beforeParamListClose
             => settings.spaceBeforeParamListClose then singleSpace else none;
     shared Spacing afterParamListClose
