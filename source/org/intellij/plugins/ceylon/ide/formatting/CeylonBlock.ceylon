@@ -234,7 +234,7 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
                     then Indent.normalIndent
                     else if (nodeType == Types.sequencedArgument, node.treeParent.elementType == Types.namedArgumentList)
                     then Indent.noneIndent // no extra indent for sequenced args in named args
-                    else if (type == Types.listedArgument)
+                    else if (type == Types.listedArgument || (type == Tokens.lineComment && nodeType == Types.positionalArgumentList))
                     then Indent.normalIndent
                     else if (nodeType == Types.letClause, type in [Types.variable, Types.destructure])
                     then Indent.normalIndent // indent stuff in let() clause
@@ -400,6 +400,8 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
             Tokens.tryClause, Tokens.catchClause, Tokens.finallyClause, Tokens.\idynamic,
             Tokens.\ilet]) {
             return spacings.afterKeyword;
+        } else if (type1 == Tokens.comma, type2 == Types.listedArgument) {
+            return spacings.keepSomeSpace;
         }
 
         return spacings.singleSpace;
