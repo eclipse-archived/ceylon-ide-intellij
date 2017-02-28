@@ -50,6 +50,7 @@ shared class CeylonCodeStyleSettingsProvider extends CodeStyleSettingsProvider {
             addTab(object extends CodeStyleSpacesPanel(mySettings) {
                 somethingChanged() => super.somethingChanged();
                 defaultLanguage => outer.defaultLanguage;
+
                 shared actual void initTables() {
                     initCustomOptions(spacingOptionsGroup);
                     initCustomOptions(parameterListGroup);
@@ -72,7 +73,7 @@ shared class CeylonLanguageCodeStyleSettingsProvider()
 
     "Here we determine which standard+custom settings to show in the UI."
     shared actual void customizeSettings(CodeStyleSettingsCustomizable consumer,
-        SettingsType settingsType) {
+            SettingsType settingsType) {
 
         switch (settingsType)
         case (SettingsType.spacingSettings) {
@@ -236,14 +237,14 @@ shared class CeylonLanguageCodeStyleSettingsProvider()
                   }
                   """;
 
-    getCodeSample(SettingsType settingsType)
-            => switch (settingsType)
-                case (SettingsType.spacingSettings) codeSampleSpaces
-                case (SettingsType.indentSettings) codeSampleIndents
-                case (SettingsType.blankLinesSettings) codeSampleBlankLines
-                else """shared class MyClass<A, B, C>()
-                                       given A satisfies Object
-                                       given B satisfies Foo {
-                                   }
-                        """;
+    getCodeSample(SettingsType settingsType) =>
+            switch (settingsType)
+            case (SettingsType.spacingSettings) codeSampleSpaces
+            case (SettingsType.indentSettings) codeSampleIndents
+            case (SettingsType.blankLinesSettings) codeSampleBlankLines
+            else """shared class MyClass<A, B, C>()
+                        given A satisfies Object
+                        given B satisfies Foo {
+                    }
+                    """;
 }
