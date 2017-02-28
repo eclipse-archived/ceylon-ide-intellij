@@ -272,6 +272,9 @@ class CeylonBlock(ASTNode node, Indent myIndent, Spacings spacings) satisfies Bl
         if (type1 == Tokens.\ireturn && type2 == Tokens.semicolon) {
             // return;
             return spacings.none;
+        } else if (type1 == Tokens.\inew && type2 == Types.parameterList) {
+            // new () {}
+            return spacings.singleSpace;
         } else if (type2 == Types.parameterList) {
             return spacings.beforeParamListOpen;
         } else if (type1 == Types.parameterList) {
