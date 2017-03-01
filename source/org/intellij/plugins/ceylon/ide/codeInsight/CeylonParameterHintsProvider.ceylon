@@ -71,22 +71,21 @@ shared class CeylonInlayParameterHintsProvider() satisfies InlayParameterHintsPr
     shared actual List<InlayInfo> getParameterHints(PsiElement psiElement) {
         if (is CeylonPsi.InvocationExpressionPsi invocation = psiElement,
             is Tree.MemberOrTypeExpression mot = invocation.ceylonNode.primary,
+            exists argList = invocation.ceylonNode?.positionalArgumentList,
             exists pl = findParameterList(mot.declaration)) {
 
             value hints = ArrayList<InlayInfo>();
-            value args = invocation.ceylonNode.positionalArgumentList.positionalArguments;
+            value args = argList.positionalArguments;
             variable value idx = 0;
-
             for (param in pl.parameters) {
-                if (exists model = param.model,
-                    idx<args.size(),
-                    exists name = model.nameAsString) {
+                if (idx < args.size(),
+                    exists name = param.model?.nameAsString,
+                    exists index = args[idx]?.startIndex) {
 
-                    hints.add(InlayInfo(name, args.get(idx).startIndex.intValue()));
+                    hints.add(InlayInfo(name, index.intValue()));
                 }
                 idx++;
             }
-
             return hints;
         }
 
