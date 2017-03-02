@@ -34,7 +34,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.3.2-SNAPSHOT/ceylon.collection-1.3.2-SNAPSHOT.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.3.3-SNAPSHOT/ceylon.collection-1.3.3-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -43,7 +43,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.3.2-SNAPSHOT/ceylon.interop.java-1.3.2-SNAPSHOT.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.3.3-SNAPSHOT/ceylon.interop.java-1.3.3-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -61,7 +61,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.3.2-SNAPSHOT/ceylon.tool.converter.java2ceylon-1.3.2-SNAPSHOT.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.3.3-SNAPSHOT/ceylon.tool.converter.java2ceylon-1.3.3-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -102,7 +102,7 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.3.2-SNAPSHOT/com.redhat.ceylon.ide.common-1.3.2-SNAPSHOT.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.3.3-SNAPSHOT/com.redhat.ceylon.ide.common-1.3.3-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -111,18 +111,18 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon.formatter/modules/ceylon/formatter/1.3.2-SNAPSHOT/ceylon.formatter-1.3.2-SNAPSHOT.car!/" />
+          <root url="jar://$MODULE_DIR$/../ceylon.formatter/modules/ceylon/formatter/1.3.3-SNAPSHOT/ceylon.formatter-1.3.3-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.collection/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.file/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.formatter/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.interop.java/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.language/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.tool.converter.java2ceylon/1.3.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.collection/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.file/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.formatter/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.interop.java/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.language/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.tool.converter.java2ceylon/1.3.3-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.github.rjeschke.txtmark/0.13" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.google.guava:guava/19.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.annotations/current" level="project" />
@@ -132,15 +132,15 @@
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.openapi/current" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.util/current" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij:forms_rt/7.0.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.cli/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.common/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.compiler.java/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.compiler.js/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.langtools.classfile/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.model/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.module-resolver/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.tools/1.3.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.typechecker/1.3.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.cli/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.common/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.compiler.java/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.compiler.js/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.langtools.classfile/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.model/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.module-resolver/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.tools/1.3.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.typechecker/1.3.3-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: commons-lang:commons-lang/2.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: jdk.tools/current" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: net.lingala.zip4j/1.3.2" level="project" />
