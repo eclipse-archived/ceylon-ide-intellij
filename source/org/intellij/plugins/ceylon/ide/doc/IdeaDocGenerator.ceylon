@@ -63,7 +63,8 @@ import java.awt {
     }
 }
 import java.lang {
-    JStringBuilder=StringBuilder
+    JStringBuilder=StringBuilder,
+    NoClassDefFoundError
 }
 
 import javax.swing {
@@ -193,20 +194,26 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
                 then model.typeDeclaration
                 else model;
 
-        if (is IdeaJavaModelAware unit = declaration.unit,
-            exists javaEl = unit.toJavaElement(declaration)) {
+        try {
+            if (is IdeaJavaModelAware unit = declaration.unit,
+                exists javaEl = unit.toJavaElement(declaration)) {
 
-            if (exists doc = javaEl.docComment) {
-                appendDocSection(buffer, doc);
-            } else if (is ClsClassImpl javaEl,
-                       exists source = javaEl.sourceMirrorClass,
-                       exists doc = source.docComment) {
-                appendDocSection(buffer, doc);
-            } else if (is ClsMethodImpl javaEl,
-                       exists source = javaEl.sourceMirrorMethod,
-                       exists doc = source.docComment) {
-                appendDocSection(buffer, doc);
+                if (exists doc = javaEl.docComment) {
+                    appendDocSection(buffer, doc);
+                } else if (is ClsClassImpl javaEl,
+                    exists source = javaEl.sourceMirrorClass,
+                    exists doc = source.docComment) {
+                    appendDocSection(buffer, doc);
+                } else if (is ClsMethodImpl javaEl,
+                    exists source = javaEl.sourceMirrorMethod,
+                    exists doc = source.docComment) {
+                    appendDocSection(buffer, doc);
+                }
             }
+        }
+        catch (Exception|NoClassDefFoundError e) {
+            //workaround for Android Studio
+            e.printStackTrace();
         }
     }
 
