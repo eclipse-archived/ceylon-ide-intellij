@@ -32,12 +32,15 @@ public class CompilerConfigurable implements SearchableConfigurable, Configurabl
     private JCheckBox cmrCheckBox;
     private JCheckBox benchmarkCheckBox;
 
-    private List<JCheckBox> verbosities = Arrays.asList(
-            allCheckBox, loaderCheckBox, astCheckBox,
-            codeCheckBox, cmrCheckBox, benchmarkCheckBox
-    );
+    private List<JCheckBox> verbosities;
 
     public CompilerConfigurable() {
+
+        verbosities = Arrays.asList(
+                allCheckBox, loaderCheckBox, astCheckBox,
+                codeCheckBox, cmrCheckBox, benchmarkCheckBox
+        );
+
         verboseCheckbox.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
