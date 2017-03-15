@@ -26,9 +26,6 @@ import com.intellij.psi.util {
         getParentOfType
     }
 }
-import com.intellij.util {
-    IJFunction=Function
-}
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
 }
@@ -47,7 +44,6 @@ import com.redhat.ceylon.model.typechecker.util {
 }
 
 import java.lang {
-    JString=String,
     ObjectArray
 }
 
@@ -217,14 +213,12 @@ shared class CeylonParameterInfoHandler()
         }
 
         if (is ParameterInfoUIContextEx context) {
-            context.setEscapeFunction(object satisfies IJFunction<JString, JString> {
-                fun(JString string)
-                        => javaString(highlighter.highlight {
-                            rawText = convertFromHTML(string.string).replace(noparams, "$$");
-                            project = context.parameterOwner.project;
-                        }
-                        .replace("$$", "<i>no parameters</i>"));
-            });
+            context.setEscapeFunction((string)
+                    => javaString(highlighter.highlight {
+                        rawText = convertFromHTML(string.string).replace(noparams, "$$");
+                        project = context.parameterOwner.project;
+                    })
+                    .replace("$$", "<i>no parameters</i>"));
         }
 
         context.setupUIComponentPresentation(builder.string,
@@ -258,17 +252,16 @@ shared class CeylonParameterInfoHandler()
         }
         builder.append(param.name);
 
-        if (is Function model = param.model) {
-            if (exists parameterList = model.firstParameterList) {
-                builder.append("(");
-                for (parameter in parameterList.parameters) {
-                    if (!builder.endsWith("(")) {
-                        builder.append(", ");
-                    }
-                    builder.append(getParameterLabel(parameter, unit, ref));
+        if (is Function model = param.model,
+            exists parameterList = model.firstParameterList) {
+            builder.append("(");
+            for (parameter in parameterList.parameters) {
+                if (!builder.endsWith("(")) {
+                    builder.append(", ");
                 }
-                builder.append(")");
+                builder.append(getParameterLabel(parameter, unit, ref));
             }
+            builder.append(")");
         }
 
         if (param.defaulted) {
