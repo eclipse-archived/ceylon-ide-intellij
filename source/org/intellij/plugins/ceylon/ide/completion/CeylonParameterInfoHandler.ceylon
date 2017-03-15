@@ -141,15 +141,16 @@ shared class CeylonParameterInfoHandler()
         }
         else if (is CeylonPsi.NamedArgumentListPsi al,
             exists node = al.ceylonNode,
-            exists model = node.namedArgumentList) {
+            exists model = node.namedArgumentList,
+            exists parameterList = model.parameterList) {
 
             if (inSequencedArgs(al, model, offset)) {
-                context.setCurrentParameter(model.parameterList.parameters.size()-1);
+                context.setCurrentParameter(parameterList.parameters.size()-1);
             }
             else {
                 for (arg in node.namedArguments) {
                     if (arg.startIndex.intValue()-1 <= offset <= arg.endIndex.intValue()+1) {
-                        value params = model.parameterList.parameters;
+                        value params = parameterList.parameters;
                         for (index in 0:params.size()) {
                             if (exists param = params[index],
                                 param.name == arg.identifier.text) {
