@@ -1,5 +1,4 @@
 import ceylon.interop.java {
-    javaString,
     javaObjectArray
 }
 
@@ -214,10 +213,10 @@ shared class CeylonParameterInfoHandler()
 
         if (is ParameterInfoUIContextEx context) {
             context.setEscapeFunction((string)
-                    => javaString(highlighter.highlight {
+                    => highlighter.highlight {
                         rawText = convertFromHTML(string.string).replace(noparams, "$$");
                         project = context.parameterOwner.project;
-                    })
+                    }
                     .replace("$$", "<i>no parameters</i>"));
         }
 
