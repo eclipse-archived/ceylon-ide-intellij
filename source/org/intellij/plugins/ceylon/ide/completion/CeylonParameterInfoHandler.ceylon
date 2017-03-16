@@ -214,7 +214,7 @@ shared class CeylonParameterInfoHandler()
         if (is ParameterInfoUIContextEx context) {
             context.setEscapeFunction((string)
                     => highlighter.highlight {
-                        rawText = convertFromHTML(string.string).replace(noparams, "$$");
+                        rawText = convertFromHTML(string).replace(noparams, "$$");
                         project = context.parameterOwner.project;
                     }
                     .replace("$$", "<i>no parameters</i>"));
