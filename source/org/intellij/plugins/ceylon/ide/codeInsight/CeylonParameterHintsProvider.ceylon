@@ -16,11 +16,13 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 import com.redhat.ceylon.model.loader.model {
     JavaMethod,
-    LazyClass
+    LazyClass,
+    LazyFunction
 }
 import com.redhat.ceylon.model.typechecker.model {
     ParameterList,
-    Declaration
+    Declaration,
+    Functional
 }
 
 import java.lang {
@@ -42,10 +44,25 @@ import org.intellij.plugins.ceylon.ide.psi {
 
 "Provide parameter names for calls to Java methods (we can't use named arguments on them)."
 shared class CeylonInlayParameterHintsProvider() satisfies InlayParameterHintsProvider {
+
     blackListDependencyLanguage => null;
 
     // Just reuse the same list as the Java provider
     defaultBlackList => JavaInlayParameterHintsProvider().defaultBlackList;
+
+    function findParameterList(Declaration? decl)
+            => if (is Functional decl)
+            then decl.firstParameterList
+            else null;
+
+    function findMethodMirror(Declaration? decl)
+            => if (is PSIMethod mirror
+                = switch (decl)
+                case (is JavaMethod) decl.mirror
+                case (is LazyClass) decl.constructor
+                case (is LazyFunction) decl.methodMirror
+                else null)
+            then mirror else null;
 
     shared actual MethodInfo? getMethodInfo(PsiElement psiElement) {
         if (is CeylonPsi.InvocationExpressionPsi invocation = psiElement,
@@ -56,12 +73,12 @@ shared class CeylonInlayParameterHintsProvider() satisfies InlayParameterHintsPr
             if (exists containingClass = psiMethod.containingClass) {
                 value fullMethodName = StringUtil.getQualifiedName(containingClass.qualifiedName, mirror.name);
 
-                value paramNames = {
+                value paramNames = Arrays.asList(
                     for (p in psiMethod.parameterList.parameters)
                     JString((p of PsiNamedElement).name else "")
-                };
+                );
 
-                return MethodInfo(fullMethodName, Arrays.asList(*paramNames));
+                return MethodInfo(fullMethodName, paramNames);
             }
         }
 
@@ -92,18 +109,4 @@ shared class CeylonInlayParameterHintsProvider() satisfies InlayParameterHintsPr
         return Collections.emptyList<InlayInfo>();
     }
 
-    ParameterList? findParameterList(Declaration? decl) =>
-            switch (decl)
-            case (is JavaMethod) decl.firstParameterList
-            case (is LazyClass) decl.firstParameterList
-            else null;
-
-    PSIMethod? findMethodMirror(Declaration? decl) =>
-            let (mirror =
-                    switch (decl)
-                    case (is JavaMethod) decl.mirror
-                    case (is LazyClass) decl.constructor
-                    else null)
-            if (is PSIMethod mirror)
-            then mirror else null;
 }
