@@ -12,6 +12,9 @@ import com.intellij.psi.util {
         getParentOfType
     }
 }
+import com.redhat.ceylon.compiler.typechecker.tree {
+    Tree
+}
 
 import java.util {
     ArrayList,
@@ -22,15 +25,24 @@ import org.intellij.plugins.ceylon.ide.psi {
     CeylonPsi
 }
 
+shared alias Typed
+        => CeylonPsi.TermPsi
+         | CeylonPsi.LocalModifierPsi
+         | CeylonPsi.TypedDeclarationPsi
+         | CeylonPsi.InitializerParameterPsi;
+
 shared class CeylonExpressionTypeProvider()
-        extends ExpressionTypeProvider<CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi>() {
+        extends ExpressionTypeProvider<Typed>() {
 
-    function type(CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi psi)
-            => if (is CeylonPsi.TermPsi psi)
-            then psi.ceylonNode?.typeModel
-            else psi.ceylonNode?.typeModel;
+    suppressWarnings("caseNotDisjoint")
+    function type(Typed psi)
+            => switch (psi)
+            case (is CeylonPsi.TermPsi) psi.ceylonNode?.typeModel
+            case (is CeylonPsi.LocalModifierPsi) psi.ceylonNode?.typeModel
+            case (is CeylonPsi.TypedDeclarationPsi) psi.ceylonNode?.type?.typeModel
+            case (is CeylonPsi.InitializerParameterPsi) psi.ceylonNode?.parameterModel?.type;
 
-    getInformationHint(CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi psi)
+    getInformationHint(Typed psi)
             => if (exists node = psi.ceylonNode, exists type = type(psi))
             //This highlighting doesn't work :-(
             //"<html>``highlighter.highlight(type.asString(node.unit), termPsi.project)``</html>"
@@ -39,21 +51,22 @@ shared class CeylonExpressionTypeProvider()
 
     errorHint => "No expression found";
 
-    shared actual List<CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi>
+    shared actual List<Typed>
     getExpressionsAt(PsiElement psiElement) {
-        value list = ArrayList<CeylonPsi.TermPsi|CeylonPsi.LocalModifierPsi>();
-        //TODO: this doesn't work because there are never any
-        //      CeylonPsi.LocalModifierPsi nodes in the tree!
-        if (exists mod = getParentOfType(psiElement, `CeylonPsi.LocalModifierPsi`)) {
+        value list = ArrayList<Typed>();
+        variable value expression = psiElement;
+        while (exists ex = getParentOfType(expression, `CeylonPsi.TermPsi`)) {
+            if (!ex is CeylonPsi.ExpressionPsi, !ex in list) {
+                list.add(ex);
+            }
+            expression = ex;
+        }
+        if (exists mod = getParentOfType(psiElement, `CeylonPsi.InitializerParameterPsi`)) {
             list.add(mod);
         }
-        else {
-            variable value expression = psiElement;
-            while (exists ex = getParentOfType(expression, `CeylonPsi.TermPsi`)) {
-                if (!ex is CeylonPsi.ExpressionPsi, !ex in list) {
-                    list.add(ex);
-                }
-                expression = ex;
+        else if (exists mod = getParentOfType(psiElement, `CeylonPsi.TypedDeclarationPsi`)) {
+            if (!mod.ceylonNode?.type is Tree.VoidModifier) {
+                list.add(mod);
             }
         }
         return list;
