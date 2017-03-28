@@ -34,13 +34,12 @@ shared alias Typed
 shared class CeylonExpressionTypeProvider()
         extends ExpressionTypeProvider<Typed>() {
 
-    suppressWarnings("caseNotDisjoint")
     function type(Typed psi)
             => switch (psi)
-            case (is CeylonPsi.TermPsi) psi.ceylonNode?.typeModel
-            case (is CeylonPsi.LocalModifierPsi) psi.ceylonNode?.typeModel
-            case (is CeylonPsi.TypedDeclarationPsi) psi.ceylonNode?.type?.typeModel
-            case (is CeylonPsi.InitializerParameterPsi) psi.ceylonNode?.parameterModel?.type;
+                 case (is CeylonPsi.TermPsi) psi.ceylonNode?.typeModel
+            else case (is CeylonPsi.LocalModifierPsi) psi.ceylonNode?.typeModel
+            else case (is CeylonPsi.TypedDeclarationPsi) psi.ceylonNode?.type?.typeModel
+            else case (is CeylonPsi.InitializerParameterPsi) psi.ceylonNode?.parameterModel?.type;
 
     getInformationHint(Typed psi)
             => if (exists node = psi.ceylonNode, exists type = type(psi))

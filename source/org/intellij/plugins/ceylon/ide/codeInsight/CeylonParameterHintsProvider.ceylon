@@ -20,7 +20,6 @@ import com.redhat.ceylon.model.loader.model {
     LazyFunction
 }
 import com.redhat.ceylon.model.typechecker.model {
-    ParameterList,
     Declaration,
     Functional
 }
