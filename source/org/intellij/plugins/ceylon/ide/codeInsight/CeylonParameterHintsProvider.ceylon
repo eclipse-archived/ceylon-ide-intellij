@@ -1,7 +1,7 @@
 import com.intellij.codeInsight.hints {
     InlayParameterHintsProvider,
     InlayInfo,
-    MethodInfo,
+    HintInfo,
     JavaInlayParameterHintsProvider
 }
 import com.intellij.openapi.util.text {
@@ -64,7 +64,7 @@ shared class CeylonInlayParameterHintsProvider() satisfies InlayParameterHintsPr
                 else null)
             then mirror else null;
 
-    shared actual MethodInfo? getMethodInfo(PsiElement psiElement) {
+    shared actual HintInfo? getHintInfo(PsiElement psiElement) {
         if (is CeylonPsi.InvocationExpressionPsi invocation = psiElement,
             is Tree.MemberOrTypeExpression mot = invocation.ceylonNode.primary,
             exists mirror = findMethodMirror(mot.declaration)) {
@@ -78,7 +78,7 @@ shared class CeylonInlayParameterHintsProvider() satisfies InlayParameterHintsPr
                     JString((p of PsiNamedElement).name else "")
                 );
 
-                return MethodInfo(fullMethodName, paramNames);
+                return HintInfo.MethodInfo(fullMethodName, paramNames);
             }
         }
 

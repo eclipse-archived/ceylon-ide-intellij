@@ -178,7 +178,9 @@ shared class CeylonPageTwo()
                                         file.setBinaryContent(JString(tpl.text).bytes);
                                         if (exists mr = moduleRoot,
                                             VfsUtil.isAncestor(mr, file, true)) {
-                                            form.moduleOverrides.text = VfsUtil.getRelativePath(file, mr);
+                                            value relativePath = VfsUtil.getRelativePath(file, mr);
+                                            assert(exists relativePath);
+                                            form.moduleOverrides.text = relativePath;
                                         } else {
                                             form.moduleOverrides.text = file.path;
                                         }
@@ -300,10 +302,16 @@ shared class CeylonPageTwo()
     shared actual void load(IdeaCeylonProject config) {
         form.\imodule = config.ideArtifact;
         value systemRepository = config.ideConfiguration.systemRepository;
-        form.systemRepository.text = if (!exists systemRepository) then null else systemRepository.string;
+        //TODO: Investigate. `text` setter has annotation `@Nullable`,
+        // but getter has annotation `@NotNull`. Ceylon inferes that null is not assignable to
+        // `text` property.
+        //form.systemRepository.text = if (!exists systemRepository) then null else systemRepository.string;
+        form.systemRepository.setText(if (!exists systemRepository) then null else systemRepository.string);
         form.myOutputDirectory.text = config.configuration.outputRepo;
         value overrides = config.configuration.projectOverrides;
-        form.moduleOverrides.text = if (!exists overrides) then null else overrides.string;
+        //TODO: Investigate. -||-
+        //form.moduleOverrides.text = if (!exists overrides) then null else overrides.string;
+        form.moduleOverrides.setText(if (!exists overrides) then null else overrides.string);
         form.flatClasspath.selected = config.configuration.projectFlatClasspath else false;
         form.autoExportMavenDeps.selected = config.configuration.projectAutoExportMavenDependencies else false;
         form.fullyExportMavenDeps.selected = config.configuration.projectFullyExportMavenDependencies else false;
