@@ -60,7 +60,7 @@ import javax.swing {
 
 import org.intellij.plugins.ceylon.ide.highlighting {
     ceylonHighlightingColors,
-    foregroundColor
+    hForegroundColor = foregroundColor
 }
 import org.intellij.plugins.ceylon.ide.settings {
     ceylonSettings
@@ -169,10 +169,10 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
             return JBColor.foreground();
         }
         else if (token.startsWith("\"") && token.endsWith("\"")) {
-            return foregroundColor(ceylonHighlightingColors.strings);
+            return hForegroundColor(ceylonHighlightingColors.strings);
         }
         else if (token in escaping.keywords) {
-            return foregroundColor(ceylonHighlightingColors.keyword);
+            return hForegroundColor(ceylonHighlightingColors.keyword);
         }
         else {
             assert (exists first = token[0]);
@@ -182,7 +182,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 if (first.uppercase)
                 then ceylonHighlightingColors.type
                 else ceylonHighlightingColors.identifier;
-            return foregroundColor(key);
+            return hForegroundColor(key);
         }
     }
 
@@ -191,7 +191,7 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
             return Singleton(ColoredFragment(text, SimpleTextAttributes(style, JBColor.white)));
         }
         else if (text.startsWith("shared actual ")) {
-            value color = foregroundColor(ceylonHighlightingColors.annotation);
+            value color = hForegroundColor(ceylonHighlightingColors.annotation);
             return [
                 ColoredFragment("shared actual ", SimpleTextAttributes(style, color)),
                 *colorizeTokens(selected, text[14...], style/*, qualifiedNameIsPath*/)
