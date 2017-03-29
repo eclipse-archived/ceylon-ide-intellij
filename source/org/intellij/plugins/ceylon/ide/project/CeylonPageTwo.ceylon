@@ -208,16 +208,16 @@ shared class CeylonPageTwo()
 
             shared actual void onLinkClicked(String href) {
                 value file = File(form.moduleOverrides.text);
-                VirtualFile? virtualFile;
-                if (file.absolute) {
-                    virtualFile = VfsUtil.findFileByIoFile(file, false);
-                } else if (exists mr = moduleRoot) {
-                    virtualFile = VfsUtil.findRelativeFile(mr, form.moduleOverrides.text);
-                } else {
-                    virtualFile = null;
-                }
+                value virtualFile =
+                        if (file.absolute)
+                            then VfsUtil.findFileByIoFile(file, false)
+                   else if (exists mr = moduleRoot)
+                            then VfsUtil.findRelativeFile(mr, form.moduleOverrides.text);
+                   else null;
+
                 if (exists virtualFile) {
-                    FileEditorManager.getInstance(form.\imodule.project).openFile(virtualFile, true);
+                    FileEditorManager.getInstance(form.\imodule.project)
+                            .openFile(virtualFile, true);
                 }
             }
         };
@@ -230,12 +230,9 @@ shared class CeylonPageTwo()
             changedUpdate(DocumentEvent e) => updateOverridesLink();
 
             void updateOverridesLink() {
-                if (form.moduleOverrides.text.empty) {
-                    form.overridesLink.text = "Module overrides file (customize module resolution):";
-                } else {
-                    form.overridesLink.text = "<html>Module <a href=\"\">"
-                        + "overrides file</a> (customize module resolution):</html>";
-                }
+                form.overridesLink.text = form.moduleOverrides.text.empty
+                    then "Module overrides file (customize module resolution):"
+                    else  "<html>Module <a href=\"\">overrides file</a> (customize module resolution):</html>";
             }
         });
 
@@ -305,13 +302,13 @@ shared class CeylonPageTwo()
         //TODO: Investigate. `text` setter has annotation `@Nullable`,
         // but getter has annotation `@NotNull`. Ceylon inferes that null is not assignable to
         // `text` property.
-        //form.systemRepository.text = if (!exists systemRepository) then null else systemRepository.string;
-        form.systemRepository.setText(if (!exists systemRepository) then null else systemRepository.string);
+        //form.systemRepository.text = systemRepository?.string;
+        form.systemRepository.setText(systemRepository?.string);
         form.myOutputDirectory.text = config.configuration.outputRepo;
         value overrides = config.configuration.projectOverrides;
         //TODO: Investigate. -||-
         //form.moduleOverrides.text = if (!exists overrides) then null else overrides.string;
-        form.moduleOverrides.setText(if (!exists overrides) then null else overrides.string);
+        form.moduleOverrides.setText(overrides?.string);
         form.flatClasspath.selected = config.configuration.projectFlatClasspath else false;
         form.autoExportMavenDeps.selected = config.configuration.projectAutoExportMavenDependencies else false;
         form.fullyExportMavenDeps.selected = config.configuration.projectFullyExportMavenDependencies else false;
