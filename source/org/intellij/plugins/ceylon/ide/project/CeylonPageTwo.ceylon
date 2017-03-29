@@ -204,23 +204,20 @@ shared class CeylonPageTwo()
             }
         });
 
-        value linkListener = object extends JLabelLinkListener() {
-
+        object linkListener extends JLabelLinkListener() {
             shared actual void onLinkClicked(String href) {
                 value file = File(form.moduleOverrides.text);
-                value virtualFile =
-                        if (file.absolute)
+                if (exists virtualFile
+                        = if (file.absolute)
                             then VfsUtil.findFileByIoFile(file, false)
-                   else if (exists mr = moduleRoot)
+                        else if (exists mr = moduleRoot)
                             then VfsUtil.findRelativeFile(mr, form.moduleOverrides.text)
-                   else null;
-
-                if (exists virtualFile) {
+                        else null) {
                     FileEditorManager.getInstance(form.\imodule.project)
                             .openFile(virtualFile, true);
                 }
             }
-        };
+        }
         form.overridesLink.addMouseListener(linkListener);
         form.overridesLink.addMouseMotionListener(linkListener);
         form.moduleOverrides.textField.document.addDocumentListener(object satisfies DocumentListener {
@@ -229,11 +226,10 @@ shared class CeylonPageTwo()
             removeUpdate(DocumentEvent e) => updateOverridesLink();
             changedUpdate(DocumentEvent e) => updateOverridesLink();
 
-            void updateOverridesLink() {
-                form.overridesLink.text = form.moduleOverrides.text.empty
+            void updateOverridesLink()
+                    => form.overridesLink.text = form.moduleOverrides.text.empty
                     then "Module overrides file (customize module resolution):"
                     else  "<html>Module <a href=\"\">overrides file</a> (customize module resolution):</html>";
-            }
         });
 
         return this;
@@ -330,13 +326,10 @@ shared class CeylonPageTwo()
     class BrowseOutputDirectoryListener()
             extends TextBrowseFolderListener(createSingleFolderDescriptor()) {
 
-        shared actual Project? project {
-            return outer.form.\imodule?.project;
-        }
+        shared actual Project? project => outer.form.\imodule?.project;
         assign project {}
 
         initialFile => moduleRoot else super.initialFile;
-
 
         shared actual String chosenFileToResultingText(VirtualFile file) {
             if (exists modRoot = moduleRoot,
@@ -351,9 +344,7 @@ shared class CeylonPageTwo()
             extends TextBrowseFolderListener(createSingleFileDescriptor(XmlFileType.instance)) {
 
 
-        shared actual Project? project {
-            return outer.form.\imodule?.project;
-        }
+        shared actual Project? project => outer.form.\imodule?.project;
         assign project {}
 
         initialFile => moduleRoot else super.initialFile;
