@@ -267,11 +267,14 @@ shared class CeyLightClass extends LightElement
     shared actual List<PsiClass> ownInnerClasses {
         value classes = ArrayList<PsiClass>();
         for (cls in mirror.directInnerClasses) {
-            if (is AbstractClassMirror cls) {
+            switch (cls)
+            case (is AbstractClassMirror) {
                 classes.add(fromMirror(cls, project));
-            } else if (is PSIClass cls) {
+            }
+            case (is PSIClass) {
                 classes.add(cls.psi);
             }
+            else {}
         }
         return classes;
     }

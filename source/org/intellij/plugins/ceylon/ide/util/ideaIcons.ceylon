@@ -195,7 +195,8 @@ shared object icons {
             else obj;
 
         if (exists model) {
-            if (is Declaration model) {
+            switch (model)
+            case (is Declaration) {
                 value decorations = ArrayList<Icon>();
                 value layer
                         = if (model.shared)
@@ -220,7 +221,7 @@ shared object icons {
                 }
                 return createIcon(decorations, baseIcon, layer);
             }
-            else if (is Package model) {
+            case (is Package) {
                 value layer
                         = if (model.shared)
                         then PlatformIcons.publicIcon
@@ -233,36 +234,39 @@ shared object icons {
                 return baseIcon;
             }
         }
-        else if (is Tree.Declaration obj) {
-            value annotations = obj.annotationList.annotations;
-            Icon visibility;
-            for (a in annotations) {
-                if (a.primary.token.text=="shared") {
-                    visibility = PlatformIcons.publicIcon;
-                    break;
+        else {
+            switch (obj)
+            case (is Tree.Declaration) {
+                value annotations = obj.annotationList.annotations;
+                Icon visibility;
+                for (a in annotations) {
+                    if (a.primary.token.text=="shared") {
+                        visibility = PlatformIcons.publicIcon;
+                        break;
+                    }
                 }
+                else {
+                    visibility = PlatformIcons.privateIcon;
+                }
+                value decorations = ArrayList<Icon>();
+                for (a in annotations) {
+                    switch (a.primary.token.text)
+                    case ("static") {
+                        decorations.add(AllIcons.Nodes.staticMark);
+                    }
+                    case ("final") {
+                        decorations.add(AllIcons.Nodes.finalMark);
+                    }
+                    else {}
+                }
+                return createIcon(decorations, baseIcon, visibility);
+            }
+            case (is Tree.SpecifierStatement) {
+                return createIcon([], baseIcon, PlatformIcons.publicIcon);
             }
             else {
-                visibility = PlatformIcons.privateIcon;
+                return baseIcon;
             }
-            value decorations = ArrayList<Icon>();
-            for (a in annotations) {
-                switch (a.primary.token.text)
-                case ("static") {
-                    decorations.add(AllIcons.Nodes.staticMark);
-                }
-                case ("final") {
-                    decorations.add(AllIcons.Nodes.finalMark);
-                }
-                else {}
-            }
-            return createIcon(decorations, baseIcon, visibility);
-        }
-        else if (is Tree.SpecifierStatement obj) {
-            return createIcon([], baseIcon, PlatformIcons.publicIcon);
-        }
-        else {
-            return baseIcon;
         }
     }
 

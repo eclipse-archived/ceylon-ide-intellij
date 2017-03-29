@@ -158,7 +158,8 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
 
     shared actual String? getProjectRelativePathString(VirtualFile resource, CeylonProject<Module,VirtualFile,VirtualFile,VirtualFile>|Module project) {
         IdeaCeylonProject ceylonProject;
-        if (is Module project) {
+        switch (project)
+        case (is Module) {
             value model = project.project.getComponent(`IdeaCeylonProjects`);
             value existingCeylonProject = model.getProject(project);
             if (is IdeaCeylonProject existingCeylonProject) {
@@ -167,9 +168,11 @@ object ideaVfsServices satisfies VfsServices<Module,VirtualFile,VirtualFile,Virt
                 return null;
             }
                     
-        } else if (is IdeaCeylonProject project) {
+        }
+        else case (is IdeaCeylonProject) {
             ceylonProject = project;
-        } else {
+        }
+        else {
             return null;
         }
         return VfsUtil.getRelativePath(resource, ceylonProject.moduleRoot);

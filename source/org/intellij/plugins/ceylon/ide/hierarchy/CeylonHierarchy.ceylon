@@ -119,7 +119,8 @@ class CeylonHierarchyNodeDescriptor(element, model, parent = null)
     shared variable ObjectArray<CeylonHierarchyNodeDescriptor>? children = null;
 
     function name(PsiElement element) {
-        if (is CeylonCompositeElement element) {
+        switch (element)
+        case (is CeylonCompositeElement) {
             switch (node = element.ceylonNode)
             case (is Tree.Declaration) {
                 return node.identifier.text;
@@ -134,7 +135,7 @@ class CeylonHierarchyNodeDescriptor(element, model, parent = null)
                 return "object expression";
             }
         }
-        else if (is PsiNamedElement element) {
+        else case (is PsiNamedElement) {
             return element.name;
         }
         else {
@@ -162,21 +163,23 @@ class CeylonHierarchyNodeDescriptor(element, model, parent = null)
     }
 
     void label(PsiElement? element) {
-        if (is CeylonCompositeElement element) {
+        switch (element)
+        case (is CeylonCompositeElement) {
             myHighlightedText = CompositeAppearance();
             Node node = element.ceylonNode;
             appendDescription(element);
             appendNative(node);
             appendLocation(node);
         }
-        else if (is PsiMethod element) {
+        else case (is PsiMethod) {
             myHighlightedText = CompositeAppearance();
             appendDescriptionAndLocation(element);
         }
-        else if (is NavigationItem element) {
+        else case (is NavigationItem) {
             myHighlightedText = CompositeAppearance();
             appendPresentation(element);
         }
+        else {}
     }
 
     void appendDescriptionAndLocation(PsiMethod psi) {
@@ -334,13 +337,14 @@ abstract class CeylonHierarchyBrowser(Project project, PsiElement element)
     }
 
     shared actual String? getQualifiedName(PsiElement psiElement) {
-        if (is CeylonCompositeElement psiElement) {
+        switch (psiElement)
+        case (is CeylonCompositeElement) {
             return getModel(psiElement)?.qualifiedNameString;
         }
-        else if (is PsiClass psiElement) {
+        else case (is PsiClass) {
             return psiElement.qualifiedName;
         }
-        else if (is PsiMethod psiElement) {
+        else case (is PsiMethod) {
             assert (exists containingClass = psiElement.containingClass,
                 exists typeName = containingClass.qualifiedName);
             return typeName + "." + psiElement.name;

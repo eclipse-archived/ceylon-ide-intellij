@@ -67,15 +67,13 @@ class CeylonInheritedMembersNodeProvider()
         if (is PsiTreeElementBase<out Anything> node) {
             if (is CeylonPsi.DeclarationPsi element = node.element) {
                 value declaration = element.ceylonNode;
-                TypeDeclaration? type;
-                if (is Tree.ObjectDefinition declaration) {
-                    type = declaration.declarationModel?.typeDeclaration;
-                } else if (is Tree.ClassOrInterface declaration) {
-                    type = (declaration).declarationModel;
-                } else {
-                    type = null;
-                }
-                if (exists type) {
+                if (exists type
+                        = switch (declaration)
+                        case (is Tree.ObjectDefinition)
+                            declaration.declarationModel?.typeDeclaration
+                        case (is Tree.ClassOrInterface)
+                            declaration.declarationModel
+                        else null) {
                     return scanMembers(element, declaration, type);
                 }
                 // else: Maybe the file hasn't been typechecked yet

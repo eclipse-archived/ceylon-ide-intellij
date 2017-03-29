@@ -26,7 +26,8 @@ import com.redhat.ceylon.ide.common.util {
 }
 import com.redhat.ceylon.model.typechecker.model {
     TypeDeclaration,
-    TypedDeclaration
+    TypedDeclaration,
+    Declaration
 }
 
 import org.intellij.plugins.ceylon.ide.model {
@@ -55,7 +56,8 @@ shared class CeylonImplementationsSearch()
     }
 
     void findImplementors(PsiElement sourceElement, void consumer(PsiElement element)) {
-        if (is PsiClass|PsiMethod sourceElement) {
+        switch (sourceElement)
+        case (is PsiClass|PsiMethod) {
             if (exists psiFile = sourceElement.containingFile,
                 is TypeDeclaration|TypedDeclaration decl = declarationFromPsiElement(sourceElement),
                 exists pus = getCeylonProject(psiFile)?.typechecker?.phasedUnits) {
@@ -69,36 +71,40 @@ shared class CeylonImplementationsSearch()
                 };
             }
         }
-        else if (is CeylonPsi.DeclarationPsi sourceElement,
-            exists node = sourceElement.ceylonNode,
-            is TypeDeclaration|TypedDeclaration decl = node.declarationModel,
-            is CeylonFile ceylonFile = sourceElement.containingFile,
-            exists project = concurrencyManager.needReadAccess(()
-                => findProjectForFile(ceylonFile)),
-            exists modules = project.modules) {
+        else case (is CeylonPsi.DeclarationPsi) {
+            if (exists node = sourceElement.ceylonNode,
+                exists decl = node.declarationModel,
+                is CeylonFile ceylonFile = sourceElement.containingFile,
+                exists project
+                        = concurrencyManager.needReadAccess(()
+                            => findProjectForFile(ceylonFile)),
+                exists modules = project.modules) {
 
-            if (exists pus = project.typechecker?.phasedUnits) {
-                scanPhasedUnits {
-                    decl = decl;
-                    node = node;
-                    sourceElement = sourceElement;
-                    consumer = consumer;
-                    for (pu in pus.phasedUnits) pu
-                };
-            }
-
-            if (isInSourceArchive(ceylonFile.realVirtualFile())) {
-                for (mod in modules) {
+                if (exists pus = project.typechecker?.phasedUnits) {
                     scanPhasedUnits {
-                        pus = mod.phasedUnits;
                         decl = decl;
                         node = node;
                         sourceElement = sourceElement;
                         consumer = consumer;
+                        for (pu in pus.phasedUnits) pu
                     };
+                }
+
+                if (isInSourceArchive(ceylonFile.realVirtualFile())) {
+                    for (mod in modules) {
+                        scanPhasedUnits {
+                            pus = mod.phasedUnits;
+                            decl = decl;
+                            node = node;
+                            sourceElement = sourceElement;
+                            consumer = consumer;
+                        };
+                    }
                 }
             }
         }
+        else {}
+
     }
 
     void action(PsiFile? declaringFile, Node dnode,
@@ -108,7 +114,7 @@ shared class CeylonImplementationsSearch()
         }
     }
 
-    function findImplementations(TypeDeclaration|TypedDeclaration decl, PhasedUnit pu) {
+    function findImplementations(Declaration decl, PhasedUnit pu) {
         switch (decl)
         case (is TypeDeclaration) {
             value vis = FindSubtypesVisitor(decl);
@@ -120,11 +126,14 @@ shared class CeylonImplementationsSearch()
             pu.compilationUnit.visit(vis);
             return vis.declarationNodes;
         }
+        else {
+            assert (false);
+        }
     }
 
     void scanPhasedUnits({PhasedUnit*} pus,
-        TypeDeclaration|TypedDeclaration decl,
-        Tree.Declaration? node, PsiElement sourceElement,
+        Declaration decl, Tree.Declaration? node,
+        PsiElement sourceElement,
         void consumer(PsiElement element)) {
 
         for (pu in pus) {

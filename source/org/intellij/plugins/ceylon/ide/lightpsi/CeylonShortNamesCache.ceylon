@@ -93,22 +93,24 @@ shared class CeylonShortNamesCache(Project project) extends PsiShortNamesCache()
 
         if (exists projects = getCeylonProjects(project)) {
             for (proj in projects.ceylonProjects) {
-                value ijMod = proj.ideArtifact;
-                
-                if (scope.isSearchInModuleContent(ijMod),
+                if (scope.isSearchInModuleContent(proj.ideArtifact),
                     is IdeaModuleManager mm = proj.modules?.manager) {
                     
                     for (declName->source in mm.modelLoader.sourceDeclarations) {
-                        if (is ClassOrInterface|Value decl = source.modelDeclaration) {
+                        switch (decl = source.modelDeclaration)
+                        case (is ClassOrInterface|Value) {
                             if (name == getJavaName(decl)) {
                                 classes.add(CeyLightClass(decl, project));
                             }
                             
                             scanInners(decl, name, classes);
-                        } else if (is Function decl = source.modelDeclaration,
-                                   name == getJavaName(decl)) {
-                            classes.add(CeyLightToplevelFunction(decl, project));
                         }
+                        case (is Function) {
+                            if (name == getJavaName(decl)) {
+                                classes.add(CeyLightToplevelFunction(decl, project));
+                            }
+                        }
+                        else {}
                     }
                 }
             }

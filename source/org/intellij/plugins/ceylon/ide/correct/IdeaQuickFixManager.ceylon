@@ -395,13 +395,15 @@ shared class IdeaQuickFixData(
         } else if (exists candidates = resolutions) {
             candidates.add(Resolution {
                 description
-                    = if (is Referenceable declaration) then declaration.nameAsString
-                    else if (is ModuleVersionDetails declaration) then declaration.\imodule
+                    = switch (declaration)
+                    case (is Referenceable) declaration.nameAsString
+                    else case (is ModuleVersionDetails) declaration.\imodule
                     else desc;
                 qualifier
-                    = if (is Declaration declaration) then declaration.unit?.\ipackage?.nameAsString
-                    else if (is Module declaration) then declaration.version
-                    else if (is ModuleVersionDetails declaration) then declaration.version
+                    = switch (declaration)
+                    case (is Declaration) declaration.unit?.\ipackage?.nameAsString
+                    case (is Module) declaration.version
+                    case (is ModuleVersionDetails) declaration.version
                     else null;
 //                qualifiedNameIsPath = qualifiedNameIsPath;
                 icon

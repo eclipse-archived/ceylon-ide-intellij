@@ -64,37 +64,45 @@ shared class CeylonTypeDeclarationProvider() satisfies TypeDeclarationProvider {
 
     shared actual ObjectArray<PsiElement>? getSymbolTypeDeclarations(PsiElement psiElement) {
         value list = ArrayList<TypeDeclaration>();
-        if (is CeylonPsi.StaticMemberOrTypeExpressionPsi psiElement,
-            is TypedDeclaration dec = psiElement.ceylonNode?.declaration,
-            exists type = dec.type) {
-            addDeclarations(type, list);
+        switch (psiElement)
+        case (is CeylonPsi.StaticMemberOrTypeExpressionPsi) {
+            if (is TypedDeclaration dec = psiElement.ceylonNode?.declaration,
+                exists type = dec.type) {
+                addDeclarations(type, list);
+            }
         }
-        else if (is CeylonPsi.ConstructorPsi psiElement,
-            exists dec = psiElement.ceylonNode?.constructor) {
-            if (exists type = dec.extendedType) {
+        else case (is CeylonPsi.ConstructorPsi) {
+            if (exists dec = psiElement.ceylonNode?.constructor,
+                exists type = dec.extendedType) {
                 list.add(type.declaration);
             }
         }
-        else if (is CeylonPsi.TypedDeclarationPsi psiElement,
-            exists type = psiElement.ceylonNode?.type?.typeModel) {
-            addDeclarations(type, list);
+        else case (is CeylonPsi.TypedDeclarationPsi) {
+            if (exists type = psiElement.ceylonNode?.type?.typeModel) {
+                addDeclarations(type, list);
+            }
         }
-        else if (is CeylonPsi.TypedArgumentPsi psiElement,
-            exists type = psiElement.ceylonNode?.type?.typeModel) {
-            addDeclarations(type, list);
+        else case (is CeylonPsi.TypedArgumentPsi) {
+            if (exists type = psiElement.ceylonNode?.type?.typeModel) {
+                addDeclarations(type, list);
+            }
         }
-        else if (is CeylonPsi.SpecifiedArgumentPsi psiElement,
-            exists type = psiElement.ceylonNode?.parameter?.type) {
-            addDeclarations(type, list);
+        else case (is CeylonPsi.SpecifiedArgumentPsi) {
+            if (exists type = psiElement.ceylonNode?.parameter?.type) {
+                addDeclarations(type, list);
+            }
         }
-        else {
+        else {}
+
+        if (list.empty) {
             return null;
         }
-        value project = psiElement.project;
-        return ObjectArray.with {
+        else {
+            return ObjectArray.with {
                 for (dec in list)
-                resolveDeclaration(dec, project)
-        };
+                resolveDeclaration(dec, psiElement.project)
+            };
+        }
     }
 
 }

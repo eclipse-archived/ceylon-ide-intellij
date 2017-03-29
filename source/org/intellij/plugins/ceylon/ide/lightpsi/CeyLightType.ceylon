@@ -99,8 +99,7 @@ class CeyLightType(TypeMirror mirror, Project project)
                 if (is CeylonUnit unit = mirror.decl.unit) {
                     return CeyLightClass.fromMirror(mirror, project);
                 } else if (is LazyClass cls = mirror.decl,
-                    is PSIClass psiCls = cls.classMirror) {
-
+                           is PSIClass psiCls = cls.classMirror) {
                     return psiCls.psi;
                 } 
             }

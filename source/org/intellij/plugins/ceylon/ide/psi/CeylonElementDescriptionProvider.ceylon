@@ -32,52 +32,57 @@ import org.intellij.plugins.ceylon.ide.psi.impl {
 }
 
 shared String kind(PsiElement element) {
-    if (is CeylonPsi.AnyClassPsi element) {
+    switch (element)
+    case (is CeylonPsi.AnyClassPsi) {
         return "class";
-    } else if (is CeylonPsi.AnyInterfacePsi element) {
+    } else case (is CeylonPsi.AnyInterfacePsi) {
         return "interface";
-    } else if (is CeylonPsi.AttributeDeclarationPsi element) {
-        return if (element.parent is CeylonPsi.ClassBodyPsi|CeylonPsi.InterfaceBodyPsi)
+    } else case (is CeylonPsi.AttributeDeclarationPsi) {
+        return if (element.parent is CeylonPsi.ClassBodyPsi
+                                   | CeylonPsi.InterfaceBodyPsi)
             then "attribute" else "value";
-    } else if (is CeylonPsi.AnyMethodPsi element) {
+    } else case (is CeylonPsi.AnyMethodPsi) {
         for (a in element.ceylonNode.annotationList.annotations) {
             if (a.primary.token.text=="annotation") {
                 return "annotation";
             }
         }
-        return if (element.parent is CeylonPsi.ClassBodyPsi|CeylonPsi.InterfaceBodyPsi)
+        return if (element.parent is CeylonPsi.ClassBodyPsi
+                                   | CeylonPsi.InterfaceBodyPsi)
             then "method" else "function";
-    } else if (is CeylonPsi.AttributeArgumentPsi element) {
+    } else case (is CeylonPsi.AttributeArgumentPsi) {
         return "value argument";
-    } else if (is CeylonPsi.MethodArgumentPsi element) {
+    } else case (is CeylonPsi.MethodArgumentPsi) {
         return "function argument";
-    } else if (is ParameterPsiIdOwner element) {
+    } else case (is ParameterPsiIdOwner) {
         return "function parameter";
-    } else if (is CeylonPsi.ParameterPsi element) {
+    } else case (is CeylonPsi.ParameterPsi) {
         return "parameter";
-    } else if (is CeylonPsi.TypeParameterDeclarationPsi element) {
+    } else case (is CeylonPsi.TypeParameterDeclarationPsi) {
         return "type parameter";
-    } else if (is CeylonPsi.ObjectDefinitionPsi element) {
+    } else case (is CeylonPsi.ObjectDefinitionPsi) {
         return "object";
-    } else if (is CeylonPsi.ObjectArgumentPsi element) {
+    } else case (is CeylonPsi.ObjectArgumentPsi) {
         return "object argument";
-    } else if (is CeylonPsi.ConstructorPsi element) {
+    } else case (is CeylonPsi.ConstructorPsi) {
         return "constructor";
-    } else if (is CeylonPsi.EnumeratedPsi element) {
+    } else case (is CeylonPsi.EnumeratedPsi) {
         return "value constructor";
-    } else if (is CeylonPsi.TypeAliasDeclarationPsi element) {
+    } else case (is CeylonPsi.TypeAliasDeclarationPsi) {
         return "alias";
-    } else if (is CeylonPsi.PackageDescriptorPsi element) {
+    } else case (is CeylonPsi.PackageDescriptorPsi) {
         return "package";
-    } else if (is CeylonPsi.ModuleDescriptorPsi element) {
+    } else case (is CeylonPsi.ModuleDescriptorPsi) {
         return "module";
-    } else if (is CeylonPsi.VariablePsi element) {
+    } else case (is CeylonPsi.VariablePsi) {
         return "variable";
-    } else if (is CeylonPsi.AttributeSetterDefinitionPsi element) {
+    } else case (is CeylonPsi.AttributeSetterDefinitionPsi) {
         return "setter";
     }
+    else {
+        return "declaration";
+    }
 //    logger.warn("Can't find type name for class " + className(element));
-    return "declaration";
 }
 
 shared class CeylonElementDescriptionProvider() satisfies ElementDescriptionProvider {

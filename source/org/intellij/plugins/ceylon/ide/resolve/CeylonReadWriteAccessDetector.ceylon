@@ -30,10 +30,11 @@ shared class CeylonReadWriteAccessDetector() extends ReadWriteAccessDetector() {
             => getExpressionAccess(psiReference.element);
     
     isDeclarationWriteAccess(PsiElement psiElement)
-            => if (is AttributeDeclarationPsi psiElement)
-                then psiElement.ceylonNode.specifierOrInitializerExpression exists
-            else if (is VariablePsi psiElement)
-                then psiElement.ceylonNode.specifierExpression exists
+            => switch (psiElement)
+            case (is AttributeDeclarationPsi)
+                psiElement.ceylonNode.specifierOrInitializerExpression exists
+            else case (is VariablePsi)
+                psiElement.ceylonNode.specifierExpression exists
             else false;
     
     isReadWriteAccessible(PsiElement psiElement)

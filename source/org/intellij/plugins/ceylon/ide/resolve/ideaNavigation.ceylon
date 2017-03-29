@@ -9,7 +9,6 @@ import com.intellij.psi {
     PsiManager,
     PsiNameIdentifierOwner,
     PsiFile,
-    PsiClass,
     PsiElement,
     PsiLiteralExpression
 }
@@ -55,18 +54,21 @@ import org.intellij.plugins.ceylon.ide.model {
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile
 }
-import ceylon.interop.java {
-    javaString
-}
 
 shared PsiNameIdentifierOwner? declarationToPsi(Declaration rawDeclaration) {
-    PsiClass? getJavaClass(ClassOrInterface cls) {
-        if (is LazyClass cls, is PSIClass mirror = cls.classMirror) {
-            return mirror.psi;
+    function getJavaClass(ClassOrInterface cls) {
+        switch (cls)
+        case (is LazyClass) {
+            if (is PSIClass mirror = cls.classMirror) {
+                return mirror.psi;
+            }
         }
-        else if (is LazyInterface cls, is PSIClass mirror = cls.classMirror) {
-            return mirror.psi;
+        case (is LazyInterface) {
+            if (is PSIClass mirror = cls.classMirror) {
+                return mirror.psi;
+            }
         }
+        else {}
         return null;
 //        value qn = cls.qualifiedNameString.replace("::", ".");
 //
@@ -86,7 +88,8 @@ shared PsiNameIdentifierOwner? declarationToPsi(Declaration rawDeclaration) {
     value declaration = if (is Function rawDeclaration, rawDeclaration.annotation)
             then rawDeclaration.typeDeclaration
             else rawDeclaration;
-    if (is LazyClass declaration) {
+    switch (declaration)
+    case (is LazyClass) {
         if (is PSIMethod meth = declaration.constructor,
             meth.psi.canNavigate()) {
             return meth.psi;
@@ -94,26 +97,29 @@ shared PsiNameIdentifierOwner? declarationToPsi(Declaration rawDeclaration) {
         if (is PSIClass cls = declaration.classMirror) {
             return cls.psi;
         }
-    } else if (is LazyInterface declaration,
-        is PSIClass cls = declaration.classMirror) {
-        return cls.psi;
-    } else if (is JavaMethod declaration,
-        is PSIMethod meth = declaration.mirror) {
-        return meth.psi;
-    } else if (is JavaBeanValue declaration,
-        is PSIMethod meth = declaration.mirror) {
-        return meth.psi;
-    } else if (is FieldValue declaration) {
+    } case (is LazyInterface) {
+        if (is PSIClass cls = declaration.classMirror) {
+            return cls.psi;
+        }
+    } case (is JavaMethod) {
+        if (is PSIMethod meth = declaration.mirror) {
+            return meth.psi;
+        }
+    } case (is JavaBeanValue) {
+        if (is PSIMethod meth = declaration.mirror) {
+            return meth.psi;
+        }
+    } case (is FieldValue) {
         if (is ClassOrInterface container = declaration.container,
             exists cls = getJavaClass(container)) {
 
             return cls.findFieldByName(declaration.realName, true);
         }
-    } else if (is Value declaration,
-        is AnnotationProxyClass container = declaration.container,
-        is PSIClass cls = container.iface.classMirror) {
-
-        return cls.psi.findMethodsByName(declaration.name, false).array.first;
+    } else case (is Value) {
+        if (is AnnotationProxyClass container = declaration.container,
+            is PSIClass cls = container.iface.classMirror) {
+            return cls.psi.findMethodsByName(declaration.name, false).array.first;
+        }
     } else if (ModelUtil.isConstructor(declaration),
         is LazyClass container = declaration.container,
         is PSIClass cls = container.classMirror) {
@@ -121,7 +127,7 @@ shared PsiNameIdentifierOwner? declarationToPsi(Declaration rawDeclaration) {
         for (ctor in cls.psi.constructors) {
             if (exists ann = ctor.modifierList.findAnnotation("com.redhat.ceylon.compiler.java.metadata.Name"),
                 is PsiLiteralExpression name = ann.findAttributeValue("value"),
-                (name.\ivalue else "") == javaString(declaration.name)) {
+                (name.\ivalue?.string else "") == declaration.name) {
 
                 return ctor;
             }

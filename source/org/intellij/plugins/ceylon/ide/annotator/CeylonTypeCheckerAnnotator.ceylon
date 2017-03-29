@@ -101,7 +101,8 @@ shared class CeylonTypeCheckerAnnotator()
 
             Annotation annotation;
             Boolean isError;
-            if (is AnyError message) {
+            switch (message)
+            case (is AnyError) {
                 annotation
                         = annotationHolder.createAnnotation(
                             HighlightSeverity.error,
@@ -112,7 +113,7 @@ shared class CeylonTypeCheckerAnnotator()
                         = ProblemHighlightType.likeUnknownSymbol;
                 }
             }
-            else if (is UsageWarning message) {
+            case (is UsageWarning) {
                 annotation
                         = annotationHolder.createAnnotation(
                             HighlightSeverity.warning,

@@ -121,7 +121,8 @@ shared class CeylonGotoSuperHandler()
 
     ObjectArray<PsiElement> findTargets(Source e) {
         value list = ArrayList<Declaration>();
-        if (is AnyMethodPsi e) {
+        switch (e)
+        case (is AnyMethodPsi) {
             if (exists fun = e.ceylonNode.declarationModel,
                 fun.actual,
                 is ClassOrInterface bottom = fun.container) {
@@ -137,7 +138,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is AnyAttributePsi e) {
+        else case (is AnyAttributePsi) {
             if (exists val = e.ceylonNode.declarationModel,
                 val.actual,
                 is ClassOrInterface bottom = val.container) {
@@ -151,7 +152,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is AnyClassPsi e) {
+        else case (is AnyClassPsi) {
             if (exists cla = e.ceylonNode.declarationModel) {
                 if (exists target = cla.extendedType?.declaration) {
                     list.add(target);
@@ -161,7 +162,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is AnyInterfacePsi e) {
+        else case (is AnyInterfacePsi) {
             if (exists int = e.ceylonNode.declarationModel) {
                 if (exists target = int.extendedType?.declaration) {
                     list.add(target);
@@ -171,7 +172,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is ObjectDefinitionPsi e) {
+        else case (is ObjectDefinitionPsi) {
             if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType?.declaration) {
                     list.add(target);
@@ -181,7 +182,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is ObjectExpressionPsi e) {
+        else case (is ObjectExpressionPsi) {
             if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType?.declaration) {
                     list.add(target);
@@ -191,7 +192,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is ObjectArgumentPsi e) {
+        else case (is ObjectArgumentPsi) {
             if (exists cla = e.ceylonNode.anonymousClass) {
                 if (exists target = cla.extendedType?.declaration) {
                     list.add(target);
@@ -201,7 +202,7 @@ shared class CeylonGotoSuperHandler()
                 }
             }
         }
-        else if (is ConstructorPsi e) {
+        else case (is ConstructorPsi) {
             Tree.DelegatedConstructor? delegatedConstructor
                     = e.ceylonNode.delegatedConstructor;
             if (exists target
@@ -209,7 +210,7 @@ shared class CeylonGotoSuperHandler()
                 list.add(target);
             }
         }
-        else if (is EnumeratedPsi e) {
+        else case (is EnumeratedPsi) {
             Tree.DelegatedConstructor? delegatedConstructor
                 = e.ceylonNode.delegatedConstructor;
             if (exists target
@@ -247,14 +248,14 @@ shared class CeylonGotoSuperHandler()
 
     shared actual void update(Editor editor, PsiFile file, Presentation presentation) {
         presentation.enabled = true;
-        value source = findSource(editor, file);
-        if (is SourceTypes source) {
+        switch (source = findSource(editor, file))
+        case (is SourceTypes) {
             presentation.setText("Supertype Declaration", false);
         }
-        else if (is SourceMembers source) {
+        else case (is SourceMembers) {
             presentation.setText("Refined Declaration", false);
         }
-        else if (is SourceConstructors source) {
+        else case (is SourceConstructors) {
             presentation.setText("Delegated Constructor", false);
         }
         else {

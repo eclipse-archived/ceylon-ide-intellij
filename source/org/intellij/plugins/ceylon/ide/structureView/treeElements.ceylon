@@ -67,17 +67,11 @@ class CeylonClassTreeElement(CeylonPsi.ClassOrInterfacePsi myClass, Boolean isIn
     shared actual List<StructureViewTreeElement> childrenBase {
         value ceylonNode = myClass.ceylonNode;
         value elements = ArrayList<StructureViewTreeElement>();
-        List<Tree.Statement> bodyChildren;
-
-        if (is CustomTree.ClassDefinition ceylonNode) {
-            Tree.ClassDefinition definition = ceylonNode;
-            bodyChildren = definition.classBody.statements;
-        } else if (is Tree.InterfaceDefinition ceylonNode) {
-            Tree.InterfaceDefinition definition = ceylonNode;
-            bodyChildren = definition.interfaceBody.statements;
-        } else {
-            bodyChildren = Collections.emptyList<Tree.Statement>();
-        }
+        value bodyChildren
+                = switch (ceylonNode)
+                case (is CustomTree.ClassDefinition) ceylonNode.classBody.statements
+                case (is Tree.InterfaceDefinition) ceylonNode.interfaceBody.statements
+                else Collections.emptyList<Tree.Statement>();
 
         for (node in bodyChildren) {
             if (is Tree.Declaration node, is CeylonFile file = myClass.containingFile) {
@@ -188,12 +182,14 @@ class CeylonObjectTreeElement(CeylonPsi.ObjectDefinitionPsi psiElement, Boolean 
         value children = ArrayList<StructureViewTreeElement>();
         if (exists el = element) {
             for (statement in el.ceylonNode.classBody.statements) {
-                if (is Tree.Declaration statement) {
+                switch (statement)
+                case (is Tree.Declaration) {
                     if (is CeylonFile file = el.containingFile,
                         exists node = getTreeElementForDeclaration(file, statement, false)) {
                         children.add(node);
                     }
-                } else if (is Tree.SpecifierStatement statement) {
+                }
+                case (is Tree.SpecifierStatement) {
                     value spec = PsiTreeUtil.getParentOfType(
                         el.containingFile.findElementAt(statement.startIndex.intValue()),
                         `CeylonPsi.SpecifierStatementPsi`
@@ -201,6 +197,7 @@ class CeylonObjectTreeElement(CeylonPsi.ObjectDefinitionPsi psiElement, Boolean 
                     assert(exists spec);
                     children.add(CeylonSpecifierTreeElement(spec));
                 }
+                else {}
             }
         }
         return children;

@@ -26,8 +26,7 @@ import com.redhat.ceylon.ide.common.util {
     FindRefinementsVisitor
 }
 import com.redhat.ceylon.model.typechecker.model {
-    TypedDeclaration,
-    TypeDeclaration
+    Declaration
 }
 
 import org.intellij.plugins.ceylon.ide.model {
@@ -57,9 +56,10 @@ shared class RefinementsSearch() extends
     }
 
     void findImplementors(PsiElement sourceElement, void consumer(PsiReference element)) {
-        if (is PsiClass|PsiMethod sourceElement) {
+        switch (sourceElement)
+        case (is PsiClass|PsiMethod) {
             if (exists psiFile = sourceElement.containingFile,
-                is TypeDeclaration|TypedDeclaration decl = declarationFromPsiElement(sourceElement),
+                exists decl = declarationFromPsiElement(sourceElement),
                 decl.formal || decl.default,
                 exists pus = getCeylonProject(psiFile)?.typechecker?.phasedUnits) {
 
@@ -68,42 +68,44 @@ shared class RefinementsSearch() extends
                     node = null;
                     sourceElement = sourceElement;
                     consumer = consumer;
-                    for (pu in pus.phasedUnits) pu
+                    *pus.phasedUnits
                 };
             }
         }
-        else if (is CeylonPsi.DeclarationPsi sourceElement,
-            exists node = sourceElement.ceylonNode,
-            is TypeDeclaration|TypedDeclaration decl = node.declarationModel,
-            decl.formal || decl.default,
-            is CeylonFile ceylonFile = sourceElement.containingFile,
-            exists project
-                    = concurrencyManager.needReadAccess(()
-                    => findProjectForFile(ceylonFile)),
-            exists modules = project.modules) {
+        else case (is CeylonPsi.DeclarationPsi) {
+            if (exists node = sourceElement.ceylonNode,
+                exists decl = node.declarationModel,
+                decl.formal || decl.default,
+                is CeylonFile ceylonFile = sourceElement.containingFile,
+                exists project
+                        = concurrencyManager.needReadAccess(()
+                            => findProjectForFile(ceylonFile)),
+                exists modules = project.modules) {
 
-            if (exists pus = project.typechecker?.phasedUnits) {
-                scanPhasedUnits {
-                    decl = decl;
-                    node = node;
-                    sourceElement = sourceElement;
-                    consumer = consumer;
-                    for (pu in pus.phasedUnits) pu
-                };
-            }
-
-            if (isInSourceArchive(ceylonFile.realVirtualFile())) {
-                for (mod in modules) {
+                if (exists pus = project.typechecker?.phasedUnits) {
                     scanPhasedUnits {
-                        pus = mod.phasedUnits;
                         decl = decl;
                         node = node;
                         sourceElement = sourceElement;
                         consumer = consumer;
+                        *pus.phasedUnits
                     };
+                }
+
+                if (isInSourceArchive(ceylonFile.realVirtualFile())) {
+                    for (mod in modules) {
+                        scanPhasedUnits {
+                            pus = mod.phasedUnits;
+                            decl = decl;
+                            node = node;
+                            sourceElement = sourceElement;
+                            consumer = consumer;
+                        };
+                    }
                 }
             }
         }
+        else {}
     }
 
     void action(PsiFile? declaringFile, Node dnode,
@@ -121,7 +123,7 @@ shared class RefinementsSearch() extends
     }
 
     void scanPhasedUnits({PhasedUnit*} pus,
-        TypeDeclaration|TypedDeclaration decl,
+        Declaration decl,
         Tree.Declaration? node, PsiElement sourceElement,
         void consumer(PsiReference element)) {
 

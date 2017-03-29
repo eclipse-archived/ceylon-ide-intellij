@@ -128,35 +128,37 @@ shared class CeylonParameterInfoHandler()
 
         value offset = context.offset;
 
-        if (is CeylonPsi.PositionalArgumentListPsi al) {
+        switch (al)
+        case (is CeylonPsi.PositionalArgumentListPsi) {
             value index
                     = ParameterInfoUtils.getCurrentParameterIndex(al.node,
                         offset, TokenTypes.comma.tokenType);
             context.setCurrentParameter(index);
         }
-        else if (is CeylonPsi.NamedArgumentListPsi al,
-            exists node = al.ceylonNode,
-            exists model = node.namedArgumentList,
-            exists parameterList = model.parameterList) {
+        else case (is CeylonPsi.NamedArgumentListPsi) {
+            if (exists node = al.ceylonNode,
+                exists model = node.namedArgumentList,
+                exists parameterList = model.parameterList) {
 
-            if (inSequencedArgs(al, model, offset)) {
-                context.setCurrentParameter(parameterList.parameters.size()-1);
-            }
-            else {
-                for (arg in node.namedArguments) {
-                    if (arg.startIndex.intValue()-1 <= offset <= arg.endIndex.intValue()+1) {
-                        value params = parameterList.parameters;
-                        for (index in 0:params.size()) {
-                            if (exists param = params[index],
-                                param.name == arg.identifier.text) {
-                                context.setCurrentParameter(index);
+                if (inSequencedArgs(al, model, offset)) {
+                    context.setCurrentParameter(parameterList.parameters.size() - 1);
+                } else {
+                    for (arg in node.namedArguments) {
+                        if (arg.startIndex.intValue() - 1<=offset<=arg.endIndex.intValue() + 1) {
+                            value params = parameterList.parameters;
+                            for (index in 0:params.size()) {
+                                if (exists param = params[index],
+                                    param.name == arg.identifier.text) {
+                                    context.setCurrentParameter(index);
+                                }
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }
         }
+        else {}
     }
 
     Boolean inSequencedArgs(CeylonPsi.NamedArgumentListPsi nal,

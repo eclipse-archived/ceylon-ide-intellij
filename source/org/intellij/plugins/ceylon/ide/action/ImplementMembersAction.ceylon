@@ -205,10 +205,11 @@ shared abstract class AbstractMembersAction()
                 return;
             }
             
-            ClassOrInterface? ci = 
-                if (is CeylonPsi.ObjectDefinitionPsi node) then node.ceylonNode.anonymousClass
-                else if (is CeylonPsi.ObjectExpressionPsi node) then node.ceylonNode.anonymousClass
-                else if (is CeylonPsi.ObjectArgumentPsi node) then node.ceylonNode.anonymousClass
+            value ci =
+                switch (node)
+                     case (is CeylonPsi.ObjectDefinitionPsi) node.ceylonNode.anonymousClass
+                else case (is CeylonPsi.ObjectExpressionPsi) node.ceylonNode.anonymousClass
+                else case (is CeylonPsi.ObjectArgumentPsi) node.ceylonNode.anonymousClass
                 else node.ceylonNode.declarationModel;
             if (!exists ci) {
                 return;

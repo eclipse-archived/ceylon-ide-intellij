@@ -52,24 +52,25 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
                 then method.returnType
                 else null;
 
-        value v = if (is PsiNameValuePair pair) then pair.\ivalue else pair;
-        if (is PsiArrayInitializerMemberValue v) {
+        switch (v = if (is PsiNameValuePair pair) then pair.\ivalue else pair)
+        case (is PsiArrayInitializerMemberValue) {
             return Arrays.asList(for (p in v.initializers) convert(p, paramName));
         }
-        else if (is PsiAnnotation v) {
+        else case (is PsiAnnotation) {
             return toListIfNeeded(PSIAnnotation(v), type);
         }
-        else if (is PsiReferenceExpression v) {
+        else case (is PsiReferenceExpression) {
             value jstring
                     = if (exists vrn = v.referenceName)
                     then javaString(vrn)
                     else null;
             return toListIfNeeded(jstring, type);
         }
-        else if (is PsiClassObjectAccessExpression v) {
+        else case (is PsiClassObjectAccessExpression) {
             return PSIType(v.operand.type);
         }
-        else if (is PsiLiteralExpression|PsiPrefixExpression v) {
+        else case (is PsiLiteralExpression
+                    | PsiPrefixExpression) {
             // TODO this is super ultra ugly, but we can't get the type associated
             // to a PsiArrayInitializerMemberValue, and IJ parses shorts as ints :(
             if (concurrencyManager.needReadAccess(() => psi.qualifiedName else "")
@@ -81,10 +82,14 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
             if (is PsiLiteralExpression v) {
                 return toListIfNeeded(v.\ivalue, type);
             }
+
+            return v;
         }
-        platformUtils.log(Status._WARNING,
-            "unsupported PsiAnnotationMemberValue ``className(v)``");
-        return v;
+        else {
+            platformUtils.log(Status._WARNING,
+                "unsupported PsiAnnotationMemberValue ``className(v)``");
+            return v;
+        }
     }
 
     concurrencyManager.needReadAccess(() {
