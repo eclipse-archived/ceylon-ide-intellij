@@ -212,7 +212,7 @@ shared class CeylonPageTwo()
                         if (file.absolute)
                             then VfsUtil.findFileByIoFile(file, false)
                    else if (exists mr = moduleRoot)
-                            then VfsUtil.findRelativeFile(mr, form.moduleOverrides.text);
+                            then VfsUtil.findRelativeFile(mr, form.moduleOverrides.text)
                    else null;
 
                 if (exists virtualFile) {
