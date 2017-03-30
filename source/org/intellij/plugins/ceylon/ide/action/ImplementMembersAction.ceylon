@@ -188,8 +188,8 @@ shared abstract class AbstractMembersAction()
             hash => declaration.hash;
             equals(Object that)
                     => if (is Member that)
-            then declaration ==that.declaration
-            else false;
+                    then declaration==that.declaration
+                    else false;
         }
         
         value offset = editor.selectionModel.selectionStart;
