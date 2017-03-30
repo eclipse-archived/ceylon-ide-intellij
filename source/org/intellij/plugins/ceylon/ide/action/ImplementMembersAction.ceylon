@@ -32,7 +32,8 @@ import com.intellij.psi {
     PsiElement
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
-    Node
+    Node,
+    Tree
 }
 import com.redhat.ceylon.ide.common.completion {
     overloads,
@@ -206,16 +207,19 @@ shared abstract class AbstractMembersAction()
             }
             
             value ci =
-                switch (node)
-                     case (is CeylonPsi.ObjectDefinitionPsi) node.ceylonNode?.anonymousClass
-                else case (is CeylonPsi.ObjectExpressionPsi) node.ceylonNode?.anonymousClass
-                else case (is CeylonPsi.ObjectArgumentPsi) node.ceylonNode?.anonymousClass
-                else node.ceylonNode?.declarationModel;
+                switch (treeNode = node.ceylonNode)
+                case (is Tree.ObjectDefinition) treeNode.anonymousClass
+                case (is Tree.ObjectExpression) treeNode.anonymousClass
+                case (is Tree.ObjectArgument) treeNode.anonymousClass
+                case (is Tree.ClassOrInterface) treeNode.declarationModel
+                else null; //impossible
             if (!exists ci) {
                 return;
             }
 
-            value proposals = ci.getMatchingMemberDeclarations(ci.unit, ci, "", 0, null).values();
+            value proposals
+                    = ci.getMatchingMemberDeclarations(ci.unit, ci, "", 0, null)
+                        .values();
             value list = ArrayList<ClassMember>();
             for (dwp in proposals) {
                 for (member in overloads(dwp.declaration)) {
