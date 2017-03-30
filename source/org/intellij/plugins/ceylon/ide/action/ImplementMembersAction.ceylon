@@ -164,8 +164,8 @@ shared abstract class AbstractMembersAction()
             hash => container.hash;
             equals(Object that)
                     => if (is Parent that)
-            then container==that.container
-            else false;
+                    then container==that.container
+                    else false;
         }
 
         class Member(declaration, container)
