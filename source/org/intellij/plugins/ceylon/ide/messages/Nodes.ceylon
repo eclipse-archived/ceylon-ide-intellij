@@ -34,6 +34,10 @@ import java.util {
     Arrays
 }
 
+import javax.swing {
+    Icon
+}
+
 import org.intellij.plugins.ceylon.ide.highlighting {
     highlighter
 }
@@ -47,16 +51,14 @@ String severityString(Severity severity)
         case (Severity.warning) "warnings"
         case (Severity.error) "errors";
 
-void setSeverityIcon(Severity severity, PresentationData presentation) {
-    switch (severity)
-    case (Severity.error) {
-        presentation.setIcon(AllIcons.General.error);
-    } case (Severity.warning) {
-        presentation.setIcon(AllIcons.General.warning);
-    } case (Severity.info) {
-        presentation.setIcon(AllIcons.General.information);
-    }
-}
+Icon severityIcon(Severity severity)
+        => switch (severity)
+        case (Severity.info) AllIcons.General.information
+        case (Severity.warning) AllIcons.General.warning
+        case (Severity.error) AllIcons.General.error;
+
+void setSeverityIcon(Severity severity, PresentationData presentation)
+        => presentation.setIcon(severityIcon(severity));
 
 alias BuildMessage => CeylonProjectBuild<out Anything,out Anything,out Anything,out Anything>.BuildMessage;
 alias SourceFileMessage => CeylonProjectBuild<out Anything,out Anything,out Anything,out Anything>.SourceFileMessage;
