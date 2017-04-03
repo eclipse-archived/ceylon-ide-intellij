@@ -115,22 +115,21 @@ shared class PSIType(psi,
     declaredClass
             => if (is PsiClassType psi,
                    exists cls = concurrencyManager.needReadAccess(() => psi.resolve()))
-               then PSIClass(SmartPointerManager.getInstance(cls.project)
-                                .createSmartPsiElementPointer(cls))
+               then PSIClass(SmartPointerManager.getInstance(cls.project).createSmartPsiElementPointer(cls))
                else unknownClassMirror;
 
-    TypeKind primitiveKind(PsiPrimitiveType psi)
-            => switch (psi)
-            case (PsiType.boolean) TypeKind.boolean
-            else case (PsiType.byte) TypeKind.byte
-            else case (PsiType.char) TypeKind.char
-            else case (PsiType.short) TypeKind.short
-            else case (PsiType.double) TypeKind.double
-            else case (PsiType.int) TypeKind.int
-            else case (PsiType.float) TypeKind.float
-            else case (PsiType.long) TypeKind.long
-            else case (PsiType.\ivoid) TypeKind.\ivoid
-            else TypeKind.null;
+    TypeKind primitiveKind(PsiPrimitiveType psi) {
+        return if (psi == PsiType.boolean) then TypeKind.boolean
+        else if (psi == PsiType.byte) then TypeKind.byte
+        else if (psi == PsiType.char) then TypeKind.char
+        else if (psi == PsiType.short) then TypeKind.short
+        else if (psi == PsiType.double) then TypeKind.double
+        else if (psi == PsiType.int) then TypeKind.int
+        else if (psi == PsiType.float) then TypeKind.float
+        else if (psi == PsiType.long) then TypeKind.long
+        else if (psi == PsiType.\ivoid) then TypeKind.\ivoid
+        else TypeKind.null;
+    }
     
     shared actual TypeKind kind {
         value kind
@@ -203,24 +202,23 @@ shared class PSIType(psi,
     qualifiedName
             => cachedQualifiedName
             else (cachedQualifiedName = concurrencyManager.needReadAccess(() => computedQualifiedName));
-
-    qualifyingType => null; //TODO
+    
+    // TODO
+    qualifyingType => null; //enclosing;
     
     raw = if (is PsiClassType psi) then concurrencyManager.needReadAccess(() => psi.raw) else false;
     
     function getTypeArguments(PsiType type)
             => if (is PsiClassType type)
-            then concurrencyManager.needReadAccess(() => type.parameters)
-            else null;
+                then concurrencyManager.needReadAccess(() => type.parameters)
+                else null;
 
     shared actual TypeParameterMirror? typeParameter {
         if (is PsiTypeParameter|PsiClassReferenceType psi) {
             return PSITypeParameter(psi);
         }
         else {
-            platformUtils.log(Status._ERROR,
-                "Unsupported PSIType.typeParameter "
-                        + className(psi));
+            platformUtils.log(Status._ERROR, "Unsupported PSIType.typeParameter " + className(psi));
             return null;
         }
     }
