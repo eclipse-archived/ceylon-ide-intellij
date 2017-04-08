@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    javaString
-}
 import ceylon.language {
     langNull=null,
     langTrue=true,
@@ -79,6 +76,9 @@ import java.io {
     File
 }
 import java.lang {
+    Types {
+        nativeString
+    },
     JString=String
 }
 import java.util {
@@ -369,7 +369,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
             if (exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
                 exists qname = cls.qualifiedName) {
-                result[javaString(qname)]
+                result[nativeString(qname)]
                     = DeclarationWithProximity(lightModel,
                         getUnimportedProximity(proximity, pkg.languagePackage, lightModel.name),
                         true);
@@ -381,7 +381,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 exists clsName = findName(cls),
                 exists annotationDecl = pkg.getMember(getJavaBeanName(clsName), noTypes, false)) {
 
-                result[javaString(annotationDecl.qualifiedNameString)]
+                result[nativeString(annotationDecl.qualifiedNameString)]
                     = DeclarationWithProximity(annotationDecl,
                         getUnimportedProximity(proximity, pkg.languagePackage, annotationDecl.name),
                         true);

@@ -1,8 +1,3 @@
-import ceylon.interop.java {
-    javaString,
-    javaClass
-}
-
 import com.intellij.openapi.util {
     TextRange
 }
@@ -10,15 +5,21 @@ import com.intellij.psi {
     AbstractElementManipulator,
     PsiFileFactory
 }
+import com.intellij.psi.util {
+    PsiTreeUtil
+}
+
+import java.lang {
+    Types {
+        nativeString
+    }
+}
 
 import org.intellij.plugins.ceylon.ide.lang {
     CeylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonPsi
-}
-import com.intellij.psi.util {
-    PsiTreeUtil
 }
 
 shared class IdentifierElementManipulator()
@@ -29,7 +30,7 @@ shared class IdentifierElementManipulator()
         value file
                 = PsiFileFactory.getInstance(element.project)
                     .createFileFromText(CeylonLanguage.instance,
-                        javaString(newContent));
+                        nativeString(newContent));
         if (exists id = file.findElementAt(0)) {
             assert (is CeylonPsi.IdentifierPsi? psi
                     = element.replace(id.parent));
@@ -49,7 +50,7 @@ shared class StringLiteralElementManipulator()
         value file
                 = PsiFileFactory.getInstance(element.project)
                     .createFileFromText(CeylonLanguage.instance,
-                        javaString(range.replace(element.text, newContent)));
+                        nativeString(range.replace(element.text, newContent)));
         if (exists str = file.findElementAt(0)) {
             assert (is CeylonPsi.StringLiteralPsi? psi
                     = element.replace(str.parent));
@@ -68,9 +69,9 @@ shared class ImportPathElementManipulator()
             TextRange range, String newContent) {
 
         value file = PsiFileFactory.getInstance(element.project)
-            .createFileFromText(CeylonLanguage.instance, javaString("import ``newContent`` {}"));
+            .createFileFromText(CeylonLanguage.instance, nativeString("import ``newContent`` {}"));
 
-        if (exists path = PsiTreeUtil.findChildOfType(file, javaClass<CeylonPsi.ImportPathPsi>()),
+        if (exists path = PsiTreeUtil.findChildOfType(file, `CeylonPsi.ImportPathPsi`),
             exists psi = element.replace(path),
             is CeylonPsi.ImportPathPsi psi) {
             return psi;

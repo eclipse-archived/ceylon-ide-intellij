@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaString
-}
-
 import com.intellij.ide.fileTemplates {
     FileTemplateUtil {
         createFromTemplate
@@ -22,6 +18,9 @@ import com.redhat.ceylon.ide.common.util {
 }
 
 import java.lang {
+    Types {
+        nativeString
+    },
     JString=String
 }
 import java.util {
@@ -38,13 +37,13 @@ shared object ceylonFileFactory {
         value props = HashMap<JString,Object>();
 
         if (exists backend) {
-            props[javaString("NATIVE")] = javaString("native(\"``backend.nativeAnnotation``\")");
+            props[nativeString("NATIVE")] = nativeString("native(\"``backend.nativeAnnotation``\")");
         }
-        props[javaString("MODULE_NAME")] = javaString(name);
-        props[javaString("MODULE_VERSION")] = javaString(version);
+        props[nativeString("MODULE_NAME")] = nativeString(name);
+        props[nativeString("MODULE_VERSION")] = nativeString(version);
 
         if (! imports.empty) {
-            props[javaString("IMPORTS")] = Arrays.asList(*imports.map(javaString));
+            props[nativeString("IMPORTS")] = Arrays.asList(*imports.map(nativeString));
         }
 
         return createFromTemplate(
@@ -57,8 +56,8 @@ shared object ceylonFileFactory {
         value tplManager = fileTemplateManager(dir.project);
         value props = HashMap<JString,Object>();
 
-        props[javaString("MODULE_NAME")] = javaString(name);
-        props[javaString("IS_SHARED")] = javaString(shared.string);
+        props[nativeString("MODULE_NAME")] = nativeString(name);
+        props[nativeString("IS_SHARED")] = nativeString(shared.string);
 
         return createFromTemplate(
             tplManager.getInternalTemplate("package.ceylon"),
@@ -70,8 +69,8 @@ shared object ceylonFileFactory {
         value tplManager = fileTemplateManager(dir.project);
         value props = HashMap<JString,Object>();
 
-        props[javaString("MODULE_NAME")] = javaString(moduleName);
-        props[javaString("FUN_NAME")] = javaString(unitName);
+        props[nativeString("MODULE_NAME")] = nativeString(moduleName);
+        props[nativeString("FUN_NAME")] = nativeString(unitName);
 
         return createFromTemplate(
             tplManager.getInternalTemplate("run.ceylon"),
@@ -89,7 +88,7 @@ shared object ceylonFileFactory {
             case ("class"|"interface")
             escaping.escapeInitialUppercase(unitName)
             else unitName;
-        props[javaString("UNIT_NAME")] = javaString(escaped);
+        props[nativeString("UNIT_NAME")] = nativeString(escaped);
 
         return createFromTemplate(
             tplManager.getInternalTemplate(templateName + ".ceylon"),

@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaString
-}
-
 import com.intellij.ide.highlighter {
     HighlighterFactory
 }
@@ -36,6 +32,9 @@ import java.awt {
     }
 }
 import java.lang {
+    Types {
+        nativeString
+    },
     StringBuffer
 }
 import java.util {
@@ -190,7 +189,7 @@ shared object highlighter {
         value highlighter
                 = HighlighterFactory.createHighlighter(project,
                     FileTypeManager.instance.getFileTypeByFileName("coin.ceylon"));
-        highlighter.setText(javaString(rawText));
+        highlighter.setText(nativeString(rawText));
 
         value iterator = highlighter.createIterator(0);
         while (!iterator.atEnd()) {

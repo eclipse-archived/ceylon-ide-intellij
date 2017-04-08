@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    javaString
-}
 
 import com.intellij.lang {
     ASTNode
@@ -23,6 +20,9 @@ import com.redhat.ceylon.common {
 }
 
 import java.lang {
+    Types {
+        nativeString
+    },
     UnsupportedOperationException,
     ObjectArray
 }
@@ -106,7 +106,7 @@ shared class CeylonDocResolvable(ASTNode node)
             type == CeylonTokens.astringLiteral
          || type == CeylonTokens.averbatimString) {
             value list = ArrayList<PsiReference>();
-            value matcher = docLinkPattern.matcher(javaString(node.text));
+            value matcher = docLinkPattern.matcher(nativeString(node.text));
             while (matcher.find()) {
                 value textRange
                         = TextRange(matcher.start(1),

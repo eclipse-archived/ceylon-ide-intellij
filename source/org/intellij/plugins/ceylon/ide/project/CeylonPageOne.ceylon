@@ -1,9 +1,3 @@
-import ceylon.interop.java {
-    javaString,
-    createJavaObjectArray,
-    javaClass
-}
-
 import com.intellij.ide.util.projectWizard {
     ModuleWizardStep
 }
@@ -37,8 +31,13 @@ import java.awt.event {
     KeyEvent
 }
 import java.lang {
+    Types {
+        nativeString,
+        classForType
+    },
     JString=String,
-    JBoolean=Boolean
+    JBoolean=Boolean,
+    ObjectArray
 }
 import java.util {
     EnumSet,
@@ -115,11 +114,11 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
             ScrollPaneConstants.verticalScrollbarAsNeeded,
             ScrollPaneConstants.horizontalScrollbarAsNeeded
         ),
-        javaString(BorderLayout.center)
+        nativeString(BorderLayout.center)
     );
 
     void createTableModel(ArrayList<Warning> warnings) {
-        model = ListTableModel(createJavaObjectArray<ColumnInfo<out Object, out Object>>({
+        model = ListTableModel(ObjectArray<ColumnInfo<out Object, out Object>>.with {
             object extends ColumnInfo<Warning,String>("Suppressed warnings") {
                 valueOf(Warning o) => o.description;
 
@@ -149,7 +148,7 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
 
                 isCellEditable(Warning warning) => true;
 
-                columnClass => javaClass<JBoolean>();
+                columnClass => classForType<JBoolean>();
 
                 shared actual TableCellRenderer getRenderer(Warning warning) {
                     return object extends BooleanTableCellRenderer() {
@@ -163,7 +162,7 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
 
                 getEditor(Warning warning) => BooleanTableCellEditor();
             }
-        }), Arrays.asList(*Warning.values()));
+        }, Arrays.asList(*Warning.values()));
 
         table.setModel(model);
         value cbWidth = JCheckBox().preferredSize.width + 4;
@@ -175,7 +174,7 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
             value column = table.columnModel.getColumn(i);
             value columnInfo = model.columnInfos.get(i);
             column.cellEditor = columnInfo.getEditor(null);
-            if (columnInfo.columnClass == javaClass<Boolean>()) {
+            if (columnInfo.columnClass == classForType<Boolean>()) {
                 TableUtil.setupCheckboxColumn(column);
             }
             i ++;
@@ -191,7 +190,7 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
             else EnumSet.copyOf(warnings);
 
         project.configuration.projectSuppressWarningsEnum = enumSet;
-        value opts = ParametersListUtil.defaultLineParser.fun(javaString(javacOptions.text));
+        value opts = ParametersListUtil.defaultLineParser.fun(nativeString(javacOptions.text));
         project.configuration.javacOptions = {for (opt in opts) opt.string};
     }
 
@@ -224,7 +223,7 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
         value it = project.configuration.javacOptions;
         variable JList<JString> opts;
         if (exists it) {
-            opts = Arrays.asList(*{for(str in it) javaString(str.string)});
+            opts = Arrays.asList(*{for(str in it) nativeString(str.string)});
         } else {
             opts = Collections.emptyList<JString>();
         }

@@ -1,5 +1,7 @@
-import ceylon.interop.java {
-    javaString
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 
 import com.intellij.pom {
@@ -345,7 +347,7 @@ shared object ideaCompletionServices satisfies CompletionServices {
 
                 class MyString(String str) {
                     shared MyString replaceAll(String regex, String replacement)
-                        => MyString(javaString(str).replaceAll(regex, replacement));
+                        => MyString(nativeString(str).replaceAll(regex, replacement));
 
                     string => str;
                 }

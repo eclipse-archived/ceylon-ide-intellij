@@ -1,5 +1,5 @@
-import ceylon.interop.java {
-    javaClass
+import ceylon.language.meta.model {
+    ClassOrInterfaceModel=ClassOrInterface
 }
 
 import com.intellij.ide.structureView {
@@ -36,7 +36,6 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
-    Class,
     ObjectArray
 }
 import java.util {
@@ -273,7 +272,7 @@ StructureViewTreeElement? getTreeElementForDeclaration(CeylonFile myFile,
         return null;
     }
 
-    function parentOfType<Type>(Class<Type> cls)
+    function parentOfType<Type>(ClassOrInterfaceModel<Type> cls)
         given Type satisfies PsiElement {
         assert(exists parent = PsiTreeUtil.getParentOfType(myFile.findElementAt(declaration.startIndex.intValue()), cls));
         return parent;
@@ -281,35 +280,35 @@ StructureViewTreeElement? getTreeElementForDeclaration(CeylonFile myFile,
 
     switch (declaration)
     case (is CustomTree.ClassOrInterface) {
-        value psiClass = parentOfType(javaClass<CeylonPsi.ClassOrInterfacePsi>());
+        value psiClass = parentOfType(`CeylonPsi.ClassOrInterfacePsi`);
         return CeylonClassTreeElement(psiClass, isInherited);
     }
     case (is Tree.AnyMethod) {
-        value psiMethod = parentOfType(javaClass<CeylonPsi.AnyMethodPsi>());
+        value psiMethod = parentOfType(`CeylonPsi.AnyMethodPsi`);
         return CeylonFunctionTreeElement(psiMethod, isInherited);
     }
     case (is Tree.ObjectDefinition) {
-        value psiObject = parentOfType(javaClass<CeylonPsi.ObjectDefinitionPsi>());
+        value psiObject = parentOfType(`CeylonPsi.ObjectDefinitionPsi`);
         return CeylonObjectTreeElement(psiObject, isInherited);
     }
     case (is Tree.AnyAttribute) {
-        value psiDecl = parentOfType(javaClass<CeylonPsi.AnyAttributePsi>());
+        value psiDecl = parentOfType(`CeylonPsi.AnyAttributePsi`);
         return CeylonAttributeTreeElement(psiDecl, isInherited);
     }
     case (is Tree.Variable) {
-        value psiDecl = parentOfType(javaClass<CeylonPsi.VariablePsi>());
+        value psiDecl = parentOfType(`CeylonPsi.VariablePsi`);
         return CeylonVariableTreeElement(psiDecl, isInherited);
     }
     case (is Tree.Constructor) {
-        value psiDecl = parentOfType(javaClass<CeylonPsi.ConstructorPsi>());
+        value psiDecl = parentOfType(`CeylonPsi.ConstructorPsi`);
         return CeylonConstructorTreeElement(psiDecl);
     }
     case (is Tree.Enumerated) {
-        value psiDecl = parentOfType(javaClass<CeylonPsi.EnumeratedPsi>());
+        value psiDecl = parentOfType(`CeylonPsi.EnumeratedPsi`);
         return CeylonEnumeratedTreeElement(psiDecl);
     }
     case (is Tree.TypeAliasDeclaration) {
-        value psiDecl = parentOfType(javaClass<CeylonPsi.TypeAliasDeclarationPsi>());
+        value psiDecl = parentOfType(`CeylonPsi.TypeAliasDeclarationPsi`);
         return CeylonTypeAliasTreeElement(psiDecl);
     }
     else {

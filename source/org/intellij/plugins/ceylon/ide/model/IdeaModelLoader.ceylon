@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.application {
     ApplicationManager {
         application
@@ -73,7 +69,8 @@ import com.redhat.ceylon.model.typechecker.model {
 
 import java.lang {
     ThreadLocal,
-    JBoolean=Boolean
+    JBoolean=Boolean,
+    Types
 }
 import java.lang.reflect {
     Modifier
@@ -180,7 +177,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     }
 
     UnindexedFilesUpdater newUnindexedFilesUpdater(Project project) {
-        for (ctor in javaClass<UnindexedFilesUpdater>().constructors) {
+        for (ctor in Types.classForType<UnindexedFilesUpdater>().constructors) {
             if (Modifier.isPublic(ctor.modifiers)) {
                 if (ctor.parameterCount == 1,
                     is UnindexedFilesUpdater up = ctor.newInstance(project)) {

@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaString
-}
-
 import com.intellij.openapi.editor {
     Editor
 }
@@ -24,6 +20,9 @@ import com.redhat.ceylon.ide.common.hierarchy {
 }
 
 import java.lang {
+    Types {
+        nativeString
+    },
     JString=String
 }
 import java.util {
@@ -75,7 +74,7 @@ shared class CeylonRenamePsiProcessor() extends RenamePsiElementProcessor() {
             value pus = collectPhasedUnits(element.project, true);
             for (subtype in hierarchyManager.findSubtypes { model; *pus }) {
                 if (exists psiElement = resolveDeclaration(subtype, element.project)) {
-                    allRenames.put(psiElement, javaString(newName));
+                    allRenames.put(psiElement, nativeString(newName));
                 }
             }
         }

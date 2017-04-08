@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaString
-}
-
 import com.intellij.codeHighlighting {
     Pass
 }
@@ -54,6 +50,9 @@ import java.awt.event {
     MouseEvent
 }
 import java.lang {
+    Types {
+        nativeString
+    },
     JString=String
 }
 import java.util {
@@ -84,7 +83,7 @@ shared class CeylonLineMarkerProvider() extends MyLineMarkerProvider() {
             extends LineMarkerInfo<PsiElement>(
                 element, range, icon, updatePass,
                 object satisfies Function<PsiElement,JString> {
-                    fun(PsiElement? param) => javaString(tooltip);
+                    fun(PsiElement? param) => nativeString(tooltip);
                 },
                 handler, alignment) {}
 

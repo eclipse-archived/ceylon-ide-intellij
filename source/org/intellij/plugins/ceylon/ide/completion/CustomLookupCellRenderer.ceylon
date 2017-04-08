@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    javaClass
-}
 
 import com.intellij.codeInsight.completion {
     CompletionProgressIndicator,
@@ -48,6 +45,9 @@ import java.awt {
     Insets
 }
 import java.lang {
+    Types {
+        classForType
+    },
     ReflectiveOperationException
 }
 
@@ -60,7 +60,7 @@ import javax.swing {
 
 import org.intellij.plugins.ceylon.ide.highlighting {
     ceylonHighlightingColors,
-    hForegroundColor = foregroundColor
+    hForegroundColor=foregroundColor
 }
 import org.intellij.plugins.ceylon.ide.settings {
     ceylonSettings
@@ -113,15 +113,15 @@ shared class CustomLookupCellRenderer(LookupImpl lookup, Project project)
                 .invokeLater(() {
                     try {
                         value field
-                                = javaClass<LookupImpl>()
+                                = classForType<LookupImpl>()
                                 .getDeclaredField("myCellRenderer");
                         field.accessible = true;
                         field.set(lookup, this);
                         field.accessible = false;
                         value method
-                                = javaClass<JList<out Object>>()
+                                = classForType<JList<out Object>>()
                                 .getDeclaredMethod("setCellRenderer",
-                                    javaClass<ListCellRenderer<out Object>>());
+                                    classForType<ListCellRenderer<out Object>>());
                         method.invoke(lookup.list, this);
                     }
                     catch (ReflectiveOperationException e) {

@@ -1,28 +1,27 @@
 import com.intellij.openapi.diagnostic {
     Logger
 }
-import com.redhat.ceylon.ide.common.platform {
-    Status,
-    IdeUtils
-}
-
-import java.lang {
-    RuntimeException
-}
 import com.intellij.openapi.progress {
     ProcessCanceledException
-}
-import ceylon.interop.java {
-    javaClassFromInstance
 }
 import com.intellij.openapi.project {
     IndexNotReadyException
 }
-import org.intellij.plugins.ceylon.ide.model {
-    ConcurrencyError
+import com.redhat.ceylon.ide.common.platform {
+    Status,
+    IdeUtils
 }
 import com.redhat.ceylon.model.loader {
     ModelResolutionException
+}
+
+import java.lang {
+    RuntimeException,
+    Types
+}
+
+import org.intellij.plugins.ceylon.ide.model {
+    ConcurrencyError
 }
 
 shared object ideaPlatformUtils satisfies IdeUtils {
@@ -74,6 +73,6 @@ shared object ideaPlatformUtils satisfies IdeUtils {
             extends RuntimeException(message) {
     }
     
-    pluginClassLoader => javaClassFromInstance(this).classLoader;
+    pluginClassLoader => Types.classForInstance(this).classLoader;
     
 }

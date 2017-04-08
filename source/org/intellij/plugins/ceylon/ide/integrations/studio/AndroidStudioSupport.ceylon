@@ -1,10 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    javaClass,
-    javaString
-}
 
 import com.intellij.codeInsight {
     CodeInsightUtilCore
@@ -69,6 +65,9 @@ import java.io {
     File
 }
 import java.lang {
+    Types {
+        nativeString
+    },
     JBoolean=Boolean,
     ReflectiveOperationException,
     ObjectArray
@@ -150,8 +149,8 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
             };
 
             for (dep in groovyFileManipulator.findAptDependencies(file)) {
-                if (!existingApt.contains(javaString(dep))) {
-                    existingApt.add(javaString(dep));
+                if (!existingApt.contains(nativeString(dep))) {
+                    existingApt.add(nativeString(dep));
                 }
             }
 
@@ -255,7 +254,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     }
 
     void syncGradleProject(Module mod) {
-        value cl = javaClass<AndroidStudioSupport>().classLoader;
+        value cl = Types.classForType<AndroidStudioSupport>().classLoader;
 
         try {
             value cls = cl.loadClass("com.android.tools.idea.gradle.project.GradleProjectImporter");
@@ -280,7 +279,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     void buildGradleProject(Module mod, Anything() callback) {
         value settings = ExternalSystemTaskExecutionSettings();
         settings.externalProjectPath = ExternalSystemApiUtil.getExternalProjectPath(mod) else "";
-        settings.taskNames = Arrays.asList(javaString("compileDebugJavaWithJavac"), javaString("compileDebugCeylonWithCeylonc"));
+        settings.taskNames = Arrays.asList(nativeString("compileDebugJavaWithJavac"), nativeString("compileDebugCeylonWithCeylonc"));
         settings.vmOptions = "";
         settings.externalSystemIdString = GradleConstants.systemId.id;
         ExternalSystemUtil.runTask(

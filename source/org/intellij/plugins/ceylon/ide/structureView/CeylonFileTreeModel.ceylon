@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.icons {
     AllIcons
 }
@@ -36,7 +32,10 @@ import com.redhat.ceylon.model.typechecker.model {
 import java.lang {
     Class,
     UnsupportedOperationException,
-    ObjectArray
+    ObjectArray,
+    Types {
+        classForType
+    }
 }
 import java.util {
     ...
@@ -175,8 +174,8 @@ class CeylonFileTreeModel(CeylonFile psiFile)
                 Sorter.alphaSorter };
     value _classes
             = ObjectArray<Class<out Object>>.with {
-                javaClass<CeylonPsi.DeclarationPsi>(),
-                javaClass<CeylonPsi.SpecifierStatementPsi>() };
+                classForType<CeylonPsi.DeclarationPsi>(),
+                classForType<CeylonPsi.SpecifierStatementPsi>() };
     value _filters
             = ObjectArray<Filter>.with { UnsharedDeclarationsFilter() };
     value _groupers

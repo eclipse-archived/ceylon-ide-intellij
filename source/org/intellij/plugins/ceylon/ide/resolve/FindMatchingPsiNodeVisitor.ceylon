@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClassFromInstance
-}
-
 import com.intellij.psi {
     PsiElement
 }
@@ -10,7 +6,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 }
 
 import java.lang {
-    Class
+    Class,
+    Types
 }
 
 import org.intellij.plugins.ceylon.ide.psi {
@@ -30,7 +27,7 @@ shared class FindMatchingPsiNodeVisitor(Node node, klass)
     shared actual void visitElement(PsiElement element) {
         super.visitElement(element);
         if (element.textRange.equalsToRange(node.startIndex.intValue(), node.endIndex.intValue()),
-            klass.isAssignableFrom(javaClassFromInstance(element))) {
+            klass.isAssignableFrom(Types.classForInstance(element))) {
             assert (is CeylonCompositeElement element);
             result = element;
         }

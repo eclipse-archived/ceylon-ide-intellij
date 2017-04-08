@@ -1,5 +1,7 @@
-import ceylon.interop.java {
-    javaString
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 
 import com.intellij.codeInsight.completion {
@@ -40,7 +42,7 @@ shared interface IdeaCompletionProposal satisfies CommonCompletionProposal {
     
     shared actual void replaceInDoc(CommonDocument doc, Integer start, Integer length, String newText) {
         assert(is IdeaDocument doc);
-        doc.nativeDocument.replaceString(start, start + length, javaString(newText));
+        doc.nativeDocument.replaceString(start, start + length, nativeString(newText));
     }
     
     shared void adjustSelection(IdeaCompletionContext data) {

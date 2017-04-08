@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaClass
-}
-
 import com.intellij.openapi.application {
     ApplicationInfo
 }
@@ -12,12 +8,13 @@ import com.intellij.openapi.diagnostic {
 import java.lang {
     Thread {
         currentThread
-    }
+    },
+    Types
 }
 
 shared class CeylonLogger<Type>() 
     given Type satisfies Object {
-    value internalLogger = Logger.getInstance(javaClass<Type>());
+    value internalLogger = Logger.getInstance(Types.classForType<Type>());
     
     function prepareMessage(Integer stackTraceDepth, String() message) {
         value stackTrace = currentThread().stackTrace;

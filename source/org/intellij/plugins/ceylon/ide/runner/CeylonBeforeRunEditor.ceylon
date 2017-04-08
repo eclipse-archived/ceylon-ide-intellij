@@ -1,6 +1,10 @@
 import ceylon.interop.java {
-    CeylonStringIterable,
-    javaString
+    CeylonStringIterable
+}
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 
 import com.intellij.openapi.project {
@@ -82,6 +86,6 @@ class CeylonBeforeRunEditor(Project project) extends DialogWrapper(project, fals
 
     shared void updateTask(CeylonBeforeRunTask task) {
         task.command = command.text;
-        task.parameters = CeylonStringIterable(lineParser.fun(javaString(parameters.text)));
+        task.parameters = CeylonStringIterable(lineParser.fun(nativeString(parameters.text)));
     }
 }

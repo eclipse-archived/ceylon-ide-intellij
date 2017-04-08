@@ -4,8 +4,10 @@ import com.redhat.ceylon.compiler.typechecker.context {
 import com.intellij.openapi.project {
     Project
 }
-import ceylon.interop.java {
-    javaString
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 import com.intellij.openapi.editor {
     Document
@@ -68,7 +70,7 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
         );
 
         for (change -> marker in zipEntries(edits, markers)) {
-            doc.replaceString(marker.startOffset, marker.endOffset, javaString(change.text));
+            doc.replaceString(marker.startOffset, marker.endOffset, nativeString(change.text));
         }
 
         if (exists project) {

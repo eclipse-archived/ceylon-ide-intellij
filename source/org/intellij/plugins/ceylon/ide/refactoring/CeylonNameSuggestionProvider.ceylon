@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaString
-}
-
 import com.intellij.psi {
     PsiElement
 }
@@ -23,6 +19,9 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
+    Types {
+        nativeString
+    },
     JString=String,
     ObjectArray
 }
@@ -53,7 +52,7 @@ class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
                 rootNode = if (is CeylonFile file = element.containingFile)
                     then file.compilationUnit else null;
             }
-            .map(javaString)
+            .map(nativeString)
             .each(result.add);
 
             //This code runs with the after-refactoring AST,

@@ -282,7 +282,7 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
 //            assert(exists fileTextLength = fileTextLengthRef.get());
 //            if (parentTextLength < fileTextLength) {
 //                String notParsed = file.text.substring(parentTextLength);
-//                parent.rawAddChildrenWithoutNotifications(LeafPsiElement(TokenType.badCharacter, javaString(notParsed)));
+//                parent.rawAddChildrenWithoutNotifications(LeafPsiElement(TokenType.badCharacter, nativeString(notParsed)));
 //            }
 //        }
 //
@@ -390,14 +390,14 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
 //            }
 //            if (type in parserConstants._LEAVES_TO_WRAP) {
 //                value comp = CompositeElement(type);
-//                value leaf = LeafPsiElement(TokenTypes.fromInt(token.type), javaString(tokenText));
+//                value leaf = LeafPsiElement(TokenTypes.fromInt(token.type), nativeString(tokenText));
 //                comp.rawAddChildrenWithoutNotifications(leaf);
 //                comp.putUserData(parserConstants._CEYLON_NODE_KEY, ceylonNode);
 //                return comp;
 //            } else if (type == TokenType.\iWHITE_SPACE || token.type == CeylonLexer.\iWS) {
-//                return PsiWhiteSpaceImpl(javaString(tokenText));
+//                return PsiWhiteSpaceImpl(nativeString(tokenText));
 //            } else {
-//                return LeafPsiElement(getElementType(token.type), javaString(tokenText));
+//                return LeafPsiElement(getElementType(token.type), nativeString(tokenText));
 //            }
 //        }
 //
@@ -421,8 +421,8 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
 //                assert(exists parent = this.parent);
 //                if (token.type == CeylonLexer.\iLINE_COMMENT && text.endsWith("\n")) {
 //                    parent.rawAddChildrenWithoutNotifications(LeafPsiElement(getElementType(token.type),
-//                            javaString(text.substring(0, text.size-1))));
-//                    parent.rawAddChildrenWithoutNotifications(PsiWhiteSpaceImpl(javaString("\n")));
+//                            nativeString(text.substring(0, text.size-1))));
+//                    parent.rawAddChildrenWithoutNotifications(PsiWhiteSpaceImpl(nativeString("\n")));
 //                }
 //                else {
 //                    parent.rawAddChildrenWithoutNotifications(buildLeaf(null, getElementType(token.type), token));

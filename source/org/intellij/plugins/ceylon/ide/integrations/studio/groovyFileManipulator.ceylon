@@ -1,8 +1,10 @@
 import ceylon.collection {
     HashMap
 }
-import ceylon.interop.java {
-    javaString
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 
 import com.intellij.psi {
@@ -62,7 +64,7 @@ object groovyFileManipulator {
     shared Boolean addApplyDirective(GroovyFile file, String applyPluginDirective) {
         if (!containsDirective(file.text, applyPluginDirective)) {
             value apply = GroovyPsiElementFactory.getInstance(file.project)
-                .createExpressionFromText(javaString(applyPluginDirective));
+                .createExpressionFromText(nativeString(applyPluginDirective));
 
             if (exists applyStatement = getApplyStatement(file)) {
                 file.addAfter(apply, applyStatement);
@@ -151,7 +153,7 @@ object groovyFileManipulator {
                 if (expr.invokedExpression.text == type,
                     exists arg = expr.argumentList.allArguments.get(0)) {
 
-                    value matcher = dependencyRegex.matcher(javaString(arg.text));
+                    value matcher = dependencyRegex.matcher(nativeString(arg.text));
 
                     if (matcher.matches()) {
                         modules.put(matcher.group(1).replace(":", "."), matcher.group(2));
@@ -220,7 +222,7 @@ object groovyFileManipulator {
             value factory = GroovyPsiElementFactory.getInstance(parent.project);
             value indents = if (is GroovyFile parent) then "" else "    ";
             value newBlock = factory.createExpressionFromText(
-                javaString(name + "{\n" + indents + "}\n"));
+                nativeString(name + "{\n" + indents + "}\n"));
             value statements = parent.statements;
             value add = if (first) then parent.addBefore else parent.addAfter;
 
@@ -254,7 +256,7 @@ object groovyFileManipulator {
             return false;
         }
         value newStatement = GroovyPsiElementFactory.getInstance(block.project)
-            .createExpressionFromText(javaString(text));
+            .createExpressionFromText(nativeString(text));
         CodeStyleManager.getInstance(block.project).reformat(newStatement);
         value statements = block.statements;
 

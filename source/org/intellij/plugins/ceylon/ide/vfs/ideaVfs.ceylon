@@ -1,5 +1,7 @@
-import ceylon.interop.java {
-    javaString
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 
 import com.intellij.openapi.\imodule {
@@ -52,7 +54,7 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     
     inputStream => concurrencyManager.needReadAccess(() => 
         let (contents = PsiManager.getInstance(mod.project).findViewProvider(file)?.contents?.string else "")
-        ByteArrayInputStream(javaString(contents).getBytes(file.charset.string)));
+        ByteArrayInputStream(nativeString(contents).getBytes(file.charset.string)));
     
     name => file.name;
     path => file.path;

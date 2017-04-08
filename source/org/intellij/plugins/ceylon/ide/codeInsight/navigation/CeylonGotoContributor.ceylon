@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    javaString
-}
 
 import com.intellij.navigation {
     GotoClassContributor,
@@ -37,6 +34,9 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
+    Types {
+        nativeString
+    },
     JString=String,
     ObjectArray
 }
@@ -185,7 +185,7 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
 
         logger.debug("Got names in ``system.nanoseconds - start``ns");
 
-        return ObjectArray.with(names.map(javaString));
+        return ObjectArray.with(names.map(nativeString));
     }
 
     shared actual String? getQualifiedName(NavigationItem item) {

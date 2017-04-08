@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    javaString
-}
-
 import com.intellij.openapi.actionSystem {
     DataContext,
     CommonDataKeys
@@ -100,6 +96,9 @@ import java.awt.event {
     ActionEvent
 }
 import java.lang {
+    Types {
+        nativeString
+    },
     ObjectArray,
     JString=String
 }
@@ -346,7 +345,7 @@ class MyParameterTableModel(IdeaChangeParameterRefactoring.ParameterList params,
 class MyParameterTableModelItem(MyParameterInfo param, Project project)
         extends ParameterTableModelItemBase<MyParameterInfo>
         (param,
-         PsiTypeCodeFragmentImpl(project, true, "type.ceylon", javaString(param.typeText), 0, null),
+         PsiTypeCodeFragmentImpl(project, true, "type.ceylon", nativeString(param.typeText), 0, null),
          null) {
 
     ellipsisType => false;
@@ -412,7 +411,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
                 panel.border = DottedBorder(UIUtil.tableForeground);
             }
         }
-        panel.add(field, javaString("West"));
+        panel.add(field, nativeString("West"));
         return panel;
     }
 
@@ -490,7 +489,7 @@ class ChangeParameterDialog(IdeaChangeParameterRefactoring.ParameterList params,
                 shared actual Object? getValueAt(Integer column) {
                     return switch (column)
                     case (0) item.typeCodeFragment
-                    case (1) javaString(myNameEditor.text.trimmed)
+                    case (1) nativeString(myNameEditor.text.trimmed)
                     else null;
                 }
             };

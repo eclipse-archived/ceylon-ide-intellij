@@ -1,5 +1,7 @@
-import ceylon.interop.java {
-    javaString
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 
 import com.intellij.lang {
@@ -116,7 +118,7 @@ shared class CeylonSyntaxAnnotator()
 
     void createAnnotations(Pattern pattern, PsiElement element, TextAttributesKey key) {
         value offset = element.textOffset;
-        value matcher = pattern.matcher(javaString(element.text));
+        value matcher = pattern.matcher(nativeString(element.text));
         while (matcher.find()) {
             value anno = annotationHolder.createInfoAnnotation(
                 TextRange(offset + matcher.start(0),
@@ -131,7 +133,7 @@ shared class CeylonSyntaxAnnotator()
         variable value offset = element.textOffset;
         variable value inCode = false;
         for (line in element.text.linesWithBreaks) {
-            value length = javaString(line).length();
+            value length = nativeString(line).length();
             if (line.whitespace) {
                 inCode = true;
             }

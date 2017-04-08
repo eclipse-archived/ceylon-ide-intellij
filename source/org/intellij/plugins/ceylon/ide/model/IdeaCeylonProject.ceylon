@@ -1,10 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    javaClass,
-    javaString
-}
 
 import com.intellij.facet {
     FacetManager
@@ -114,6 +110,9 @@ import java.io {
     IOException
 }
 import java.lang {
+    Types {
+        nativeString
+    },
     System,
     Thread
 }
@@ -191,7 +190,8 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
         shared actual void afterDependencyTreeValidation(CeylonProjectAlias ceylonProject,
             BaseProgressMonitor.Progress progress) {
-            Thread.currentThread().contextClassLoader = javaClass<IdeaCeylonProject>().classLoader;
+            Thread.currentThread().contextClassLoader
+                    = Types.classForType<IdeaCeylonProject>().classLoader;
 
             value sourcesToAttach = Ref<{ArtifactContext*}>();
 
@@ -443,7 +443,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 value libModel = provider.getModifiableLibraryModel(lib);
 
                 void updateUrl(OrderRootType type, VirtualFile file) {
-                    if (!javaString(file.string) in libModel.getUrls(type).iterable) {
+                    if (!nativeString(file.string) in libModel.getUrls(type).iterable) {
                         libModel.addRoot(file, type);
                     }
                 }
@@ -484,7 +484,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
                             .findFileByUrl(JarFileSystem.protocolPrefix + sourceArtifact.artifact().canonicalPath + JarFileSystem.jarSeparator);
 
                         if (exists srcFile) {
-                            if (!javaString(srcFile.string) in libModel.getUrls(OrderRootType.sources).iterable) {
+                            if (!nativeString(srcFile.string) in libModel.getUrls(OrderRootType.sources).iterable) {
                                 libModel.addRoot(srcFile, OrderRootType.sources);
                             }
                         }

@@ -1,9 +1,6 @@
 import ceylon.collection {
     ArrayList
 }
-import ceylon.interop.java {
-    javaString
-}
 
 import com.intellij.openapi.externalSystem.service.project {
     IdeModifiableModelsProvider
@@ -19,6 +16,9 @@ import com.redhat.ceylon.common {
 }
 
 import java.lang {
+    Types {
+        nativeString
+    },
     JString=String
 }
 import java.util {
@@ -128,15 +128,15 @@ shared class CeylonMavenImporter()
         value sources = getChildren(el, "sources", "source", "directory");
 
         if (sources.empty) {
-            result.consume(javaString("src/main/ceylon"), JavaSourceRootType.source);
+            result.consume(nativeString("src/main/ceylon"), JavaSourceRootType.source);
         } else {
             for (element in sources) {
-                result.consume(javaString(element.text), JavaSourceRootType.source);
+                result.consume(nativeString(element.text), JavaSourceRootType.source);
             }
         }
 
         for (element in getChildren(el, "resources", "resource", "directory")) {
-            result.consume(javaString(element.text), JavaResourceRootType.resource);
+            result.consume(nativeString(element.text), JavaResourceRootType.resource);
         }
     }
 

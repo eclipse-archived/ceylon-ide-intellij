@@ -1,5 +1,7 @@
-import ceylon.interop.java {
-    javaString
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 
 import com.intellij.diff {
@@ -215,7 +217,7 @@ class CeylonProblemsList(Project project)
 
     shared void setup() {
         this.layout = BorderLayout();
-        add(JScrollPane(myTree), javaString(BorderLayout.center));
+        add(JScrollPane(myTree), nativeString(BorderLayout.center));
         myTree.rootVisible = false;
 
         value treeModel = DefaultTreeModel(DefaultMutableTreeNode());
@@ -232,7 +234,7 @@ class CeylonProblemsList(Project project)
         builder.treeStructure = ProblemsTreeStructure(project, model);
 
         value toolbar = JPanel(BorderLayout());
-        toolbar.add(createActionsToolbar(), javaString(BorderLayout.west));
+        toolbar.add(createActionsToolbar(), nativeString(BorderLayout.west));
         setToolbar(toolbar);
 
         myTree.addFocusListener(object extends FocusAdapter() {

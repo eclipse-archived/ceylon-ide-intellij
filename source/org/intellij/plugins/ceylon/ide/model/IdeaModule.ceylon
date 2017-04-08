@@ -3,9 +3,6 @@ import ceylon.collection {
     MutableSet,
     MutableList
 }
-import ceylon.interop.java {
-    javaString
-}
 import ceylon.language {
     langNull=null,
     langFalse=false
@@ -48,6 +45,9 @@ import java.io {
     File
 }
 import java.lang {
+    Types {
+        nativeString
+    },
     JString=String
 }
 import java.util {
@@ -112,7 +112,7 @@ shared class IdeaModule(
 
             for (name -> getter in arrays) {
                 if (matcher.isStartMatch(name)) {
-                    proposals[javaString("java.lang." + name)]
+                    proposals[nativeString("java.lang." + name)]
                         = DeclarationWithProximity(getter(unit), proximity+4);
                 }
             }

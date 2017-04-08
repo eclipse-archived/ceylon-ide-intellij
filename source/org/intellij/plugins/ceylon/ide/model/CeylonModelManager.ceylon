@@ -1,15 +1,14 @@
 import ceylon.collection {
     HashSet
 }
-import ceylon.interop.java {
-    javaClassFromInstance,
-    javaClass
-}
 
 import com.intellij.compiler.server {
     BuildManagerListener {
         buildManagerTopic=topic
     }
+}
+import com.intellij.facet {
+    FacetManager
 }
 import com.intellij.notification {
     Notification,
@@ -71,6 +70,9 @@ import com.intellij.openapi.roots {
     },
     ModuleRootManager
 }
+import com.intellij.openapi.roots.ui.configuration {
+    ModulesConfigurator
+}
 import com.intellij.openapi.startup {
     StartupManager {
         startupManager=getInstance
@@ -117,7 +119,10 @@ import java.lang {
     InterruptedException,
     Error,
     Thread,
-    ThreadLocal
+    ThreadLocal,
+    Types {
+        classForInstance
+    }
 }
 import java.util {
     JHashSet=HashSet,
@@ -133,6 +138,10 @@ import java.util.concurrent.atomic {
     AtomicInteger
 }
 
+import org.intellij.plugins.ceylon.ide.facet {
+    CeylonFacet,
+    CeylonFacetConfiguration
+}
 import org.intellij.plugins.ceylon.ide.messages {
     getCeylonProblemsView,
     SourceMsg,
@@ -149,16 +158,6 @@ import org.intellij.plugins.ceylon.ide.settings {
 }
 import org.intellij.plugins.ceylon.ide.util {
     CeylonLogger
-}
-import com.intellij.facet {
-    FacetManager
-}
-import org.intellij.plugins.ceylon.ide.facet {
-    CeylonFacet,
-    CeylonFacetConfiguration
-}
-import com.intellij.openapi.roots.ui.configuration {
-    ModulesConfigurator
 }
 
 final class ChangesInProject of noChange | changesThatAlwaysRequireModelUpdate {
@@ -500,7 +499,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                                         } catch(AssertionError e) {
                                             e.printStackTrace();
                                         } catch(Error e) {
-                                            if (javaClassFromInstance(e).name == 
+                                            if (classForInstance(e).name ==
                                                 "com.redhat.ceylon.compiler.java.runtime.metamodel.ModelError") {
                                                 e.printStackTrace();
                                             } else {
@@ -709,9 +708,8 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
  IJ module is opened/closed."
 shared class CeylonProjectManager satisfies ModuleComponent {
 
-    shared static CeylonProjectManager forModule(Module mod) {
-        return mod.getComponent(javaClass<CeylonProjectManager>());
-    }
+    shared static CeylonProjectManager forModule(Module mod)
+            => mod.getComponent(`CeylonProjectManager`);
 
     Module mod;
     variable IdeaCeylonProjects? ceylonModel;
@@ -744,7 +742,7 @@ shared class CeylonProjectManager satisfies ModuleComponent {
 
     shared void addFacetToModule(Module mod, String? jdkProvider, Boolean forAndroid, Boolean showSettings) {
         if (!exists _ = ceylonModel) {
-            value model = mod.project.getComponent(javaClass<IdeaCeylonProjects>());
+            value model = mod.project.getComponent(`IdeaCeylonProjects`);
             model.addProject(mod);
             ceylonModel = model;
         }

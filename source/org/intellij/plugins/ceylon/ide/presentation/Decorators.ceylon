@@ -1,5 +1,7 @@
-import ceylon.interop.java {
-    javaString
+import java.lang {
+    Types {
+        nativeString
+    }
 }
 
 import com.intellij.ide.projectView {
@@ -285,7 +287,7 @@ String parameters(PsiMethod clsMethod) {
 
 String getAnnotatedType(PsiParameter param, PsiAnnotation tann) {
     String type =
-            javaString(nameValue(tann))
+            nativeString(nameValue(tann))
                 .replaceAll("[a-z]\\w*(\\.[a-z]\\w*)*::", "");
     return
         if (hasAnnotation(param,"Sequenced"))

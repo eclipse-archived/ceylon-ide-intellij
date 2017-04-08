@@ -1,8 +1,3 @@
-import ceylon.interop.java {
-    javaClass,
-    javaString
-}
-
 import com.intellij.openapi.actionSystem {
     CommonDataKeys,
     LangDataKeys,
@@ -54,6 +49,9 @@ import com.redhat.ceylon.ide.common.refactoring {
 }
 
 import java.lang {
+    Types {
+        nativeString
+    },
     ObjectArray,
     JString=String
 }
@@ -160,10 +158,10 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
 
     function createContext(Editor editor, CeylonFile file, CeylonPsi.DeclarationPsi inserted) {
         value myDataContext = HashMap<JString,Object>();
-        myDataContext[javaString(CommonDataKeys.editor.name)] = editor;
-        myDataContext[javaString(CommonDataKeys.psiFile.name)] = file;
-        myDataContext[javaString(CommonDataKeys.psiElement.name)] = inserted;
-        myDataContext[javaString(LangDataKeys.psiElementArray.name)]
+        myDataContext[nativeString(CommonDataKeys.editor.name)] = editor;
+        myDataContext[nativeString(CommonDataKeys.psiFile.name)] = file;
+        myDataContext[nativeString(CommonDataKeys.psiElement.name)] = inserted;
+        myDataContext[nativeString(LangDataKeys.psiElementArray.name)]
                     = ObjectArray<PsiElement>(0, inserted);
         return SimpleDataContext.getSimpleContext(myDataContext, null);
     }
@@ -195,7 +193,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
             given T satisfies CeylonCompositeElement
             => elements.map((term) {
                 value visitor
-                    = FindMatchingPsiNodeVisitor(term, javaClass<T>());
+                    = FindMatchingPsiNodeVisitor(term, Types.classForType<T>());
                 visitor.visitFile(file);
                 if (is T element = visitor.psi) {
                     return element;

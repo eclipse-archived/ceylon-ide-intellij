@@ -1,8 +1,3 @@
-import ceylon.interop.java {
-    javaClass,
-    javaString
-}
-
 import com.intellij.ide.actions {
     CreateFileFromTemplateDialog,
     CreateFromTemplateAction
@@ -26,8 +21,19 @@ import com.intellij.psi.util {
     }
 }
 
+import java.lang {
+    Types {
+        nativeString
+    }
+}
+
 import org.apache.commons.lang {
     StringUtils
+}
+import org.intellij.plugins.ceylon.ide {
+    CeylonBundle {
+        message
+    }
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile,
@@ -38,11 +44,6 @@ import org.intellij.plugins.ceylon.ide.psi.impl {
 }
 import org.intellij.plugins.ceylon.ide.util {
     icons
-}
-import org.intellij.plugins.ceylon.ide {
-    CeylonBundle {
-        message
-    }
 }
 
 shared class CeylonAddFileAction()
@@ -59,7 +60,7 @@ shared class CeylonAddFileAction()
         value unit = ceylonFileFactory.createUnit(dir, name, name + ".ceylon", templateName);
 
         if (is CeylonFile unit) {
-            return findChildOfType(unit, javaClass<DeclarationPsiNameIdOwner>()) else unit;
+            return findChildOfType(unit, `DeclarationPsiNameIdOwner`) else unit;
         }
         return unit;
     }
@@ -83,14 +84,14 @@ shared class CeylonAddFileAction()
 
         shared actual Boolean checkInput(String inputString)
                 => StringUtils.isNotBlank(inputString)
-                    && javaString(inputString).matches("(\\w|-)+")
+                    && nativeString(inputString).matches("(\\w|-)+")
                     && !directory.findChild(getCompleteFileName(inputString)) exists;
 
         shared actual String? getErrorText(String inputString) {
             value completeFileName = getCompleteFileName(inputString);
             if (StringUtils.isBlank(inputString)) {
                 return message("ceylon.file.wizard.error.blank");
-            } else if (!javaString(inputString).matches("(\\w|-)+")) {
+            } else if (!nativeString(inputString).matches("(\\w|-)+")) {
                 return message("ceylon.file.wizard.error.illegal", inputString);
             } else {
                 if (directory.findChild(completeFileName) exists) {
