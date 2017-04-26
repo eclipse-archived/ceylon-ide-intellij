@@ -15,8 +15,10 @@ public class CeylonBuilderService extends BuilderService {
     @NotNull
     @Override
     public List<? extends ModuleLevelBuilder> createModuleLevelBuilders() {
-        // Our builders won't work on Java < 7
-        if (Integer.parseInt(System.getProperty("java.version").split("\\.")[1]) < 7) {
+		String version = System.getProperty("java.version");
+		
+		// Our builders won't work on Java < 7
+		if (version.startsWith("1.") && Integer.parseInt(version.split("\\.")[1]) < 7) {
             return Collections.emptyList();
         }
 
