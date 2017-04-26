@@ -99,7 +99,7 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     
     ceylonToplevelObject => !innerClass && hasAnnotation(Annotations.\iobject);
 
-    value private => psi.hasModifierProperty(PsiModifier.private)
+    value private => psi.hasModifierProperty(PsiModifier.private);
 
     defaultAccess => !(public || protected || private);
 
