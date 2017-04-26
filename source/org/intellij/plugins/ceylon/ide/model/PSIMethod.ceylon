@@ -36,7 +36,8 @@ shared class PSIMethod(SmartPsiElementPointer<out PsiMethod> psiPointer)
     }
 
     Return doWithContainingClass<Return>(Return(PsiClass) func, Return default)
-            => concurrencyManager.needReadAccess(() => if (exists cc = psi.containingClass) then func(cc) else default);
+            => concurrencyManager.needReadAccess(() =>
+                if (exists cc = psi.containingClass) then func(cc) else default);
 
     Boolean classIs(String cls)
             => doWithContainingClass((cc) => (cc.qualifiedName else "") == cls, false);
@@ -56,8 +57,8 @@ shared class PSIMethod(SmartPsiElementPointer<out PsiMethod> psiPointer)
             && doWithContainingClass((cc)
                 => count { for (m in cc.findMethodsByName(psi.name, true))
                         m == psi ||
-                           !m.modifierList.hasModifierProperty("static")
-                        && !m.modifierList.hasModifierProperty("private")
+                           !m.modifierList.hasModifierProperty(PsiModifier.static)
+                        && !m.modifierList.hasModifierProperty(PsiModifier.private)
                         && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
                         && !MethodSignatureUtil.isSuperMethod(m, psi)
                      } > 1,
@@ -77,8 +78,10 @@ shared class PSIMethod(SmartPsiElementPointer<out PsiMethod> psiPointer)
     default => if (is PsiAnnotationMethod meth = psi)
                then concurrencyManager.needReadAccess(() => meth.defaultValue exists)
                else false;
-    
-    defaultAccess => !(public || protected || psi.hasModifierProperty(PsiModifier.private));
+
+    value private => psi.hasModifierProperty(PsiModifier.private);
+
+    defaultAccess => !(public || protected || private);
     
     enclosingClass => doWithContainingClass((cc) => PSIClass(pointer(cc)), null);
     

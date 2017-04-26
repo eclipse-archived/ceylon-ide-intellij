@@ -18,10 +18,10 @@ class PSIField(SmartPsiElementPointer<PsiField> psiPointer)
     }
     
     type = PSIType(concurrencyManager.needReadAccess(() => psi.type));
-    
-    defaultAccess =>
-            let (private = psi.hasModifierProperty(PsiModifier.private))
-                !(private || protected || public);
+
+    value private => psi.hasModifierProperty(PsiModifier.private)
+
+    defaultAccess => !(private || protected || public);
     
     final => psi.hasModifierProperty(PsiModifier.final);
     
