@@ -132,7 +132,7 @@ shared class CeylonGotoSuperHandler()
                     if (type!=bottom,
                         is Function dec
                             = type.getDirectMember(fun.name, signature, variadic, true),
-                        dec.shared || dec.actual) {
+                        dec.shared) {
                         list.add(dec);
                     }
                 }
@@ -146,7 +146,7 @@ shared class CeylonGotoSuperHandler()
                     if (type!=bottom,
                         is Value dec
                             = type.getDirectMember(val.name, null, false, true),
-                        dec.shared || dec.actual) {
+                        dec.shared) {
                         list.add(dec);
                     }
                 }
