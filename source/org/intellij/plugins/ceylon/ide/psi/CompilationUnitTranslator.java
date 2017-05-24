@@ -217,6 +217,9 @@ public class CompilationUnitTranslator extends Visitor {
                 case CeylonLexer.UIDENTIFIER:
                     tokenText = "\\I" + tokenText;
                     break;
+                case CeylonLexer.EOF:
+                    tokenText = "";
+                    break;
                 default:
                     throw new UnsupportedOperationException("Unsupported token type " + token);
             }
