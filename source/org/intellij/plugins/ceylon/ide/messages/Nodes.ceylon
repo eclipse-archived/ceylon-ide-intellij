@@ -28,6 +28,9 @@ import com.redhat.ceylon.ide.common.model {
     CeylonProjectBuild
 }
 
+import java.lang {
+    IllegalStateException
+}
 import java.util {
     ArrayList,
     Collections,
@@ -103,13 +106,20 @@ class FileNode(Project project, VirtualFile file, Severity severity,
         }
     }
 
-    canNavigate() => true;
+    function descriptor() => OpenFileDescriptor(myProject, file, 0, 0);
 
-    canNavigateToSource() => true;
+    canNavigate() => descriptor().canNavigate();
 
-    navigate(Boolean requestFocus)
-            => OpenFileDescriptor(myProject, file, 0, 0)
-                .navigate(requestFocus);
+    canNavigateToSource() => canNavigate();
+
+    shared actual void navigate(Boolean requestFocus) {
+        try {
+            descriptor().navigate(requestFocus);
+        }
+        catch (IllegalStateException ise) {
+            //ignore, file has been deleted
+        }
+    }
 
 }
 
@@ -126,22 +136,33 @@ class ProblemNode(Project project, shared BuildMessage message)
                     SimpleTextAttributes.grayedAttributes);
             highlighter.highlightPresentationData {
                 data = presentation;
-                description = message.message.size > 1000 then message.message[...1000] + "…" else message.message;
+                description
+                    = message.message.size > 1000
+                    then message.message[...1000] + "…"
+                    else message.message;
                 project = project;
             };
         }
         presentation.presentableText = message.message;
     }
 
-    canNavigate() => message is SourceFileMessage;
+    function descriptor()
+            => if (is SourceFileMessage message,
+                   is VirtualFile file = message.file)
+            then OpenFileDescriptor(myProject, file,
+                    message.startLine-1, message.startCol)
+            else null;
+
+    canNavigate() => descriptor()?.canNavigate() else false;
 
     canNavigateToSource() => canNavigate();
 
     shared actual void navigate(Boolean requestFocus) {
-        if (is SourceFileMessage message,
-            is VirtualFile file = message.file) {
-            OpenFileDescriptor(myProject, file, message.startLine-1, message.startCol)
-                .navigate(requestFocus);
+        try {
+            descriptor()?.navigate(requestFocus);
+        }
+        catch (IllegalStateException ise) {
+            //ignore, file has been deleted
         }
     }
 }

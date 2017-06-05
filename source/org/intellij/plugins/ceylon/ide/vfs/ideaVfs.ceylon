@@ -1,7 +1,8 @@
 import java.lang {
     Types {
         nativeString
-    }
+    },
+    ByteArray
 }
 
 import com.intellij.openapi.\imodule {
@@ -52,9 +53,21 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     
     hash => file.hash;
     
-    inputStream => concurrencyManager.needReadAccess(() => 
-        let (contents = PsiManager.getInstance(mod.project).findViewProvider(file)?.contents?.string else "")
-        ByteArrayInputStream(nativeString(contents).getBytes(file.charset.string)));
+    inputStream => concurrencyManager.needReadAccess(() {
+        try {
+            if (exists contents
+                    = PsiManager.getInstance(mod.project)
+                .findViewProvider(file)
+                ?.contents) {
+                value bytes =
+                        nativeString(contents.string)
+                            .getBytes(file.charset.string);
+                return ByteArrayInputStream(bytes);
+            }
+        }
+        catch (e) {}
+        return ByteArrayInputStream(ByteArray(0));
+    });
     
     name => file.name;
     path => file.path;
