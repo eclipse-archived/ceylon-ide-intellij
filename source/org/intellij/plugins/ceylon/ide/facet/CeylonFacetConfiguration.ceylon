@@ -1,7 +1,3 @@
-import ceylon.interop.java {
-    createJavaObjectArray
-}
-
 import com.intellij.facet {
     FacetConfiguration
 }
@@ -12,6 +8,10 @@ import com.intellij.facet.ui {
 }
 import com.intellij.openapi.\imodule {
     Module
+}
+
+import java.lang {
+    ObjectArray
 }
 
 import javax.swing {
@@ -38,14 +38,13 @@ shared class CeylonFacetConfiguration satisfies FacetConfiguration {
     shared static String reposTab = "Repositories";
     variable IdeaCeylonProject? ceylonProject = null;
 
-    shared new () {
-    }
+    shared new () {}
 
-    createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) =>
-            createJavaObjectArray<FacetEditorTab>({
+    createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager)
+            => ObjectArray<FacetEditorTab>.with {
                 CeylonFacetTab(compilationTab, CeylonPageOne()),
                 CeylonFacetTab(reposTab, CeylonPageTwo().init())
-            });
+            };
 
     shared actual void readExternal(Element element) {}
 
@@ -67,25 +66,24 @@ shared class CeylonFacetConfiguration satisfies FacetConfiguration {
     }
 
     shared void setModule(Module mod) {
-        ceylonProject = getCeylonProject(mod);
-
-        if (ceylonProject is Null,
-            exists ceylonModel = getCeylonProjects(mod.project),
-            ceylonModel.addProject(mod),
-            is IdeaCeylonProject p = ceylonModel.getProject(mod)) {
-            ceylonProject = p;
-        }
+        ceylonProject
+                = if (exists p = getCeylonProject(mod))
+                    then p
+                else if (exists ceylonModel = getCeylonProjects(mod.project),
+                        ceylonModel.addProject(mod),
+                        is IdeaCeylonProject p = ceylonModel.getProject(mod))
+                    then p
+                else null;
     }
 
-    class CeylonFacetTab(String tabName, CeylonConfigForm form) extends FacetEditorTab() {
+    class CeylonFacetTab(String tabName, CeylonConfigForm form)
+            extends FacetEditorTab() {
 
-        shared actual JComponent createComponent() {
-            return form.panel;
-        }
+        createComponent() => form.panel;
 
-        shared actual Boolean modified {
-            return if (exists p = ceylonProject) then form.isModified(p) else false;
-        }
+        modified => if (exists p = ceylonProject)
+                then form.isModified(p)
+                else false;
 
         shared actual void reset() {
             if (exists p = ceylonProject) {
@@ -103,8 +101,7 @@ shared class CeylonFacetConfiguration satisfies FacetConfiguration {
 
         shared actual void disposeUIResources() {}
 
-        shared actual String displayName {
-            return tabName;
-        }
+        displayName => tabName;
+
     }
 }

@@ -35,16 +35,12 @@ import java.lang {
         nativeString,
         classForType
     },
-    JString=String,
     JBoolean=Boolean,
     ObjectArray
 }
 import java.util {
     EnumSet,
     Arrays,
-    JList=List,
-    Collections,
-    TreeSet,
     ArrayList
 }
 
@@ -71,10 +67,10 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
 
     panel => super.myPanel;
 
-    String defaultVm = ceylonSettings.defaultTargetVm;
+    value defaultVm = ceylonSettings.defaultTargetVm;
 
-    compileForJvm.selected = !defaultVm.equals("js");
-    compileToJs.selected = !defaultVm.equals("jvm");
+    compileForJvm.selected = defaultVm != "js";
+    compileToJs.selected = defaultVm != "jvm";
 
     value warnings = ArrayList<Warning>();
 
@@ -82,8 +78,8 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
         suppressWarnings("uncheckedTypeArguments")
         shared actual TableCellRenderer? getCellRenderer(Integer row, Integer column) {
             if (is ListTableModel<out Anything> mod = this.model) {
-                assert(is ColumnInfo<Warning, out Anything> columnInfo = mod.columnInfos[column]);
-                assert(is Warning item = mod.getItem(row));
+                assert (is ColumnInfo<Warning, out Anything> columnInfo = mod.columnInfos[column]);
+                assert (is Warning item = mod.getItem(row));
                 return columnInfo.getRenderer(item);
             }
             return null;
@@ -93,10 +89,8 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
     table.tableHeader = null;
     table.rowSelectionAllowed = true;
     table.registerKeyboardAction(object satisfies ActionListener {
-
         shared actual void actionPerformed(ActionEvent e) {
-            value selectedRows = table.selectedRows;
-            for (selectedRow in selectedRows) {
+            for (selectedRow in table.selectedRows) {
                 value warning = model.getRowValue(selectedRow);
                 if (warnings.contains(warning)) {
                     warnings.remove(warning);
@@ -121,17 +115,15 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
         model = ListTableModel(ObjectArray<ColumnInfo<out Object, out Object>>.with {
             object extends ColumnInfo<Warning,String>("Suppressed warnings") {
                 valueOf(Warning o) => o.description;
-
-                shared actual TableCellRenderer getRenderer(Warning warning) {
-                    return object extends DefaultTableCellRenderer() {
-
-                        shared actual Component getTableCellRendererComponent(JTable table, Object val, Boolean isSelected, Boolean hasFocus, Integer row, Integer column) {
+                getRenderer(Warning warning)
+                    => object extends DefaultTableCellRenderer() {
+                        shared actual Component getTableCellRendererComponent
+                                (JTable table, Object val, Boolean isSelected, Boolean hasFocus, Integer row, Integer column) {
                             value cmp = super.getTableCellRendererComponent(table, val, isSelected, hasFocus, row, column);
                             this.border = null;
                             return cmp;
                         }
                     };
-                }
             },
             object extends ColumnInfo<Warning,JBoolean>("") {
                 valueOf(Warning o) => JBoolean(warnings.contains(o));
@@ -150,15 +142,15 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
 
                 columnClass => classForType<JBoolean>();
 
-                shared actual TableCellRenderer getRenderer(Warning warning) {
-                    return object extends BooleanTableCellRenderer() {
-                        shared actual Component getTableCellRendererComponent(JTable table, Object val, Boolean isSel, Boolean hasFocus, Integer row, Integer column) {
+                getRenderer(Warning warning)
+                    => object extends BooleanTableCellRenderer() {
+                        shared actual Component getTableCellRendererComponent
+                                (JTable table, Object val, Boolean isSel, Boolean hasFocus, Integer row, Integer column) {
                             value cmp = super.getTableCellRendererComponent(table, val, isSel, hasFocus, row, column);
                             this.border = null;
                             return cmp;
                         }
                     };
-                }
 
                 getEditor(Warning warning) => BooleanTableCellEditor();
             }
@@ -181,34 +173,34 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
         }
     }
 
+    value warningsSet
+            => if (warnings.empty)
+            then EnumSet.noneOf(`Warning`)
+            else EnumSet.copyOf(warnings);
+
     shared actual void apply(IdeaCeylonProject project) {
         project.ideConfiguration.compileToJvm = compileForJvm.selected;
         project.ideConfiguration.compileToJs = compileToJs.selected;
         project.configuration.projectOffline = workOffline.selected;
-        value enumSet = if (warnings.empty)
-            then EnumSet.noneOf(`Warning`)
-            else EnumSet.copyOf(warnings);
-
-        project.configuration.projectSuppressWarningsEnum = enumSet;
+        project.configuration.projectSuppressWarningsEnum = warningsSet;
         value opts = ParametersListUtil.defaultLineParser.fun(nativeString(javacOptions.text));
-        project.configuration.javacOptions = {for (opt in opts) opt.string};
+        project.configuration.javacOptions = { for (opt in opts) opt.string };
     }
 
-    shared actual Boolean isModified(IdeaCeylonProject project) {
-        return !project.ideConfiguration.compileToJvm exists
+    isModified(IdeaCeylonProject project)
+            => !project.ideConfiguration.compileToJvm exists
             || !project.ideConfiguration.compileToJs exists
             || !project.configuration.projectOffline exists
             || (project.ideConfiguration.compileToJvm else false) != compileForJvm.selected
             || (project.ideConfiguration.compileToJs else false) != compileToJs.selected
             || (project.configuration.projectOffline else false) != workOffline.selected
-            || !project.configuration.suppressWarningsEnum.equals(TreeSet(warnings))
-            || !getJavacOpts(project).equals(javacOptions.text);
-    }
+            || project.configuration.suppressWarningsEnum != warningsSet
+            || getJavacOpts(project) != javacOptions.text;
 
     shared actual void load(IdeaCeylonProject project) {
         value defaultVm = ceylonSettings.defaultTargetVm;
-        compileForJvm.selected = project.ideConfiguration.compileToJvm else !defaultVm.equals("js");
-        compileToJs.selected = project.ideConfiguration.compileToJs else !defaultVm.equals("jvm");
+        compileForJvm.selected = project.ideConfiguration.compileToJvm else defaultVm != "js";
+        compileToJs.selected = project.ideConfiguration.compileToJs else defaultVm != "jvm";
         workOffline.selected = project.configuration.projectOffline else false;
 
         warnings.clear();
@@ -221,21 +213,19 @@ shared class CeylonPageOne() extends PageOne() satisfies CeylonConfigForm {
 
     String getJavacOpts(IdeaCeylonProject project) {
         value it = project.configuration.javacOptions;
-        variable JList<JString> opts;
-        if (exists it) {
-            opts = Arrays.asList(*{for(str in it) nativeString(str.string)});
-        } else {
-            opts = Collections.emptyList<JString>();
-        }
+        value opts
+                = Arrays.asList(
+                    if (exists it)
+                    for (str in it)
+                    nativeString(str.string)
+                );
         return ParametersListUtil.defaultLineJoiner.fun(opts).string;
     }
 }
 
-shared class PageOneWizardStep(CeylonModuleBuilder moduleBuilder) extends ModuleWizardStep() {
-
+shared class PageOneWizardStep(CeylonModuleBuilder moduleBuilder)
+        extends ModuleWizardStep() {
     value step = CeylonPageOne();
-
     component => step.panel;
-
     updateDataModel() => moduleBuilder.setPageOne(step);
 }
