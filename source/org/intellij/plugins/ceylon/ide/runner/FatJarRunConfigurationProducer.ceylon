@@ -43,6 +43,8 @@ shared abstract class CeylonTaskRunConfigurationProducer()
         ConfigurationContext context) {
 
         if (exists element = context.psiLocation,
+            exists configModule = configuration.\imodule,
+            exists contextModule = context.\imodule,
             exists file = element.containingFile,
             exists ceylonProject = getCeylonProject(file),
             exists mod = PsiTreeUtil.getParentOfType(element, `CeylonPsi.ModuleDescriptorPsi`),
@@ -53,7 +55,7 @@ shared abstract class CeylonTaskRunConfigurationProducer()
             value jarName = getGeneratedJarName(modName, modVersion);
             value dir = ceylonProject.rootDirectory.absolutePath;
 
-            return configuration.\imodule == context.\imodule
+            return configModule == contextModule
                 && configuration.jarPath == dir + File.separator + jarName;
         }
         return false;
