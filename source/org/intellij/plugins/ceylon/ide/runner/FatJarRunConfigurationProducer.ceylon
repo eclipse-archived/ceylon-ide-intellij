@@ -48,10 +48,11 @@ shared abstract class CeylonTaskRunConfigurationProducer()
             exists file = element.containingFile,
             exists ceylonProject = getCeylonProject(file),
             exists mod = PsiTreeUtil.getParentOfType(element, `CeylonPsi.ModuleDescriptorPsi`),
-            isEnabledForModule(mod)) {
+            isEnabledForModule(mod),
+            exists node = mod.ceylonNode) {
 
-            value modName = mod.ceylonNode.importPath.model.nameAsString;
-            value modVersion = mod.ceylonNode.version.text.trim('"'.equals);
+            value modName = node.importPath.model.nameAsString;
+            value modVersion = node.version.text.trim('"'.equals);
             value jarName = getGeneratedJarName(modName, modVersion);
             value dir = ceylonProject.rootDirectory.absolutePath;
 
