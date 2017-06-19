@@ -32,6 +32,9 @@ import com.redhat.ceylon.compiler.typechecker.analyzer {
     AnalysisError,
     UsageWarning
 }
+import com.redhat.ceylon.compiler.typechecker.context {
+    PhasedUnit
+}
 import com.redhat.ceylon.compiler.typechecker.parser {
     RecognitionError
 }
@@ -72,9 +75,6 @@ import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile,
     CeylonPsi
 }
-import com.redhat.ceylon.compiler.typechecker.context {
-    PhasedUnit
-}
 
 shared alias AnyError => AnalysisError|RecognitionError|UnexpectedError;
 
@@ -100,36 +100,34 @@ shared class CeylonTypeCheckerAnnotator()
                 .replaceFirst(": ", "<br/>");
 
             Annotation annotation;
-            Boolean isError;
             switch (message)
             case (is AnyError) {
                 annotation
                         = annotationHolder.createAnnotation(
-                            HighlightSeverity.error,
+                            !message.warning
+                                    then HighlightSeverity.error
+                                    else HighlightSeverity.warning,
                             range, message.message, highlighted);
-                isError = true;
-                if (message.code in unresolvedReferenceCodes) {
-                    annotation.highlightType
-                        = ProblemHighlightType.likeUnknownSymbol;
-                }
+                annotation.highlightType
+                        = message.code in unresolvedReferenceCodes
+                        then ProblemHighlightType.likeUnknownSymbol
+                        else ProblemHighlightType.genericErrorOrWarning;
             }
             case (is UsageWarning) {
                 annotation
                         = annotationHolder.createAnnotation(
                             HighlightSeverity.warning,
                             range, message.message, highlighted);
-                isError = false;
                 annotation.highlightType
-                    = if (message.warningName in unusedCodes)
-                    then ProblemHighlightType.likeUnusedSymbol
-                    else ProblemHighlightType.genericErrorOrWarning;
+                        = message.warningName in unusedCodes
+                        then ProblemHighlightType.likeUnusedSymbol
+                        else ProblemHighlightType.genericErrorOrWarning;
             }
             else {
                 annotation
                         = annotationHolder.createAnnotation(
                             HighlightSeverity.information,
                             range, message.message, highlighted);
-                isError = false;
             }
 
             if (!ApplicationManager.application.unitTestMode) {
