@@ -56,7 +56,7 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
         if (params == null) {
             return false;
         }
-        String pfx = StringUtil.isEmpty(params.pkg) ? "" : params.pkg + ".";
+        String pfx = StringUtil.isEmpty(params.pkg) ? "" : params.pkg + "::";
         final String topLevelNameFull = pfx + params.topLevel;
         configuration.setTopLevelNameFull(topLevelNameFull);
         configuration.setName(topLevelNameFull);
@@ -182,9 +182,9 @@ public class CeylonRunConfigurationProducer extends RunConfigurationProducer<Cey
             if (o == null || getClass() != o.getClass()) return false;
             final RunConfigParams that = (RunConfigParams) o;
             return Objects.equals(this.module, that.module)
-                    && Objects.equals(this.pkg, that.pkg)
-                    && Objects.equals(this.topLevel, that.topLevel)
-                    && Objects.equals(this.backend, that.backend);
+                && Objects.equals(this.pkg, that.pkg)
+                && Objects.equals(this.topLevel, that.topLevel)
+                && Objects.equals(this.backend, that.backend);
         }
 
         @Override
