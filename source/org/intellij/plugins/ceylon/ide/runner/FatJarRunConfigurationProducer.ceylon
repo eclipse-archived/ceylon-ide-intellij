@@ -30,6 +30,9 @@ import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile,
     CeylonPsi
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Module
+}
 
 shared abstract class CeylonTaskRunConfigurationProducer()
         extends RunConfigurationProducer<JarApplicationConfiguration>(JarApplicationConfigurationType.instance) {
@@ -49,10 +52,11 @@ shared abstract class CeylonTaskRunConfigurationProducer()
             exists ceylonProject = getCeylonProject(file),
             exists mod = PsiTreeUtil.getParentOfType(element, `CeylonPsi.ModuleDescriptorPsi`),
             isEnabledForModule(mod),
-            exists node = mod.ceylonNode) {
+            exists model = mod.ceylonNode?.importPath?.model) {
+            assert (is Module model);
 
-            value modName = node.importPath.model.nameAsString;
-            value modVersion = node.version.text.trim('"'.equals);
+            value modName = model.nameAsString;
+            value modVersion = model.version;
             value jarName = getGeneratedJarName(modName, modVersion);
             value dir = ceylonProject.rootDirectory.absolutePath;
 
@@ -72,10 +76,13 @@ shared abstract class CeylonTaskRunConfigurationProducer()
             exists mod = PsiTreeUtil.getParentOfType(el, `CeylonPsi.ModuleDescriptorPsi`),
             isEnabledForModule(mod),
             is RunManagerEx runManager = context.runManager,
-            exists modName = mod.ceylonNode.importPath?.model?.nameAsString,
-            exists modVersion = mod.ceylonNode.version?.text?.trim('"'.equals)) {
+            exists model = mod.ceylonNode?.importPath?.model) {
+            assert (is Module model);
 
             value dir = ceylonProject.rootDirectory.absolutePath;
+
+            value modName = model.nameAsString;
+            value modVersion = model.version;
 
             configuration.setName(getRunConfigName(modName, modVersion));
             configuration.jarPath = dir + File.separator + getGeneratedJarName(modName, modVersion);
