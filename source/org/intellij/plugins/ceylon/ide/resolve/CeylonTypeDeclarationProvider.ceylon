@@ -25,38 +25,40 @@ import org.intellij.plugins.ceylon.ide.psi {
 shared class CeylonTypeDeclarationProvider() satisfies TypeDeclarationProvider {
 
     void addDeclarations(Type type, ArrayList<TypeDeclaration> list) {
-        if (type.union) {
-            for (t in type.caseTypes) {
-                addDeclarations(t, list);
-            }
-        }
-        else if (type.intersection) {
-            for (t in type.satisfiedTypes) {
-                addDeclarations(t, list);
-            }
-        }
-        else if (!type.unknown) {
-            value declaration = type.declaration;
-            if (!declaration in list) {
-                list.add(declaration);
-            }
-            if (declaration.unit.isTupleType(type)) {
-                for (elementType in declaration.unit.getTupleElementTypes(type)) {
-                    addDeclarations(elementType, list);
+        if (!type.unknown && !type.nothing) {
+            if (type.union) {
+                for (t in type.caseTypes) {
+                    addDeclarations(t, list);
                 }
             }
-            else if (declaration.unit.isIterableType(type)) {
-                if (!type.isSubtypeOf(declaration.unit.stringType),
-                    exists iteratedType = declaration.unit.getIteratedType(type)) {
-                    addDeclarations(iteratedType, list);
+            else if (type.intersection) {
+                for (t in type.satisfiedTypes) {
+                    addDeclarations(t, list);
                 }
             }
-            else if (declaration.unit.isCallableType(type)) {
-                if (exists iteratedType = declaration.unit.getCallableReturnType(type)) {
-                    addDeclarations(iteratedType, list);
+            else {
+                value declaration = type.declaration;
+                if (!declaration in list) {
+                    list.add(declaration);
                 }
-                for (argType in declaration.unit.getCallableArgumentTypes(type)) {
-                    addDeclarations(argType, list);
+                if (declaration.unit.isTupleType(type)) {
+                    for (elementType in declaration.unit.getTupleElementTypes(type)) {
+                        addDeclarations(elementType, list);
+                    }
+                }
+                else if (declaration.unit.isIterableType(type)) {
+                    if (!type.isSubtypeOf(declaration.unit.stringType),
+                        exists iteratedType = declaration.unit.getIteratedType(type)) {
+                        addDeclarations(iteratedType, list);
+                    }
+                }
+                else if (declaration.unit.isCallableType(type)) {
+                    if (exists iteratedType = declaration.unit.getCallableReturnType(type)) {
+                        addDeclarations(iteratedType, list);
+                    }
+                    for (argType in declaration.unit.getCallableArgumentTypes(type)) {
+                        addDeclarations(argType, list);
+                    }
                 }
             }
         }
