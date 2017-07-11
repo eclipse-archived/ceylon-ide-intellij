@@ -17,9 +17,8 @@ shared class CeylonFacet extends Facet<CeylonFacetConfiguration> {
         return type;
     }
 
-    shared static CeylonFacet? forModule(Module mod) {
-        return FacetManager.getInstance(mod).getFacetByType(id);
-    }
+    shared static CeylonFacet? forModule(Module mod)
+            => FacetManager.getInstance(mod).getFacetByType(id);
 
     shared new (Module mod, String name, CeylonFacetConfiguration config)
         extends Facet<CeylonFacetConfiguration>(facetType, mod, name, config, null) {}

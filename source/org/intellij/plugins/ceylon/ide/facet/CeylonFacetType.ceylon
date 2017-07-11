@@ -29,8 +29,8 @@ shared class CeylonFacetType()
 
     isSuitableModuleType(ModuleType<out Anything> moduleType)
             => moduleType is JavaModuleType
-                || moduleType is CeylonModuleType
-                ||"PLUGIN_MODULE".equals(moduleType.id);
+            || moduleType is CeylonModuleType
+            ||"PLUGIN_MODULE" == moduleType.id;
 
     icon => icons.ceylon;
 }
