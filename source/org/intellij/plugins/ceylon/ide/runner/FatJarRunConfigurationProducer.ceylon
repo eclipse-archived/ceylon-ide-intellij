@@ -18,9 +18,15 @@ import com.intellij.psi {
 import com.intellij.psi.util {
     PsiTreeUtil
 }
+import com.redhat.ceylon.model.typechecker.model {
+    Module
+}
 
 import java.io {
     File
+}
+import java.util {
+    ArrayList
 }
 
 import org.intellij.plugins.ceylon.ide.model {
@@ -29,9 +35,6 @@ import org.intellij.plugins.ceylon.ide.model {
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile,
     CeylonPsi
-}
-import com.redhat.ceylon.model.typechecker.model {
-    Module
 }
 
 shared abstract class CeylonTaskRunConfigurationProducer()
@@ -92,9 +95,9 @@ shared abstract class CeylonTaskRunConfigurationProducer()
             value beforeTask = getBeforeTask(modName, modVersion);
             beforeTask.enabled = true;
 
-            value runTasks = runManager.getBeforeRunTasks(configuration);
-            runTasks.add(beforeTask);
-            runManager.setBeforeRunTasks(configuration, runTasks, false);
+            value beforeTasks = ArrayList(runManager.getBeforeRunTasks(configuration));
+            beforeTasks.add(beforeTask);
+            runManager.setBeforeRunTasks(configuration, beforeTasks, false);
 
             return true;
         }

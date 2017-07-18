@@ -33,8 +33,7 @@ import com.intellij.openapi.\imodule {
     Mod=Module
 }
 import com.intellij.openapi.progress {
-    ProgressManager,
-    PerformInBackgroundOption
+    ProgressManager
 }
 import com.intellij.openapi.project {
     Project
@@ -387,8 +386,8 @@ shared class IdeaQuickFixData(
                                 };
                             }
                         },
-                        noop,
-                        PerformInBackgroundOption.alwaysBackground);
+                        () {},
+                        () => true);
                 }
                 affectsOtherUnits = affectsOtherUnits;
             };
