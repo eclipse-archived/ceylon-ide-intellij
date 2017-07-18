@@ -100,7 +100,8 @@ import java.lang {
         nativeString
     },
     ObjectArray,
-    JString=String
+    JString=String,
+    overloaded
 }
 import java.util {
     List,
@@ -136,9 +137,11 @@ import org.intellij.plugins.ceylon.ide.psi {
 
 shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
 
+    overloaded
     shared actual PsiElement? findTargetMember(PsiFile file, Editor editor)
             => findTargetMember(file.findElementAt(editor.caretModel.offset));
 
+    overloaded
     shared actual PsiElement? findTargetMember(PsiElement? element) {
         if (exists element,
             is CeylonFile file = element.containingFile,
@@ -155,6 +158,7 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
         return null;
     }
 
+    overloaded
     shared actual void invoke(Project project, ObjectArray<PsiElement> elements, DataContext? ctx) {
         assert (exists modelManager = getModelManager(project));
         try {
@@ -172,6 +176,7 @@ shared class CeylonChangeSignatureHandler() satisfies ChangeSignatureHandler {
         }
     }
 
+    overloaded
     shared actual void invoke(Project p, Editor editor, PsiFile file, DataContext? dataContext) {
         if (is CeylonFile file,
             exists localAnalysisResult = file.localAnalyzer?.result,

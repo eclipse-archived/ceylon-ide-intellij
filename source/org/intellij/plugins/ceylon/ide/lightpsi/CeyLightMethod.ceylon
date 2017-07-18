@@ -47,7 +47,8 @@ import com.redhat.ceylon.model.loader.mirror {
 }
 
 import java.lang {
-    ObjectArray
+    ObjectArray,
+    overloaded
 }
 import java.util {
     Collections
@@ -97,10 +98,13 @@ shared class CeyLightMethod(containingClass, mirror, project)
 
     nameIdentifier => null;
 
+    overloaded
     shared actual ObjectArray<PsiMethod> findSuperMethods() => PsiMethod.emptyArray;
 
+    overloaded
     shared actual ObjectArray<PsiMethod> findSuperMethods(Boolean checkAccess) => PsiMethod.emptyArray;
 
+    overloaded
     shared actual ObjectArray<PsiMethod> findSuperMethods(PsiClass parentClass) => PsiMethod.emptyArray;
 
     findSuperMethodSignaturesIncludingStatic(Boolean checkAccess)

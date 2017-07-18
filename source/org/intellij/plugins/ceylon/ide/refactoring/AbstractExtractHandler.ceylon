@@ -53,7 +53,8 @@ import java.lang {
         nativeString
     },
     ObjectArray,
-    JString=String
+    JString=String,
+    overloaded
 }
 import java.util {
     HashMap,
@@ -87,6 +88,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
                 ceylonNode = null;
             };
 
+    overloaded
     shared actual void invoke(Project project, Editor editor, PsiFile psiFile, DataContext dataContext) {
         assert (exists modelManager = getModelManager(project));
         try {
@@ -101,6 +103,7 @@ shared abstract class AbstractExtractHandler() satisfies RefactoringActionHandle
         }
     }
 
+    overloaded
     shared actual void invoke(Project p, ObjectArray<PsiElement> elements, DataContext ctx) {
         // Do nothing
     }

@@ -23,7 +23,8 @@ import java.lang {
         nativeString
     },
     JString=String,
-    ObjectArray
+    ObjectArray,
+    overloaded
 }
 import java.util {
     Set
@@ -69,18 +70,21 @@ class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
                     variable Tree.ListedArgument|Tree.SpreadArgument|Tree.SpecifiedArgument?
                     currentArg = null;
 
+                    overloaded
                     shared actual void visit(Tree.ListedArgument that) {
                         value oca = currentArg;
                         currentArg = that;
                         super.visit(that);
                         currentArg = oca;
                     }
+                    overloaded
                     shared actual void visit(Tree.SpreadArgument that) {
                         value oca = currentArg;
                         currentArg = that;
                         super.visit(that);
                         currentArg = oca;
                     }
+                    overloaded
                     shared actual void visit(Tree.SpecifiedArgument that) {
                         value oca = currentArg;
                         currentArg = that;
@@ -97,6 +101,7 @@ class CeylonNameSuggestionProvider() satisfies NameSuggestionProvider {
                             case (is Tree.BaseMemberExpression) term == bme
                             else false;
 
+                    overloaded
                     shared actual void visit(Tree.BaseMemberExpression that) {
                         if (that.declaration?.equals(dec) else false,
                             exists arg = currentArg) {

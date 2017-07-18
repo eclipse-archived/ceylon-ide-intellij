@@ -34,7 +34,8 @@ import com.redhat.ceylon.model.loader.mirror {
 import java.lang {
     CharSequence,
     CharArray,
-    UnsupportedOperationException
+    UnsupportedOperationException,
+    overloaded
 }
 import java.util {
     Collections
@@ -251,9 +252,11 @@ class CeyLightTypeParameter(TypeParameterMirror mirror, shared actual PsiManager
     textContains(Character c) => false;
     
     textLength => 0;
-    
+
+    overloaded
     shared actual Boolean textMatches(CharSequence text) => false;
-    
+
+    overloaded
     shared actual Boolean textMatches(PsiElement element) => false;
     
     textOffset => 0;

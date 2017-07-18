@@ -1,7 +1,8 @@
 import java.lang {
     Types {
         nativeString
-    }
+    },
+    overloaded
 }
 
 import com.intellij.ide.projectView {
@@ -148,6 +149,7 @@ shared class CeylonClassDecorator()
         return null;
     }
 
+    overloaded
     shared actual void decorate(ProjectViewNode<out Object> node, PresentationData data) {
         if (is ClassTreeNode node) {
             if (is ClsClassImpl psiClass = node.psiClass,
@@ -182,6 +184,7 @@ shared class CeylonClassDecorator()
         }
     }
 
+    overloaded
     shared actual void decorate(PackageDependenciesNode node, ColoredTreeCellRenderer cellRenderer) {}
 
     shared actual ItemPresentation getPresentation(ClsClassImpl item) {
