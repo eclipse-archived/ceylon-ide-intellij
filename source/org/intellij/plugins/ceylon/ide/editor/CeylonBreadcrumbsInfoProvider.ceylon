@@ -1,8 +1,8 @@
 import com.intellij.psi {
     PsiElement
 }
-import com.intellij.xml.breadcrumbs {
-    BreadcrumbsInfoProvider
+import com.intellij.ui.breadcrumbs {
+    BreadcrumbsProvider
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     TreeUtil {
@@ -27,7 +27,7 @@ import org.intellij.plugins.ceylon.ide.psi {
 }
 
 shared class CeylonBreadcrumbsInfoProvider()
-        extends BreadcrumbsInfoProvider() {
+        satisfies BreadcrumbsProvider {
 
     function packageName(CeylonPsi.CompilationUnitPsi e)
             //TODO: get the package name from the CeylonFile
