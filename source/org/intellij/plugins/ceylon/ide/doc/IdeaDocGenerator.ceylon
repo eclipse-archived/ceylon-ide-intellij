@@ -138,8 +138,8 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
             green = foregroundColor.green;
             blue = foregroundColor.blue;
         };
-        value fontBold = if (attributes.fontType.and(bold) != 0) then "font-weight:bold;" else "";
-        value fontItalic = if (attributes.fontType.and(italic) != 0) then "font-style:italic;" else "";
+        value fontBold = attributes.fontType.and(bold) != 0 then "font-weight:bold;" else "";
+        value fontItalic = attributes.fontType.and(italic) != 0 then "font-style:italic;" else "";
 
         return "<code style='color:``color``;``fontBold````fontItalic``'>``what else "<error>"``</code>";
     }
@@ -224,20 +224,16 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
 
     shared String buildUrl(Referenceable model) {
         if (is Package model) {
-            return buildUrl(model.\imodule) + ":" + model.nameAsString;
+            return buildUrl(model.\imodule) + "/" + model.nameAsString;
         }
         if (is Module model) {
             return model.nameAsString + "/" + model.version;
         }
         else if (is Declaration model) {
-            String result = ":" + (model.name else "new");
-            Scope? container = model.container;
-            if (is Referenceable container) {
-                return buildUrl(container) + result;
-            }
-            else {
-                return result;
-            }
+            value result = "/" + (model.name else "new");
+            return if (is Referenceable container = model.container)
+                then buildUrl(container) + result
+                else result;
         }
         else {
             return "";
@@ -263,7 +259,7 @@ shared class IdeaDocGenerator(TypeChecker typechecker)
         String protocol) {
         
         value href = if (is Referenceable model) then buildUrl(model) else model;
-        return "<a href=\"``psiProtocol````protocol``:``href``\">``text``</a>";
+        return "<a href='``psiProtocol````protocol``:``href``'>``text``</a>";
     }
 
     class MyPrinter(Boolean abbreviate)
