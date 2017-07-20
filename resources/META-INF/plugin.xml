@@ -7,21 +7,16 @@
     <description>Provides support for the Ceylon programming language</description>
 
     <change-notes><![CDATA[
-        This is a stable release of Ceylon IDE for IntelliJ based on Ceylon 1.3.2.<br/>
+        This is a bugfix release of Ceylon IDE for IntelliJ based on Ceylon 1.3.2.<br/>
         <br/>
         Notable changes:
         <ul>
-            <li>support for <code>ceylon fat-jar</code> (<a href="https://github.com/ceylon/ceylon-ide-intellij/issues/359">#359</a>)</li>
-            <li>support for the ceylon-maven-plugin (<a href="https://github.com/ceylon/ceylon-ide-intellij/issues/491">#491</a>)</li>
-            <li>navigate from <code>value</code> or <code>function</code> to the inferred type declaration (<a href="https://github.com/ceylon/ceylon-ide-intellij/issues/595">#595</a>)</li>
-            <li>many improvements in the code formatter, which is now configurable in Preferences &gt; Editor &gt; Code Style &gt; Ceylon</li>
-            <li>lots of bug fixes</li>
+            <li>support for IntelliJ 2017.1 (<a href="https://github.com/ceylon/ceylon-ide-intellij/issues/623">#623</a>)</li>
         </ul>
-        The complete list of fixed issues is available <a href="https://github.com/ceylon/ceylon-ide-intellij/milestone/7?closed=1">here</a>.
     ]]></change-notes>
 
-    <!-- Supports IDEA 15+ and Android Studio 2.0+ -->
-    <idea-version since-build="143"/>
+    <!-- Supports IDEA 2017.1+ -->
+    <idea-version since-build="171"/>
 
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="plugin-studio.xml">com.intellij.modules.androidstudio</depends>
