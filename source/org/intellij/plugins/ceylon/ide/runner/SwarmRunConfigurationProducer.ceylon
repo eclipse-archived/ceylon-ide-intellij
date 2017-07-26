@@ -48,7 +48,8 @@ shared class SwarmRunConfigurationProducer()
             => modName + " in Swarm";
 
     isEnabledForModule(CeylonPsi.ModuleDescriptorPsi descriptor)
-            => if (exists node=descriptor.ceylonNode)
-            then importsJavaEE(node.importModuleList.importModules)
+            => if (exists md = descriptor.ceylonNode,
+                   exists iml = md.importModuleList)
+            then importsJavaEE(iml.importModules)
             else false;
 }
