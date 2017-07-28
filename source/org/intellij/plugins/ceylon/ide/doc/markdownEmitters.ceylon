@@ -86,12 +86,12 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
     
     Referenceable? resolveLink(String linkTarget, Scope linkScope, Unit unit) {
         if (linkTarget.startsWith("package ")) {
-            value mod = resolveModule(linkScope);
-            return mod?.getPackage(linkTarget[8...].trimmed);
+            return resolveModule(linkScope)
+                ?.getPackage(linkTarget[8...].trimmed);
         } else if (linkTarget.startsWith("module ")) {
-            value mod = resolveModule(linkScope);
-            Package? pack = mod?.getPackage(linkTarget[7...].trimmed);
-            return pack?.\imodule;
+            return resolveModule(linkScope)
+                ?.getPackage(linkTarget[7...].trimmed)
+                ?.\imodule;
         }
         
         value pkgSeparatorIndex = linkTarget.firstInclusion("::");
@@ -116,8 +116,12 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
                     = scope.getMemberOrParameter(unit, declNames.first, null, false);
             
             for (name in declNames.skip(1)) {
-                if (is Scope d = decl) {
-                    decl = d.getMember(name, null, false);
+                if (is Scope s = decl) {
+                    decl = s.getMember(name, null, false);
+                    if (!decl exists) {
+                        //a parameter
+                        decl = s.getDirectMember(name, null, false);
+                    }
                 } else {
                     return null;
                 }
@@ -129,17 +133,11 @@ class CeylonSpanEmitter(Scope scope, Unit unit, String buildUrl(Referenceable mo
         return null;
     }
     
-    Module? resolveModule(Scope? scope) {
-        if (exists scope) {
-            if (is Package scope) {
-                return scope.\imodule;
-            }
-            
-            return resolveModule(scope.container);
-        }
-        
-        return null;
-    }
+    Module? resolveModule(Scope? scope)
+            => switch (scope)
+            case (null) null
+            case (is Package) scope.\imodule
+            else resolveModule(scope.container);
 }
 
 class CeylonBlockEmitter(Project project) satisfies BlockEmitter {
