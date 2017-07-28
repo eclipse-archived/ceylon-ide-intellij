@@ -109,8 +109,8 @@ abstract class CeylonDeclarationTreeElement<Decl>
 
     getIcon(Boolean open)
             => if (valid, exists node = element?.ceylonNode)
-            then icons.forDeclaration(node)
-            else null;
+            then (icons.forDeclaration(node) else super.getIcon(open))
+            else super.getIcon(open);
 
     alphaSortKey
             => element?.ceylonNode?.identifier?.text else "";
