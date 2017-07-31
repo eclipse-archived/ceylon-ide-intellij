@@ -107,11 +107,10 @@ abstract class CeylonDeclarationTreeElement<Decl>
                 then descriptions.descriptionForPsi(el, false, false)
             else null;
 
-    shared actual Icon getIcon(Boolean open){
-            assert (valid, exists node = element?.ceylonNode);
-            assert (exists ret = icons.forDeclaration(node));
-            return ret;
-    }
+    getIcon(Boolean open)
+            => if (valid, exists node = element?.ceylonNode)
+            then icons.forDeclaration(node)
+            else null;
 
     alphaSortKey
             => element?.ceylonNode?.identifier?.text else "";
