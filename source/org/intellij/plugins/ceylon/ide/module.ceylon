@@ -1,5 +1,3 @@
-"Default documentation for module `org.intellij.plugins.ceylon.ide`."
-
 native("jvm")
 module org.intellij.plugins.ceylon.ide "current" {
     shared import java.base "7";
