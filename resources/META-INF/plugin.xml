@@ -6,15 +6,12 @@
 
     <description>Provides support for the Ceylon programming language</description>
 
-    <change-notes>
-        Ceylon IDE for IntelliJ is a brand-new development tool for IntelliJ IDEA and Android Studio,
-        featuring incremental error reporting, code completion, basic refactoring,
-        many intention actions, sophisticated navigation, searching, type hierarchy and file structure,
-        online documentation, full integration with Ceylon Herd and much, much more.
-    </change-notes>
+    <change-notes><![CDATA[
+        This is a stable release of Ceylon IDE for IntelliJ based on Ceylon 1.3.3.<br/>
+    ]]></change-notes>
 
-    <!-- Supports IDEA 15+ and Android Studio 2.0+ -->
-    <idea-version since-build="143"/>
+    <!-- Supports IDEA 2017.1+ -->
+    <idea-version since-build="171"/>
 
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="plugin-studio.xml">com.intellij.modules.androidstudio</depends>
