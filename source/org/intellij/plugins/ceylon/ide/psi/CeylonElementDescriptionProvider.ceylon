@@ -200,7 +200,7 @@ shared object descriptions {
                 includeContainer = includeContainer;
                 includeReturnType = includeReturnType;
                 includeParameters = includeParameters;
-                unit = node.unit else decl.unit;
+                unit = node?.unit else decl.unit;
             };
         }
         else if (is Tree.Declaration|Tree.TypedArgument node) {
