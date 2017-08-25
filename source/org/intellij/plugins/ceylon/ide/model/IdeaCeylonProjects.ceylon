@@ -97,7 +97,10 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
     }
 
     shared [String, String]? parseExternalPhasedUnitFullPath(<CeylonFile|VirtualFile>? file) {
-        value path = if (is CeylonFile? file) then file?.virtualFile?.path else file.path;
+        if (!exists file) {
+            return null;
+        }
+        value path = if (is CeylonFile file) then file.virtualFile?.path else file.path;
         
         if (exists path,
             exists offset = path.firstInclusion(JarFileSystem.jarSeparator)) {
@@ -106,21 +109,20 @@ shared class IdeaCeylonProjects(shared IdeaProject ideaProject)
                     = path.startsWith(JarFileSystem.protocolPrefix)
                     then JarFileSystem.protocolPrefix.size
                     else 0;
-            value archivePath = path.span(start, offset - 1);
-            value filePath = path.spanFrom(offset + JarFileSystem.jarSeparator.size);
+            value archivePath = path[start..offset-1];
+            value filePath = path[offset + JarFileSystem.jarSeparator.size...];
             return [archivePath, filePath];
         }
         return null;
     }
 
-    IdeModuleAlias? findModuleForParsedArchivePaths([String, String]? parsedArchivePaths) {
-        if (exists parsedArchivePaths) {
-            return expand(ceylonProjects*.modules.coalesced*.external)
-                    .filter((m) => if (exists sap=m.sourceArchivePath) then sap == parsedArchivePaths[0] else false)
-                    .find((m) => m.containsPhasedUnitWithRelativePath(parsedArchivePaths[1]));
-        }
-        return null;
-    }
+    IdeModuleAlias? findModuleForParsedArchivePaths([String, String]? parsedArchivePaths)
+        => if (exists parsedArchivePaths)
+        then let([first, second] = parsedArchivePaths)
+                expand(ceylonProjects*.modules.coalesced*.external)
+                    .filter((m) => if (exists sap=m.sourceArchivePath) then sap == first else false)
+                    .find((m) => m.containsPhasedUnitWithRelativePath(second))
+        else null;
 
     shared IdeModuleAlias? findModuleForExternalPhasedUnit(<CeylonFile|VirtualFile>? file)
             => findModuleForParsedArchivePaths(parseExternalPhasedUnitFullPath(file));
