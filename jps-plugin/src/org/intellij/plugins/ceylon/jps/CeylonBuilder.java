@@ -471,11 +471,13 @@ class CeylonBuilder extends ModuleLevelBuilder {
         }
 
         private void log(String msg, BuildMessage.Kind kind) {
-            ctx.processMessage(new CompilerMessage(
-                    BUILDER_NAME,
-                    kind,
-                    msg
-            ));
+            if (kind != BuildMessage.Kind.INFO) {
+                ctx.processMessage(new CompilerMessage(
+                        BUILDER_NAME,
+                        kind,
+                        msg
+                ));
+            }
             CeylonBuilder.this.customLog(
                     ctx,
                     "",
