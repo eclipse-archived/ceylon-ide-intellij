@@ -64,22 +64,22 @@ shared  class IdeaCeylonParser(Language language) extends IStubFileElementType<P
 
 
     function structurallyDifferent(JList<CommonToken> puTokens, JList<CommonToken> localTokens)
-            => puTokens.size() != localTokens.size() ||
-                        zipPairs(CeylonList(puTokens).reversed, CeylonList(localTokens).reversed).any((tokensToCompare) => 
-                                    tokensToCompare[0].stopIndex != tokensToCompare[1].stopIndex || 
-                                    tokensToCompare[0].startIndex != tokensToCompare[1].startIndex ||
-                                    tokensToCompare[0].type != tokensToCompare[1].type);
+            => puTokens.size() != localTokens.size()
+                    || zipPairs(CeylonList(puTokens).reversed, CeylonList(localTokens).reversed)
+                            .any(([one, two])
+                                    => one.stopIndex != two.stopIndex
+                                    || one.startIndex != two.startIndex
+                                    || one.type != two.type);
     
     shared actual ASTNode? doParseContents(ASTNode chameleon, PsiElement psi) {
         assert(is CeylonFile file = psi);
         Boolean verbose = false;
 
         value psiManager = PsiDocumentManager.getInstance(file.project);
-        VirtualFile? virtualFile;
         value document = psiManager.getDocument(file.originalFile);
         value isCommitted = if (exists document) then psiManager.isCommitted(document) else false;
         value lastCommittedDocument = psiManager.getLastCommittedDocument(file.originalFile);
-        virtualFile = file.originalFile.virtualFile;
+        value virtualFile = file.originalFile.virtualFile;
         value localAnalyzer = file.localAnalyzer else null;
 
         try {
