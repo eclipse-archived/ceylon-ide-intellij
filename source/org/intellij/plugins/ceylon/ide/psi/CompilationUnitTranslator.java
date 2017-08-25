@@ -198,10 +198,7 @@ public class CompilationUnitTranslator extends Visitor {
     }
 
     private IElementType getElementType(int idx) {
-        if (idx == -2) {
-            return TokenType.BAD_CHARACTER;
-        }
-        return TokenTypes.fromInt(idx);
+        return idx == -2 ? TokenType.BAD_CHARACTER : TokenTypes.fromInt(idx);
     }
 
     @NotNull
