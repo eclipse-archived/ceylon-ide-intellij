@@ -53,19 +53,24 @@ shared class CeylonExpressionTypeProvider()
     shared actual List<Typed>
     getExpressionsAt(PsiElement psiElement) {
         value list = ArrayList<Typed>();
-        variable value expression = psiElement;
-        while (exists ex = getParentOfType(expression, `CeylonPsi.TermPsi`)) {
-            if (!ex is CeylonPsi.ExpressionPsi, !ex in list) {
-                list.add(ex);
-            }
-            expression = ex;
-        }
-        if (exists mod = getParentOfType(psiElement, `CeylonPsi.InitializerParameterPsi`)) {
+        if (exists mod = getParentOfType(psiElement, `CeylonPsi.LocalModifierPsi`)) {
             list.add(mod);
         }
-        else if (exists mod = getParentOfType(psiElement, `CeylonPsi.TypedDeclarationPsi`)) {
-            if (!mod.ceylonNode?.type is Tree.VoidModifier) {
+        else {
+            variable value expression = psiElement;
+            while (exists ex = getParentOfType(expression, `CeylonPsi.TermPsi`)) {
+                if (!ex is CeylonPsi.ExpressionPsi, !ex in list) {
+                    list.add(ex);
+                }
+                expression = ex;
+            }
+            if (exists mod = getParentOfType(psiElement, `CeylonPsi.InitializerParameterPsi`)) {
                 list.add(mod);
+            }
+            else if (exists mod = getParentOfType(psiElement, `CeylonPsi.TypedDeclarationPsi`)) {
+                if (!mod.ceylonNode?.type is Tree.VoidModifier) {
+                    list.add(mod);
+                }
             }
         }
         return list;
