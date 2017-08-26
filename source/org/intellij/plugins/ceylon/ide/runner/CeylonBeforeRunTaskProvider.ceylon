@@ -156,7 +156,7 @@ shared class CeylonBeforeRunTaskProvider extends BeforeRunTaskProvider<CeylonBef
         return executeTaskInternal(configuration, task);
     }
 
-    getDescription(CeylonBeforeRunTask task) => "Assemble with '``task.command``'";
+    getDescription(CeylonBeforeRunTask task) => "Assemble with 'ceylon ``task.command``'";
 
     id => key;
 
