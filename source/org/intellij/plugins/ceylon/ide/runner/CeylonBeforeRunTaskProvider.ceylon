@@ -78,7 +78,7 @@ shared class CeylonBeforeRunTaskProvider extends BeforeRunTaskProvider<CeylonBef
     }
 
     canExecuteTask(RunConfiguration configuration, CeylonBeforeRunTask task)
-            => task.command.size > 0;
+            => !task.command.empty;
 
     configurable => true;
 
@@ -97,23 +97,26 @@ shared class CeylonBeforeRunTaskProvider extends BeforeRunTaskProvider<CeylonBef
             => CeylonBeforeRunTask();
 
     function executeTaskInternal(RunConfiguration configuration, CeylonBeforeRunTask task) {
-        value workingDirectory = if (is CommonProgramRunConfigurationParameters configuration)
-            then File(configuration.workingDirectory)
-            else if (is ModuleBasedConfiguration<out RunConfigurationModule> configuration,
-                     exists mod = configuration.configurationModule.\imodule)
-            then getCeylonProject(mod)?.rootDirectory
-            else null;
+        value workingDirectory =
+                if (is CommonProgramRunConfigurationParameters configuration)
+                then File(configuration.workingDirectory)
+                else if (is ModuleBasedConfiguration<out RunConfigurationModule> configuration,
+                         exists mod = configuration.configurationModule.\imodule)
+                    then getCeylonProject(mod)?.rootDirectory
+                    else null;
 
         if (exists workingDirectory) {
 
             try {
                 value ceylonBinary = File(CeylonIdePlugin.embeddedCeylonDist, "bin/ceylon");
                 ceylonBinary.setExecutable(true, true);
-                value command = GeneralCommandLine(ceylonBinary.absolutePath, task.command, *task.parameters)
-                    .withWorkDirectory(workingDirectory);
+                value command
+                        = GeneralCommandLine(ceylonBinary.absolutePath, task.command, *task.parameters)
+                            .withWorkDirectory(workingDirectory);
                 value processHandler = OSProcessHandler(command);
-                value executor = RunContentExecutor(configuration.project, processHandler)
-                    .withTitle("ceylon swarm");
+                value executor
+                        = RunContentExecutor(configuration.project, processHandler)
+                            .withTitle("Ceylon assembly");
 
                 value exitCode = Ref<Integer>();
                 processHandler.addProcessListener(object extends ProcessAdapter() {
@@ -128,7 +131,8 @@ shared class CeylonBeforeRunTaskProvider extends BeforeRunTaskProvider<CeylonBef
                     return true;
                 }
             } catch (e) {
-                Logger.getInstance(`class`.qualifiedName).error("Could not run " + task.string, e);
+                Logger.getInstance(`class`.qualifiedName)
+                    .error("Could not run " + task.string, e);
             }
             return false;
         }
@@ -143,18 +147,16 @@ shared class CeylonBeforeRunTaskProvider extends BeforeRunTaskProvider<CeylonBef
         value done = Semaphore();
         done.down();
 
-        void callback(Boolean aborted, Integer errors, Integer warnings, CompileContext ctx) {
-            done.up();
-        }
-
-        application.invokeLater(() => compilerManager.make(compileScope, callback));
+        application.invokeLater(() => compilerManager.make(compileScope,
+                    (Boolean aborted, Integer errors, Integer warnings, CompileContext ctx)
+                            => done.up()));
 
         done.waitFor();
 
         return executeTaskInternal(configuration, task);
     }
 
-    getDescription(CeylonBeforeRunTask task) => "Run 'ceylon ``task.command``'";
+    getDescription(CeylonBeforeRunTask task) => "Assemble and run module";
 
     id => key;
 
@@ -186,15 +188,11 @@ shared class CeylonBeforeRunTask(command = "", parameters = {})
         element.setAttribute("parameters", rawParams);
     }
 
-    shared actual Boolean equals(Object that) {
-        if (is CeylonBeforeRunTask that) {
-            return command==that.command &&
-                parameters.sequence()==that.parameters.sequence();
-        }
-        else {
-            return false;
-        }
-    }
+    shared actual Boolean equals(Object that)
+            => if (is CeylonBeforeRunTask that)
+            then command==that.command
+              && parameters.sequence()==that.parameters.sequence()
+            else false;
 
     shared actual Integer hash {
         variable value hash = 1;

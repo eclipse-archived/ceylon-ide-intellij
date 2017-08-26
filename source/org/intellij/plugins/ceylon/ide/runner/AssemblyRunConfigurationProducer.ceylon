@@ -37,20 +37,23 @@ import org.intellij.plugins.ceylon.ide.psi {
     CeylonPsi
 }
 
-"Generates run configurations for fat-jar apps, with a 'ceylon fat-jar' before-run task."
-shared class FatJarRunConfigurationProducer()
+"Generates run configurations for assemblies, with a 'ceylon assemble' before-run task."
+shared class AssemblyRunConfigurationProducer()
         extends CeylonTaskRunConfigurationProducer() {
 
     getGeneratedJarName(String modName, String version)
-            => "``modName``-``version``.jar";
+            => "``modName``-``version``.cas";
 
     getBeforeTask(String modName, String version)
             => CeylonBeforeRunTask {
-                command = "fat-jar";
+                command = "assemble";
+                    "--jvm",
                     "--force",
+                    "--include-runtime",
+                    "--include-language",
                     modName + "/" + version
             };
 
     getRunConfigName(String modName, String version)
-            => "fat jar " + modName;
+            => "assembly " + modName;
 }

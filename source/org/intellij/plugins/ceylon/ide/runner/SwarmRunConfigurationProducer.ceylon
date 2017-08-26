@@ -36,16 +36,16 @@ shared class SwarmRunConfigurationProducer()
 
     getBeforeTask(String modName, String version)
             => CeylonBeforeRunTask {
-                    command = "swarm";
-                        "--provided-module", "javax:javaee-api",
-                        modName + "/" + version
-                };
+                command = "swarm";
+                    "--provided-module=javax:javaee-api",
+                    modName + "/" + version
+            };
 
     getGeneratedJarName(String modName, String version)
-            => modName + "-" + version + "-swarm.jar";
+            => "``modName``-``version``-swarm.jar";
 
     getRunConfigName(String modName, String version)
-            => modName + " in Swarm";
+            => "Swarm uberjar " + modName;
 
     isEnabledForModule(CeylonPsi.ModuleDescriptorPsi descriptor)
             => if (exists md = descriptor.ceylonNode,
