@@ -72,7 +72,7 @@ shared class CeylonFoldingBuilder() extends CustomFoldingBuilder() {
     }
 
     void foldRange(Integer[2] range, PsiElement element, void add(FoldingDescriptor d)) {
-        value [start, end] = range;
+        let ([start, end] = range);
         if (end > start) {
             add(FoldingDescriptor(element.node, TextRange(start, end)));
         }
