@@ -9,9 +9,9 @@ module org.intellij.plugins.ceylon.ide "current" {
     shared import org.intellij.groovy "current";
     shared import org.intellij.maven "current";
     shared import org.jdom "current";
-    shared import maven:"com.google.guava:guava" "19.0";
-    import maven:"com.intellij:forms_rt" "7.0.3";
-    import maven:"commons-lang:commons-lang" "2.6";
+    shared import maven:com.google.guava:"guava" "19.0";
+    import maven:com.intellij:"forms_rt" "7.0.3";
+    import maven:"commons-lang":"commons-lang" "2.6";
     import com.github.rjeschke.txtmark "0.13";
     shared import java.desktop "7";
     import java.compiler "7";

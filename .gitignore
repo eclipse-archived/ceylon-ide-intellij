@@ -6,8 +6,11 @@
 .idea/shelf
 .idea/dictionaries/
 .idea/scopes/scope_settings.xml
-.idea/libraries/Ceylon_dependencies.xml
 .idea/libraries/Ceylon__*.xml
+.idea/libraries/com_*.xml
+.idea/libraries/net_*.xml
+.idea/libraries/org_*.xml
+.idea/libraries/ceylon_*.xml
 testdata/CeylonTest/.idea/misc.xml
 testdata/CeylonTest/.idea/scopes/scope_settings.xml
 testdata/CeylonTest/.idea/workspace.xml
@@ -15,7 +18,6 @@ testdata/CeylonTest/modules
 /gen/
 /gensrc/
 test-resources/modules
-.ceylon/ide-config~
 intellij-repository
 out
 ant-build

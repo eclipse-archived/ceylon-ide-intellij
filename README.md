@@ -117,7 +117,8 @@ If you want to debug or hack this plugin, you'll need to build it from sources.
    if necessary.)
 
 6. Open the project `ceylon-ide-intellij` in IDEA. When the IDE shows a tooltip indicating "Frameworks detected: Ceylon 
-   framework is detected in the project", **do not** click on Configure, the project is already correctly configured. You might be requested to enter the value of two path variables. Go to 'Preferences ... > Appearance & Behavior > Path Variables',
+   framework is detected in the project", **do not** click on Configure, the project is already correctly configured. 
+   You might be requested to enter the value of two path variables. Go to 'Preferences ... > Appearance & Behavior > Path Variables',
    and add a variable named `CEYLON_DIST` pointing to `../ceylon/dist/dist`.
 
 7. In the IDE's 'Preferences ... > Editor > File Types', under 'Recognized File Types', register

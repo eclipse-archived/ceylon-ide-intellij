@@ -10,6 +10,10 @@ fullyexportmavendependencies=false
 lookup=flat:./intellij-repository
 lookup=../ceylon-ide-common/repo
 lookup=../ceylon-ide-common/modules
+lookup=../ceylon-sdk/modules
+lookup=../ceylon.formatter/modules/
+lookup=../ceylon.tool.converter.java2ceylon
+
 
 [compiler]
 source=source

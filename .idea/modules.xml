@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CeylonIDEA.iml" filepath="$PROJECT_DIR$/CeylonIDEA.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../ceylon-ide-common/ceylon-ide-common.iml" filepath="$PROJECT_DIR$/../ceylon-ide-common/ceylon-ide-common.iml" />
-      <module fileurl="file://$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" filepath="$PROJECT_DIR$/jps-plugin/ceylon-jps-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ceylon-ide-intellij.iml" filepath="$PROJECT_DIR$/ceylon-ide-intellij.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jps-plugin/jps-plugin.iml" filepath="$PROJECT_DIR$/jps-plugin/jps-plugin.iml" />
     </modules>
   </component>
 </project>

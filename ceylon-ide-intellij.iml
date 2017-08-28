@@ -28,13 +28,13 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="ceylon-jps-plugin" />
+    <orderEntry type="module" module-name="jps-plugin" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon IDE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon Runtime" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/collection/1.3.4-SNAPSHOT/ceylon.collection-1.3.4-SNAPSHOT.car!/" />
+          <root url="jar://$USER_HOME$/ceylon-sdk/modules/ceylon/collection/1.3.4-SNAPSHOT/ceylon.collection-1.3.4-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -43,7 +43,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-sdk/modules/ceylon/interop/java/1.3.4-SNAPSHOT/ceylon.interop.java-1.3.4-SNAPSHOT.car!/" />
+          <root url="jar://$USER_HOME$/ceylon-sdk/modules/ceylon/interop/java/1.3.4-SNAPSHOT/ceylon.interop.java-1.3.4-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -52,7 +52,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar!/" />
+          <root url="jar://$USER_HOME$/ceylon.tool.converter.java2ceylon/repo/org/antlr/antlr4-runtime-osgi/4.5.1/org.antlr.antlr4-runtime-osgi-4.5.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -61,7 +61,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.3.4-SNAPSHOT/ceylon.tool.converter.java2ceylon-1.3.4-SNAPSHOT.car!/" />
+          <root url="jar://$USER_HOME$/ceylon.tool.converter.java2ceylon/modules/ceylon/tool/converter/java2ceylon/1.3.4-SNAPSHOT/ceylon.tool.converter.java2ceylon-1.3.4-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -70,24 +70,23 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar!/" />
+          <root url="jar://$USER_HOME$/ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.src!/Zip4j/src" />
+          <root url="jar://$USER_HOME$/ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.src!/Zip4j/src" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar!/" />
+          <root url="jar://$USER_HOME$/ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="ceylon-ide-common" />
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
@@ -102,7 +101,7 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.3.4-SNAPSHOT/com.redhat.ceylon.ide.common-1.3.4-SNAPSHOT.car!/" />
+          <root url="jar://$USER_HOME$/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/1.3.4-SNAPSHOT/com.redhat.ceylon.ide.common-1.3.4-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -111,7 +110,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../ceylon.formatter/modules/ceylon/formatter/1.3.4-SNAPSHOT/ceylon.formatter-1.3.4-SNAPSHOT.car!/" />
+          <root url="jar://$USER_HOME$/ceylon.formatter/modules/ceylon/formatter/1.3.4-SNAPSHOT/ceylon.formatter-1.3.4-SNAPSHOT.car!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -136,6 +135,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.common/1.3.4-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.compiler.java/1.3.4-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.compiler.js/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.ide.common/1.3.4-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.langtools.classfile/1.3.4-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.model/1.3.4-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.redhat.ceylon.module-resolver/1.3.4-SNAPSHOT" level="project" />
