@@ -99,8 +99,7 @@ import org.intellij.plugins.ceylon.ide.model {
     getModelManager
 }
 import org.intellij.plugins.ceylon.ide.util {
-    CeylonLogger,
-    LogUtils
+    CeylonLogger
 }
 
 
@@ -142,7 +141,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
     value logger => ceylonLocalAnalyzerLogger;
     
     function makeTaskId(Anything() typecheckingTask)
-            => "[`` LogUtils.retrieveHash(typecheckingTask) ``(`` virtualFile.name ``)]";
+            => "[``(typecheckingTask of Object).hash``(``virtualFile.name``)]";
 
     void submitLocalTypechecking(
         void typecheckingTask(), 

@@ -31,10 +31,6 @@ import com.redhat.ceylon.common {
     Backend
 }
 
-import java.lang {
-    Runnable
-}
-
 import javax.swing {
     ...
 }
@@ -50,7 +46,7 @@ import org.intellij.plugins.ceylon.ide.util {
     icons
 }
 import org.intellij.plugins.ceylon.ide.wizard {
-    CreateCeylonModuleWizard
+    CeylonCreateCeylonModuleWizard
 }
 
 shared class CeylonAddModuleAction() extends CeylonAddingFilesAction() {
@@ -66,65 +62,68 @@ shared class CeylonAddModuleAction() extends CeylonAddingFilesAction() {
         }
 
         try {
-            value wizard = CreateCeylonModuleWizard(p, project);
+            value wizard = CeylonCreateCeylonModuleWizard(p, project);
             if (exists modelManager) {
                 modelManager.pauseAutomaticModelUpdate();
             }
             wizard.show();
 
             if (wizard.exitCode == DialogWrapper.okExitCode) {
-                value moduleName = wizard.moduleName;
-                value hasSuffix = wizard.compilationUnitName.endsWith(".ceylon");
-                value unitFileName = hasSuffix then wizard.compilationUnitName else wizard.compilationUnitName + ".ceylon";
-                value unitName = hasSuffix then wizard.compilationUnitName.substring(0, ".ceylon".size) else wizard.compilationUnitName;
+                value moduleName = wizard.moduleNameText;
+                value hasSuffix = wizard.compilationUnitNameText.endsWith(".ceylon");
+                value unitFileName =
+                        hasSuffix
+                            then wizard.compilationUnitNameText
+                            else wizard.compilationUnitNameText + ".ceylon";
+                value unitName =
+                        hasSuffix
+                            then wizard.compilationUnitNameText.substring(0, ".ceylon".size)
+                            else wizard.compilationUnitNameText;
 
-                ApplicationManager.application.runWriteAction(object satisfies Runnable {
+                void configureSourceRootIfNeeded() {
+                    if (ProjectRootsUtil.isSourceRoot(srcRootDir),
+                        !project.configuration.sourceDirectories.contains(srcRootDir.virtualFile)) {
 
-                    shared actual void run() {
-                        configureSourceRootIfNeeded();
-                        value subdirectory = findOrCreateModuleDirectory();
-                        assert(exists subdirectory);
+                        project.addSourceRoot(srcRootDir.virtualFile);
+                        project.configuration.save();
+                    }
+                }
 
-                        try {
-                            variable Backend? backend;
-                            if (project.compileToJs, !project.compileToJava) {
-                                backend = Backend.\iJavaScript;
-                            } else if (!project.compileToJs, project.compileToJava) {
-                                backend = Backend.\iJava;
-                            } else {
-                                backend = null;
-                            }
-                            ceylonFileFactory.createModuleDescriptor(subdirectory, moduleName,
-                                wizard.moduleVersion, backend);
-                            ceylonFileFactory.createPackageDescriptor(subdirectory, moduleName);
-                            if (StringUtil.isNotEmpty(unitName)) {
-                                value run = ceylonFileFactory.createRun(subdirectory, moduleName,
-                                    unitFileName, unitName);
-                                if (is PsiFile run) {
-                                    run.navigate(true);
-                                }
-                            }
+                PsiDirectory? findOrCreateModuleDirectory() {
+                    value targetDir = srcRoot.findChild(moduleName.replace(".", "/"));
+                    return if (exists targetDir)
+                    then PsiManager.getInstance(p).findDirectory(targetDir)
+                    else DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
+                }
+
+                ApplicationManager.application.runWriteAction(() {
+                    configureSourceRootIfNeeded();
+                    value subdirectory = findOrCreateModuleDirectory();
+                    assert(exists subdirectory);
+
+                    try {
+                        variable Backend? backend;
+                        if (project.compileToJs, !project.compileToJava) {
+                            backend = Backend.\iJavaScript;
+                        } else if (!project.compileToJs, project.compileToJava) {
+                            backend = Backend.\iJava;
+                        } else {
+                            backend = null;
                         }
-                        catch (e1) {
-                            Logger.getInstance(`CeylonAddModuleAction`)
-                                .error("Can't create file from template", e1);
+                        ceylonFileFactory.createModuleDescriptor(subdirectory, moduleName,
+                            wizard.moduleVersionText, backend);
+                        ceylonFileFactory.createPackageDescriptor(subdirectory, moduleName);
+                        if (StringUtil.isNotEmpty(unitName)) {
+                            value run = ceylonFileFactory.createRun(subdirectory, moduleName,
+                                unitFileName, unitName);
+                            if (is PsiFile run) {
+                                run.navigate(true);
+                            }
                         }
                     }
-
-                    void configureSourceRootIfNeeded() {
-                        if (ProjectRootsUtil.isSourceRoot(srcRootDir),
-                            !project.configuration.sourceDirectories.contains(srcRootDir.virtualFile)) {
-
-                            project.addSourceRoot(srcRootDir.virtualFile);
-                            project.configuration.save();
-                        }
-                    }
-
-                    PsiDirectory? findOrCreateModuleDirectory() {
-                        value targetDir = srcRoot.findChild(moduleName.replace(".", "/"));
-                        return if (exists targetDir)
-                        then PsiManager.getInstance(p).findDirectory(targetDir)
-                        else DirectoryUtil.createSubdirectories(moduleName, srcRootDir, ".");
+                    catch (e1) {
+                        Logger.getInstance(`CeylonAddModuleAction`)
+                            .error("Can't create file from template", e1);
                     }
                 });
                 madeTheChange = true;

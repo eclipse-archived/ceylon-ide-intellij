@@ -41,8 +41,8 @@ import javax.swing.event {
 import org.intellij.plugins.ceylon.ide.highlighting {
     highlighter
 }
-import org.intellij.plugins.ceylon.ide.util {
-    UnparameterizedJBList
+import com.intellij.ui.components {
+    JBList
 }
 
 shared void showChooser<out T>
@@ -57,7 +57,7 @@ shared void showChooser<out T>
     for (expr in expressions) {
         model.addElement(SmartPointerManager.getInstance(expr.project).createSmartPsiElementPointer(expr));
     }
-    value myList = UnparameterizedJBList(model);
+    value myList = JBList(model);
 
     myList.selectionModel.selectionMode = ListSelectionModel.singleSelection;
     if (exists selection) {
@@ -112,8 +112,7 @@ shared void showChooser<out T>
         .setResizable(true)
         .setRequestFocus(true)
         .setItemChoosenCallback(() {
-            assert (is SmartPsiElementPointer<out Anything>? pointer = myList.selectedValue);
-            if (is T expr = pointer?.element) {
+            if (is T expr = myList.selectedValue?.element) {
                 callback(expr);
             }
         })

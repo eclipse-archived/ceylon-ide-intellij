@@ -4,27 +4,23 @@ import com.intellij.compiler.server {
 import com.intellij.openapi.util.io {
     FileUtil
 }
-import com.intellij.util {
-    CommonProcessors
-}
-import org.intellij.plugins.ceylon.ide.startup {
-    CeylonIdePlugin
-}
-import org.jetbrains.annotations {
-    NotNull
-}
+
 import java.io {
     File
-}
-import java.util {
-    ArrayList,
-    List
 }
 import java.lang {
     Str=String,
     Types {
         str=nativeString
     }
+}
+import java.util {
+    ArrayList,
+    List
+}
+
+import org.intellij.plugins.ceylon.ide.startup {
+    CeylonIdePlugin
 }
 
 shared class BuildClasspathProvider() extends BuildProcessParametersProvider() {

@@ -391,9 +391,8 @@ shared class CeylonPageTwo()
             value dialog = AetherRepositoryDialog(form.myPanel);
             dialog.pack();
 
-            if (dialog.showAndGet(),
-                exists repo = dialog.repository) {
-                addAetherRepo(repo);
+            if (dialog.showAndGet()) {
+                addAetherRepo(dialog.repository);
             }
         }
     }

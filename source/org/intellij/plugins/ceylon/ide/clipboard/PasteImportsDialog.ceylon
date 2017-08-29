@@ -12,7 +12,8 @@ import com.intellij.ui {
     ScrollPaneFactory
 }
 import com.intellij.ui.components {
-    JBLabel
+    JBLabel,
+    JBList
 }
 import com.intellij.util.ui {
     UIUtil,
@@ -36,14 +37,11 @@ import org.intellij.plugins.ceylon.ide.correct {
     CeylonCellRenderer,
     CeylonListItem
 }
-import org.intellij.plugins.ceylon.ide.util {
-    UnparameterizedJBList
-}
 
 class PasteImportsDialog(Project project, {CeylonListItem*} elements)
         extends DialogWrapper(project, true) {
 
-    value myList = UnparameterizedJBList(*elements);
+    value myList = JBList(*elements);
 
     shared actual JComponent createCenterPanel() {
         title = "Select Declarations to Import";

@@ -124,8 +124,9 @@ public class CeylonConfigurable extends BaseConfigurable {
     private void setupLinks() {
         JLabelLinkListener listener = new JLabelLinkListener() {
             @Override
-            public void onLinkClicked(String href) {
+            public Object onLinkClicked(String href) {
                 selectConfigurable(href);
+                return null;
             }
         };
 
