@@ -95,9 +95,9 @@
                 text="Create Ceylon Bootstrap Files">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
-        <action id="ParticlesToggleAction"
+        <!--action id="ParticlesToggleAction"
                 class="org.intellij.plugins.ceylon.ide.action.ParticlesToggleAction"
-                text="I like ponies"/>
+                text="I like ponies"/-->
     </actions>
 
     <!-- These extensions are only here to allow calling our Java code from our Ceylon code :( -->
@@ -206,7 +206,7 @@
         <codeInsight.lineMarkerProvider language="Ceylon" implementationClass="org.intellij.plugins.ceylon.ide.codeInsight.CeylonLineMarkerProvider"/>
         <lang.smartEnterProcessor language="Ceylon"
                                   implementationClass="org.intellij.plugins.ceylon.ide.editor.TerminateStatementAction"/>
-        <editorTypedHandler order="first" implementationClass="org.intellij.plugins.ceylon.ide.editor.Particles"/>
+        <!--editorTypedHandler order="first" implementationClass="org.intellij.plugins.ceylon.ide.editor.Particles"/-->
         <copyPastePreProcessor implementation="org.intellij.plugins.ceylon.ide.clipboard.CeylonCopyPastePreProcessor"/>
         <copyPastePostProcessor implementation="org.intellij.plugins.ceylon.ide.clipboard.CeylonCopyPastePostProcessor"/>
         <refactoring.copyHandler implementation="org.intellij.plugins.ceylon.ide.refactoring.CopyCeylonFileHandler" order="first"/>
