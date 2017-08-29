@@ -83,12 +83,12 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
                 lastStopIndex = -1;
                 lastWasEof = false;
             }
-            if (!lastWasEof, lastStopIndex != token.startIndex - 1) {
+            if (!lastWasEof && lastStopIndex != token.startIndex-1) {
                 value badToken
                         = CommonToken(token.inputStream,
                             -2, 0,
-                            lastStopIndex + 1,
-                            token.startIndex - 1);
+                            lastStopIndex+1,
+                            token.startIndex-1);
                 if (badToken.stopIndex>=badToken.startIndex) {
                     customizedTokens.add(badToken);
                 }
@@ -100,13 +100,15 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
             value badToken
                     = CommonToken(lastToken.get().inputStream,
                         -2, 0,
-                        lastToken.get().stopIndex + 1,
-                        file.textLength - 1);
+                        lastToken.get().stopIndex+1,
+                        file.textLength-1);
             if (badToken.stopIndex>=badToken.startIndex) {
                 customizedTokens.add(badToken);
             }
         }
+
         visit(rootNode);
+
         if (verbose) {
             dump(parent, "");
         }
@@ -115,29 +117,30 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
 
     shared actual void visit(Tree.CompilationUnit that) {
         super.visit(that);
+
         while (!customizedTokens.empty) {
             value token = customizedTokens.remove();
             if (token.type != CeylonLexer.eof) {
-                value elementType = getElementType(token.type);
                 parent.rawAddChildrenWithoutNotifications(buildLeaf {
                     ceylonNode = null;
-                    type = elementType;
+                    type = getElementType(token.type);
                     token = token;
                 });
             }
-            if (verbose, !parserConstants.nodesAllowedAtEof.contains(token.type)) {
+            if (verbose && !parserConstants.nodesAllowedAtEof.contains(token.type)) {
                 logger.error("Unexpected token ``token`` in ``file.name``");
             }
         }
+
         value parentAndFileTextLength = IntArray(2);
         ApplicationManager.application.runReadAction(() {
             parentAndFileTextLength.set(0, parent.textLength);
             parentAndFileTextLength.set(1, file.textLength);
         });
-        value parentTextLength = parentAndFileTextLength.get(0);
-        value fileTextLength = parentAndFileTextLength.get(1);
-        if (parentTextLength<fileTextLength) {
-            value notParsed = file.text.substring(parentTextLength);
+        value parentTextLength = parentAndFileTextLength[0];
+        value fileTextLength = parentAndFileTextLength[1];
+        if (parentTextLength < fileTextLength) {
+            value notParsed = file.text[parentTextLength...];
             parent.rawAddChildrenWithoutNotifications(LeafPsiElement(TokenType.badCharacter, notParsed));
         }
     }
@@ -153,11 +156,14 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
             parent = CompositeElement(type);
         }
 
-        if (is Tree.DocLink that) {
+        if (that is Tree.DocLink) {
             return;
         }
+
         index = consumeTokens(that, index, true);
+
         value token = that.mainToken;
+
         value visitor = OrderedChildrenVisitor();
         try {
             that.visitChildren(visitor);
@@ -165,11 +171,13 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
         catch (Exception e) {
             that.handleException(e, visitor);
         }
-        if (token exists, that.token exists,
-            visitor.children.empty,
+
+        if (token exists && that.token exists
+                && visitor.children.empty,
             exists peek = customizedTokens.peek()) {
             if (getTokenLength(peek)
-                    == that.endIndex.intValue() - that.startIndex.intValue()) {
+                    == that.endIndex.intValue()
+                     - that.startIndex.intValue()) {
                 value toRemove = customizedTokens.remove();
                 parent.rawAddChildrenWithoutNotifications(buildLeaf {
                     ceylonNode = that;
@@ -179,24 +187,27 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
                 if (verbose) {
                     print("t \"``toRemove.text``\"");
                 }
-                index +=getTokenLength(toRemove);
+                index += getTokenLength(toRemove);
             } else {
                 value comp = CompositeElement(type);
-                while (index<that.endIndex.intValue()) {
+                while (index < that.endIndex.intValue()) {
                     value toRemove = customizedTokens.remove();
-                    value elementType = getElementType(token.type);
                     comp.rawAddChildrenWithoutNotifications(buildLeaf {
                         ceylonNode = null;
-                        type = elementType;
+                        type = getElementType(token.type);
                         token = toRemove;
                     });
                     if (verbose) {
                         print("t \"" + toRemove.text + "\"");
                     }
-                    index +=getTokenLength(toRemove);
+                    index += getTokenLength(toRemove);
                 }
                 parent.rawAddChildrenWithoutNotifications(comp);
             }
+
+            // TODO should be == but sometimes the tree includes
+            // a node that was already included before
+            // (see `exists` constructs for example)
             assert (index>=that.endIndex.intValue());
         }
         else {
