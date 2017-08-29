@@ -50,8 +50,9 @@ import org.intellij.plugins.ceylon.ide.model {
 }
 
 PsiClassType createType(TypeMirror mirror, Project project)
-        => if (is PSIType mirror, is PsiClassType t = mirror.psi)
-        then t
+        => if (is PSIType mirror,
+               is PsiClassType psiType = mirror.psi)
+        then psiType
         else CeyLightType(mirror, project);
 
 class CeyLightType(TypeMirror mirror, Project project)

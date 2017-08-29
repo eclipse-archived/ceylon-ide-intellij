@@ -1,8 +1,7 @@
 import com.intellij.psi {
     PsiClass,
     PsiJavaFile,
-    SmartPsiElementPointer,
-    PsiFile
+    SmartPsiElementPointer
 }
 import com.redhat.ceylon.ide.common.platform {
     platformUtils,
@@ -15,39 +14,28 @@ import com.redhat.ceylon.model.loader.mirror {
 class PSIPackage(SmartPsiElementPointer<PsiClass> psiPointer)
     satisfies PackageMirror {
 
-    PsiClass psi {
-        "The PSI element should still exist"
-        assert(exists el = psiPointer.element);
-        return el;
-    }
-    
-    variable String? name = null;
-
-    "This is needed when a PsiClass is removed from the index, and the model loader
-     tries to unload the corresponding mirror. When that happens, we still need to access
-     the qualified name although the PSI has been invalidated."
+    "This is needed when a PsiClass is removed from the index,
+     and the model loader tries to unload the corresponding
+     mirror. When that happens, we still need to access the
+     qualified name although the PSI has been invalidated."
     variable String cachedQualifiedName = "";
 
     shared actual String qualifiedName { 
-        if (!name exists) {
-            try {
-                name = concurrencyManager.needReadAccess(() {
-                    PsiFile? f = psi.containingFile;
-                    if (is PsiJavaFile f) {
-                        return f.packageName;
-                    }
-                    platformUtils.log(Status._WARNING,
-                        "No qualified name for file ``f else "<null>"``");
-                    return "";
-                });
-            } catch (AssertionError e) {
-                return cachedQualifiedName;
-            }
-        }
+        try {
+            cachedQualifiedName = concurrencyManager.needReadAccess(() {
+                value file = get(psiPointer).containingFile;
+                if (is PsiJavaFile file) {
+                    return file.packageName;
+                }
+                platformUtils.log(Status._WARNING,
+                    "No qualified name for file ``file else "<null>"``");
+                return "";
+            });
+        } catch (PsiElementGoneException e) {}
 
-        cachedQualifiedName = name else "";
         return cachedQualifiedName;
     }
 
-    cachedQualifiedName = qualifiedName;
+    noop(qualifiedName); //initialize it on construction
+
 }

@@ -56,16 +56,10 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
         extends PSIAnnotatedMirror(psiPointer)
         satisfies IdeClassMirror {
 
+    shared PsiClass psi => get(psiPointer);
+
     shared Boolean valid => psiPointer.element exists;
-
-    shared PsiClass psi {
-        "The PSI element should still exist"
-        assert(exists el = psiPointer.element);
-        return el;
-    }
     
-    variable String? cacheKey = null;
-
     "This is needed when a PsiClass is removed from the index, and the model loader
      tries to unload the corresponding mirror. When that happens, we still need to access
      the qualified name although the PSI has been invalidated."
@@ -77,6 +71,11 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
                         + ((psi of PsiNamedElement).name else "")
                 else (psi.qualifiedName else ""));
 
+    variable String? cacheKey = null;
+    getCacheKey(Module mod)
+            => cacheKey
+            else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
+
     Boolean hasAnnotation(Annotations annotation)
         => let (cn = annotation.className)
             concurrencyManager.needReadAccess(() =>
@@ -87,7 +86,7 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
                         name == cn
                 });
 
-    abstract => PsiUtil.isAbstractClass(psi);
+    abstract => PsiUtil.isAbstractClass(get(psiPointer));
     
     annotationType => psi.annotationType;
     
@@ -106,8 +105,8 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     typeParameters
             => concurrencyManager.needReadAccess(()
                 => Arrays.asList<TypeParameterMirror>(
-                    for (tp in psi.typeParameters)
-                        PSITypeParameter(tp)));
+                    for (typeParam in psi.typeParameters)
+                        PSITypeParameter(typeParam)));
 
     directFields
             => concurrencyManager.needReadAccess(()
@@ -135,7 +134,7 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
                 }
 
                 if (psi.enum,
-                    is PsiExtensibleClass ec = psi) {
+                    is PsiExtensibleClass ec = get(psiPointer)) {
                     value cache = ClassInnerStuffCache(ec);
                     if (exists valueOfMethod = cache.valueOfMethod) {
                         result.add(PSIMethod(pointer(valueOfMethod)));
@@ -174,10 +173,7 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     final => psi.hasModifierProperty(PsiModifier.final);
     
     flatName => concurrencyManager.needReadAccess(() => psi.qualifiedName else "");
-   
-    getCacheKey(Module mod) 
-            => cacheKey else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
-    
+
     innerClass => psi.containingClass exists
                || hasAnnotation(Annotations.container);
 
@@ -191,13 +187,12 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
                     for (t in supertypes)
                         PSIType(t)));
     
-    javaSource
-            => concurrencyManager.needReadAccess(() => psi.containingFile else null)
-                ?.name?.endsWith(".java") else false;
-    
+    javaSource => concurrencyManager.needReadAccess(()
+                    => psi.containingFile?.name?.endsWith(".java") else false);
+
     loadedFromSource => javaSource;
     
-    localClass => PsiUtil.isLocalClass(psi)
+    localClass => PsiUtil.isLocalClass(get(psiPointer))
                || hasAnnotation(Annotations.localContainer);
     
     \ipackage => PSIPackage(psiPointer);
@@ -208,13 +203,14 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     
     shared actual String qualifiedName {
         try {
-            value qName = if (is PsiTypeParameter tp = psi)
-            then \ipackage.qualifiedName + "." + name
-            else concurrencyManager.needReadAccess(() => psi.qualifiedName else "");
+            value qualifiedName
+                    = if (is PsiTypeParameter tp = get(psiPointer))
+                    then \ipackage.qualifiedName + "." + name
+                    else concurrencyManager.needReadAccess(() => psi.qualifiedName else "");
 
-            cacheQualifiedName = qName; // in case the class was renamed
-            return qName;
-        } catch (AssertionError e) {
+            cacheQualifiedName = qualifiedName; // in case the class was renamed
+            return qualifiedName;
+        } catch (PsiElementGoneException e) {
             // PSI was invalidated, use the cached qualified name.
             return cacheQualifiedName;
         }
@@ -234,10 +230,7 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     fileName => psi.containingFile?.name else "<unknown>";
     
     fullPath => if (exists f = psi.containingFile)
-                then let (p = f.virtualFile.path)
-                    if (exists i = p.firstInclusion("!/"))
-                    then p[i+2...]
-                    else "<unknown>"
+                then f.virtualFile.path.removeInitial("!/")
                 else "<unknown>";
     
     isBinary => psi is ClsClassImpl;

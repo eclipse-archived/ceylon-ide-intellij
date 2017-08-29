@@ -11,11 +11,7 @@ class PSIField(SmartPsiElementPointer<PsiField> psiPointer)
         extends PSIAnnotatedMirror(psiPointer)
         satisfies FieldMirror {
 
-    PsiField psi {
-        "The PSI element should still exist"
-        assert(exists el = psiPointer.element);
-        return el;
-    }
+    shared PsiField psi => get(psiPointer);
     
     type = PSIType(concurrencyManager.needReadAccess(() => psi.type));
 

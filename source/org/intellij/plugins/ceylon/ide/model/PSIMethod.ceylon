@@ -4,7 +4,8 @@ import com.intellij.psi {
     PsiType,
     PsiAnnotationMethod,
     PsiClass,
-    SmartPsiElementPointer
+    SmartPsiElementPointer,
+    PsiParameter
 }
 import com.intellij.psi.search.searches {
     SuperMethodsSearch
@@ -25,51 +26,63 @@ import java.util {
     Arrays
 }
 
-shared class PSIMethod(SmartPsiElementPointer<out PsiMethod> psiPointer)
-        extends PSIAnnotatedMirror(psiPointer)
+shared class PSIMethod
+        extends PSIAnnotatedMirror
         satisfies MethodMirror {
 
-    shared PsiMethod psi {
-        "The PSI element should still exist"
-        assert(exists el = psiPointer.element);
-        return el;
+    static value idMethods = ["equals", "hashCode"];
+    static value objectMethods => ["equals", "hashCode", "toString"];
+
+    SmartPsiElementPointer<out PsiMethod> psiPointer;
+
+    shared new (SmartPsiElementPointer<out PsiMethod> psiPointer)
+            extends PSIAnnotatedMirror(psiPointer) {
+        this.psiPointer = psiPointer;
     }
+
+    shared PsiMethod psi => get(psiPointer);
 
     Return doWithContainingClass<Return>(Return(PsiClass) func, Return default)
             => concurrencyManager.needReadAccess(() =>
                 if (exists cc = psi.containingClass) then func(cc) else default);
 
-    Boolean classIs(String cls)
-            => doWithContainingClass((cc) => (cc.qualifiedName else "") == cls, false);
+    Boolean classIs(String className)
+            => doWithContainingClass((cc) => (cc.qualifiedName else "") == className, false);
 
-    Boolean computedIsOverriding
-            =>  (classIs("ceylon.language.Identifiable") && psi.name in ["equals", "hashCode"])
-            || !(classIs("ceylon.language.Object") && psi.name in ["equals", "hashCode", "toString"])
-                && concurrencyManager.needIndexes(psi.project,
-                    ()=> concurrencyManager.dontCancel(
-                        () => SuperMethodsSearch.search(psi, null, true, false).findFirst())) exists;
+    value isIdentifiable => classIs("ceylon.language.Identifiable");
+    value isObject = classIs("ceylon.language.Object");
+    value isException = classIs("ceylon.language.Exception");
 
-    variable Boolean? lazyIsOverriding = null;
-    shared Boolean isOverriding => lazyIsOverriding else (lazyIsOverriding = computedIsOverriding);
+    shared late Boolean isOverriding
+            = (isIdentifiable && psi.name in idMethods)
+            || !(isObject && psi.name in objectMethods)
+            && concurrencyManager.needIndexes(psi.project,
+                    () => concurrencyManager.dontCancel(
+                        () => SuperMethodsSearch.search(psi, null, true, false)
+                                .findFirst())) exists;
 
-    Boolean computedIsOverloading
-            => !classIs("ceylon.language.Exception")
-            && doWithContainingClass((cc)
-                => count { for (m in cc.findMethodsByName(psi.name, true))
-                        m == psi ||
-                           !m.modifierList.hasModifierProperty(PsiModifier.static)
-                        && !m.modifierList.hasModifierProperty(PsiModifier.private)
-                        && !m.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
-                        && !MethodSignatureUtil.isSuperMethod(m, psi)
-                     } > 1,
-                false);
+    shared late Boolean isOverloading
+            = !isException
+            && doWithContainingClass((cc) {
+                variable value count = 0;
+                for (method in cc.findMethodsByName(psi.name, true)) {
+                    if (method == psi ||
+//                           !m.modifierList.hasModifierProperty(PsiModifier.static)
+                           !method.modifierList.hasModifierProperty(PsiModifier.private)
+                        && !method.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
+                        && !MethodSignatureUtil.isSuperMethod(method, psi)) {
+                        if (++count > 1) {
+                            return true;
+                        }
+                    }
+                }
+                else {
+                    return false;
+                }
+            }, false);
     
-    variable Boolean? lazyIsOverloading = null;
-    shared Boolean isOverloading => lazyIsOverloading else (lazyIsOverloading = computedIsOverloading);
-    
-    abstract =>
-        psi.hasModifierProperty(PsiModifier.abstract)
-        || doWithContainingClass(PsiClass.\iinterface, false);
+    abstract => psi.hasModifierProperty(PsiModifier.abstract)
+            || doWithContainingClass(PsiClass.\iinterface, false);
 
     constructor => concurrencyManager.dontCancel(() => psi.constructor);
     
@@ -86,31 +99,42 @@ shared class PSIMethod(SmartPsiElementPointer<out PsiMethod> psiPointer)
     enclosingClass => doWithContainingClass((cc) => PSIClass(pointer(cc)), null);
     
     final => psi.hasModifierProperty(PsiModifier.final);
-    
+
+    class PSIParameter(PsiParameter psiParameter)
+            extends PSIAnnotatedMirror(outer.pointer(psiParameter))
+            satisfies VariableMirror {
+
+        type = PSIType(psiParameter.type);
+
+        string => "PSIVariable[``name``]";
+    }
+
     parameters
             => concurrencyManager.needReadAccess(()
                 => Arrays.asList<VariableMirror>(
-                    for (p in psi.parameterList.parameters)
-                        PSIVariable(pointer(p))));
+                    for (parameter in psi.parameterList.parameters)
+                        PSIParameter(parameter)));
     
     protected => psi.hasModifierProperty(PsiModifier.protected);
     
     public => psi.hasModifierProperty(PsiModifier.public);
-    
-    returnType => concurrencyManager.needReadAccess(() => if (exists t = psi.returnType) then PSIType(t) else null);
-    
+
     static => psi.hasModifierProperty(PsiModifier.static);
+
+    returnType => concurrencyManager.needReadAccess(()
+            => if (exists type = psi.returnType) then PSIType(type) else null);
     
     staticInit => false;
     
     typeParameters
-            => Arrays.asList<TypeParameterMirror>(
-                for (tp in psi.typeParameters)
-                    PSITypeParameter(tp));
+            => concurrencyManager.needReadAccess(() =>
+                Arrays.asList<TypeParameterMirror>(
+                    for (typeParam in psi.typeParameters)
+                        PSITypeParameter(typeParam)));
     
     variadic => psi.varArgs;
 
     string => "PSIMethod[``name``]";
     
-    defaultMethod => psi.hasModifierProperty(PsiModifier.default);   
+    defaultMethod => psi.hasModifierProperty(PsiModifier.default);
 }

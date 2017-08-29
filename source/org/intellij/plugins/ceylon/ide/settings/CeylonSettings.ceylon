@@ -21,7 +21,7 @@ shared class CeylonOptions() {
     shared variable Boolean makeCompilerVerbose = false;
     shared variable String verbosityLevel = "";
     shared variable Integer autoUpdateInterval = 4000;
-    shared variable Integer modelUpdateTimeoutMinutes = 7;
+    shared variable Integer modelUpdateTimeoutMinutes = 6;
     shared variable Boolean lowerModelUpdatePriority = false;
     shared variable Boolean highlightedLabels = true;
 }

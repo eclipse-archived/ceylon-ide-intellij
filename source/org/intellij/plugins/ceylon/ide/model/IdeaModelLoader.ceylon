@@ -338,13 +338,17 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         });
 
     isFunctionalInterface(ClassMirror klass) =>
-            concurrencyManager.dontCancel(() =>
-                if (is PSIClass klass,
-                    exists method = LambdaUtil.getFunctionalInterfaceMethod(klass.psi),
-                    !method.hasTypeParameters())
-                then method.name
-                else null
-            );
+            concurrencyManager.dontCancel(() {
+                try {
+                    if (is PSIClass klass,
+                        exists method = LambdaUtil.getFunctionalInterfaceMethod(klass.psi),
+                        !method.hasTypeParameters()) {
+                        return method.name;
+                    }
+                }
+                catch (PsiElementGoneException e) {}
+                return null;
+            });
 
     isFunctionalInterfaceType(TypeMirror typeMirror) =>
             concurrencyManager.dontCancel(() =>

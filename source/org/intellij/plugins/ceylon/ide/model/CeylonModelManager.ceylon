@@ -326,32 +326,32 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                         ceylonProject.build.performBuild(progress.newChild(1000));
                     }
                 });
-            } catch(Throwable t) {
-                if (is ProcessCanceledException t) {
-                    throw t;
-                } else if (is AssertionError t,
-                    t.message == "The PSI element should still exist") {
-
-                    // A PSI element has been invalidated, we should rebuild the project
-                    // to make sure we keep a consistent state.
-                    for (project in model.ceylonProjects) {
-                        project.build.requestFullBuild();
-                    }
-                    scheduleModelUpdate(0);
-                } else {
-                    automaticModelUpdateEnabled = false;
-                    
-                    Notification(
-                        "Ceylon Model Update",
-                        "Ceylon model update failed",
-                        "The Ceylon model update triggered an unexpected exception: `` t `` that will be reported in the Event View.
-                               To avoid performance issues the automatic update of the Ceylon model has been disabled.
-                               You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                        warning
-                    ).notify(model.ideaProject);
-                    throw t;
+            }
+            catch (PsiElementGoneException e) {
+                // A PSI element has been invalidated, we should rebuild the project
+                // to make sure we keep a consistent state.
+                for (project in model.ceylonProjects) {
+                    project.build.requestFullBuild();
                 }
-            } finally {
+                scheduleModelUpdate(0);
+            }
+            /*catch (ProcessCanceledException t) {
+                throw t;
+            }
+            catch (Throwable t) {
+                automaticModelUpdateEnabled = false;
+
+                Notification(
+                    "Ceylon Model Update",
+                    "Ceylon model update failed",
+                    "The Ceylon model update triggered an unexpected exception: `` t `` that will be reported in the Event View.
+                           To avoid performance issues the automatic update of the Ceylon model has been disabled.
+                           You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
+                    warning
+                ).notify(model.ideaProject);
+                throw t;
+            }*/
+            finally {
                 currentThread.priority = currentPriority;
                 modelUpdateOriginalPriority.set(null);
                 busy_ = false;
@@ -374,18 +374,18 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                 ModalityState.any());
             
             if (! bakgroundBuildLatch.await(modelUpdateTimeoutMinutes, TimeUnit.minutes)) {
-                automaticModelUpdateEnabled_ = false;
+//                automaticModelUpdateEnabled_ = false;
                 try {
                     buildProgressIndicator.get()?.cancel();
                 } catch(Exception e) {
                     logger.warnThrowable(e, () => "Error when trying to cancel a timed-out model update");
                 }
-                Notification(
+                /*Notification(
                     "Ceylon Model Update",
                     "Ceylon model update stalled",
                     "The Ceylon model update didn't respond in a decent time. To avoid performance issues the automatic update of the Ceylon model has been disabled.
                      You can reenable it by using the following menu entry: Tools -> Ceylon -> Enable automatic update of model.",
-                    warning).notify(model.ideaProject);
+                    warning).notify(model.ideaProject);*/
             }
         } finally {
             stopWaitingForModelUpdate = null;
@@ -435,7 +435,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                             return;
                         }
                         
-                        FileEditorManager mgr = FileEditorManager.getInstance(model.ideaProject);
+                        value mgr = FileEditorManager.getInstance(model.ideaProject);
                         function isThereOnlyOneCeylonFileContentChange(CeylonProjectAlias ceylonProject) {
                             value fileChangesToAnalyze = ceylonProject.build.fileChangesToAnalyze;
                             if (exists firstChange = fileChangesToAnalyze.first) {

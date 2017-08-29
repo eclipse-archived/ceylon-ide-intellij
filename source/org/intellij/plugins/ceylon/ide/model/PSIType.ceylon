@@ -94,31 +94,31 @@ shared PsiClass? searchForClass(String potentialClass, [String*] potentialPackag
 
 
 shared class PSIType(psi,
-    originatingTypes = IdentityHashMap<PsiType,PSIType?>(),
+//    originatingTypes = IdentityHashMap<PsiType,PSIType?>(),
     enclosing = null)
         satisfies TypeMirror {
 
     shared PsiType psi;
 
     PSIType? enclosing;
-    Map<PsiType,PSIType?> originatingTypes;
+//    Map<PsiType,PSIType?> originatingTypes;
 
-    variable String? cachedQualifiedName = null;
-    
-    originatingTypes[psi] = null;
+//    originatingTypes[psi] = null;
    
     componentType
             => if (is PsiArrayType psi)
-               then PSIType(psi.componentType)
-               else null;
+            then PSIType(psi.componentType)
+            else null;
     
     declaredClass
             => if (is PsiClassType psi,
                    exists cls = concurrencyManager.needReadAccess(() => psi.resolve()))
-               then PSIClass(SmartPointerManager.getInstance(cls.project).createSmartPsiElementPointer(cls))
-               else unknownClassMirror;
+            then PSIClass(SmartPointerManager.getInstance(cls.project).createSmartPsiElementPointer(cls))
+            else unknownClassMirror;
 
     TypeKind primitiveKind(PsiPrimitiveType psi) {
+        //can't use switch here because it refuses
+        //to use the value equality of PsiType
         return if (psi == PsiType.boolean) then TypeKind.boolean
         else if (psi == PsiType.byte) then TypeKind.byte
         else if (psi == PsiType.char) then TypeKind.char
@@ -199,9 +199,8 @@ shared class PSIType(psi,
         return canonicalText;
     }
 
-    qualifiedName
-            => cachedQualifiedName
-            else (cachedQualifiedName = concurrencyManager.needReadAccess(() => computedQualifiedName));
+    shared actual late String qualifiedName
+            = concurrencyManager.needReadAccess(() => computedQualifiedName);
     
     // TODO
     qualifyingType => null; //enclosing;
@@ -210,18 +209,19 @@ shared class PSIType(psi,
     
     function getTypeArguments(PsiType type)
             => if (is PsiClassType type)
-                then concurrencyManager.needReadAccess(() => type.parameters)
-                else null;
+            then concurrencyManager.needReadAccess(() => type.parameters)
+            else null;
 
-    shared actual TypeParameterMirror? typeParameter {
-        if (is PsiTypeParameter|PsiClassReferenceType psi) {
-            return PSITypeParameter(psi);
-        }
-        else {
-            platformUtils.log(Status._ERROR, "Unsupported PSIType.typeParameter " + className(psi));
-            return null;
-        }
-    }
+    typeParameter
+            => switch (psi)
+            case (is PsiTypeParameter)
+                concurrencyManager.needReadAccess(() => PSITypeParameter(psi))
+            else case (is PsiClassReferenceType)
+                concurrencyManager.needReadAccess(()
+                    => if (is PsiTypeParameter param = psi.resolve())
+                        then PSITypeParameter(param)
+                        else null)
+            else null;
     
     upperBound =
             if (is PsiWildcardType psi, psi.\iextends,
@@ -232,8 +232,8 @@ shared class PSIType(psi,
     typeArguments
             => Arrays.asList<TypeMirror>(
                 if (exists types = getTypeArguments(psi))
-                for (t in types)
-                PSIType(t, originatingTypes, this));
+                for (psiType in types)
+                PSIType(psiType, /*originatingTypes,*/ this));
 
     string => "PSIType[``qualifiedName``]";
     

@@ -1,7 +1,3 @@
-import ceylon.collection {
-    HashMap
-}
-
 import com.intellij.psi {
     PsiAnnotation,
     PsiLiteralExpression,
@@ -27,16 +23,17 @@ import java.lang {
     Types {
         nativeString
     },
-    JShort=Short
+    Short,
+    Str=String
 }
 import java.util {
     Collections,
-    Arrays
+    Arrays,
+    Map,
+    HashMap
 }
 
-class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
-
-    value values = HashMap<String, Object?>();
+class PSIAnnotation(PsiAnnotation psi) satisfies AnnotationMirror {
 
     // somehow, IntelliJ returns a single value when it reads things like
     // `@MyAnnotation({...})`, so we have to make sure we return the correct type
@@ -73,10 +70,10 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
                     | PsiPrefixExpression) {
             // TODO this is super ultra ugly, but we can't get the type associated
             // to a PsiArrayInitializerMemberValue, and IJ parses shorts as ints :(
-            if (concurrencyManager.needReadAccess(() => psi.qualifiedName else "")
+            if ((psi.qualifiedName else "")
                     == "com.redhat.ceylon.compiler.java.metadata.AnnotationInstantiation",
                 paramName == "arguments") {
-                return JShort(v.text);
+                return Short(v.text);
             }
 
             if (is PsiLiteralExpression v) {
@@ -92,15 +89,15 @@ class PSIAnnotation(shared PsiAnnotation psi) satisfies AnnotationMirror {
         }
     }
 
-    concurrencyManager.needReadAccess(() {
-        for (attr in psi.parameterList.attributes) {
-            value name = attr.name else "value";
-            value val = convert(attr, name);
-            values[name] = val;
-        }
-    });
-    
-    getValue(String name) => values.get(name);
+    //eager!
+
+    value values = HashMap<Str,Object>();
+    for (attr in psi.parameterList.attributes) {
+        value name = attr.name else "value";
+        values[nativeString(name)] = convert(attr, name);
+    }
+
+    getValue(String name) => values[nativeString(name)];
     
     \ivalue => getValue("value");
 }

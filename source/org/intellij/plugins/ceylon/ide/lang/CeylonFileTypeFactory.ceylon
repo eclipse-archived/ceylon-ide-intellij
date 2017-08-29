@@ -5,11 +5,9 @@ import com.intellij.openapi.fileTypes {
     FileTypeConsumer,
     FileTypeFactory
 }
+
 import org.intellij.plugins.ceylon.ide.lang {
     CeylonFileType
-}
-import org.jetbrains.annotations {
-    NotNull
 }
 
 shared class CeylonFileTypeFactory() extends FileTypeFactory() {

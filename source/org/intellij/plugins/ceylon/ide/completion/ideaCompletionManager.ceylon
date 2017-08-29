@@ -56,7 +56,8 @@ import java.lang {
 import org.intellij.plugins.ceylon.ide.model {
     concurrencyManager,
     getModelManager,
-    CeylonModelManager
+    CeylonModelManager,
+    PsiElementGoneException
 }
 import org.intellij.plugins.ceylon.ide.model.parsing {
     ProgressIndicatorMonitor
@@ -181,11 +182,9 @@ shared class IdeaCompletionProvider()
                         }
                     });
                 } catch (ProcessCanceledException e) {
-                    noop();// for debugging purposes
-                } catch (AssertionError e) {
-                    if (!"The PSI element should still exist" in e.message) {
-                        throw e;
-                    }
+                    noop(); // for debugging purposes
+                } catch (PsiElementGoneException e) {
+                    noop(); //noop
                 } finally {
                     application.removeApplicationListener(listener);
                 }

@@ -34,7 +34,8 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 
 import java.lang {
     IntArray,
-    UnsupportedOperationException
+    UnsupportedOperationException,
+    Types
 }
 
 import org.antlr.runtime {
@@ -236,7 +237,7 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
     TreeElement buildLeaf(Node? ceylonNode, IElementType type, Token token) {
         String tokenText;
         value txt = token.text;
-        if (txt.size != getTokenLength(token)) {
+        if (Types.nativeString(txt).length() != getTokenLength(token)) {
             switch (token.type)
             case (CeylonLexer.pidentifier
                 | CeylonLexer.aidentifier
@@ -313,7 +314,7 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
     Integer getTokenLength(Token token)
             => if (is CommonToken token)
             then token.stopIndex - token.startIndex + 1
-            else token.text.size;
+            else Types.nativeString(token.text).length();
 
     class OrderedChildrenVisitor() extends Visitor() {
 
