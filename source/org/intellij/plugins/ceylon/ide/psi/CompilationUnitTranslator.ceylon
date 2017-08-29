@@ -208,7 +208,9 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
             // TODO should be == but sometimes the tree includes
             // a node that was already included before
             // (see `exists` constructs for example)
-            assert (index>=that.endIndex.intValue());
+
+//            "went too far in ``file.name``"
+//            assert (index>=that.endIndex.intValue());
         }
         else {
             value oldParent = parent;
@@ -302,7 +304,9 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
                 print("c \"``text``\"");
             }
         }
-        assert (i == targetIndex);
+
+//        "did not reach the target index ``file.name``"
+//        assert (i == targetIndex);
         return i;
     }
 
