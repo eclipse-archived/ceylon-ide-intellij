@@ -7,7 +7,6 @@ import com.intellij.util.IncorrectOperationException;
 import com.redhat.ceylon.compiler.typechecker.tree.Tree;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTreeUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,12 +44,12 @@ public class NamedStatementOrArgumentPsi extends CeylonPsiImpl.StatementOrArgume
             Tree.ModuleDescriptor node = (Tree.ModuleDescriptor) super.getCeylonNode();
             return node == null
                     ? findChildOfType(this, CeylonPsi.IdentifierPsi.class)
-                    : CeylonTreeUtil.findPsiElement(node.getImportPath(), getContainingFile());
+                    : JavaTreeUtil.findPsiElement(node.getImportPath(), getContainingFile());
         } else if (this instanceof CeylonPsi.PackageDescriptorPsi) {
             Tree.PackageDescriptor node = (Tree.PackageDescriptor) super.getCeylonNode();
             return node == null
                     ? findChildOfType(this, CeylonPsi.IdentifierPsi.class)
-                    : CeylonTreeUtil.findPsiElement(node.getImportPath(), getContainingFile());
+                    : JavaTreeUtil.findPsiElement(node.getImportPath(), getContainingFile());
         }
         return null;
     }

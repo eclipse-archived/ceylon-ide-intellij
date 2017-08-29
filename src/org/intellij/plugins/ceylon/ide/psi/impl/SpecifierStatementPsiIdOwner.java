@@ -13,10 +13,10 @@ import com.redhat.ceylon.ide.common.platform.platformUtils_;
 import com.redhat.ceylon.ide.common.typechecker.AnalysisResult;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.psi.isInSourceArchive_;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl;
-import org.intellij.plugins.ceylon.ide.util.utilJ2C;
+import org.intellij.plugins.ceylon.ide.psi.isInSourceArchive_;
+import org.intellij.plugins.ceylon.ide.util.icons_;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +65,7 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return utilJ2C.getIconForDeclaration(getCeylonNode());
+        return icons_.get_().forDeclaration(getCeylonNode());
     }
 
     @NotNull

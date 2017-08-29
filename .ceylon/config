@@ -18,4 +18,5 @@ lookup=../ceylon.tool.converter.java2ceylon
 [compiler]
 source=source
 source=gen
+source=src
 resource=resource

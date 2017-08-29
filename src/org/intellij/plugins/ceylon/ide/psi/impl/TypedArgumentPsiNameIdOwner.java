@@ -9,7 +9,7 @@ import com.intellij.util.IncorrectOperationException;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
 import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl;
-import org.intellij.plugins.ceylon.ide.util.utilJ2C;
+import org.intellij.plugins.ceylon.ide.util.icons_;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +53,7 @@ public abstract class TypedArgumentPsiNameIdOwner
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return utilJ2C.getIconForDeclaration(getCeylonNode());
+        return icons_.get_().forDeclaration(getCeylonNode());
     }
 
     @Override

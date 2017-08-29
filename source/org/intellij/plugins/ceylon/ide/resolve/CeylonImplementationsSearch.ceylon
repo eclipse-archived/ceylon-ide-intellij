@@ -107,7 +107,7 @@ shared class CeylonImplementationsSearch()
 
     }
 
-    void action(PsiFile? declaringFile, Node dnode,
+    void action(PsiFile declaringFile, Node dnode,
             void consumer(PsiElement element)) {
         if (exists psiElement = findPsiElement(dnode, declaringFile)) {
             consumer(psiElement);
@@ -152,7 +152,7 @@ shared class CeylonImplementationsSearch()
                 value declaringFile = getDeclaringFile(dnode.unit, sourceElement.project);
                 if (is CeylonFile declaringFile) {
                     declaringFile.doWhenAnalyzed((_) => action(declaringFile, dnode, consumer));
-                } else {
+                } else if (exists declaringFile) {
                     action(declaringFile, dnode, consumer);
                 }
             }

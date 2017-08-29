@@ -14,12 +14,9 @@ import com.redhat.ceylon.ide.common.typechecker.AnalysisResult;
 import com.redhat.ceylon.ide.common.util.escaping_;
 import com.redhat.ceylon.model.typechecker.model.Declaration;
 import com.redhat.ceylon.model.typechecker.model.FunctionOrValue;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.psi.isInSourceArchive_;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTreeUtil;
-import org.intellij.plugins.ceylon.ide.util.utilJ2C;
+import org.intellij.plugins.ceylon.ide.psi.*;
+import org.intellij.plugins.ceylon.ide.util.icons_;
+
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,7 +66,7 @@ public abstract class DeclarationPsiNameIdOwner
         if (id != null) {
             String quoted = escaping_.get_().escape(name);
             CeylonPsi.DeclarationPsi decl =
-                    CeylonTreeUtil.createDeclarationFromText(project,
+                    JavaTreeUtil.createDeclarationFromText(project,
                             "void " + quoted + "(){}");
             id.replace(decl.getChildren()[0]);
         }
@@ -117,7 +114,7 @@ public abstract class DeclarationPsiNameIdOwner
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return utilJ2C.getIconForDeclaration(getCeylonNode());
+        return icons_.get_().forDeclaration(getCeylonNode());
     }
 
     @Override

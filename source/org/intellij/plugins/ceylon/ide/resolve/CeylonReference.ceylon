@@ -105,8 +105,8 @@ shared class CeylonReference(element, span = element,
 
     function resolvedElement(Node target, Project project) {
         if (exists targetUnit = target.unit,
-            exists file = getVirtualFile(targetUnit)) {
-            value psiFile = PsiManager.getInstance(project).findFile(file);
+            exists file = getVirtualFile(targetUnit),
+            exists psiFile = PsiManager.getInstance(project).findFile(file)) {
             Node currentTarget;
             if (is CeylonFile psiFile,
                 exists localAnalysisResult

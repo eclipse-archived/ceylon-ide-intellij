@@ -50,7 +50,7 @@ import java.nio.file {
 }
 
 import org.intellij.plugins.ceylon.ide.model {
-    ConcurrencyManagerForJava,
+    concurrencyManager,
     IdeaCeylonProject,
     IdeaCeylonProjects
 }
@@ -85,7 +85,7 @@ shared class CeylonBuilder() satisfies CompileTask {
                     project.compileToJava || project.compileToJs) {
                     value monitor = ProgressIndicatorMonitor.wrap(compileContext.progressIndicator);
                     value res
-                            = ConcurrencyManagerForJava.withUpToDateIndexes(() {
+                            = concurrencyManager.withUpToDateIndexes(() {
                         project.build.performBuild(monitor);
                         if (ceylonSettings.useOutProcessBuild) {
                             project.build.performBinaryGeneration(monitor, project.build.binaryGenerator(

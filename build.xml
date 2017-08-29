@@ -191,7 +191,7 @@
             </classpath>
         </java>
         <javac
-                srcdir="source:${gen}:grammar"
+                srcdir="src:${gen}:grammar"
                 destdir="${build.classes}"
                 debug="true"
                 encoding="UTF-8">
@@ -377,9 +377,9 @@
                         fork="true"
                         mavenoverrides="${basedir}/overrides.xml"
                         out="${out.repo}">
-            <source value="${basedir}/source"/>
-            <source value="${gen}"/>
             <source value="${basedir}/src"/>
+            <source value="${gen}"/>
+            <source value="${basedir}/source"/>
             <reposet refid="reposet.compile"/>
             <moduleset refid="modules.source"/>
         </ceylon-compile>

@@ -108,7 +108,7 @@ shared class RefinementsSearch() extends
         else {}
     }
 
-    void action(PsiFile? declaringFile, Node dnode,
+    void action(PsiFile declaringFile, Node dnode,
                 void consumer(PsiReference element)) {
         variable CeylonReference? ref = null;
         concurrencyManager.needReadAccess(() {
@@ -145,7 +145,7 @@ shared class RefinementsSearch() extends
                 value declaringFile = getDeclaringFile(dnode.unit, sourceElement.project);
                 if (is CeylonFile declaringFile) {
                     declaringFile.doWhenAnalyzed((_) => action(declaringFile, dnode, consumer));
-                } else {
+                } else if (exists declaringFile) {
                     action(declaringFile, dnode, consumer);
                 }
             }
