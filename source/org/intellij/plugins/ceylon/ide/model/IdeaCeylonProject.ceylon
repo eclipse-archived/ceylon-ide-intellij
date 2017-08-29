@@ -135,8 +135,10 @@ shared class IdeaCeylonProject(ideArtifact, model)
     variable Boolean languageModuleAdded = false;
     
     shared object nativeFolderProperties {
-        shared Key<WeakReference<Package>> packageModel = Key<WeakReference<Package>>("CeylonPlugin.nativeFolder_packageModel");
-        shared Key<WeakReference<FolderVirtualFileAlias>> root = Key<WeakReference<FolderVirtualFileAlias>>("CeylonPlugin.nativeFolder_root");
+        shared Key<WeakReference<Package>> packageModel
+                = Key<WeakReference<Package>>("CeylonPlugin.nativeFolder_packageModel");
+        shared Key<WeakReference<FolderVirtualFileAlias>> root
+                = Key<WeakReference<FolderVirtualFileAlias>>("CeylonPlugin.nativeFolder_root");
         shared Key<Boolean> rootIsSource = Key<Boolean>("CeylonPlugin.nativeFolder_rootIsSource");
     }
 
