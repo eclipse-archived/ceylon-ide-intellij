@@ -3,9 +3,9 @@
         <CLASSES>
             <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/module-resolver/1.3.4-SNAPSHOT/com.redhat.ceylon.module-resolver-1.3.4-SNAPSHOT.jar!/" />
             <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/common/1.3.4-SNAPSHOT/com.redhat.ceylon.common-1.3.4-SNAPSHOT.jar!/" />
-            <root url="jar://$CEYLON_DIST$/repo/ceylon/language/1.3.4-SNAPSHOT/ceylon.language-1.3.4-SNAPSHOT.car!/" />
             <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/model/1.3.4-SNAPSHOT/com.redhat.ceylon.model-1.3.4-SNAPSHOT.jar!/" />
             <root url="jar://$CEYLON_DIST$/repo/com/redhat/ceylon/langtools/classfile/1.3.4-SNAPSHOT/com.redhat.ceylon.langtools.classfile-1.3.4-SNAPSHOT.jar!/" />
+            <!--root url="jar://$CEYLON_DIST$/repo/ceylon/language/1.3.4-SNAPSHOT/ceylon.language-1.3.4-SNAPSHOT.car!/" /-->
         </CLASSES>
         <JAVADOC />
         <SOURCES>
@@ -19,10 +19,10 @@
             <root url="file://$PROJECT_DIR$/../ceylon/cmr/webdav/src/main/java" />
             <root url="file://$PROJECT_DIR$/../ceylon/cmr/testsuite/src/test/java" />
             <root url="file://$PROJECT_DIR$/../ceylon/model/src" />
-            <root url="file://$PROJECT_DIR$/../ceylon/language/runtime" />
+            <!--root url="file://$PROJECT_DIR$/../ceylon/language/runtime" />
             <root url="file://$PROJECT_DIR$/../ceylon/language/template" />
             <root url="file://$PROJECT_DIR$/../ceylon/language/test" />
-            <root url="file://$PROJECT_DIR$/../ceylon/language/test-jvm" />
+            <root url="file://$PROJECT_DIR$/../ceylon/language/test-jvm" /-->
         </SOURCES>
     </library>
 </component>
