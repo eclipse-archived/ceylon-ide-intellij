@@ -52,7 +52,6 @@ import org.intellij.plugins.ceylon.ide.model {
     PsiElementGoneException
 }
 import org.intellij.plugins.ceylon.ide.psi {
-    CeylonFile,
     CeylonTreeUtil
 }
 

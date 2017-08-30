@@ -12,9 +12,7 @@ import com.intellij.facet {
 }
 import com.intellij.notification {
     Notification,
-    NotificationType {
-        warning
-    },
+    NotificationType,
     Notifications
 }
 import com.intellij.openapi {
@@ -189,14 +187,14 @@ Anything() withOriginalModelUpdatePriority() {
 
 shared class CeylonModelManager(IdeaCeylonProjects model_)
         satisfies ProjectComponent
-        & Disposable
-        & VirtualFileListener
-        & FileEditorManagerListener
-        & PsiDocumentTransactionListener
-        & BuildManagerListener
-        & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile>
-        & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
-        & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
+                & Disposable
+                & VirtualFileListener
+                & FileEditorManagerListener
+                & PsiDocumentTransactionListener
+                & BuildManagerListener
+                & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile>
+                & ChangeAware<Module, VirtualFile, VirtualFile, VirtualFile>
+                & ModelAliases<Module, VirtualFile, VirtualFile, VirtualFile> {
 
     value pauseRequests = AtomicInteger();
     variable Integer? lastRequestedDelay = null;

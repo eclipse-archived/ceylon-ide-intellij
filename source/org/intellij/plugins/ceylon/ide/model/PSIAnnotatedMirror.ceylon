@@ -31,10 +31,10 @@ import org.intellij.plugins.ceylon.ide.model {
     }
 }
 
-shared SmartPsiElementPointer<Psi> pointer<Psi>(Psi psiElement)
+shared SmartPsiElementPointer<Psi> pointer<Psi>(Psi element)
         given Psi satisfies PsiElement
-        => SmartPointerManager.getInstance(psiElement.project)
-            .createSmartPsiElementPointer(psiElement);
+        => SmartPointerManager.getInstance(element.project)
+            .createSmartPsiElementPointer(element);
 
 shared abstract class PSIAnnotatedMirror(psiPointer)
         satisfies AnnotatedMirror & AccessibleMirror {

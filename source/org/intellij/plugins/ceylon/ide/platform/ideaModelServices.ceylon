@@ -36,9 +36,6 @@ import org.intellij.plugins.ceylon.ide.model {
     },
     IdeaCeylonProject
 }
-import org.jetbrains.jps.model.java {
-    JavaResourceRootType
-}
 
 shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, VirtualFile,VirtualFile> {
 

@@ -121,15 +121,15 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     directFields
             => needReadAccess(()
                 => Arrays.asList<FieldMirror>(
-                    for (f in psi.fields)
-                    if (!f.hasModifierProperty(PsiModifier.private)) // TODO !f.synthetic?
-                        PSIField(pointer(f))));
+                    for (field in psi.fields)
+                    if (!field.hasModifierProperty(PsiModifier.private)) // TODO !f.synthetic?
+                        PSIField(pointer(field))));
     
     directInnerClasses
             => needReadAccess(()
                 => Arrays.asList<ClassMirror>(
-                    for (ic in psi.innerClasses)
-                        PSIClass(pointer(ic))));
+                    for (innerClass in psi.innerClasses)
+                        PSIClass(pointer(innerClass))));
     
     directMethods
             => needReadAccess(() {
@@ -240,8 +240,8 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     
     fileName => psi.containingFile?.name else "<unknown>";
     
-    fullPath => if (exists f = psi.containingFile)
-                then f.virtualFile.path.removeInitial(JarFileSystem.jarSeparator)
+    fullPath => if (exists file = psi.containingFile)
+                then file.virtualFile.path.removeInitial(JarFileSystem.jarSeparator)
                 else "<unknown>";
     
     isBinary => psi is ClsClassImpl;

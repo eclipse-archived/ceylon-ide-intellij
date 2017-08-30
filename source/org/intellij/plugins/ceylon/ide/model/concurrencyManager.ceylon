@@ -29,9 +29,6 @@ import java.lang {
     ThreadLocal,
     System
 }
-import java.util.concurrent {
-    JCallable=Callable
-}
 
 import org.intellij.plugins.ceylon.ide.util {
     CeylonLogger
