@@ -23,19 +23,12 @@ import com.intellij.psi.search {
 import com.redhat.ceylon.ide.common.model {
     unknownClassMirror
 }
-import com.redhat.ceylon.ide.common.platform {
-    platformUtils,
-    Status
-}
 import com.redhat.ceylon.model.loader.mirror {
     TypeMirror,
-    TypeParameterMirror,
     TypeKind
 }
 
 import java.util {
-    IdentityHashMap,
-    Map,
     Arrays
 }
 
