@@ -29,11 +29,11 @@ shared class BuildClasspathProvider() extends BuildProcessParametersProvider() {
         value repo = CeylonIdePlugin.embeddedCeylonRepository;
         value modulePaths = ArrayList<Str>();
         modulePaths.add(str(CeylonIdePlugin.classesDir.absolutePath));
-        FileUtil.visitFiles(repo, (File file) {
-            if (file.file, file.name.endsWith(".jar")) {
+        FileUtil.visitFiles(repo, (file) {
+            if (file.file && file.name.endsWith(".jar")) {
                 modulePaths.add(str(file.absolutePath));
             }
-            return false;
+            return true;
         });
         return modulePaths;
     }
