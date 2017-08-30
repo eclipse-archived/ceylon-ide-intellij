@@ -5,9 +5,6 @@ import com.intellij.openapi.util.io {
     FileUtil
 }
 
-import java.io {
-    File
-}
 import java.lang {
     Str=String,
     Types {
