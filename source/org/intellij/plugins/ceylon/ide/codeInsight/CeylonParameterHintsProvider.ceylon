@@ -8,8 +8,7 @@ import com.intellij.openapi.util.text {
     StringUtil
 }
 import com.intellij.psi {
-    PsiElement,
-    PsiNamedElement
+    PsiElement
 }
 import com.redhat.ceylon.compiler.typechecker.tree {
     Tree
@@ -25,7 +24,9 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
-    JString=String
+    Types {
+        nativeString
+    }
 }
 import java.util {
     List,
@@ -35,7 +36,8 @@ import java.util {
 }
 
 import org.intellij.plugins.ceylon.ide.model {
-    PSIMethod
+    PSIMethod,
+    PsiElementGoneException
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonPsi
@@ -68,16 +70,19 @@ shared class CeylonInlayParameterHintsProvider() satisfies InlayParameterHintsPr
             is Tree.MemberOrTypeExpression mot = invocation.ceylonNode.primary,
             exists mirror = findMethodMirror(mot.declaration)) {
 
-            value psiMethod = mirror.psi;
-            if (exists containingClass = psiMethod.containingClass) {
-                value fullMethodName = StringUtil.getQualifiedName(containingClass.qualifiedName, mirror.name);
-
-                value paramNames = Arrays.asList(
-                    for (p in psiMethod.parameterList.parameters)
-                    JString((p of PsiNamedElement).name else "")
-                );
-
-                return HintInfo.MethodInfo(fullMethodName, paramNames);
+            try {
+                return mirror.withContainingClass((clazz) {
+                    value fullMethodName
+                            = StringUtil.getQualifiedName(clazz.qualifiedName, mirror.name);
+                    value paramNames = Arrays.asList(
+                        for (p in mirror.parameters)
+                        nativeString(p.name)
+                    );
+                    return HintInfo.MethodInfo(fullMethodName, paramNames);
+                }, null);
+            }
+            catch (PsiElementGoneException e) {
+                return null;
             }
         }
 
