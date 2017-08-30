@@ -9,8 +9,7 @@ import com.intellij.openapi.util {
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
-    VirtualFileManager,
-    JarFileSystem
+    VirtualFileManager
 }
 import com.intellij.psi {
     ...
