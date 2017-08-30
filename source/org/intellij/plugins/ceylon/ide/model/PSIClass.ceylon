@@ -1,6 +1,9 @@
 import com.intellij.lang.java {
     JavaLanguage
 }
+import com.intellij.openapi.vfs {
+    JarFileSystem
+}
 import com.intellij.psi {
     PsiClass,
     PsiModifier,
@@ -52,6 +55,12 @@ import java.util {
     Arrays
 }
 
+import org.intellij.plugins.ceylon.ide.model {
+    concurrencyManager {
+        needReadAccess
+    }
+}
+
 shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
         extends PSIAnnotatedMirror(psiPointer)
         satisfies IdeClassMirror {
@@ -64,7 +73,7 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
      tries to unload the corresponding mirror. When that happens, we still need to access
      the qualified name although the PSI has been invalidated."
     variable value cacheQualifiedName
-            = concurrencyManager.needReadAccess(() =>
+            = needReadAccess(() =>
                 if (is PsiTypeParameter tp = psi)
                 then PSIPackage(psiPointer).qualifiedName
                         + "."
@@ -73,18 +82,23 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
 
     variable String? cacheKey = null;
     getCacheKey(Module mod)
-            => cacheKey
-            else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
+            => cacheKey else (cacheKey = getCacheKeyByModule(mod, qualifiedName));
 
     Boolean hasAnnotation(Annotations annotation)
-        => let (cn = annotation.className)
-            concurrencyManager.needReadAccess(() =>
-                any {
-                    if (exists mods = psi.modifierList)
-                    for (ann in mods.annotations)
-                    if (exists name = ann.qualifiedName)
-                        name == cn
-                });
+            => needReadAccess(() {
+                if (exists modifiers = psi.modifierList) {
+                    for (ann in modifiers.annotations) {
+                        if (exists name = ann.qualifiedName,
+                            name == annotation.className) {
+                            return true;
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            });
 
     abstract => PsiUtil.isAbstractClass(get(psiPointer));
     
@@ -98,43 +112,39 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     
     ceylonToplevelObject => !innerClass && hasAnnotation(Annotations.\iobject);
 
-    value private => psi.hasModifierProperty(PsiModifier.private);
-
-    defaultAccess => !(public || protected || private);
-
     typeParameters
-            => concurrencyManager.needReadAccess(()
+            => needReadAccess(()
                 => Arrays.asList<TypeParameterMirror>(
                     for (typeParam in psi.typeParameters)
                         PSITypeParameter(typeParam)));
 
     directFields
-            => concurrencyManager.needReadAccess(()
+            => needReadAccess(()
                 => Arrays.asList<FieldMirror>(
                     for (f in psi.fields)
                     if (!f.hasModifierProperty(PsiModifier.private)) // TODO !f.synthetic?
                         PSIField(pointer(f))));
     
     directInnerClasses
-            => concurrencyManager.needReadAccess(()
+            => needReadAccess(()
                 => Arrays.asList<ClassMirror>(
                     for (ic in psi.innerClasses)
                         PSIClass(pointer(ic))));
     
     directMethods
-            => concurrencyManager.needReadAccess(() {
-                value result = ArrayList<MethodMirror>();
+            => needReadAccess(() {
+                value methods = psi.methods;
+                value result = ArrayList<MethodMirror>(methods.size);
                 variable value hasCtor = false;
 
-                for (m in psi.methods) {
-                    if (m.constructor) {
+                for (method in methods) {
+                    if (method.constructor) {
                         hasCtor = true;
                     }
-                    result.add(PSIMethod(pointer(m)));
+                    result.add(PSIMethod(pointer(method)));
                 }
 
-                if (psi.enum,
-                    is PsiExtensibleClass ec = get(psiPointer)) {
+                if (psi.enum, is PsiExtensibleClass ec = psi) {
                     value cache = ClassInnerStuffCache(ec);
                     if (exists valueOfMethod = cache.valueOfMethod) {
                         result.add(PSIMethod(pointer(valueOfMethod)));
@@ -155,6 +165,7 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
                             .setConstructor(true);
                     result.add(PSIMethod(pointer(builder)));
                 }
+
                 return result;
             });
     
@@ -172,23 +183,25 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     
     final => psi.hasModifierProperty(PsiModifier.final);
     
-    flatName => concurrencyManager.needReadAccess(() => psi.qualifiedName else "");
+    flatName => needReadAccess(() => psi.qualifiedName else "");
 
     innerClass => psi.containingClass exists
                || hasAnnotation(Annotations.container);
 
     \iinterface => psi.\iinterface;
     
-    interfaces => concurrencyManager.needReadAccess(()
+    interfaces => needReadAccess(()
             => let (supertypes = psi.\iinterface
                     then psi.extendsListTypes
                     else psi.implementsListTypes)
                 Arrays.asList<TypeMirror>(
-                    for (t in supertypes)
-                        PSIType(t)));
+                    for (supertype in supertypes)
+                        PSIType(supertype)));
     
-    javaSource => concurrencyManager.needReadAccess(()
-                    => psi.containingFile?.name?.endsWith(".java") else false);
+    javaSource => needReadAccess(()
+            => if (exists file = psi.containingFile)
+            then file.name.endsWith(".java")
+            else false);
 
     loadedFromSource => javaSource;
     
@@ -197,16 +210,12 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
     
     \ipackage => PSIPackage(psiPointer);
      
-    protected => psi.hasModifierProperty(PsiModifier.protected);
-    
-    public => psi.hasModifierProperty(PsiModifier.public);
-    
     shared actual String qualifiedName {
         try {
             value qualifiedName
                     = if (is PsiTypeParameter tp = get(psiPointer))
                     then \ipackage.qualifiedName + "." + name
-                    else concurrencyManager.needReadAccess(() => psi.qualifiedName else "");
+                    else needReadAccess(() => psi.qualifiedName else "");
 
             cacheQualifiedName = qualifiedName; // in case the class was renamed
             return qualifiedName;
@@ -222,15 +231,17 @@ shared class PSIClass(SmartPsiElementPointer<PsiClass> psiPointer)
         if (psi.\iinterface || qualifiedName == "java.lang.Object") {
             return null;
         }
-        return concurrencyManager.needReadAccess(()
-            // TODO check that the first element is always the superclass
-            => if (exists st = psi.superTypes[0]) then PSIType(st) else null);
+        else {
+            return needReadAccess(()
+                // TODO check that the first element is always the superclass
+                => if (exists st = psi.superTypes[0]) then PSIType(st) else null);
+        }
     }
     
     fileName => psi.containingFile?.name else "<unknown>";
     
     fullPath => if (exists f = psi.containingFile)
-                then f.virtualFile.path.removeInitial("!/")
+                then f.virtualFile.path.removeInitial(JarFileSystem.jarSeparator)
                 else "<unknown>";
     
     isBinary => psi is ClsClassImpl;

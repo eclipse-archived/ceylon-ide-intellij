@@ -11,8 +11,7 @@ import com.intellij.psi {
     JavaPsiFacade {
         javaFacade=getInstance
     },
-    PsiNameHelper,
-    SmartPointerManager
+    PsiNameHelper
 }
 import com.intellij.psi.impl.source {
     PsiClassReferenceType
@@ -30,6 +29,12 @@ import com.redhat.ceylon.model.loader.mirror {
 
 import java.util {
     Arrays
+}
+
+import org.intellij.plugins.ceylon.ide.model {
+    concurrencyManager {
+        needReadAccess
+    }
 }
 
 shared PsiClass? searchForClass(String potentialClass, [String*] potentialPackageParts,
@@ -86,18 +91,9 @@ shared PsiClass? searchForClass(String potentialClass, [String*] potentialPackag
 }
 
 
-shared class PSIType(psi,
-//    originatingTypes = IdentityHashMap<PsiType,PSIType?>(),
-    enclosing = null)
+shared class PSIType(shared PsiType psi, PSIType? enclosing = null)
         satisfies TypeMirror {
 
-    shared PsiType psi;
-
-    PSIType? enclosing;
-//    Map<PsiType,PSIType?> originatingTypes;
-
-//    originatingTypes[psi] = null;
-   
     componentType
             => if (is PsiArrayType psi)
             then PSIType(psi.componentType)
@@ -106,7 +102,7 @@ shared class PSIType(psi,
     declaredClass
             => if (is PsiClassType psi,
                    exists cls = concurrencyManager.needReadAccess(() => psi.resolve()))
-            then PSIClass(SmartPointerManager.getInstance(cls.project).createSmartPsiElementPointer(cls))
+            then PSIClass(pointer(cls))
             else unknownClassMirror;
 
     TypeKind primitiveKind(PsiPrimitiveType psi) {
@@ -166,7 +162,7 @@ shared class PSIType(psi,
 
             if (!psi.reference.project.isDisposed(),
                 exists cls
-                    = concurrencyManager.needReadAccess(()
+                    = needReadAccess(()
                         => facade.findClass(canonicalText, resolveScope))) {
                 assert (exists qualifiedName = cls.qualifiedName);
                 return qualifiedName;
@@ -177,7 +173,7 @@ shared class PSIType(psi,
                 value reversedParts = parts.reversed;
 
                 if (exists clsName
-                        = concurrencyManager.needReadAccess(()
+                        = needReadAccess(()
                             => searchForClass {
                                 potentialClass = reversedParts.first;
                                 potentialPackageParts = reversedParts.rest;
@@ -193,24 +189,24 @@ shared class PSIType(psi,
     }
 
     shared actual late String qualifiedName
-            = concurrencyManager.needReadAccess(() => computedQualifiedName);
+            = needReadAccess(() => computedQualifiedName);
     
     // TODO
     qualifyingType => null; //enclosing;
     
-    raw = if (is PsiClassType psi) then concurrencyManager.needReadAccess(() => psi.raw) else false;
+    raw = if (is PsiClassType psi) then needReadAccess(() => psi.raw) else false;
     
     function getTypeArguments(PsiType type)
             => if (is PsiClassType type)
-            then concurrencyManager.needReadAccess(() => type.parameters)
+            then needReadAccess(() => type.parameters)
             else null;
 
     typeParameter
             => switch (psi)
             case (is PsiTypeParameter)
-                concurrencyManager.needReadAccess(() => PSITypeParameter(psi))
+                needReadAccess(() => PSITypeParameter(psi))
             else case (is PsiClassReferenceType)
-                concurrencyManager.needReadAccess(()
+                needReadAccess(()
                     => if (is PsiTypeParameter param = psi.resolve())
                         then PSITypeParameter(param)
                         else null)

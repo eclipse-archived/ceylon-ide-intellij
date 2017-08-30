@@ -30,7 +30,9 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import org.intellij.plugins.ceylon.ide.model {
-    concurrencyManager,
+    concurrencyManager {
+        needReadAccess
+    },
     getCeylonProject,
     findProjectForFile,
     declarationFromPsiElement
@@ -78,7 +80,7 @@ shared class RefinementsSearch() extends
                 decl.formal || decl.default,
                 is CeylonFile ceylonFile = sourceElement.containingFile,
                 exists project
-                        = concurrencyManager.needReadAccess(()
+                        = needReadAccess(()
                             => findProjectForFile(ceylonFile)),
                 exists modules = project.modules) {
 
@@ -111,7 +113,7 @@ shared class RefinementsSearch() extends
     void action(PsiFile declaringFile, Node dnode,
                 void consumer(PsiReference element)) {
         variable CeylonReference? ref = null;
-        concurrencyManager.needReadAccess(() {
+        needReadAccess(() {
             if (is PsiNameIdentifierOwner psiElement = findPsiElement(dnode, declaringFile),
                 exists id = psiElement.nameIdentifier) {
                 ref = CeylonReference(id);

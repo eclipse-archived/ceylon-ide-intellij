@@ -68,7 +68,9 @@ import org.intellij.plugins.ceylon.ide.highlighting {
 }
 import org.intellij.plugins.ceylon.ide.model {
     IdeaCeylonProjects,
-    concurrencyManager,
+    concurrencyManager {
+        withAlternateResolution
+    },
     getCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.psi {
@@ -198,7 +200,7 @@ shared class CeylonTypeCheckerAnnotator()
                              .resetImportHintsEnabledForProject();*/
                      
                      variable value hasErrors = false;
-                     concurrencyManager.withAlternateResolution(() {
+                     withAlternateResolution(() {
                          for ([message, range] in ceylonMessages) {
                              value result = addAnnotation {
                                  message = message;

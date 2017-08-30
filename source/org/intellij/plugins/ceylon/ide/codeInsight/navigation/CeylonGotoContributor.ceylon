@@ -49,7 +49,9 @@ import org.intellij.plugins.ceylon.ide.codeInsight.navigation {
 }
 import org.intellij.plugins.ceylon.ide.model {
     IdeaModule,
-    concurrencyManager,
+    concurrencyManager {
+        withAlternateResolution
+    },
     getCeylonProjects
 }
 
@@ -204,7 +206,7 @@ shared abstract class CeylonGotoContributor() satisfies GotoClassContributor {
         Boolean includeNonProjectItems, Boolean(Declaration) consumer);
 
     void processDeclarations(Project project, Boolean includeNonProjectItems, Boolean(Declaration) consumer)
-            => concurrencyManager.withAlternateResolution(() {
+            => withAlternateResolution(() {
                 if (exists ceylonProjects = getCeylonProjects(project)) {
                     for (mod in ModuleManager.getInstance(project).modules) {
                         if (exists ceylonProject = ceylonProjects.getProject(mod),

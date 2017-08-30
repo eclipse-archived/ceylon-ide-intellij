@@ -21,7 +21,8 @@ import com.intellij.openapi.\imodule {
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
-    VirtualFileManager
+    VirtualFileManager,
+    JarFileSystem
 }
 import com.redhat.ceylon.cmr.api {
     RepositoryManager,
@@ -184,8 +185,11 @@ shared class IdeaModule(
     void scanPackages(Module mod, MutableSet<String> packageList) {
         if (exists jarToSearch = returnCarFile()
             else getModuleArtifact(moduleManager.repositoryManager, this),
-            exists vfile = VirtualFileManager.instance.findFileByUrl(
-                "jar://" + jarToSearch.absolutePath + "!/")) {
+            exists vfile
+                    = VirtualFileManager.instance.findFileByUrl(
+                        JarFileSystem.protocolPrefix
+                        + jarToSearch.absolutePath
+                        + JarFileSystem.jarSeparator)) {
             listPackagesInternal(vfile, packageList);
         }
     }

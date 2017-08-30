@@ -107,7 +107,9 @@ import org.intellij.plugins.ceylon.ide.highlighting {
     foregroundColor
 }
 import org.intellij.plugins.ceylon.ide.model {
-    concurrencyManager,
+    concurrencyManager {
+        withAlternateResolution
+    },
     getModelManager
 }
 import org.intellij.plugins.ceylon.ide.platform {
@@ -337,7 +339,7 @@ shared class IdeaQuickFixData(
                             .runProcessWithProgressAsynchronously(
                         project, "Searching...",
                         () =>
-                            concurrencyManager.withAlternateResolution(() =>
+                            withAlternateResolution(() =>
                                 ApplicationManager.application.runReadAction(change)),
                         () {
                             resolutions = null;

@@ -25,7 +25,9 @@ import com.intellij.util {
 }
 
 import org.intellij.plugins.ceylon.ide.model {
-    concurrencyManager
+    concurrencyManager {
+        needReadAccess
+    }
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonCompositeElement,
@@ -49,7 +51,7 @@ shared class ImportAliasReferencesSearch() extends
             exists name = toSearch.name) {
 
             value helper = ServiceManager.getService(params.project, `PsiSearchHelper`);
-            value scope = concurrencyManager.needReadAccess(() => params.effectiveSearchScope);
+            value scope = needReadAccess(() => params.effectiveSearchScope);
             value processor = object satisfies TextOccurenceProcessor {
                 shared actual Boolean execute(PsiElement element, Integer offsetInElement) {
                     if (is CeylonCompositeElement element,

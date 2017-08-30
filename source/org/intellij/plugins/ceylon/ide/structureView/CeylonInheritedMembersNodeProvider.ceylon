@@ -46,7 +46,9 @@ import java.util {
 import org.intellij.plugins.ceylon.ide.model {
     PSIClass,
     PSIMethod,
-    concurrencyManager,
+    concurrencyManager {
+        outsideDumbMode
+    },
     PsiElementGoneException
 }
 import org.intellij.plugins.ceylon.ide.psi {
@@ -126,7 +128,7 @@ class CeylonInheritedMembersNodeProvider()
         if (!exists declaration) {
             return null;
         }
-        return concurrencyManager.outsideDumbMode(() {
+        return outsideDumbMode(() {
             value visitor = FindDeclarationNodeVisitor(declaration);
             myFile.compilationUnit.visit(visitor);
 

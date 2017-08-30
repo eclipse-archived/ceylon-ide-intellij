@@ -11,6 +11,12 @@ import com.redhat.ceylon.model.loader.mirror {
     PackageMirror
 }
 
+import org.intellij.plugins.ceylon.ide.model {
+    concurrencyManager {
+        needReadAccess
+    }
+}
+
 class PSIPackage(SmartPsiElementPointer<PsiClass> psiPointer)
     satisfies PackageMirror {
 
@@ -22,7 +28,7 @@ class PSIPackage(SmartPsiElementPointer<PsiClass> psiPointer)
 
     shared actual String qualifiedName { 
         try {
-            cachedQualifiedName = concurrencyManager.needReadAccess(() {
+            cachedQualifiedName = needReadAccess(() {
                 value file = get(psiPointer).containingFile;
                 if (is PsiJavaFile file) {
                     return file.packageName;

@@ -34,7 +34,9 @@ import org.intellij.plugins.ceylon.ide.model {
     findProjectForFile,
     declarationFromPsiElement,
     getCeylonProject,
-    concurrencyManager
+    concurrencyManager {
+        needReadAccess
+    }
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonTreeUtil {
@@ -76,7 +78,7 @@ shared class CeylonImplementationsSearch()
                 exists decl = node.declarationModel,
                 is CeylonFile ceylonFile = sourceElement.containingFile,
                 exists project
-                        = concurrencyManager.needReadAccess(()
+                        = needReadAccess(()
                             => findProjectForFile(ceylonFile)),
                 exists modules = project.modules) {
 

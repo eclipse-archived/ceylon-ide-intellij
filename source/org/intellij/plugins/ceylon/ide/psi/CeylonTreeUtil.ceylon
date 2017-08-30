@@ -2,7 +2,9 @@ import com.intellij.openapi.project {
     Project
 }
 import com.intellij.openapi.vfs {
-    VirtualFileManager
+    VirtualFileManager,
+    JarFileSystem,
+    LocalFileSystem
 }
 import com.intellij.psi {
     PsiFile,
@@ -34,12 +36,16 @@ import org.intellij.plugins.ceylon.ide.model {
 
 shared class CeylonTreeUtil {
 
+    shared static String withProtocol(String path)
+            => JarFileSystem.jarSeparator in path
+            then JarFileSystem.protocolPrefix
+            else LocalFileSystem.protocolPrefix;
+
     shared static PsiFile? getDeclaringFile(Unit unit, Project project) {
         if (is CeylonUnit unit,
             exists value path = unit.sourceFullPath?.string) {
-            value protocol = "!/" in path then "jar://" else "file://";
             if (exists vfile
-                    = VirtualFileManager.instance.findFileByUrl(protocol + path)) {
+                    = VirtualFileManager.instance.findFileByUrl(withProtocol(path))) {
                 return concurrencyManager.needReadAccess(()
                     => PsiManager.getInstance(project).findFile(vfile));
             }

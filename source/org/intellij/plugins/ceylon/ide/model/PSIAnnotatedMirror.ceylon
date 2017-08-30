@@ -7,10 +7,12 @@ import com.intellij.psi {
     },
     SmartPsiElementPointer,
     SmartPointerManager,
-    PsiElement
+    PsiElement,
+    PsiModifier
 }
 import com.redhat.ceylon.model.loader.mirror {
-    AnnotatedMirror
+    AnnotatedMirror,
+    AccessibleMirror
 }
 
 import java.lang {
@@ -29,18 +31,28 @@ import org.intellij.plugins.ceylon.ide.model {
     }
 }
 
+shared SmartPsiElementPointer<Psi> pointer<Psi>(Psi psiElement)
+        given Psi satisfies PsiElement
+        => SmartPointerManager.getInstance(psiElement.project)
+            .createSmartPsiElementPointer(psiElement);
+
 shared abstract class PSIAnnotatedMirror(psiPointer)
-        satisfies AnnotatedMirror {
+        satisfies AnnotatedMirror & AccessibleMirror {
 
     SmartPsiElementPointer<out PsiModifierListOwner&PsiNamedElement> psiPointer;
 
-    shared SmartPsiElementPointer<Psi> pointer<Psi>(Psi psiElement)
-            given Psi satisfies PsiElement
-            => SmartPointerManager.getInstance(psiPointer.project)
-                .createSmartPsiElementPointer(psiElement);
-
     //eager:
     name = needReadAccess(() => get(psiPointer).name else "unknown");
+
+    PsiModifierListOwner psi => get(psiPointer);
+
+    public => psi.hasModifierProperty(PsiModifier.public);
+
+    protected => psi.hasModifierProperty(PsiModifier.protected);
+
+    value private => psi.hasModifierProperty(PsiModifier.private);
+
+    defaultAccess => !(public || protected || private);
 
     String? getAnnotationName(PsiAnnotation psi) {
         value qualifiedName = needReadAccess(() => psi.qualifiedName);
@@ -78,8 +90,8 @@ shared abstract class PSIAnnotatedMirror(psiPointer)
     late value annotations
             = needReadAccess(() {
                 value map = HashMap<Str,PSIAnnotation>();
-                if (exists ml = get(psiPointer).modifierList) {
-                    for (ann in ml.annotations) {
+                if (exists modifiers = get(psiPointer).modifierList) {
+                    for (ann in modifiers.annotations) {
                         if (exists name = getAnnotationName(ann)) {
                             map[nativeString(name)] = PSIAnnotation(ann);
                         }

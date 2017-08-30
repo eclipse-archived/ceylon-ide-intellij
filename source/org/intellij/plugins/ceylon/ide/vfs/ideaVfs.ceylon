@@ -30,7 +30,9 @@ import java.util {
 
 import org.intellij.plugins.ceylon.ide.model {
     getCeylonProjects,
-    concurrencyManager
+    concurrencyManager {
+        needReadAccess
+    }
 }
 
 shared alias IdeaResource => ResourceVirtualFile<Module,VirtualFile,VirtualFile,VirtualFile>;
@@ -53,7 +55,7 @@ shared class VirtualFileVirtualFile(VirtualFile file, Module mod)
     
     hash => file.hash;
     
-    inputStream => concurrencyManager.needReadAccess(() {
+    inputStream => needReadAccess(() {
         try {
             if (exists contents
                     = PsiManager.getInstance(mod.project)

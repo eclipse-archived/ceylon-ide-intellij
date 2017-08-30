@@ -9,7 +9,8 @@ import com.intellij.openapi.util {
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
-    VirtualFileManager
+    VirtualFileManager,
+    JarFileSystem
 }
 import com.intellij.psi {
     ...
@@ -39,7 +40,9 @@ import org.intellij.plugins.ceylon.ide.lang {
     ceylonLanguage
 }
 import org.intellij.plugins.ceylon.ide.model {
-    concurrencyManager
+    concurrencyManager {
+        withAlternateResolution
+    }
 }
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonCompositeElement,
@@ -85,9 +88,9 @@ shared class CeylonReference(element, span = element,
 
     function getVirtualFile(Unit unit) {
         if (is SourceAware unit) {
-            assert (exists path = unit.sourceFullPath?.string);
-            value prefix = "!/" in path then "jar" else "file";
-            return VirtualFileManager.instance.findFileByUrl(prefix + "://" + path);
+            assert (exists path = unit.sourceFullPath);
+            value pathWithProtocol = CeylonTreeUtil.withProtocol(path.string);
+            return VirtualFileManager.instance.findFileByUrl(pathWithProtocol);
         }
         else if (is IResourceAware<out Anything, out Anything, out Anything> unit,
                  is VirtualFile file = unit.resourceFile) {
@@ -114,7 +117,7 @@ shared class CeylonReference(element, span = element,
                 exists targetModel
                         = nodes.getReferencedModel(nodes.getIdentifyingNode(target) else target),
                 exists targetInEditor
-                        = concurrencyManager.withAlternateResolution(()
+                        = withAlternateResolution(()
                         => nodes.getReferencedNode(targetModel, localAnalysisResult.parsedRootNode))) {
                 currentTarget = targetInEditor;
             } else {
@@ -178,7 +181,7 @@ shared class CeylonReference(element, span = element,
             exists rootNode
                     = ceylonFile.availableAnalysisResult?.typecheckedRootNode,
             exists target
-                    = concurrencyManager.withAlternateResolution(()
+                    = withAlternateResolution(()
                         => IdeaNavigation(project)
                             .getTarget(rootNode, referenceNode, backend)),
             exists result = resolvedElement(target, project)) {

@@ -94,7 +94,9 @@ import org.intellij.plugins.ceylon.ide.lang {
 }
 import org.intellij.plugins.ceylon.ide.model {
     IdeaCeylonProjects,
-    concurrencyManager,
+    concurrencyManager {
+        needReadAccess
+    },
     getCeylonProjects
 }
 import org.intellij.plugins.ceylon.ide.util {
@@ -209,14 +211,15 @@ shared class CeylonLocalAnalyzerManager(model)
     shared actual void modelPhasedUnitsTypechecked({ProjectPhasedUnit<Module, VirtualFile, VirtualFile, VirtualFile>*} typecheckedUnits) {
         logger.trace(()=>"Enter modelPhasedUnitsTypechecked(``typecheckedUnits``)", 10);
         value ceylonEditedFiles
-                = concurrencyManager.needReadAccess(()
+                = needReadAccess(()
                     => [*fileEditorManagerInstance(model.ideaProject).openFiles]);
 
         for (unit in typecheckedUnits) {
             value virtualFile = unit.unitFile.nativeResource;
             if (virtualFile in ceylonEditedFiles) {
-                if (is CeylonFile ceylonFile = concurrencyManager.needReadAccess(()
-                    => psiManager(model.ideaProject).findFile(virtualFile)),
+                if (is CeylonFile ceylonFile
+                        = needReadAccess(()
+                            => psiManager(model.ideaProject).findFile(virtualFile)),
                     exists localAnalyzer = ceylonFile.localAnalyzer) {
                     localAnalyzer.scheduleForcedTypechecking();
                 }
@@ -229,7 +232,7 @@ shared class CeylonLocalAnalyzerManager(model)
 
     shared actual void ceylonModelParsed(CeylonProject<Module, VirtualFile, VirtualFile, VirtualFile> project) {
         value ceylonEditedFiles
-                = concurrencyManager.needReadAccess(()
+                = needReadAccess(()
                     => [*fileEditorManagerInstance(model.ideaProject).openFiles]);
         for (externalFile in ceylonEditedFiles.filter(isInSourceArchive)) {
             if (exists analyzer = editedFilesAnalyzersMap.get(externalFile)) {

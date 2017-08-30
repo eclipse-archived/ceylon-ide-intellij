@@ -79,7 +79,9 @@ import org.intellij.plugins.ceylon.ide.lang {
 }
 import org.intellij.plugins.ceylon.ide.model {
     IdeaCeylonProjects,
-    concurrencyManager
+    concurrencyManager {
+        needReadAccess
+    }
 }
 import org.intellij.plugins.ceylon.ide.platform {
     IdeaDocument
@@ -307,8 +309,8 @@ shared class CeylonFile(FileViewProvider viewProvider)
     Return requestAnalysisResult<Return>(
             Return onExistingResult(AnalysisResult? result),
             Return onNonExistingResult(AsyncFuture<AnalysisResult>() futureBuilder)) {
-        value attachedCompilationUnit
-                => concurrencyManager.needReadAccess(() => compilationUnit);
+
+        value attachedCompilationUnit=> needReadAccess(() => compilationUnit);
 
         function checkRootNode(Tree.CompilationUnit toCheck, AnalysisResult() produceResult, String checkedAttributeName) {
             AnalysisResult? resultToReturn;

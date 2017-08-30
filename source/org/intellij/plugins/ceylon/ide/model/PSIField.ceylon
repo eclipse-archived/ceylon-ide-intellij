@@ -6,6 +6,11 @@ import com.intellij.psi {
 import com.redhat.ceylon.model.loader.mirror {
     FieldMirror
 }
+import org.intellij.plugins.ceylon.ide.model {
+    concurrencyManager {
+        needReadAccess
+    }
+}
 
 class PSIField(SmartPsiElementPointer<PsiField> psiPointer)
         extends PSIAnnotatedMirror(psiPointer)
@@ -13,18 +18,11 @@ class PSIField(SmartPsiElementPointer<PsiField> psiPointer)
 
     shared PsiField psi => get(psiPointer);
     
-    type = PSIType(concurrencyManager.needReadAccess(() => psi.type));
+    shared actual late PSIType type
+            = needReadAccess(() => PSIType(psi.type));
 
-    value private => psi.hasModifierProperty(PsiModifier.private);
-
-    defaultAccess => !(private || protected || public);
-    
     final => psi.hasModifierProperty(PsiModifier.final);
-    
-    protected => psi.hasModifierProperty(PsiModifier.protected);
-    
-    public => psi.hasModifierProperty(PsiModifier.public);
-    
+
     static => psi.hasModifierProperty(PsiModifier.static);
     
 }

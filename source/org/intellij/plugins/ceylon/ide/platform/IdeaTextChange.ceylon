@@ -14,7 +14,8 @@ import com.intellij.openapi.editor {
 }
 import com.intellij.openapi.vfs {
     VirtualFile,
-    VirtualFileManager
+    VirtualFileManager,
+    LocalFileSystem
 }
 import com.redhat.ceylon.ide.common.platform {
     CommonDocument,
@@ -45,7 +46,7 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
         doc = input.nativeDocument;
     } else {
         VirtualFile? vfile = if (is PhasedUnit input)
-        then VirtualFileManager.instance.findFileByUrl("file://" + input.unit.fullPath)
+        then VirtualFileManager.instance.findFileByUrl(LocalFileSystem.protocolPrefix + input.unit.fullPath)
         else input.virtualFile;
 
         assert (exists vfile);

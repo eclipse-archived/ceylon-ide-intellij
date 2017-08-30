@@ -19,10 +19,6 @@ import com.intellij.psi.util {
 import com.redhat.ceylon.ide.common.open {
     AbstractNavigation
 }
-import com.redhat.ceylon.ide.common.platform {
-    platformUtils,
-    Status
-}
 import com.redhat.ceylon.ide.common.util {
     Path
 }
@@ -50,11 +46,14 @@ import java.lang {
 import org.intellij.plugins.ceylon.ide.model {
     PSIClass,
     PSIMethod,
-    concurrencyManager,
+    concurrencyManager {
+        withAlternateResolution
+    },
     PsiElementGoneException
 }
 import org.intellij.plugins.ceylon.ide.psi {
-    CeylonFile
+    CeylonFile,
+    CeylonTreeUtil
 }
 
 
@@ -158,7 +157,7 @@ shared class IdeaNavigation(Project project)
     filePath(VirtualFile file) => Path(file.path);
     
     gotoDeclaration(Referenceable? model)
-            => concurrencyManager.withAlternateResolution(() => super.gotoDeclaration(model));
+            => withAlternateResolution(() => super.gotoDeclaration(model));
 
     shared actual PsiElement? gotoFile(VirtualFile file, Integer offset, Integer length) {
         try {
@@ -179,9 +178,7 @@ shared class IdeaNavigation(Project project)
         if (!exists path) {
             return null;
         }
-        String pathWithProtocol
-                = let (pathString = path.string)
-                ("!/" in pathString then "jar" else "file") + "://" + pathString;
+        value pathWithProtocol = CeylonTreeUtil.withProtocol(path.string);
         try {
             if (exists file = VirtualFileManager.instance.findFileByUrl(pathWithProtocol),
                 file.\iexists(),

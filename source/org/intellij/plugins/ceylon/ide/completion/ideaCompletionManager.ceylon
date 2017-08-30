@@ -54,7 +54,9 @@ import java.lang {
 }
 
 import org.intellij.plugins.ceylon.ide.model {
-    concurrencyManager,
+    concurrencyManager {
+        withAlternateResolution
+    },
     getModelManager,
     CeylonModelManager,
     PsiElementGoneException
@@ -160,7 +162,7 @@ shared class IdeaCompletionProvider()
                 application.addApplicationListener(listener);
 
                 try {
-                    concurrencyManager.withAlternateResolution(() {
+                    withAlternateResolution(() {
                         if (is CeylonFile ceylonFile = parameters.originalFile,
                             exists localAnalyzer = ceylonFile.localAnalyzer,
                             exists analysisResult = getAnalysisResult {

@@ -2,9 +2,6 @@ import com.intellij.psi {
     PsiTypeParameter,
     PsiNamedElement
 }
-import com.intellij.psi.impl.source {
-    PsiClassReferenceType
-}
 import com.redhat.ceylon.model.loader.mirror {
     TypeParameterMirror,
     TypeMirror

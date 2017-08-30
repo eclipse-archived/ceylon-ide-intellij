@@ -2,7 +2,8 @@ import com.intellij.lang {
     Language
 }
 import com.intellij.openapi.vfs {
-    VirtualFile
+    VirtualFile,
+    JarFileSystem
 }
 import com.intellij.psi {
     FileViewProviderFactory,
@@ -25,7 +26,7 @@ import org.intellij.plugins.ceylon.ide.util {
 
 shared Boolean isInSourceArchive(VirtualFile? virtualFile) {
     if (exists path = virtualFile?.path) {
-        return ".src!/" in path.lowercased;
+        return ".src" + JarFileSystem.jarSeparator in path.lowercased;
     } else {
         return false;
     }

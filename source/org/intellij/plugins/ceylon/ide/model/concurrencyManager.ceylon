@@ -275,17 +275,17 @@ shared object concurrencyManager {
     }
 }
 
-object concurrencyManagerForJava {
-    shared Anything needReadAccess(JCallable<Anything> func, Integer timeout)
-            => concurrencyManager.needReadAccess(func.call, timeout);
-
-    shared Anything withAlternateResolution(JCallable<Anything> func)
-            => concurrencyManager.withAlternateResolution(func.call);
-
-    shared Anything withUpToDateIndexes(JCallable<Anything> func)
-            => concurrencyManager.withUpToDateIndexes(func.call);
-
-    shared Anything outsideDumbMode(JCallable<Anything> func)
-            => concurrencyManager.outsideDumbMode(func.call);
-}
-
+//object concurrencyManagerForJava {
+//    shared Anything needReadAccess(JCallable<Anything> func, Integer timeout)
+//            => concurrencyManager.needReadAccess(func.call, timeout);
+//
+//    shared Anything withAlternateResolution(JCallable<Anything> func)
+//            => concurrencyManager.withAlternateResolution(func.call);
+//
+//    shared Anything withUpToDateIndexes(JCallable<Anything> func)
+//            => concurrencyManager.withUpToDateIndexes(func.call);
+//
+//    shared Anything outsideDumbMode(JCallable<Anything> func)
+//            => concurrencyManager.outsideDumbMode(func.call);
+//}
+//

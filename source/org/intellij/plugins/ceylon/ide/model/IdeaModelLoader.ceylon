@@ -33,7 +33,9 @@ import com.intellij.psi {
     PsiElement,
     LambdaUtil,
     PsiWildcardType,
-    PsiType
+    PsiType,
+    PsiModifier,
+    PsiMethod
 }
 import com.intellij.psi.impl.compiled {
     ClsFileImpl
@@ -85,6 +87,24 @@ import java.util.concurrent {
 import org.intellij.plugins.ceylon.ide.platform {
     ideaPlatformUtils
 }
+import com.intellij.psi.search.searches {
+    SuperMethodsSearch
+}
+import com.redhat.ceylon.model.loader {
+    AbstractModelLoader
+}
+import com.intellij.psi.util {
+    MethodSignatureUtil
+}
+import org.intellij.plugins.ceylon.ide.model {
+    concurrencyManager {
+        outsideDumbMode,
+        dontCancel,
+        needReadAccess,
+        needIndexes,
+        noIndexStrategy
+    }
+}
 
 shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     IdeaModuleSourceMapper ideaModuleSourceMapper, Modules modules)
@@ -106,19 +126,18 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
                 if (application.readAccessAllowed) {
                     ref.set(action.call());
                 } else {
-                    if (exists currentStrategy = concurrencyManager.noIndexStrategy,
+                    if (exists currentStrategy = noIndexStrategy,
                         currentStrategy == NoIndexStrategy.waitForIndexes) {
                         updateIndexIfnecessary();
                         assert(exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
                         dumbService(project).runReadActionInSmartMode(() {
                             value restoreCurrentPriority = withOriginalModelUpdatePriority();
                             try {
-                                return concurrencyManager.outsideDumbMode(() {
+                                return outsideDumbMode(() {
                                     ref.set(action.call());
                                 });
                             } finally {
-                                    restoreCurrentPriority();
-
+                                restoreCurrentPriority();
                             }
                         });
                     } else {
@@ -141,17 +160,53 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             project.addDependencyToClasspath(artifact);
         }
     }
-    
-    shared actual Boolean isOverloadingMethod(MethodMirror method) {
-        assert(is PSIMethod method);
-        return method.isOverloading;
-    }
-    
+
+    Boolean nameEquals(PsiClass clazz, String className)
+            => clazz.qualifiedName?.equals(className) else false;
+
     shared actual Boolean isOverridingMethod(MethodMirror method) {
-        assert(is PSIMethod method);
-        return method.isOverriding;
+        assert (is PSIMethod method);
+        return method.withContainingClass((clazz) {
+            if (nameEquals(clazz, "ceylon.language.Object")) {
+                return false;
+            }
+            if (nameEquals(clazz,"ceylon.language.Identifiable")) {
+                return true;
+            }
+            return null;
+        }, null)
+        else needIndexes(method.psi.project,
+            () => dontCancel(
+                () => SuperMethodsSearch.search(method.psi, null, true, false)
+                        .findFirst() exists));
     }
 
+    shared actual Boolean isOverloadingMethod(MethodMirror method) {
+        assert (is PSIMethod method);
+        return method.withContainingClass((clazz) {
+            if (nameEquals(clazz, "ceylon.language.Exception")
+                || nameEquals(clazz, "ceylon.language.Object")
+                || nameEquals(clazz,"ceylon.language.Identifiable")) {
+                return false;
+            }
+            value psiMethod = method.psi;
+            for (method in clazz.findMethodsByName(psiMethod.name, true)) {
+                if (method != psiMethod
+                        && isOverloadedVersion(method, psiMethod)) {
+                    return true;
+                }
+            }
+            else {
+                return false;
+            }
+        }, false);
+    }
+
+    Boolean isOverloadedVersion(PsiMethod method, PsiMethod mine)
+            => !method.modifierList.hasModifierProperty(PsiModifier.private)
+//           && !m.modifierList.hasModifierProperty(PsiModifier.static)
+            && !method.modifierList.findAnnotation(AbstractModelLoader.ceylonIgnoreAnnotation) exists
+            && !MethodSignatureUtil.isSuperMethod(method, mine);
 
     void updateIndexIfnecessary() {
         if (application.readAccessAllowed) {
@@ -163,13 +218,12 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             // read lock
             return;
         }
-        if (exists strategy = concurrencyManager.noIndexStrategy,
+        if (exists strategy = noIndexStrategy,
             strategy == NoIndexStrategy.waitForIndexes) {
             resetJavaModelSourceIfNecessary(() =>
                     application.invokeAndWait(() {
-                        assert (exists project =
-                                ideaModuleManager.ceylonProject?.ideArtifact?.project);
-
+                        assert (exists ceylonProject = ideaModuleManager.ceylonProject);
+                        value project = ceylonProject.ideArtifact.project;
                         dumbService(project).queueTask(newUnindexedFilesUpdater(project));
                     },
                     ModalityState.nonModal));
@@ -206,8 +260,8 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             if (ideaModule.project.isDisposed()) {
                 return false;
             }
-            return concurrencyManager.needIndexes(ideaModule.project,
-                () => concurrencyManager.needReadAccess(()
+            return needIndexes(ideaModule.project,
+                () => needReadAccess(()
                     => facade.findClass(name, scope) exists));
         }
         
@@ -215,12 +269,14 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
     }
 
     function pointer<Psi>(Psi el) given Psi satisfies PsiElement {
-        assert (exists project = ideaModuleManager.ceylonProject?.ideArtifact?.project);
-        return SmartPointerManager.getInstance(project).createSmartPsiElementPointer(el);
+        assert (exists ceylonProject = ideaModuleManager.ceylonProject);
+        value project = ceylonProject.ideArtifact.project;
+        return SmartPointerManager.getInstance(project)
+            .createSmartPsiElementPointer(el);
     }
     
     shared actual ClassMirror? buildClassMirrorInternal(String name) {
-        assert(is IdeaCeylonProject ceylonProject = ideaModuleManager.ceylonProject);
+        assert (is IdeaCeylonProject ceylonProject = ideaModuleManager.ceylonProject);
 
         if (ceylonProject.validatingDependencies) {
             return findModuleDescriptorInArtifacts(ceylonProject, name);
@@ -229,15 +285,17 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         value project = ceylonProject.ideArtifact.project;
         updateIndexIfnecessary();
 
-        return concurrencyManager.needIndexes(project,
-            () => concurrencyManager.needReadAccess(() {
-                if (exists m = ideaModuleManager.ceylonProject?.ideArtifact,
-                    !m.isDisposed()) {
-                    value scope = m.getModuleWithDependenciesAndLibrariesScope(true);
-                    value facade = javaPsiFacade(m.project);
+        return needIndexes(project,
+            () => needReadAccess(() {
+                if (exists ceylonProject = ideaModuleManager.ceylonProject) {
+                    value artifact = ceylonProject.ideArtifact;
+                    if (!artifact.isDisposed()) {
+                        value scope = artifact.getModuleWithDependenciesAndLibrariesScope(true);
+                        value facade = javaPsiFacade(artifact.project);
 
-                    if (exists psi = facade.findClass(name, scope)) {
-                        return PSIClass(pointer(psi));
+                        if (exists psi = facade.findClass(name, scope)) {
+                            return PSIClass(pointer(psi));
+                        }
                     }
                 }
                 return null;
@@ -293,12 +351,12 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         value facade = javaPsiFacade(project);
         
         shared actual Boolean packageExists(String quotedPackageName) 
-            => concurrencyManager.needReadAccess(() => if (project.isDisposed()) then false else facade.findPackage(quotedPackageName) exists);
+            => needReadAccess(() => if (project.isDisposed()) then false else facade.findPackage(quotedPackageName) exists);
         
         packageMembers(String quotedPackageName) =>
             if (ideaModuleManager.isExternalModuleLoadedFromSource(ideModule.nameAsString))
             then null
-            else concurrencyManager.needReadAccess(() {
+            else needReadAccess(() {
                 if (exists pkg = facade.findPackage(quotedPackageName)) {
                     value classes = pkg.getClasses(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(mod));
                     
@@ -319,7 +377,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
            else null;
 
     getFunctionalInterfaceType(TypeMirror typeMirror) =>
-        concurrencyManager.dontCancel(() {
+        dontCancel(() {
             function noWildcard(PsiType type)
                 => if (is PsiWildcardType type, exists bound = type.bound) then bound else type;
 
@@ -338,7 +396,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
         });
 
     isFunctionalInterface(ClassMirror klass) =>
-            concurrencyManager.dontCancel(() {
+            dontCancel(() {
                 try {
                     if (is PSIClass klass,
                         exists method = LambdaUtil.getFunctionalInterfaceMethod(klass.psi),
@@ -351,7 +409,7 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
             });
 
     isFunctionalInterfaceType(TypeMirror typeMirror) =>
-            concurrencyManager.dontCancel(() =>
+            dontCancel(() =>
                 if (is PSIType typeMirror,
                     exists method = LambdaUtil.getFunctionalInterfaceMethod(typeMirror.psi),
                     !method.hasTypeParameters())
