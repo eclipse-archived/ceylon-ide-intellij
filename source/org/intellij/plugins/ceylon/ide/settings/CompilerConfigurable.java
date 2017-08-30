@@ -101,8 +101,8 @@ public class CompilerConfigurable implements SearchableConfigurable, Configurabl
         CeylonSettings settings = ceylonSettings_.get_();
 
         return outProcessMode.isSelected() != settings.getUseOutProcessBuild()
-                || verboseCheckbox.isSelected() != settings.getCompilerVerbose()
-                || !Objects.equals(getVerbosityLevel(), settings.getVerbosityLevel());
+            || verboseCheckbox.isSelected() != settings.getCompilerVerbose()
+            || !Objects.equals(getVerbosityLevel(), settings.getVerbosityLevel());
     }
 
     @Override
