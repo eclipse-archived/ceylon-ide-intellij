@@ -1,152 +1,30 @@
 package org.intellij.plugins.ceylon.ide.settings;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.options.*;
-import com.intellij.openapi.options.ex.Settings;
+import com.intellij.openapi.options.BaseConfigurable;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
-import org.intellij.plugins.ceylon.ide.settings.ceylonSettings_;
-import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
-import org.intellij.plugins.ceylon.ide.settings.CeylonOptions;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Settings for Ceylon.
  */
-public class CeylonConfigurable extends BaseConfigurable {
-    private JPanel myPanel;
-    private JRadioButton jvmTarget;
-    private JRadioButton jsTarget;
-    private JRadioButton crossTarget;
-    private JTextField sourceName;
-    private JTextField resourceName;
-    private JLabel editorLink;
-    private JLabel completionLink;
-    private JButton restoreDefaultsButton;
-    private JLabel compilerLink;
-    private ButtonGroup targetVM;
+public abstract class AbstractCeylonConfigurable extends BaseConfigurable {
+    protected JPanel myPanel;
+    protected JRadioButton jvmTarget;
+    protected JRadioButton jsTarget;
+    protected JRadioButton crossTarget;
+    protected JTextField sourceName;
+    protected JTextField resourceName;
+    protected JLabel editorLink;
+    protected JLabel completionLink;
+    protected JButton restoreDefaultsButton;
+    protected JLabel compilerLink;
+    protected ButtonGroup targetVM;
 
-    public CeylonConfigurable() {
-        setupLinks();
-        restoreDefaultsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ceylonSettings_.get_().loadState(new CeylonOptions());
-                reset();
-            }
-        });
-    }
 
-    @Nls
-    @Override
-    public String getDisplayName() {
-        return "Ceylon";
-    }
-
-    @Nullable
-    @Override
-    public String getHelpTopic() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public JComponent createComponent() {
-        return myPanel;
-    }
-
-    @Override
-    public void apply() throws ConfigurationException {
-        CeylonSettings settings = ceylonSettings_.get_();
-
-        settings.setDefaultTargetVm(getTargetVm());
-        settings.setDefaultSourceFolder(sourceName.getText());
-        settings.setDefaultResourceFolder(resourceName.getText());
-    }
-
-    private String getTargetVm() {
-        if (jvmTarget.isSelected()) {
-            return "jvm";
-        } else if (jsTarget.isSelected()) {
-            return "js";
-        }
-        return "cross";
-    }
-
-    @Override
-    public void reset() {
-        CeylonSettings settings = ceylonSettings_.get_();
-
-        switch (settings.getDefaultTargetVm()) {
-            case "jvm":
-                targetVM.setSelected(jvmTarget.getModel(), true);
-                break;
-            case "js":
-                targetVM.setSelected(jsTarget.getModel(), true);
-                break;
-            default:
-                targetVM.setSelected(crossTarget.getModel(), true);
-                break;
-        }
-        sourceName.setText(settings.getDefaultSourceFolder());
-        resourceName.setText(settings.getDefaultResourceFolder());
-    }
-
-    @Override
-    public boolean isModified() {
-        CeylonSettings settings = ceylonSettings_.get_();
-
-        return !(
-                settings.getDefaultTargetVm().equals(getTargetVm())
-                        && settings.getDefaultSourceFolder().equals(sourceName.getText())
-                        && settings.getDefaultResourceFolder().equals(resourceName.getText())
-        );
-    }
-
-    @Override
-    public void disposeUIResources() {
-
-    }
-
-    private void createUIComponents() {
-    }
-
-    private void setupLinks() {
-        JLabelLinkListener listener = new JLabelLinkListener() {
-            @Override
-            public Object onLinkClicked(String href) {
-                selectConfigurable(href);
-                return null;
-            }
-        };
-
-        List<JLabel> links = Arrays.asList(editorLink, completionLink, compilerLink);
-
-        for (JLabel link : links) {
-            link.addMouseListener(listener);
-            link.addMouseMotionListener(listener);
-        }
-    }
-
-    static void selectConfigurable(String id) {
-        DataContext context = DataManager.getInstance().getDataContextFromFocus().getResult();
-        if (context != null) {
-            Settings settings = Settings.KEY.getData(context);
-            if (settings != null) {
-                settings.select(settings.find(id));
-            }
-        }
-    }
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer

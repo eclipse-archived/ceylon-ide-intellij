@@ -1,16 +1,10 @@
 package org.intellij.plugins.ceylon.ide.settings;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
-import org.intellij.plugins.ceylon.ide.settings.ceylonSettings_;
-import org.intellij.plugins.ceylon.ide.settings.CeylonSettings;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -18,23 +12,22 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-public class CompilerConfigurable implements SearchableConfigurable, Configurable.NoScroll {
-    private JRadioButton inProcessMode;
-    private JRadioButton outProcessMode;
-    private JPanel mainPanel;
-    private JCheckBox verboseCheckbox;
-    private JCheckBox allCheckBox;
-    private JCheckBox loaderCheckBox;
-    private JCheckBox astCheckBox;
-    private JCheckBox codeCheckBox;
-    private JCheckBox cmrCheckBox;
-    private JCheckBox benchmarkCheckBox;
+public abstract class AbstractCompilerConfigurable implements SearchableConfigurable, Configurable.NoScroll {
+    protected JRadioButton inProcessMode;
+    protected JRadioButton outProcessMode;
+    protected JPanel mainPanel;
+    protected JCheckBox verboseCheckbox;
+    protected JCheckBox allCheckBox;
+    protected JCheckBox loaderCheckBox;
+    protected JCheckBox astCheckBox;
+    protected JCheckBox codeCheckBox;
+    protected JCheckBox cmrCheckBox;
+    protected JCheckBox benchmarkCheckBox;
 
-    private List<JCheckBox> verbosities;
+    protected List<JCheckBox> verbosities;
 
-    public CompilerConfigurable() {
+    public AbstractCompilerConfigurable() {
 
         verbosities = Arrays.asList(
                 allCheckBox, loaderCheckBox, astCheckBox,
@@ -63,101 +56,6 @@ public class CompilerConfigurable implements SearchableConfigurable, Configurabl
 
         for (JCheckBox cb : verbosities) {
             cb.setEnabled(verboseCheckbox.isSelected());
-        }
-    }
-
-    @NotNull
-    @Override
-    public String getId() {
-        return "preferences.Ceylon.compiler";
-    }
-
-    @Nullable
-    @Override
-    public Runnable enableSearch(String option) {
-        return null;
-    }
-
-    @Nls
-    @Override
-    public String getDisplayName() {
-        return "Ceylon compiler";
-    }
-
-    @Nullable
-    @Override
-    public String getHelpTopic() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public JComponent createComponent() {
-        return mainPanel;
-    }
-
-    @Override
-    public boolean isModified() {
-        CeylonSettings settings = ceylonSettings_.get_();
-
-        return outProcessMode.isSelected() != settings.getUseOutProcessBuild()
-            || verboseCheckbox.isSelected() != settings.getCompilerVerbose()
-            || !Objects.equals(getVerbosityLevel(), settings.getVerbosityLevel());
-    }
-
-    @Override
-    public void apply() throws ConfigurationException {
-        CeylonSettings settings = ceylonSettings_.get_();
-        settings.setUseOutProcessBuild(outProcessMode.isSelected());
-        settings.setCompilerVerbose(verboseCheckbox.isSelected());
-        settings.setVerbosityLevel(getVerbosityLevel());
-    }
-
-    @Override
-    public void reset() {
-        CeylonSettings settings = ceylonSettings_.get_();
-        outProcessMode.setSelected(settings.getUseOutProcessBuild());
-        inProcessMode.setSelected(!settings.getUseOutProcessBuild());
-        verboseCheckbox.setSelected(settings.getCompilerVerbose());
-        setVerbosityLevel(settings.getVerbosityLevel());
-    }
-
-    @Override
-    public void disposeUIResources() {
-    }
-
-    private String getVerbosityLevel() {
-        if (allCheckBox.isSelected()) {
-            return "all";
-        } else {
-            StringBuilder builder = new StringBuilder();
-
-            for (JCheckBox cb : verbosities) {
-                if (cb.isSelected()) {
-                    if (builder.length() > 0) {
-                        builder.append(",");
-                    }
-                    builder.append(cb.getText());
-                }
-            }
-
-            return builder.toString();
-        }
-    }
-
-    private void setVerbosityLevel(String level) {
-        for (JCheckBox cb : verbosities) {
-            cb.setSelected(false);
-        }
-
-        String[] parts = level.split(",");
-
-        for (String part : parts) {
-            for (JCheckBox cb : verbosities) {
-                if (Objects.equals(cb.getText(), part)) {
-                    cb.setSelected(true);
-                }
-            }
         }
     }
 
