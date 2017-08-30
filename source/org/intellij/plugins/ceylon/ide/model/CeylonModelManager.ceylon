@@ -224,9 +224,8 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
 
     value logger => ceylonModelManagerLogger;
 
-    shared void pauseAutomaticModelUpdate() {
-        pauseRequests.incrementAndGet();
-    }
+    shared void pauseAutomaticModelUpdate()
+            => pauseRequests.incrementAndGet();
 
     shared void resumeAutomaticModelUpdate(Integer delay = delayBeforeUpdatingAfterChange) {
         if (pauseRequests.decrementAndGet() == 0) {

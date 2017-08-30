@@ -76,7 +76,7 @@ shared class CeylonBuilder() satisfies CompileTask {
                 value files = builderDir.listFiles();
                 if (exists files) {
                     for (file in files) {
-                        if (file.file, file.name.startsWith("ceylonFiles-")) {
+                        if (file.file && file.name.startsWith("ceylonFiles-")) {
                             file.delete();
                         }
                     }
