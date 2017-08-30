@@ -163,34 +163,33 @@ shared class IdeaNavigation(Project project)
             => PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(), `PsiElement`, false);
 
     shared actual PsiElement? gotoFile(VirtualFile file, Integer offset, Integer length) {
-        try {
+//        try {
             if (file.\iexists(),
                 exists psiFile = PsiManager.getInstance(project).findFile(file)) {
                 return findElementAtOffset(psiFile, offset);
             }
-        }
-        catch (Throwable t) {
-            //IDEA really throws Throwable from findFile()
-        }
+//        }
+//        catch (Throwable t) {
+//            //IDEA really throws Throwable from findFile()
+//        }
         return null;
     }
     
     gotoJavaNode(Declaration rawDeclaration) => declarationToPsi(rawDeclaration);
 
     shared actual PsiElement? gotoLocation(Path? path, Integer offset, Integer length) {
-        if (!exists path) {
-            return null;
-        }
-        value pathWithProtocol = CeylonTreeUtil.withProtocol(path.string);
-        try {
+        if (exists path) {
+            value pathWithProtocol = CeylonTreeUtil.withProtocol(path.string);
+//        try {
             if (exists file = VirtualFileManager.instance.findFileByUrl(pathWithProtocol),
                 file.\iexists(),
                 exists psiFile = PsiManager.getInstance(project).findFile(file)) {
                 return findElementAtOffset(psiFile, offset);
             }
-        }
-        catch (Throwable t) {
-            //IDEA really throws Throwable from findFile()
+//        }
+//        catch (Throwable t) {
+//            //IDEA really throws Throwable from findFile()
+//        }
         }
         return null;
     }

@@ -327,12 +327,13 @@ shared class IdeaModelLoader(IdeaModuleManager ideaModuleManager,
 
         if (is PsiJavaFileStubImpl stub = ClsFileImpl.buildFileStub(file, file.contentsToByteArray()),
             stub.classes.size > 0,
-            exists ideaProject = ideaModuleManager.ceylonProject?.ideArtifact?.project,
-            is PsiJavaFile psiFile = PsiManager.getInstance(ideaProject).findFile(file)) {
-
-            stub.psi = psiFile;
-            value internalPsiClass = stub.classes.get(0);
-            return PSIClass(pointer(internalPsiClass));
+            exists ceylonProject = ideaModuleManager.ceylonProject) {
+            value ideaProject = ceylonProject.ideArtifact.project;
+            if (is PsiJavaFile psiFile = PsiManager.getInstance(ideaProject).findFile(file)) {
+                stub.psi = psiFile;
+                value internalPsiClass = stub.classes.get(0);
+                return PSIClass(pointer(internalPsiClass));
+            }
         }
 
         return null;

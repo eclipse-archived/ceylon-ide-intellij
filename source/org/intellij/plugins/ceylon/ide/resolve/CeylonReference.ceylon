@@ -87,18 +87,20 @@ shared class CeylonReference(element, span = element,
     Backends backend;
 
     function getVirtualFile(Unit unit) {
-        if (is SourceAware unit) {
-            assert (exists path = unit.sourceFullPath);
-            value pathWithProtocol = CeylonTreeUtil.withProtocol(path.string);
-            return VirtualFileManager.instance.findFileByUrl(pathWithProtocol);
+        switch (unit)
+        case (is SourceAware) {
+            if (exists path = unit.sourceFullPath) {
+                value pathWithProtocol = CeylonTreeUtil.withProtocol(path.string);
+                return VirtualFileManager.instance.findFileByUrl(pathWithProtocol);
+            }
         }
-        else if (is IResourceAware<out Anything, out Anything, out Anything> unit,
-                 is VirtualFile file = unit.resourceFile) {
-            return file;
+        else case (is IResourceAware<out Anything, out Anything, out Anything>) {
+             if (is VirtualFile file = unit.resourceFile) {
+                 return file;
+             }
         }
-        else {
-            return null;
-        }
+        else {}
+        return null;
     }
 
     value node {

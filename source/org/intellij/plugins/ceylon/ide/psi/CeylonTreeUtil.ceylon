@@ -37,21 +37,18 @@ import org.intellij.plugins.ceylon.ide.model {
 shared class CeylonTreeUtil {
 
     shared static String withProtocol(String path)
-            => JarFileSystem.jarSeparator in path
+            => (JarFileSystem.jarSeparator in path
             then JarFileSystem.protocolPrefix
-            else LocalFileSystem.protocolPrefix;
+            else LocalFileSystem.protocolPrefix)
+                    + path;
 
-    shared static PsiFile? getDeclaringFile(Unit unit, Project project) {
-        if (is CeylonUnit unit,
-            exists value path = unit.sourceFullPath?.string) {
-            if (exists vfile
-                    = VirtualFileManager.instance.findFileByUrl(withProtocol(path))) {
-                return concurrencyManager.needReadAccess(()
-                    => PsiManager.getInstance(project).findFile(vfile));
-            }
-        }
-        return null;
-    }
+    shared static PsiFile? getDeclaringFile(Unit unit, Project project)
+            => if (is CeylonUnit unit,
+                    exists path = unit.sourceFullPath,
+                    exists vfile = VirtualFileManager.instance.findFileByUrl(withProtocol(path)))
+            then concurrencyManager.needReadAccess(()
+                    => PsiManager.getInstance(project).findFile(vfile))
+            else null;
 
     shared static PsiElement? findPsiElement(Node? node, PsiFile file) {
         Node ceylonNode;
