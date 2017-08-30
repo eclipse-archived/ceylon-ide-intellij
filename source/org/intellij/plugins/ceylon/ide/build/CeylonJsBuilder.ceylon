@@ -99,11 +99,14 @@ shared class CeylonJsBuilder() satisfies CompileTask {
                     .sourceDirs(sources)
                     .systemRepo(project.systemRepository)
                     .outRepo(context.getModuleOutputDirectory(mod)?.canonicalPath)
-                    .optimize(true).generateSourceArchive(true);
+                    .optimize(true)
+                    .generateSourceArchive(true)
+                    .verbose(ceylonSettings.verbosityLevel);
         value compiler
                 = JsCompiler(tc, options)
                     .stopOnErrors(false)
                     .setSourceFiles(files);
+
         try {
             if (!compiler.generate()) {
                 for (message in compiler.errors) {
