@@ -24,15 +24,13 @@ import org.intellij.plugins.ceylon.ide.util {
 
 
 
-shared Boolean isInSourceArchive(VirtualFile? virtualFile) {
-    if (exists path = virtualFile?.path) {
-        return ".src" + JarFileSystem.jarSeparator in path.lowercased;
-    } else {
-        return false;
-    }
-}
+shared Boolean isInSourceArchive(VirtualFile? virtualFile)
+        => if (exists path = virtualFile?.path)
+        then ".src" + JarFileSystem.jarSeparator in path.lowercased
+        else false;
 
-CeylonLogger<CeylonSourceFileViewProviderFactory> ceylonSourceFileViewProviderFactoryLogger = CeylonLogger<CeylonSourceFileViewProviderFactory>();
+CeylonLogger<CeylonSourceFileViewProviderFactory> ceylonSourceFileViewProviderFactoryLogger
+        = CeylonLogger<CeylonSourceFileViewProviderFactory>();
 
 shared class CeylonSourceFileViewProviderFactory() 
         satisfies FileViewProviderFactory {

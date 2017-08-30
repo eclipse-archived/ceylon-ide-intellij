@@ -56,7 +56,8 @@ shared class MutableLocalAnalysisResult(
     variable PhasedUnit? lastPhasedUnit_ = null;
 
     value futureMutex = object {};
-    variable AsyncFutureResult<PhasedUnit> phasedUnitWhenTypechecked_ = AsyncFutureFactory.instance.createAsyncFutureResult<PhasedUnit>();
+    variable AsyncFutureResult<PhasedUnit> phasedUnitWhenTypechecked_
+            = AsyncFutureFactory.instance.createAsyncFutureResult<PhasedUnit>();
 
     document_ = theDocument;
     commonDocument_ = IdeaDocument(theDocument);

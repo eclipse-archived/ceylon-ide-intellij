@@ -25,6 +25,7 @@ import org.intellij.plugins.ceylon.ide.model {
     IdeaCeylonBinaryUnit,
     IdeaCrossProjectJavaCompilationUnit
 }
+
 object ideaJavaModelServices satisfies JavaModelServices<PsiClass> {
     shared actual PsiClass getJavaClassRoot(ClassMirror classMirror) {
         assert(is PSIClass classMirror);

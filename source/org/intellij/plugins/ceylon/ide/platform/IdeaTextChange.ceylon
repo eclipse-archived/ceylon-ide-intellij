@@ -45,13 +45,11 @@ shared class IdeaTextChange(CommonDocument|PhasedUnit|CeylonFile input) satisfie
         assert (is IdeaDocument input);
         doc = input.nativeDocument;
     } else {
-        VirtualFile? vfile = if (is PhasedUnit input)
-        then VirtualFileManager.instance.findFileByUrl(LocalFileSystem.protocolPrefix + input.unit.fullPath)
-        else input.virtualFile;
-
-        assert (exists vfile);
-
-        assert(exists d = FileDocumentManager.instance.getDocument(vfile));
+        assert (exists vfile
+                    = if (is PhasedUnit input)
+                    then VirtualFileManager.instance.findFileByUrl(LocalFileSystem.protocolPrefix + input.unit.fullPath)
+                    else input.virtualFile,
+                exists d = FileDocumentManager.instance.getDocument(vfile));
         doc = d;
     }
 

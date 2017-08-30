@@ -111,11 +111,11 @@ shared Key<ExternalPhasedUnit> uneditedExternalPhasedUnitToParse = Key<ExternalP
 
 shared class CeylonLocalAnalyzerManager(model) 
         satisfies Correspondence<VirtualFile, CeylonLocalAnalyzer>
-        & ProjectComponent
-        & Disposable
-        & VirtualFileListener
-        & FileEditorManagerListener
-        & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile> {
+                & ProjectComponent
+                & Disposable
+                & VirtualFileListener
+                & FileEditorManagerListener
+                & ModelListenerAdapter<Module, VirtualFile, VirtualFile, VirtualFile> {
     shared IdeaCeylonProjects model;    
     value editedFilesAnalyzersMap = ImmutableMapWrapper<VirtualFile, CeylonLocalAnalyzer>(emptyMap, map);
     
