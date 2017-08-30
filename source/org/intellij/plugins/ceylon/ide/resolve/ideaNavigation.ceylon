@@ -159,11 +159,14 @@ shared class IdeaNavigation(Project project)
     gotoDeclaration(Referenceable? model)
             => withAlternateResolution(() => super.gotoDeclaration(model));
 
+    function findElementAtOffset(PsiFile psiFile, Integer offset)
+            => PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(), `PsiElement`, false);
+
     shared actual PsiElement? gotoFile(VirtualFile file, Integer offset, Integer length) {
         try {
             if (file.\iexists(),
-                is PsiFile psiFile = PsiManager.getInstance(project).findFile(file)) {
-                return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(), `PsiElement`, false);
+                exists psiFile = PsiManager.getInstance(project).findFile(file)) {
+                return findElementAtOffset(psiFile, offset);
             }
         }
         catch (Throwable t) {
@@ -182,8 +185,8 @@ shared class IdeaNavigation(Project project)
         try {
             if (exists file = VirtualFileManager.instance.findFileByUrl(pathWithProtocol),
                 file.\iexists(),
-                is CeylonFile psiFile = PsiManager.getInstance(project).findFile(file)) {
-                return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(), `PsiElement`, false);
+                exists psiFile = PsiManager.getInstance(project).findFile(file)) {
+                return findElementAtOffset(psiFile, offset);
             }
         }
         catch (Throwable t) {
