@@ -58,7 +58,8 @@ import com.intellij.openapi.vfs {
         virtualFileManager=instance
     },
     JarFileSystem,
-    VfsUtilCore
+    VfsUtilCore,
+    LocalFileSystem
 }
 import com.intellij.psi {
     PsiFile,
@@ -278,7 +279,7 @@ shared class IdeaCeylonProject(ideArtifact, model)
 
         value path = ideaModule.moduleFilePath;
         if (exists lastSlash = path.lastOccurrence('/')) {
-            String parentPath = "file://``path[0..lastSlash]``";
+            String parentPath = LocalFileSystem.protocolPrefix + path[0..lastSlash];
             if (exists file = virtualFileManager.findFileByUrl(parentPath)) {
                 return file;
             }
