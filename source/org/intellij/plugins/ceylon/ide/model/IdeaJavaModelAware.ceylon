@@ -26,7 +26,7 @@ shared interface IdeaJavaModelAware
             => nothing; // TODO : this has to be implemented
 
         toJavaElement(Declaration ceylonDeclaration, BaseProgressMonitor? monitor)
-            => if (is <PsiClass|PsiMethod>? psi = declarationToPsi(ceylonDeclaration))
+            => if (is PsiClass|PsiMethod psi = declarationToPsi(ceylonDeclaration))
                 then psi
                 else null;
 }

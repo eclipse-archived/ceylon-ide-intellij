@@ -157,28 +157,42 @@ shared class IdeaNavigation(Project project)
     
     filePath(VirtualFile file) => Path(file.path);
     
-    gotoDeclaration(Referenceable? model) =>
-            concurrencyManager.withAlternateResolution(() => super.gotoDeclaration(model));
+    gotoDeclaration(Referenceable? model)
+            => concurrencyManager.withAlternateResolution(() => super.gotoDeclaration(model));
 
-    shared actual PsiElement? gotoFile(VirtualFile file,
-        Integer offset, Integer length) {
-        if (is PsiFile psiFile = PsiManager.getInstance(project).findFile(file)) {
-            return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(), `PsiElement`, false);
+    shared actual PsiElement? gotoFile(VirtualFile file, Integer offset, Integer length) {
+        try {
+            if (file.\iexists(),
+                is PsiFile psiFile = PsiManager.getInstance(project).findFile(file)) {
+                return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(), `PsiElement`, false);
+            }
         }
-        else {
-            platformUtils.log(Status._WARNING, "Can't navigate to file " + file.path);
-            return null;
+        catch (Throwable t) {
+            //IDEA really throws Throwable from findFile()
         }
+        return null;
     }
     
     gotoJavaNode(Declaration rawDeclaration) => declarationToPsi(rawDeclaration);
 
-    gotoLocation(Path? path,Integer offset, Integer length)
-            =>  if (exists strPath = path?.string,
-                    exists file = VirtualFileManager.instance.findFileByUrl(
-                        ("!/" in strPath then "jar" else "file") + "://" + strPath),
-                    is CeylonFile psiFile = PsiManager.getInstance(project).findFile(file))
-            then PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(), `PsiElement`, false)
-            else null;
+    shared actual PsiElement? gotoLocation(Path? path, Integer offset, Integer length) {
+        if (!exists path) {
+            return null;
+        }
+        String pathWithProtocol
+                = let (pathString = path.string)
+                ("!/" in pathString then "jar" else "file") + "://" + pathString;
+        try {
+            if (exists file = VirtualFileManager.instance.findFileByUrl(pathWithProtocol),
+                file.\iexists(),
+                is CeylonFile psiFile = PsiManager.getInstance(project).findFile(file)) {
+                return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset.intValue(), `PsiElement`, false);
+            }
+        }
+        catch (Throwable t) {
+            //IDEA really throws Throwable from findFile()
+        }
+        return null;
+    }
 
 }
