@@ -39,6 +39,7 @@ import org.jetbrains.jps.model.java {
 }
 
 shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, VirtualFile,VirtualFile> {
+
     newCrossProjectSourceFile(CrossProjectPhasedUnit<Module,VirtualFile,VirtualFile,VirtualFile> phasedUnit)
             => CrossProjectSourceFile(phasedUnit);
     
@@ -51,7 +52,7 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
     // TODO : review this to use : ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(virtualFile);
     shared actual Boolean isResourceContainedInProject(VirtualFile resource, CeylonProjectAlias ceylonProject)
             => concurrencyManager.needReadAccess(() {
-                for (root in  moduleRootManager(ceylonProject.ideArtifact).contentRoots) {
+                for (root in moduleRootManager(ceylonProject.ideArtifact).contentRoots) {
                     if (VfsUtil.isAncestor(root, resource, true)) {
                         return true;
                     }
@@ -66,7 +67,8 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
     nativeProjectIsAccessible(Module nativeProject) => true;
 
     referencedNativeProjects(Module mod)
-            => concurrencyManager.needReadAccess(() => {*moduleRootManager(mod).dependencies});
+            => concurrencyManager.needReadAccess(()
+                => { *moduleRootManager(mod).dependencies} );
 
     referencingNativeProjects(Module mod)
             => { *concurrencyManager.needReadAccess(()
@@ -74,26 +76,37 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
                         .getModuleDependentModules(mod)) };
 
     shared actual {VirtualFile*} resourceNativeFolders(CeylonProjectAlias ceylonProject) {
-        value roots = concurrencyManager.needReadAccess(()
-                => moduleRootManager(ceylonProject.ideArtifact)
-                    ?.getSourceRoots(JavaResourceRootType.resource));
-
-        return if (exists roots) then {*roots} else {};
+        value roots
+                = concurrencyManager.needReadAccess(()
+                    => moduleRootManager(ceylonProject.ideArtifact)
+                        ?.getSourceRoots(JavaResourceRootType.resource));
+        return { if (exists roots) for (root in roots) root };
     }
 
     scanRootFolder(RootFolderScanner<Module,VirtualFile,VirtualFile,VirtualFile> scanner)
         => VfsUtilCore.visitChildrenRecursively(scanner.nativeRootDir,
             object extends VirtualFileVisitor<Nothing>() {
-                visitFile(VirtualFile file) => scanner.visitNativeResource(file);
+                visitFile(VirtualFile file)
+                        => scanner.visitNativeResource(file);
             }
         );
 
+    function sourceNativeFolder(IdeaCeylonProject ceylonProject, String dir) {
+        try {
+            value path = dir.removeInitial("./").split('/'.equals);
+            return VfsUtil.findRelativeFile(ceylonProject.moduleRoot, *path);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
     shared actual {VirtualFile*} sourceNativeFolders(CeylonProjectAlias ceylonProject) {
-        assert(is IdeaCeylonProject ceylonProject);
+        assert (is IdeaCeylonProject ceylonProject);
 
         return {
             for (dir in ceylonProject.configuration.sourceDirectories)
-            if (exists vfile = VfsUtil.findRelativeFile(ceylonProject.moduleRoot, *dir.removeInitial("./").split('/'.equals)))
+            if (exists vfile = sourceNativeFolder(ceylonProject, dir))
             vfile
         };
     }

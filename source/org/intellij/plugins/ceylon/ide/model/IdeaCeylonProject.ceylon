@@ -277,27 +277,30 @@ shared class IdeaCeylonProject(ideArtifact, model)
         }
 
         value path = ideaModule.moduleFilePath;
-        Integer? lastSlash = path.lastOccurrence('/');
-        if (exists lastSlash) {
-            String parentPath = path.span(0, lastSlash);
-            assert(exists file = virtualFileManager
-                .findFileByUrl("file://``parentPath``"));
-            return file;
+        if (exists lastSlash = path.lastOccurrence('/')) {
+            String parentPath = "file://``path[0..lastSlash]``";
+            if (exists file = virtualFileManager.findFileByUrl(parentPath)) {
+                return file;
+            }
         }
 
         if (application.unitTestMode) {
             return ideaModule.project.baseDir;
         }
+
         throw Exception("Couldn't get module root for ``path``");
     }
 
-    shared VirtualFile moduleRoot
-            => let (defaultRoot = getDefaultRoot())
-                    if (exists contentsRoot = ModuleRootManager
-                            .getInstance(ideaModule)?.contentRoots,
-                        contentsRoot.array.size == 1)
-                        then ( contentsRoot.array.first else defaultRoot)
-                        else defaultRoot;
+    shared VirtualFile moduleRoot {
+        value defaultRoot = getDefaultRoot();
+        if (exists mmr = ModuleRootManager.getInstance(ideaModule),
+            mmr.contentRoots.size == 1) {
+            return mmr.contentRoots[0] else defaultRoot;
+        }
+        else {
+            return defaultRoot;
+        }
+    }
 
     shared actual File rootDirectory
             => VfsUtilCore.virtualToIoFile(moduleRoot);
@@ -351,7 +354,6 @@ shared class IdeaCeylonProject(ideArtifact, model)
                 }
             } else {
                 // TODO : if we keep the old output folder, remove the "Derived flag"
-
             }
         }
     }
