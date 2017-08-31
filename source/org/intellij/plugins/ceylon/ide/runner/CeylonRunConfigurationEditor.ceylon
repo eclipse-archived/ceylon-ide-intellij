@@ -56,11 +56,10 @@ class CeylonRunConfigurationEditor(Project project)
         myCeylonModule = TextFieldWithBrowseButton((e) {
             value dialog = ModuleChooserDialog(project);
             dialog.show();
-            if (dialog.ok) {
-                if (is IdeaModule mod = dialog.selectedModule) {
-                    myCeylonModule.setText(mod.nameAsString);
-                    myIdeModule.selectedModule = mod.ceylonProject?.ideArtifact;
-                }
+            if (dialog.ok,
+                is IdeaModule mod = dialog.selectedModule) {
+                myCeylonModule.setText(mod.nameAsString);
+                myIdeModule.selectedModule = mod.ceylonProject?.ideArtifact;
             }
         });
 
@@ -78,11 +77,9 @@ class CeylonRunConfigurationEditor(Project project)
             if (exists mod = findModuleByName(myCeylonModule.text)) {
                 value dialog = RunnableChooserDialog(project, mod);
                 dialog.show();
-                if (dialog.ok) {
-                    value decl = dialog.selectedDeclaration;
-                    if (exists decl) {
-                        myRunnableName.setText(decl.qualifiedNameString);
-                    }
+                if (dialog.ok,
+                    exists decl = dialog.selectedDeclaration) {
+                    myRunnableName.setText(decl.qualifiedNameString);
                 }
             }
         });
