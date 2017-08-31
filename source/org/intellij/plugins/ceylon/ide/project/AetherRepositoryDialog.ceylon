@@ -3,6 +3,9 @@ import com.intellij.openapi.ui {
     ValidationInfo
 }
 
+import java.awt {
+    Component
+}
 import java.io {
     File
 }
@@ -10,14 +13,11 @@ import java.io {
 import org.intellij.plugins.ceylon.ide {
     CeylonBundle
 }
-import java.awt {
-    Component
-}
 
 shared class AetherRepositoryDialog(Component parent)
         extends DialogWrapper(parent, false) {
 
-    value form = AetherRepositoryForm();
+    value form = CeylonAetherRepositoryForm();
 
     init();
     title = CeylonBundle.message("project.wizard.repo.maven.title");
