@@ -8,7 +8,6 @@ import com.intellij.execution.actions {
 import com.intellij.execution.configurations {
     ConfigurationFactory,
     RunConfigurationModule,
-    RunProfileState,
     JavaCommandLineState,
     JavaParameters,
     ModuleBasedConfiguration,
@@ -24,7 +23,6 @@ import com.intellij.openapi.extensions {
     }
 }
 import com.intellij.openapi.\imodule {
-    Module,
     ModuleManager
 }
 import com.intellij.openapi.project {
@@ -65,13 +63,10 @@ import java.io {
     File
 }
 import java.lang {
-    ObjectArray,
-    overloaded
+    ObjectArray
 }
 import java.util {
-    Arrays,
-    Collection,
-    Objects
+    Arrays
 }
 
 import org.intellij.plugins.ceylon.ide.model {
@@ -107,8 +102,7 @@ shared class CeylonRunConfigurationProducer(ConfigurationType? configurationType
                 !exists parent = getTopMostElement(toplevel, ceylonNode),
                 exists methodIdentifier = ceylonNode.identifier) {
                 value identifier = methodIdentifier.text;
-                value cu = file.compilationUnit;
-                if (exists pkg = cu.unit?.\ipackage,
+                if (exists pkg = file.compilationUnit.unit?.\ipackage,
                     is IdeaModule mod = pkg.\imodule) {
                     value moduleName = mod.nameAsString;
                     value packageName = pkg.nameAsString;
@@ -147,18 +141,19 @@ shared class CeylonRunConfigurationProducer(ConfigurationType? configurationType
         }
     }
 
-    function configParams(CeylonRunConfiguration rc) {
-        value full = rc.topLevelNameFull;
+    function configParams(CeylonRunConfiguration config) {
+        value full = config.topLevelNameFull;
         value dot = full.lastIndexOf(".");
         return RunConfigParams {
-            mod = rc.ceylonModule;
+            mod = config.ceylonModule;
             topLevel = dot<0 then full else full[dot+1...];
             pkg = dot<0 then "" else full[0:dot];
-            backend = rc.backend;
+            backend = config.backend;
         };
     }
 
-    shared actual Boolean isConfigurationFromContext(CeylonRunConfiguration rc, ConfigurationContext context) {
+    shared actual Boolean isConfigurationFromContext(
+            CeylonRunConfiguration rc, ConfigurationContext context) {
         if (exists loc = context.location,
             exists params = getRunConfigParams(loc.psiElement)) {
             return params == configParams(rc);
@@ -170,13 +165,15 @@ shared class CeylonRunConfigurationProducer(ConfigurationType? configurationType
 
     Backend? findBackend(Tree.Declaration declaration, IdeaModule mod) {
         value backends
-                = if (exists model = declaration.declarationModel, !model.nativeBackends.none())
-                then declaration.declarationModel.nativeBackends
+                = if (exists model = declaration.declarationModel,
+                        !model.nativeBackends.none())
+                then model.nativeBackends
                 else mod.nativeBackends;
         return
-            if (backends.none() || backends.supports(Backend.java))
-            then Backend.\iJava
-            else if (backends.supports(Backend.javaScript)) then Backend.javaScript else null;
+            if (backends.none()) then Backend.java
+            else if (backends.supports(Backend.java)) then Backend.java
+            else if (backends.supports(Backend.javaScript)) then Backend.javaScript
+            else null;
     }
 
     CeylonCompositeElement? getTopMostElement(CeylonPsi.DeclarationPsi toplevel, Tree.Declaration ceylonNode) {
@@ -203,8 +200,13 @@ shared class CeylonRunConfigurationProducer(ConfigurationType? configurationType
 
 
 shared class CeylonRunConfiguration
-        (String name, RunConfigurationModule configurationModule, ConfigurationFactory factory)
-        extends ModuleBasedConfiguration<RunConfigurationModule>(name, configurationModule, factory) {
+        (name, configurationModule, factory)
+        extends ModuleBasedConfiguration<RunConfigurationModule>
+                (name, configurationModule, factory) {
+
+    String name;
+    RunConfigurationModule configurationModule;
+    ConfigurationFactory factory;
 
     shared variable String ceylonModule = "";
     shared variable String topLevelNameFull = "";
@@ -213,14 +215,11 @@ shared class CeylonRunConfiguration
 
     shared variable Backend backend = Backend.java;
 
-    shared actual Collection<Module> validModules {
-        value modules = ModuleManager.getInstance(project).modules;
-        return Arrays.asList(*modules);
-    }
+    validModules => Arrays.asList(*ModuleManager.getInstance(project).modules);
 
     configurationEditor => CeylonRunConfigurationEditor(project);
 
-    shared actual RunProfileState getState(Executor executor, ExecutionEnvironment env)
+    getState(Executor executor, ExecutionEnvironment env)
             => object extends JavaCommandLineState(env) {
 
                 String ceylonModuleOrDft {
@@ -240,10 +239,17 @@ shared class CeylonRunConfiguration
                         then ModuleRootManager.getInstance(mod).sdk
                         else ProjectRootManager.getInstance(configurationModule.project).projectSdk;
 
+                String bootstrapJarPath {
+                    value bootstrapJar
+                            = File(CeylonIdePlugin.embeddedCeylonDist,
+                                FileUtil.join("lib", "ceylon-bootstrap.jar"));
+                    assert (bootstrapJar.\iexists() && !bootstrapJar.directory);
+                    return bootstrapJar.absolutePath;
+                }
+
                 shared actual JavaParameters createJavaParameters() {
-                    value projectJdk = projectSdk;
                     value params = JavaParameters();
-                    params.jdk = projectJdk;
+                    params.jdk = projectSdk;
                     value repoDir = CeylonIdePlugin.embeddedCeylonRepository.absolutePath;
                     params.vmParametersList.add("-Dceylon.system.repo=" + repoDir);
                     params.vmParametersList.addParametersString(vmOptions);
@@ -258,14 +264,6 @@ shared class CeylonRunConfiguration
                     params.programParametersList.add(ceylonModuleOrDft);
                     params.programParametersList.addParametersString(arguments);
                     return params;
-                }
-
-                String bootstrapJarPath {
-                    value bootstrapJar
-                            = File(CeylonIdePlugin.embeddedCeylonDist,
-                                    FileUtil.join("lib", "ceylon-bootstrap.jar"));
-                    assert (bootstrapJar.\iexists() && !bootstrapJar.directory);
-                    return bootstrapJar.absolutePath;
                 }
 
             };
@@ -311,8 +309,8 @@ shared class CeylonRunConfigurationType() satisfies ConfigurationType {
 
     id => "CeylonRunConfiguration";
 
-    configurationFactories
-            => ObjectArray<ConfigurationFactory>.with { CeylonFactory(this) };
+    shared actual late ObjectArray<ConfigurationFactory> configurationFactories
+            = ObjectArray<ConfigurationFactory>.with { CeylonFactory(this) };
 
 }
 

@@ -19,6 +19,9 @@ import org.intellij.plugins.ceylon.ide.model {
     IdeaModule,
     getCeylonProjects
 }
+import com.redhat.ceylon.common {
+    Backend
+}
 
 class CeylonRunConfigurationEditor(Project project)
         extends AbstractCeylonRunConfigurationEditor(project) {
@@ -41,7 +44,9 @@ class CeylonRunConfigurationEditor(Project project)
         config.arguments = myArguments.text;
         config.vmOptions = myVmOptions.text;
         config.configurationModule.\imodule = myIdeModule.selectedModule;
-        config.backend = myBackend.model.getElementAt(myBackend.selectedIndex);
+        config.backend
+            = myBackend.model.getElementAt(myBackend.selectedIndex)
+            else Backend.java;
     }
 
     createEditor() => myPanel;
