@@ -88,7 +88,13 @@ public class SpecifierStatementPsiIdOwner extends CeylonPsiImpl.SpecifierStateme
                         "Local scope not added in getUseScope() because the file "
                                 + getContainingFile()
                                 + " is not typechecked and up-to-date");
-                throw platformUtils_.get_().newOperationCanceledException();
+                Exception e = platformUtils_.get_().newOperationCanceledException();
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+                else {
+                    throw new RuntimeException(e);
+                }
             }
 
             if (isInSourceArchive_.isInSourceArchive(ceylonFile.realVirtualFile())) {
