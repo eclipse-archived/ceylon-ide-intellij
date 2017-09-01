@@ -10,19 +10,21 @@ import java.util {
     ResourceBundle
 }
 
-import org.jetbrains.annotations {
-    propertyKey
-}
-
 shared class CeylonBundle {
 
-    static late Reference<ResourceBundle> bundleRef
-            = SoftReference(ResourceBundle.getBundle("messages.CeylonBundle"));
+    static variable SoftReference<ResourceBundle>? bundleRef = null;
 
-    shared static String message(
-            propertyKey { resourceBundle = "messages.CeylonBundle"; } String key,
-            Object* params)
-            => CommonBundle.message(bundleRef.get(), key, params);
+    shared static String message(String key, Object* params) {
+        ResourceBundle bundle;
+        if (exists cached = bundleRef?.get()) {
+            bundle =  cached;
+        }
+        else {
+            bundle = ResourceBundle.getBundle("messages.CeylonBundle");
+            bundleRef = SoftReference(bundle);
+        }
+        return CommonBundle.message(bundle, key, params);
+    }
 
     new () {}
 
