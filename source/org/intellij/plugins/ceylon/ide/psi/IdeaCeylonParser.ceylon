@@ -31,9 +31,6 @@ import com.redhat.ceylon.ide.common.typechecker {
 import java.io {
     StringReader
 }
-import java.lang {
-    RuntimeException
-}
 import java.lang.ref {
     WeakReference
 }
@@ -195,12 +192,8 @@ shared  class IdeaCeylonParser(Language language)
             }
 
             return root;
-        } catch (RuntimeException re) {
-            if (is RecognitionException cause = re.cause) {
-                cause.printStackTrace();
-            } else {
-            throw re;
-            }
+        } catch (RecognitionException re) {
+            re.cause?.printStackTrace();
         }
         return null;
     }

@@ -79,8 +79,7 @@ import com.redhat.ceylon.model.typechecker.model {
 }
 
 import java.lang {
-    Thread,
-    RuntimeException
+    Thread
 }
 import java.util {
     List
@@ -200,7 +199,7 @@ shared class CeylonLocalAnalyzer(VirtualFile virtualFile, Project ideaProject)
                 typecheckingTask();
             } catch(ProcessCanceledException e) {
                 if (!cancelledToRestart_) {
-                    logger.debugThrowable(RuntimeException(e), 
+                    logger.debugThrowable(e,
                         ()=>"Typechecking task `` taskId `` received a cancellation exception during its run
                                  => Submitting a new one with delay `` delayToRetryCancelledLocalAnalysis ``");
                     // The local typechecking was cancelled because external conditions made it impossible

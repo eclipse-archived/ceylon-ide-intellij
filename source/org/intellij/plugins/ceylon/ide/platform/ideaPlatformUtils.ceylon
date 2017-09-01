@@ -16,7 +16,6 @@ import com.redhat.ceylon.model.loader {
 }
 
 import java.lang {
-    RuntimeException,
     Types
 }
 
@@ -70,7 +69,7 @@ shared object ideaPlatformUtils satisfies IdeUtils {
             => exception is IndexNotReadyException | ConcurrencyError;
 
     class OperationCanceledException(String message)
-            extends RuntimeException(message) {
+            extends Exception(message) {
     }
     
     pluginClassLoader => Types.classForInstance(this).classLoader;
