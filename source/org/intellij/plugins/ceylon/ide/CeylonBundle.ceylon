@@ -3,7 +3,6 @@ import com.intellij {
 }
 
 import java.lang.ref {
-    Reference,
     SoftReference
 }
 import java.util {

@@ -193,24 +193,23 @@ shared class CeylonDocProvider() extends AbstractDocumentationProvider() {
                     else navigationElement;
             
             //special case for Navigate > Class
-            if (is CeylonPsi.DeclarationPsi sourcePsiElement) {
-                if (exists phasedUnit = phasedUnit(sourcePsiElement),
-                    exists node = sourcePsiElement.ceylonNode) {
+            if (is CeylonPsi.DeclarationPsi sourcePsiElement,
+                exists phasedUnit = phasedUnit(sourcePsiElement),
+                exists node = sourcePsiElement.ceylonNode) {
     
-                    return generator.getDocumentationText {
-                        rootNode = phasedUnit.compilationUnit;
-                        model = node.declarationModel;
-                        node = node;
-                        cmp = generator.DocParams(phasedUnit, element.project);
-                    };
-                }
+                return generator.getDocumentationText {
+                    rootNode = phasedUnit.compilationUnit;
+                    model = node.declarationModel;
+                    node = node;
+                    cmp = generator.DocParams(phasedUnit, element.project);
+                };
             }
 
         }
+        catch (ProcessCanceledException e) {
+            throw e;
+        }
         catch (AssertionError|Exception e) {
-            if (is ProcessCanceledException e) {
-                throw e;
-            }
             e.printStackTrace();
         }
 
