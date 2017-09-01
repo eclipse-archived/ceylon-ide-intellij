@@ -311,7 +311,7 @@ shared  class IdeaCeylonParser(Language language)
 //            value visitor = OrderedChildrenVisitor();
 //            try {
 //                that.visitChildren(visitor);
-//            } catch (Exception e) {
+//            } catch (e) {
 //                that.handleException(e, visitor);
 //            }
 //

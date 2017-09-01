@@ -65,7 +65,7 @@ class CeylonClsStubBuilder() extends ClsStubBuilder() {
             }
             return stub;
         }
-        catch (Exception e) {
+        catch (e) {
             throw ClsFormatException(file.path + ": " + e.message, e);
         }
     }

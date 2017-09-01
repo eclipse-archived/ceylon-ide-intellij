@@ -94,7 +94,7 @@ shared class MutableLocalAnalysisResult(
                             ! (cu === parsedRootNode)) {
                             platformUtils.log(Status._WARNING, "The typechecked phased unit future was already set with a different phased unit in `MutableLocalAnalysisResult.finishTypechecking()` !");
                         }
-                    } catch(Exception e) {}
+                    } catch(e) {}
                 }
             });
         } else {
@@ -142,7 +142,7 @@ shared class MutableLocalAnalysisResult(
             if (phasedUnitWhenTypechecked.done) {
                 try {
                     return phasedUnitWhenTypechecked.get();
-                } catch(Exception e) {
+                } catch(e) {
                 }
             }
             return initialLastPhasedUnit;

@@ -233,7 +233,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
             try {
                 phasedUnitFuture.get(timeout, unit);
                 return analysisResult;
-            } catch (Exception e) {
+            } catch (e) {
                 // We could check for ControlFlowExceptions if we didn't have to support Android Studio 2.1
                 if (is ProcessCanceledException realException = e) {
                     throw realException;
@@ -458,7 +458,7 @@ shared class CeylonFile(FileViewProvider viewProvider)
                 }
             }
             return resultFuture.get(timeout, unit);
-        } catch (Exception e) {
+        } catch (e) {
             // We could check for ControlFlowExceptions if we didn't have to support Android Studio 2.1
             if (is ProcessCanceledException realException = e) {
                 throw realException;

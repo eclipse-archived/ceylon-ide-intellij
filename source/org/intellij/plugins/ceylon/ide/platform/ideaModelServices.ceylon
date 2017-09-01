@@ -87,7 +87,7 @@ shared object ideaModelServices satisfies ModelServices<Module, VirtualFile, Vir
             value path = dir.removeInitial("./").split('/'.equals);
             return VfsUtil.findRelativeFile(ceylonProject.moduleRoot, *path);
         }
-        catch (Exception e) {
+        catch (e) {
             return null;
         }
     }

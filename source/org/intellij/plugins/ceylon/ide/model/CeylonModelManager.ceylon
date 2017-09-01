@@ -374,7 +374,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
 //                automaticModelUpdateEnabled_ = false;
                 try {
                     buildProgressIndicator.get()?.cancel();
-                } catch(Exception e) {
+                } catch(e) {
                     logger.warnThrowable(e, () => "Error when trying to cancel a timed-out model update");
                 }
                 /*Notification(
@@ -492,7 +492,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                                                 deltas.childrenDeltas.empty) {
                                                 shouldCancel = true;
                                             }
-                                        } catch(Exception e) {
+                                        } catch(e) {
                                         } catch(AssertionError e) {
                                             e.printStackTrace();
                                         } catch(Error e) {

@@ -158,7 +158,7 @@ shared class CeylonLanguageCodeStyleSettingsProvider()
                        for (l in r) {
                            print(l);
                        }
-                   } catch (Exception e) {
+                   } catch (e) {
                        e.printStackTrace();
                    }
                    print({ "Here", "have", "an", "iterable", "enumeration" });

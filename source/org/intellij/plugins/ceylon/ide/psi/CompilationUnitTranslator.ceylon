@@ -169,7 +169,7 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
         try {
             that.visitChildren(visitor);
         }
-        catch (Exception e) {
+        catch (e) {
             that.handleException(e, visitor);
         }
 
