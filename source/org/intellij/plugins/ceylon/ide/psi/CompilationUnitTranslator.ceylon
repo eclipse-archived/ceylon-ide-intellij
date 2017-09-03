@@ -149,7 +149,7 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
     shared actual void visitAny(Node that) {
         value type = NodeToIElementTypeMap.get(that);
         if (!exists type) {
-            logger.error("Unknown IElementType for ``that`` in ``that.unit.fullPath``");
+            logger.error("Unknown IElementType for ``that`` in ``that.unit?.fullPath else ""``");
             return;
         }
 
