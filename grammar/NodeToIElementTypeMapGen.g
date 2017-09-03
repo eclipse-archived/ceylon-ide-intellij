@@ -30,6 +30,7 @@ nodeList : {
             println("    static {");
             println("        map.put(CustomTree.ExtendedTypeExpression.class, CeylonTypes.EXTENDED_TYPE_EXPRESSION);");
             println("        map.put(CustomTree.IsCase.class, CeylonTypes.IS_CASE);");
+            println("        map.put(CustomTree.MatchCase.class, CeylonTypes.MATCH_CASE);");
             println("        map.put(CustomTree.GuardedVariable.class, CeylonTypes.GUARDED_VARIABLE);");
            }
            (nodeDescription? node)+ 
