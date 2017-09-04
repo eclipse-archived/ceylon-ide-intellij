@@ -42,7 +42,7 @@ shared class CeylonSyntaxAnnotator()
     variable AnnotationHolder? holder = null;
 
     value docLinkPattern = Pattern.compile("""\[\[([^\]\[]*)\]\]""");
-    value escapePattern = Pattern.compile("""\\[^{]|\\\{[^}]*\}""");
+    value escapePattern = Pattern.compile("""\\[^{]|\\\{[^}]*\}|^\)""");
     value codePattern = Pattern.compile("""`[^`]*`""");
 
     value annotationHolder {

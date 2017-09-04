@@ -8,7 +8,8 @@ import com.intellij.psi.tree {
     IElementType
 }
 import com.redhat.ceylon.compiler.typechecker.parser {
-    CeylonLexer
+    CeylonLexer,
+    CeylonInterpolatingLexer
 }
 
 import java.lang {
@@ -19,7 +20,8 @@ import org.antlr.runtime {
     ANTLRStringStream,
     CommonToken,
     Lexer,
-    RecognitionException
+    RecognitionException,
+    TokenSource
 }
 import org.intellij.plugins.ceylon.ide.psi {
     TokenTypes
@@ -28,7 +30,7 @@ import org.intellij.plugins.ceylon.ide.psi {
 shared class CeylonAntlrToIntellijLexerAdapter() extends LexerBase() {
 
     variable late CharSequence buffer;
-    variable late Lexer lexer;
+    variable late TokenSource lexer;
     
     variable Integer endOffset = -1;
     variable CommonToken? myToken = null;
@@ -46,12 +48,12 @@ shared class CeylonAntlrToIntellijLexerAdapter() extends LexerBase() {
         lastTokenEnd = - 1;
         tokenAfterLastError = null;
         String textFragment = buffer.subSequence(startOffset, endOffset).string;
-        lexer = object extends CeylonLexer(ANTLRStringStream(textFragment)) {
+        lexer = CeylonInterpolatingLexer(object extends CeylonLexer(ANTLRStringStream(textFragment)) {
             shared actual void reportError(RecognitionException e) {
                 super.reportError(e);
                 needsRecover = true;
             }
-        };
+        });
         myToken = null;
     }
 
