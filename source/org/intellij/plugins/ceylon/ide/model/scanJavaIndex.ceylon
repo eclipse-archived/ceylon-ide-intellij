@@ -172,6 +172,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
             if (cls.\iinterface) {
                 lightModel = object extends Interface() satisfies FakeCompletionDeclaration {
+                    modelClass => Types.classForType<Interface>();
+
                     variable Interface? lazyRealIntf = langNull;
 
                     function computeRealIntf() {
@@ -205,6 +207,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
             } else if (modifiers.findAnnotation(ceylonMethodAnnotation) exists) {
                 lightModel = object extends Function() satisfies FakeCompletionDeclaration {
+                    modelClass => Types.classForType<Function>();
+
                     variable Function? lazyRealFunction = langNull;
 
                     function computeRealFunction() {
@@ -236,6 +240,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             } else if (modifiers.findAnnotation(ceylonObjectAnnotation) exists
                         || modifiers.findAnnotation(ceylonAttributeAnnotation) exists) {
                 lightModel = object extends Value() satisfies FakeCompletionDeclaration {
+                    modelClass => Types.classForType<Value>();
+
                     variable Value? lazyRealValue = langNull;
 
                     function computeRealValue() {
@@ -260,6 +266,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 };
             } else if (modifiers.findAnnotation(ceylonTypeAliasAnnotation) exists) {
                 lightModel = object extends TypeAlias() satisfies FakeCompletionDeclaration {
+                    modelClass => Types.classForType<TypeAlias>();
+
                     variable TypeAlias? lazyRealAlias = langNull;
 
                     function computeRealAlias() {
@@ -288,6 +296,8 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
                 };
             } else {
                 lightModel = object extends Class() satisfies FakeCompletionDeclaration {
+                    modelClass => Types.classForType<Class>();
+
                     variable Class? lazyRealClass = langNull;
 
                     function computeRealClass() {
