@@ -373,6 +373,10 @@
             <category>Ceylon/Syntax</category>
         </intentionAction>
         <intentionAction>
+            <className>org.intellij.plugins.ceylon.ide.correct.AddStaticImportIntention</className>
+            <category>Ceylon/Syntax</category>
+        </intentionAction>
+        <intentionAction>
             <className>org.intellij.plugins.ceylon.ide.correct.AssignToFieldIntention</className>
             <category>Ceylon/Declaration</category>
         </intentionAction>
