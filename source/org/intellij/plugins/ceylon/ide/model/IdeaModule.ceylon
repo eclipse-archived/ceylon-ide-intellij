@@ -98,23 +98,25 @@ shared class IdeaModule(
 
         if ("java.base" in transitiveDependencies.map(CeylonModule.nameAsString)) {
             value arrays = [
-                "ObjectArray" -> Unit.javaObjectArrayDeclaration,
-                "BooleanArray" -> Unit.javaBooleanArrayDeclaration,
-                "ByteArray" -> Unit.javaByteArrayDeclaration,
-                "ShortArray" -> Unit.javaShortArrayDeclaration,
-                "IntArray" -> Unit.javaIntArrayDeclaration,
-                "LongArray" -> Unit.javaLongArrayDeclaration,
-                "FloatArray" -> Unit.javaFloatArrayDeclaration,
-                "DoubleArray" -> Unit.javaDoubleArrayDeclaration,
-                "CharArray" -> Unit.javaCharArrayDeclaration
+                "ObjectArray" -> unit.javaObjectArrayDeclaration,
+                "BooleanArray" -> unit.javaBooleanArrayDeclaration,
+                "ByteArray" -> unit.javaByteArrayDeclaration,
+                "ShortArray" -> unit.javaShortArrayDeclaration,
+                "IntArray" -> unit.javaIntArrayDeclaration,
+                "LongArray" -> unit.javaLongArrayDeclaration,
+                "FloatArray" -> unit.javaFloatArrayDeclaration,
+                "DoubleArray" -> unit.javaDoubleArrayDeclaration,
+                "CharArray" -> unit.javaCharArrayDeclaration,
+                "Types" -> unit.javaLangPackage?.getMember("Types", null, false),
+                "overloaded" -> unit.javaLangPackage?.getMember("overloaded", null, false)
             ];
 
             value matcher = CamelHumpMatcher(startingWith);
 
-            for (name -> getter in arrays) {
+            for (name -> declaration in arrays) {
                 if (matcher.isStartMatch(name)) {
                     proposals[nativeString("java.lang." + name)]
-                        = DeclarationWithProximity(getter(unit), proximity+4);
+                        = DeclarationWithProximity(declaration, proximity+4);
                 }
             }
         }
