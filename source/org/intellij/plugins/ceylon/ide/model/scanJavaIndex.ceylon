@@ -102,7 +102,11 @@ String[] ignoredTypes = [
     "java.lang.Object",
     "java.lang.Exception",
     "java.lang.Throwable",
-    "java.lang.annotation.Annotation"
+    "java.lang.annotation.Annotation",
+    "java.lang.annotation.Retention",
+    "java.lang.annotation.Target",
+    "java.lang.Override",
+    "java.lang.Deprecated"
 ];
 
 Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
@@ -142,9 +146,6 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
         function findOrCreateDeclaration(PsiClass cls, PsiModifierList modifiers, Package pkg) {
 
-            if (!pkg.shared) {
-                return null;
-            }
             if (cls.containingClass exists) {
                 return null;
             }
@@ -162,9 +163,6 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
             value clsName = findName(cls);
             if (!exists clsName) {
-                return null;
-            }
-            if (ignored(cls)) {
                 return null;
             }
 
@@ -375,10 +373,12 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
         if (exists modifiers = cls.modifierList,
             modifiers.hasExplicitModifier(PsiModifier.public),
             is PsiClassOwner file = cls.containingFile,
-            exists pkg = moduleManager.modelLoader.findPackage(file.packageName)) {
+            exists pkg = moduleManager.modelLoader.findPackage(file.packageName),
+            pkg.shared && !ignored(cls)) {
 
             if (exists lightModel = findOrCreateDeclaration(cls, modifiers, pkg),
                 exists qname = cls.qualifiedName) {
+
                 result[nativeString(qname)]
                     = DeclarationWithProximity(lightModel,
                         getUnimportedProximity(proximity, pkg.languagePackage, lightModel.name),
@@ -454,7 +454,7 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
 
                 visited.add(mod);
 
-                if (jdkProvider.isJDKModule(mod.nameAsString),
+                if (jdkProvider.isJDKModule(mod.nameAsString) &&
                     jdkProvider.isJDKPackage(mod.nameAsString, pkg)) {
 
                     // makes sure the LazyPackage exists because it will be used later
@@ -482,9 +482,11 @@ Proposals scanJavaIndex(IdeaModule that, Unit sourceUnit,
             => str[0..0].lowercased + str[1...];
 
         prefixMatches(String name)
-                => (name[0..0]==startingWith[0..0] && super.prefixMatches(name))
+                => name[0..0]==startingWith[0..0]
+                    && super.prefixMatches(name)
                 // for Java annotations
-                || (name[0..0].lowercased==startingWith[0..0] && super.prefixMatches(uncapitalize(name)));
+                || name[0..0].lowercased==startingWith[0..0]
+                    && super.prefixMatches(uncapitalize(name));
 
     }, mod.project, scope, processor);
 //    print("processed Java index in ``system.milliseconds - before``ms => ``result.size()`` results");
