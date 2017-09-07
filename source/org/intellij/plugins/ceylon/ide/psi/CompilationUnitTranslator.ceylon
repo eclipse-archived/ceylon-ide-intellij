@@ -34,13 +34,9 @@ import com.redhat.ceylon.compiler.typechecker.tree {
 
 import java.lang {
     IntArray,
-    UnsupportedOperationException,
-    Types
-}
-
-import org.antlr.runtime {
-    CommonToken,
-    Token
+    Types {
+        nativeString
+    }
 }
 import java.util {
     List,
@@ -48,6 +44,11 @@ import java.util {
     LinkedList,
     ArrayList,
     Collections
+}
+
+import org.antlr.runtime {
+    CommonToken,
+    Token
 }
 
 Logger logger = Logger.getInstance(`IdeaCeylonParser`);
@@ -128,15 +129,15 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
                     token = token;
                 });
             }
-            if (verbose && !parserConstants.nodesAllowedAtEof.contains(token.type)) {
+            if (verbose && !token.type in parserConstants.nodesAllowedAtEof) {
                 logger.error("Unexpected token ``token`` in ``file.name``");
             }
         }
 
         value parentAndFileTextLength = IntArray(2);
         ApplicationManager.application.runReadAction(() {
-            parentAndFileTextLength.set(0, parent.textLength);
-            parentAndFileTextLength.set(1, file.textLength);
+            parentAndFileTextLength[0] = parent.textLength;
+            parentAndFileTextLength[1] = file.textLength;
         });
         value parentTextLength = parentAndFileTextLength[0];
         value fileTextLength = parentAndFileTextLength[1];
@@ -199,7 +200,7 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
                         token = toRemove;
                     });
                     if (verbose) {
-                        print("t \"" + toRemove.text + "\"");
+                        print("t \"``toRemove.text``\"");
                     }
                     index += getTokenLength(toRemove);
                 }
@@ -235,30 +236,13 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
             else TokenUtil.fromInt(idx);
 
     TreeElement buildLeaf(Node? ceylonNode, IElementType type, Token token) {
-        String tokenText;
-        value txt = token.text;
-        if (Types.nativeString(txt).length() != getTokenLength(token)) {
-            switch (token.type)
-            case (CeylonLexer.pidentifier
-                | CeylonLexer.aidentifier
-                | CeylonLexer.lidentifier) {
-                tokenText = "\\i" + txt;
-            }
-            else case (CeylonLexer.uidentifier) {
-                tokenText = "\\I" + txt;
-            }
-            else case (CeylonLexer.eof) {
-                tokenText = "";
-            }
-            else {
-                throw UnsupportedOperationException("Unsupported token type ``token``");
-            }
-        }
-        else {
-            tokenText = txt;
-        }
 
-        if (parserConstants.leavesToWrap.contains(type)) {
+        value tokenText
+                = nativeString(token.text).length()
+                    == getTokenLength(token)
+                then token.text else "";
+
+        if (type in parserConstants.leavesToWrap) {
             value comp = CompositeElement(type);
             value leaf = LeafPsiElement(TokenUtil.fromInt(token.type), tokenText);
             comp.rawAddChildrenWithoutNotifications(leaf);
@@ -314,7 +298,7 @@ shared class CompilationUnitTranslator(PsiFile file, Boolean verbose)
     Integer getTokenLength(Token token)
             => if (is CommonToken token)
             then token.stopIndex - token.startIndex + 1
-            else Types.nativeString(token.text).length();
+            else nativeString(token.text).length();
 
     class OrderedChildrenVisitor() extends Visitor() {
 
