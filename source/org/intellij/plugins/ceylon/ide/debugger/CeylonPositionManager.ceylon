@@ -161,7 +161,7 @@ class CeylonPositionManager(DebugProcess process) extends PositionManagerEx() {
         checkCeylonFile(position);
 
         if (is CeylonFile file = position.file,
-            exists doc = file.viewProvider.document,
+            exists doc = needReadAccess(() => file.viewProvider.document),
             exists location = getFirstValidLocation {
                 rootNode = needReadAccess(() => file.compilationUnit);
                 document = IdeaDocument(doc);
