@@ -1,7 +1,7 @@
 import com.redhat.ceylon.ide.common.correct {
-    convertToNamedArgumentsQuickFix,
     addStaticImportQuickFix
 }
+
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile
 }
