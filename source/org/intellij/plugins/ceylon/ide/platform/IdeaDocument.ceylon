@@ -8,8 +8,10 @@ import com.redhat.ceylon.ide.common.platform {
     CommonDocument
 }
 
-shared class IdeaDocument(shared Document nativeDocument) 
+shared class IdeaDocument(nativeDocument)
         satisfies CommonDocument {
+
+    shared Document nativeDocument;
     
     getLineOfOffset(Integer offset) 
             => nativeDocument.getLineNumber(offset);
