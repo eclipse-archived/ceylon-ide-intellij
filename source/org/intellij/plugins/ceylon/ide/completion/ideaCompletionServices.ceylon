@@ -127,7 +127,13 @@ shared object ideaCompletionServices satisfies CompletionServices {
                             //a void named argument
                             return null;
                         }
-                        return (fullType then reference.fullType else reference.type)?.asString();
+                        else {
+                            value type =
+                                    fullType
+                                    then reference.fullType
+                                    else reference.type;
+                            return type?.asString();
+                        }
                     }
                     else {
                         //a regular refinement
