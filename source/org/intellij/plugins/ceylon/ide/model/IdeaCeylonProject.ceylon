@@ -391,12 +391,12 @@ shared class IdeaCeylonProject(ideArtifact, model)
     
     shared actual String systemRepository =>
             let (path = if (exists val = ideConfiguration.systemRepository, !val.empty) then val else null)
-            interpolateVariablesInRepositoryPath(path else "${ceylon.repo}");
+            interpolateVariablesInRepositoryPath(path else "\${ceylon.repo}");
     
     String interpolateVariablesInRepositoryPath(String repoPath) {
         value userHomePath = System.getProperty("user.home");
         value pluginRepoPath = CeylonIdePlugin.embeddedCeylonRepository.absolutePath;
-        return repoPath.replace("${user.home}", userHomePath).replace("${ceylon.repo}", pluginRepoPath);
+        return repoPath.replace("\${user.home}", userHomePath).replace("\${ceylon.repo}", pluginRepoPath);
     }
 
     shared actual void completeCeylonModelParsing(BaseProgressMonitorChild monitor) {}
