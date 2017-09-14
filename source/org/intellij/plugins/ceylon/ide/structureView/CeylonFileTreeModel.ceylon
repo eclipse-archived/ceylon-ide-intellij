@@ -9,21 +9,46 @@ import com.intellij.ide.structureView {
     StructureViewTreeElement,
     TextEditorBasedStructureViewModel
 }
+import com.intellij.ide.structureView.impl.common {
+    PsiTreeElementBase
+}
 import com.intellij.ide.structureView.impl.java {
     AccessLevelProvider,
     VisibilitySorter
+}
+import com.intellij.ide.util {
+    FileStructureFilter
 }
 import com.intellij.ide.util.treeView {
     AbstractTreeNode
 }
 import com.intellij.ide.util.treeView.smartTree {
-    ...
+    Group,
+    SortableTreeElement,
+    TreeElement,
+    Grouper,
+    ActionPresentationData,
+    Sorter,
+    Filter,
+    NodeProvider
 }
 import com.intellij.navigation {
     ItemPresentation
 }
+import com.intellij.openapi.actionSystem {
+    KeyboardShortcut,
+    Shortcut
+}
+import com.intellij.openapi.util {
+    SystemInfo
+}
 import com.intellij.psi.util {
     PsiUtil
+}
+import com.intellij.util {
+    PlatformIcons {
+        publicIcon
+    }
 }
 import com.redhat.ceylon.model.typechecker.model {
     ClassOrInterface
@@ -38,11 +63,11 @@ import java.lang {
     }
 }
 import java.util {
-    ...
-}
-
-import javax.swing {
-    ...
+    Collection,
+    Collections,
+    ArrayList,
+    HashMap,
+    Comparator
 }
 
 import org.intellij.plugins.ceylon.ide.psi {
@@ -55,9 +80,43 @@ class CeylonFileTreeModel(CeylonFile psiFile)
         satisfies StructureViewModel.ElementInfoProvider
                 & StructureViewModel.ExpandInfoProvider {
 
-    class SupertypesGrouper() satisfies Grouper {
+    class SupertypeGroup(ClassOrInterface type)
+            satisfies Group
+                    & ItemPresentation
+                    & AccessLevelProvider
+                    & SortableTreeElement {
 
-        Boolean isParentGrouped(AbstractTreeNode<out Anything>? parent) {
+        value list = ArrayList<TreeElement>();
+
+        shared void add(TreeElement element)
+                => list.add(element);
+
+        presentation => this;
+
+        presentableText => type.name;
+
+        locationString => "";
+
+        getIcon(Boolean b)
+                => AllIcons.General.implementingMethod;
+
+        children => list;
+
+        accessLevel
+                => if (type.shared)
+        then PsiUtil.accessLevelPublic
+        else PsiUtil.accessLevelPrivate;
+
+        subLevel => 1;
+
+        alphaSortKey => " " + type.name;
+    }
+
+    object supertypesGrouper satisfies Grouper {
+
+        Boolean isParentGrouped(parent) {
+            AbstractTreeNode<out Anything>? parent;
+
             variable value current = parent;
             while (exists node = current) {
                 if (node.\ivalue is SupertypeGroup) {
@@ -68,8 +127,10 @@ class CeylonFileTreeModel(CeylonFile psiFile)
             return false;
         }
 
-        shared actual Collection<Group> group(AbstractTreeNode<out Object> parent,
-                Collection<TreeElement> collection) {
+        shared actual Collection<Group> group(parent, collection) {
+            AbstractTreeNode<out Object> parent;
+            Collection<TreeElement> collection;
+
             if (isParentGrouped(parent)) {
                 return Collections.emptyList<Group>();
             }
@@ -77,16 +138,15 @@ class CeylonFileTreeModel(CeylonFile psiFile)
             for (element in collection) {
                 //TODO: introduce a SupertypeGroupable interface!
                 value type = switch (element)
-                    case (is CeylonDeclarationTreeElement<out Anything>)
-                        element.type
-                    case (is CeylonSpecifierTreeElement)
-                        element.type
-                    else null;
+                case (is CeylonDeclarationTreeElement<out Anything>)
+                element.type
+                case (is CeylonSpecifierTreeElement)
+                element.type
+                else null;
                 if (exists type) {
                     if (exists group = map[type]) {
                         group.add(element);
-                    }
-                    else {
+                    } else {
                         value group = SupertypeGroup(type);
                         group.add(element);
                         map.put(type, group);
@@ -99,45 +159,14 @@ class CeylonFileTreeModel(CeylonFile psiFile)
 
         presentation
                 => ActionPresentationData(
-                    IdeBundle.message("action.structureview.group.methods.by.defining.type"),
-                    null, AllIcons.General.implementingMethod);
+            IdeBundle.message("action.structureview.group.methods.by.defining.type"),
+            null, AllIcons.General.implementingMethod);
 
         name => "SHOW_INTERFACES";
 
-        shared class SupertypeGroup(ClassOrInterface type)
-                satisfies Group
-                        & ItemPresentation
-                        & AccessLevelProvider
-                        & SortableTreeElement {
-
-            value list = ArrayList<TreeElement>();
-
-            shared void add(TreeElement element)
-                    => list.add(element);
-
-            presentation => this;
-
-            presentableText => type.name;
-
-            locationString => "";
-
-            getIcon(Boolean b)
-                    => AllIcons.General.\iImplementingMethod;
-
-            children => list;
-
-            accessLevel
-                    => if (type.shared)
-                    then PsiUtil.accessLevelPublic
-                    else PsiUtil.accessLevelPrivate;
-
-            subLevel => 1;
-
-            alphaSortKey => " " + type.name;
-        }
     }
 
-    class KindSorter() satisfies Sorter {
+    object kindSorter satisfies Sorter {
 
         shared actual object comparator satisfies Comparator<Object> {
 
@@ -145,15 +174,15 @@ class CeylonFileTreeModel(CeylonFile psiFile)
                 value i1 = o1 is CeylonImportTreeElement;
                 value i2 = o2 is CeylonImportTreeElement;
                 if (i1, !i2) {
-                    return - 1;
+                    return -1;
                 }
                 if (i2, !i1) {
                     return 1;
                 }
-                value g1 = o1 is SupertypesGrouper.SupertypeGroup;
-                value g2 = o2 is SupertypesGrouper.SupertypeGroup;
+                value g1 = o1 is SupertypeGroup;
+                value g2 = o2 is SupertypeGroup;
                 if (g1, !g2) {
-                    return - 1;
+                    return -1;
                 }
                 if (g2, !g1) {
                     return 1;
@@ -166,31 +195,54 @@ class CeylonFileTreeModel(CeylonFile psiFile)
 
         visible => false;
 
-        shared actual ActionPresentation presentation {
+        shared actual Nothing presentation {
             throw UnsupportedOperationException();
         }
 
         name => "KIND";
     }
 
-    value _nodeProviders
+    object unsharedDeclarationsFilter
+            satisfies FileStructureFilter {
+
+        isVisible(TreeElement treeNode)
+                => if (is PsiTreeElementBase<out Anything> treeNode,
+            is CeylonPsi.DeclarationPsi element = treeNode.element)
+        then element.ceylonNode.declarationModel.shared
+        else true;
+
+        reverted => false;
+
+        presentation => ActionPresentationData("Hide unshared declarations", null, publicIcon);
+
+        name => "CEYLON_HIDE_UNSHARED";
+
+        checkBoxText => "Hide unshared declarations";
+
+        shortcut = ObjectArray<Shortcut>.with {
+            KeyboardShortcut.fromString(SystemInfo.isMac then "meta U" else "control U")
+        };
+    }
+
+    nodeProviders
             = Collections.singletonList<NodeProvider<out TreeElement>>
                 (CeylonInheritedMembersNodeProvider());
-    value _sorters
-            = ObjectArray<Sorter>.with {
-                KindSorter(),
+
+    sorters = ObjectArray<Sorter>.with {
+                kindSorter,
                 VisibilitySorter.instance,
-                Sorter.alphaSorter };
-    value _classes
+                Sorter.alphaSorter
+            };
+
+    suitableClasses
             = ObjectArray<Class<out Object>>.with {
                 classForType<CeylonPsi.DeclarationPsi>(),
-                classForType<CeylonPsi.SpecifierStatementPsi>() };
-    value _filters
-            = ObjectArray<Filter>.with { UnsharedDeclarationsFilter() };
-    value _groupers
-            = ObjectArray<Grouper>.with { SupertypesGrouper() };
+                classForType<CeylonPsi.SpecifierStatementPsi>()
+            };
 
-    nodeProviders => _nodeProviders;
+    filters = ObjectArray<Filter>.with { unsharedDeclarationsFilter };
+
+    groupers = ObjectArray<Grouper>.with { supertypesGrouper };
 
     root => CeylonFileTreeElement(psiFile);
 
@@ -204,14 +256,6 @@ class CeylonFileTreeModel(CeylonFile psiFile)
             => !(element is CeylonImportListTreeElement);
 
     smartExpand => false;
-
-    filters => _filters;
-
-    suitableClasses => _classes;
-
-    sorters => _sorters;
-
-    groupers => _groupers;
 
     // TODO filters for inherited, fields, etc.
 }

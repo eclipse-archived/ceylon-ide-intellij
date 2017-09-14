@@ -179,8 +179,8 @@ class CeylonObjectTreeElement(CeylonPsi.ObjectDefinitionPsi psiElement, Boolean 
 
     shared actual List<StructureViewTreeElement> childrenBase {
         value children = ArrayList<StructureViewTreeElement>();
-        if (exists el = element) {
-            for (statement in el.ceylonNode.classBody.statements) {
+        if (exists el = element, exists body = el.ceylonNode?.classBody) {
+            for (statement in body.statements) {
                 switch (statement)
                 case (is Tree.Declaration) {
                     if (is CeylonFile file = el.containingFile,
@@ -189,11 +189,10 @@ class CeylonObjectTreeElement(CeylonPsi.ObjectDefinitionPsi psiElement, Boolean 
                     }
                 }
                 case (is Tree.SpecifierStatement) {
-                    value spec = PsiTreeUtil.getParentOfType(
+                    assert (exists spec = PsiTreeUtil.getParentOfType(
                         el.containingFile.findElementAt(statement.startIndex.intValue()),
                         `CeylonPsi.SpecifierStatementPsi`
-                    );
-                    assert(exists spec);
+                    ));
                     children.add(CeylonSpecifierTreeElement(spec));
                 }
                 else {}

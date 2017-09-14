@@ -1,5 +1,4 @@
 import com.intellij.ide.structureView {
-    StructureViewBuilder,
     TreeBasedStructureViewBuilder
 }
 import com.intellij.lang {
