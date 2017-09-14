@@ -103,9 +103,9 @@ class CeylonFileTreeModel(CeylonFile psiFile)
         children => list;
 
         accessLevel
-                => if (type.shared)
-        then PsiUtil.accessLevelPublic
-        else PsiUtil.accessLevelPrivate;
+                => type.shared
+                then PsiUtil.accessLevelPublic
+                else PsiUtil.accessLevelPrivate;
 
         subLevel => 1;
 

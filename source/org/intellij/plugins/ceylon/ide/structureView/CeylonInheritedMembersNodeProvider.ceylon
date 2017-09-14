@@ -66,26 +66,22 @@ class CeylonInheritedMembersNodeProvider()
         extends InheritedMembersNodeProvider<TreeElement>()
         satisfies CeylonContainerTreeElement {
 
-    shared actual Collection<TreeElement> provideNodes(TreeElement node) {
-        if (is PsiTreeElementBase<out Anything> node) {
-            if (is CeylonPsi.DeclarationPsi element = node.element) {
-                value declaration = element.ceylonNode;
-                if (exists type
+    provideNodes(TreeElement node)
+            =>  if (is PsiTreeElementBase<out Anything> node,
+                    is CeylonPsi.DeclarationPsi element = node.element,
+                    exists declaration = element.ceylonNode,
+                    exists type
                         = switch (declaration)
                         case (is Tree.ObjectDefinition)
                             declaration.declarationModel?.typeDeclaration
                         case (is Tree.ClassOrInterface)
                             declaration.declarationModel
-                        else null) {
-                    return scanMembers(element, declaration, type);
-                }
-                // else: Maybe the file hasn't been typechecked yet
-            }
-        }
-        return Collections.emptyList<TreeElement>();
-    }
+                        else null)
+            then scanMembers(element, declaration, type)
+            else Collections.emptyList<TreeElement>();
 
-    List<TreeElement> scanMembers(PsiElement element, Tree.Declaration declaration, TypeDeclaration type) {
+    List<TreeElement> scanMembers(PsiElement element,
+            Tree.Declaration declaration, TypeDeclaration type) {
         value elements = ArrayList<TreeElement>();
         value decls = type.getMatchingMemberDeclarations(declaration.unit, type, "", 0, null);
 
@@ -93,13 +89,18 @@ class CeylonInheritedMembersNodeProvider()
             for (decl in overloads(dwp.declaration)) {
                 if (!(decl is TypeParameter)) {
                     value unit = decl.unit;
-                    value file = if (unit.equals(declaration.unit))
-                    then element.containingFile
-                    else CeylonTreeUtil.getDeclaringFile(unit, element.project);
+                    value file =
+                            unit==declaration.unit
+                            then element.containingFile
+                            else CeylonTreeUtil.getDeclaringFile(unit, element.project);
 
                     if (is CeylonFile file) {
-                        Boolean inherited = type.isInherited(decl);
-                        if (exists treeElement = getTreeElement(file, decl, inherited)) {
+                        if (exists treeElement
+                                = getTreeElement {
+                                    myFile = file;
+                                    declaration = decl;
+                                    inherited = type.isInherited(decl);
+                                }) {
                             elements.add(treeElement);
                         }
                     } else {
@@ -144,12 +145,13 @@ class CeylonInheritedMembersNodeProvider()
                 return null;
             }
 
-            if (is Tree.Declaration node) {
-                return getTreeElementForDeclaration(myFile, node, inherited);
-            }
-            else {
-                return null;
-            }
+            return if (is Tree.Declaration node)
+                then getTreeElementForDeclaration {
+                    myFile = myFile;
+                    declaration = node;
+                    isInherited = inherited;
+                }
+                else null;
         });
     }
 }
