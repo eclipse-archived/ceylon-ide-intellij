@@ -137,12 +137,13 @@ class CeylonFileTreeModel(CeylonFile psiFile)
             value map = HashMap<ClassOrInterface,SupertypeGroup>();
             for (element in collection) {
                 //TODO: introduce a SupertypeGroupable interface!
-                value type = switch (element)
-                case (is CeylonDeclarationTreeElement<out Anything>)
-                element.type
-                case (is CeylonSpecifierTreeElement)
-                element.type
-                else null;
+                value type
+                        = switch (element)
+                        case (is CeylonDeclarationTreeElement<out Anything>)
+                            element.type
+                        case (is CeylonSpecifierTreeElement)
+                            element.type
+                        else null;
                 if (exists type) {
                     if (exists group = map[type]) {
                         group.add(element);
@@ -207,9 +208,9 @@ class CeylonFileTreeModel(CeylonFile psiFile)
 
         isVisible(TreeElement treeNode)
                 => if (is PsiTreeElementBase<out Anything> treeNode,
-            is CeylonPsi.DeclarationPsi element = treeNode.element)
-        then element.ceylonNode.declarationModel.shared
-        else true;
+                       is CeylonPsi.DeclarationPsi element = treeNode.element)
+                then element.ceylonNode.declarationModel.shared
+                else true;
 
         reverted => false;
 
