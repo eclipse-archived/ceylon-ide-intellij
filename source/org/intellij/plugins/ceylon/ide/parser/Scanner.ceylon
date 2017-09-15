@@ -19,7 +19,6 @@ import java.lang {
 import org.antlr.runtime {
     ANTLRStringStream,
     CommonToken,
-    Lexer,
     RecognitionException,
     TokenSource
 }
