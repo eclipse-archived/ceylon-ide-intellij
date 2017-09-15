@@ -23,8 +23,7 @@ import com.intellij.util.ui {
     UIUtil
 }
 import com.redhat.ceylon.model.typechecker.model {
-    ClassOrInterface,
-    Declaration
+    ClassOrInterface
 }
 
 import java.util {
@@ -52,8 +51,7 @@ abstract class CeylonDeclarationTreeElement<Decl>
                 & AccessLevelProvider
         given Decl satisfies CeylonPsi.DeclarationPsi {
 
-    Declaration? model
-            => element?.ceylonNode?.declarationModel;
+    value model => element?.ceylonNode?.declarationModel;
 
     shared actual default List<StructureViewTreeElement> childrenBase
             => Collections.emptyList<StructureViewTreeElement>();
@@ -68,17 +66,18 @@ abstract class CeylonDeclarationTreeElement<Decl>
     textAttributesKey
             => if (isInherited)
                 then CodeInsightColors.notUsedElementAttributes
-            else if (exists m = model, m.deprecated)
+            else if (exists dec = model, dec.deprecated)
                 then CodeInsightColors.deprecatedAttributes
             else null;
 
     shared ClassOrInterface? type {
-        if (exists m = model, m.classOrInterfaceMember) {
+        if (exists dec = model, dec.classOrInterfaceMember) {
             if (isInherited) {
-                assert (is ClassOrInterface? c = m.container);
+                assert (is ClassOrInterface? c = dec.container);
                 return c;
             }
-            if (exists refined = m.refinedDeclaration, refined != m) {
+            if (exists refined = dec.refinedDeclaration,
+                refined != dec) {
                 assert (is ClassOrInterface? c = refined.container);
                 return c;
             }
@@ -87,12 +86,13 @@ abstract class CeylonDeclarationTreeElement<Decl>
     }
 
     shared actual String? locationString {
-        if (valid, exists m = model) {
-            if (isInherited, m.classOrInterfaceMember) {
-                assert (is ClassOrInterface container = m.container);
+        if (valid, exists dec = model) {
+            if (isInherited && dec.classOrInterfaceMember) {
+                assert (is ClassOrInterface container = dec.container);
                 return " " + UIUtil.rightArrow() + container.name;
             }
-            if (exists refined = m.refinedDeclaration, refined != m) {
+            if (exists refined = dec.refinedDeclaration,
+                refined != dec) {
                 assert (is ClassOrInterface container = refined.container);
                 return " " + UIUtil.upArrow("^") + container.name;
             }
@@ -121,19 +121,24 @@ abstract class CeylonDeclarationTreeElement<Decl>
         if (isInherited) {
             return PsiUtil.accessLevelPublic;
         }
-        if (exists m = model, m.shared) {
-            return PsiUtil.accessLevelPublic;
-        }
-
-        if (exists el = element) {
-            for (a in el.ceylonNode.annotationList.annotations) {
+        else if (exists node = element?.ceylonNode) {
+            if (exists dec = node.declarationModel) {
+                return dec.shared
+                    then PsiUtil.accessLevelPublic
+                    else PsiUtil.accessLevelPrivate;
+            }
+            for (a in node.annotationList.annotations) {
                 if (a.primary.text=="shared") {
                     return PsiUtil.accessLevelPublic;
                 }
             }
+            else {
+                return PsiUtil.accessLevelPrivate;
+            }
         }
-
-        return PsiUtil.accessLevelPrivate;
+        else {
+            return PsiUtil.accessLevelPrivate;
+        }
     }
 
     subLevel => 0;
