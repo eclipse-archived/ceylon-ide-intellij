@@ -292,10 +292,14 @@ String getAnnotatedType(PsiParameter param, PsiAnnotation tann) {
     String type =
             nativeString(nameValue(tann))
                 .replaceAll("[a-z]\\w*(\\.[a-z]\\w*)*::", "");
-    return
-        if (hasAnnotation(param,"Sequenced"))
-        then type.replaceLast("[]", "*")
-        else type;
+    if (hasAnnotation(param,"Sequenced")) {
+        return type.endsWith("[]")
+            then type.removeTerminal("[]") + "*"
+            else type.removeInitial("[").removeTerminal("]");
+    }
+    else {
+        return type;
+    }
 }
 
 Boolean isSelfParameter(PsiMethod clsMethod, PsiParameter param) {
