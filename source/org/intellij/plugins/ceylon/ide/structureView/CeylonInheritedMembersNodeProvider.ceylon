@@ -38,7 +38,6 @@ import com.redhat.ceylon.model.typechecker.model {
 
 import java.util {
     ArrayList,
-    Collection,
     Collections,
     List
 }
