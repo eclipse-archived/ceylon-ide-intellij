@@ -69,7 +69,7 @@ have the ability to create Ceylon IntelliJ modules in which you can develop and 
 
         ideaRoot=/path/to/your/idea/install/
 
-3. Build the Ceylon distribution, SDK, and Ceylon IDE:
+3. From the `ceylon` directory, build the Ceylon distribution, SDK, and Ceylon IDE:
 
         ant dist sdk intellij
 
