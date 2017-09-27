@@ -1,2 +1,2 @@
 suppressWarnings("packageName")
-shared package org.intellij.plugins.ceylon.ide.codeInsight;
+shared package org.eclipse.ceylon.ide.intellij.codeInsight;

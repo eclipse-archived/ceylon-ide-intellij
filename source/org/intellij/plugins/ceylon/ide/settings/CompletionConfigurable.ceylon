@@ -6,7 +6,7 @@ import java.awt.event {
     ActionEvent
 }
 
-import org.intellij.plugins.ceylon.ide.completion {
+import org.eclipse.ceylon.ide.intellij.completion {
     completionSettings
 }
 

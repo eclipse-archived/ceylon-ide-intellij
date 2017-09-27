@@ -33,7 +33,7 @@ import javax.swing {
     JButton
 }
 
-import org.intellij.plugins.ceylon.ide.correct {
+import org.eclipse.ceylon.ide.intellij.correct {
     CeylonCellRenderer,
     CeylonListItem
 }

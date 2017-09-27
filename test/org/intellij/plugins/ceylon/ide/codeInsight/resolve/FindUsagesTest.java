@@ -1,11 +1,11 @@
-package org.intellij.plugins.ceylon.ide.codeInsight.resolve;
+package org.eclipse.ceylon.ide.intellij.codeInsight.resolve;
 
 import com.intellij.codeInsight.TargetElementUtilBase;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.usageView.UsageInfo;
-import org.intellij.plugins.ceylon.ideInsightTestSupport;
+import org.eclipse.ceylon.ide.intellijInsightTestSupport;
 
 import java.util.Collection;
 

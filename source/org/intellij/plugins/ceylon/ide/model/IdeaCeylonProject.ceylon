@@ -121,13 +121,13 @@ import java.lang.ref {
     WeakReference
 }
 
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     ideaPlatformUtils
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.startup {
+import org.eclipse.ceylon.ide.intellij.startup {
     CeylonIdePlugin
 }
 

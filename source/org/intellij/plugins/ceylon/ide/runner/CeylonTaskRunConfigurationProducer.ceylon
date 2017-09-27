@@ -29,10 +29,10 @@ import java.util {
     ArrayList
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     getCeylonProject
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile,
     CeylonPsi
 }

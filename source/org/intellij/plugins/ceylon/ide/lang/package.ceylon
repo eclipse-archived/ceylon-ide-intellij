@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.lang;
+shared package org.eclipse.ceylon.ide.intellij.lang;

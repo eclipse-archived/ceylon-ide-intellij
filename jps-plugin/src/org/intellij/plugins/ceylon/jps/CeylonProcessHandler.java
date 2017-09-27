@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.jps;
+package org.eclipse.ceylon.jps;
 
 import com.intellij.execution.process.BaseOSProcessHandler;
 import com.intellij.execution.process.ProcessOutputTypes;

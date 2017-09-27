@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.codeInsight;
+package org.eclipse.ceylon.ide.intellij.codeInsight;
 
 import java.util.Collection;
 import java.util.List;

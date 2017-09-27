@@ -52,21 +52,21 @@ import java.util {
     Collections
 }
 
-import org.intellij.plugins.ceylon.ide.correct {
+import org.eclipse.ceylon.ide.intellij.correct {
     CeylonListItem
 }
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     ceylonHighlightingColors,
     foregroundColor
 }
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaDocument,
     IdeaTextChange
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

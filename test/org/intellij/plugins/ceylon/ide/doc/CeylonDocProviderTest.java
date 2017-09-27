@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.doc;
+package org.eclipse.ceylon.ide.intellij.doc;
 
 import ceylon.language.language_;
 import com.intellij.openapi.util.io.FileUtil;
@@ -8,7 +8,7 @@ import org.eclipse.ceylon.compiler.typechecker.TypeCheckerBuilder;
 import org.eclipse.ceylon.compiler.typechecker.context.PhasedUnit;
 import org.eclipse.ceylon.compiler.typechecker.tree.Tree;
 import org.eclipse.ceylon.ide.common.typechecker.LocalAnalysisResult;
-import org.intellij.plugins.ceylon.ide.doc.IdeaDocGenerator;
+import org.eclipse.ceylon.ide.intellij.doc.IdeaDocGenerator;
 
 import java.io.File;
 import java.io.IOException;

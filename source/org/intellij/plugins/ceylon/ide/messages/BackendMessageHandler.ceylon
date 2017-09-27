@@ -30,7 +30,7 @@ import java.util {
     UUID
 }
 
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     highlighter,
     ceylonHighlightingColors
 }

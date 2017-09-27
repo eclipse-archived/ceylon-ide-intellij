@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.clipboard;
+package org.eclipse.ceylon.ide.intellij.clipboard;

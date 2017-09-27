@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.resolve;
+shared package org.eclipse.ceylon.ide.intellij.resolve;

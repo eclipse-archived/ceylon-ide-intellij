@@ -12,10 +12,10 @@ import com.intellij.refactoring.listeners {
     RefactoringElementListenerProvider
 }
 
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.psi.impl {
+import org.eclipse.ceylon.ide.intellij.psi.impl {
     DeclarationPsiNameIdOwner
 }
 

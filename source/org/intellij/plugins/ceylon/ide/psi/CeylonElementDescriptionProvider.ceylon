@@ -27,7 +27,7 @@ import org.eclipse.ceylon.model.typechecker.model {
     ClassOrInterface,
     TypedDeclaration
 }
-import org.intellij.plugins.ceylon.ide.psi.impl {
+import org.eclipse.ceylon.ide.intellij.psi.impl {
     ParameterPsiIdOwner
 }
 

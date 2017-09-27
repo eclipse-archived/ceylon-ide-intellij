@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.psi.impl;
+package org.eclipse.ceylon.ide.intellij.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -12,11 +12,11 @@ import org.eclipse.ceylon.ide.common.platform.Status;
 import org.eclipse.ceylon.ide.common.platform.platformUtils_;
 import org.eclipse.ceylon.ide.common.typechecker.AnalysisResult;
 import org.eclipse.ceylon.model.typechecker.model.Declaration;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl;
-import org.intellij.plugins.ceylon.ide.psi.isInSourceArchive_;
-import org.intellij.plugins.ceylon.ide.util.icons_;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonFile;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonPsi;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonPsiImpl;
+import org.eclipse.ceylon.ide.intellij.psi.isInSourceArchive_;
+import org.eclipse.ceylon.ide.intellij.util.icons_;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

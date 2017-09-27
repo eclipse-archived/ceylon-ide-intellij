@@ -85,10 +85,10 @@ import javax.swing.tree {
     DefaultMutableTreeNode
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonFileType
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject,
     getCeylonProjects,
     getModelManager

@@ -28,23 +28,23 @@ import java.io {
     File,
     IOException
 }
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonFileType
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject,
     CeylonProjectManager,
     getCeylonProjects
 }
-import org.intellij.plugins.ceylon.ide.project {
+import org.eclipse.ceylon.ide.intellij.project {
     CeylonModuleBuilder {
         setCompilerOutput
     }
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonLocalAnalyzerManager
 }
-import org.intellij.plugins.ceylon.ide.settings {
+import org.eclipse.ceylon.ide.intellij.settings {
     ceylonSettings
 }
 import org.jetbrains.jps.model.java {

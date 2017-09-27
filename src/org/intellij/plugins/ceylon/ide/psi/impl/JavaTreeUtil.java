@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.psi.impl;
+package org.eclipse.ceylon.ide.intellij.psi.impl;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -10,9 +10,9 @@ import com.intellij.psi.util.PsiUtilCore;
 import org.eclipse.ceylon.compiler.typechecker.tree.CustomTree;
 import org.eclipse.ceylon.compiler.typechecker.tree.Node;
 import org.eclipse.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.lang.CeylonLanguage;
-import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
+import org.eclipse.ceylon.ide.intellij.lang.CeylonLanguage;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonCompositeElement;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonPsi;
 
 import java.util.ArrayList;
 import java.util.Objects;

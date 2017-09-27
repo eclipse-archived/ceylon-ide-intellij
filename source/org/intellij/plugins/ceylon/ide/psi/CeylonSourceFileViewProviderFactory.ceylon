@@ -12,13 +12,13 @@ import com.intellij.psi {
     SingleRootFileViewProvider
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     ceylonLanguage
 }
 import com.intellij.testFramework {
     LightVirtualFile
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     CeylonLogger
 }
 

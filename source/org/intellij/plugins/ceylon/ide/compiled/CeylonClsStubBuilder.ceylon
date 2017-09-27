@@ -26,7 +26,7 @@ import java.io {
     IOException
 }
 
-import org.intellij.plugins.ceylon.ide.compiled {
+import org.eclipse.ceylon.ide.intellij.compiled {
     classFileDecompilerUtil
 }
 import org.jetbrains.org.objectweb.asm {

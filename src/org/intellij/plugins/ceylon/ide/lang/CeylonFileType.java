@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.lang;
+package org.eclipse.ceylon.ide.intellij.lang;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.util.IconLoader;

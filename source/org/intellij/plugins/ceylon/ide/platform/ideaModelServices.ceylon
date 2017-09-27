@@ -30,7 +30,7 @@ import org.eclipse.ceylon.ide.common.typechecker {
     CrossProjectPhasedUnit
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     concurrencyManager {
         needReadAccess
     },

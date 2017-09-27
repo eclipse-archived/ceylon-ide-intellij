@@ -1,11 +1,11 @@
-package org.intellij.plugins.ceylon.ide.formatting;
+package org.eclipse.ceylon.ide.intellij.formatting;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonFile;
 
 import java.io.BufferedReader;
 import java.io.File;

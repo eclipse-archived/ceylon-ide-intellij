@@ -41,7 +41,7 @@ import java.util {
     Collections
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     ceylonLanguage
 }
 import com.intellij.psi.search {

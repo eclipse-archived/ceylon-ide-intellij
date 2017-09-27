@@ -11,7 +11,7 @@ import org.eclipse.ceylon.model.loader.mirror {
     PackageMirror
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     concurrencyManager {
         needReadAccess
     }

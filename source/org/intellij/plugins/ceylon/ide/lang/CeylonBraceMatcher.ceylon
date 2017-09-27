@@ -10,7 +10,7 @@ import com.intellij.psi.tree {
     IElementType
 }
 
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi,
     TokenTypes,
     CeylonTokens

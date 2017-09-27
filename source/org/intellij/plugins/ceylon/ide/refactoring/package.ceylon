@@ -1,2 +1,2 @@
-package org.intellij.plugins.ceylon.ide.refactoring;
+package org.eclipse.ceylon.ide.intellij.refactoring;
 

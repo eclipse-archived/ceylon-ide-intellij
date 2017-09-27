@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.doc;
+shared package org.eclipse.ceylon.ide.intellij.doc;

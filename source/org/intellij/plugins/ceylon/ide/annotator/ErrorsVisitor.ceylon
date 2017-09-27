@@ -22,10 +22,10 @@ import org.eclipse.ceylon.ide.common.util {
     ErrorVisitor
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     findProjectForFile
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
 

@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.presentation;
+package org.eclipse.ceylon.ide.intellij.presentation;

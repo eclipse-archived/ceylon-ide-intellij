@@ -34,7 +34,7 @@ import org.eclipse.ceylon.ide.common.platform {
     LinkedMode
 }
 
-import org.intellij.plugins.ceylon.ide.completion {
+import org.eclipse.ceylon.ide.intellij.completion {
     installCustomLookupCellRenderer,
     IdeaListProposalsHolder
 }

@@ -1,9 +1,9 @@
-package org.intellij.plugins.ceylon.ide.annotator;
+package org.eclipse.ceylon.ide.intellij.annotator;
 
 import com.intellij.psi.PsiFile;
-import org.intellij.plugins.ceylon.ideInsightTestSupport;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.psi.CeylonLocalAnalyzer;
+import org.eclipse.ceylon.ide.intellijInsightTestSupport;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonFile;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonLocalAnalyzer;
 
 public class CeylonSyntaxAnnotatorTest extends CeylonCodeInsightTestSupport {
 

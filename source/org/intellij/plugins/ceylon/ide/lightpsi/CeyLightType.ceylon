@@ -44,7 +44,7 @@ import java.util {
     ArrayList
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     PSIClass,
     PSIType
 }

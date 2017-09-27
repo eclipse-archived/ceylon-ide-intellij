@@ -38,7 +38,7 @@ import org.eclipse.ceylon.model.typechecker.model {
     Module
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonLanguage
 }
 

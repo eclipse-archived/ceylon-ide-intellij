@@ -1,7 +1,7 @@
-//package org.intellij.plugins.ceylon.ide.templates;
+//package org.eclipse.ceylon.ide.intellij.templates;
 //
 //import com.intellij.codeInsight.template.FileTypeBasedContextType;
-//import org.intellij.plugins.ceylon.ide.lang.CeylonFileType;
+//import org.eclipse.ceylon.ide.intellij.lang.CeylonFileType;
 //
 //public class CeylonLiveTemplateContext extends FileTypeBasedContextType {
 //

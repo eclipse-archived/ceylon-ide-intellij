@@ -1,5 +1,5 @@
 /*
-package org.intellij.plugins.ceylon.ide.completion;
+package org.eclipse.ceylon.ide.intellij.completion;
 
 import ceylon.interop.java.CeylonList;
 import ceylon.interop.java.JavaList;
@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.intellij.plugins.ceylon.ide.completion.mergeHighlightAndMatches_.mergeHighlightAndMatches;
+import static org.eclipse.ceylon.ide.intellij.completion.mergeHighlightAndMatches_.mergeHighlightAndMatches;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 

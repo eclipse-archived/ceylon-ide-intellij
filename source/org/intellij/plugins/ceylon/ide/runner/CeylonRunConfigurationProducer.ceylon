@@ -31,11 +31,11 @@ import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaModule,
     IdeaCeylonProjects
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi,
     CeylonCompositeElement,
     CeylonFile

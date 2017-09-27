@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.psi;
+package org.eclipse.ceylon.ide.intellij.psi;
 
 import com.intellij.psi.tree.IElementType;
 

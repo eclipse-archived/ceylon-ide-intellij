@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.jps;
+package org.eclipse.ceylon.jps;
 
 import org.eclipse.ceylon.compiler.java.runtime.tools.Backend;
 import org.jetbrains.annotations.NotNull;

@@ -38,24 +38,24 @@ import javax.swing {
     ...
 }
 
-import org.intellij.plugins.ceylon.ide {
+import org.eclipse.ceylon.ide.intellij {
     CeylonBundle {
         message
     }
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     CeylonModelManager,
     IdeaCeylonProject
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     ceylonFileFactory
 }
-import org.intellij.plugins.ceylon.ide.validate {
+import org.eclipse.ceylon.ide.intellij.validate {
     NameValidator {
         packageNameIsLegal
     }
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

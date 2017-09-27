@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.templates;
+package org.eclipse.ceylon.ide.intellij.templates;

@@ -53,13 +53,13 @@ import java.util.concurrent {
     TimeUnit
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonLanguage
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     Annotations
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonTreeUtil,
     CeylonFile
 }

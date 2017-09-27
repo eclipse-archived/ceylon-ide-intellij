@@ -42,7 +42,7 @@ import org.antlr.runtime {
     RecognitionException,
     CommonToken
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     CeylonLogger
 }
 

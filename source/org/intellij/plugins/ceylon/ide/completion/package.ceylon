@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.completion;
+shared package org.eclipse.ceylon.ide.intellij.completion;

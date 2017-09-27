@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.validate;
+package org.eclipse.ceylon.ide.intellij.validate;

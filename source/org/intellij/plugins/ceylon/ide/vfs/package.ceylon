@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.vfs;
+shared package org.eclipse.ceylon.ide.intellij.vfs;

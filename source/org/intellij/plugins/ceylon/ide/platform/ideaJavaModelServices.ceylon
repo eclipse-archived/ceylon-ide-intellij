@@ -17,7 +17,7 @@ import org.eclipse.ceylon.model.typechecker.model {
     Unit
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaJavaCompilationUnit,
     IdeaJavaClassFile,
     IdeaCrossProjectBinaryUnit,

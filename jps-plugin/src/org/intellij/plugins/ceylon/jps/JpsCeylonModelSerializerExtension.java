@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.jps;
+package org.eclipse.ceylon.jps;
 
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;

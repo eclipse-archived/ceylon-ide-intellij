@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.runner;
+shared package org.eclipse.ceylon.ide.intellij.runner;

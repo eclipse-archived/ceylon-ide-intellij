@@ -30,10 +30,10 @@ import java.util {
     Set
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     ceylonLanguage
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi,
     CeylonFile
 }

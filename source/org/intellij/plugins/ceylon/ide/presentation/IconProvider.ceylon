@@ -18,14 +18,14 @@ import javax.swing {
     Icon
 }
 
-import org.intellij.plugins.ceylon.ide.lightpsi {
+import org.eclipse.ceylon.ide.intellij.lightpsi {
     CeyLightClass,
     CeyLightMethod
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

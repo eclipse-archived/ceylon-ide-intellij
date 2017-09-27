@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.wizard;
+package org.eclipse.ceylon.ide.intellij.wizard;

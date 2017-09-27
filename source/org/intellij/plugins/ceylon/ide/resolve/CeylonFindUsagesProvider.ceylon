@@ -31,17 +31,17 @@ import java.util.concurrent {
     TimeUnit
 }
 
-import org.intellij.plugins.ceylon.ide.parser {
+import org.eclipse.ceylon.ide.intellij.parser {
     CeylonAntlrToIntellijLexerAdapter
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonCompositeElement,
     CeylonFile,
     CeylonPsi,
     TokenTypes,
     kind
 }
-import org.intellij.plugins.ceylon.ide.psi.impl {
+import org.eclipse.ceylon.ide.intellij.psi.impl {
     DeclarationPsiNameIdOwner
 }
 

@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.project;
+package org.eclipse.ceylon.ide.intellij.project;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;

@@ -43,7 +43,7 @@ import java.lang {
     Integer
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     PSIClass,
     PSIMethod,
     concurrencyManager {
@@ -51,7 +51,7 @@ import org.intellij.plugins.ceylon.ide.model {
     },
     PsiElementGoneException
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonTreeUtil
 }
 

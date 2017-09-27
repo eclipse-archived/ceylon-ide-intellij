@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.runner;
+package org.eclipse.ceylon.ide.intellij.runner;
 
 import com.intellij.application.options.ModulesComboBox;
 import com.intellij.execution.configurations.RunConfiguration;

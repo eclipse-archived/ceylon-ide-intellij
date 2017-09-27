@@ -7,7 +7,7 @@ import org.eclipse.ceylon.ide.common.util {
     nodes
 }
 
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
 

@@ -1,2 +1,2 @@
 suppressWarnings("packageName")
-package org.intellij.plugins.ceylon.ide.projectView;
+package org.eclipse.ceylon.ide.intellij.projectView;

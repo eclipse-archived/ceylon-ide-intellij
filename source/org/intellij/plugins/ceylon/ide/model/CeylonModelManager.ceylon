@@ -136,25 +136,25 @@ import java.util.concurrent.atomic {
     AtomicInteger
 }
 
-import org.intellij.plugins.ceylon.ide.facet {
+import org.eclipse.ceylon.ide.intellij.facet {
     CeylonFacet,
     CeylonFacetConfiguration
 }
-import org.intellij.plugins.ceylon.ide.messages {
+import org.eclipse.ceylon.ide.intellij.messages {
     getCeylonProblemsView,
     SourceMsg,
     ProjectMsg
 }
-import org.intellij.plugins.ceylon.ide.model.parsing {
+import org.eclipse.ceylon.ide.intellij.model.parsing {
     ProgressIndicatorMonitor
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonLocalAnalyzerManager
 }
-import org.intellij.plugins.ceylon.ide.settings {
+import org.eclipse.ceylon.ide.intellij.settings {
     ceylonSettings
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     CeylonLogger
 }
 

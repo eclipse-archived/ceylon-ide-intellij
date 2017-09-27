@@ -91,14 +91,14 @@ import java.util.concurrent.locks {
 import org.antlr.runtime {
     CommonToken
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject,
     concurrencyManager,
     getCeylonProjects,
     getModelManager,
     PsiElementGoneException
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     CeylonLogger
 }
 

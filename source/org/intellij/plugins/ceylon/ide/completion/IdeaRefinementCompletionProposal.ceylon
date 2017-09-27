@@ -25,7 +25,7 @@ import org.eclipse.ceylon.model.typechecker.model {
     Scope
 }
 
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

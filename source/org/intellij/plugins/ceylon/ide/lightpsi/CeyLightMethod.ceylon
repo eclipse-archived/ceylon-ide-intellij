@@ -54,10 +54,10 @@ import java.util {
     Collections
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     ceylonLanguage
 }
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     IdeaNavigation
 }
 

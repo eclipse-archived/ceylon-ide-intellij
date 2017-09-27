@@ -10,10 +10,10 @@ import com.intellij.openapi.command {
     WriteCommandAction
 }
 
-import org.intellij.plugins.ceylon.ide.correct {
+import org.eclipse.ceylon.ide.intellij.correct {
     AbstractIntention
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
 

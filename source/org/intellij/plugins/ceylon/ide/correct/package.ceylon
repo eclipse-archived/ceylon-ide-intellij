@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.correct;
+shared package org.eclipse.ceylon.ide.intellij.correct;

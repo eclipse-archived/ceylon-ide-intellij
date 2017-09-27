@@ -46,10 +46,10 @@ import java.lang {
     ObjectArray
 }
 
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     highlighter
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile,
     TokenTypes,
     CeylonPsi

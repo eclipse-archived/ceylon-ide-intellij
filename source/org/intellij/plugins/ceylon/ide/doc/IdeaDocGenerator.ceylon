@@ -71,15 +71,15 @@ import javax.swing {
     Icon
 }
 
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     ceylonHighlightingColors,
     highlighter,
     textAttributes
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaJavaModelAware
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

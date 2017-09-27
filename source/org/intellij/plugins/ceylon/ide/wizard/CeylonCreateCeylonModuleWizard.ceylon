@@ -19,15 +19,15 @@ import javax.swing {
 import org.apache.commons.lang {
     StringUtils
 }
-import org.intellij.plugins.ceylon.ide {
+import org.eclipse.ceylon.ide.intellij {
     CeylonBundle {
         message
     }
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject
 }
-import org.intellij.plugins.ceylon.ide.validate {
+import org.eclipse.ceylon.ide.intellij.validate {
     NameValidator {
         packageNameIsLegal,
         unitNameIsLegal

@@ -23,7 +23,7 @@ import java.util {
     List
 }
 
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     highlighter
 }
 

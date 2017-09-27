@@ -2,7 +2,7 @@ import com.intellij.psi.compiled {
     ClassFileDecompilers
 }
 
-import org.intellij.plugins.ceylon.ide.compiled {
+import org.eclipse.ceylon.ide.intellij.compiled {
     classFileDecompilerUtil
 }
 

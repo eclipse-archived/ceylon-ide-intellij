@@ -40,11 +40,11 @@ import java.util {
     List
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject,
     IdeaCeylonProjects
 }
-import org.intellij.plugins.ceylon.ide.settings {
+import org.eclipse.ceylon.ide.intellij.settings {
     ceylonSettings
 }
 

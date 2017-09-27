@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.integrations.studio;
+package org.eclipse.ceylon.ide.intellij.integrations.studio;

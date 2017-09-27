@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.action;
+shared package org.eclipse.ceylon.ide.intellij.action;

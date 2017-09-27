@@ -29,13 +29,13 @@ import java.util {
     HashMap
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     ceylonFileType
 }
-import org.intellij.plugins.ceylon.ide.parser {
+import org.eclipse.ceylon.ide.intellij.parser {
     CeylonAntlrToIntellijLexerAdapter
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonTokens,
     TokenTypes
 }

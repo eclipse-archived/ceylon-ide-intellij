@@ -21,10 +21,10 @@ import org.eclipse.ceylon.ide.common.platform {
     Status
 }
 
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.psi.impl {
+import org.eclipse.ceylon.ide.intellij.psi.impl {
     DeclarationPsiNameIdOwner,
     ParameterPsiIdOwner
 }

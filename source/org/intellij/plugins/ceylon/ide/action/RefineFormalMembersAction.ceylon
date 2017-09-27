@@ -1,4 +1,4 @@
-import org.intellij.plugins.ceylon.ide.correct {
+import org.eclipse.ceylon.ide.intellij.correct {
     RefineFormalMembersIntention
 }
 import com.intellij.lang {
@@ -13,7 +13,7 @@ import com.intellij.psi {
 import com.intellij.openapi.project {
     Project
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
 import com.intellij.openapi.command {

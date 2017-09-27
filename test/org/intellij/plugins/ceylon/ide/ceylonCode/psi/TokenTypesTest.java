@@ -1,8 +1,8 @@
-package org.intellij.plugins.ceylon.ide.psi;
+package org.eclipse.ceylon.ide.intellij.psi;
 
-import org.intellij.plugins.ceylon.ide.psi.CeylonTokens;
-import org.intellij.plugins.ceylon.ide.psi.CeylonTypes;
-import org.intellij.plugins.ceylon.ide.psi.TokenTypes;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonTokens;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonTypes;
+import org.eclipse.ceylon.ide.intellij.psi.TokenTypes;
 import org.junit.Assert;
 import org.junit.Test;
 

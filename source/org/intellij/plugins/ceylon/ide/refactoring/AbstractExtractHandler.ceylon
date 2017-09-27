@@ -63,15 +63,15 @@ import java.util {
     ArrayList
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     getModelManager
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi,
     CeylonFile,
     CeylonCompositeElement
 }
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     FindMatchingPsiNodeVisitor
 }
 

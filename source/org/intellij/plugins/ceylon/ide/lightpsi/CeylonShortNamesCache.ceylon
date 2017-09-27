@@ -36,7 +36,7 @@ import java.lang {
     ObjectArray
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaModuleManager,
     getCeylonProjects
 }

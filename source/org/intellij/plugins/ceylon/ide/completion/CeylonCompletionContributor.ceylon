@@ -10,7 +10,7 @@ import org.eclipse.ceylon.ide.common.settings {
     CompletionOptions
 }
 
-import org.intellij.plugins.ceylon.ide.completion {
+import org.eclipse.ceylon.ide.intellij.completion {
     IdeaCompletionProvider
 }
 

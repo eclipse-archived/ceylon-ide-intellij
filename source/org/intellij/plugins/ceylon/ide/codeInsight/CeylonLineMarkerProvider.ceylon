@@ -64,13 +64,13 @@ import javax.swing {
     Icon
 }
 
-import org.intellij.plugins.ceylon.ide.codeInsight.navigation {
+import org.eclipse.ceylon.ide.intellij.codeInsight.navigation {
     CeylonGotoSuperHandler
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

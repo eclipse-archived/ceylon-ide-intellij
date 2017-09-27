@@ -6,7 +6,7 @@ import com.intellij.openapi.fileTypes {
     FileTypeFactory
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonFileType
 }
 

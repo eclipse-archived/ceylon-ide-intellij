@@ -1,12 +1,12 @@
-package org.intellij.plugins.ceylon.ide;
+package org.eclipse.ceylon.ide.intellij;
 
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import org.eclipse.ceylon.compiler.typechecker.TypeChecker;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.psi.CeylonLocalAnalyzer;
-import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonFile;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonLocalAnalyzer;
+import org.eclipse.ceylon.ide.intellij.facet.CeylonFacet;
 
 import java.util.concurrent.TimeoutException;
 

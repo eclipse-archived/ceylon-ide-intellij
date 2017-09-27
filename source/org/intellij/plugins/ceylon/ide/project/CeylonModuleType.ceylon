@@ -18,10 +18,10 @@ import java.util {
     ArrayList
 }
 
-import org.intellij.plugins.ceylon.ide {
+import org.eclipse.ceylon.ide.intellij {
     CeylonBundle
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

@@ -77,13 +77,13 @@ import java.util {
     Arrays
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject,
     getCeylonProjects,
     getModelManager,
     CeylonProjectManager
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     ceylonFileFactory
 }
 import org.jetbrains.plugins.gradle.util {
@@ -99,7 +99,7 @@ shared interface AndroidStudioSupport {
 
 shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
     shared ExtensionPointName<AndroidStudioSupport> epName
-        = create<AndroidStudioSupport>("org.intellij.plugins.ceylon.ide.androidStudioSupport");
+        = create<AndroidStudioSupport>("org.eclipse.ceylon.ide.intellij.androidStudioSupport");
 
     value applyCeylonPlugin = "apply plugin: 'com.athaydes.ceylon'";
     value applyCeylonAndroidPlugin = "apply plugin: 'org.eclipse.ceylon.gradle.android'";

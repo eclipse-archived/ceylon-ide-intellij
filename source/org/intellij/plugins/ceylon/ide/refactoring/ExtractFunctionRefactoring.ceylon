@@ -38,12 +38,12 @@ import java.lang {
     JString=String
 }
 
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaDocument,
     IdeaTextChange,
     IdeaCompositeChange
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile,
     CeylonPsi,
     descriptions

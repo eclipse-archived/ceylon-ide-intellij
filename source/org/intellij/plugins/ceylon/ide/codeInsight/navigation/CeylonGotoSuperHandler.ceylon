@@ -42,15 +42,15 @@ import java.util {
     ArrayList
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     ceylonFileType
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi {
         ...
     }
 }
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     resolveDeclaration
 }
 

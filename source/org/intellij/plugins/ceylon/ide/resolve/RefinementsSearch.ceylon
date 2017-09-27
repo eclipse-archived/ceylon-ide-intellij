@@ -29,7 +29,7 @@ import org.eclipse.ceylon.model.typechecker.model {
     Declaration
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     concurrencyManager {
         needReadAccess
     },
@@ -37,7 +37,7 @@ import org.intellij.plugins.ceylon.ide.model {
     findProjectForFile,
     declarationFromPsiElement
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi,
     isInSourceArchive,
     CeylonFile,

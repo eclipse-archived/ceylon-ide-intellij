@@ -27,7 +27,7 @@ import java.lang {
     JInteger=Integer
 }
 
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonTokens
 }
 import com.intellij.psi.tree {

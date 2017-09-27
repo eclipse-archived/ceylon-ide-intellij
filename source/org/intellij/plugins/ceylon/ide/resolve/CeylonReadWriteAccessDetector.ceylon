@@ -6,7 +6,7 @@ import com.intellij.psi {
     PsiElement
 }
 
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi {
         ...
     }

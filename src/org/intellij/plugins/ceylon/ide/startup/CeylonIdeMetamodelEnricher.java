@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.startup;
+package org.eclipse.ceylon.ide.intellij.startup;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import static org.intellij.plugins.ceylon.ide.startup.CeylonIdePlugin.getEmbeddedCeylonRepository;
+import static org.eclipse.ceylon.ide.intellij.startup.CeylonIdePlugin.getEmbeddedCeylonRepository;
 
 class CeylonIdeMetamodelEnricher extends AbstractMetamodelEnricher {
 

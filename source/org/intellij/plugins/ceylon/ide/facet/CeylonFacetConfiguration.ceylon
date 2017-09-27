@@ -18,12 +18,12 @@ import javax.swing {
     ...
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject,
     getCeylonProject,
     getCeylonProjects
 }
-import org.intellij.plugins.ceylon.ide.project {
+import org.eclipse.ceylon.ide.intellij.project {
     CeylonConfigForm,
     CeylonPageOne,
     CeylonPageTwo

@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.runner;
+package org.eclipse.ceylon.ide.intellij.runner;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;

@@ -3,7 +3,7 @@ import com.intellij.openapi.actionSystem {
     AnActionEvent
 }
 
-import org.intellij.plugins.ceylon.ide.settings {
+import org.eclipse.ceylon.ide.intellij.settings {
     ceylonSettings
 }
 

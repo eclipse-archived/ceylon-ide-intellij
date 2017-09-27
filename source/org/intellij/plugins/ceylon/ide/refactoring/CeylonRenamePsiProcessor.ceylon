@@ -29,14 +29,14 @@ import java.util {
     Map
 }
 
-import org.intellij.plugins.ceylon.ide.hierarchy {
+import org.eclipse.ceylon.ide.intellij.hierarchy {
     collectPhasedUnits
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile,
     CeylonPsi
 }
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     resolveDeclaration
 }
 

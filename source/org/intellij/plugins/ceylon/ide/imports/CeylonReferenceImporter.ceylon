@@ -40,21 +40,21 @@ import org.eclipse.ceylon.ide.common.refactoring {
     DefaultRegion
 }
 
-import org.intellij.plugins.ceylon.ide.correct {
+import org.eclipse.ceylon.ide.intellij.correct {
     Resolution,
     showPopup
 }
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonLanguage
 }
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaDocument
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi,
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 shared class CeylonReferenceImporter() satisfies ReferenceImporter {

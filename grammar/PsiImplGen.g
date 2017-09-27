@@ -9,12 +9,12 @@ grammar PsiImplGen;
 }
 
 nodeList : { 
-           println("package org.intellij.plugins.ceylon.ide.psi;\n");
+           println("package org.eclipse.ceylon.ide.intellij.psi;\n");
            println("import com.intellij.lang.ASTNode;");
            println("import org.eclipse.ceylon.compiler.typechecker.tree.Tree;");
            println("import org.eclipse.ceylon.compiler.typechecker.tree.CustomTree;");
-           println("import org.intellij.plugins.ceylon.ide.resolve.*;");
-           println("import org.intellij.plugins.ceylon.ide.psi.impl.*;");
+           println("import org.eclipse.ceylon.ide.intellij.resolve.*;");
+           println("import org.eclipse.ceylon.ide.intellij.psi.impl.*;");
            println("/* Generated using Antlr by PsiImplGen.g */");
            println("\npublic class CeylonPsiImpl {\n");
            println("    public static class GuardedVariablePsiImpl extends CeylonCompositeElementImpl");

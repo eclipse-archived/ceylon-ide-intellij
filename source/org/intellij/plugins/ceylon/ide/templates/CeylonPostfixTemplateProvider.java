@@ -1,4 +1,4 @@
-//package org.intellij.plugins.ceylon.ide.templates;
+//package org.eclipse.ceylon.ide.intellij.templates;
 //
 //import com.intellij.codeInsight.template.postfix.templates.PostfixTemplate;
 //import com.intellij.codeInsight.template.postfix.templates.PostfixTemplateProvider;

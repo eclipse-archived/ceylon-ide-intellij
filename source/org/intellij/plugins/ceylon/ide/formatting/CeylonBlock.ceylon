@@ -25,10 +25,10 @@ import java.util {
     ArrayList
 }
 
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     ceylonHighlighter
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     Tokens=CeylonTokens,
     Types=CeylonTypes,
     CeylonPsi

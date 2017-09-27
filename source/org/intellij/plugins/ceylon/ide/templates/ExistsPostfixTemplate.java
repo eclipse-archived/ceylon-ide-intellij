@@ -1,4 +1,4 @@
-//package org.intellij.plugins.ceylon.ide.templates;
+//package org.eclipse.ceylon.ide.intellij.templates;
 //
 //import com.google.common.base.Objects;
 //import com.intellij.codeInsight.template.postfix.templates.PostfixTemplateExpressionSelector;
@@ -27,10 +27,10 @@
 //import org.eclipse.ceylon.ide.common.util.FindNodeVisitor;
 //import org.eclipse.ceylon.model.typechecker.model.Type;
 //import org.eclipse.ceylon.model.typechecker.model.Unit;
-//import org.intellij.plugins.ceylon.ide.lang.CeylonFileType;
-//import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-//import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
-//import org.intellij.plugins.ceylon.ide.vfs.VirtualFileVirtualFile;
+//import org.eclipse.ceylon.ide.intellij.lang.CeylonFileType;
+//import org.eclipse.ceylon.ide.intellij.psi.CeylonFile;
+//import org.eclipse.ceylon.ide.intellij.psi.CeylonPsi;
+//import org.eclipse.ceylon.ide.intellij.vfs.VirtualFileVirtualFile;
 //import org.jetbrains.annotations.NotNull;
 //import org.jetbrains.annotations.Nullable;
 //
@@ -101,7 +101,7 @@
 //        CeylonFile ceylonFile = (CeylonFile) expr.getContainingFile();
 //        final VirtualFile virtualFile = Objects.firstNonNull(ceylonFile.getVirtualFile(), ceylonFile.getUserData(CeylonPostfixTemplateProvider.ORIG_VFILE));
 //        Module module = ModuleUtil.findModuleForFile(virtualFile, ceylonFile.getProject());
-//        TypeChecker typeChecker = org.intellij.plugins.ceylon.ide.model.getCeylonProject_.getCeylonProject(ceylonFile).getTypechecker();
+//        TypeChecker typeChecker = org.eclipse.ceylon.ide.intellij.model.getCeylonProject_.getCeylonProject(ceylonFile).getTypechecker();
 //
 //        if (typeChecker == null) {
 //            // the typechecker was not correctly initialized, there's nothing we can do

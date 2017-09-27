@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.jps;
+package org.eclipse.ceylon.jps;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtilRt;

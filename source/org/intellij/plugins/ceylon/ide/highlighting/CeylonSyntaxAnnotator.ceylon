@@ -25,10 +25,10 @@ import java.util.regex {
     Pattern
 }
 
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     ceylonHighlightingColors
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi,
     CeylonPsiVisitor,
     CeylonTokens,

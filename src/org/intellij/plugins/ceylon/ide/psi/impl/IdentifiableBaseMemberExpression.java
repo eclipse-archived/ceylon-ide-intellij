@@ -1,11 +1,11 @@
-package org.intellij.plugins.ceylon.ide.psi.impl;
+package org.eclipse.ceylon.ide.intellij.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.util.IncorrectOperationException;
 import org.eclipse.ceylon.compiler.typechecker.tree.Tree;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonPsiImpl;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

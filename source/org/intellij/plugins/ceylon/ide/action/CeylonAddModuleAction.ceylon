@@ -35,17 +35,17 @@ import javax.swing {
     ...
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     CeylonModelManager,
     IdeaCeylonProject
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     ceylonFileFactory
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
-import org.intellij.plugins.ceylon.ide.wizard {
+import org.eclipse.ceylon.ide.intellij.wizard {
     CeylonCreateCeylonModuleWizard
 }
 

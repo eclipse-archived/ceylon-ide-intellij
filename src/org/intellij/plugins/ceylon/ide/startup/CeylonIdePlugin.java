@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.startup;
+package org.eclipse.ceylon.ide.intellij.startup;
 
 import com.intellij.diagnostic.PluginException;
 import com.intellij.ide.ApplicationLoadListener;
@@ -108,7 +108,7 @@ public class CeylonIdePlugin implements ApplicationLoadListener {
             return repoDir;
         }
 
-        throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
+        throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.eclipse.ceylon.ide.intellij"));
     }
 
     @NotNull
@@ -118,7 +118,7 @@ public class CeylonIdePlugin implements ApplicationLoadListener {
             return ceylonRepoDir;
         }
 
-        throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
+        throw new PluginException("Embedded Ceylon system repo not found", PluginId.getId("org.eclipse.ceylon.ide.intellij"));
     }
 
     @NotNull
@@ -129,7 +129,7 @@ public class CeylonIdePlugin implements ApplicationLoadListener {
             return pluginClassesDir;
         }
 
-        throw new PluginException("Plugin's 'classes' directory not found", PluginId.getId("org.intellij.plugins.ceylon.ide"));
+        throw new PluginException("Plugin's 'classes' directory not found", PluginId.getId("org.eclipse.ceylon.ide.intellij"));
     }
 
     /**

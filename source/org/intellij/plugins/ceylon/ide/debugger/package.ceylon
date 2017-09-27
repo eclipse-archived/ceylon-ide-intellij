@@ -1,2 +1,2 @@
-"Default documentation for package `org.intellij.plugins.ceylon.ide.debugger`."
-shared package org.intellij.plugins.ceylon.ide.debugger;
+"Default documentation for package `org.eclipse.ceylon.ide.intellij.debugger`."
+shared package org.eclipse.ceylon.ide.intellij.debugger;

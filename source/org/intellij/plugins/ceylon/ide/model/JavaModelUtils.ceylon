@@ -25,7 +25,7 @@ import org.eclipse.ceylon.model.typechecker.model {
     Module
 }
 
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     ceylonSourceNavigator
 }
 

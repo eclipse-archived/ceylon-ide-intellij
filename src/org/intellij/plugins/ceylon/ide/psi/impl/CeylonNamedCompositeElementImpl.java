@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.psi.impl;
+package org.eclipse.ceylon.ide.intellij.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiNamedElement;

@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.project;
+package org.eclipse.ceylon.ide.intellij.project;

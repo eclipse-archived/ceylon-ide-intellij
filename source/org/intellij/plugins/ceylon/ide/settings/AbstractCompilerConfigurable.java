@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.settings;
+package org.eclipse.ceylon.ide.intellij.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;

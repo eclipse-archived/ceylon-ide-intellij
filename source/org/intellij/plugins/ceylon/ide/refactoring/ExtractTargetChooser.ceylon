@@ -38,7 +38,7 @@ import javax.swing.event {
     ListSelectionEvent
 }
 
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     highlighter
 }
 import com.intellij.ui.components {

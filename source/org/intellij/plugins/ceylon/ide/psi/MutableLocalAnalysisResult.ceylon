@@ -33,7 +33,7 @@ import java.util {
 import org.antlr.runtime {
     CommonToken
 }
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaDocument
 }
 import ceylon.interop.java {

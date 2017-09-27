@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.psi.impl;
+package org.eclipse.ceylon.ide.intellij.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ApplicationManager;
@@ -14,8 +14,8 @@ import org.eclipse.ceylon.ide.common.typechecker.AnalysisResult;
 import org.eclipse.ceylon.ide.common.util.escaping_;
 import org.eclipse.ceylon.model.typechecker.model.Declaration;
 import org.eclipse.ceylon.model.typechecker.model.FunctionOrValue;
-import org.intellij.plugins.ceylon.ide.psi.*;
-import org.intellij.plugins.ceylon.ide.util.icons_;
+import org.eclipse.ceylon.ide.intellij.psi.*;
+import org.eclipse.ceylon.ide.intellij.util.icons_;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;

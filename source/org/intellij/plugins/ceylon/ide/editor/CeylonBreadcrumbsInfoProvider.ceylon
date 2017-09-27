@@ -17,10 +17,10 @@ import java.lang {
     ObjectArray
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonLanguage
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     descriptions,
     CeylonCompositeElement,
     CeylonPsi

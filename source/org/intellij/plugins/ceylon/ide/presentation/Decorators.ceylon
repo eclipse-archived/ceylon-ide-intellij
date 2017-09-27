@@ -66,10 +66,10 @@ import java.util {
     Comparator
 }
 
-import org.intellij.plugins.ceylon.ide.compiled {
+import org.eclipse.ceylon.ide.intellij.compiled {
     classFileDecompilerUtil
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.integrations.maven;
+package org.eclipse.ceylon.ide.intellij.integrations.maven;

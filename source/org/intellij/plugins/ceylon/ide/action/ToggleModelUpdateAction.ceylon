@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem {
     CommonDataKeys
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     getModelManager
 }
 

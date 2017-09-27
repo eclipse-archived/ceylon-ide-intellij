@@ -44,10 +44,10 @@ import java.util {
     Set
 }
 
-import org.intellij.plugins.ceylon.ide.codeInsight.navigation {
+import org.eclipse.ceylon.ide.intellij.codeInsight.navigation {
     CeylonGotoContributor
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaModule,
     concurrencyManager {
         withAlternateResolution

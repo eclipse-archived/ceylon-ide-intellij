@@ -10,7 +10,7 @@ import java.lang {
     Types
 }
 
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonCompositeElement,
     CeylonPsiVisitor
 }

@@ -37,7 +37,7 @@ import java.awt {
     Color
 }
 
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 import java.lang {

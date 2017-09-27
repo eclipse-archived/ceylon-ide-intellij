@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.facet;
+package org.eclipse.ceylon.ide.intellij.facet;

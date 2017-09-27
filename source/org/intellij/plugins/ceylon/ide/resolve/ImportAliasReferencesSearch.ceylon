@@ -24,12 +24,12 @@ import com.intellij.util {
     Processor
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     concurrencyManager {
         needReadAccess
     }
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonCompositeElement,
     CeylonPsi,
     CeylonFile

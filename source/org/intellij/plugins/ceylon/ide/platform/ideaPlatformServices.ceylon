@@ -13,7 +13,7 @@ import org.eclipse.ceylon.model.typechecker.model {
     Unit
 }
 
-import org.intellij.plugins.ceylon.ide.completion {
+import org.eclipse.ceylon.ide.intellij.completion {
     ideaCompletionServices
 }
 

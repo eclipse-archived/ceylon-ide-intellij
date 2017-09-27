@@ -64,21 +64,21 @@ import java.util {
     List
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     ceylonLanguage
 }
-import org.intellij.plugins.ceylon.ide.lightpsi {
+import org.eclipse.ceylon.ide.intellij.lightpsi {
     CeyLightMethod,
     CeyLightTypeParameter
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     PSIClass,
     PSIMethod
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonTreeUtil
 }
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     IdeaNavigation
 }
 

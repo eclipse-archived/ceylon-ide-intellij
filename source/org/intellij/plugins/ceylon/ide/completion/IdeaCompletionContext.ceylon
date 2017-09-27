@@ -34,10 +34,10 @@ import org.eclipse.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
 
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaDocument
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
 

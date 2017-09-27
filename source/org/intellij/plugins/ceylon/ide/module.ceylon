@@ -1,5 +1,5 @@
 native("jvm")
-module org.intellij.plugins.ceylon.ide "current" {
+module org.eclipse.ceylon.ide.intellij "current" {
     shared import java.base "7";
     shared import org.eclipse.ceylon.ide.common "1.3.4-SNAPSHOT";
     shared import ceylon.tool.converter.java2ceylon "1.3.4-SNAPSHOT";

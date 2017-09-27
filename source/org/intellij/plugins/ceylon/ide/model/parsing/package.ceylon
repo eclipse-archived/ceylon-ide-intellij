@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.model.parsing;
+shared package org.eclipse.ceylon.ide.intellij.model.parsing;

@@ -5,7 +5,7 @@ import com.intellij.psi {
     PsiElement
 }
 
-import org.intellij.plugins.ceylon.ide.refactoring {
+import org.eclipse.ceylon.ide.intellij.refactoring {
     CeylonChangeSignatureHandler,
     ExtractFunctionHandler,
     ExtractValueHandler

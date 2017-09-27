@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.formatting;
+package org.eclipse.ceylon.ide.intellij.formatting;
 
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CustomCodeStyleSettings;

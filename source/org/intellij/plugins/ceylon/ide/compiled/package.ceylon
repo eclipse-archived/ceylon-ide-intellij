@@ -4,4 +4,4 @@
  * changing labels and icons to reflect the original Ceylon declaration
  * associating original source declarations
  "
-shared package org.intellij.plugins.ceylon.ide.compiled;
+shared package org.eclipse.ceylon.ide.intellij.compiled;

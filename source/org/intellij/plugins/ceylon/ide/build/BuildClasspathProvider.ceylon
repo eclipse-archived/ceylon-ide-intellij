@@ -16,7 +16,7 @@ import java.util {
     List
 }
 
-import org.intellij.plugins.ceylon.ide.startup {
+import org.eclipse.ceylon.ide.intellij.startup {
     CeylonIdePlugin
 }
 

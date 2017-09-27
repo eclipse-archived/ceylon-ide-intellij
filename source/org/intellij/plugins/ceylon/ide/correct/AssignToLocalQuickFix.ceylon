@@ -22,19 +22,19 @@ import org.eclipse.ceylon.model.typechecker.model {
     Declaration
 }
 
-import org.intellij.plugins.ceylon.ide.completion {
+import org.eclipse.ceylon.ide.intellij.completion {
     IdeaProposalsHolder,
     CompletionHandler
 }
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaTextChange,
     IdeaLinkedMode,
     IdeaDocument
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

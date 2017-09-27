@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.wizard;
+package org.eclipse.ceylon.ide.intellij.wizard;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;

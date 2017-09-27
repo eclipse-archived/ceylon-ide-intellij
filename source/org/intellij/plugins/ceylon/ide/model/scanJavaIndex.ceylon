@@ -89,7 +89,7 @@ import java.util {
     JList=List
 }
 
-import org.intellij.plugins.ceylon.ide.compiled {
+import org.eclipse.ceylon.ide.intellij.compiled {
     classFileDecompilerUtil
 }
 

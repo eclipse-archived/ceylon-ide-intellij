@@ -4,7 +4,7 @@ import com.intellij.openapi.fileChooser {
 import com.intellij.ide.highlighter {
     XmlFileType
 }
-import org.intellij.plugins.ceylon.ide {
+import org.eclipse.ceylon.ide.intellij {
     CeylonBundle
 }
 

@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.lightpsi;
+shared package org.eclipse.ceylon.ide.intellij.lightpsi;

@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.model;
+shared package org.eclipse.ceylon.ide.intellij.model;

@@ -1,14 +1,14 @@
-package org.intellij.plugins.ceylon.ide.codeInsight.resolve;
+package org.eclipse.ceylon.ide.intellij.codeInsight.resolve;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.intellij.plugins.ceylon.ideInsightTestSupport;
-import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
-import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
+import org.eclipse.ceylon.ide.intellijInsightTestSupport;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonCompositeElement;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonFile;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonPsi;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.project;
+package org.eclipse.ceylon.ide.intellij.project;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;

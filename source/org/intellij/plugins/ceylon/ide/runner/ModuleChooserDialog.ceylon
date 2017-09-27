@@ -30,17 +30,17 @@ import javax.swing.tree {
     DefaultTreeCellRenderer
 }
 
-import org.intellij.plugins.ceylon.ide.facet {
+import org.eclipse.ceylon.ide.intellij.facet {
     CeylonFacet
 }
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     highlighter
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProjects,
     IdeaCeylonProject
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

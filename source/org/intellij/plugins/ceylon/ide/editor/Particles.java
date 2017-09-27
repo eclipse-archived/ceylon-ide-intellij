@@ -1,4 +1,4 @@
-//package org.intellij.plugins.ceylon.ide.editor;
+//package org.eclipse.ceylon.ide.intellij.editor;
 //
 //import com.intellij.codeInsight.template.impl.editorActions.TypedActionHandlerBase;
 //import com.intellij.openapi.Disposable;

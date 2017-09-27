@@ -42,7 +42,7 @@ import java.util {
     List
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     PSIClass,
     PSIMethod,
     concurrencyManager {
@@ -50,13 +50,13 @@ import org.intellij.plugins.ceylon.ide.model {
     },
     PsiElementGoneException
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonCompositeElement,
     CeylonFile,
     CeylonPsi,
     CeylonTreeUtil
 }
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     resolveDeclaration
 }
 

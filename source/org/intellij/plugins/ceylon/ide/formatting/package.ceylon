@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.formatting;
+package org.eclipse.ceylon.ide.intellij.formatting;

@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.startup;
+package org.eclipse.ceylon.ide.intellij.startup;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;

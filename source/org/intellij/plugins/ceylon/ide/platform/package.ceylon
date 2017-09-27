@@ -1,2 +1,2 @@
-"Default documentation for package `org.intellij.plugins.ceylon.ide.platform`."
-shared package org.intellij.plugins.ceylon.ide.platform;
+"Default documentation for package `org.eclipse.ceylon.ide.intellij.platform`."
+shared package org.eclipse.ceylon.ide.intellij.platform;

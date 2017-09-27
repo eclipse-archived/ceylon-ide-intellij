@@ -35,11 +35,11 @@ import java.util {
     Arrays
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     PSIMethod,
     PsiElementGoneException
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi
 }
 

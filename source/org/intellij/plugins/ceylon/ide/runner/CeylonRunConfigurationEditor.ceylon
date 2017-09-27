@@ -15,7 +15,7 @@ import javax.swing.event {
     DocumentEvent
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaModule,
     getCeylonProjects
 }

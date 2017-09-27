@@ -10,7 +10,7 @@ import java.io {
     File
 }
 
-import org.intellij.plugins.ceylon.ide {
+import org.eclipse.ceylon.ide.intellij {
     CeylonBundle
 }
 

@@ -56,10 +56,10 @@ import javax.swing.table {
     DefaultTableCellRenderer
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject
 }
-import org.intellij.plugins.ceylon.ide.settings {
+import org.eclipse.ceylon.ide.intellij.settings {
     ceylonSettings
 }
 

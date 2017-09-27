@@ -49,14 +49,14 @@ import java.util {
 import org.antlr.runtime {
     CommonToken
 }
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaDocument,
     IdeaTextChange
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
-import org.intellij.plugins.ceylon.ide.vfs {
+import org.eclipse.ceylon.ide.intellij.vfs {
     VirtualFileVirtualFile
 }
 import com.intellij.refactoring.util {

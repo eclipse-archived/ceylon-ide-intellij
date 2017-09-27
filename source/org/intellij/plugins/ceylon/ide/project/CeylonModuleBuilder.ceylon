@@ -41,18 +41,18 @@ import java.util {
     List
 }
 
-import org.intellij.plugins.ceylon.ide.facet {
+import org.eclipse.ceylon.ide.intellij.facet {
     CeylonFacet
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject,
     CeylonProjectManager,
     getCeylonProjects
 }
-import org.intellij.plugins.ceylon.ide.settings {
+import org.eclipse.ceylon.ide.intellij.settings {
     ceylonSettings
 }
-import org.intellij.plugins.ceylon.ide.startup {
+import org.eclipse.ceylon.ide.intellij.startup {
     CeylonIdePlugin {
         embeddedCeylonDist
     }

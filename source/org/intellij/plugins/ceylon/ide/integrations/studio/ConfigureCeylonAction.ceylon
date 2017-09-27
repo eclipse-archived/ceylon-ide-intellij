@@ -3,7 +3,7 @@ import com.intellij.openapi.actionSystem {
     AnActionEvent,
     LangDataKeys
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

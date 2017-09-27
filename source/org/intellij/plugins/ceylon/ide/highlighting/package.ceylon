@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.highlighting;
+package org.eclipse.ceylon.ide.intellij.highlighting;

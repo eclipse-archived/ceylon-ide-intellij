@@ -30,11 +30,11 @@ import java.util.regex {
     Pattern
 }
 
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonPsi,
     CeylonTokens
 }
-import org.intellij.plugins.ceylon.ide.psi.impl {
+import org.eclipse.ceylon.ide.intellij.psi.impl {
     CeylonNamedCompositeElementImpl,
     CeylonNamedTypePsiImpl
 }

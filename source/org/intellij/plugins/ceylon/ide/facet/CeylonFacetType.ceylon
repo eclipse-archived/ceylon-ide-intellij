@@ -8,10 +8,10 @@ import com.intellij.openapi.\imodule {
     ModuleType
 }
 
-import org.intellij.plugins.ceylon.ide.project {
+import org.eclipse.ceylon.ide.intellij.project {
     CeylonModuleType
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

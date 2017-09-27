@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.settings;
+package org.eclipse.ceylon.ide.intellij.settings;

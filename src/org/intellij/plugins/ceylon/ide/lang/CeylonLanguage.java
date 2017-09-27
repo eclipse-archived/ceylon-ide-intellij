@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.lang;
+package org.eclipse.ceylon.ide.intellij.lang;
 
 import com.intellij.lang.Language;
 

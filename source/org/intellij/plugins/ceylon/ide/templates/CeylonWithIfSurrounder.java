@@ -1,4 +1,4 @@
-//package org.intellij.plugins.ceylon.ide.templates;
+//package org.eclipse.ceylon.ide.intellij.templates;
 //
 //import com.intellij.codeInsight.CodeInsightUtilCore;
 //import com.intellij.lang.surroundWith.Surrounder;
@@ -11,8 +11,8 @@
 //import com.intellij.psi.util.PsiTreeUtil;
 //import com.intellij.psi.util.PsiUtilCore;
 //import com.intellij.util.IncorrectOperationException;
-//import org.intellij.plugins.ceylon.ide.lang.CeylonFileType;
-//import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
+//import org.eclipse.ceylon.ide.intellij.lang.CeylonFileType;
+//import org.eclipse.ceylon.ide.intellij.psi.CeylonPsi;
 //import org.jetbrains.annotations.NotNull;
 //import org.jetbrains.annotations.Nullable;
 //

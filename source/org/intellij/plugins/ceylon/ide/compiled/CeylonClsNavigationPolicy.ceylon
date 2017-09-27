@@ -8,7 +8,7 @@ import com.intellij.psi.impl.compiled {
     ClsFieldImpl
 }
 
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     ceylonSourceNavigator
 }
 import java.lang {

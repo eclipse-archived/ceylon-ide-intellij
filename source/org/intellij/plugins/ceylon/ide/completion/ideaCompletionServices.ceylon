@@ -52,16 +52,16 @@ import org.eclipse.ceylon.model.typechecker.model {
     Functional
 }
 
-import org.intellij.plugins.ceylon.ide.compiled {
+import org.eclipse.ceylon.ide.intellij.compiled {
     classFileDecompilerUtil
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     FakeCompletionDeclaration
 }
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaTextChange
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

@@ -1,4 +1,4 @@
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     IdeaDocument
 }
 import com.intellij.codeInsight.editorActions.smartEnter {

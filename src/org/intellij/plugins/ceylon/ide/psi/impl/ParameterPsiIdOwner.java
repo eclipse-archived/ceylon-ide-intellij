@@ -1,4 +1,4 @@
-package org.intellij.plugins.ceylon.ide.psi.impl;
+package org.eclipse.ceylon.ide.intellij.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -6,8 +6,8 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsi;
-import org.intellij.plugins.ceylon.ide.psi.CeylonPsiImpl;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonPsi;
+import org.eclipse.ceylon.ide.intellij.psi.CeylonPsiImpl;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

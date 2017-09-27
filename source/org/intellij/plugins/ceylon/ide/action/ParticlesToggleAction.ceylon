@@ -2,7 +2,7 @@
 //    AnActionEvent,
 //    ToggleAction
 //}
-//import org.intellij.plugins.ceylon.ide.editor {
+//import org.eclipse.ceylon.ide.intellij.editor {
 //    Particles
 //}
 //

@@ -43,14 +43,14 @@ import java.util {
     Arrays
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     getCeylonProject,
     findModuleByName
 }
-import org.intellij.plugins.ceylon.ide.startup {
+import org.eclipse.ceylon.ide.intellij.startup {
     CeylonIdePlugin
 }
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 import org.jdom {

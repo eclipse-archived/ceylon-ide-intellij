@@ -60,27 +60,27 @@ import java.util.concurrent {
     TimeUnit
 }
 
-import org.intellij.plugins.ceylon.ide.correct {
+import org.eclipse.ceylon.ide.intellij.correct {
     IdeaQuickFixData
 }
-import org.intellij.plugins.ceylon.ide.doc {
+import org.eclipse.ceylon.ide.intellij.doc {
     IdeaDocGenerator
 }
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     highlighter
 }
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonLanguage
 }
-import org.intellij.plugins.ceylon.ide.lightpsi {
+import org.eclipse.ceylon.ide.intellij.lightpsi {
     CeylonLightElement
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     getCeylonProjects,
     FakeCompletionDeclaration,
     getCeylonProject
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonCompositeElement,
     CeylonFile,
     CeylonTokens {
@@ -89,10 +89,10 @@ import org.intellij.plugins.ceylon.ide.psi {
     descriptions,
     CeylonPsi
 }
-import org.intellij.plugins.ceylon.ide.psi.impl {
+import org.eclipse.ceylon.ide.intellij.psi.impl {
     DeclarationPsiNameIdOwner
 }
-import org.intellij.plugins.ceylon.ide.resolve {
+import org.eclipse.ceylon.ide.intellij.resolve {
     resolveDeclaration,
     CeylonSourceNavigator
 }

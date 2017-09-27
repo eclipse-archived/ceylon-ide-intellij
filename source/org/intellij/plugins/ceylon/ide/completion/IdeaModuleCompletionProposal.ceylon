@@ -19,7 +19,7 @@ import org.eclipse.ceylon.ide.common.refactoring {
     DefaultRegion
 }
 
-import org.intellij.plugins.ceylon.ide.util {
+import org.eclipse.ceylon.ide.intellij.util {
     icons
 }
 

@@ -58,11 +58,11 @@ import javax.swing {
     ListCellRenderer
 }
 
-import org.intellij.plugins.ceylon.ide.highlighting {
+import org.eclipse.ceylon.ide.intellij.highlighting {
     ceylonHighlightingColors,
     hForegroundColor=foregroundColor
 }
-import org.intellij.plugins.ceylon.ide.settings {
+import org.eclipse.ceylon.ide.intellij.settings {
     ceylonSettings
 }
 

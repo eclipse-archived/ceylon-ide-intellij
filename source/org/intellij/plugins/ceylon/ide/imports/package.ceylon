@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.imports;
+shared package org.eclipse.ceylon.ide.intellij.imports;

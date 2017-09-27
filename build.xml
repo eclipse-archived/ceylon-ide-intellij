@@ -46,7 +46,7 @@
         <typedef resource="org/eclipse/ceylon/ant/antlib.xml" classpathref="ant-tasks" />
 
         <moduleset id="modules.source">
-            <module name="org.intellij.plugins.ceylon.ide" />
+            <module name="org.eclipse.ceylon.ide.intellij" />
         </moduleset>
 
         <reposet id="reposet.compile">
@@ -203,7 +203,7 @@
             </classpath>
 
             <include name="*.java"/>
-            <include name="org/intellij/plugins/ceylon/ide/psi/CeylonPsi.java"/>
+            <include name="org/eclipse/ceylon/ide/intellij/psi/CeylonPsi.java"/>
         </javac>
         <java classname="TokenTypesGenerator" dir="${basedir}" fork="yes">
             <arg path="gen"/>
@@ -276,7 +276,7 @@
     </path>
 
     <path id="dist.classpath">
-        <pathelement path="${basedir}/modules/org/intellij/plugins/ceylon/ide/current/org.intellij.plugins.ceylon.ide-current.car" />
+        <pathelement path="${basedir}/modules/org/eclipse/ceylon/ide/intellij/current/org.eclipse.ceylon.ide.intellij-current.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/org/eclipse/ceylon/ide/common/${module.org.eclipse.ceylon.ide.common.version}/org.eclipse.ceylon.ide.common-${module.org.eclipse.ceylon.ide.common.version}.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar" />

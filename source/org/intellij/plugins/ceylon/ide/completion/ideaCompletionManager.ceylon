@@ -53,7 +53,7 @@ import java.lang {
     JInteger=Integer
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     concurrencyManager {
         withAlternateResolution
     },
@@ -61,10 +61,10 @@ import org.intellij.plugins.ceylon.ide.model {
     CeylonModelManager,
     PsiElementGoneException
 }
-import org.intellij.plugins.ceylon.ide.model.parsing {
+import org.eclipse.ceylon.ide.intellij.model.parsing {
     ProgressIndicatorMonitor
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile,
     CeylonTokens,
     CeylonLocalAnalyzer

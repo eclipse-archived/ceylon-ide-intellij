@@ -1,1 +1,1 @@
-shared package org.intellij.plugins.ceylon.ide.startup;
+shared package org.eclipse.ceylon.ide.intellij.startup;

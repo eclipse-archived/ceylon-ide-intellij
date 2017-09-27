@@ -1,4 +1,4 @@
-import org.intellij.plugins.ceylon.ide.correct {
+import org.eclipse.ceylon.ide.intellij.correct {
     RefineEqualsHashIntention
 }
 

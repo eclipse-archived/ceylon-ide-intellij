@@ -49,20 +49,20 @@ import java.nio.file {
     StandardOpenOption
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     concurrencyManager {
         withUpToDateIndexes
     },
     IdeaCeylonProject,
     IdeaCeylonProjects
 }
-import org.intellij.plugins.ceylon.ide.model.parsing {
+import org.eclipse.ceylon.ide.intellij.model.parsing {
     ProgressIndicatorMonitor
 }
-import org.intellij.plugins.ceylon.ide.settings {
+import org.eclipse.ceylon.ide.intellij.settings {
     ceylonSettings
 }
-import org.intellij.plugins.ceylon.ide.vfs {
+import org.eclipse.ceylon.ide.intellij.vfs {
     VirtualFileVirtualFile
 }
 shared class CeylonBuilder() satisfies CompileTask {

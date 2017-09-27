@@ -18,10 +18,10 @@ import java.lang {
     UnsupportedOperationException
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     ceylonLanguage
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile,
     CeylonPsiFactory,
     CeylonTypes,
@@ -30,7 +30,7 @@ import org.intellij.plugins.ceylon.ide.psi {
     CeylonPsi,
     parserConstants
 }
-import org.intellij.plugins.ceylon.ide.psi.impl {
+import org.eclipse.ceylon.ide.intellij.psi.impl {
     SpecifierStatementPsiIdOwner
 }
 

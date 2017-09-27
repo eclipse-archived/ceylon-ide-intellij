@@ -1,3 +1,3 @@
-"Default documentation for package `org.intellij.plugins.ceylon.ide.structureView`."
+"Default documentation for package `org.eclipse.ceylon.ide.intellij.structureView`."
 suppressWarnings("packageName")
-shared package org.intellij.plugins.ceylon.ide.structureView;
+shared package org.eclipse.ceylon.ide.intellij.structureView;

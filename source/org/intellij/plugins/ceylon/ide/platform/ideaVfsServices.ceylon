@@ -40,12 +40,12 @@ import java.lang.ref {
     WeakReference
 }
 
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     IdeaCeylonProject,
     IdeaCeylonProjects,
     CeylonModelManager
 }
-import org.intellij.plugins.ceylon.ide.vfs {
+import org.eclipse.ceylon.ide.intellij.vfs {
     IdeaVirtualFolder,
     VirtualFileVirtualFile
 }

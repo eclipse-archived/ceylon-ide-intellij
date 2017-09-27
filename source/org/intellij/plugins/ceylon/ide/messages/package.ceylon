@@ -1,2 +1,2 @@
-"Default documentation for package `org.intellij.plugins.ceylon.ide.messages`."
-shared package org.intellij.plugins.ceylon.ide.messages;
+"Default documentation for package `org.eclipse.ceylon.ide.intellij.messages`."
+shared package org.eclipse.ceylon.ide.intellij.messages;

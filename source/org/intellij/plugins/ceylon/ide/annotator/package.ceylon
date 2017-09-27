@@ -1,1 +1,1 @@
-package org.intellij.plugins.ceylon.ide.annotator;
+package org.eclipse.ceylon.ide.intellij.annotator;

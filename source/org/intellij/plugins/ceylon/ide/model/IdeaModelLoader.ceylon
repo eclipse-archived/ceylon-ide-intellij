@@ -84,7 +84,7 @@ import java.util.concurrent {
     Callable
 }
 
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     ideaPlatformUtils
 }
 import com.intellij.psi.search.searches {
@@ -96,7 +96,7 @@ import org.eclipse.ceylon.model.loader {
 import com.intellij.psi.util {
     MethodSignatureUtil
 }
-import org.intellij.plugins.ceylon.ide.model {
+import org.eclipse.ceylon.ide.intellij.model {
     concurrencyManager {
         outsideDumbMode,
         dontCancel,

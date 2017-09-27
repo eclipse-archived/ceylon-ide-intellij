@@ -22,19 +22,19 @@ import org.eclipse.ceylon.ide.common.typechecker {
     ExternalPhasedUnit
 }
 
-import org.intellij.plugins.ceylon.ide.platform {
+import org.eclipse.ceylon.ide.intellij.platform {
     ideaPlatformServices
 }
-import org.intellij.plugins.ceylon.ide.psi {
+import org.eclipse.ceylon.ide.intellij.psi {
     CeylonFile
 }
 import com.intellij.codeInsight.intention {
     IntentionManager
 }
-import org.intellij.plugins.ceylon.ide.correct {
+import org.eclipse.ceylon.ide.intellij.correct {
     AbstractIntention
 }
-import org.intellij.plugins.ceylon.ide.messages {
+import org.eclipse.ceylon.ide.intellij.messages {
     BackendMessageHandler
 }
 import com.intellij.compiler.server {

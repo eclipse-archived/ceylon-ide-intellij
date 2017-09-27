@@ -15,7 +15,7 @@ import com.intellij.psi.codeStyle {
     CodeStyleSettings
 }
 
-import org.intellij.plugins.ceylon.ide.lang {
+import org.eclipse.ceylon.ide.intellij.lang {
     CeylonLanguage
 }
 
