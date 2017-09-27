@@ -10,15 +10,15 @@ import com.intellij.openapi.util.text {
 import com.intellij.psi {
     PsiElement
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.model.loader.model {
+import org.eclipse.ceylon.model.loader.model {
     JavaMethod,
     LazyClass,
     LazyFunction
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration,
     Functional
 }

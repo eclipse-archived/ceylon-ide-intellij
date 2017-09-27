@@ -11,7 +11,7 @@ import com.intellij.openapi.\imodule {
 import com.intellij.util {
     PairConsumer
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backend
 }
 

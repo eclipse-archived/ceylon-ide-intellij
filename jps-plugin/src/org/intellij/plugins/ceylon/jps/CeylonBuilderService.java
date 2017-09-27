@@ -1,6 +1,6 @@
 package org.intellij.plugins.ceylon.jps;
 
-import com.redhat.ceylon.compiler.java.runtime.tools.Backend;
+import org.eclipse.ceylon.compiler.java.runtime.tools.Backend;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.incremental.BuilderCategory;
 import org.jetbrains.jps.incremental.BuilderService;

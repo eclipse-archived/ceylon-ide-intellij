@@ -1,7 +1,7 @@
 import com.intellij.openapi.project {
     Project
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration,
     Class,
     Function

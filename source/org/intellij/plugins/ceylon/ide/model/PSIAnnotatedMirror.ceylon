@@ -10,7 +10,7 @@ import com.intellij.psi {
     PsiElement,
     PsiModifier
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     AnnotatedMirror,
     AccessibleMirror
 }

@@ -16,7 +16,7 @@ import com.intellij.refactoring.rename {
 import com.intellij.util {
     ProcessingContext
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     escaping
 }
 

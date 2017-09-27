@@ -6,7 +6,7 @@ import com.intellij.codeInsight.completion {
 import com.intellij.patterns {
     PlatformPatterns
 }
-import com.redhat.ceylon.ide.common.settings {
+import org.eclipse.ceylon.ide.common.settings {
     CompletionOptions
 }
 

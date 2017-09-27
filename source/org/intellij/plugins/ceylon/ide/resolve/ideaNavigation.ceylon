@@ -16,13 +16,13 @@ import com.intellij.psi {
 import com.intellij.psi.util {
     PsiTreeUtil
 }
-import com.redhat.ceylon.ide.common.open {
+import org.eclipse.ceylon.ide.common.open {
     AbstractNavigation
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     Path
 }
-import com.redhat.ceylon.model.loader.model {
+import org.eclipse.ceylon.model.loader.model {
     JavaBeanValue,
     LazyClass,
     LazyInterface,
@@ -30,7 +30,7 @@ import com.redhat.ceylon.model.loader.model {
     FieldValue,
     AnnotationProxyClass
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration,
     ClassOrInterface,
     Referenceable,
@@ -87,7 +87,7 @@ shared PsiNameIdentifierOwner? declarationToPsi(Declaration rawDeclaration) {
     }
 
     function hasAnnotationName(PsiMethod ctor, Declaration declaration)
-            => if (exists ann = ctor.modifierList.findAnnotation("com.redhat.ceylon.compiler.java.metadata.Name"),
+            => if (exists ann = ctor.modifierList.findAnnotation("org.eclipse.ceylon.compiler.java.metadata.Name"),
                    is PsiLiteralExpression name = ann.findAttributeValue("value"),
                    exists text = name.\ivalue?.string)
             then text == declaration.name

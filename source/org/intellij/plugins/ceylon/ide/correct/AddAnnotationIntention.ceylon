@@ -1,17 +1,17 @@
-import com.redhat.ceylon.ide.common.correct {
+import org.eclipse.ceylon.ide.common.correct {
     addAnnotationQuickFix
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     nodes
 }
 
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration
 }
 

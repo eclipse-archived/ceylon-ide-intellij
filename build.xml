@@ -43,7 +43,7 @@
     </path>
 
     <target name="ceylondefs">
-        <typedef resource="com/redhat/ceylon/ant/antlib.xml" classpathref="ant-tasks" />
+        <typedef resource="org/eclipse/ceylon/ant/antlib.xml" classpathref="ant-tasks" />
 
         <moduleset id="modules.source">
             <module name="org.intellij.plugins.ceylon.ide" />
@@ -132,10 +132,10 @@
 
     <target name="antlr.tree"
             description="Generate code from ANTLR grammar">
-        <mkdir dir="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"/>
+        <mkdir dir="${antlr.dst}/org/eclipse/ceylon/compiler/typechecker/treegen"/>
         <java classname="org.antlr.Tool" dir="${basedir}" fork="yes">
             <arg value="-fo"/>
-            <arg value="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"/>
+            <arg value="${antlr.dst}/org/eclipse/ceylon/compiler/typechecker/treegen"/>
             <arg value="grammar/IdeaAstTypesGen.g"/>
             <arg value="grammar/PsiIntfGen.g"/>
             <arg value="grammar/PsiImplGen.g"/>
@@ -146,7 +146,7 @@
             </classpath>
         </java>
         <delete>
-            <fileset dir="${antlr.dst}/com/redhat/ceylon/compiler/typechecker/treegen"
+            <fileset dir="${antlr.dst}/org/eclipse/ceylon/compiler/typechecker/treegen"
                      includes="*.tokens"/>
         </delete>
     </target>
@@ -165,7 +165,7 @@
                 debug="true"
                 encoding="UTF-8">
             <classpath refid="grammar-common-classpath"/>
-            <include name="com/redhat/ceylon/compiler/typechecker/treegen/*.java"/>
+            <include name="org/eclipse/ceylon/compiler/typechecker/treegen/*.java"/>
         </javac>
     </target>
 
@@ -182,7 +182,7 @@
         <mkdir dir="${basedir}/gen"/>
 
         <property name="NodesFile" location="../ceylon/typechecker/antlr/Ceylon.nodes"/>
-        <java classname="com.redhat.ceylon.compiler.typechecker.treegen.GenerateIdeaElements" dir="${basedir}" fork="yes">
+        <java classname="org.eclipse.ceylon.compiler.typechecker.treegen.GenerateIdeaElements" dir="${basedir}" fork="yes">
             <arg value="${NodesFile}"/>
             <arg path="${gen}"/>
             <classpath>
@@ -231,11 +231,11 @@
     </target>
 
     <path id="ceylon.runtime">
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/common/${embedded.ceylon.version}/com.redhat.ceylon.common-${embedded.ceylon.version}.jar" />
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/module-resolver/${embedded.ceylon.version}/com.redhat.ceylon.module-resolver-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/common/${embedded.ceylon.version}/org.eclipse.ceylon.common-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/module-resolver/${embedded.ceylon.version}/org.eclipse.ceylon.module-resolver-${embedded.ceylon.version}.jar" />
         <pathelement path="${dist.repo.dir}/ceylon/language/${embedded.ceylon.version}/ceylon.language-${embedded.ceylon.version}.car" />
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/model/${embedded.ceylon.version}/com.redhat.ceylon.model-${embedded.ceylon.version}.jar" />
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/langtools/classfile/${embedded.ceylon.version}/com.redhat.ceylon.langtools.classfile-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/model/${embedded.ceylon.version}/org.eclipse.ceylon.model-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/langtools/classfile/${embedded.ceylon.version}/org.eclipse.ceylon.langtools.classfile-${embedded.ceylon.version}.jar" />
     </path>
 
     <path id="compile.runtime.classpath">
@@ -263,13 +263,13 @@
         <pathelement path="${dist.repo.dir}/org/apache/commons/logging/1.1.1/org.apache.commons.logging-1.1.1.jar" />
         <pathelement path="${dist.repo.dir}/com/github/rjeschke/txtmark/0.13/com.github.rjeschke.txtmark-0.13.jar" />
         <pathelement path="${dist.repo.dir}/com/github/lookfirst/sardine/5.1/com.github.lookfirst.sardine-5.1.jar" />
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/maven-support/2.0/com.redhat.ceylon.maven-support-2.0.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/maven-support/2.0/org.eclipse.ceylon.maven-support-2.0.jar" />
 
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/cli/${embedded.ceylon.version}/com.redhat.ceylon.cli-${embedded.ceylon.version}.jar" />
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/compiler/js/${embedded.ceylon.version}/com.redhat.ceylon.compiler.js-${embedded.ceylon.version}.jar" />
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/compiler/java/${embedded.ceylon.version}/com.redhat.ceylon.compiler.java-${embedded.ceylon.version}.jar" />
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/typechecker/${embedded.ceylon.version}/com.redhat.ceylon.typechecker-${embedded.ceylon.version}.jar" />
-        <pathelement path="${dist.repo.dir}/com/redhat/ceylon/tool/provider/${embedded.ceylon.version}/com.redhat.ceylon.tool.provider-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/cli/${embedded.ceylon.version}/org.eclipse.ceylon.cli-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/compiler/js/${embedded.ceylon.version}/org.eclipse.ceylon.compiler.js-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/compiler/java/${embedded.ceylon.version}/org.eclipse.ceylon.compiler.java-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/typechecker/${embedded.ceylon.version}/org.eclipse.ceylon.typechecker-${embedded.ceylon.version}.jar" />
+        <pathelement path="${dist.repo.dir}/org/eclipse/ceylon/tool/provider/${embedded.ceylon.version}/org.eclipse.ceylon.tool.provider-${embedded.ceylon.version}.jar" />
         <pathelement path="${dist.repo.dir}/ceylon/runtime/${embedded.ceylon.version}/ceylon.runtime-${embedded.ceylon.version}.jar" />
 
         <pathelement path="${dist.libs.dir}/ceylon-bootstrap.jar" />
@@ -277,7 +277,7 @@
 
     <path id="dist.classpath">
         <pathelement path="${basedir}/modules/org/intellij/plugins/ceylon/ide/current/org.intellij.plugins.ceylon.ide-current.car" />
-        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/com/redhat/ceylon/ide/common/${module.com.redhat.ceylon.ide.common.version}/com.redhat.ceylon.ide.common-${module.com.redhat.ceylon.ide.common.version}.car" />
+        <pathelement path="${projects.base.dir}/ceylon-ide-common/modules/org/eclipse/ceylon/ide/common/${module.org.eclipse.ceylon.ide.common.version}/org.eclipse.ceylon.ide.common-${module.org.eclipse.ceylon.ide.common.version}.car" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/org/jgrapht/core/0.9.1/org.jgrapht.core-0.9.1.jar" />
         <pathelement path="${projects.base.dir}/ceylon-ide-common/repo/net/lingala/zip4j/1.3.2/net.lingala.zip4j-1.3.2.jar" />
         <pathelement path="${projects.base.dir}/ceylon-sdk/modules/ceylon/collection/${embedded.ceylon.version}/ceylon.collection-${embedded.ceylon.version}.car" />
@@ -319,16 +319,16 @@
             <fileset dir="${basedir}/resources" includes="META-INF/**"/>
         </copy>
         <if>
-            <contains string="${module.com.redhat.ceylon.ide.intellij.version}" substring="-SNAPSHOT"/>
+            <contains string="${module.org.eclipse.ceylon.ide.intellij.version}" substring="-SNAPSHOT"/>
             <then>
                 <replace file="${build.dir}/CeylonIDEA/META-INF/plugin.xml"
-                         value="${module.com.redhat.ceylon.ide.intellij.version}-${NOW}">
+                         value="${module.org.eclipse.ceylon.ide.intellij.version}-${NOW}">
                     <replacetoken>$pluginVersion$</replacetoken>
                 </replace>
             </then>
             <else>
                 <replace file="${build.dir}/CeylonIDEA/META-INF/plugin.xml"
-                         value="${module.com.redhat.ceylon.ide.intellij.version}">
+                         value="${module.org.eclipse.ceylon.ide.intellij.version}">
                     <replacetoken>$pluginVersion$</replacetoken>
                 </replace>
             </else>

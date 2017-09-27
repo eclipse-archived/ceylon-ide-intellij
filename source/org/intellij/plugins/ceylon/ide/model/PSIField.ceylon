@@ -3,7 +3,7 @@ import com.intellij.psi {
     PsiModifier,
     SmartPsiElementPointer
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     FieldMirror
 }
 import org.intellij.plugins.ceylon.ide.model {

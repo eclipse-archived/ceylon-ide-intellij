@@ -70,19 +70,19 @@ import com.intellij.util.ui.table {
     JBTableRowEditor,
     JBTableRow
 }
-import com.redhat.ceylon.compiler.typechecker.context {
+import org.eclipse.ceylon.compiler.typechecker.context {
     PhasedUnit,
     TypecheckerUnit
 }
-import com.redhat.ceylon.ide.common.refactoring {
+import org.eclipse.ceylon.ide.common.refactoring {
     ChangeParametersRefactoring,
     parseTypeExpression
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     nodes,
     escaping
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration,
     Functional
 }

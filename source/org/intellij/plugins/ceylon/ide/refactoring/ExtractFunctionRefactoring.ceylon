@@ -25,11 +25,11 @@ import com.intellij.psi {
 import com.intellij.psi.util {
     PsiTreeUtil
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Visitor,
     Tree
 }
-import com.redhat.ceylon.ide.common.refactoring {
+import org.eclipse.ceylon.ide.common.refactoring {
     createExtractFunctionRefactoring,
     DefaultRegion
 }

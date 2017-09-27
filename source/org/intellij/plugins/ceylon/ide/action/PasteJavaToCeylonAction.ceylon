@@ -39,7 +39,7 @@ import com.intellij.psi {
 import com.intellij.psi.codeStyle {
     CodeStyleManager
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     CeylonIdeConfig
 }
 

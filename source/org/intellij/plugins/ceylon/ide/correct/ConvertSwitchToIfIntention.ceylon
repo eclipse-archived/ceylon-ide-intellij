@@ -1,9 +1,9 @@
-import com.redhat.ceylon.ide.common.correct {
+import org.eclipse.ceylon.ide.common.correct {
     convertSwitchToIfQuickFix,
     convertSwitchStatementToExpressionQuickFix,
     convertSwitchExpressionToStatementQuickFix
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     nodes
 }
 

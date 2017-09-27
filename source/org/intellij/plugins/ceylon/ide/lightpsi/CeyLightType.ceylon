@@ -24,16 +24,16 @@ import com.intellij.psi.search {
 import com.intellij.util.containers {
     ContainerUtil
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     CeylonUnit
 }
-import com.redhat.ceylon.ide.common.model.asjava {
+import org.eclipse.ceylon.ide.common.model.asjava {
     AbstractClassMirror
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     TypeMirror
 }
-import com.redhat.ceylon.model.loader.model {
+import org.eclipse.ceylon.model.loader.model {
     LazyClass
 }
 

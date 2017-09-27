@@ -1,17 +1,17 @@
 grammar PsiIntfGen;
 
 @parser::header { 
-    package com.redhat.ceylon.compiler.typechecker.treegen;
-    import static com.redhat.ceylon.compiler.typechecker.treegen.Util.*;
+    package org.eclipse.ceylon.compiler.typechecker.treegen;
+    import static org.eclipse.ceylon.compiler.typechecker.treegen.Util.*;
 }
 @lexer::header { 
-    package com.redhat.ceylon.compiler.typechecker.treegen; 
+    package org.eclipse.ceylon.compiler.typechecker.treegen; 
 }
 
 nodeList : { 
            println("package org.intellij.plugins.ceylon.ide.psi;\n");
-           println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
-           println("import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;");
+           println("import org.eclipse.ceylon.compiler.typechecker.tree.Tree;");
+           println("import org.eclipse.ceylon.compiler.typechecker.tree.CustomTree;");
            println("/* Generated using Antlr by PsiIntfGen.g */");
            println("\npublic class CeylonPsi {\n");
            println("    public static interface GuardedVariablePsi extends CeylonCompositeElement {");

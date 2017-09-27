@@ -53,11 +53,11 @@ import com.intellij.openapi.vfs {
 import com.intellij.psi {
     PsiManager
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Constants,
     Backend
 }
-import com.redhat.ceylon.common.config {
+import org.eclipse.ceylon.common.config {
     ConfigWriter
 }
 
@@ -102,7 +102,7 @@ shared class AndroidStudioSupportImpl() satisfies AndroidStudioSupport {
         = create<AndroidStudioSupport>("org.intellij.plugins.ceylon.ide.androidStudioSupport");
 
     value applyCeylonPlugin = "apply plugin: 'com.athaydes.ceylon'";
-    value applyCeylonAndroidPlugin = "apply plugin: 'com.redhat.ceylon.gradle.android'";
+    value applyCeylonAndroidPlugin = "apply plugin: 'org.eclipse.ceylon.gradle.android'";
 
     shared actual void setupModule(Module mod) {
         assert(exists modelManager = getModelManager(mod.project));

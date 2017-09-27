@@ -3,11 +3,11 @@ package org.intellij.plugins.ceylon.ide.doc;
 import ceylon.language.language_;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.testFramework.LightCodeInsightTestCase;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
-import com.redhat.ceylon.compiler.typechecker.TypeCheckerBuilder;
-import com.redhat.ceylon.compiler.typechecker.context.PhasedUnit;
-import com.redhat.ceylon.compiler.typechecker.tree.Tree;
-import com.redhat.ceylon.ide.common.typechecker.LocalAnalysisResult;
+import org.eclipse.ceylon.compiler.typechecker.TypeChecker;
+import org.eclipse.ceylon.compiler.typechecker.TypeCheckerBuilder;
+import org.eclipse.ceylon.compiler.typechecker.context.PhasedUnit;
+import org.eclipse.ceylon.compiler.typechecker.tree.Tree;
+import org.eclipse.ceylon.ide.common.typechecker.LocalAnalysisResult;
 import org.intellij.plugins.ceylon.ide.doc.IdeaDocGenerator;
 
 import java.io.File;

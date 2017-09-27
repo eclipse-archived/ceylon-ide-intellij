@@ -15,7 +15,7 @@ import com.intellij.refactoring.rename {
     RenameProcessor,
     RenamePsiElementProcessor
 }
-import com.redhat.ceylon.ide.common.hierarchy {
+import org.eclipse.ceylon.ide.common.hierarchy {
     hierarchyManager
 }
 

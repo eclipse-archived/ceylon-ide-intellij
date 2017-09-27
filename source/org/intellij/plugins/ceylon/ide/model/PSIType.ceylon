@@ -19,10 +19,10 @@ import com.intellij.psi.impl.source {
 import com.intellij.psi.search {
     GlobalSearchScope
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     unknownClassMirror
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     TypeMirror,
     TypeKind
 }

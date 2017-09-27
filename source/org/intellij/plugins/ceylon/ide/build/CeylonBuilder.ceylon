@@ -21,13 +21,13 @@ import com.intellij.openapi.vfs {
 import com.intellij.util.containers {
     MultiMap
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backend
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     CeylonProjectBuild
 }
-import com.redhat.ceylon.ide.common.vfs {
+import org.eclipse.ceylon.ide.common.vfs {
     FileVirtualFile
 }
 

@@ -26,7 +26,7 @@ import com.intellij.openapi.wm {
 import com.intellij.ui.content {
     ContentManager
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     Severity
 }
 

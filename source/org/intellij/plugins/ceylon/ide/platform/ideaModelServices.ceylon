@@ -13,18 +13,18 @@ import com.intellij.openapi.vfs {
     VirtualFileVisitor,
     VfsUtil
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     EditedSourceFile,
     ProjectSourceFile,
     CrossProjectSourceFile
 }
-import com.redhat.ceylon.ide.common.model.parsing {
+import org.eclipse.ceylon.ide.common.model.parsing {
     RootFolderScanner
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     ModelServices
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     EditedPhasedUnit,
     ProjectPhasedUnit,
     CrossProjectPhasedUnit

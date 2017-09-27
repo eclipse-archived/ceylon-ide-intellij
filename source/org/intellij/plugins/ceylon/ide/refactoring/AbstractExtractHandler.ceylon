@@ -40,11 +40,11 @@ import com.intellij.refactoring.rename.inplace {
     VariableInplaceRenameHandler,
     VariableInplaceRenamer
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree,
     Node
 }
-import com.redhat.ceylon.ide.common.refactoring {
+import org.eclipse.ceylon.ide.common.refactoring {
     FindContainingExpressionsVisitor
 }
 

@@ -4,12 +4,12 @@ import com.intellij.psi {
 import com.intellij.ui.breadcrumbs {
     BreadcrumbsProvider
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     TreeUtil {
         formatPath
     }
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Function
 }
 

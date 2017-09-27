@@ -74,7 +74,7 @@ import org.intellij.plugins.ceylon.ide.util {
 }
 
 String metaAnnotationName(String ann)
-        => "com.redhat.ceylon.compiler.java.metadata." + ann;
+        => "org.eclipse.ceylon.compiler.java.metadata." + ann;
 
 Boolean hasAnnotation(PsiModifierListOwner owner, String ann)
         => owner.modifierList?.findAnnotation(metaAnnotationName(ann)) exists;
@@ -334,7 +334,7 @@ String name(PsiNamedElement pne) {
 Boolean isTypeDescriptor(PsiParameter param)
         => name(param).startsWith("$reified$")
         || param.type.canonicalText
-            == "com.redhat.ceylon.compiler.java.runtime.model.TypeDescriptor";
+            == "org.eclipse.ceylon.compiler.java.runtime.model.TypeDescriptor";
 
 String getCeylonType(PsiParameter param) {
     PsiType pt = param.type;

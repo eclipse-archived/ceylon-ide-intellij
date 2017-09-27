@@ -27,32 +27,32 @@ import com.intellij.psi {
     PsiElement,
     PsiFile
 }
-import com.redhat.ceylon.compiler.typechecker.analyzer {
+import org.eclipse.ceylon.compiler.typechecker.analyzer {
     Warning,
     AnalysisError,
     UsageWarning
 }
-import com.redhat.ceylon.compiler.typechecker.context {
+import org.eclipse.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
-import com.redhat.ceylon.compiler.typechecker.parser {
+import org.eclipse.ceylon.compiler.typechecker.parser {
     RecognitionError
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Message,
     UnexpectedError
 }
-import com.redhat.ceylon.ide.common.correct {
+import org.eclipse.ceylon.ide.common.correct {
     ideQuickFixManager
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     ExternalPhasedUnit
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     nodes
 }
 

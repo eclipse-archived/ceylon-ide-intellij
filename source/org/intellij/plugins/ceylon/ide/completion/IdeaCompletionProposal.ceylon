@@ -12,16 +12,16 @@ import com.intellij.codeInsight.lookup {
     LookupElementBuilder,
     LookupElement
 }
-import com.redhat.ceylon.cmr.api {
+import org.eclipse.ceylon.cmr.api {
     ModuleVersionDetails
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     CommonCompletionProposal
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     CommonDocument
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Referenceable,
     Declaration
 }

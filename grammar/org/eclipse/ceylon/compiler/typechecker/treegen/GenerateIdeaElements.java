@@ -1,4 +1,4 @@
-package com.redhat.ceylon.compiler.typechecker.treegen;
+package org.eclipse.ceylon.compiler.typechecker.treegen;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;

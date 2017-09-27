@@ -13,13 +13,13 @@ import com.intellij.openapi.project {
 import com.intellij.psi {
     PsiElement
 }
-import com.redhat.ceylon.ide.common.hierarchy {
+import org.eclipse.ceylon.ide.common.hierarchy {
     hierarchyManager
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     types
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration
 }
 

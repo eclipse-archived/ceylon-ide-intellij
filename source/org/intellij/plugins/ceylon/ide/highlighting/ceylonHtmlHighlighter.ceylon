@@ -21,7 +21,7 @@ import com.intellij.ui {
     JBColor,
     SimpleTextAttributes
 }
-import com.redhat.ceylon.ide.common.doc {
+import org.eclipse.ceylon.ide.common.doc {
     convertToHTML
 }
 

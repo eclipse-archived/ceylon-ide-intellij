@@ -104,7 +104,7 @@ shared class CeylonNodeRenderer() extends NodeRendererImpl() {
 
     isApplicable(Type type) =>
             (type is ReferenceType
-                && DebuggerUtils.instanceOf(type, "com.redhat.ceylon.compiler.java.runtime.model.ReifiedType"))
+                && DebuggerUtils.instanceOf(type, "org.eclipse.ceylon.compiler.java.runtime.model.ReifiedType"))
             || type is ReifiedTypesType;
 
 

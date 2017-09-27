@@ -10,10 +10,10 @@ import com.intellij.psi {
     PsiDirectory,
     PsiElement
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backend
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     escaping
 }
 

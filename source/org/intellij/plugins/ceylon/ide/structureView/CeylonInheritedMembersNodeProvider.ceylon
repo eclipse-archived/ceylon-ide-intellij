@@ -17,22 +17,22 @@ import com.intellij.ide.util.treeView.smartTree {
 import com.intellij.psi {
     PsiElement
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Node,
     Tree
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     overloads
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     FindDeclarationNodeVisitor
 }
-import com.redhat.ceylon.model.loader.model {
+import org.eclipse.ceylon.model.loader.model {
     FieldValue,
     JavaMethod,
     LazyClass
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     ...
 }
 

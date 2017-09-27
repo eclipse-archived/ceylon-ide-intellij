@@ -1,21 +1,21 @@
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
-import com.redhat.ceylon.cmr.api {
+import org.eclipse.ceylon.cmr.api {
     ModuleVersionDetails,
     ModuleSearchResult
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Node
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     ModuleProposal,
     ProposalsHolder
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     LinkedMode
 }
-import com.redhat.ceylon.ide.common.refactoring {
+import org.eclipse.ceylon.ide.common.refactoring {
     DefaultRegion
 }
 

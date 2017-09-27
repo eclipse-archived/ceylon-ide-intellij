@@ -1,7 +1,7 @@
 import org.intellij.plugins.ceylon.ide.psi {
     CeylonFile
 }
-import com.redhat.ceylon.ide.common.correct {
+import org.eclipse.ceylon.ide.common.correct {
     convertToNamedArgumentsQuickFix,
     convertToPositionalArgumentsQuickFix
 }

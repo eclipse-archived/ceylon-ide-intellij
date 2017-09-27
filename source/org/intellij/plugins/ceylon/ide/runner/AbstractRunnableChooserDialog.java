@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.redhat.ceylon.model.typechecker.model.Declaration;
+import org.eclipse.ceylon.model.typechecker.model.Declaration;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;

@@ -2,11 +2,11 @@ package org.intellij.plugins.ceylon.ide.startup;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.openapi.application.ApplicationInfo;
-import com.redhat.ceylon.cmr.api.RepositoryManagerBuilder;
-import com.redhat.ceylon.cmr.impl.DefaultRepository;
-import com.redhat.ceylon.cmr.impl.FileContentStore;
-import com.redhat.ceylon.cmr.spi.StructureBuilder;
-import com.redhat.ceylon.model.cmr.*;
+import org.eclipse.ceylon.cmr.api.RepositoryManagerBuilder;
+import org.eclipse.ceylon.cmr.impl.DefaultRepository;
+import org.eclipse.ceylon.cmr.impl.FileContentStore;
+import org.eclipse.ceylon.cmr.spi.StructureBuilder;
+import org.eclipse.ceylon.model.cmr.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

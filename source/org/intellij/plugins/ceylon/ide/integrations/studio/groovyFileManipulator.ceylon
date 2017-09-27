@@ -45,7 +45,7 @@ import org.jetbrains.plugins.groovy.lang.psi.api.util {
 // Mainly adapted from org.jetbrains.kotlin.idea.configuration.KotlinWithGradleConfigurator
 object groovyFileManipulator {
     value sourceSet = "main.java.srcDirs += 'src/main/ceylon'\n";
-    value ceylonAndroidDep = "classpath 'com.redhat.ceylon.gradle:android:1.0.1'\n";
+    value ceylonAndroidDep = "classpath 'org.eclipse.ceylon.gradle:android:1.0.1'\n";
     value repositoryName = "jcenter()\n";
     value dependencyRegex = Pattern.compile("^['\"](.*):([^:]+)['\"]$");
 

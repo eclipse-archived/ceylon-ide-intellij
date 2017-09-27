@@ -11,7 +11,7 @@ import com.intellij.debugger.jdi {
 import com.intellij.debugger.ui.impl.watch {
     StackFrameDescriptorImpl
 }
-import com.redhat.ceylon.ide.common.debug {
+import org.eclipse.ceylon.ide.common.debug {
     fixVariableName
 }
 

@@ -10,7 +10,7 @@ import com.intellij.ui {
 import com.intellij.util {
     PlatformIcons
 }
-import com.redhat.ceylon.model.typechecker.util {
+import org.eclipse.ceylon.model.typechecker.util {
     ModuleManager
 }
 

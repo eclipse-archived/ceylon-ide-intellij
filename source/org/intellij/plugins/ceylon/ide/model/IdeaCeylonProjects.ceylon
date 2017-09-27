@@ -14,11 +14,11 @@ import com.intellij.openapi.vfs {
     VirtualFile,
     JarFileSystem
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     CeylonProjects,
     ModelListenerAdapter
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     ExternalPhasedUnit
 }
 

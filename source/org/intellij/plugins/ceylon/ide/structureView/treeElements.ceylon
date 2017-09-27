@@ -27,11 +27,11 @@ import com.intellij.psi.util {
 import com.intellij.util.ui {
     UIUtil
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree,
     CustomTree
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     ClassOrInterface
 }
 

@@ -4,7 +4,7 @@ import com.intellij.openapi.editor {
 import com.intellij.openapi.util {
     TextRange
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     CommonDocument
 }
 

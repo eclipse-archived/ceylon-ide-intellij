@@ -1,4 +1,4 @@
-import com.redhat.ceylon.compiler.typechecker.parser {
+import org.eclipse.ceylon.compiler.typechecker.parser {
     CeylonLexer
 }
 import com.intellij.openapi.util {
@@ -11,7 +11,7 @@ import java.util {
 import com.intellij.psi.tree {
     IElementType
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Node
 }
 

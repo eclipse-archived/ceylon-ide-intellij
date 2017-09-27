@@ -22,7 +22,7 @@ import com.intellij.psi.util {
 import com.intellij.util.ui {
     UIUtil
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     ClassOrInterface
 }
 

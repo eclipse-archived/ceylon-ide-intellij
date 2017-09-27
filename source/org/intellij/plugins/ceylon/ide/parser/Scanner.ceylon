@@ -7,7 +7,7 @@ import com.intellij.psi {
 import com.intellij.psi.tree {
     IElementType
 }
-import com.redhat.ceylon.compiler.typechecker.parser {
+import org.eclipse.ceylon.compiler.typechecker.parser {
     CeylonLexer,
     CeylonInterpolatingLexer
 }

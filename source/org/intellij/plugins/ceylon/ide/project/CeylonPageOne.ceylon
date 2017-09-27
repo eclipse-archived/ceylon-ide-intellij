@@ -17,7 +17,7 @@ import com.intellij.util.ui {
     ListTableModel,
     ColumnInfo
 }
-import com.redhat.ceylon.compiler.typechecker.analyzer {
+import org.eclipse.ceylon.compiler.typechecker.analyzer {
     Warning
 }
 

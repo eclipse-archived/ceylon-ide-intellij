@@ -11,15 +11,15 @@ import com.intellij.psi {
     PsiClass,
     PsiMethod
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     JVMModuleUtil
 }
-import com.redhat.ceylon.model.loader {
+import org.eclipse.ceylon.model.loader {
     ModelLoader {
         DeclarationType
     }
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Package,
     Declaration,
     Module

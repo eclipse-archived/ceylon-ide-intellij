@@ -10,10 +10,10 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
-import com.redhat.ceylon.ide.common.typechecker.AnalysisResult;
-import com.redhat.ceylon.ide.common.util.escaping_;
-import com.redhat.ceylon.model.typechecker.model.Declaration;
-import com.redhat.ceylon.model.typechecker.model.FunctionOrValue;
+import org.eclipse.ceylon.ide.common.typechecker.AnalysisResult;
+import org.eclipse.ceylon.ide.common.util.escaping_;
+import org.eclipse.ceylon.model.typechecker.model.Declaration;
+import org.eclipse.ceylon.model.typechecker.model.FunctionOrValue;
 import org.intellij.plugins.ceylon.ide.psi.*;
 import org.intellij.plugins.ceylon.ide.util.icons_;
 

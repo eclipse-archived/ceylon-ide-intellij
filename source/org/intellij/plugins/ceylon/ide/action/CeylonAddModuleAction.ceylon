@@ -27,7 +27,7 @@ import com.intellij.psi {
     PsiFile,
     PsiManager
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backend
 }
 

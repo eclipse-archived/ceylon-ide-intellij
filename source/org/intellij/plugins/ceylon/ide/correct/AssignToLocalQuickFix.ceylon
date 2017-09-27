@@ -8,15 +8,15 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Editor
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     ProposalsHolder
 }
-import com.redhat.ceylon.ide.common.correct {
+import org.eclipse.ceylon.ide.common.correct {
     AssignToLocalProposal,
     importProposals,
     assignToLocalQuickFix
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Type,
     Unit,
     Declaration

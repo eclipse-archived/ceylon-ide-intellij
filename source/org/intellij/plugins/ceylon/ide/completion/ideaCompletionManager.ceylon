@@ -39,13 +39,13 @@ import com.intellij.psi.impl.source.tree {
 import com.intellij.util {
     ProcessingContext
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     completionManager
 }
-import com.redhat.ceylon.ide.common.settings {
+import org.eclipse.ceylon.ide.common.settings {
     CompletionOptions
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
 

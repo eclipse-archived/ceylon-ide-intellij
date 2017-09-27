@@ -106,7 +106,7 @@ import com.intellij.util {
 import com.intellij.util.messages {
     MessageBusConnection
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     ChangeAware,
     ModelAliases,
     ModelListenerAdapter,
@@ -497,7 +497,7 @@ shared class CeylonModelManager(IdeaCeylonProjects model_)
                                             e.printStackTrace();
                                         } catch(Error e) {
                                             if (classForInstance(e).name ==
-                                                "com.redhat.ceylon.compiler.java.runtime.metamodel.ModelError") {
+                                                "org.eclipse.ceylon.compiler.java.runtime.metamodel.ModelError") {
                                                 e.printStackTrace();
                                             } else {
                                                 throw e;

@@ -10,8 +10,8 @@ import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
-import com.redhat.ceylon.common.Backend;
-import com.redhat.ceylon.model.typechecker.model.Module;
+import org.eclipse.ceylon.common.Backend;
+import org.eclipse.ceylon.model.typechecker.model.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

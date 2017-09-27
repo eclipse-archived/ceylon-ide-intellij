@@ -5,7 +5,7 @@ import com.github.rjeschke.txtmark {
 import com.intellij.openapi.project {
     Project
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Unit,
     Scope,
     Referenceable,

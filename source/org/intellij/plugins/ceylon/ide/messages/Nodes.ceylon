@@ -23,7 +23,7 @@ import com.intellij.openapi.vfs {
 import com.intellij.ui {
     SimpleTextAttributes
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     Severity,
     CeylonProjectBuild
 }

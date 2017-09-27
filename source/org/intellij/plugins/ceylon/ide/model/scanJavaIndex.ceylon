@@ -31,15 +31,15 @@ import com.intellij.psi {
     PsiModifierList,
     PsiType
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     completionManager {
         Proposals
     }
 }
-import com.redhat.ceylon.ide.common.model.asjava {
+import org.eclipse.ceylon.ide.common.model.asjava {
     javaQualifiedName
 }
-import com.redhat.ceylon.model.loader {
+import org.eclipse.ceylon.model.loader {
     AbstractModelLoader {
         ceylonTypeAliasAnnotation,
         ceylonContainerAnnotation,
@@ -53,7 +53,7 @@ import com.redhat.ceylon.model.loader {
         getJavaBeanName
     }
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     TypeParameter,
     DeclarationWithProximity,
     Function,

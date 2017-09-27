@@ -34,7 +34,7 @@ import com.intellij.psi.impl.compiled {
 import com.intellij.psi.impl.file {
     PsiBinaryFileImpl
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Module
 }
 

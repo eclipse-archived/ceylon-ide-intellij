@@ -16,7 +16,7 @@ import com.intellij.psi.impl.compiled {
 import com.intellij.util.ui {
     UIUtil
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     AnyProjectSourceFile
 }
 

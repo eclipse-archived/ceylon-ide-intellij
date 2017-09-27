@@ -11,13 +11,13 @@ import com.intellij.util.containers {
         newArrayList
     }
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     CeylonUnit
 }
-import com.redhat.ceylon.ide.common.model.asjava {
+import org.eclipse.ceylon.ide.common.model.asjava {
     javaQualifiedName
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     ClassOrInterface,
     Value,
     FunctionOrValue,

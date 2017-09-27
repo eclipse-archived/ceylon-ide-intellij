@@ -59,7 +59,7 @@ import com.intellij.ui {
 import com.intellij.util {
     EditSourceOnDoubleClickHandler
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     CeylonProjectBuild
 }
 

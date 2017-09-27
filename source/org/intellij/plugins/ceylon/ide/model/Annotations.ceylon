@@ -11,11 +11,11 @@ shared class Annotations {
     }
 
     shared new attribute extends create("attribute",
-        "com.redhat.ceylon.compiler.java.metadata.Attribute") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Attribute") {}
 
     shared
     new annotationInstantiation extends create("annotationInstantiation",
-        "com.redhat.ceylon.compiler.java.metadata.AnnotationInstantiation") {}
+        "org.eclipse.ceylon.compiler.java.metadata.AnnotationInstantiation") {}
 
     shared
     new annotationType extends create("annotationType",
@@ -24,31 +24,31 @@ shared class Annotations {
 
     shared
     new \iclass extends create("clazz",
-        "com.redhat.ceylon.compiler.java.metadata.Class") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Class") {}
 
     shared
     new \iobject extends create("object",
-        "com.redhat.ceylon.compiler.java.metadata.Object") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Object") {}
 
     shared
     new method extends create("method",
-        "com.redhat.ceylon.compiler.java.metadata.Method") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Method") {}
 
     shared
     new container extends create("container",
-        "com.redhat.ceylon.compiler.java.metadata.Container") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Container") {}
 
     shared
     new localContainer extends create("localContainer",
-        "com.redhat.ceylon.compiler.java.metadata.LocalContainer") {}
+        "org.eclipse.ceylon.compiler.java.metadata.LocalContainer") {}
 
     shared
     new ceylon extends create("ceylon",
-        "com.redhat.ceylon.compiler.java.metadata.Ceylon") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Ceylon") {}
 
     shared
     new ignore extends create("ignore",
-        "com.redhat.ceylon.compiler.java.metadata.Ignore") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Ignore") {}
 
     shared
     new deprecated extends create("deprecated",
@@ -56,13 +56,13 @@ shared class Annotations {
 
     shared
     new packageDescriptor extends create("packageDescriptor",
-        "com.redhat.ceylon.compiler.java.metadata.Package") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Package") {}
 
     shared
     new moduleDescriptor extends create("moduleDescriptor",
-        "com.redhat.ceylon.compiler.java.metadata.Module") {}
+        "org.eclipse.ceylon.compiler.java.metadata.Module") {}
 
     shared
     new constructorName extends create("constructorName",
-        "com.redhat.ceylon.compiler.java.metadata.ConstructorName") {}
+        "org.eclipse.ceylon.compiler.java.metadata.ConstructorName") {}
 }

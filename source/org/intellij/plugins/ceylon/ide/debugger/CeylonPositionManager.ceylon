@@ -42,10 +42,10 @@ import com.intellij.util {
 import com.intellij.xdebugger.frame {
     XStackFrame
 }
-import com.redhat.ceylon.ide.common.debug {
+import org.eclipse.ceylon.ide.common.debug {
     getFirstValidLocation
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Interface
 }
 import com.sun.jdi {

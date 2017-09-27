@@ -8,10 +8,10 @@ import com.intellij.usageView {
     UsageViewTypeLocation,
     UsageViewShortNameLocation
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Function,
     ModelUtil,
     Declaration,

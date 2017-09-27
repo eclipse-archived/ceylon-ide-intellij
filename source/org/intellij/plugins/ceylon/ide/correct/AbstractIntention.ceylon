@@ -16,37 +16,37 @@ import com.intellij.openapi.util {
 import com.intellij.psi {
     PsiFile
 }
-import com.redhat.ceylon.cmr.api {
+import org.eclipse.ceylon.cmr.api {
     ModuleVersionDetails
 }
-import com.redhat.ceylon.compiler.typechecker.analyzer {
+import org.eclipse.ceylon.compiler.typechecker.analyzer {
     UsageWarning
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.ide.common.correct {
+import org.eclipse.ceylon.ide.common.correct {
     QuickFixKind,
     convertToClassQuickFix
 }
-import com.redhat.ceylon.ide.common.doc {
+import org.eclipse.ceylon.ide.common.doc {
     Icons
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     PlatformTextChange=TextChange,
     platformUtils,
     Status
 }
-import com.redhat.ceylon.ide.common.refactoring {
+import org.eclipse.ceylon.ide.common.refactoring {
     DefaultRegion
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     ModifiablePhasedUnit
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     nodes
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Referenceable
 }
 

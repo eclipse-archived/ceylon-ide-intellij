@@ -5,20 +5,20 @@ import ceylon.collection {
 import com.intellij.openapi.util {
     TextRange
 }
-import com.redhat.ceylon.compiler.typechecker.analyzer {
+import org.eclipse.ceylon.compiler.typechecker.analyzer {
     ModuleSourceMapper,
     Warning
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree,
     Message,
     Node,
     UnexpectedError
 }
-import com.redhat.ceylon.compiler.typechecker.util {
+import org.eclipse.ceylon.compiler.typechecker.util {
     WarningSuppressionVisitor
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     ErrorVisitor
 }
 
@@ -31,7 +31,7 @@ import org.intellij.plugins.ceylon.ide.psi {
 
 
 "A visitor that visits a compilation unit returned by
- [[com.redhat.ceylon.compiler.typechecker.parser::CeylonParser]] to gather errors and
+ [[org.eclipse.ceylon.compiler.typechecker.parser::CeylonParser]] to gather errors and
   warnings."
 shared class ErrorsVisitor(Tree.CompilationUnit compilationUnit, CeylonFile file) extends ErrorVisitor() {
 

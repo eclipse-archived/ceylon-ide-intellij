@@ -20,7 +20,7 @@ import com.intellij.openapi.roots.ui.configuration {
 import com.intellij.openapi.vfs {
     VfsUtil
 }
-import com.redhat.ceylon.common.config {
+import org.eclipse.ceylon.common.config {
     CeylonConfigFinder,
     DefaultToolOptions
 }

@@ -18,16 +18,16 @@ import com.intellij.openapi.vfs {
 import com.intellij.util.containers {
     MultiMap
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backend
 }
-import com.redhat.ceylon.compiler.js {
+import org.eclipse.ceylon.compiler.js {
     JsCompiler
 }
-import com.redhat.ceylon.compiler.js.util {
+import org.eclipse.ceylon.compiler.js.util {
     Options
 }
-import com.redhat.ceylon.compiler.typechecker {
+import org.eclipse.ceylon.compiler.typechecker {
     TypeChecker
 }
 

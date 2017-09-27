@@ -38,42 +38,42 @@ import com.intellij.psi {
 import com.intellij.util {
     Alarm
 }
-import com.redhat.ceylon.compiler.typechecker {
+import org.eclipse.ceylon.compiler.typechecker {
     TypeChecker
 }
-import com.redhat.ceylon.compiler.typechecker.parser {
+import org.eclipse.ceylon.compiler.typechecker.parser {
     RecognitionError
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree,
     Visitor,
     Node
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     BaseIdeModuleSourceMapper,
     cancelDidYouMeanSearch
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     ExternalPhasedUnit,
     EditedPhasedUnit,
     ProjectPhasedUnit,
     LocalAnalysisResult
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     SingleSourceUnitPackage,
     Path
 }
-import com.redhat.ceylon.ide.common.vfs {
+import org.eclipse.ceylon.ide.common.vfs {
     FileVirtualFile,
     FolderVirtualFile,
     DummyFolder,
     SourceCodeVirtualFile
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Package,
     Cancellable
 }

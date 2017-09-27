@@ -72,15 +72,15 @@ import com.intellij.psi {
 import com.intellij.util.messages {
     MessageBusConnection
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     ModelListenerAdapter,
     CeylonProject
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     ProjectPhasedUnit,
     ExternalPhasedUnit
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     ImmutableMapWrapper
 }
 

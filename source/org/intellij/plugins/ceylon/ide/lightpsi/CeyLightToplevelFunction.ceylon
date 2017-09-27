@@ -40,12 +40,12 @@ import com.intellij.psi.util {
 import com.intellij.util {
     IncorrectOperationException
 }
-import com.redhat.ceylon.ide.common.model.asjava {
+import org.eclipse.ceylon.ide.common.model.asjava {
     ceylonToJavaMapper,
     JToplevelFunctionMirror,
     AbstractMethodMirror
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Function
 }
 

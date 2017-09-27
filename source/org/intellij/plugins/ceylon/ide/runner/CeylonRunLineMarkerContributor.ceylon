@@ -11,7 +11,7 @@ import com.intellij.psi {
 import com.intellij.psi.impl.source.tree {
     LeafPsiElement
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
 

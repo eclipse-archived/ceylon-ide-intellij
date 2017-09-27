@@ -46,11 +46,11 @@ import com.intellij.util {
     PlatformIcons,
     Consumer
 }
-import com.redhat.ceylon.common.config {
+import org.eclipse.ceylon.common.config {
     Repositories,
     CeylonConfigFinder
 }
-import com.redhat.ceylon.ide.common.configuration {
+import org.eclipse.ceylon.ide.common.configuration {
     CeylonRepositoryConfigurator
 }
 

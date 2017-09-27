@@ -11,26 +11,26 @@ import com.intellij.codeInsight.lookup {
 import com.intellij.openapi.editor {
     Editor
 }
-import com.redhat.ceylon.compiler.typechecker {
+import org.eclipse.ceylon.compiler.typechecker {
     TypeChecker
 }
-import com.redhat.ceylon.compiler.typechecker.context {
+import org.eclipse.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     CompletionContext,
     ProposalsHolder
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     BaseCeylonProject
 }
-import com.redhat.ceylon.ide.common.settings {
+import org.eclipse.ceylon.ide.common.settings {
     CompletionOptions
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     LocalAnalysisResult
 }
 

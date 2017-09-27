@@ -68,41 +68,41 @@ import com.intellij.psi {
 import com.intellij.psi.search {
     GlobalSearchScope
 }
-import com.redhat.ceylon.cmr.api {
+import org.eclipse.ceylon.cmr.api {
     ArtifactContext
 }
-import com.redhat.ceylon.compiler.typechecker {
+import org.eclipse.ceylon.compiler.typechecker {
     TypeChecker
 }
-import com.redhat.ceylon.compiler.typechecker.context {
+import org.eclipse.ceylon.compiler.typechecker.context {
     Context
 }
-import com.redhat.ceylon.compiler.typechecker.util {
+import org.eclipse.ceylon.compiler.typechecker.util {
     ModuleManagerFactory
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     CeylonProject,
     BuildHook
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     IdePhasedUnit
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     BaseProgressMonitorChild,
     BaseProgressMonitor
 }
-import com.redhat.ceylon.model.cmr {
+import org.eclipse.ceylon.model.cmr {
     ArtifactResult,
     ArtifactResultType
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Package
 }
-import com.redhat.ceylon.model.typechecker.util {
+import org.eclipse.ceylon.model.typechecker.util {
     TCModManager=ModuleManager
 }
 

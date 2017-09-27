@@ -9,7 +9,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.containers.EmptyIterable;
-import com.redhat.ceylon.compiler.java.language.AbstractCallable;
+import org.eclipse.ceylon.compiler.java.language.AbstractCallable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

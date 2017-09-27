@@ -5,7 +5,7 @@ import com.intellij.navigation {
 import com.intellij.openapi.editor.colors {
     CodeInsightColors
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     ClassOrInterface,
     Scope,
     Declaration

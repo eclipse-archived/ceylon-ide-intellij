@@ -2,7 +2,7 @@ import com.intellij.psi {
     PsiTypeParameter,
     PsiNamedElement
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     TypeParameterMirror,
     TypeMirror
 }

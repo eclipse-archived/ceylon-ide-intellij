@@ -6,7 +6,7 @@ import com.intellij.psi {
     PsiClass,
     SmartPsiElementPointer
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     MethodMirror,
     TypeParameterMirror,
     VariableMirror

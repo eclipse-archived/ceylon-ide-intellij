@@ -13,7 +13,7 @@ import com.intellij.psi {
     PsiReference,
     PsiNamedElement
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backends {
         header=\iHEADER
     }

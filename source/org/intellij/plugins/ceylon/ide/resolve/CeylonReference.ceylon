@@ -14,24 +14,24 @@ import com.intellij.openapi.vfs {
 import com.intellij.psi {
     ...
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backends
 }
-import com.redhat.ceylon.compiler.typechecker.analyzer {
+import org.eclipse.ceylon.compiler.typechecker.analyzer {
     AnnotationVisitor
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree,
     Node
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     IResourceAware,
     SourceAware
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     nodes
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     ...
 }
 

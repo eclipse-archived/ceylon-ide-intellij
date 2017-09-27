@@ -23,10 +23,10 @@ import com.intellij.psi.impl.source.tree {
 import com.intellij.psi.tree {
     IElementType
 }
-import com.redhat.ceylon.compiler.typechecker.parser {
+import org.eclipse.ceylon.compiler.typechecker.parser {
     CeylonLexer
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Node,
     Tree,
     Visitor

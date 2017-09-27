@@ -1,11 +1,11 @@
 grammar IdeaAstTypesGen;
 
 @parser::header { 
-    package com.redhat.ceylon.compiler.typechecker.treegen; 
-    import static com.redhat.ceylon.compiler.typechecker.treegen.Util.*; 
+    package org.eclipse.ceylon.compiler.typechecker.treegen; 
+    import static org.eclipse.ceylon.compiler.typechecker.treegen.Util.*; 
 }
 @lexer::header { 
-    package com.redhat.ceylon.compiler.typechecker.treegen; 
+    package org.eclipse.ceylon.compiler.typechecker.treegen; 
 }
 
 nodeList : { 

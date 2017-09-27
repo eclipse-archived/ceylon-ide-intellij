@@ -7,7 +7,7 @@ import com.intellij.psi {
 import com.intellij.refactoring.inline {
     InlineOptionsDialog
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration
 }
 

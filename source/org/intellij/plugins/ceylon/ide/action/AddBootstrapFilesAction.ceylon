@@ -11,7 +11,7 @@ import com.intellij.openapi.actionSystem {
 import com.intellij.openapi.ui {
     Messages
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     messages,
     versionsAvailableForBoostrap
 }

@@ -8,10 +8,10 @@ import com.intellij.psi {
     PsiClass,
     PsiMethod
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     JavaClassFile
 }
-import com.redhat.ceylon.model.loader.model {
+import org.eclipse.ceylon.model.loader.model {
     LazyPackage
 }
 

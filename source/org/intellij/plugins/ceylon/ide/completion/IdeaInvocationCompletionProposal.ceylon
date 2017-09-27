@@ -15,11 +15,11 @@ import com.intellij.openapi.command {
 import com.intellij.psi {
     PsiDocumentManager
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     InvocationCompletionProposal,
     ProposalsHolder
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration,
     Scope,
     Reference,

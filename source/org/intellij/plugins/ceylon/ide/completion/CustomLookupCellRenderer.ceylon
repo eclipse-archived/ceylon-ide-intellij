@@ -35,7 +35,7 @@ import com.intellij.ui {
     SimpleColoredComponent,
     SimpleTextAttributes
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     escaping
 }
 

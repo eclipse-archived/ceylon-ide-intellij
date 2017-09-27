@@ -19,7 +19,7 @@ import org.intellij.plugins.ceylon.ide.model {
     IdeaModule,
     getCeylonProjects
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backend
 }
 

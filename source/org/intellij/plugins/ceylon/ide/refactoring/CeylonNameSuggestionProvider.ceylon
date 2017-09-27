@@ -7,14 +7,14 @@ import com.intellij.psi.codeStyle {
 import com.intellij.refactoring.rename {
     NameSuggestionProvider
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Visitor,
     Tree
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     nodes
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Parameter
 }
 

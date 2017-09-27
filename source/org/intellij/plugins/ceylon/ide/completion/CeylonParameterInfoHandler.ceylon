@@ -25,10 +25,10 @@ import com.intellij.psi.util {
         getParentOfType
     }
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Functional,
     Unit,
     Parameter,
@@ -38,7 +38,7 @@ import com.redhat.ceylon.model.typechecker.model {
     ModelUtil,
     Reference
 }
-import com.redhat.ceylon.model.typechecker.util {
+import org.eclipse.ceylon.model.typechecker.util {
     TypePrinter
 }
 

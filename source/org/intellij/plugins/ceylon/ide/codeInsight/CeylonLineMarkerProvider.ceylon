@@ -38,10 +38,10 @@ import com.intellij.psi {
 import com.intellij.util {
     Function
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     types
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration,
     ClassOrInterface
 }

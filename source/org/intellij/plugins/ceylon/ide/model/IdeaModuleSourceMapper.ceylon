@@ -4,14 +4,14 @@ import com.intellij.openapi.\imodule {
 import com.intellij.openapi.vfs {
     VirtualFile
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     BaseIdeModule,
     IdeModuleSourceMapper
 }
-import com.redhat.ceylon.compiler.typechecker.context {
+import org.eclipse.ceylon.compiler.typechecker.context {
     Context
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     platformUtils,
     Status
 }

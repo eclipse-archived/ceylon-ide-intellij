@@ -21,10 +21,10 @@ import com.intellij.psi.stubs {
 import com.intellij.psi.tree {
     IStubFileElementType
 }
-import com.redhat.ceylon.ide.common.model.parsing {
+import org.eclipse.ceylon.ide.common.model.parsing {
     sourceCodeParser
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     ExternalPhasedUnit
 }
 

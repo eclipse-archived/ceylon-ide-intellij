@@ -29,7 +29,7 @@ import com.intellij.openapi.roots {
 import com.intellij.openapi.util.io {
     FileUtil
 }
-import com.redhat.ceylon.common {
+import org.eclipse.ceylon.common {
     Backend
 }
 
@@ -114,7 +114,7 @@ shared class CeylonRunConfiguration
                     value repoDir = CeylonIdePlugin.embeddedCeylonRepository.absolutePath;
                     params.vmParametersList.add("-Dceylon.system.repo=" + repoDir);
                     params.vmParametersList.addParametersString(vmOptions);
-                    params.mainClass = "com.redhat.ceylon.launcher.Bootstrap"; //TODO: not typesafe
+                    params.mainClass = "org.eclipse.ceylon.launcher.Bootstrap"; //TODO: not typesafe
                     params.classPath.add(bootstrapJarPath);
                     if (exists mod = configurationModule.\imodule,
                         exists ceylonProject = getCeylonProject(mod)) {

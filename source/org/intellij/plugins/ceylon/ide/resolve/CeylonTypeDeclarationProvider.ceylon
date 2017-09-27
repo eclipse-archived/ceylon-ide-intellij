@@ -8,7 +8,7 @@ import com.intellij.codeInsight.navigation.actions {
 import com.intellij.psi {
     PsiElement
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     TypedDeclaration,
     Type,
     TypeDeclaration

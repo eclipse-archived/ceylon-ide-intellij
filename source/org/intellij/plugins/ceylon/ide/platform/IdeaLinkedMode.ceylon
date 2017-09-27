@@ -27,10 +27,10 @@ import com.intellij.openapi.util {
 import com.intellij.psi {
     PsiDocumentManager
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     ProposalsHolder
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     LinkedMode
 }
 

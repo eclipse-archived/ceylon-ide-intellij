@@ -15,10 +15,10 @@ import com.intellij.pom {
 import com.intellij.psi {
     PsiNameIdentifierOwner
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     SourceFile
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration
 }
 

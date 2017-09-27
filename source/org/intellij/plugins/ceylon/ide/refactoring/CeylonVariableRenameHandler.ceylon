@@ -16,7 +16,7 @@ import com.intellij.refactoring.rename.inplace {
     VariableInplaceRenameHandler,
     VariableInplaceRenamer
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     platformUtils,
     Status
 }

@@ -4,7 +4,7 @@ import com.intellij.openapi.application {
 import com.intellij.openapi.components {
     ...
 }
-import com.redhat.ceylon.ide.common.settings {
+import org.eclipse.ceylon.ide.common.settings {
     CompletionOptions
 }
 

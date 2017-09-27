@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide.project;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
-import com.redhat.ceylon.ide.common.util.versionsAvailableForBoostrap_;
+import org.eclipse.ceylon.ide.common.util.versionsAvailableForBoostrap_;
 
 import javax.swing.*;
 

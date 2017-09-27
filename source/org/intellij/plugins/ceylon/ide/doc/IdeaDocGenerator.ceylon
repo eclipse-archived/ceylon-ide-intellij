@@ -24,25 +24,25 @@ import com.intellij.ui {
 import com.intellij.util.concurrency {
     FixedFuture
 }
-import com.redhat.ceylon.compiler.typechecker {
+import org.eclipse.ceylon.compiler.typechecker {
     TypeChecker
 }
-import com.redhat.ceylon.compiler.typechecker.context {
+import org.eclipse.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.ide.common.doc {
+import org.eclipse.ceylon.ide.common.doc {
     DocGenerator,
     Colors,
     Icons
 }
-import com.redhat.ceylon.ide.common.typechecker {
+import org.eclipse.ceylon.ide.common.typechecker {
     LocalAnalysisResult,
     IdePhasedUnit
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Referenceable,
     Declaration,
     Package,
@@ -52,7 +52,7 @@ import com.redhat.ceylon.model.typechecker.model {
     Scope,
     Function
 }
-import com.redhat.ceylon.model.typechecker.util {
+import org.eclipse.ceylon.model.typechecker.util {
     TypePrinter
 }
 

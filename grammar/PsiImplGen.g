@@ -1,18 +1,18 @@
 grammar PsiImplGen;
 
 @parser::header { 
-    package com.redhat.ceylon.compiler.typechecker.treegen;
-    import static com.redhat.ceylon.compiler.typechecker.treegen.Util.*;
+    package org.eclipse.ceylon.compiler.typechecker.treegen;
+    import static org.eclipse.ceylon.compiler.typechecker.treegen.Util.*;
 }
 @lexer::header { 
-    package com.redhat.ceylon.compiler.typechecker.treegen; 
+    package org.eclipse.ceylon.compiler.typechecker.treegen; 
 }
 
 nodeList : { 
            println("package org.intellij.plugins.ceylon.ide.psi;\n");
            println("import com.intellij.lang.ASTNode;");
-           println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
-           println("import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;");
+           println("import org.eclipse.ceylon.compiler.typechecker.tree.Tree;");
+           println("import org.eclipse.ceylon.compiler.typechecker.tree.CustomTree;");
            println("import org.intellij.plugins.ceylon.ide.resolve.*;");
            println("import org.intellij.plugins.ceylon.ide.psi.impl.*;");
            println("/* Generated using Antlr by PsiImplGen.g */");

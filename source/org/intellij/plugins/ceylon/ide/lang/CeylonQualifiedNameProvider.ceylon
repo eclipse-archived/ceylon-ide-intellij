@@ -10,7 +10,7 @@ import com.intellij.openapi.project {
 import com.intellij.psi {
     PsiElement
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
 

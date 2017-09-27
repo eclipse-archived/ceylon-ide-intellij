@@ -11,11 +11,11 @@ import com.intellij.psi {
     PsiAnnotationMemberValue,
     PsiPrefixExpression
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     AnnotationMirror
 }
 
@@ -70,7 +70,7 @@ class PSIAnnotation(PsiAnnotation psi) satisfies AnnotationMirror {
             // TODO this is super ultra ugly, but we can't get the type associated
             // to a PsiArrayInitializerMemberValue, and IJ parses shorts as ints :(
             if ((psi.qualifiedName else "")
-                    == "com.redhat.ceylon.compiler.java.metadata.AnnotationInstantiation",
+                    == "org.eclipse.ceylon.compiler.java.metadata.AnnotationInstantiation",
                 paramName == "arguments") {
                 return Short(v.text);
             }

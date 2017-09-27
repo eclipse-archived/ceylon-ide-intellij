@@ -1,11 +1,11 @@
 grammar NodeToIElementTypeMapGen;
 
 @parser::header { 
-    package com.redhat.ceylon.compiler.typechecker.treegen;
-    import static com.redhat.ceylon.compiler.typechecker.treegen.Util.*;
+    package org.eclipse.ceylon.compiler.typechecker.treegen;
+    import static org.eclipse.ceylon.compiler.typechecker.treegen.Util.*;
 }
 @lexer::header { 
-    package com.redhat.ceylon.compiler.typechecker.treegen; 
+    package org.eclipse.ceylon.compiler.typechecker.treegen; 
 }
 
 nodeList : { 
@@ -13,9 +13,9 @@ nodeList : {
             println("package org.intellij.plugins.ceylon.ide.psi;");
             println("");
             println("import com.intellij.psi.tree.IElementType;");
-            println("import com.redhat.ceylon.compiler.typechecker.tree.Node;");
-            println("import com.redhat.ceylon.compiler.typechecker.tree.Tree;");
-            println("import com.redhat.ceylon.compiler.typechecker.tree.CustomTree;");
+            println("import org.eclipse.ceylon.compiler.typechecker.tree.Node;");
+            println("import org.eclipse.ceylon.compiler.typechecker.tree.Tree;");
+            println("import org.eclipse.ceylon.compiler.typechecker.tree.CustomTree;");
             println("");
             println("import java.util.HashMap;");
             println("import java.util.Map;");

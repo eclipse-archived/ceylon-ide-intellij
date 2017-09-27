@@ -3,11 +3,11 @@ import com.intellij.psi {
     PsiJavaFile,
     SmartPsiElementPointer
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     platformUtils,
     Status
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     PackageMirror
 }
 

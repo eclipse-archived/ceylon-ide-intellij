@@ -14,7 +14,7 @@ import com.intellij.openapi.vfs {
 import com.intellij.psi {
     PsiManager
 }
-import com.redhat.ceylon.ide.common.vfs {
+import org.eclipse.ceylon.ide.common.vfs {
     FileVirtualFile,
     FolderVirtualFile,
     ResourceVirtualFile

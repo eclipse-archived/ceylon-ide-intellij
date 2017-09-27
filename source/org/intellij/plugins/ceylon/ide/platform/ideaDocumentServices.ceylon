@@ -1,11 +1,11 @@
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     DocumentServices,
     CommonDocument
 }
 import com.intellij.psi.codeStyle {
     CodeStyleSettings
 }
-import com.redhat.ceylon.compiler.typechecker.context {
+import org.eclipse.ceylon.compiler.typechecker.context {
     PhasedUnit
 }
 

@@ -1,7 +1,7 @@
 import com.intellij.openapi.progress {
     ProgressIndicator
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     ProgressMonitorImpl
 }
 

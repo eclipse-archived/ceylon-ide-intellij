@@ -13,17 +13,17 @@ import com.intellij.openapi.project {
 import com.intellij.psi {
     PsiFile
 }
-import com.redhat.ceylon.compiler.typechecker.parser {
+import org.eclipse.ceylon.compiler.typechecker.parser {
     CeylonParser,
     CeylonLexer
 }
-import com.redhat.ceylon.compiler.typechecker.tree {
+import org.eclipse.ceylon.compiler.typechecker.tree {
     Tree
 }
-import com.redhat.ceylon.ide.common.editor {
+import org.eclipse.ceylon.ide.common.editor {
     AbstractTerminateStatementAction
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     unsafeCast
 }
 

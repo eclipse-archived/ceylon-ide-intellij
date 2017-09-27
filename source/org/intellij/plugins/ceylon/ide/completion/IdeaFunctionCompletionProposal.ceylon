@@ -1,10 +1,10 @@
 import com.intellij.codeInsight.lookup {
     LookupElement
 }
-import com.redhat.ceylon.ide.common.completion {
+import org.eclipse.ceylon.ide.common.completion {
     FunctionCompletionProposal
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Declaration
 }
 

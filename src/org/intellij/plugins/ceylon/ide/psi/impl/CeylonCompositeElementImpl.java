@@ -4,7 +4,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProviders;
-import com.redhat.ceylon.compiler.typechecker.tree.Node;
+import org.eclipse.ceylon.compiler.typechecker.tree.Node;
 import org.intellij.plugins.ceylon.ide.psi.CeylonCompositeElement;
 
 public class CeylonCompositeElementImpl extends ASTWrapperPsiElement implements CeylonCompositeElement {

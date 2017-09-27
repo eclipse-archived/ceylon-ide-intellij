@@ -3,7 +3,7 @@ package org.intellij.plugins.ceylon.ide;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
-import com.redhat.ceylon.compiler.typechecker.TypeChecker;
+import org.eclipse.ceylon.compiler.typechecker.TypeChecker;
 import org.intellij.plugins.ceylon.ide.psi.CeylonFile;
 import org.intellij.plugins.ceylon.ide.psi.CeylonLocalAnalyzer;
 import org.intellij.plugins.ceylon.ide.facet.CeylonFacet;

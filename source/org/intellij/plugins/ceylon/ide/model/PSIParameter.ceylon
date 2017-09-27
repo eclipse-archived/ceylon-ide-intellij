@@ -1,7 +1,7 @@
 import com.intellij.psi {
     PsiParameter
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     VariableMirror
 }
 import org.intellij.plugins.ceylon.ide.model {

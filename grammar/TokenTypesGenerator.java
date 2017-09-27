@@ -1,4 +1,4 @@
-import com.redhat.ceylon.compiler.typechecker.parser.CeylonLexer;
+import org.eclipse.ceylon.compiler.typechecker.parser.CeylonLexer;
 
 import java.io.File;
 import java.io.FileOutputStream;

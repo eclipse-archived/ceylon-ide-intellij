@@ -31,22 +31,22 @@ import com.intellij.psi.util {
         getContextOfType
     }
 }
-import com.redhat.ceylon.ide.common.model.mirror {
+import org.eclipse.ceylon.ide.common.model.mirror {
     IdeClassMirror
 }
-import com.redhat.ceylon.model.loader {
+import org.eclipse.ceylon.model.loader {
     AbstractModelLoader {
         getCacheKeyByModule
     }
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     ClassMirror,
     TypeParameterMirror,
     FieldMirror,
     TypeMirror,
     MethodMirror
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Module
 }
 

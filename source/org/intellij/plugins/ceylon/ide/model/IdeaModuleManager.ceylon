@@ -11,10 +11,10 @@ import com.intellij.openapi.roots {
 import com.intellij.openapi.vfs {
     VirtualFile
 }
-import com.redhat.ceylon.cmr.api {
+import org.eclipse.ceylon.cmr.api {
     RepositoryManager
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     IdeModuleManager,
     BaseIdeModuleManager,
     BaseIdeModuleSourceMapper,
@@ -22,10 +22,10 @@ import com.redhat.ceylon.ide.common.model {
     BaseCeylonProject,
     CeylonProjects
 }
-import com.redhat.ceylon.model.cmr {
+import org.eclipse.ceylon.model.cmr {
     JDKUtils
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Modules,
     CeylonModule=Module
 }

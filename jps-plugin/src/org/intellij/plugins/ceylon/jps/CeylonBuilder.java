@@ -5,11 +5,11 @@ import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.PathUtil;
 import com.intellij.util.containers.ContainerUtil;
-import com.redhat.ceylon.common.config.CeylonConfig;
-import com.redhat.ceylon.common.config.CeylonConfigFinder;
-import com.redhat.ceylon.common.config.DefaultToolOptions;
-import com.redhat.ceylon.compiler.java.runtime.tools.*;
-import com.redhat.ceylon.compiler.java.runtime.tools.Compiler;
+import org.eclipse.ceylon.common.config.CeylonConfig;
+import org.eclipse.ceylon.common.config.CeylonConfigFinder;
+import org.eclipse.ceylon.common.config.DefaultToolOptions;
+import org.eclipse.ceylon.compiler.java.runtime.tools.*;
+import org.eclipse.ceylon.compiler.java.runtime.tools.Compiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
@@ -31,7 +31,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static com.redhat.ceylon.common.tools.ModuleWildcardsHelper.expandWildcards;
+import static org.eclipse.ceylon.common.tools.ModuleWildcardsHelper.expandWildcards;
 import static java.nio.file.Files.readAllLines;
 import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isCompileJavaIncrementally;
 import static org.jetbrains.jps.builders.java.JavaBuilderUtil.isForcedRecompilationAllJavaModules;
@@ -308,8 +308,8 @@ class CeylonBuilder extends ModuleLevelBuilder {
                     getSourceRoots(chunk, config),
                     Collections.singletonList("*"),
                     (backend == Backend.Java)
-                            ? com.redhat.ceylon.common.Backend.Java
-                            : com.redhat.ceylon.common.Backend.JavaScript
+                            ? org.eclipse.ceylon.common.Backend.Java
+                            : org.eclipse.ceylon.common.Backend.JavaScript
             ));
             if (defaultModulePresent(chunk, config)) {
                 moduleNames.add("default");

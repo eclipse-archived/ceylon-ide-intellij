@@ -1,4 +1,4 @@
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     ModelServices,
     PlatformServices,
     VfsServices,
@@ -6,10 +6,10 @@ import com.redhat.ceylon.ide.common.platform {
     NoopLinkedMode,
     JavaModelServices
 }
-import com.redhat.ceylon.ide.common.util {
+import org.eclipse.ceylon.ide.common.util {
     unsafeCast
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Unit
 }
 

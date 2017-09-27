@@ -34,11 +34,11 @@ import com.intellij.openapi.util.io {
         processFilesRecursively
     }
 }
-import com.redhat.ceylon.common.config {
+import org.eclipse.ceylon.common.config {
     CeylonConfigFinder,
     DefaultToolOptions
 }
-import com.redhat.ceylon.compiler.typechecker.parser {
+import org.eclipse.ceylon.compiler.typechecker.parser {
     CeylonLexer,
     CeylonParser
 }

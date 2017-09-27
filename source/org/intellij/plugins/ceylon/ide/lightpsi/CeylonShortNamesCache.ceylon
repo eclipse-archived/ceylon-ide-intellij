@@ -20,10 +20,10 @@ import com.intellij.util {
 import com.intellij.util.containers {
     HashSet
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     CeylonUnit
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     ClassOrInterface,
     Value,
     Declaration,

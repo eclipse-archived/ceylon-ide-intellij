@@ -7,11 +7,11 @@ import com.intellij.openapi.progress {
 import com.intellij.openapi.project {
     IndexNotReadyException
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     Status,
     IdeUtils
 }
-import com.redhat.ceylon.model.loader {
+import org.eclipse.ceylon.model.loader {
     ModelResolutionException
 }
 

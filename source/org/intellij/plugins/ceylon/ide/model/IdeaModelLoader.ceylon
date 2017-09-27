@@ -49,23 +49,23 @@ import com.intellij.psi.search {
 import com.intellij.util.indexing {
     UnindexedFilesUpdater
 }
-import com.redhat.ceylon.ide.common.model {
+import org.eclipse.ceylon.ide.common.model {
     IdeModelLoader,
     BaseIdeModule
 }
-import com.redhat.ceylon.ide.common.platform {
+import org.eclipse.ceylon.ide.common.platform {
     Status
 }
-import com.redhat.ceylon.model.cmr {
+import org.eclipse.ceylon.model.cmr {
     ArtifactResult
 }
-import com.redhat.ceylon.model.loader.mirror {
+import org.eclipse.ceylon.model.loader.mirror {
     ClassMirror,
     MethodMirror,
     FunctionalInterfaceType,
     TypeMirror
 }
-import com.redhat.ceylon.model.typechecker.model {
+import org.eclipse.ceylon.model.typechecker.model {
     Modules
 }
 
@@ -90,7 +90,7 @@ import org.intellij.plugins.ceylon.ide.platform {
 import com.intellij.psi.search.searches {
     SuperMethodsSearch
 }
-import com.redhat.ceylon.model.loader {
+import org.eclipse.ceylon.model.loader {
     AbstractModelLoader
 }
 import com.intellij.psi.util {
