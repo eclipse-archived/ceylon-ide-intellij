@@ -1,4 +1,4 @@
-package org.eclipse.ceylon.jps;
+package org.eclipse.ceylon.ide.intellij.jps;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.JpsElement;

@@ -1,4 +1,4 @@
-package org.eclipse.ceylon.jps;
+package org.eclipse.ceylon.ide.intellij.jps;
 
 import java.io.IOException;
 import java.io.InputStream;
