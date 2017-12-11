@@ -1,0 +1,6 @@
+if (is String obj) {
+    print(obj);
+}
+else {
+    assert (false);
+}

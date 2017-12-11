@@ -1,0 +1,9 @@
+
+[project]
+compile-jvm=true
+compile-js=false
+system-repository=
+source-attachments=.ceylon/attachments.properties
+
+[converter]
+use-values=true

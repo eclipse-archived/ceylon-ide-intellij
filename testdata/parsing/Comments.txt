@@ -1,0 +1,6 @@
+FILE
+  PsiComment(LINE_COMMENT)('// foo\n')
+  PsiComment(LINE_COMMENT)('// bar\n')
+  PsiComment(MULTI_COMMENT)('/* multi line\n  comment\n  */')
+  COMPILATION_UNIT
+    <empty list>

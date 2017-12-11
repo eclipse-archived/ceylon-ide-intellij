@@ -1,0 +1,4 @@
+class Clz {
+    shared new (String a) {
+    }
+}

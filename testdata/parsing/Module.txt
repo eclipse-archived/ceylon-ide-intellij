@@ -1,0 +1,33 @@
+FILE
+  COMPILATION_UNIT
+    COMPILER_ANNOTATION
+      PsiElement(COMPILER_ANNOTATION)('@')
+      IDENTIFIER
+        PsiElement(LIDENTIFIER)('error')
+    MISSING_DECLARATION
+      ANNOTATION_LIST
+        ANNOTATION
+          IDENTIFIER
+            PsiElement(LIDENTIFIER)('doc')
+          PsiErrorElement:incorrect syntax: no viable alternative at token '"Test for illegal top level module"'
+            <empty list>
+      PsiElement(STRING_LITERAL)('"Test for illegal top level module"')
+    MISSING_DECLARATION
+      ANNOTATION_LIST
+        ANNOTATION
+          IDENTIFIER
+            PsiElement(LIDENTIFIER)('license')
+          PsiErrorElement:incorrect syntax: no viable alternative at token '"http://www.apache.org/licenses/LICENSE-2.0.html"'
+            <empty list>
+      PsiElement(STRING_LITERAL)('"http://www.apache.org/licenses/LICENSE-2.0.html"')
+    MODULE_DESCRIPTOR
+      ANNOTATION_LIST
+        <empty list>
+      PsiElement(MODULE)('module')
+      IMPORT_PATH
+        IDENTIFIER
+          PsiElement(LIDENTIFIER)('default')
+      PsiElement(CHAR_LITERAL)(''0.2'')
+      IMPORT_MODULE_LIST
+        PsiElement(LBRACE)('{')
+        PsiElement(RBRACE)('}')

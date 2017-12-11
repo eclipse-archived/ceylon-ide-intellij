@@ -1,0 +1,11 @@
+void func() {
+    value result = if (true) then "a" else "b";
+
+    String s;
+    if (1>2) {
+        s = "bigger";
+    }
+    else {
+        s = "smaller";
+    }
+}

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PLUGIN_MODULE" version="4">
+  <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/resources/META-INF/plugin.xml" manifest="file://$MODULE_DIR$/resources/META-INF/plugin.xml" />
+  <component name="FacetManager">
+    <facet type="ceylon" name="Ceylon">
+      <configuration>
+        <option name="compileForJvm" value="true" />
+        <option name="compileToJs" value="false" />
+        <option name="systemRepository" value="" />
+        Do not edit, modify .config/ide-config instead
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/testdata" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/source" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gensrc" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/ant-build" />
+      <excludeFolder url="file://$MODULE_DIR$/modules" />
+    </content>
+    <content url="file://$CEYLON_DIST$">
+      <sourceFolder url="file://$CEYLON_DIST$" type="java-resource" relativeOutputPath="embeddedDist" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="jps-plugin" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.collection/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.file/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.formatter/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.interop.java/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.language/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: ceylon.tool.converter.java2ceylon/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.github.rjeschke.txtmark/0.13" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.google.guava:guava/19.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.annotations/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.asm/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.extensions/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.idea/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.openapi/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij.util/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: com.intellij:forms_rt/7.0.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.cli/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.common/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.compiler.java/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.compiler.js/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.ide.common/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.langtools.classfile/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.model/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.module-resolver/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.tools/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.eclipse.ceylon.typechecker/1.3.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: commons-lang:commons-lang/2.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: jdk.tools/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: net.lingala.zip4j/1.3.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.antlr.antlr4-runtime-osgi/4.5.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.antlr.runtime/3.5.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.intellij.groovy/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.intellij.maven/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.jdom/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.jetbrains.plugins.gradle/current" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Ceylon: org.jgrapht.core/0.9.1" level="project" />
+  </component>
+</module>

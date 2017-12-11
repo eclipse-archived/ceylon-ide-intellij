@@ -1,0 +1,9 @@
+import java.lang {
+    System {
+        currentTimeMillis
+    }
+}
+
+shared void run() {
+    print(currentTimeMillis());
+}

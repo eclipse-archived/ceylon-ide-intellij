@@ -1,0 +1,12 @@
+if (cond1)
+    if (cond2) {
+        print("true");
+    }
+}
+
+if (cond1) {
+} else {
+    if (cond2) {
+
+    }
+}

@@ -1,0 +1,6 @@
+class Hello {
+    String who;
+    shared new (String who) {
+        this.who = who;
+    }
+}

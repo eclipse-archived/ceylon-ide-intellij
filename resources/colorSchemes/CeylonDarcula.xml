@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<list>
+    <option name="CEYLON_KEYWORD">
+        <value>
+            <option name="FOREGROUND" value="33BBBB"/>
+        </value>
+    </option>
+    <option name="CEYLON_IDENTIFIER">
+        <value>
+            <option name="FOREGROUND" value="698EE0"/>
+        </value>
+    </option>
+    <option name="CEYLON_MEMBER">
+        <value>
+            <option name="FOREGROUND" value="1B99CC"/>
+        </value>
+    </option>
+    <option name="CEYLON_TYPE">
+        <value>
+            <option name="FOREGROUND" value="4FBB38"/>
+        </value>
+    </option>
+    <option name="CEYLON_ANNOTATION">
+        <value>
+            <option name="FOREGROUND" value="A0B0C0"/>
+        </value>
+    </option>
+    <option name="CEYLON_ANNOTATION_STRING">
+        <value>
+            <option name="FOREGROUND" value="808080"/>
+            <option name="FONT_TYPE" value="2"/>
+        </value>
+    </option>
+    <option name="CEYLON_PACKAGE">
+        <value>
+            <option name="FONT_TYPE" value="2"/>
+        </value>
+    </option>
+    <option name="CEYLON_STRING">
+        <value>
+            <option name="FOREGROUND" value="50875C"/>
+        </value>
+    </option>
+    <option name="CEYLON_CHARACTER">
+        <value>
+            <option name="FOREGROUND" value="50875C"/>
+        </value>
+    </option>
+</list>

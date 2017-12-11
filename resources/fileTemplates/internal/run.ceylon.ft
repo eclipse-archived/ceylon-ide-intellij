@@ -1,0 +1,5 @@
+"Run the module `${MODULE_NAME}`."
+
+shared void ${FUN_NAME}() {
+
+}

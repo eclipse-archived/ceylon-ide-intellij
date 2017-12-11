@@ -1,0 +1,26 @@
+FILE
+  PsiComment(LINE_COMMENT)('// This is an examaple for https://github.com/ceylon/ceylon-ide-intellij/issues/2 .\n')
+  COMPILATION_UNIT
+    Class Foo
+      ANNOTATION_LIST
+        <empty list>
+      Class Foo
+        PsiElement(CLASS_DEFINITION)('class')
+        IDENTIFIER
+          PsiElement(UIDENTIFIER)('Foo')
+        PARAMETER_LIST
+          PsiElement(LPAREN)('(')
+          PsiElement(RPAREN)(')')
+        CLASS_BODY
+          PsiElement(LBRACE)('{')
+          PsiElement(RBRACE)('}')
+    PsiElement(RBRACE)('}')
+    PsiErrorElement:incorrect syntax: mismatched token 'void' expecting EOF
+      <empty list>
+    MISSING_DECLARATION
+      ANNOTATION_LIST
+        ANNOTATION
+          IDENTIFIER
+            PsiElement(LIDENTIFIER)('void')
+          PsiErrorElement:incorrect syntax: no viable alternative at token end of file
+            <empty list>

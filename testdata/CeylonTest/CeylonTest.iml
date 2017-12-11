@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Ceylon libs">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.ceylon/cache/ceylon/math/0.4/ceylon.math-0.4.car!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ceylon.language-1.1.0.car!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar:///usr/local/Cellar/ceylon/1.0.0/libexec/repo/ceylon/language/1.0.0/ceylon.language-1.0.0.src!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>
+

@@ -1,0 +1,8 @@
+String func(Boolean cond) {
+     switch (cond)
+     case (true) {
+         return "true";
+     } case (false) {
+         return "false";
+     }
+}

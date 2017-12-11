@@ -1,0 +1,3 @@
+"".split { function splitting(Character ch) {
+    return ch.equals(' ');
+} };

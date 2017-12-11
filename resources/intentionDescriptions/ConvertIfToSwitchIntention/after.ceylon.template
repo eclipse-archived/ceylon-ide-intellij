@@ -1,0 +1,10 @@
+void func(Boolean cond) {
+     String result;
+
+     switch (cond)
+     case (true) {
+         result = "true";
+     } else {
+         result = "false";
+     }
+}

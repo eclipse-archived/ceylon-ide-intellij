@@ -1,0 +1,2 @@
+void fun(Entry<String,Iterable<Integer,Nothing> arg) {
+}

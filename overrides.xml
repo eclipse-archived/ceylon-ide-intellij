@@ -1,0 +1,57 @@
+<overrides xmlns="http://www.ceylon-lang.org/xsd/overrides">
+    <module module="com.intellij.openapi">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+        <add module="com.intellij.extensions" version="current" shared="true"/>
+        <add module="com.intellij.annotations" version="current" shared="true"/>
+        <add module="com.intellij.util" version="current" shared="true"/>
+        <add module="org.jdom" version="current"/>
+    </module>
+
+    <module module="com.intellij.extensions">
+        <filter>
+            <include path="com/intellij/openapi/extensions/*"/>
+            <include path="com/intellij/openapi/extensions/impl/*"/>
+            <exclude path="com/intellij/openapi/*"/>
+        </filter>
+    </module>
+
+    <module module="com.intellij.idea">
+        <add module="com.intellij.extensions" version="current" shared="false"/>
+        <add module="com.intellij.annotations" version="current" shared="false"/>
+        <add module="com.intellij.util" version="current" shared="false"/>
+        <add module="com.intellij.openapi" version="current" shared="false"/>
+        <add module="com.intellij.asm" version="current" shared="true"/>
+        <add module="org.jdom" version="current"/>
+        <add module="jdk.tools" version="current"/>
+        <!--<filter>-->
+            <!--<exclude path="com/intellij/util/containers/*"/>-->
+            <!--<exclude path="com/intellij/codeInsight/highlighting/*"/>-->
+            <!--<exclude path="com/intellij/openapi/editor/*"/>-->
+            <!--<include path="com/intellij/openapi/progress/util/*"/>-->
+            <!--<exclude path="com/intellij/openapi/progress/*"/>-->
+            <!--<include path="com/intellij/psi/text/*"/>-->
+            <!--<include path="com/intellij/psi/impl/*"/>-->
+            <!--<exclude path="com/intellij/psi/*"/>-->
+            <!--<exclude path="com/intellij/ui/*"/>-->
+        <!--</filter>-->
+    </module>
+
+    <module module="org.intellij.groovy">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+        <add module="com.intellij.openapi" version="current" shared="false"/>
+    </module>
+
+    <module module="org.intellij.maven">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+        <add module="com.intellij.openapi" version="current" shared="false"/>
+        <add module="org.jdom" version="current"/>
+    </module>
+
+    <module module="com.intellij.util">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+    </module>
+
+    <module module="org.jetbrains.plugins.gradle">
+        <add module="com.intellij.idea" version="current" shared="false"/>
+    </module>
+</overrides>

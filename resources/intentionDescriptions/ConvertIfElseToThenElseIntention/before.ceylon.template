@@ -1,0 +1,14 @@
+void func(Boolean cond) {
+    String result1;
+    if (cond) {
+        result1 = "true";
+    } else {
+        result1 = "false";
+    }
+    String? result2;
+    if (cond) {
+        result2 = "true";
+    } else {
+        result2 = null;
+    }
+}

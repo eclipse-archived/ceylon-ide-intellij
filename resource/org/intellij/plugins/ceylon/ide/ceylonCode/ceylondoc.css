@@ -1,0 +1,39 @@
+html {
+    font-family: '.SF NS Text',sans-serif;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: normal;
+    background-color: #ecebec;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, table, td, caption, th, ul, ol, dl, li, dd, dt {
+    font-size: 1em;
+}
+
+pre, tt, code {
+    font-family: 'Monaco', monospace;
+    font-size: 100%;
+}
+
+body {
+    padding: 5px;
+}
+
+p {
+    margin: 4px 0;
+}
+
+div {
+    margin: 0;
+}
+
+.paragraph {
+    margin-top: 10px;
+}
+
+a:link	     { color: #0000FF; }
+a:hover	     { color: #000080; }
+a:visited    { text-decoration: underline; }
+a.header:link    { text-decoration: none; color: #000000 }
+a.header:visited { text-decoration: none; color: #000000 }
+a.header:hover   { text-decoration: underline; color: #000080; }
